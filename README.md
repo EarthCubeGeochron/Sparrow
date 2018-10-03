@@ -9,10 +9,6 @@ be tailored to the needs of individual analytical labs that manage a wide
 variety of data. Currently, we are testing the software with Ar and detrital
 zircon geochronology data.
 
-Goals:
-- Clear, concise, and extensible schema
-- Minimal code footprint
-
 ## Modes of access
 
 When data leaves an analytical lab, it is integrated into publications
@@ -38,9 +34,10 @@ command line interface will allow the lab to:
 - Upload new and legacy data using customized scripts
 - Apply new corrections without breaking
   links to published versions or raw data
+- Run global checks for data integrity
 - Back up the database
 
-A web frontend will allow the public to
+A web frontend will allow users outside the lab to
 
 - Access data directly from the lab through an API for meta-analysis
 - Browse a snapshot of the lab's publicly available data, possibly
@@ -58,24 +55,30 @@ management pipelines through simple import scripts. Generally,
 these import scripts will be run on an in-lab machine with access
 to the server. Data collection, storage, and analysis tools
 such as [`PyChron`](https://github.com/NMGRL/PyChron)
-sit immediately prior to this system in a typical lab's data lifecycle.
+sit immediately prior to this system in a typical lab's data production pipeline.
 
 ## Design
 
 We want this to be software that can be used by many labs, so a
 strong and flexible design is crucial. We envision an
 extensible core with well-documented interfaces for pluggable
-components.
+components. Key goals from a development perspective will
+be a clear, concise, **well-documented** and extensible schema,
+and a reasonably small and stable code footprint for the
+core functionality, with clear "hooks" for lab specific
+functionality.
+
+Currently, we envision a technology stack consisting of
 
 - Python-based backend (v3)
 - `sqlalchemy` for database access
 - `Flask` for web-application development
 - `click` for command line
 - PostgreSQL as the database backend (optionally configurable to other
-  databases)
+  databases) with a configurable and extensible schema
 - Managed with `git` with separate branches for analytical
   types and individual labs.
 - Code and issues tracked on Github.
-- Packaged for a virtualized servers, and potentially
+- Software packaged for virtualized servers, and potentially
   for lightweight, containerized (e.g. Docker) instances.
 
