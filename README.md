@@ -57,7 +57,7 @@ It will be able to accept data from a variety of data
 management pipelines through simple import scripts. Generally,
 these import scripts will be run on an in-lab machine with access
 to the server. Data collection, storage, and analysis tools
-such as [`PyChron`](https://github.com/NMGRL/PyChron),
+such as [`PyChron`](https://github.com/NMGRL/PyChron)
 sit immediately prior to this system in a typical lab's data lifecycle.
 
 ## Design
@@ -76,4 +76,6 @@ components.
 - Managed with `git` with separate branches for analytical
   types and individual labs.
 - Code and issues tracked on Github.
+- Packaged for a virtualized servers, and potentially
+  for lightweight, containerized (e.g. Docker) instances.
 
