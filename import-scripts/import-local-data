@@ -1,0 +1,31 @@
+#!/usr/bin/env python -W ignore
+"""
+Import script to load detrital zircon data for the Naukluft Nappe Complex, Namibia
+directly from the local project-specific PostgreSQL database.
+"""
+
+from sqlalchemy import create_engine
+from labdata.util import run_query
+
+
+
+dest = create_engine("postgresql:///earthcube_labdata")
+
+def port_table(sourcedb, table_name):
+    df = run_query(sourcedb, "SELECT * FROM "+table_name)
+    df.to_sql(table_name, dest, if_exists='replace')
+
+
+source = create_engine("postgresql:///Naukluft")
+port_table(source, 'detrital_zircon')
+
+source = create_engine("postgresql:///xenoliths_flask")
+port_table(source, 'probe_datum')
+port_table(source, 'probe_measurement')
+port_table(source, 'probe_session')
+
+port_table(source, 'sims_datum')
+port_table(source, 'sims_measurement')
+
+
+
