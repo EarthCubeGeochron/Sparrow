@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+basedir="$LABDATA_PATH"
+cd $basedir
+
+pip install -e .
+bin/create-database

@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+dbname="earthcube_labdata"
+basedir="${0:h:h}"
+sqldir="$basedir/sql"
+
+createdb $dbname
+cat "$sqldir/setup-database.sql" | psql $dbname
+
