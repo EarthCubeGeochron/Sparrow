@@ -4,4 +4,6 @@ basedir="$LABDATA_PATH"
 cd $basedir
 
 pip install -e .
+pip install -e deps/sadisplay
+
 bin/create-database

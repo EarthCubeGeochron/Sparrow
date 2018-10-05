@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+
+output="$LABDATA_PATH/output"
+mkdir -p "$output"
+
+graph="$output/erd.dot"
+sadisplay -u postgresql:///earthcube_labdata \
+  -r dot -e spatial_ref_sys > "$graph"
+cat "$graph" | dot -Tpdf > "$output/entity-relationship-diagram.pdf"
+
