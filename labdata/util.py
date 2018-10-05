@@ -1,4 +1,6 @@
 from pandas import read_sql
+from click import secho
+from sqlalchemy.exc import ProgrammingError
 
 def run_query(db, filename_or_query, **kwargs):
     """
@@ -16,4 +18,18 @@ def run_query(db, filename_or_query, **kwargs):
             sql = f.read()
 
     return read_sql(sql,db,**kwargs)
+
+def run_sql_file(db, sql_file):
+    sql = open(sql_file).read()
+    queries = sql.split(';')
+    conn = db.connect()
+    for q in queries:
+        try:
+            sql = q.strip()
+            conn.execute(sql)
+            secho(sql, dim=True)
+        except:
+            secho(sql, fg='red', dim=True)
+    conn.close()
+
 
