@@ -3,6 +3,10 @@ DROP TABLE
   project_researcher, sample_analysis, sample
   CASCADE;
 
+/*
+A minimal schema
+*/
+
 CREATE TABLE researcher (
   id text PRIMARY KEY,
   name text NOT NULL,
@@ -48,6 +52,8 @@ CREATE TABLE analysis_session (
   sample_id text REFERENCES sample(id),
   date timestamp
 );
+
+-- Single analyses
 
 CREATE TABLE analysis (
   id serial PRIMARY KEY,
