@@ -11,9 +11,8 @@ INSERT INTO researcher (id, name, orcid) VALUES
 ( 'davenquinn', 'Daven P. Quinn', '0000-0003-1895-3742');
 
 INSERT INTO publication (title, doi) VALUES
-( 'Late Cretaceous construction of the mantle lithosphere
-   beneath the central California coast revealed
-   by Crystal Knob xenoliths', '10.1029/2017GC007260');
+( 'Late Cretaceous construction of the mantle lithosphere beneath the central California coast revealed by Crystal Knob xenoliths',
+  '10.1029/2017GC007260');
 
 INSERT INTO project_researcher (project_id, researcher_id) VALUES
 ( 'crystal-knob', 'davenquinn');

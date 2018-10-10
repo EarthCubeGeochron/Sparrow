@@ -43,9 +43,27 @@ CREATE TABLE sample (
   location geometry
 );
 
-CREATE TABLE sample_analysis (
+CREATE TABLE analysis_session (
   id serial PRIMARY KEY,
-  sample_id text REFERENCES sample(id)
+  sample_id text REFERENCES sample(id),
+  date timestamp
 );
 
+CREATE TABLE analysis (
+  id serial PRIMARY KEY,
+  session_id integer REFERENCES analysis_session(id)
+);
 
+CREATE TABLE datum_type (
+  id text PRIMARY KEY,
+  description text
+);
+
+CREATE TABLE datum (
+  id serial PRIMARY KEY,
+  analysis integer REFERENCES analysis(id),
+  type text REFERENCES datum_type(id),
+  value numeric NOT NULL,
+  error numeric,
+  computed boolean DEFAULT false
+);
