@@ -1,6 +1,8 @@
 DROP TABLE
   researcher, publication, project, project_publication,
-  project_researcher, sample_analysis, sample
+  project_researcher, analysis, analysis_session,
+  sample, technique, instrument,
+  datum, datum_type
   CASCADE;
 
 /*
@@ -39,10 +41,29 @@ CREATE TABLE project_publication (
   PRIMARY KEY (project_id, publication_id)
 );
 
+-- Descriptors for types of measurements/techniques
+
+CREATE TABLE instrument (
+  id text PRIMARY KEY,
+  description text
+);
+
+CREATE TABLE technique (
+  id text PRIMARY KEY,
+  description text
+);
+
+CREATE TABLE datum_type (
+  id text PRIMARY KEY,
+  description text,
+  unit text
+);
+
 -- Samples
 
 CREATE TABLE sample (
   id text PRIMARY KEY,
+  igsn text UNIQUE,
   project_id text REFERENCES project(id),
   location geometry
 );
@@ -50,13 +71,9 @@ CREATE TABLE sample (
 CREATE TABLE analysis_session (
   id serial PRIMARY KEY,
   sample_id text REFERENCES sample(id),
-  date timestamp
-);
-
-CREATE TABLE datum_type (
-  id text PRIMARY KEY,
-  description text,
-  unit text
+  date timestamp,
+  instrument text REFERENCES instrument(id),
+  technique text REFERENCES technique(id)
 );
 
 /*
@@ -73,6 +90,5 @@ CREATE TABLE datum (
   analysis integer REFERENCES analysis(id),
   type text REFERENCES datum_type(id),
   value numeric NOT NULL,
-  error numeric,
-  computed boolean DEFAULT false
+  error numeric
 );
