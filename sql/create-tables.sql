@@ -53,16 +53,19 @@ CREATE TABLE analysis_session (
   date timestamp
 );
 
--- Single analyses
+CREATE TABLE datum_type (
+  id text PRIMARY KEY,
+  description text,
+  unit text
+);
 
+/*
+SINGLE ANALYSES
+These two tables will end up needing data-type specific columns
+*/
 CREATE TABLE analysis (
   id serial PRIMARY KEY,
   session_id integer REFERENCES analysis_session(id)
-);
-
-CREATE TABLE datum_type (
-  id text PRIMARY KEY,
-  description text
 );
 
 CREATE TABLE datum (
