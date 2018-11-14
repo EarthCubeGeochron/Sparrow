@@ -1,8 +1,16 @@
 DROP TABLE
-  researcher, publication, project, project_publication,
-  project_researcher, analysis, analysis_session,
-  sample, technique, instrument,
-  datum, datum_type
+  researcher,
+  publication,
+  project,
+  project_publication,
+  project_researcher,
+  analysis,
+  analysis_session,
+  sample,
+  technique,
+  instrument,
+  datum,
+  datum_type
   CASCADE;
 
 /*

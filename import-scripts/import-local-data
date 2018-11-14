@@ -6,9 +6,8 @@ directly from the local project-specific PostgreSQL database on `daven-quinn.loc
 
 from sqlalchemy import create_engine
 from labdata.util import run_query, run_sql_file
+import click
 from click import secho
-
-
 
 dest = create_engine("postgresql:///earthcube_labdata")
 
@@ -22,19 +21,29 @@ def port_table(sourcedb, table_name, query=None):
     except ValueError:
         secho("Table exists", fg="yellow")
 
+@click.command()
+@click.option("--port",is_flag=True,default=False)
+def cli(port=False):
+    """
+    Import data from local databases
+    """
+    if port:
+        source = create_engine("postgresql:///Naukluft")
+        port_table(source, 'detrital_zircon')
 
-source = create_engine("postgresql:///Naukluft")
-port_table(source, 'detrital_zircon')
+        source = create_engine("postgresql:///xenoliths_flask")
+        port_table(source, 'probe_datum')
+        port_table(source, 'probe_measurement', query='sql/get-probe-measurements.sql')
+        port_table(source, 'probe_session')
 
-source = create_engine("postgresql:///xenoliths_flask")
-port_table(source, 'probe_datum')
-port_table(source, 'probe_measurement', query='sql/get-probe-measurements.sql')
-port_table(source, 'probe_session')
+        port_table(source, 'sims_datum')
+        port_table(source, 'sims_measurement')
 
-port_table(source, 'sims_datum')
-port_table(source, 'sims_measurement')
+    # Run SQL to normalize all these tables
+    run_sql_file(dest, "sql/create-tables.sql")
 
-# Run SQL to normalize all these tables
-run_sql_file(dest, "sql/create-tables.sql")
-run_sql_file(dest, "sql/normalize-measurements.sql")
+    # Start inserting data
+    run_sql_file(dest, "sql/normalize-measurements.sql")
+
+cli()
 
