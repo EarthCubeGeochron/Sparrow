@@ -100,3 +100,30 @@ CREATE TABLE datum (
   value numeric NOT NULL,
   error numeric
 );
+
+/*
+Vocabularies
+Tables to integrate units, etc.
+from curated collections
+*/
+DROP SCHEMA vocabulary CASCADE;
+CREATE SCHEMA vocabulary;
+
+CREATE TABLE vocabulary.parameter (
+  id text PRIMARY KEY,
+  description text,
+  authority text
+);
+
+CREATE TABLE vocabulary.method (
+  id text PRIMARY KEY,
+  description text,
+  authority text
+);
+
+
+CREATE TABLE vocabulary.unit (
+  id text PRIMARY KEY,
+  authority text
+);
+

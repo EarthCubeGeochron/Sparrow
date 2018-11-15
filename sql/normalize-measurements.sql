@@ -39,3 +39,5 @@ SELECT DISTINCT ON (sample_id)
   sample_id,
   'crystal-knob'
 FROM s;
+
+INSERT INTO instrument (id
