@@ -38,8 +38,9 @@ def run_sql_file(db, sql_file):
             sql = q.strip()
             conn.execute(sql)
             pretty_print(sql, dim=True)
-        except:
-            pretty_print(sql, fg='red', dim=True)
+        except Exception as err:
+            pretty_print(sql, fg='red', dim=True, nl=False)
+            secho(err.message, fg='red')
     conn.close()
 
 

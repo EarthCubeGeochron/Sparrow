@@ -40,4 +40,7 @@ SELECT DISTINCT ON (sample_id)
   'crystal-knob'
 FROM s;
 
-INSERT INTO instrument (id
+INSERT INTO instrument (name, description) VALUES
+("IMS-7fGEO", "SIMS for rock geochemical analysis"),
+("Element2", "LA-ICP mass spectrometer"),
+("JEOL JXA-8200", "Electron probe microanalyzer");
