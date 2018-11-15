@@ -1,4 +1,4 @@
-# EarthCube Lab Data Manager
+# EarthCube Lab Data Interface
 
 This repository will soon hold software for managing the geochronology data
 created by an individual laboratory. This software has the goal of managing
@@ -8,6 +8,16 @@ The software is designed for flexibility and extensibility, so that it can
 be tailored to the needs of individual analytical labs that manage a wide
 variety of data. Currently, we are testing the software with Ar and detrital
 zircon geochronology data.
+
+This is both a software implementation and a specification of the default
+interface that the "Lab Data Interface" will expose.
+
+## Principles
+
+- Federated
+- Standardized basic schema
+- Standardized web-facing API
+- Flexible and extensible
 
 ## Modes of access
 
