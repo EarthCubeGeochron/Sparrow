@@ -2,6 +2,7 @@
 """
 Import some basic EarthChem vocabularies from
 http://www.earthchem.org/resources/vocabularies
+for data categorization.
 """
 
 import pandas as P

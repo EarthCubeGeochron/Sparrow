@@ -33,7 +33,8 @@ def cli(port=False):
 
         source = create_engine("postgresql:///xenoliths_flask")
         port_table(source, 'probe_datum')
-        port_table(source, 'probe_measurement', query='sql/get-probe-measurements.sql')
+        port_table(source, 'probe_measurement',
+                   query='sql/get-probe-measurements.sql')
         port_table(source, 'probe_session')
 
         port_table(source, 'sims_datum')

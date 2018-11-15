@@ -19,6 +19,16 @@ def run_query(db, filename_or_query, **kwargs):
 
     return read_sql(sql,db,**kwargs)
 
+def pretty_print(sql, **kwargs):
+    for line in sql.split("\n"):
+        for i in ["SELECT", "INSERT","UPDATE","CREATE", "DROP","DELETE"]:
+            if not line.startswith(i):
+                continue
+            start = line.split("(")[0].strip()
+            secho(start, **kwargs)
+            return
+
+
 def run_sql_file(db, sql_file):
     sql = open(sql_file).read()
     queries = sql.split(';')
@@ -27,9 +37,9 @@ def run_sql_file(db, sql_file):
         try:
             sql = q.strip()
             conn.execute(sql)
-            secho(sql, dim=True)
+            pretty_print(sql, dim=True)
         except:
-            secho(sql, fg='red', dim=True)
+            pretty_print(sql, fg='red', dim=True)
     conn.close()
 
 
