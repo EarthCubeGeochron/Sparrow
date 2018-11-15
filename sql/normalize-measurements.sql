@@ -41,6 +41,6 @@ SELECT DISTINCT ON (sample_id)
 FROM s;
 
 INSERT INTO instrument (name, description) VALUES
-("IMS-7fGEO", "SIMS for rock geochemical analysis"),
-("Element2", "LA-ICP mass spectrometer"),
-("JEOL JXA-8200", "Electron probe microanalyzer");
+('IMS-7fGEO', 'SIMS for rock geochemical analysis'),
+('Element2', 'LA-ICP mass spectrometer'),
+('JEOL JXA-8200', 'Electron probe microanalyzer');

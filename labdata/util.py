@@ -35,13 +35,15 @@ def run_sql_file(db, sql_file):
     queries = sql.split(';')
     conn = db.connect()
     for q in queries:
+        sql = q.strip()
+        if sql == '':
+            continue
         try:
-            sql = q.strip()
             conn.execute(sql)
             pretty_print(sql, dim=True)
         except (ProgrammingError,IntegrityError) as err:
-            pretty_print(sql, fg='red', dim=True, nl=False)
-            secho(" "+str(err.orig), fg='red')
+            pretty_print(sql, fg='red')
+            secho(str(err.orig), fg='red', dim=True)
 
     conn.close()
 

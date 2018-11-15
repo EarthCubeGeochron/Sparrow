@@ -1,4 +1,4 @@
-DROP TABLE
+DROP TABLE IF EXISTS
   researcher,
   publication,
   project,
@@ -78,7 +78,7 @@ CREATE TABLE project_publication (
 -- Descriptors for types of measurements/techniques
 
 CREATE TABLE instrument (
-  id serial PRIMARY KEY
+  id serial PRIMARY KEY,
   name text UNIQUE NOT NULL,
   description text
 );
@@ -105,9 +105,9 @@ CREATE TABLE analysis_session (
      closely spaced in time. */
   id serial PRIMARY KEY,
   sample_id text REFERENCES sample(id),
-  date timestamp with timezone NOT NULL,
-  end_date timestamp with timezone,
-  instrument text REFERENCES instrument(id),
+  date timestamptz NOT NULL,
+  end_date timestamptz,
+  instrument integer REFERENCES instrument(id),
   technique text REFERENCES vocabulary.method(id)
 );
 
@@ -120,13 +120,13 @@ CREATE TABLE analysis (
   -- Ex: different oxides measured on an EPMA are *data* in a single analysis
   id serial PRIMARY KEY,
   session_id integer REFERENCES analysis_session(id),
-  date timestamp with timezone
+  date timestamptz
 );
 
 CREATE TABLE datum (
   id serial PRIMARY KEY,
   analysis integer REFERENCES analysis(id),
-  type text REFERENCES datum_type(id),
+  type integer REFERENCES datum_type(id),
   value numeric NOT NULL,
   error numeric
 );
