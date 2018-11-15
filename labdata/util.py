@@ -1,6 +1,7 @@
 from pandas import read_sql
 from click import secho
-from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.exc import ProgrammingError, IntegrityError
+import psycopg2
 
 def run_query(db, filename_or_query, **kwargs):
     """
@@ -38,9 +39,10 @@ def run_sql_file(db, sql_file):
             sql = q.strip()
             conn.execute(sql)
             pretty_print(sql, dim=True)
-        except Exception as err:
+        except (ProgrammingError,IntegrityError) as err:
             pretty_print(sql, fg='red', dim=True, nl=False)
-            secho(err.message, fg='red')
+            secho(" "+str(err.orig), fg='red')
+
     conn.close()
 
 

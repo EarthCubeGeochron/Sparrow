@@ -85,8 +85,9 @@ CREATE TABLE instrument (
 
 CREATE TABLE datum_type (
   id serial PRIMARY KEY,
-  parameter text REFERENCES vocabulary.parameter,
-  unit text
+  parameter text REFERENCES vocabulary.parameter(id) NOT NULL,
+  unit text REFERENCES vocabulary.unit(id) NOT NULL,
+  error_unit text REFERENCES vocabulary.unit(id)
 );
 
 -- Samples
@@ -99,10 +100,13 @@ CREATE TABLE sample (
 );
 
 CREATE TABLE analysis_session (
+  /* Set of analyses on the same instrument
+     with the same technique, at the same or
+     closely spaced in time. */
   id serial PRIMARY KEY,
   sample_id text REFERENCES sample(id),
-  date timestamp NOT NULL,
-  end_date timestamp,
+  date timestamp with timezone NOT NULL,
+  end_date timestamp with timezone,
   instrument text REFERENCES instrument(id),
   technique text REFERENCES vocabulary.method(id)
 );
@@ -112,11 +116,11 @@ SINGLE ANALYSES
 These two tables will end up needing data-type specific columns
 */
 CREATE TABLE analysis (
-  -- Data measured together at one time on one instrument
-  -- Ex: different oxides measured on an EPMA
+  -- Set of data measured together at one time on one instrument
+  -- Ex: different oxides measured on an EPMA are *data* in a single analysis
   id serial PRIMARY KEY,
   session_id integer REFERENCES analysis_session(id),
-  date timestamp,
+  date timestamp with timezone
 );
 
 CREATE TABLE datum (

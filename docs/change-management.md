@@ -17,3 +17,4 @@ run in order, define a mapping from one state to another of the database.
 ## References
 
 - https://www.depesz.com/2010/08/22/versioning/
+- https://github.com/tk0miya/testing.postgresql
