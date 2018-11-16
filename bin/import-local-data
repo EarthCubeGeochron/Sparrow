@@ -8,6 +8,8 @@ from sqlalchemy import create_engine
 from labdata.util import run_query, run_sql_file
 import click
 from click import secho
+from periodictable import elements
+from pandas import DataFrame
 
 dest = create_engine("postgresql:///earthcube_labdata")
 
@@ -20,6 +22,21 @@ def port_table(sourcedb, table_name, query=None):
         df.to_sql(table_name, dest, schema='test_data')
     except ValueError:
         secho("Table exists", fg="yellow")
+
+
+def create_elements_table(*args, **kwargs):
+    def process_elements():
+        for el in list(elements)[1:]:
+            yield dict(
+                symbol=el.symbol,
+                mass=el.mass,
+                number=el.number,
+                name=el.name)
+    try:
+        df = DataFrame.from_records(process_elements(), index='number')
+        df.to_sql(*args,**kwargs)
+    except:
+        pass
 
 @click.command()
 @click.option("--port",is_flag=True,default=False)
@@ -42,6 +59,9 @@ def cli(port=False):
 
     # Run SQL to normalize all these tables
     run_sql_file(dest, "sql/create-tables.sql")
+
+    # Create temp table of elements as a helper
+    create_elements_table("element", dest, schema='vocabulary')
 
     # Start inserting data
     run_sql_file(dest, "sql/normalize-measurements.sql")
