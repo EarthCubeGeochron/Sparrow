@@ -87,7 +87,9 @@ CREATE TABLE datum_type (
   id serial PRIMARY KEY,
   parameter text REFERENCES vocabulary.parameter(id) NOT NULL,
   unit text REFERENCES vocabulary.unit(id) NOT NULL,
-  error_unit text REFERENCES vocabulary.unit(id)
+  error_unit text REFERENCES vocabulary.unit(id),
+  is_computed boolean, -- Can be rebuilt from data IN THE DATABASE
+  is_interpreted boolean -- Results from a data-reduction process
 );
 
 -- Samples
@@ -119,8 +121,13 @@ CREATE TABLE analysis (
   -- Set of data measured together at one time on one instrument
   -- Ex: different oxides measured on an EPMA are *data* in a single analysis
   id serial PRIMARY KEY,
-  session_id integer REFERENCES analysis_session(id),
-  date timestamptz
+  session_id integer REFERENCES analysis_session(id), -- optional
+  sample_id  integer REFERENCES sample(id),
+  session_index integer, -- captures ordering within a session
+  date timestamptz,
+  /* The analysis must be related to a sample
+     whether or not sessions are defined */
+  CHECK (session_id NOT NULL OR sample_id NOT NULL)
 );
 
 CREATE TABLE datum (
@@ -128,5 +135,6 @@ CREATE TABLE datum (
   analysis integer REFERENCES analysis(id),
   type integer REFERENCES datum_type(id),
   value numeric NOT NULL,
-  error numeric
+  error numeric,
+  is_bad boolean
 );
