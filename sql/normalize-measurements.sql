@@ -196,3 +196,4 @@ JOIN __insert_datum_type t
 ON CONFLICT DO NOTHING
 RETURNING *;
 
+DROP TABLE vocabulary.element;
