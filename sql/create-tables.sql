@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS
   project_publication,
   project_researcher,
   analysis,
-  analysis_session,
+  session,
   sample,
   technique,
   instrument,
@@ -101,7 +101,7 @@ CREATE TABLE sample (
   location geometry
 );
 
-CREATE TABLE analysis_session (
+CREATE TABLE session (
   /* Set of analyses on the same instrument
      with the same technique, at the same or
      closely spaced in time. */
@@ -121,13 +121,11 @@ CREATE TABLE analysis (
   -- Set of data measured together at one time on one instrument
   -- Ex: different oxides measured on an EPMA are *data* in a single analysis
   id serial PRIMARY KEY,
-  session_id integer REFERENCES analysis_session(id), -- optional
-  sample_id  integer REFERENCES sample(id),
+  session_id integer REFERENCES session(id) NOT NULL,
   session_index integer, -- captures ordering within a session
-  date timestamptz,
+  date timestamptz
   /* The analysis must be related to a sample
      whether or not sessions are defined */
-  CHECK (session_id NOT NULL OR sample_id NOT NULL)
 );
 
 CREATE TABLE datum (
