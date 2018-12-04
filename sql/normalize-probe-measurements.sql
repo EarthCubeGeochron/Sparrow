@@ -5,9 +5,7 @@ this info.
 */
 
 INSERT INTO vocabulary.error_metric (id, description)
-VALUES
-('%', 'Percent')
-ON CONFLICT DO NOTHING;
+VALUES ('percent', 'Percent') ON CONFLICT DO NOTHING;
 
 INSERT INTO vocabulary.material (id, description, type_of)
 VALUES ('sp', 'Spinel', 'mineral'),

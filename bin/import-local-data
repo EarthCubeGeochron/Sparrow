@@ -65,6 +65,7 @@ def cli(port=False):
 
     # Start inserting data
     run_sql_file(dest, "sql/normalize-measurements.sql")
+    run_sql_file(dest, "sql/normalize-probe-measurements.sql")
 
 cli()
 
