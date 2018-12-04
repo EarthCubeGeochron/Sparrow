@@ -5,7 +5,8 @@ this info.
 */
 
 INSERT INTO vocabulary.error_metric (id, description)
-VALUES ('percent', 'Percent') ON CONFLICT DO NOTHING;
+-- percent symbols are escaped with %%
+VALUES ('%%', 'Percent') ON CONFLICT DO NOTHING;
 
 INSERT INTO vocabulary.material (id, description, type_of)
 VALUES ('sp', 'Spinel', 'mineral'),
@@ -30,6 +31,14 @@ SELECT
 FROM test_data.probe_session
 ON CONFLICT DO NOTHING;
 
+INSERT INTO datum_type
+(parameter, unit, error_metric, is_computed, is_interpreted, description)
+VALUES
+('Mg#', '%%', '%%', true, true, 'Microprobe-measured Mg# (computed from modeled stoichiometry)'),
+('Cr#', '%%', '%%', true, true, 'Microprobe-measured Cr# (computed from modeled stoichiometry)');
+
+COMMIT;
+
 WITH measurement_data AS (
 SELECT
 	s.id session_id,
@@ -51,9 +60,12 @@ JOIN session s
  AND ps.date = s.date
  AND s.instrument = (SELECT id FROM instrument WHERE name='JEOL JXA-8200')
  AND s.technique = 'EMP'
- )
+),
+analyis_insert AS (
 INSERT INTO analysis (session_id, session_index, material)
 SELECT session_id, session_index, material
 FROM measurement_data
-ON CONFLICT (session_id, session_index) DO NOTHING;
+ON CONFLICT DO NOTHING
+)
+SELECT * FROM measurement_data;
 
