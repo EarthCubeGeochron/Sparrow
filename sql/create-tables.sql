@@ -157,9 +157,10 @@ CREATE TABLE analysis (
   session_id integer REFERENCES session(id) NOT NULL,
   session_index integer, -- captures ordering within a session
   date timestamptz,
-  material text REFERENCES vocabulary.material(id)
+  material text REFERENCES vocabulary.material(id),
   /* Not really sure that material is the best parameterization
      of this concept... */
+  UNIQUE (session_id, session_index)
 );
 
 CREATE TABLE datum (

@@ -39,7 +39,8 @@ VALUES
 ('basalt', 'Basalt', 'rock'),
 ('pyx', 'Pyroxene', 'mineral'),
 ('cpx', 'Clinopyroxene', 'pyx'),
-('opx', 'Orthopyroxene', 'pyx');
+('opx', 'Orthopyroxene', 'pyx'),
+('dunite-xeno','Dunite xenolith', 'xenolith');
 
 WITH s AS (
   SELECT sample_id FROM test_data.probe_session
@@ -49,9 +50,11 @@ WITH s AS (
 INSERT INTO sample (id, material, project_id)
 SELECT DISTINCT ON (sample_id)
   sample_id,
-  CASE WHEN sample_id = 'CK-2'
+  CASE WHEN sample_id = 'CK-1'
     THEN 'basalt'
-    ELSE 'sp-xeno'
+  WHEN sample_id IN ('CK-D1','CK-D2')
+    THEN 'dunite-xeno'
+  ELSE 'sp-xeno'
   END,
   'crystal-knob'
 FROM s;
@@ -88,6 +91,11 @@ VALUES
 ('std', 'Standard deviation')
 ON CONFLICT DO NOTHING;
 
+/* This chain of queries inserts SIMS data into the datum table, given the values
+   of data inserted into several other tables. For datasets not already
+   stored in PostgreSQL, most of the heavy lifting in this set of queries
+   would be accomplished in Python or another language.
+*/
 WITH a AS (
 SELECT
 	id orig_id,
