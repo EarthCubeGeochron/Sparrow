@@ -1,7 +1,10 @@
+import psycopg2
+import os
 from pandas import read_sql
 from click import secho
 from sqlalchemy.exc import ProgrammingError, IntegrityError
-import psycopg2
+from pathlib import Path
+from contextlib import contextmanager
 
 def run_query(db, filename_or_query, **kwargs):
     """
@@ -47,4 +50,13 @@ def run_sql_file(db, sql_file):
 
     conn.close()
 
-
+@contextmanager
+def working_directory(path):
+    """Changes working directory and returns to previous on exit."""
+    prev_cwd = Path.cwd()
+    print(path)
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(prev_cwd)

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+PROJECT_DIR="$(git rev-parse --show-toplevel)"
+
+cd "$PROJECT_DIR/import-pipelines/boise-state"
+
+
