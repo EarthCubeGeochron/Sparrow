@@ -1,8 +1,5 @@
 -- Set up project--publication links
 INSERT INTO project (id, title, description) VALUES
-( 'zebra-nappe',
-  'Zebra Nappe',
-  'Structural study of the southernmost nappe of the Naukluft Nappe Complex, Namibia' ),
 ( 'crystal-knob',
   'Crystal Knob',
   'Mantle xenoliths from Crystal Knob, California');
@@ -21,13 +18,6 @@ INSERT INTO project_publication (project_id, publication_id)
 SELECT 'crystal-knob', id
 FROM publication
 WHERE doi = '10.1029/2017GC007260';
-
--- Set up samples
-INSERT INTO sample (id, project_id)
-SELECT DISTINCT ON (sample)
-  sample,
-  'zebra-nappe'
-FROM test_data.detrital_zircon;
 
 -- Materials
 INSERT INTO vocabulary.material (id, description, type_of)
@@ -61,7 +51,6 @@ FROM s;
 
 INSERT INTO instrument (name, description) VALUES
 ('IMS-7fGEO', 'SIMS for rock geochemical analysis'),
-('Element2', 'LA-ICP mass spectrometer'),
 ('JEOL JXA-8200', 'Electron probe microanalyzer');
 
 COMMIT;

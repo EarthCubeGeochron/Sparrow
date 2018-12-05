@@ -1,3 +1,5 @@
+DROP SCHEMA method_data CASCADE;
+
 DROP TABLE IF EXISTS
   researcher,
   publication,
@@ -158,6 +160,7 @@ CREATE TABLE analysis (
   session_index integer, -- captures ordering within a session
   date timestamptz,
   material text REFERENCES vocabulary.material(id),
+  is_standard boolean,
   /* Not really sure that material is the best parameterization
      of this concept... */
   UNIQUE (session_id, session_index)
