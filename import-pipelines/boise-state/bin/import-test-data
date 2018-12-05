@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
+DBNAME="earthcube_labdata_boise_state"
 PROJECT_DIR="$(git rev-parse --show-toplevel)"
 
 cd "$PROJECT_DIR/import-pipelines/boise-state"
+
+createdb $DBNAME
+labdata init $DBNAME
 
 

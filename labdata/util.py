@@ -54,8 +54,7 @@ def run_sql_file(db, sql_file):
 def working_directory(path):
     """Changes working directory and returns to previous on exit."""
     prev_cwd = Path.cwd()
-    print(path)
-    os.chdir(path)
+    os.chdir(os.path.dirname(os.path.realpath(path)))
     try:
         yield
     finally:
