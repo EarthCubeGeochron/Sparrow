@@ -1,5 +1,12 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Remove weird failures from script file
-cat test-data/*_testoutput.xml \
-| sed 's/^"//g; s/>"$/>/g; s/>NONE"$/>/g'
+cat $1 \
+| sed 's/^"//g; s/>"$/>/g; s/>NONE"$/>/g; s/""""/""/g; s/>NONE$//g' \
+> $2
+
+#xmllint $2
+
+# There is also a problem where too many end tags for `sampleDateModels`
+# are printed, and too many `includedFractionsVector` tags as well...
+# we had to fix this data manually. `xmllint` helped with this

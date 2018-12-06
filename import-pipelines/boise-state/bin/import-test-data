@@ -13,3 +13,5 @@ else
 fi
 
 labdata init $DBNAME
+
+python import-test-data.py test-data/*.xml
