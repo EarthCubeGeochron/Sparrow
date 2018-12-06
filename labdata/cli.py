@@ -1,6 +1,8 @@
 import click
 from sqlalchemy import create_engine
-from labdata.util import run_sql_file, working_directory
+
+from .util import run_sql_file, working_directory
+from .app import app
 
 cli = click.Group()
 
@@ -14,3 +16,8 @@ def init_database(database):
     with working_directory(__file__):
         run_sql_file(db, "sql/setup-database.sql")
         run_sql_file(db, "sql/create-tables.sql")
+
+@cli.command(name='serve')
+@click.argument('database', type=str) # For testing
+def dev_server(database):
+    app.run(debug=True)
