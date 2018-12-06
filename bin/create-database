@@ -4,6 +4,11 @@ dbname="earthcube_labdata"
 basedir="${0:h:h}"
 sqldir="$basedir/sql"
 
-createdb $dbname
-cat "$sqldir/setup-database.sql" | psql $dbname
+createdb $dbname > /dev/null
+if [ $? -eq 0 ]; then
+  echo "Creating database \033[1$dbname\033[0"
+else
+  echo "Database \033[1$dbname\033[0 already exists"
+fi
 
+cat "$sqldir/setup-database.sql" | psql $dbname

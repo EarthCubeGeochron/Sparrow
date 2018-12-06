@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Remove weird failures from script file
+cat test-data/*_testoutput.xml \
+| sed 's/^"//g; s/>"$/>/g; s/>NONE"$/>/g'
