@@ -12,6 +12,6 @@ else
   echo -e "Database \033[1m"$DBNAME"\033[0m already exists"
 fi
 
-labdata init $DBNAME
+#labdata init $DBNAME
 
 python import-test-data.py test-data/*.xml

@@ -291,7 +291,7 @@
       <fractionID>z4</fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -784,7 +784,7 @@
       <fractionID>z5</fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -1277,7 +1277,7 @@
       <fractionID>z6</fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -1770,7 +1770,7 @@
       <fractionID>z7</fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -2263,7 +2263,7 @@
       <fractionID>z8</fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -2288,7 +2288,7 @@
         <minorVersionNumber>NONE</minorVersionNumber>
         <labName>Boise State IGL</labName>
         <dateCertified>41829.3394321759</dateCertified>
-        <reference>Stacey and Kramers, 1975</reference>"
+        <reference>Stacey and Kramers, 1975</reference>
         <comment></comment>
         <ratios>
           <ValueModel>
@@ -2756,7 +2756,7 @@
       <fractionID>z9</fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -3249,7 +3249,7 @@
       <fractionID>z10</fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -3742,7 +3742,7 @@
       <fractionID>z11</fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -4235,7 +4235,7 @@
       <fractionID>z12</fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -4728,7 +4728,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -5221,7 +5221,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -5714,7 +5714,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394321759</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -6207,7 +6207,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -6700,7 +6700,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -7193,7 +7193,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -7686,7 +7686,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -8179,7 +8179,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -8672,7 +8672,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -9165,7 +9165,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -9658,7 +9658,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -10151,7 +10151,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -10644,7 +10644,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -11137,7 +11137,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -11630,7 +11630,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -12123,7 +12123,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -12616,7 +12616,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -13109,7 +13109,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -13602,7 +13602,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -14095,7 +14095,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
@@ -14588,7 +14588,7 @@
       <fractionID></fractionID>
       <grainID></grainID>
       <zircon>TRUE</zircon>
-      <imageURL URL=""/>NONE"
+      <imageURL URL=""/>
       <timeStamp>41829.3394320602</timeStamp>
       <mineralName>zircon</mineralName>
       <settingType>NONE</settingType>
