@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
-from .util import run_sql_file
+from .util import run_sql_file, working_directory
 
 metadata = MetaData()
 
@@ -21,8 +21,8 @@ class Database:
     def initialize(self, drop=False):
         with working_directory(__file__):
             if drop:
-                db.exec_sql("sql/00-drop-tables.sql")
-            db.exec_sql("sql/01-setup-database.sql")
-            db.exec_sql("sql/02-create-tables.sql")
-            db.exec_sql("sql/03-create-views.sql")
-            db.exec_sql("sql/04-populate-vocabulary.sql")
+                self.exec_sql("sql/00-drop-tables.sql")
+            self.exec_sql("sql/01-setup-database.sql")
+            self.exec_sql("sql/02-create-tables.sql")
+            self.exec_sql("sql/03-create-views.sql")
+            self.exec_sql("sql/04-populate-vocabulary.sql")

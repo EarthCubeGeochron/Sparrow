@@ -1,7 +1,7 @@
 import click
 from sqlalchemy import create_engine
 
-from .util import run_sql_file, working_directory
+from .util import working_directory
 from .app import construct_app
 from .database import Database
 

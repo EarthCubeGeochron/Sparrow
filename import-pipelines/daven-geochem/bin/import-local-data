@@ -65,14 +65,15 @@ def cli(port=False):
         port_table(source, 'sims_datum')
         port_table(source, 'sims_measurement')
 
-    # Run SQL to normalize all these tables
-    run(["labdata", "init", "earthcube_labdata"])
+    # Run SQL to reset database
+    run(["labdata", "init", "--drop"])
 
     # Create temp table of elements as a helper
     create_elements_table("element", dest, schema='vocabulary')
 
     # Start inserting data
     with working_directory(base_dir):
+        run_sql_file(dest, "sql/create-schema.sql")
         run_sql_file(dest, "sql/normalize-sims-measurements.sql")
         run_sql_file(dest, "sql/normalize-probe-measurements.sql")
         run_sql_file(dest, "sql/normalize-dz-measurements.sql")

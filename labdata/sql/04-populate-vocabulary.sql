@@ -8,7 +8,7 @@ SELECT id, description, 'EarthChem'
 FROM earthchem_vocabulary.parameter
 ON CONFLICT DO NOTHING;
 
-INSERT INTO vocabulary.unit (id, description, authority)
-SELECT id, description, 'EarthChem'
+INSERT INTO vocabulary.unit (id, authority)
+SELECT id, 'EarthChem'
 FROM earthchem_vocabulary.unit
 ON CONFLICT DO NOTHING;

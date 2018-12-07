@@ -1,5 +1,6 @@
 import psycopg2
 import os
+from os import path
 from pandas import read_sql
 from click import secho
 from sqlalchemy.exc import ProgrammingError, IntegrityError
@@ -51,10 +52,13 @@ def run_sql_file(db, sql_file):
     conn.close()
 
 @contextmanager
-def working_directory(path):
+def working_directory(pathname):
     """Changes working directory and returns to previous on exit."""
     prev_cwd = Path.cwd()
-    os.chdir(os.path.dirname(os.path.realpath(path)))
+    fn = path.realpath(pathname)
+    if not path.isdir(fn):
+        fn = path.dirname(fn)
+    os.chdir(fn)
     try:
         yield
     finally:

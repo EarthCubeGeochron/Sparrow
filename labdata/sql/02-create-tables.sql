@@ -19,8 +19,6 @@ Vocabularies
 Tables to integrate units, etc.
 from curated collections
 */
---DROP SCHEMA vocabulary CASCADE;
-DROP TABLE vocabulary.material;
 CREATE SCHEMA vocabulary;
 
 CREATE TABLE vocabulary.parameter (
