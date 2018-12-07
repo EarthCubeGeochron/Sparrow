@@ -19,11 +19,8 @@ class APIv1(Api):
         super().__init__(self.blueprint)
 
     def build_route(self, tablename, **kwargs):
-        db = self.db
-        schema = kwargs.pop("schema", "public")
-        meta = MetaData(schema=schema)
-        table = Table(tablename, meta,
-            autoload=True, autoload_with=db.engine, **kwargs)
+        schema = kwargs.pop('schema', None)
+        table = self.db.reflect_table(tablename, schema=schema)
 
         def infer_primary_key():
             pk = table.primary_key
@@ -63,7 +60,7 @@ class APIv1(Api):
             def get(self):
                 args = parser.parse_args()
                 print(args)
-                q = db.session.query(table)
+                q = self.db.session.query(table)
 
                 for k,col in table.c.items():
                     val = args.pop(k, None)

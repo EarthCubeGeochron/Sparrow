@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+here=$(dirname "$(readlink -f "$0")")
+
+reposource="https://github.com/WiscArData"
+repository="NOB-Unknowns"
+local_repo="$PROJECT_DIR/.pychron-import/$repository"
+
+mkdir -p "$local_repo"
+cd "$local_repo"
+
+repo="$reposource/$repository.git"
+git clone $repo . 2&>/dev/null
+[ $? -ne 0 ] && echo -e "Repository \033[1m$repo\033[0m already cloned"
+git pull
+
+for fn in */ia/*.json; do
+  "$here/import-pychron-interpreted-age" $fn
+done
