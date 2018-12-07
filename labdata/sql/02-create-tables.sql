@@ -78,7 +78,8 @@ CREATE TABLE vocabulary.error_metric (
 CREATE TABLE project (
   id text PRIMARY KEY,
   title text NOT NULL,
-  description text
+  description text,
+  embargo_date timestamptz
 );
 
 CREATE TABLE project_researcher (
@@ -134,7 +135,13 @@ CREATE TABLE sample (
 CREATE TABLE session (
   /* Set of analyses on the same instrument
      with the same technique, at the same or
-     closely spaced in time. */
+     closely spaced in time.
+
+     Examples:
+     - An entire Ar/Ar step heating experiment
+     - A set of detrital single-crystal zircon measurements
+     - A multi-grain igneous age determination
+  */
   id serial PRIMARY KEY,
   sample_id text REFERENCES sample(id),
   date timestamptz NOT NULL,
@@ -152,17 +159,34 @@ These two tables will end up needing data-type specific columns
 CREATE TABLE analysis (
   /*
   Set of data measured together at one time on one instrument
-  Example: different oxides measured on an EPMA
-           are *data* in a single analysis
+  Examples:
+  - A single EPMA analytical spot
+    (different oxides measured on an EPMA are *data* in a single analysis)
+  - A heating step for Ar/Ar age determination
+  - A single-crystal zircon analysis
   */
   id serial PRIMARY KEY,
   session_id integer REFERENCES session(id) NOT NULL,
   session_index integer, -- captures ordering within a session
   date timestamptz,
   material text REFERENCES vocabulary.material(id),
-  is_standard boolean,
   /* Not really sure that material is the best parameterization
      of this concept... */
+  is_standard boolean,
+  /*
+  Some analytical results can be interpreted from other data, so we
+  should explicitly state that this is the case.
+
+  Examples:
+  - a detrital zircon age spectrum
+    (the `datum` table would contain individual probability values at each age)
+  - a multi-zircon igneous age
+    (the `datum` table would include jointly-fitted age determinations
+     for each relevant system)
+  - a calculated plateau age for a stepped-heating Ar-Ar experiment.
+
+  */
+  is_interpreted boolean,
   UNIQUE (session_id, session_index)
 );
 
