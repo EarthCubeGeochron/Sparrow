@@ -77,6 +77,7 @@ def cli(port=False):
         run_sql_file(dest, "sql/normalize-sims-measurements.sql")
         run_sql_file(dest, "sql/normalize-probe-measurements.sql")
         run_sql_file(dest, "sql/normalize-dz-measurements.sql")
+        run_sql_file(dest, "sql/create-views.sql")
 
 
 cli()

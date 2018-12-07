@@ -1,5 +1,5 @@
 from flask import Flask, Blueprint
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, Api, reqparse, inputs
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
 
@@ -38,24 +38,48 @@ class APIv1(Api):
                 if pk is not None: return pk
             return list(table.c)[0]
 
+        def infer_type(t):
+            # Really hackish
+            type = t.type.python_type
+            if type == bool:
+                type = inputs.boolean
+            return type
+
         key = infer_primary_key()
 
         parser = reqparse.RequestParser()
         parser.add_argument('offset', type=int, help='Query offset', default=0)
         parser.add_argument('limit', type=int, help='Query limit', default=100)
 
+        for name, column in table.c.items():
+            try:
+                typename = infer_type(column)
+                parser.add_argument(name, type=typename,
+                    help=f"Column '{name}' of type '{typename}'")
+            except: pass
+
 
         class TableModel(Resource):
             def get(self):
                 args = parser.parse_args()
+                print(args)
+                q = db.session.query(table)
 
-                return (db.session.query(table)
-                          .offset(args['offset'])
-                          .limit(args['limit'])
-                          .all())
+                for k,col in table.c.items():
+                    val = args.pop(k, None)
+                    if val is not None:
+                        q = q.filter(col==val)
+
+                for k in ('offset','limit'):
+                    val = args.pop(k, None)
+                    if val is not None:
+                        q = getattr(q,k)(val)
+
+                return q.all()
 
         class RecordModel(Resource):
             def get(self, id):
+                # Should fail if more than one record is returned
                 return (db.session.query(table)
                     .filter(key==id)
                     .first())
@@ -70,7 +94,7 @@ class APIv1(Api):
         route = f"/{tablename}"
         self.add_resource(TableModel, route)
 
-        tname = key.type.python_type.__name__
+        tname = infer_type(key).__name__
         if tname != 'int':
             tname = 'string'
         self.add_resource(RecordModel, f"{route}/<{tname}:id>")

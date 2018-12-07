@@ -126,10 +126,15 @@ ALTER TABLE method_data.detrital_zircon_analysis
    interpreted "best age" for each analysis.
 */
 INSERT INTO vocabulary.parameter (id, description)
-VALUES ('U-Pb-best-age', 'Accepted age across U-Pb systems');
+VALUES
+('age_206Pb_238U', 'Age for 206Pb-238U system'),
+('age_207Pb_235U', 'Age for 207Pb-235U system'),
+('age_206Pb_207Pb', 'Age for 206Pb-207Pb system'),
+('U-Pb-best-age', 'Best age across U-Pb systems');
 
 INSERT INTO datum_type (parameter, unit, error_metric, is_computed, is_interpreted)
-VALUES ('U-Pb-best-age', 'Ma', 'std', true, true);
+VALUES
+('U-Pb-best-age', 'Ma', 'std', true, true);
 
 INSERT INTO datum (analysis, type, value, error)
 SELECT

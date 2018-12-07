@@ -81,7 +81,7 @@ SELECT
   sa.igsn,
   sa.project_id,
   sa.location,
-  '2020-01-01' as embargo_date
+  '2020-01-01'::timestamptz as embargo_date
 FROM __a
 JOIN analysis a USING (id)
 JOIN session s
@@ -104,10 +104,11 @@ SELECT
   t.is_interpreted,
   d.is_bad,
   false as is_public,
-  '2020-01-01' as embargo_date,
+  '2020-01-01'::timestamptz as embargo_date,
   a.session_id,
   a.session_index,
-  s.sample_id
+  s.sample_id,
+  s.technique
 FROM datum d
 JOIN analysis a
   ON d.analysis = a.id
