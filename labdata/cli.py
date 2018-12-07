@@ -7,26 +7,35 @@ from .database import Database
 
 cli = click.Group()
 
+def validate_database(ctx, param, value):
+    try:
+        prefix = "postgresql://"
+        if not value.startswith(prefix):
+            value = f"{prefix}/{value}"
+        db = Database(value)
+        return db
+    except ValueError:
+        raise click.BadParameter('Invalid database specified')
+
+with_database = click.option('--database', 'db', type=str,
+                    envvar="LABDATA_DATABASE", required=True,
+                    callback=validate_database)
+
 @cli.command(name='init')
-@click.argument('dbname', type=str)
-def init_database(dbname):
-    # Don't need to build the app just for this
-    db = Database(f"postgresql:///{dbname}")
-    with working_directory(__file__):
-        db.exec_sql("sql/01-setup-database.sql")
-        db.exec_sql("sql/02-create-tables.sql")
-        db.exec_sql("sql/03-create-views.sql")
+@with_database
+@click.option('--drop', is_flag=True, default=False)
+def init_database(db, drop=False):
+    db.initialize(drop=drop)
 
 @cli.command(name='create-views')
-@click.argument('dbname', type=str)
-def create_views(dbname):
+@with_database
+def create_views(db):
     # Don't need to build the app just for this
-    db = Database(f"postgresql:///{dbname}")
     with working_directory(__file__):
         db.exec_sql("sql/03-create-views.sql")
 
 @cli.command(name='serve')
-@click.argument('dbname', type=str) # For testing
-def dev_server(dbname):
-    app = construct_app(f"postgresql:///{dbname}")
+@with_database
+def dev_server(db):
+    app = construct_app(db)
     app.run(debug=True)

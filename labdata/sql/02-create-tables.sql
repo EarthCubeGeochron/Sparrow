@@ -1,20 +1,3 @@
-DROP SCHEMA method_data CASCADE;
-
-DROP TABLE IF EXISTS
-  researcher,
-  publication,
-  project,
-  project_publication,
-  project_researcher,
-  analysis,
-  session,
-  sample,
-  technique,
-  instrument,
-  datum,
-  datum_type
-  CASCADE;
-
 /*
 A minimal schema
 */
@@ -163,7 +146,7 @@ CREATE TABLE analysis (
   - A single EPMA analytical spot
     (different oxides measured on an EPMA are *data* in a single analysis)
   - A heating step for Ar/Ar age determination
-  - A single-crystal zircon analysis
+  - A single-crystal zircon age measurement
   */
   id serial PRIMARY KEY,
   session_id integer REFERENCES session(id) NOT NULL,
@@ -197,5 +180,12 @@ CREATE TABLE datum (
   value numeric NOT NULL,
   error numeric,
   is_bad boolean,
+  /*
+  If set, this means that this is an "accepted" value
+  among several related measurements.
+  Examples:
+  - Accepted system for U-Pb single-zircon age
+  */
+  is_accepted boolean,
   UNIQUE (analysis, type)
 );

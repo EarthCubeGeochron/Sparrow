@@ -17,3 +17,12 @@ class Database:
 
     def exec_sql(self, *args):
         run_sql_file(self.engine, *args)
+
+    def initialize(self, drop=False):
+        with working_directory(__file__):
+            if drop:
+                db.exec_sql("sql/00-drop-tables.sql")
+            db.exec_sql("sql/01-setup-database.sql")
+            db.exec_sql("sql/02-create-tables.sql")
+            db.exec_sql("sql/03-create-views.sql")
+            db.exec_sql("sql/04-populate-vocabulary.sql")

@@ -80,13 +80,15 @@ SELECT
   ) sample_material,
   sa.igsn,
   sa.project_id,
-  sa.location
+  sa.location,
+  '2020-01-01' as embargo_date
 FROM __a
 JOIN analysis a USING (id)
 JOIN session s
   ON s.id = a.session_id
 JOIN sample sa
-  ON s.sample_id = sa.id;
+  ON s.sample_id = sa.id
+ORDER BY a.id;
 
 CREATE VIEW core_view.datum AS
 SELECT
@@ -113,3 +115,9 @@ JOIN datum_type t
   ON d.type = t.id
 JOIN session s
   ON a.session_id = s.id
+ORDER BY d.id;
+
+CREATE VIEW core_view.age_datum AS
+SELECT *
+FROM core_view.datum
+WHERE unit IN ('Ga','Ma');

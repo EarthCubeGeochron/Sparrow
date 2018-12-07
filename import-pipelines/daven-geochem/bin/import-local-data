@@ -5,6 +5,7 @@ directly from the local project-specific PostgreSQL database on `daven-quinn.loc
 """
 
 from sqlalchemy import create_engine
+from subprocess import run
 from labdata.util import run_query, run_sql_file, working_directory
 import click
 from click import secho
@@ -57,7 +58,7 @@ def cli(port=False):
 
         with working_directory(base_dir):
             port_table(source, 'probe_measurement',
-                   query='sql/get-probe-measurements.sql'
+                   query='sql/get-probe-measurements.sql')
 
         port_table(source, 'probe_session')
 
@@ -65,7 +66,7 @@ def cli(port=False):
         port_table(source, 'sims_measurement')
 
     # Run SQL to normalize all these tables
-    run_sql_file(dest, "sql/create-tables.sql")
+    run(["labdata", "init", "earthcube_labdata"])
 
     # Create temp table of elements as a helper
     create_elements_table("element", dest, schema='vocabulary')

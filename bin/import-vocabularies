@@ -12,7 +12,6 @@ def get_table(category):
     url = f'http://www.earthchem.org/petdbWeb/search/vocabulary.jsp?category={category}'
     tables = P.read_html(url, index_col=0) # Returns list of all tables on page
     df = tables[0]
-    df["authority"] = "EarthChem"
     df.index.names = ['id']
     df.rename(columns={
         'METHOD_NAME': 'description',
@@ -22,15 +21,18 @@ def get_table(category):
 conn = create_engine("postgresql:///earthcube_labdata")
 
 def write_table(tbl, name):
-    return tbl.to_sql(name, conn, schema='vocabulary', if_exists='append')
+    return tbl.to_sql(name, conn, schema='earthchem_vocabulary', if_exists='replace')
 
 def copy_table(category, tbl):
     df = get_table(category)
     write_table(df, tbl)
     return df
 
+try:
+    conn.execute("CREATE SCHEMA earthchem_vocabulary")
+except:
+    print("Schema already exists")
+
 units = copy_table("Unit", "unit")
 methods = copy_table("Method", "method")
 parameters = copy_table("MeasuredParameter", "parameter")
-
-

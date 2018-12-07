@@ -107,7 +107,13 @@ SELECT DISTINCT ON (sample, index)
   "age_206Pb_207Pb_err",
   best_age,
   best_age_err,
-  concordia
+  concordia,
+  CASE
+	WHEN best_age = "age_206Pb_238U" THEN '206Pb_238U'
+	WHEN best_age = "age_207Pb_235U" THEN '207Pb_235U'
+	WHEN best_age = "age_206Pb_207Pb" THEN '206Pb_207Pb'
+	ELSE null
+	END AS best_age_system
 FROM test_data.detrital_zircon d;
 
 ALTER TABLE method_data.detrital_zircon_analysis
