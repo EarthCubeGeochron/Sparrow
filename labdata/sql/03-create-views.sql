@@ -29,34 +29,8 @@ SELECT DISTINCT ON (id)
 FROM __r
 ORDER BY id,n_levels DESC;
 
-CREATE VIEW core_view.datum_info AS
-SELECT
-  d.id datum_id,
-  d.analysis analysis_id,
-  d.type datum_type,
-  d.value,
-  d.error,
-  t.unit,
-  t.parameter,
-  t.error_metric,
-  t.is_computed,
-  t.is_interpreted,
-  d.is_bad,
-  false as is_public,
-  '2020-01-01' as embargo_date,
-  a.session_id,
-  a.session_index,
-  s.sample_id
-FROM datum d
-JOIN analysis a
-  ON d.analysis = a.id
-JOIN datum_type t
-  ON d.type = t.id
-JOIN session s
-  ON a.session_id = s.id;
-
 /* Analysis info with nested JSON data*/
-CREATE VIEW core_view.analysis_info AS
+CREATE VIEW core_view.analysis AS
 WITH __a AS (
 SELECT
   a.id,
@@ -87,7 +61,11 @@ SELECT
   a.session_index,
   a.is_standard,
   s.technique,
-  (SELECT name FROM instrument WHERE id = s.instrument) instrument,
+  ( SELECT
+      name
+    FROM instrument
+    WHERE id = s.instrument
+  ) instrument,
   sa.id sample_id,
   (	SELECT
       tree
@@ -109,3 +87,29 @@ JOIN session s
   ON s.id = a.session_id
 JOIN sample sa
   ON s.sample_id = sa.id;
+
+CREATE VIEW core_view.datum AS
+SELECT
+  d.id datum_id,
+  d.analysis analysis_id,
+  d.type datum_type,
+  d.value,
+  d.error,
+  t.unit,
+  t.parameter,
+  t.error_metric,
+  t.is_computed,
+  t.is_interpreted,
+  d.is_bad,
+  false as is_public,
+  '2020-01-01' as embargo_date,
+  a.session_id,
+  a.session_index,
+  s.sample_id
+FROM datum d
+JOIN analysis a
+  ON d.analysis = a.id
+JOIN datum_type t
+  ON d.type = t.id
+JOIN session s
+  ON a.session_id = s.id
