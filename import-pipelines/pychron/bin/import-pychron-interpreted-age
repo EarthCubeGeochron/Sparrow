@@ -4,9 +4,10 @@ Import a single interpreted-age json file from PyChron's format
 
 Usage: import-pychron-interpreted-age <jsonfile> <dbname (optional)>
 """
-from json import load
+from json import load, dumps
 from sys import argv
 from labdata import Database
+from labdata.util import working_directory
 
 fn = argv[1]
 
@@ -14,5 +15,11 @@ with open(fn) as f:
     data = load(f)
 
 db = Database()
+
+with working_directory(__file__, '..'):
+    db.exec_sql("sql/create-tables.sql")
+    sql = open('sql/data-insert.sql').read()
+    db.session.execute(sql, dict(id=data['uuid'], data=dumps(data)))
+    db.session.commit()
 
 import IPython; IPython.embed(); raise

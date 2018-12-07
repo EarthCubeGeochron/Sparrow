@@ -20,7 +20,8 @@ class APIv1(Api):
 
     def build_route(self, tablename, **kwargs):
         schema = kwargs.pop('schema', None)
-        table = self.db.reflect_table(tablename, schema=schema)
+        db = self.db
+        table = db.reflect_table(tablename, schema=schema)
 
         def infer_primary_key():
             pk = table.primary_key
@@ -60,7 +61,7 @@ class APIv1(Api):
             def get(self):
                 args = parser.parse_args()
                 print(args)
-                q = self.db.session.query(table)
+                q = db.session.query(table)
 
                 for k,col in table.c.items():
                     val = args.pop(k, None)

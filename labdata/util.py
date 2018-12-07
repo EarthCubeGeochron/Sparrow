@@ -52,12 +52,13 @@ def run_sql_file(db, sql_file):
     conn.close()
 
 @contextmanager
-def working_directory(pathname):
+def working_directory(pathname, *args):
     """Changes working directory and returns to previous on exit."""
     prev_cwd = Path.cwd()
     fn = path.realpath(pathname)
     if not path.isdir(fn):
         fn = path.dirname(fn)
+    fn = path.abspath(path.join(fn, *args))
     os.chdir(fn)
     try:
         yield
