@@ -3,6 +3,16 @@
 output="$LABDATA_PATH/output"
 mkdir -p "$output"
 
+graph="$output/erd-core.dot"
+sadisplay -u postgresql:///earthcube_labdata \
+  -r dot \
+  -e public.spatial_ref_sys > "$graph"
+cat "$graph" \
+| sed "s/NULLTYPE/GEOMETRY/g" \
+| sed "s/WITH TIME ZONE//g" \
+| dot -Tpng \
+> "$output/entity-relationship-diagram-core.png"
+
 graph="$output/erd.dot"
 sadisplay -u postgresql:///earthcube_labdata \
   -s public,vocabulary \
@@ -12,5 +22,4 @@ cat "$graph" \
 | sed "s/NULLTYPE/GEOMETRY/g" \
 | sed "s/WITH TIME ZONE//g" \
 | dot -Tpdf \
-> "$output/entity-relationship-diagram.pdf"
-
+> "$output/entity-relationship-diagram.png"
