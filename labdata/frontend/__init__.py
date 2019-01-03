@@ -1,7 +1,7 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
 
 web = Blueprint('frontend', __name__)
 
 @web.route('/')
 def index():
-    return "Hello, world from lab data land!"
+    return render_template('index.html')
