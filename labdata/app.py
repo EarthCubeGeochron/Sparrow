@@ -4,6 +4,7 @@ from flask import Flask
 from .database import Database
 from .encoders import JSONEncoder
 from .api import APIv1
+from .frontend import web
 
 def construct_app(db):
     app = Flask(__name__)
@@ -18,4 +19,7 @@ def construct_app(db):
 
     app.register_blueprint(api.blueprint, url_prefix='/api/v1')
     app.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
+
+    app.register_blueprint(web, url_prefix='/')
+
     return app
