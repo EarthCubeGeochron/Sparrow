@@ -1,12 +1,19 @@
 
+from os import path
 from flask import Flask
 
 from .database import Database
 from .encoders import JSONEncoder
 from .api import APIv1
+from .frontend import web
+from .util import relative_path
+
+
 
 def construct_app(db):
-    app = Flask(__name__)
+    # Should allow configuration of template path
+    app = Flask(__name__,
+            template_folder=relative_path(__file__, "frontend/templates"))
 
     api = APIv1(db)
 
@@ -18,4 +25,7 @@ def construct_app(db):
 
     app.register_blueprint(api.blueprint, url_prefix='/api/v1')
     app.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
+
+    app.register_blueprint(web, url_prefix='/')
+
     return app

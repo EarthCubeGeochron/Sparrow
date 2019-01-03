@@ -51,6 +51,11 @@ def run_sql_file(db, sql_file):
 
     conn.close()
 
+def relative_path(base, *parts):
+    if not path.isdir(base):
+        base = path.dirname(base)
+    return path.join(base, *parts)
+
 @contextmanager
 def working_directory(pathname, *args):
     """Changes working directory and returns to previous on exit."""

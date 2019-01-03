@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+
+rootDir=${0:h:h}
+
+cd "$rootDir"
+
+bin/labdata serve &
+$(npm bin)/webpack --watch &
+
+wait
+echo "Finished running server."
