@@ -28,7 +28,8 @@ module.exports = {
     extensions: [".coffee", ".js", ".styl",".css"]
   },
   entry: {
-    index: './labdata/frontend/index.coffee'
+    index: './labdata/frontend/index.coffee',
+    'api-explorer': './labdata/frontend/api-explorer'
   },
   output: {
     path: assetsDir,
