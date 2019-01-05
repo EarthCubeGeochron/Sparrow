@@ -1,17 +1,17 @@
+import 'babel-polyfill'
 import React from "react"
 import {render} from 'react-dom'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom"
 import h from 'react-hyperscript'
-
-Homepage = ->
-  h 'div', [
-    h 'h1', 'Lab Data Interface – API Explorer'
-  ]
+import {RouteComponent} from './route-component'
 
 AppRouter = ->
-  h Router, [
+  h Router, {basename: '/api-explorer'}, [
     h 'div', [
-      h Route, {path: '/', component: Homepage}
+      h 'h1', 'Lab Data Interface – API Explorer'
+      h 'div#api', [
+        h Route, {path: '/', component: RouteComponent}
+      ]
     ]
   ]
 
