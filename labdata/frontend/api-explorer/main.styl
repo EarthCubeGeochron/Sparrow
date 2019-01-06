@@ -1,11 +1,11 @@
+@import '../shared/colors'
+
 *
   box-sizing: border-box
 
 #container
   max-width 60em
   margin 0 auto 2em
-
-blue5=#48AFF0
 
 .usage
   position relative
@@ -39,17 +39,24 @@ ul.routes li
   a
     text-decoration none
     &:hover
-      background-color: blue5
+      background-color: $blue5
 
 .collapse-panel div.panel-header
+  background-color $light-gray4
+  border 1px solid $light-gray1
+  padding 6px
+  border-radius 6px
   display flex
   flex-direction row
-  margin-right -1em
   margin-top 1em
   margin-bottom 0.5em
+  align-items baseline
   &>*
     margin-right 1em
+    &:last-child
+      margin-right 0
   h1,h2,h3
+    color $dark-gray4
     margin-top 0
     margin-bottom 0
   div.expander
