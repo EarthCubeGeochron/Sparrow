@@ -6,7 +6,11 @@ web = Blueprint('frontend', __name__)
 def index():
     return render_template('index.html')
 
-@web.route('/api-explorer/<path>')
+# This route is a catch-all route for anything
+# beneath the /api-explorer endpoint. Allows
+# the API explorer to function with client-side
+# routing with react-router...
 @web.route('/api-explorer')
+@web.route('/api-explorer/<path:path>')
 def api_explorer(path='/'):
     return render_template('page.html', title="API Explorer", id='api-explorer')
