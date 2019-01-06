@@ -1,8 +1,9 @@
 import {Component} from 'react'
 import h from 'react-hyperscript'
 import ReactJson from 'react-json-view'
-import {Button, Intent, Collapse} from '@blueprintjs/core'
-import {nullIfError, Argument} from './utils'
+import {Button, Intent, Collapse, NonIdealState} from '@blueprintjs/core'
+import {Argument} from './utils'
+import {join} from 'path'
 
 class APIUsageComponent extends Component
   @defaultProps: {data: null}
@@ -10,25 +11,33 @@ class APIUsageComponent extends Component
     super props
     @state = {showJSON: true, isOpen: false}
 
-  renderArguments: nullIfError ->
-    {arguments: args} = @props.data
-    h 'div.arguments', [
-      h 'h3', 'Arguments'
-      h 'ul.arguments', args.map (d)->
-        h 'li', null, (
-          h Argument, d
-        )
-    ]
-
-  renderRecordRoute: nullIfError ->
-    {record, api_route} = @props.data
+  renderContent: ->
+    {arguments: args, record, api_route} = @props.data
     {route, key: name, type} = record
     route = join api_route, route
-    return h 'div.record', [
-      h 'h3', route
-      h 'p.description', 'Get a single record'
-      h Argument, {name, type}
+    return [
+      h 'div.arguments', [
+        h 'h3', 'Arguments'
+        h 'ul.arguments', args.map (d)->
+          h 'li', null, (
+            h Argument, d
+          )
+      ]
+      h 'div.record', [
+        h 'h3', route
+        h 'p.description', 'Get a single record'
+        h Argument, {name, type}
+      ]
     ]
+
+  renderInterior: ->
+    try
+      return @renderContent()
+    catch err
+      return h NonIdealState, {
+        title: "No usage information"
+        description: "This route does not return data."
+      }
 
   expandButton: ->
     {isOpen} = @state
@@ -65,10 +74,7 @@ class APIUsageComponent extends Component
       h Collapse, {isOpen}, (
         if showJSON then (
           h ReactJson, {src: data}
-        ) else [
-          @renderArguments()
-          @renderRecordRoute()
-        ]
+        ) else @renderInterior()
       )
     ]
 
