@@ -15,7 +15,8 @@ nullIfError = (fn)-> ->
     return null
 
 Argument = (props)->
-  {name, default: defaultArg, description, type} = props
+  {name, type, default: defaultArg, description} = props
+  console.log name, type
   h 'div.argument', {key: name}, [
     h 'h5.name', [
       name+" "
@@ -98,14 +99,11 @@ class RouteComponent extends Component
   renderRecordRoute: nullIfError ->
     {record, api_route} = @routeData()
     {route, key: name, type} = record
-    route = join api_route, record.route
+    route = join api_route, route
     return h 'div.record', [
-      h 'h4', route,
+      h 'h4', route
       h 'p.description', 'Get a single record'
-      h 'h5.key', [
-        name+" "
-        h 'span.type', type
-      ]
+      h Argument, {name, type}
     ]
 
   renderSubRoutes: nullIfError ->

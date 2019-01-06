@@ -108,7 +108,7 @@ class APIv1(Api):
         tname = infer_type(key).__name__
         if tname != 'int':
             tname = 'string'
-        get_route = f"/<{tname}:id>"
+        get_route = f"/<{tname}:{key.name}>"
         describe_route = f"{route}/describe"
 
         basicInfo = dict(
