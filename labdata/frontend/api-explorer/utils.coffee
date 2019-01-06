@@ -12,7 +12,7 @@ nullIfError = (fn)-> ->
 Argument = (props)->
   {name, type, default: defaultArg, description} = props
   console.log name, type
-  h 'div.argument.bp3-card', {key: name}, [
+  h 'div.argument.bp3-card.bp3-interactive', {key: name}, [
     h 'h5.name', [
       name+" "
       h 'span.type.bp3-code', type

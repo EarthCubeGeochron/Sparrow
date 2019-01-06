@@ -9,11 +9,6 @@
 
 .usage
   position relative
-  .toggle-json
-    position absolute
-    right 0
-    top 0
-    z-index 20
 
 .small-card
   padding 10px
@@ -30,6 +25,17 @@ ul.arguments, ul.routes
     margin-bottom 0.5em
   .bp3-card
     @extends .small-card
+
+ul.arguments
+  display flex
+  flex-flow row wrap
+  align-items stretch
+  li
+    max-width 20em
+    flex-grow 1
+    margin-right 0.5em
+    .bp3-card
+      height 100%
 
 .argument.bp3-card
   @extends .small-card
