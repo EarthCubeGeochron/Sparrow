@@ -30,8 +30,8 @@ class APIv1(Api):
                 return dict(
                     route='/api/v1',
                     description='Version 1 API for Lab Data Interface',
-                    routes=route_descriptions
-                )
+                    routes=route_descriptions)
+
         self.add_resource(APIDescriptionModel, '/', '/describe')
 
 
