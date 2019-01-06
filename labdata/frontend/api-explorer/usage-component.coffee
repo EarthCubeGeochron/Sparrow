@@ -9,7 +9,7 @@ class APIUsageComponent extends Component
   @defaultProps: {data: null}
   constructor: (props)->
     super props
-    @state = {showJSON: true, isOpen: false}
+    @state = {isOpen: false}
 
   renderContent: ->
     {arguments: args, record, api_route} = @props.data
@@ -48,34 +48,13 @@ class APIUsageComponent extends Component
   render: ->
     {data} = @props
     {showJSON, isOpen} = @state
-    onClick = =>
-      @setState {showJSON: not showJSON}
 
     h 'div.usage.collapse-panel', [
       h 'div.panel-header', [
         @expandButton()
         h 'h2', 'Usage'
-        h 'div.expander'
-        h Button, {
-          rightIcon: 'list',
-          minimal: true,
-          className: 'show-json',
-          intent: if not showJSON then Intent.PRIMARY else null
-          onClick: => @setState {showJSON: false}
-        }, 'Summary'
-        h Button, {
-          rightIcon: 'code',
-          minimal: true,
-          className: 'show-json',
-          intent: if showJSON then Intent.PRIMARY else null
-          onClick: => @setState {showJSON: true}
-        }, 'JSON'
       ]
-      h Collapse, {isOpen}, (
-        if showJSON then (
-          h ReactJson, {src: data}
-        ) else @renderInterior()
-      )
+      h Collapse, {isOpen}, @renderInterior()
     ]
 
 export {APIUsageComponent}
