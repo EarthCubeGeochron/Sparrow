@@ -92,3 +92,6 @@ Currently, we envision a technology stack consisting of
 - Software packaged for virtualized servers, and potentially
   for lightweight, containerized (e.g. Docker) instances.
 
+## Possible technologies for backend
+
+- `migra` for PostgreSQL schema migrations?

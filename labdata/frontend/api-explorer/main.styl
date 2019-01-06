@@ -1,0 +1,38 @@
+*
+  box-sizing: border-box
+
+#container
+  max-width 60em
+  margin 0 auto 2em
+
+blue5=#48AFF0
+
+.extended-info
+  position relative
+  .toggle-json
+    position absolute
+    right 0
+    top 0
+    z-index 20
+
+.small-card
+  padding 10px
+  h4,h5
+    margin-top 0
+    margin-bottom 0.2em
+  p
+    margin-bottom 0.2em
+
+ul.arguments, ul.routes
+  @extends .small-card
+  list-style: none
+  padding-left 0
+  li
+    margin-bottom 0.5em
+
+ul.routes li
+  margin-bottom 1em
+  a
+    text-decoration none
+    &:hover
+      background-color: blue5

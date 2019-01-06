@@ -3,6 +3,7 @@ import h from 'react-hyperscript'
 import {get} from 'axios'
 import {Link, Route} from 'react-router-dom'
 import ReactJson from 'react-json-view'
+import {Button, Intent} from '@blueprintjs/core'
 import {join} from 'path'
 
 nullIfError = (fn)-> ->
@@ -17,12 +18,11 @@ nullIfError = (fn)-> ->
 Argument = (props)->
   {name, type, default: defaultArg, description} = props
   console.log name, type
-  h 'div.argument', {key: name}, [
+  h 'div.argument.bp3-card', {key: name}, [
     h 'h5.name', [
       name+" "
-      h 'span.type', type
+      h 'span.type.bp3-code', type
     ]
-
     h('p.description', description) if description?
     h('p.default', "Default: #{defaultArg}") if defaultArg?
   ]
@@ -35,18 +35,19 @@ class RouteComponent extends Component
     super props
     @state = {
       response: null
+      showJSON: false
     }
     @getData()
 
   renderRoutesList: nullIfError ->
     {routes} = @state.response
     h 'div.child-routes', [
-      h 'h4', 'Child routes'
+      h 'h2', 'Children'
       h 'ul.routes', routes.map (d)->
         h 'li.route', [
           h Link, {to: d.route}, (
-            h 'div', [
-              h 'h5', d.route
+            h 'div.bp3-card.bp3-interactive', [
+              h 'h4', d.route
               h 'p', d.description
             ]
           )
@@ -64,7 +65,7 @@ class RouteComponent extends Component
     (routes or []).length > 0
 
   renderMatch: ->
-    {response} = @state
+    {response, showJSON} = @state
     {match, parent} = @props
     {path, isExact} = match
     exact = @hasSubRoutes()
@@ -72,24 +73,34 @@ class RouteComponent extends Component
     return null unless isExact
     data = @routeData()
 
+    onClick = =>
+      @setState {showJSON: not showJSON}
+
     h Route, {path, exact}, [
       h 'div', [
         h 'div.basic-info', [
+          h Link, {to: parent}, "Back to parent" if parent?
           h 'h2.route-name', data.api_route
           h 'p.description', data.description
         ]
-        h Link, {to: parent}, "Back to parent" if parent?
         @renderRoutesList()
-        @renderArguments()
-        @renderRecordRoute()
-        h ReactJson, {src: data}
+        h 'div.extended-info', [
+          h 'h2', 'Usage'
+          h Button, {className: 'toggle-json', onClick}, if showJSON then 'Show summary' else 'Show JSON'
+          if showJSON then (
+            h ReactJson, {src: data}
+          ) else [
+            @renderArguments()
+            @renderRecordRoute()
+          ]
+        ]
       ]
     ]
 
   renderArguments: nullIfError ->
     {arguments: args} = @state.response
     h 'div.arguments', [
-      h 'h4', 'Arguments'
+      h 'h3', 'Arguments'
       h 'ul.arguments', args.map (d)->
         h 'li', null, (
           h Argument, d
@@ -101,7 +112,7 @@ class RouteComponent extends Component
     {route, key: name, type} = record
     route = join api_route, route
     return h 'div.record', [
-      h 'h4', route
+      h 'h3', route
       h 'p.description', 'Get a single record'
       h Argument, {name, type}
     ]

@@ -14,14 +14,22 @@ let browserSync = new BrowserSyncPlugin({
 });
 
 let jsLoader = {loader: 'babel-loader', options: {presets: ['@babel/preset-env']}};
+let fontLoader = {
+  loader: 'file-loader',
+  options: {name: "fonts/[name].[ext]"}
+};
+let stylusLoader = {
+  loader: 'stylus-relative-loader'
+};
 
 module.exports = {
   module: {
     rules: [
       {test: /\.js$/, use: [jsLoader]},
       {test: /\.coffee$/, use: [ jsLoader, "coffee-loader" ]},
-      {test: /\.styl$/, use: ["css-loader", "stylus-loader"]},
-      {test: /\.css$/, use: [ 'css-loader' ]}
+      {test: /\.styl$/, use: ["style-loader", "css-loader", stylusLoader]},
+      {test: /\.css$/, use: ["style-loader", 'css-loader' ]},
+      {test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader]}
     ]
   },
   resolve: {
