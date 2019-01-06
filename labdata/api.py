@@ -28,7 +28,7 @@ class APIv1(Api):
         class APIDescriptionModel(Resource):
             def get(self):
                 return dict(
-                    route='/ap1/v1',
+                    route='/api/v1',
                     description='Version 1 API for Lab Data Interface',
                     routes=route_descriptions
                 )
@@ -108,7 +108,7 @@ class APIv1(Api):
         tname = infer_type(key).__name__
         if tname != 'int':
             tname = 'string'
-        get_route = f"{route}/<{tname}:id>"
+        get_route = f"/<{tname}:id>"
         describe_route = f"{route}/describe"
 
         basicInfo = dict(
