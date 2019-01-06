@@ -4,12 +4,12 @@ import ReactJson from 'react-json-view'
 import {Button, Intent, Collapse, NonIdealState} from '@blueprintjs/core'
 import {Argument} from './utils'
 import {join} from 'path'
+import {CollapsePanel} from './collapse-panel'
 
 class APIUsageComponent extends Component
   @defaultProps: {data: null}
   constructor: (props)->
     super props
-    @state = {isOpen: false}
 
   renderContent: ->
     {arguments: args, record, api_route} = @props.data
@@ -39,22 +39,8 @@ class APIUsageComponent extends Component
         description: "This route does not return data."
       }
 
-  expandButton: ->
-    {isOpen} = @state
-    icon = if isOpen then 'collapse-all' else 'expand-all'
-    onClick = => @setState {isOpen: not isOpen}
-    h Button, {icon, minimal: true, onClick}
-
   render: ->
     {data} = @props
-    {showJSON, isOpen} = @state
-
-    h 'div.usage.collapse-panel', [
-      h 'div.panel-header', [
-        @expandButton()
-        h 'h2', 'Usage'
-      ]
-      h Collapse, {isOpen}, @renderInterior()
-    ]
+    h CollapsePanel, {className: 'usage', title: 'Usage'}, @renderInterior()
 
 export {APIUsageComponent}

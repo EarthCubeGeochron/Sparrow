@@ -7,6 +7,7 @@ import {Button, AnchorButton, Intent, Icon} from '@blueprintjs/core'
 import {join} from 'path'
 import {nullIfError, Argument} from './utils'
 import {APIUsageComponent} from './usage-component'
+import {APIDataComponent} from './data-component'
 
 RouteName = ({api_route, route, parent})->
   text = api_route
@@ -110,6 +111,7 @@ class RouteComponent extends Component
       h 'p.description', data.description
       @renderRoutesList()
       h APIUsageComponent, {data}
+      h APIDataComponent, {data}
     ]
 
   renderSubRoutes: nullIfError ->
