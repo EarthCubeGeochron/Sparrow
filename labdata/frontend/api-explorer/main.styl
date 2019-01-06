@@ -7,7 +7,7 @@
 
 blue5=#48AFF0
 
-.extended-info
+.usage
   position relative
   .toggle-json
     position absolute
@@ -24,11 +24,15 @@ blue5=#48AFF0
     margin-bottom 0.2em
 
 ul.arguments, ul.routes
-  @extends .small-card
   list-style: none
   padding-left 0
   li
     margin-bottom 0.5em
+  .bp3-card
+    @extends .small-card
+
+.argument.bp3-card
+  @extends .small-card
 
 ul.routes li
   margin-bottom 1em

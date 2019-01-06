@@ -3,6 +3,7 @@ import React from "react"
 import {render} from 'react-dom'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom"
 import h from 'react-hyperscript'
+import { FocusStyleManager } from "@blueprintjs/core"
 
 import {RouteComponent} from './route-component'
 
@@ -10,6 +11,8 @@ import {RouteComponent} from './route-component'
 import '@blueprintjs/core/lib/css/blueprint.css'
 import '@blueprintjs/icons/lib/css/blueprint-icons.css'
 import './main.styl'
+
+FocusStyleManager.onlyShowFocusOnTabs()
 
 AppRouter = ->
   h Router, {basename: '/api-explorer'}, [
