@@ -11,6 +11,9 @@ def index():
 # the API explorer to function with client-side
 # routing with react-router...
 @web.route('/api-explorer')
+# Should really replace this with trailing-slash removal
+# middleware of some sort
+@web.route('/api-explorer/')
 @web.route('/api-explorer/<path:path>')
 def api_explorer(path='/'):
     return render_template('page.html', title="API Explorer", id='api-explorer')

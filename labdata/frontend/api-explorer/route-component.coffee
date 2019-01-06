@@ -3,6 +3,7 @@ import h from 'react-hyperscript'
 import {get} from 'axios'
 import {Link, Route} from 'react-router-dom'
 import ReactJson from 'react-json-view'
+import {join} from 'path'
 
 class RouteComponent extends Component
   constructor: (props)->
@@ -30,29 +31,34 @@ class RouteComponent extends Component
 
   renderInner: ->
     {response} = @state
-    {path} = @props.match
+    {match, parent} = @props
+    parent ?= null
+    {path, isExact} = match
     exact = @hasSubRoutes()
     return null unless response?
+    return null unless isExact
     h Route, {path, exact}, [
       h 'div', [
         @renderRoutesList()
-        h ReactJson, {src: response}
+        h ReactJson, {src: {parent, response...}}
       ]
     ]
 
   renderSubRoutes: ->
-    r = @state.response
-    return null unless r?
-    {routes} = r
+    {response} = @state
+    return null unless response?
+    {routes, route} = response
     return null unless routes?
+    # Use a render function instead of a component match
+    render = (props)->
+      h RouteComponent, {props..., parent: route}
+
     routes.map (r)->
       path = r.route
-      h Route, {path, key: path, component: RouteComponent}
+      h Route, {path, key: path, render}
 
 
   render: ->
-    console.log @props.match
-    console.log @props.location
     h 'div', [
       @renderInner()
       @renderSubRoutes()
