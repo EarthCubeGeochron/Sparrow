@@ -82,7 +82,9 @@ class RouteComponent extends Component
   renderMatch: =>
     {response, showJSON} = @state
     {match} = @props
-    parent = basename @apiPath()
+    p = @apiPath().split('/')
+    p.pop()
+    parent = p.join("/").replace("/api/v1","")
     {path, isExact} = match
     exact = false #@hasSubRoutes()
     return null unless response?
