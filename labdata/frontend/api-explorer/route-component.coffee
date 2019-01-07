@@ -42,6 +42,21 @@ JSONToggle = ({showJSON, onChange})->
     }, 'JSON'
   ]
 
+ChildRoutesList = ({routes})->
+  return null unless routes?
+  h 'div.child-routes', [
+    h 'h3', 'Routes'
+    h 'ul.routes', routes.map (d)->
+      h 'li.route', [
+        h Link, {to: d.route}, (
+          h 'div.bp3-card.bp3-interactive', [
+            h 'h4', d.route
+            h 'p', d.description
+          ]
+        )
+      ]
+  ]
+
 class RouteComponent extends Component
   @defaultProps: {
     parent: null
@@ -53,21 +68,6 @@ class RouteComponent extends Component
       showJSON: false
     }
     @getData()
-
-  renderRoutesList: nullIfError ->
-    {routes} = @state.response
-    h 'div.child-routes', [
-      h 'h3', 'Routes'
-      h 'ul.routes', routes.map (d)->
-        h 'li.route', [
-          h Link, {to: d.route}, (
-            h 'div.bp3-card.bp3-interactive', [
-              h 'h4', d.route
-              h 'p', d.description
-            ]
-          )
-        ]
-    ]
 
   routeData: ->
     {parent} = @props
@@ -104,12 +104,15 @@ class RouteComponent extends Component
 
   renderBody: ->
     {showJSON} = @state
+
     data = @routeData()
+    {routes} = @state.response
+
     if showJSON
       return h ReactJson, {src: data}
     return [
       h 'p.description', data.description
-      @renderRoutesList()
+      h ChildRoutesList, {routes}
       h APIUsageComponent, {data}
       h APIDataComponent, {data}
     ]
