@@ -42,6 +42,10 @@ class APIUsageComponent extends Component
   render: ->
     {data} = @props
     return null unless data.arguments?
-    h CollapsePanel, {className: 'usage', title: 'Usage'}, @renderInterior()
+    h CollapsePanel, {
+      storageID: 'usage',
+      className: 'usage',
+      title: 'Usage'
+    }, @renderInterior()
 
 export {APIUsageComponent}

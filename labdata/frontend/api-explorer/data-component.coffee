@@ -12,7 +12,11 @@ class APIDataComponent extends Component
     # Just as a shorthand, there will be no results unless
     # there are arguments for any given route
     return null unless data.arguments?
-    h CollapsePanel, {className: 'data', title: 'Data'}, [
+    h CollapsePanel, {
+      storageID: 'data'
+      className: 'data',
+      title: 'Data'
+    }, [
       h 'div', 'Data'
     ]
 
