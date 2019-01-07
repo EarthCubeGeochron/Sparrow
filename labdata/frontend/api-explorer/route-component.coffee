@@ -30,24 +30,6 @@ RouteName = ({api_route, route, parent})->
     h 'span.current-route', text
   ]
 
-JSONToggle = ({showJSON, onChange})->
-  return [
-    h Button, {
-      rightIcon: 'list',
-      minimal: true,
-      key: 'hide-json'
-      intent: if not showJSON then Intent.PRIMARY else null
-      onClick: -> onChange {showJSON: false}
-    }, 'Summary'
-    h Button, {
-      rightIcon: 'code',
-      minimal: true,
-      key: 'show-json'
-      intent: if showJSON then Intent.PRIMARY else null
-      onClick: -> onChange {showJSON: true}
-    }, 'JSON'
-  ]
-
 ChildRoutesList = ({base, routes})->
   return null unless routes?
   h 'div.child-routes', [
@@ -72,7 +54,6 @@ class RouteComponent extends Component
     super props
     @state = {
       response: null
-      showJSON: false
     }
     @getData()
 
@@ -101,8 +82,6 @@ class RouteComponent extends Component
       h 'div.route-ui', [
         h 'div.panel-header', [
           h RouteName, {api_route, route, parent}
-          h 'div.expander'
-          h JSONToggle, {showJSON, onChange: (d)=>@setState(d)}
         ]
         h 'div.route-body', [
           @renderBody()
@@ -111,19 +90,19 @@ class RouteComponent extends Component
     ]
 
   renderBody: ->
-    {showJSON} = @state
-
     data = @routeData()
     {routes} = @state.response
     {path: base} = @props.match
+    api_route = @apiPath()
+    if not data.arguments?
+      # Basically, tell the data component not to render
+      api_route = null
 
-    if showJSON
-      return h ReactJson, {src: data}
     return h 'div', [
       h 'p.description', data.description
       h ChildRoutesList, {base, routes}
       h APIUsageComponent, {data}
-      h APIDataComponent, {data}
+      h APIDataComponent, {route: api_route}
     ]
 
   renderSubRoutes: nullIfError ->

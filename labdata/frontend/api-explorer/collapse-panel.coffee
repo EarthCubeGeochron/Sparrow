@@ -3,6 +3,9 @@
 import {Component} from 'react'
 import h from 'react-hyperscript'
 import {Button, Collapse} from '@blueprintjs/core'
+import ReactJson from 'react-json-view'
+
+import {JSONToggle} from './utils'
 
 class CollapsePanel extends Component
   @defaultProps: {
@@ -53,20 +56,42 @@ class CollapsePanel extends Component
     window.localStorage.setItem('collapse-panel-state', j)
 
   render: ->
-    {title, children, storageID, props...} = @props
+    {title, children, storageID, headerRight, props...} = @props
     {isOpen} = @state
 
     icon = if isOpen then 'collapse-all' else 'expand-all'
     onClick = => @setState {isOpen: not isOpen}
 
+    headerRight ?= null
+
     h 'div.collapse-panel', props, [
       h 'div.panel-header', [
         h Button, {icon, minimal: true, onClick}
         h 'h2', title
+        h 'div.expander'
+        headerRight
       ]
       h Collapse, {isOpen}, children
     ]
 
+class JSONCollapsePanel extends Component
+  constructor: (props)->
+    super props
+    @state = {showJSON: false}
+  renderInterior: ->
+    {showJSON} = @state
+    {data, children} = @props
+    data ?= {}
+    if showJSON
+      return h ReactJson, {src: data}
+    return h 'div', null, children
+
+  render: ->
+    {children, props...} = @props
+    {showJSON} = @state
+    onChange = (d)=>@setState(d)
+    headerRight = h JSONToggle, {showJSON, onChange}
+    h CollapsePanel, {props..., headerRight}, @renderInterior()
 
 
-export {CollapsePanel}
+export {CollapsePanel, JSONCollapsePanel}

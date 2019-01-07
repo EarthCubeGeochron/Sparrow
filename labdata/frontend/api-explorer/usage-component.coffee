@@ -1,10 +1,9 @@
 import {Component} from 'react'
 import h from 'react-hyperscript'
-import ReactJson from 'react-json-view'
 import {Button, Intent, Collapse, NonIdealState} from '@blueprintjs/core'
 import {Argument} from './utils'
 import {join} from 'path'
-import {CollapsePanel} from './collapse-panel'
+import {JSONCollapsePanel} from './collapse-panel'
 
 class APIUsageComponent extends Component
   @defaultProps: {data: null}
@@ -42,7 +41,8 @@ class APIUsageComponent extends Component
   render: ->
     {data} = @props
     return null unless data.arguments?
-    h CollapsePanel, {
+    h JSONCollapsePanel, {
+      data
       storageID: 'usage',
       className: 'usage',
       title: 'Usage'

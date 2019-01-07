@@ -69,7 +69,7 @@ class APIv1(Api):
 
         parser = reqparse.RequestParser()
         parser.add_argument('offset', type=int, help='Query offset', default=0)
-        parser.add_argument('limit', type=int, help='Query limit', default=100)
+        parser.add_argument('limit', type=int, help='Query limit', default=10)
 
         for name, column in table.c.items():
             try:
