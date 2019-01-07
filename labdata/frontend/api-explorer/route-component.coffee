@@ -4,7 +4,7 @@ import {get} from 'axios'
 import {Link, Route} from 'react-router-dom'
 import ReactJson from 'react-json-view'
 import {Button, AnchorButton, Intent, Icon} from '@blueprintjs/core'
-import {join} from 'path'
+import {join, basename} from 'path'
 import {nullIfError, Argument} from './utils'
 import {APIUsageComponent} from './usage-component'
 import {APIDataComponent} from './data-component'
@@ -81,13 +81,15 @@ class RouteComponent extends Component
 
   renderMatch: =>
     {response, showJSON} = @state
-    {match, parent} = @props
+    {match} = @props
+    parent = basename @apiPath()
     {path, isExact} = match
-    exact = @hasSubRoutes()
+    exact = false #@hasSubRoutes()
     return null unless response?
-    return null unless isExact
+    #return null unless isExact
     data = @routeData()
     {api_route, route} = data
+    console.log api_route, route, parent
 
     h Route, {path, exact}, [
       h 'div.route-ui', [
@@ -120,7 +122,8 @@ class RouteComponent extends Component
   renderSubRoutes: nullIfError ->
     {response} = @state
     {routes} = response
-    {path: parent} = @props.match
+    {pathname: parent} = @props.location
+    console.log parent
     # Use a render function instead of a component match
     render = (props)->
       h RouteComponent, {props..., parent}
@@ -133,15 +136,14 @@ class RouteComponent extends Component
   render: ->
     h 'div', [
       @renderMatch()
-      @renderSubRoutes()
+      #@renderSubRoutes()
     ]
 
   apiPath: ->
-    {path} = @props.match
-    join '/api/v1', path
+    {pathname} = @props.location
+    join '/api/v1', pathname
 
   getData: ->
-    {path} = @props.match
     apiPath = join @apiPath(), 'describe'
     {data, status} = await get(apiPath)
     @setState {response: data}
