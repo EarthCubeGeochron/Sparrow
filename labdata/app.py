@@ -23,6 +23,7 @@ def construct_app(db):
     api.build_route("dz_sample", schema='method_data')
     api.build_route("ar_age", schema='method_data')
 
+    app.api = api
     app.register_blueprint(api.blueprint, url_prefix='/api/v1')
     app.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
 

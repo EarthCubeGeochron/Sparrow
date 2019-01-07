@@ -5,7 +5,7 @@ rootDir=${0:h:h}
 cd "$rootDir"
 
 bin/labdata serve &
-$(npm bin)/webpack --watch &
+$(npm bin)/webpack --watch --mode=development &
 
 wait
 echo "Finished running server."
