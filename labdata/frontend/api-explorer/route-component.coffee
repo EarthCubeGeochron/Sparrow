@@ -19,7 +19,7 @@ RouteName = ({api_route, route, parent})->
     backLink = [
       # Have to assemble the button ourselves to make it a react-router link
       h Link, {
-        to: parent
+        to: parent.replace('/api','')
         className: 'bp3-button bp3-minimal bp3-intent-primary route-parent'
         role: 'button'
       }, [
@@ -94,19 +94,20 @@ class RouteComponent extends Component
 
   renderMatch: =>
     {response, showJSON} = @state
-    {match, parent} = @props
-    console.log match
+    {match, location, parent} = @props
+    console.log match, location
     {path, isExact} = match
     exact = false #@hasSubRoutes()
     return null unless response?
-    #return null unless isExact
     data = @routeData()
     {api_route, route} = data
     {pathname} = @props.location
-    pathname = pathname.replace('/v1','/')
-    parent = api_route.replace(route,"").replace("/api","")
+    api_route = '/api'+pathname
+    route = "/"+(api_route.replace('/api/v1','').split('/').pop())
+    parent = api_route.replace(route,"")
+    parent = null if route == '/'
+
     console.log pathname, api_route, route, parent
-    parent = null if pathname == '/'
 
     h Route, {path, exact}, [
       h 'div.route-ui', [
@@ -158,8 +159,8 @@ class RouteComponent extends Component
     ]
 
   apiPath: ->
-    {path} = @props.match
-    join '/api', path
+    {pathname} = @props.location
+    join '/api', pathname
 
   getData: ->
     apiPath = join @apiPath(), 'describe'
