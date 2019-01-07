@@ -4,6 +4,7 @@ import {render} from 'react-dom'
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
 import h from 'react-hyperscript'
 import { FocusStyleManager } from "@blueprintjs/core"
+import cfg from '../config'
 
 import {RouteComponent} from './route-component'
 
@@ -17,7 +18,10 @@ FocusStyleManager.onlyShowFocusOnTabs()
 AppRouter = ->
   h Router, {basename: '/api-explorer'}, [
     h 'div', [
-      h 'h1', 'Lab Data Interface – API Explorer'
+      h 'h1', [
+        h 'a', {href: '/'}, cfg.siteTitle
+        " – API Explorer"
+      ]
       h 'div#api', [
         h Route, {
           path: '/',
