@@ -9,6 +9,9 @@ class APIDataComponent extends Component
 
   render: ->
     {data} = @props
+    # Just as a shorthand, there will be no results unless
+    # there are arguments for any given route
+    return null unless data.arguments?
     h CollapsePanel, {className: 'data', title: 'Data'}, [
       h 'div', 'Data'
     ]
