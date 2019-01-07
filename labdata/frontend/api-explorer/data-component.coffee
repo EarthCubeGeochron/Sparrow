@@ -11,6 +11,7 @@ class APIDataComponent extends Component
     {data} = @props
     # Just as a shorthand, there will be no results unless
     # there are arguments for any given route
+    console.log data
     return null unless data.arguments?
     h CollapsePanel, {
       storageID: 'data'

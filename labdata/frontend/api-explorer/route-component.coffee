@@ -16,16 +16,14 @@ RouteName = ({api_route, route, parent})->
   ]
   if parent?
     text = route
-    backLink = [
-      # Have to assemble the button ourselves to make it a react-router link
-      h Link, {
-        to: parent
-        className: 'bp3-button bp3-minimal bp3-intent-primary route-parent'
-        role: 'button'
-      }, [
-        h Icon, {icon: 'arrow-left'}
-        h 'span.bp3-button-text', api_route.replace(route, '')
-      ]
+    # Have to assemble the button ourselves to make it a react-router link
+    backLink = h Link, {
+      to: parent
+      className: 'bp3-button bp3-minimal bp3-intent-primary route-parent'
+      role: 'button'
+    }, [
+      h Icon, {icon: 'arrow-left'}
+      h 'span.bp3-button-text', api_route.replace(route, '')
     ]
   return h 'h2.route-name', [
     backLink
@@ -37,14 +35,14 @@ JSONToggle = ({showJSON, onChange})->
     h Button, {
       rightIcon: 'list',
       minimal: true,
-      className: 'show-json',
+      key: 'hide-json'
       intent: if not showJSON then Intent.PRIMARY else null
       onClick: -> onChange {showJSON: false}
     }, 'Summary'
     h Button, {
       rightIcon: 'code',
       minimal: true,
-      className: 'show-json',
+      key: 'show-json'
       intent: if showJSON then Intent.PRIMARY else null
       onClick: -> onChange {showJSON: true}
     }, 'JSON'
@@ -121,7 +119,7 @@ class RouteComponent extends Component
 
     if showJSON
       return h ReactJson, {src: data}
-    return [
+    return h 'div', [
       h 'p.description', data.description
       h ChildRoutesList, {base, routes}
       h APIUsageComponent, {data}
