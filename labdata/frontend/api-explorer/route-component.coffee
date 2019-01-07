@@ -11,18 +11,26 @@ import {APIDataComponent} from './data-component'
 
 RouteName = ({api_route, route, parent})->
   text = api_route
+  backLink = h 'span.home-icon', [
+    h Icon, {icon: 'home'}
+  ]
   if parent?
-    text = [
-      h AnchorButton, {
-        href: join('/api-explorer', parent),
-        minimal: true
-        intent: Intent.PRIMARY
-        className: 'route-parent'
-        icon: 'arrow-left'
-      }, " "+api_route.replace(route, '')
-      h 'span.current-route', route
+    text = route
+    backLink = [
+      # Have to assemble the button ourselves to make it a react-router link
+      h Link, {
+        to: parent
+        className: 'bp3-button bp3-minimal bp3-intent-primary route-parent'
+        role: 'button'
+      }, [
+        h Icon, {icon: 'arrow-left'}
+        h 'span.bp3-button-text', api_route.replace(route, '')
+      ]
     ]
-  return h 'h2.route-name', text
+  return h 'h2.route-name', [
+    backLink
+    h 'span.current-route', text
+  ]
 
 JSONToggle = ({showJSON, onChange})->
   return [
@@ -42,14 +50,14 @@ JSONToggle = ({showJSON, onChange})->
     }, 'JSON'
   ]
 
-ChildRoutesList = ({pathname, routes})->
+ChildRoutesList = ({base, routes})->
   return null unless routes?
   h 'div.child-routes', [
     h 'h3', 'Routes'
     h 'ul.routes', routes.map (d)->
-      console.log d
+      to = join(base, d.route)
       h 'li.route', [
-        h Link, {to: join(pathname,d.route)}, (
+        h Link, {to}, (
           h 'div.bp3-card.bp3-interactive', [
             h 'h4', d.route
             h 'p', d.description
@@ -86,11 +94,8 @@ class RouteComponent extends Component
 
   renderMatch: =>
     {response, showJSON} = @state
-    {match} = @props
-    console.log @props
-    p = @apiPath().split('/')
-    p.pop()
-
+    {match, parent} = @props
+    console.log match
     {path, isExact} = match
     exact = false #@hasSubRoutes()
     return null unless response?
@@ -121,13 +126,13 @@ class RouteComponent extends Component
 
     data = @routeData()
     {routes} = @state.response
-    {pathname} = @props.location
+    {path: base} = @props.match
 
     if showJSON
       return h ReactJson, {src: data}
     return [
       h 'p.description', data.description
-      h ChildRoutesList, {pathname, routes}
+      h ChildRoutesList, {base, routes}
       h APIUsageComponent, {data}
       h APIDataComponent, {data}
     ]
@@ -142,8 +147,8 @@ class RouteComponent extends Component
       h RouteComponent, {props..., parent}
 
     routes.map (r)->
-      path = r.route
-      h Route, {path, key: path, render}
+      path = join parent, r.route
+      h Route, {path, key: r.route, render}
 
 
   render: ->
@@ -153,9 +158,8 @@ class RouteComponent extends Component
     ]
 
   apiPath: ->
-    {pathname} = @props.location
-    console.log pathname
-    join '/api', pathname
+    {path} = @props.match
+    join '/api', path
 
   getData: ->
     apiPath = join @apiPath(), 'describe'

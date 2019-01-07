@@ -19,7 +19,11 @@ AppRouter = ->
     h 'div', [
       h 'h1', 'Lab Data Interface – API Explorer'
       h 'div#api', [
-        h Route, {path: '/', exact: true, render: => h Redirect, {to: '/v1'}}
+        h Route, {
+          path: '/',
+          exact: true,
+          render: -> h Redirect, {to: '/v1'}
+        }
         h Route, {path: '/v1', component: RouteComponent}
       ]
     ]
