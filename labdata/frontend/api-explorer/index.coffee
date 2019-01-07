@@ -1,7 +1,7 @@
 import 'babel-polyfill'
 import React from "react"
 import {render} from 'react-dom'
-import { BrowserRouter as Router, Route, Link } from "react-router-dom"
+import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
 import h from 'react-hyperscript'
 import { FocusStyleManager } from "@blueprintjs/core"
 
@@ -19,7 +19,12 @@ AppRouter = ->
     h 'div', [
       h 'h1', 'Lab Data Interface – API Explorer'
       h 'div#api', [
-        h Route, {path: '/', component: RouteComponent}
+        h Route, {
+          path: '/',
+          exact: true,
+          render: -> h Redirect, {to: '/v1'}
+        }
+        h Route, {path: '/v1', component: RouteComponent}
       ]
     ]
   ]
