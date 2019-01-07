@@ -42,13 +42,14 @@ JSONToggle = ({showJSON, onChange})->
     }, 'JSON'
   ]
 
-ChildRoutesList = ({routes})->
+ChildRoutesList = ({pathname, routes})->
   return null unless routes?
   h 'div.child-routes', [
     h 'h3', 'Routes'
     h 'ul.routes', routes.map (d)->
+      console.log d
       h 'li.route', [
-        h Link, {to: d.route}, (
+        h Link, {to: join(pathname,d.route)}, (
           h 'div.bp3-card.bp3-interactive', [
             h 'h4', d.route
             h 'p', d.description
@@ -69,6 +70,10 @@ class RouteComponent extends Component
     }
     @getData()
 
+  componentDidUpdate: (prevProps)->
+    return unless prevProps.location != @props.location
+    @getData()
+
   routeData: ->
     {parent} = @props
     response = @state.response or {}
@@ -82,16 +87,21 @@ class RouteComponent extends Component
   renderMatch: =>
     {response, showJSON} = @state
     {match} = @props
+    console.log @props
     p = @apiPath().split('/')
     p.pop()
-    parent = p.join("/").replace("/api/v1","")
+
     {path, isExact} = match
     exact = false #@hasSubRoutes()
     return null unless response?
     #return null unless isExact
     data = @routeData()
     {api_route, route} = data
-    console.log api_route, route, parent
+    {pathname} = @props.location
+    pathname = pathname.replace('/v1','/')
+    parent = api_route.replace(route,"").replace("/api","")
+    console.log pathname, api_route, route, parent
+    parent = null if pathname == '/'
 
     h Route, {path, exact}, [
       h 'div.route-ui', [
@@ -111,12 +121,13 @@ class RouteComponent extends Component
 
     data = @routeData()
     {routes} = @state.response
+    {pathname} = @props.location
 
     if showJSON
       return h ReactJson, {src: data}
     return [
       h 'p.description', data.description
-      h ChildRoutesList, {routes}
+      h ChildRoutesList, {pathname, routes}
       h APIUsageComponent, {data}
       h APIDataComponent, {data}
     ]
@@ -143,10 +154,12 @@ class RouteComponent extends Component
 
   apiPath: ->
     {pathname} = @props.location
-    join '/api/v1', pathname
+    console.log pathname
+    join '/api', pathname
 
   getData: ->
     apiPath = join @apiPath(), 'describe'
+    console.log apiPath
     {data, status} = await get(apiPath)
     @setState {response: data}
 
