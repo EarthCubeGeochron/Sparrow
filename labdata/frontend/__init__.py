@@ -17,3 +17,7 @@ def index():
 @web.route('/api-explorer/<path:path>')
 def api_explorer(path='/'):
     return render_template('page.html', title="API Explorer", id='api-explorer')
+
+@web.route('/dz-samples')
+def dz_samples():
+    return render_template('page.html', title="Detrital Zircon samples", id='dz-samples')
