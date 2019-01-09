@@ -1,2 +1,2 @@
 import '@blueprintjs/core/lib/css/blueprint.css'
-import './shared/main.styl'
+import './shared/ui-main.styl'
