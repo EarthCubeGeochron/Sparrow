@@ -62,15 +62,20 @@ class DetritalZirconComponent extends Component
         domain: [0, maxProbability]
       })
 
+      labelProps = {label: "Age (Ga)"}
+      if i != data.length-1
+        labelProps.label = null
+        labelProps.tickLabelProps = -> {visibility: 'hidden'}
+
       id = "gradient_#{i}"
       h 'g', {
         key: sample_id
-        transform: "translate(0,#{height-(i+1)*eachHeight})"
+        transform: "translate(0,#{i*eachHeight})"
       }, [
         h gradients[i], {id}
-        createElement 'foreignObject', {x: 0, y: 0, width: 100, height: 50}, [
+        createElement 'foreignObject', {x: 0, y: 0, width: 100, height: 50}, (
           h 'h2.sample-name', null, sample_id
-        ]
+        )
         h AreaClosed, {
           data: kdeData
           yScale
@@ -79,13 +84,13 @@ class DetritalZirconComponent extends Component
           fill: "url(##{id})"
         }
         h AxisBottom, {
-          label: "Age (Ga)"
           scale: xScale
           numTicks: 10
           tickLength: 4
           tickFormat: (d)->d/1000
           strokeWidth: 1.5
           top: 50
+          labelProps...
         }
       ]
 
