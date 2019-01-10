@@ -39,3 +39,11 @@ def create_views(db):
 def dev_server(db):
     app = construct_app(db)
     app.run(debug=True)
+
+@cli.command(name='shell')
+@with_database
+def shell(db):
+    from IPython import embed
+    app = construct_app(db)
+    with app.app_context():
+        embed()

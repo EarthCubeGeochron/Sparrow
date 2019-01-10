@@ -1,0 +1,74 @@
+@import '../shared/colors'
+@import '../shared/ui-main'
+
+.usage
+  position relative
+
+.small-card
+  padding 10px
+  h4,h5
+    margin-top 0
+    margin-bottom 0.2em
+  p
+    margin-bottom 0.2em
+
+ul.arguments, ul.routes
+  list-style: none
+  padding-left 0
+  li
+    margin-bottom 0.5em
+  .bp3-card
+    @extends .small-card
+
+ul.arguments
+  display flex
+  flex-flow row wrap
+  align-items stretch
+  li
+    max-width 20em
+    flex-grow 1
+    margin-right 0.5em
+    .bp3-card
+      height 100%
+
+.argument.bp3-card
+  @extends .small-card
+
+ul.routes li
+  margin-bottom 1em
+  a
+    text-decoration none
+    &:hover
+      background-color: $blue5
+
+h2.route-name
+  .bp3-button.route-parent
+    font-size inherit
+    padding-right 2px
+    vertical-align: inherit
+  &>span
+    display: inline-flex
+    padding: 5px 0
+  span.home-icon
+    padding 5px 10px
+
+
+div.panel-header
+  background-color $light-gray4
+  //border 1px solid $light-gray1
+  padding 6px
+  border-radius 6px
+  display flex
+  flex-direction row
+  margin-top 1em
+  margin-bottom 0.5em
+  &>*
+    margin-right 1em
+    &:last-child
+      margin-right 0
+  h1,h2,h3
+    color $dark-gray4
+    margin-top 0
+    margin-bottom 0
+  div.expander
+    flex-grow 1
