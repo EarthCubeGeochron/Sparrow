@@ -10,6 +10,7 @@
     "@blueprintjs/core": "^3.10.0",
     "@blueprintjs/table": "^3.3.0",
     "@vx/axis": "0.0.183",
+    "@vx/gradient": "0.0.183",
     "@vx/scale": "0.0.182",
     "@vx/shape": "0.0.183",
     "axios": "^0.18.0",

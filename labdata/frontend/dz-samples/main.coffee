@@ -5,6 +5,8 @@ import { scaleLinear } from '@vx/scale'
 import { AreaClosed } from '@vx/shape'
 import { AxisLeft, AxisBottom } from '@vx/axis'
 import { extent, min, max, histogram } from 'd3-array'
+import gradients from './gradients'
+import {kernelDensityEstimator, kernelEpanechnikov} from './kernel-density'
 
 class DetritalZirconComponent extends Component
   constructor: ->
@@ -41,20 +43,32 @@ class DetritalZirconComponent extends Component
 
     yScale = scaleLinear({
       range: [height, 0]
-      domain: [0, 300]
+      domain: [0, 0.04]
     })
+
 
     h 'svg', { width, height }, data.map (sampleData, i)->
       {grain_data} = sampleData
-      console.log hist(grain_data)
-      h AreaClosed, {
-        data: hist(grain_data)
-        yScale
-        x: (d)-> xScale((d.x1-d.x0)/2+d.x0)
-        y: (d)-> yScale(d.length)
-        fill: 'red'
-        transform: "translate(0,#{-i*100})"
-      }
+
+      xTicks = xScale.ticks(400)
+      kde = kernelDensityEstimator(kernelEpanechnikov(30), xTicks)
+      fn = (d)->d.best_age
+      kdeData = kde(grain_data.map(fn))
+      console.log kdeData
+
+      id = "gradient_#{i}"
+      h 'g', [
+        h gradients[i], {id}
+        h AreaClosed, {
+          data: kdeData
+          yScale
+          x: (d)-> xScale(d[0])
+          y: (d)-> yScale(d[1])
+          fill: "url(##{id})"
+          transform: "translate(0,#{-i*50})"
+        }
+      ]
+
 
   getData: ->
     {data} = await get '/api/v1/dz_sample'
