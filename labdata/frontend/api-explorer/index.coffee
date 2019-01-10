@@ -1,3 +1,5 @@
+import '../shared/ui-init'
+
 import React from "react"
 import {render} from 'react-dom'
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
@@ -6,7 +8,6 @@ import h from 'react-hyperscript'
 import {SiteTitle} from '../shared/util'
 import {RouteComponent} from './route-component'
 
-import '../shared/ui-init.styl'
 import './main.styl'
 
 AppRouter = ->

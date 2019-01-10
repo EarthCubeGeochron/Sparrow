@@ -9,8 +9,12 @@
   "dependencies": {
     "@blueprintjs/core": "^3.10.0",
     "@blueprintjs/table": "^3.3.0",
+    "@vx/axis": "0.0.183",
+    "@vx/scale": "0.0.182",
+    "@vx/shape": "0.0.183",
     "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
+    "d3-array": "^2.0.3",
     "immutability-helper": "^2.9.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
