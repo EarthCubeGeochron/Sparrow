@@ -20,6 +20,9 @@ def construct_app(db):
     api.build_route("datum", schema='core_view')
     api.build_route("analysis", schema='core_view')
     api.build_route("age_datum", schema='core_view')
+    api.build_route("sample", schema='core_view')
+    api.build_route("project", schema='core_view')
+
     api.build_route("dz_sample", schema='method_data')
     api.build_route("ar_age", schema='method_data')
 
