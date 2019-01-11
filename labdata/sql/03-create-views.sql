@@ -156,53 +156,34 @@ JOIN sample s
   ON s.id = b.id;
 
 CREATE VIEW core_view.project AS
-WITH project_links AS (
 SELECT
 	p.id,
+	p.description,
+	p.title,
+	p.embargo_date,
 	-- Get data from researchers table in standard format
-	CASE WHEN count(r.id) != 0 THEN
-		json_agg((SELECT a FROM (SELECT
-		  r.*
-		)AS a))
-	ELSE null END AS researchers,
+	to_jsonb((SELECT array_agg(a) FROM (
+		SELECT r.* FROM researcher r
+		JOIN project_researcher pr
+		  ON pr.researcher_id = r.id
+		WHERE pr.project_id = p.id
+	) AS a)) AS researchers,
 	-- Get data from publications table in standard format
-	CASE WHEN count(pub.id) != 0 THEN
-		json_agg((SELECT a FROM (SELECT
-		  pub.*
-		)AS a))
-	ELSE null END AS publications,
+	to_jsonb((SELECT array_agg(a) FROM (
+		SELECT pub.* FROM publication pub
+		  JOIN project_publication pp
+		    ON pp.publication_id = pub.id
+		 WHERE p.id = pp.project_id
+	) AS a)) AS publications,
 	-- Get data from samples table in standard format
 	-- Note: we might convert this link to *analytical sessions*
 	-- to cover cases when samples are in use by multiple projects
-	CASE WHEN count(s.id) != 0 THEN
-		json_agg((SELECT a FROM (SELECT
-		  s.*
-		)AS a))
-	ELSE null END AS samples
-FROM project p
-LEFT JOIN project_researcher pr
-  ON p.id = pr.project_id
-LEFT JOIN researcher r
-  ON pr.researcher_id = r.id
-LEFT JOIN project_publication pp
-  ON p.id = pp.project_id
-LEFT JOIN publication pub
-  ON pp.publication_id = pub.id
-LEFT JOIN core_view.sample s
-  ON s.project_id = p.id
-GROUP BY p.id
-)
-SELECT
-  p.id,
-  p.description,
-  p.title,
-  l.researchers,
-  l.publications,
-  l.samples,
-  p.embargo_date
-FROM project_links l
-JOIN project p
-  ON l.id = p.id;
+	to_jsonb((SELECT array_agg(a) FROM (
+		SELECT *
+		FROM core_view.sample s
+		WHERE s.project_id = p.id
+	) AS a)) AS samples
+FROM project p;
 
 COMMENT ON COLUMN core_view.project.samples IS
 'Array of objects representing samples in the project

@@ -38,7 +38,8 @@ module.exports = {
   entry: {
     index: './labdata/frontend/index.coffee',
     'api-explorer': './labdata/frontend/api-explorer',
-    'dz-samples': './labdata/frontend/dz-samples'
+    'dz-samples': './labdata/frontend/dz-samples',
+    'admin': './labdata/frontend/admin'
   },
   output: {
     path: assetsDir,
