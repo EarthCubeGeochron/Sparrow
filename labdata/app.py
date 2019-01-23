@@ -8,8 +8,6 @@ from .api import APIv1
 from .frontend import web
 from .util import relative_path
 
-
-
 def construct_app(db):
     # Should allow configuration of template path
     app = Flask(__name__,
