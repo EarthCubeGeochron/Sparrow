@@ -122,3 +122,69 @@ CREATE VIEW core_view.age_datum AS
 SELECT *
 FROM core_view.datum
 WHERE unit IN ('Ga','Ma');
+
+CREATE VIEW core_view.material AS
+SELECT id, description, authority
+FROM vocabulary.material;
+
+CREATE VIEW core_view.sample AS
+WITH a AS (
+SELECT
+	s.id,
+	unnest(t.tree) material_id
+FROM sample s
+JOIN core_view.material_tree t
+  ON s.material = t.id
+),
+b AS (
+SELECT
+  a.id,
+  json_agg((SELECT m FROM (
+    SELECT
+    *
+    FROM core_view.material
+    WHERE id = a.material_id
+  ) AS m)) material
+FROM a
+GROUP BY a.id
+)
+SELECT
+  s.*,
+  b.material material_data
+FROM b
+JOIN sample s
+  ON s.id = b.id;
+
+CREATE VIEW core_view.project AS
+SELECT
+	p.id,
+	p.description,
+	p.title,
+	p.embargo_date,
+	-- Get data from researchers table in standard format
+	to_jsonb((SELECT array_agg(a) FROM (
+		SELECT r.* FROM researcher r
+		JOIN project_researcher pr
+		  ON pr.researcher_id = r.id
+		WHERE pr.project_id = p.id
+	) AS a)) AS researchers,
+	-- Get data from publications table in standard format
+	to_jsonb((SELECT array_agg(a) FROM (
+		SELECT pub.* FROM publication pub
+		  JOIN project_publication pp
+		    ON pp.publication_id = pub.id
+		 WHERE p.id = pp.project_id
+	) AS a)) AS publications,
+	-- Get data from samples table in standard format
+	-- Note: we might convert this link to *analytical sessions*
+	-- to cover cases when samples are in use by multiple projects
+	to_jsonb((SELECT array_agg(a) FROM (
+		SELECT *
+		FROM core_view.sample s
+		WHERE s.project_id = p.id
+	) AS a)) AS samples
+FROM project p;
+
+COMMENT ON COLUMN core_view.project.samples IS
+'Array of objects representing samples in the project
+(each object follows the schema of "core_view.sample")';

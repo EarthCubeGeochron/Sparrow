@@ -1,3 +1,6 @@
 [submodule "deps/sadisplay"]
 	path = deps/sadisplay
 	url = git://github.com/davenquinn/sadisplay.git
+[submodule "deps/ui-components"]
+	path = deps/ui-components
+	url = git://github.com/UW-Macrostrat/ui-components.git
