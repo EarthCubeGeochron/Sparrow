@@ -6,7 +6,7 @@ web = Blueprint('frontend', __name__)
 def index():
     return render_template('index.html')
 
-@web.route('/admin')
+@web.route('/admin/')
 def admin():
     return render_template('page.html', title="Admin", id='admin')
 
@@ -26,3 +26,4 @@ def api_explorer(path='/'):
 @web.route('/dz-samples')
 def dz_samples():
     return render_template('page.html', title="Detrital Zircon samples", id='dz-samples')
+

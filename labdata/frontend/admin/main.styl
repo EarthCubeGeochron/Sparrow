@@ -1,2 +1,32 @@
+@import "../shared/colors.styl"
+
 .project
   margin-bottom 2em
+
+a.publication
+  text-decoration none
+
+.doi-info
+  display inline-block
+  font-weight 600
+  color $dark-gray5
+  .label
+    font-size 0.8em
+    text-transform uppercase
+    &:after
+      content: " "
+
+
+div.samples
+  display: table
+
+div.sample
+  display: table-row
+  &>span
+    display table-cell
+  span.name
+    font-weight 600
+    min-width 50px
+    display inline-block
+  span.material
+    font-style italic

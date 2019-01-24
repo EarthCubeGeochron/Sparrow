@@ -3,13 +3,37 @@ import h from 'react-hyperscript'
 import {get} from 'axios'
 import './main.styl'
 
+class Publication extends Component
+  renderMain: ->
+    {doi, title} = @props
+    doiAddendum = []
+    if doi?
+      doiAddendum = [
+        " – "
+        h 'span.doi-info', [
+          h 'span.label', 'DOI:'
+          h 'span.doi.bp3-monospace-text', doi
+        ]
+      ]
+    h 'div.publication', [
+      h 'span.title', title
+      doiAddendum...
+    ]
+
+  render: ->
+    interior = @renderMain()
+    {doi} = @props
+    return interior unless doi?
+    href = "https://dx.doi.org/#{doi}"
+    h 'a.publication', {href, target: "_blank"}, interior
+
 ProjectPublications = ({data})->
   content = [
     h 'p', 'No publications'
   ]
   if data?
     content = data.map (d)->
-      h 'div.publication', d.title
+      h Publication, d
   h 'div.publications', [
     h 'h4', 'Publications'
     content...
@@ -25,6 +49,21 @@ ProjectResearchers = ({data})->
     content...
   ]
 
+Sample = (props)->
+  h 'div.sample', [
+    h 'span.name', props.id
+    h 'span.material', props.material_data[0].description
+  ]
+
+ProjectSamples = ({data})->
+  content = [ h 'p', 'No samples' ]
+  if data?
+    content = data.map (d)->
+      h Sample, d
+  h 'div.samples', [
+    h 'h4', 'Samples'
+    content...
+  ]
 
 class ProjectComponent extends Component
   @defaultProps: {
@@ -42,6 +81,7 @@ class ProjectComponent extends Component
       h 'p.description', description
       h ProjectPublications, {data: project.publications}
       h ProjectResearchers, {data: project.researchers}
+      h ProjectSamples, {data: project.samples}
     ]
 
   render: ->
