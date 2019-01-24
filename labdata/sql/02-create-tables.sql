@@ -105,6 +105,10 @@ CREATE TABLE sample (
     (e.g. different replicates or drillings from the same rock sample)
     (could have a self-referential 'part_of' relation on sample...)
   - Samples might belong to several projects
+
+  Should the `session` table contain the link to project rather than
+  the `sample` table? This might be more correct -- samples could still
+  be linked to projects through a table relationship
   */
   id text PRIMARY KEY,
   igsn text UNIQUE,

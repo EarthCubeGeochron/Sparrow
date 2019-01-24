@@ -1,23 +1,19 @@
-import 'babel-polyfill'
+import '../shared/ui-init'
+
 import React from "react"
 import {render} from 'react-dom'
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom"
 import h from 'react-hyperscript'
-import { FocusStyleManager } from "@blueprintjs/core"
 
+import {SiteTitle} from '../shared/util'
 import {RouteComponent} from './route-component'
 
-# Should import this in styles
-import '@blueprintjs/core/lib/css/blueprint.css'
-import '@blueprintjs/icons/lib/css/blueprint-icons.css'
 import './main.styl'
-
-FocusStyleManager.onlyShowFocusOnTabs()
 
 AppRouter = ->
   h Router, {basename: '/api-explorer'}, [
     h 'div', [
-      h 'h1', 'Lab Data Interface – API Explorer'
+      h SiteTitle, {subPage: 'API Explorer'}
       h 'div#api', [
         h Route, {
           path: '/',
