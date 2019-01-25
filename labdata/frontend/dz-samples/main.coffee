@@ -96,7 +96,7 @@ class DetritalZirconComponent extends Component
 
 
   getData: ->
-    {data} = await get '/api/v1/dz_sample'
+    {data} = await get '/api/v1/dz_sample?all=1'
     @setState {data}
 
 export {DetritalZirconComponent}
