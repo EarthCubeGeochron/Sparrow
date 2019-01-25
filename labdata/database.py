@@ -21,7 +21,7 @@ class Database:
         """
         if cfg is None:
             # Set config from environment variable
-            cfg = App()
+            cfg = App(__name__)
         if hasattr(cfg,'config'):
             cfg = cfg.config.get("DATABASE")
 
