@@ -38,7 +38,7 @@ module.exports = {
   entry: {
     index: './labdata/frontend/index.coffee',
     'api-explorer': './labdata/frontend/api-explorer',
-    'dz-samples': './labdata/frontend/dz-samples',
+    'dz-samples': './frontend-plugins/dz-samples',
     'admin': './labdata/frontend/admin'
   },
   output: {
