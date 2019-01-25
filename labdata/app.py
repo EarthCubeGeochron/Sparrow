@@ -5,13 +5,13 @@ from flask import Flask
 from .database import Database
 from .encoders import JSONEncoder
 from .api import APIv1
-from .frontend import web
+from .web import web
 from .util import relative_path
 
 def construct_app(db):
     # Should allow configuration of template path
     app = Flask(__name__,
-            template_folder=relative_path(__file__, "frontend/templates"))
+            template_folder=relative_path(__file__, "templates"))
 
     api = APIv1(db)
 

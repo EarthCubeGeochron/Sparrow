@@ -1,8 +1,8 @@
 import {render} from 'react-dom'
 import h from 'react-hyperscript'
 
-import '../shared/ui-init'
-import {SiteTitle} from '../shared/util'
+import '../../frontend/shared/ui-init'
+import {SiteTitle} from '../../frontend/shared/util'
 import {DetritalZirconComponent} from './main'
 
 MainPage = ->

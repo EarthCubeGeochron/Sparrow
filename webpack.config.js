@@ -36,10 +36,10 @@ module.exports = {
     extensions: [".coffee", ".js", ".styl",".css"]
   },
   entry: {
-    index: './labdata/frontend/index.coffee',
-    'api-explorer': './labdata/frontend/api-explorer',
-    'dz-samples': './labdata/frontend/dz-samples',
-    'admin': './labdata/frontend/admin'
+    index: './frontend/index.coffee',
+    'api-explorer': './frontend/api-explorer',
+    'dz-samples': './frontend-plugins/dz-samples',
+    'admin': './frontend/admin'
   },
   output: {
     path: assetsDir,

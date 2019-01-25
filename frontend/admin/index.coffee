@@ -3,12 +3,12 @@ import h from 'react-hyperscript'
 
 import '../shared/ui-init'
 import {SiteTitle} from '../shared/util'
-import {ProjectComponent} from './project-component'
+import {ProjectListComponent} from './project-component'
 
 MainPage = ->
   h 'div', [
     h SiteTitle, {subPage: 'Admin'}
-    h ProjectComponent
+    h ProjectListComponent
   ]
 
 el = document.querySelector("#container")
