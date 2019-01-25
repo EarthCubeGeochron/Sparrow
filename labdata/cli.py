@@ -1,25 +1,32 @@
 import click
+from click import echo, style
 from sqlalchemy import create_engine
+from sqlalchemy.exc import OperationalError
+from sys import exit
 
 from .util import working_directory
-from .app import construct_app
+from .app import App, construct_app
 from .database import Database
 
 cli = click.Group()
 
-def validate_database(ctx, param, value):
+def abort(message, status=1):
+    echo(style("ABORTING: ", fg='red', bold=True)+message)
+    exit(status)
+
+def get_database(ctx, param, value):
     try:
-        prefix = "postgresql://"
-        if not value.startswith(prefix):
-            value = f"{prefix}/{value}"
-        db = Database(value)
-        return db
+        app = App(__name__, config=value)
+        return app.database
     except ValueError:
         raise click.BadParameter('Invalid database specified')
+    except OperationalError as err:
+        dbname = click.style(app.dbname, fg='cyan', bold=True)
+        abort(f"Database {dbname} does not exist.")
 
-with_database = click.option('--database', 'db', type=str,
-                    envvar="LABDATA_DATABASE", required=True,
-                    callback=validate_database)
+with_database = click.option('--config', 'db', type=str,
+                    envvar="LABDATA_CONFIG", required=True,
+                    callback=get_database)
 
 @cli.command(name='init')
 @with_database
