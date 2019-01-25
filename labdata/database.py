@@ -13,7 +13,8 @@ metadata = MetaData()
 class Database:
     def __init__(self, cfg=None):
         if cfg is None:
-            cfg = environ.get("LABDATA_DATABASE")
+            cfg = environ.get("LABDATA_CONFIG")
+
         self.engine = create_engine(cfg)
         metadata.create_all(bind=self.engine)
         self.meta = metadata

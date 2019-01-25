@@ -11,18 +11,26 @@ from .database import Database
 cli = click.Group()
 
 def abort(message, status=1):
-    echo(style("ABORTING: ", fg='red', bold=True)+message)
+    prefix = "ABORTING: "
+    msg = message.replace("\n","\n"+" "*len(prefix))
+    echo(style(prefix, fg='red', bold=True)+msg)
     exit(status)
+
+def get_app(ctx, param, value):
+    return App(__name__, config=value)
 
 def get_database(ctx, param, value):
     try:
-        app = App(__name__, config=value)
+        app = get_app(ctx, param, value)
         return app.database
     except ValueError:
         raise click.BadParameter('Invalid database specified')
     except OperationalError as err:
         dbname = click.style(app.dbname, fg='cyan', bold=True)
-        abort(f"Database {dbname} does not exist.")
+        cmd = style(f"createdb {app.dbname}", dim=True)
+        abort(f"Database {dbname} does not exist.\n"
+               "Please create it before continuing.\n"
+              f"Command: `{cmd}`")
 
 with_database = click.option('--config', 'db', type=str,
                     envvar="LABDATA_CONFIG", required=True,
