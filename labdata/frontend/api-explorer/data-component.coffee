@@ -2,24 +2,13 @@ import {Component} from 'react'
 import h from 'react-hyperscript'
 import {JSONCollapsePanel} from './collapse-panel'
 import {get} from 'axios'
+import { APIResultView, APIConsumer } from "@macrostrat/ui-components"
 import { Cell, Column, Table } from "@blueprintjs/table"
 import "@blueprintjs/table/lib/css/table.css"
 
-class APIDataComponent extends Component
-  @defaultProps: {route: null}
-  constructor: (props)->
-    super props
-    @state = {data: null}
-    @getData()
-
-  getData: ->
-    {route} = @props
-    return unless route?
-    {data} = await get route
-    @setState {data}
-
-  renderDataTable: ->
-    {data} = @state
+class DataTable extends Component
+  render: ->
+    {data} = @props
     return null if not data?
 
     columns = []
@@ -38,17 +27,20 @@ class APIDataComponent extends Component
       defaultRowHeight: 30
     }, columns
 
+
+class APIDataComponent extends Component
+  @defaultProps: {route: null}
   render: ->
-    {route} = @props
-    {data} = @state
-    # Just as a shorthand, there will be no results unless
-    # there are arguments for any given route
+    {route, params} = @props
     return null unless route?
-    h JSONCollapsePanel, {
-      data
-      storageID: 'data'
-      className: 'data'
-      title: 'Data'
-    }, @renderDataTable()
+    h APIResultView, {route, params}, (data)=>
+      h JSONCollapsePanel, {
+        data
+        storageID: 'data'
+        className: 'data'
+        title: 'Data'
+      }, (
+        h DataTable, {data}
+      )
 
 export {APIDataComponent}
