@@ -4,7 +4,6 @@ from os import path, environ
 from flask import Flask
 from sqlalchemy.engine.url import make_url
 
-from .database import Database
 from .encoders import JSONEncoder
 from .api import APIv1
 from .web import web
@@ -32,6 +31,7 @@ class App(Flask):
 
     @property
     def database(self):
+        from .database import Database
         if self.db is not None: return self.db
         self.db = Database(self.db_url)
         return self.db
@@ -41,9 +41,9 @@ def construct_app(config=None):
     app = App(__name__, config=config,
             template_folder=relative_path(__file__, "templates"))
 
-
+    db = Database(app)
     # Setup API
-    api = APIv1(app.database)
+    api = APIv1(db)
 
     api.build_route("datum", schema='core_view')
     api.build_route("analysis", schema='core_view')

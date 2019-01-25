@@ -16,13 +16,11 @@ def abort(message, status=1):
     echo(style(prefix, fg='red', bold=True)+msg)
     exit(status)
 
-def get_app(ctx, param, value):
-    return App(__name__, config=value)
 
 def get_database(ctx, param, value):
     try:
-        app = get_app(ctx, param, value)
-        return app.database
+        app = App(__name__, config=value)
+        return Database(app)
     except ValueError:
         raise click.BadParameter('Invalid database specified')
     except OperationalError as err:
@@ -32,9 +30,9 @@ def get_database(ctx, param, value):
                "Please create it before continuing.\n"
               f"Command: `{cmd}`")
 
-with_database = click.option('--config', 'db', type=str,
-                    envvar="LABDATA_CONFIG", required=True,
-                    callback=get_database)
+kw = dict(type=str, envvar="LABDATA_CONFIG", required=True)
+with_config = click.option('--config', 'cfg', **kw)
+with_database = click.option('--config', 'db', callback=get_database, **kw)
 
 @cli.command(name='init')
 @with_database
@@ -50,15 +48,15 @@ def create_views(db):
         db.exec_sql("sql/03-create-views.sql")
 
 @cli.command(name='serve')
-@with_database
-def dev_server(db):
-    app = construct_app(db)
+@with_config
+def dev_server(cfg):
+    app = construct_app(cfg)
     app.run(debug=True)
 
 @cli.command(name='shell')
-@with_database
-def shell(db):
+@with_config
+def shell(cfg):
     from IPython import embed
-    app = construct_app(db)
+    app = construct_app(cfg)
     with app.app_context():
         embed()
