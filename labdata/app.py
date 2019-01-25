@@ -1,4 +1,5 @@
 
+from click import echo, style, secho
 from os import path
 from flask import Flask
 
@@ -13,6 +14,15 @@ def construct_app(db):
     app = Flask(__name__,
             template_folder=relative_path(__file__, "templates"))
 
+    # Setup config as suggested in http://flask.pocoo.org/docs/1.0/config/
+    app.config.from_object('labdata.default_config')
+    try:
+        app.config.from_envvar('LABDATA_CONFIG')
+    except RuntimeError as err:
+        secho("No lab-specific configuration file found.", bold=True)
+        print(str(err))
+
+    # Setup API
     api = APIv1(db)
 
     api.build_route("datum", schema='core_view')
