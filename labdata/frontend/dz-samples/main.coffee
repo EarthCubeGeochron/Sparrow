@@ -1,6 +1,7 @@
 import {Component, createElement} from 'react'
 import h from 'react-hyperscript'
 import {get} from 'axios'
+import {APIResultView} from '@macrostrat/ui-components'
 import { scaleLinear } from '@vx/scale'
 import { AreaClosed } from '@vx/shape'
 import { AxisLeft, AxisBottom } from '@vx/axis'
@@ -10,14 +11,9 @@ import {kernelDensityEstimator, kernelEpanechnikov} from './kernel-density'
 
 import './main.styl'
 
-class DetritalZirconComponent extends Component
-  constructor: ->
-    super arguments...
-    @state = {data: null}
-    @getData()
-
+class DetritalZirconBase extends Component
   render: ->
-    {data} = @state
+    {data} = @props
     return null unless data?
 
 
@@ -94,9 +90,9 @@ class DetritalZirconComponent extends Component
         }
       ]
 
-
-  getData: ->
-    {data} = await get '/api/v1/dz_sample?all=1'
-    @setState {data}
+DetritalZirconComponent = (props)->
+  route = '/api/v1/dz_sample'
+  h APIResultView, {route, params: {all: 1}, props...}, (data)->
+    h DetritalZirconBase, {data}
 
 export {DetritalZirconComponent}
