@@ -1,6 +1,7 @@
 import {Component, createElement} from 'react'
 import h from 'react-hyperscript'
 import {get} from 'axios'
+import {PagedAPIView} from '@macrostrat/ui-components'
 import './main.styl'
 
 class Publication extends Component
@@ -65,36 +66,27 @@ ProjectSamples = ({data})->
     content...
   ]
 
-class ProjectComponent extends Component
+ProjectComponent = (props)->
+  {id, title, description} = props
+  h 'div.project.bp3-card', {key: id}, [
+    h 'h3', title
+    h 'p.description', description
+    h ProjectPublications, {data: props.publications}
+    h ProjectResearchers, {data: props.researchers}
+    h ProjectSamples, {data: props.samples}
+  ]
+
+class ProjectListComponent extends Component
   @defaultProps: {
     apiEndpoint: '/api/v1/project'
   }
-  constructor: ->
-    super arguments...
-    @state = {data: null}
-    @getData()
-
-  renderProject: (project)=>
-    {id, title, description} = project
-    h 'div.project.bp3-card', {key: id}, [
-      h 'h3', title
-      h 'p.description', description
-      h ProjectPublications, {data: project.publications}
-      h ProjectResearchers, {data: project.researchers}
-      h ProjectSamples, {data: project.samples}
-    ]
 
   render: ->
-    {data} = @state
-    return null unless data?
-    console.log data
+    {apiEndpoint} = @props
     return h 'div.projects', [
       h 'h2', 'Projects'
-      h 'div', null, data.map @renderProject
+      h PagedAPIView, {route: apiEndpoint}, (data)=>
+        h 'div', null, data.map (d)-> h(ProjectComponent, d)
     ]
 
-  getData: ->
-    {data} = await get(@props.apiEndpoint)
-    @setState {data}
-
-export {ProjectComponent}
+export {ProjectListComponent}
