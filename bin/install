@@ -6,4 +6,4 @@ cd $basedir
 pip install -e .
 pip install -e deps/sadisplay
 
-bin/create-database
+pip install -e import-pipelines/WiscAr-MAP
