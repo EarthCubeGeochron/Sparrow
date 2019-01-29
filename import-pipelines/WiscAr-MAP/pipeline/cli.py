@@ -20,7 +20,18 @@ def extract_results_table(df):
             .dropna(axis=0, how='all')
             .dropna(axis=1, how='all'))
     results = results.rename(columns=results.iloc[0]).iloc[2:]
+
+    ## Extract total fusion data
+
+    try:
+        plateau_comment = results.iloc[0,0].split('\n')[1]
+    except IndexError:
+        plateau_comment = None
+    print(plateau_comment)
     results.iloc[0,0] = 'Age Plateau'
+
+    ar = '39Ar(k)'
+
     results.set_index(results.iloc[:,0], inplace=True)
     results = results.iloc[:,1:]
     ## Ignore most of the table (past the ages) for now
@@ -29,31 +40,38 @@ def extract_results_table(df):
     age_plateau = results.iloc[:ix,:]
     total_fusion = results.iloc[ix:,:]
 
-    # Get n_steps out from 39Ar percentage
-    ar = '39Ar(k)'
-    val = age_plateau.loc[N.nan, ar]
-    age_plateau.loc[N.nan, ar] = N.nan
-    age_plateau.loc['Age Plateau', 'n_steps'] = val
-
     ix = ('Total Fusion Age', ar)
     val = total_fusion.loc[ix]
     total_fusion.loc[ix] = N.nan
     total_fusion.loc['Total Fusion Age', 'n_steps'] = val
 
+    table_parts = [total_fusion]
 
-    # Not quite sure what these confidence limits are on right now
-    ix = value_index(age_plateau, "2σ Confidence Limit", integer=True)
-    loc = N.index_exp[ix[0]:ix[0]+2,ix[1]-1:ix[1]+1]
-    confidence = age_plateau.iloc[loc].copy()
-    age_plateau.iloc[loc] = N.nan
+    plateau_confidence = None
+    if plateau_comment != 'Cannot Calculate':
+        # Get n_steps out from 39Ar percentage
+        val = age_plateau.loc[N.nan, ar]
+        age_plateau.loc[N.nan, ar] = N.nan
+        age_plateau.loc['Age Plateau', 'n_steps'] = val
 
-    confidence = (confidence
-                    .set_index(confidence.columns[1])
+        # Extract confidence on plateau fit
+        # Find the first matching measure of confidence
+        for v in ["2σ Confidence Limit","1σ Confidence Limit","Statistical T Ratio"]:
+            ix = value_index(age_plateau, v, integer=True)
+            if ix is not None: break
+        loc = N.index_exp[ix[0]:ix[0]+2,ix[1]-1:ix[1]+1]
+        conf = age_plateau.iloc[loc].copy()
+        age_plateau.iloc[loc] = N.nan
+
+        conf = (conf.set_index(conf.columns[1])
                     .transpose())
-    confidence.columns.name = None
-    confidence.index = ['Age Plateau']
+        conf.columns.name = None
+        conf.index = ['Age Plateau']
+        plateau_confidence = conf
 
-    for a in (age_plateau, total_fusion):
+        table_parts.insert(0, age_plateau)
+
+    for a in table_parts:
         errors = a.iloc[2:].copy().transpose().dropna(how='all')
         a.insert(4, errors.columns[0], errors.iloc[0,0])
         a.insert(5, errors.columns[1], errors.iloc[0,1])
@@ -61,10 +79,13 @@ def extract_results_table(df):
         # since the errors in age units are more interesting anyway
         a.drop(a.tail(3).index, axis=0, inplace=True)
 
-    results = concat((age_plateau,total_fusion))
+    results = concat(table_parts)
 
-    # Merge age plateau confidence info back in to combined data frame
-    return results.merge(confidence, how='left', left_index=True, right_index=True)
+    if plateau_confidence is not None:
+        # Merge age plateau confidence info back in to combined data frame
+        results = results.merge(plateau_confidence, how='left',
+                                left_index=True, right_index=True)
+    return results
 
 def extract_data_tables(fn):
     # Create a `Pandas` representation of the entire first sheet of the spreadsheet
@@ -91,9 +112,9 @@ def extract_data_tables(fn):
     info.index.names = ['key']
     info.columns.names = ['value']
 
-    results = extract_result_table(df)
+    results = extract_results_table(df)
 
-    print(incremental_heating, info, results)
+    #print(incremental_heating, info, results)
     return incremental_heating, info, results
 
 def extract_analysis(fn):
