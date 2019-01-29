@@ -40,7 +40,7 @@ def extract_results_table(df):
     val = total_fusion.loc[ix]
     total_fusion.loc[ix] = N.nan
     total_fusion.loc['Total Fusion Age', 'n_steps'] = val
-    total_fusion.loc[:,'comment'] = None
+    total_fusion.loc[:,'Comment'] = None
 
     table_parts = [total_fusion]
 
@@ -59,7 +59,7 @@ def extract_results_table(df):
         loc = N.index_exp[ix[0]:ix[0]+2,ix[1]-1:ix[1]+1]
         conf = age_plateau.iloc[loc].copy()
         age_plateau.iloc[loc] = N.nan
-        age_plateau.loc[:,'comment'] = plateau_comment
+        age_plateau.loc[:,'Comment'] = plateau_comment
 
         conf = (conf.set_index(conf.columns[1])
                     .transpose())
