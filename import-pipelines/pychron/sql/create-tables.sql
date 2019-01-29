@@ -1,5 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+CREATE SCHEMA IF NOT EXISTS method_data;
+
 CREATE TABLE method_data.pychron_interpreted_age (
   session_id integer REFERENCES session(id),
   uid uuid PRIMARY KEY,

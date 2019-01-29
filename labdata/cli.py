@@ -1,25 +1,38 @@
 import click
+from click import echo, style
 from sqlalchemy import create_engine
+from sqlalchemy.exc import OperationalError
+from sys import exit
 
 from .util import working_directory
-from .app import construct_app
+from .app import App, construct_app
 from .database import Database
 
 cli = click.Group()
 
-def validate_database(ctx, param, value):
+def abort(message, status=1):
+    prefix = "ABORTING: "
+    msg = message.replace("\n","\n"+" "*len(prefix))
+    echo(style(prefix, fg='red', bold=True)+msg)
+    exit(status)
+
+
+def get_database(ctx, param, value):
     try:
-        prefix = "postgresql://"
-        if not value.startswith(prefix):
-            value = f"{prefix}/{value}"
-        db = Database(value)
-        return db
+        app = App(__name__, config=value)
+        return Database(app)
     except ValueError:
         raise click.BadParameter('Invalid database specified')
+    except OperationalError as err:
+        dbname = click.style(app.dbname, fg='cyan', bold=True)
+        cmd = style(f"createdb {app.dbname}", dim=True)
+        abort(f"Database {dbname} does not exist.\n"
+               "Please create it before continuing.\n"
+              f"Command: `{cmd}`")
 
-with_database = click.option('--database', 'db', type=str,
-                    envvar="LABDATA_DATABASE", required=True,
-                    callback=validate_database)
+kw = dict(type=str, envvar="LABDATA_CONFIG", required=True)
+with_config = click.option('--config', 'cfg', **kw)
+with_database = click.option('--config', 'db', callback=get_database, **kw)
 
 @cli.command(name='init')
 @with_database
@@ -35,15 +48,15 @@ def create_views(db):
         db.exec_sql("sql/03-create-views.sql")
 
 @cli.command(name='serve')
-@with_database
-def dev_server(db):
-    app = construct_app(db)
+@with_config
+def dev_server(cfg):
+    app = construct_app(cfg)
     app.run(debug=True)
 
 @cli.command(name='shell')
-@with_database
-def shell(db):
+@with_config
+def shell(cfg):
     from IPython import embed
-    app = construct_app(db)
+    app = construct_app(cfg)
     with app.app_context():
         embed()
