@@ -138,6 +138,27 @@ CREATE TABLE session (
 );
 
 /*
+ANALYTICAL CONSTANTS
+Constants, etc. used in measurements, and their relationships
+to individual analytical sessions, etc.
+
+Right now, we support linking these parameters at the session
+level. Some coarser (e.g. a table for analytical process) or finer
+(linked parameters for each datum) abstraction might be desired.
+
+In many ways, the column layout mirrors that of the datum table,
+with the exception that there is a many-to-many link on the data.
+*/
+CREATE TABLE session_datum (
+  /* Handles many-to-many links between session and datum, which
+     is primarily useful for handling analytical parameters
+     that remain constant for many sessions.
+  */
+  session_id integer REFERENCES session(id),
+  datum_id integer REFERENCES datum(id)
+);
+
+/*
 SINGLE ANALYSES
 These two tables will end up needing data-type specific columns
 */
