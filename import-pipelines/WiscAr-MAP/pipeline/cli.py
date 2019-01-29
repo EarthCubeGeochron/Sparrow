@@ -13,7 +13,7 @@ def value_index(df, value, integer=False):
                 j = df.columns.get_loc(j)
             return (i,j)
 
-def extract_results(df):
+def extract_results_table(df):
     ixc = value_index(df, "Results")
     col = df.columns.get_loc(ixc[1])
     results = (df.iloc[ixc[0]:,col:]
@@ -66,8 +66,11 @@ def extract_results(df):
     # Merge age plateau confidence info back in to combined data frame
     return results.merge(confidence, how='left', left_index=True, right_index=True)
 
-def extract_analysis(fn):
+def extract_data_tables(fn):
+    # Create a `Pandas` representation of the entire first sheet of the spreadsheet
     df = read_excel(fn, sheet_name="Incremental Heating Summary")
+
+    # Get the upper-left index of several subtables
     ixa = value_index(df, "Incremental\nHeating")
     ixb = value_index(df, "Information\non Analysis")
 
@@ -82,14 +85,20 @@ def extract_analysis(fn):
     # Clean Information on Analysis
     col = df.columns.get_loc(ixb[1])
     info = df.iloc[ixb[0]+1:,col:col+1].dropna()
+    # Expand key/value pairs
     info = info.iloc[:,0].str.split("=", n=1, expand=True)
     info.set_index(0, inplace=True)
     info.index.names = ['key']
     info.columns.names = ['value']
 
-    results = extract_results(df)
+    results = extract_result_table(df)
 
     print(incremental_heating, info, results)
+    return incremental_heating, info, results
+
+def extract_analysis(fn):
+    # Extract data tables from Excel sheet
+    incremental_heating, info, results = extract_data_tables(fn)
 
 @command(name="import-map")
 @option('--stop-on-error', is_flag=True, default=False)
