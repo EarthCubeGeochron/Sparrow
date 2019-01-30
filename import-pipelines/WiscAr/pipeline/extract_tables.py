@@ -83,32 +83,56 @@ def extract_results_table(df):
         # Merge age plateau confidence info back in to combined data frame
         results = results.merge(plateau_confidence, how='left',
                                 left_index=True, right_index=True)
+
+    # Move MSWD and associated columns to the end of the frame
+    cols = ['MSWD', *results.columns[-2:]]
+    results = results.drop(columns=cols).assign(
+        **{k:results[k] for k in cols})
+
     return results
 
-def extract_data_tables(fn):
-    # Create a `Pandas` representation of the entire first sheet of the spreadsheet
-    df = read_excel(fn, sheet_name="Incremental Heating Summary")
-
+def extract_incremental_heating_table(df):
     # Get the upper-left index of several subtables
     ixa = value_index(df, "Incremental\nHeating")
     ixb = value_index(df, "Information\non Analysis")
 
     # Clean the Incremental Heating table
-    incremental_heating = (df.iloc[ixa[0]:ixb[0],:]
+    ih = (df.iloc[ixa[0]:ixb[0],:]
         .dropna(axis=0, how='all')
         .dropna(axis=1, how='all'))
-    #incremental_heating.drop(len(incremental_heating)-1, inplace=True)
-    incremental_heating.drop(1, inplace=True)
-    incremental_heating.drop(incremental_heating.tail(1).index, inplace=True)
+    ih.iloc[0,1:3] = ['temperature', 'in_plateau']
+    ih.columns = ih.iloc[0]
+    #ih.drop(len(ih)-1, inplace=True)
+    ih.drop(ih.head(2).index, inplace=True)
+    ih.drop(ih.tail(1).index, inplace=True)
+
+    ih.set_index(ih.columns[0], inplace=True)
+    ih.columns.name = 'Incremental Heating'
+    ih.index.name = 'Heating Step'
+
+    ix = ih['in_plateau'].isnull()
+    ih.loc[~ix,'in_plateau'] = True
+    ih.loc[ix,'in_plateau'] = False
+    return ih
+
+def extract_information_table(df):
+    # Get the upper-left index of several subtables
+    ix = value_index(df, "Information\non Analysis")
 
     # Clean Information on Analysis
-    col = df.columns.get_loc(ixb[1])
-    info = df.iloc[ixb[0]+1:,col:col+1].dropna()
+    col = df.columns.get_loc(ix[1])
+    info = df.iloc[ix[0]+1:,col:col+1].dropna()
     # Expand key/value pairs
     info = info.iloc[:,0].str.split("=", n=1, expand=True)
     info.set_index(0, inplace=True)
     info.index.names = ['key']
-    info.columns.names = ['value']
+    info.columns = ['value']
+    return info
 
+def extract_data_tables(fn):
+    # Create a `Pandas` representation of the entire first sheet of the spreadsheet
+    df = read_excel(fn, sheet_name="Incremental Heating Summary")
+    heating = extract_incremental_heating_table(df)
+    info = extract_information_table(df)
     results = extract_results_table(df)
-    return incremental_heating, info, results
+    return heating, info, results
