@@ -129,7 +129,7 @@ CREATE TABLE session (
   */
   id serial PRIMARY KEY,
   sample_id text REFERENCES sample(id),
-  date timestamptz,
+  date timestamptz NOT NULL,
   end_date timestamptz,
   instrument integer REFERENCES instrument(id),
   technique text REFERENCES vocabulary.method(id),

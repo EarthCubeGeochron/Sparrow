@@ -103,6 +103,9 @@ def extract_incremental_heating_table(df):
     ih.iloc[0,1:3] = ['temperature', 'in_plateau']
     # Get rid of second line of labels
     ih.iloc[0] = ih.iloc[0].str.split('\n').str[0]
+    # re-add percent to avoid confusion
+    ih.iloc[0,10:12] = ih.iloc[0,10:12]+" [%]"
+
     # Promote first row to column labels
     ih.columns = ih.iloc[0]
     ih.drop(ih.head(2).index, inplace=True)
