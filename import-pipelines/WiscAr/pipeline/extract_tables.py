@@ -101,8 +101,10 @@ def extract_incremental_heating_table(df):
         .dropna(axis=0, how='all')
         .dropna(axis=1, how='all'))
     ih.iloc[0,1:3] = ['temperature', 'in_plateau']
+    # Get rid of second line of labels
+    ih.iloc[0] = ih.iloc[0].str.split('\n').str[0]
+    # Promote first row to column labels
     ih.columns = ih.iloc[0]
-    #ih.drop(len(ih)-1, inplace=True)
     ih.drop(ih.head(2).index, inplace=True)
     ih.drop(ih.tail(1).index, inplace=True)
 

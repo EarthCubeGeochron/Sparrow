@@ -20,8 +20,8 @@ def extract_analysis(db, fn, verbose=False):
     cls = db.mapped_classes
 
     get_or_create(db.session, cls.error_metric,
-        id='1s', description='1 standard deviation', authority='WiscAr'
-    )
+        id='1s', description='1 standard deviation',
+        authority='WiscAr')
     db.session.commit()
 
     import IPython; IPython.embed(); raise
