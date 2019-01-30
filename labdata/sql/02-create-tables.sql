@@ -174,6 +174,9 @@ CREATE TABLE analysis (
   id serial PRIMARY KEY,
   session_id integer REFERENCES session(id) NOT NULL,
   session_index integer, -- captures ordering within a session
+  analysis_type text,
+  /* If `session_index` is not set, `analysis_type` allows the
+    unique identification of a record within the session */
   date timestamptz,
   material text REFERENCES vocabulary.material(id),
   /* Not really sure that material is the best parameterization
@@ -193,7 +196,7 @@ CREATE TABLE analysis (
 
   */
   is_interpreted boolean,
-  UNIQUE (session_id, session_index)
+  UNIQUE (session_id, session_index, analysis_type)
 );
 
 CREATE TABLE datum (

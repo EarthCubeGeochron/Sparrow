@@ -10,6 +10,13 @@ from  .extract_tables import extract_data_tables
 def print_dataframe(df):
     secho(str(df.fillna(''))+'\n', dim=True)
 
+def import_age_plateau(db, analysis_session, row):
+    import IPython; IPython.embed(); raise
+    pass
+
+def import_fusion_age(db, analysis_session, row):
+    pass
+
 def extract_analysis(db, fn, verbose=False):
     # Extract data tables from Excel sheet
 
@@ -122,7 +129,7 @@ def extract_analysis(db, fn, verbose=False):
             session_index=i,
             step_id=ix
         )
-        analysis.in_plateau=row['in_plateau']
+        analysis.in_plateau = row['in_plateau']
         analysis.is_interpreted = False
         db.session.add(analysis)
         i += 1
@@ -179,6 +186,16 @@ def extract_analysis(db, fn, verbose=False):
             error_metric=em.id,
             error_unit=ratio.id)
 
+    # Import results table
+    try:
+        res = results.loc["Age Plateau"]
+        import_age_plateau(db, session, res)
+    except KeyError:
+        pass
+
+    res = results.loc["Total Fusion Age"]
+    import_fusion_age(db, session, res)
+
     db.session.commit()
 
 @command(name="import-map")
@@ -191,6 +208,8 @@ def cli(stop_on_error=False, verbose=False):
     directory = environ.get("WISCAR_MAP_DATA")
     db = Database()
 
+    success = 0
+    error = 0
     for fn in listdir(directory):
         dn = path.join(directory, fn)
         if not path.isdir(dn): continue
@@ -202,7 +221,10 @@ def cli(stop_on_error=False, verbose=False):
             fp = path.join(dn, fn)
             try:
                 extract_analysis(db, fp, verbose=verbose)
+                success += 1
             except Exception as err:
                 if stop_on_error: raise err
                 secho(str(err), fg='red')
                 echo("")
+                error += 1
+    echo(f"Successfully imported {success} files; {error} errors")

@@ -77,6 +77,13 @@ class Database:
         self.automap_base = Base
         return self.automap_base.classes
 
+    def get_or_create(self, model, defaults=None, **kwargs):
+        """
+        Get an instance of a model, or create it if it doesn't
+        exist.
+        """
+        return get_or_create(self.session, model, defaults=None, **kwargs)
+
     def initialize(self, drop=False):
         secho("Creating core schema...", bold=True)
         with working_directory(__file__):
