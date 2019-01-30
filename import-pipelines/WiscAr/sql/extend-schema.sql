@@ -4,5 +4,6 @@ as unstructured JSON.
 */
 ALTER TABLE session ADD COLUMN data jsonb;
 ALTER TABLE analysis ADD COLUMN in_plateau boolean;
+ALTER TABLE analysis ADD COLUMN step_id text;
 
 COMMIT;

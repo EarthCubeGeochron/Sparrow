@@ -126,15 +126,27 @@ def extract_information_table(df):
     info = df.iloc[ix[0]+1:,col:col+1].dropna()
     # Expand key/value pairs
     info = info.iloc[:,0].str.split("=", n=1, expand=True)
+    info.iloc[:,0] = info.iloc[:,0].str.strip()
+    info.iloc[:,1] = info.iloc[:,1].str.strip()
+
     info.set_index(0, inplace=True)
     info.index.names = ['key']
     info.columns = ['value']
-    return info
+    return info.loc[:,'value']
 
 def extract_data_tables(fn):
     # Create a `Pandas` representation of the entire first sheet of the spreadsheet
     df = read_excel(fn, sheet_name="Incremental Heating Summary")
     heating = extract_incremental_heating_table(df)
+
+    T = heating['temperature']
+    if (T == T[0]).sum() == len(T):
+        # All the heating steps are at the same temperature
+        type = 'Fusion'
+    else:
+        type = 'Incremental Heating'
+
     info = extract_information_table(df)
+    info['Type'] = type
     results = extract_results_table(df)
     return heating, info, results
