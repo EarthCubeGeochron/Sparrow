@@ -41,6 +41,8 @@ def construct_app(config=None):
     app = App(__name__, config=config,
             template_folder=relative_path(__file__, "templates"))
 
+    from .database import Database
+
     db = Database(app)
     # Setup API
     api = APIv1(db)

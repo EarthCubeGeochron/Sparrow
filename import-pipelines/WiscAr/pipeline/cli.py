@@ -10,7 +10,12 @@ from  .extract_tables import extract_data_tables
 def print_dataframe(df):
     secho(str(df.fillna(''))+'\n', dim=True)
 
+def import_shared_parameters(db, analysis, row):
+    return row
+
 def import_age_plateau(db, analysis_session, row):
+    analysis = db
+
     import IPython; IPython.embed(); raise
     pass
 

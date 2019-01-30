@@ -65,3 +65,9 @@ def shell(cfg):
     app = construct_app(cfg)
     with app.app_context():
         embed()
+
+@cli.command(name='config')
+@with_config
+def config(cfg):
+    app = construct_app(cfg)
+    print(app.config)

@@ -1,4 +1,5 @@
 from click import secho
+from os import environ
 
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
@@ -48,6 +49,10 @@ class Database:
             cfg = cfg.config
         self.config = cfg
         db_conn = self.config.get("DATABASE")
+        # Override with environment variable
+        envvar = environ.get("LABDATA_DATABASE", None)
+        if envvar is not None:
+            db_conn = envvar
         self.engine = create_engine(db_conn)
         metadata.create_all(bind=self.engine)
         self.meta = metadata
