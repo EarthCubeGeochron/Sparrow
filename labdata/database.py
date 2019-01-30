@@ -19,13 +19,15 @@ class Database:
         case we will try to infer the correct database from
         the LABDATA_CONFIG file, if available.
         """
+        self.config = None
         if cfg is None:
             # Set config from environment variable
             cfg = App(__name__)
         if hasattr(cfg,'config'):
-            cfg = cfg.config.get("DATABASE")
-
-        self.engine = create_engine(cfg)
+            cfg = cfg.config
+        self.config = cfg
+        db_conn = self.config.get("DATABASE")
+        self.engine = create_engine(db_conn)
         metadata.create_all(bind=self.engine)
         self.meta = metadata
         self.session = sessionmaker(bind=self.engine)()
@@ -46,3 +48,8 @@ class Database:
             self.exec_sql("sql/02-create-tables.sql")
             self.exec_sql("sql/03-create-views.sql")
             self.exec_sql("sql/04-populate-vocabulary.sql")
+
+        init_sql = self.config.get("INIT_SQL", None)
+        if init_sql is not None:
+            for s in init_sql:
+                self.exec_sql(s)
