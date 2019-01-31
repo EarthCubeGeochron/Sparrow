@@ -138,6 +138,8 @@ class APIv1(Api):
                 if args.pop('all', False):
                     should_describe = False
 
+                count = q.count()
+
                 for k in ('offset','limit'):
                     val = args.pop(k, None)
                     if val is not None:
@@ -148,7 +150,6 @@ class APIv1(Api):
                     return self.describe()
 
                 # Save the count of the query
-                count = q.count()
                 response = q.all()
                 status = 200
                 headers = {'x-total-count': count}

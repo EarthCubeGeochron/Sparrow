@@ -3,6 +3,7 @@ from click import echo, style
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sys import exit
+from json import dumps
 from click_plugins import with_plugins
 from pkg_resources import iter_entry_points
 
@@ -70,4 +71,10 @@ def shell(cfg):
 @with_config
 def config(cfg):
     app, db = construct_app(cfg)
-    print(app.config)
+    res = dict()
+    for k in ("LAB_NAME","DATABASE","SITE_CONTENT"):
+        val = app.config.get(k)
+        v = k.lower()
+        res[v] = val
+    print(dumps(res))
+

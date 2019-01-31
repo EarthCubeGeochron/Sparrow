@@ -133,7 +133,7 @@ SELECT
 	s.id,
 	unnest(t.tree) material_id
 FROM sample s
-JOIN core_view.material_tree t
+LEFT JOIN core_view.material_tree t
   ON s.material = t.id
 ),
 b AS (
@@ -151,8 +151,8 @@ GROUP BY a.id
 SELECT
   s.*,
   b.material material_data
-FROM b
-JOIN sample s
+FROM sample s
+LEFT JOIN b
   ON s.id = b.id;
 
 CREATE VIEW core_view.project AS

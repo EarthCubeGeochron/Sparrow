@@ -51,9 +51,14 @@ ProjectResearchers = ({data})->
   ]
 
 Sample = (props)->
+  {material_data} = props
+  material = null
+  if material_data?
+    material = h 'span.material', material_data[0].description
+
   h 'div.sample', [
     h 'span.name', props.id
-    h 'span.material', props.material_data[0].description
+    material
   ]
 
 ProjectSamples = ({data})->
@@ -85,7 +90,7 @@ class ProjectListComponent extends Component
     {apiEndpoint} = @props
     return h 'div.projects', [
       h 'h2', 'Projects'
-      h PagedAPIView, {route: apiEndpoint}, (data)=>
+      h PagedAPIView, {route: apiEndpoint, perPage: 5}, (data)=>
         h 'div', null, data.map (d)-> h(ProjectComponent, d)
     ]
 
