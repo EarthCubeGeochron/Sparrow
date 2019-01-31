@@ -26,7 +26,7 @@ def run_query(db, filename_or_query, **kwargs):
 
 def pretty_print(sql, **kwargs):
     for line in sql.split("\n"):
-        for i in ["SELECT", "INSERT","UPDATE","CREATE", "DROP","DELETE"]:
+        for i in ["SELECT", "INSERT","UPDATE","CREATE", "DROP","DELETE", "ALTER"]:
             if not line.startswith(i):
                 continue
             start = line.split("(")[0].strip()

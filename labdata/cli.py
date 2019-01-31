@@ -3,12 +3,17 @@ from click import echo, style
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sys import exit
+from click_plugins import with_plugins
+from pkg_resources import iter_entry_points
 
 from .util import working_directory
 from .app import App, construct_app
 from .database import Database
 
-cli = click.Group()
+@with_plugins(iter_entry_points('labdata.plugins'))
+@click.group()
+def cli():
+    pass
 
 def abort(message, status=1):
     prefix = "ABORTING: "
@@ -50,13 +55,19 @@ def create_views(db):
 @cli.command(name='serve')
 @with_config
 def dev_server(cfg):
-    app = construct_app(cfg)
+    app, db = construct_app(cfg)
     app.run(debug=True)
 
 @cli.command(name='shell')
 @with_config
 def shell(cfg):
     from IPython import embed
-    app = construct_app(cfg)
+    app, db = construct_app(cfg)
     with app.app_context():
         embed()
+
+@cli.command(name='config')
+@with_config
+def config(cfg):
+    app, db = construct_app(cfg)
+    print(app.config)
