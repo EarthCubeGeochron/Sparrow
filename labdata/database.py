@@ -87,6 +87,8 @@ class Database:
         Get an instance of a model, or create it if it doesn't
         exist.
         """
+        if isinstance(model, str):
+            model = self.mapped_classes[model]
         return get_or_create(self.session, model, defaults=None, **kwargs)
 
     def initialize(self, drop=False):

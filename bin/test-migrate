@@ -5,4 +5,4 @@ createdb "$db"
 LABDATA_DATABASE="$conn" labdata init
 
 migra "postgresql:///wiscar_labdata" "$conn" --unsafe > test.sql
-#dropdb "$db"
+dropdb "$db"

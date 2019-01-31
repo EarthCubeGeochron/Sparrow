@@ -10,17 +10,129 @@ from  .extract_tables import extract_data_tables
 def print_dataframe(df):
     secho(str(df.fillna(''))+'\n', dim=True)
 
+def add_datum(db, analysis, **kwargs):
+    cls = db.mapped_classes
+    dtype_cols = [i for i in
+        cls.datum_type.__table__.columns.keys()
+        if i != 'id']
+    defaults = dict(
+        is_computed=False,
+        is_interpreted=False)
+    dtype_kw = dict()
+    for i in dtype_cols:
+        val = kwargs.pop(i, defaults.get(i, None))
+        if val is not None:
+            dtype_kw[i] = val
+    dtype = db.get_or_create(cls.datum_type, **dtype_kw)
+    kwargs['type'] = dtype.id
+    kwargs['analysis'] = analysis.id
+    return db.get_or_create(cls.datum, **kwargs)
+
+def add_K_Ca_ratio(db, analysis, row):
+    ratio = db.get_or_create('unit',
+        id='ratio', authority="WiscAr")
+
+    ix = list(row.index).index('K/Ca')
+    error_ix = ix+1
+    em = get_error_metric(db, row.index[error_ix])
+    add_datum(db, analysis,
+        value=row['K/Ca'],
+        unit=ratio.id,
+        parameter=db.get_or_create("parameter", id="K/Ca").id,
+        description="Potassium/Calcuim ratio",
+        error=row.iloc[error_ix],
+        error_metric=em.id,
+        error_unit=ratio.id)
+
+def get_error_metric(db, label):
+    error_metric = label.replace("± ","")
+    description = ""
+    if error_metric == '1s':
+        description = "1 standard deviation"
+    elif error_metric == '2s':
+        description = "2 standard deviations"
+    return db.get_or_create('error_metric',
+        id=error_metric, description=description)
+
 def import_shared_parameters(db, analysis, row):
+    add_K_Ca_ratio(db, analysis, row)
+
+    ratio = db.get_or_create('unit',
+        id='ratio', authority="WiscAr")
+
+    id = 'plateau_age'
+    if analysis.analysis_type == 'Total Fusion Age':
+        id = 'total_fusion_age'
+
+    age_parameter = db.get_or_create("parameter", id=id)
+    Ma = db.get_or_create("unit", id='Ma')
+
+    ix = list(row.index).index('Age')
+    error_ix = ix+1
+    em = get_error_metric(db, row.index[error_ix])
+
+    add_datum(db, analysis,
+        value=row['Age'],
+        unit=Ma.id,
+        parameter=age_parameter.id,
+        error=row.iloc[error_ix],
+        error_metric=em.id,
+        is_computed=True,
+        error_unit=Ma.id)
+
+    ## 40Ar/39Ar(k) ratio
+    label = '40(r)/39(k)'
+    parameter = db.get_or_create("parameter", id=label)
+    ix = list(row.index).index(label)
+    error_ix = ix+1
+    el = row.index[error_ix]
+    em = get_error_metric(db, el)
+    add_datum(db, analysis,
+        value=row[label],
+        unit=ratio.id,
+        parameter=parameter.id,
+        error=row.iloc[error_ix],
+        error_metric=em.id,
+        is_interpreted=True,
+        is_computed=True,
+        error_unit=ratio.id)
+
+    row.drop(index=['Age','K/Ca',label, el], inplace=True)
     return row
 
 def import_age_plateau(db, analysis_session, row):
-    analysis = db
 
-    import IPython; IPython.embed(); raise
-    pass
+    analysis = db.get_or_create('analysis',
+        session_id = analysis_session.id,
+        is_interpreted=True,
+        analysis_type='Age Plateau')
+
+    row = import_shared_parameters(db, analysis, row)
+
+    parameter = db.get_or_create('parameter',
+        id='39Ar(k) plateau [%]',
+        description="39Ar from potassium, cumulative percent released in all plateau steps",
+        authority='WiscAr')
+
+    add_datum(db, analysis,
+        value=row.pop('39Ar(k)'),
+        unit='%',
+        parameter=parameter.id,
+        is_interpreted=True,
+        is_computed=True)
+
+    analysis.data = row.dropna().to_dict()
+    db.session.add(analysis)
 
 def import_fusion_age(db, analysis_session, row):
-    pass
+
+    analysis = db.get_or_create('analysis',
+        session_id = analysis_session.id,
+        is_interpreted=True,
+        analysis_type='Total Fusion Age')
+    row = import_shared_parameters(db, analysis, row)
+    analysis.data = row.dropna().to_dict()
+    db.session.add(analysis)
 
 def extract_analysis(db, fn, verbose=False):
     # Extract data tables from Excel sheet
@@ -40,16 +152,6 @@ def extract_analysis(db, fn, verbose=False):
 
     def get(c, **kwargs):
         return get_or_create(db.session, c, **kwargs)
-
-    def get_error_metric(label):
-        error_metric = label.replace("± ","")
-        description = ""
-        if error_metric == '1s':
-            description = "1 standard deviation"
-        elif error_metric == '2s':
-            description = "2 standard deviations"
-        return get(cls.error_metric, id=error_metric,
-                    description=description)
 
     project = get(cls.project,id=info.pop('Project'))
     project.title = project.id
@@ -86,13 +188,17 @@ def extract_analysis(db, fn, verbose=False):
         '38Ar(cl)': "38Ar, reactor corrected for Cl interference",
         '39Ar(k)': "39Ar, corrected for amount produced by K",
         '40Ar(r)': "Radiogenic 40Ar measured abundance",
+        '40(r)/39(k)': "Ratio of radiogenic 40Ar to 39Ar from K",
         'step_age': "Age calculated for a single heating step",
+        'plateau_age': "Age calculated for a plateau",
+        'total_fusion_age': "Age calculated for fusion of all heating steps",
         '40Ar(r) [%]': "Radiogenic 40Ar, percent released in this step",
         '39Ar(k) [%]': "39Ar from potassium, percent released in this step",
         'K/Ca': "Potassium/Calcium ratio"
     }
 
-    V = get(cls.unit, id='V', description='Measured isotope abundance',
+    V = get(cls.unit, id='V',
+            description='Measured isotope abundance',
             authority='WiscAr')
     percent = get(cls.unit, id='%')
     degrees_c = get(cls.unit, id="°C")
@@ -108,31 +214,12 @@ def extract_analysis(db, fn, verbose=False):
         p[k].description = v
         db.session.add(p[k])
 
-    def add_datum(analysis, **kwargs):
-        dtype_cols = [i for i in
-            cls.datum_type.__table__.columns.keys()
-            if i != 'id']
-        defaults = dict(
-            is_computed=False,
-            is_interpreted=False
-        )
-        dtype_kw = dict()
-        for i in dtype_cols:
-            val = kwargs.pop(i, defaults.get(i, None))
-            if val is not None:
-                dtype_kw[i] = val
-        dtype = get(cls.datum_type, **dtype_kw)
-        kwargs['type'] = dtype.id
-        kwargs['analysis'] = analysis.id
-        return get(cls.datum, **kwargs)
-
-
     i = 0
     for ix, row in incremental_heating.iterrows():
         analysis = get(cls.analysis,
             session_id=session.id,
             session_index=i,
-            step_id=ix
+            analysis_type=ix
         )
         analysis.in_plateau = row['in_plateau']
         analysis.is_interpreted = False
@@ -140,7 +227,7 @@ def extract_analysis(db, fn, verbose=False):
         i += 1
 
         def datum(**kwargs):
-            return add_datum(analysis, **kwargs)
+            return add_datum(db, analysis, **kwargs)
 
         # Check whether we are measuring laser power or temperature
         s = incremental_heating['temperature']
@@ -170,7 +257,7 @@ def extract_analysis(db, fn, verbose=False):
 
         ix = list(row.index).index('Age')
         error_ix = ix+1
-        em = get_error_metric(row.index[error_ix])
+        em = get_error_metric(db, row.index[error_ix])
 
         datum(value=row['Age'],
             unit=Ma.id,
@@ -180,16 +267,7 @@ def extract_analysis(db, fn, verbose=False):
             error_metric=em.id,
             error_unit=Ma.id)
 
-        ix = list(row.index).index('K/Ca')
-        error_ix = ix+1
-        em = get_error_metric(row.index[error_ix])
-        datum(value=row['K/Ca'],
-            unit=ratio.id,
-            parameter=p["K/Ca"].id,
-            description="Potassium/Calcuim ratio",
-            error=row.iloc[error_ix],
-            error_metric=em.id,
-            error_unit=ratio.id)
+        add_K_Ca_ratio(db, analysis, row)
 
     # Import results table
     try:
