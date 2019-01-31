@@ -1,10 +1,12 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, current_app
 
 web = Blueprint('frontend', __name__)
 
 @web.route('/')
 def index():
-    return render_template('index.html')
+    v = current_app.config.get("SITE_TITLE")
+    return render_template('page.html', title=v, id='index')
+
 
 @web.route('/admin/')
 def admin():

@@ -23,7 +23,7 @@ let browserSync = new BrowserSyncPlugin({
 
 let jsLoader = {
   loader: 'babel-loader',
-  options: {presets: ['@babel/preset-env']}
+  options: {presets: ['@babel/preset-env', '@babel/preset-react']}
 };
 
 let fontLoader = {
@@ -38,8 +38,8 @@ let stylusLoader = {
 module.exports = {
   module: {
     rules: [
-      {test: /\.js$/, use: [jsLoader], exclude: /node_modules/},
       {test: /\.coffee$/, use: [ jsLoader, "coffee-loader" ]},
+      {test: /\.(js|jsx)$/, use: [ jsLoader ], exclude: /node_modules/ },
       {test: /\.styl$/, use: ["style-loader", "css-loader", stylusLoader]},
       {test: /\.css$/, use: ["style-loader", 'css-loader' ]},
       {test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader]},
@@ -49,8 +49,8 @@ module.exports = {
   resolve: {
     extensions: [".coffee", ".js", ".styl",".css",".html",".md"],
     alias: {
-      app: path.resolve(__dirname, "frontend/"),
-      content: path.resolve(cfg.site_content)
+      "app": path.resolve(__dirname, "frontend/"),
+      "site-content": path.resolve(cfg.site_content)
     }
   },
   entry: {
