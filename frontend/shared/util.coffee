@@ -1,12 +1,13 @@
 import h from 'react-hyperscript'
 import cfg from 'site-content/variables'
 import React from 'react'
+import { Link } from "react-router-dom"
 
 SiteNav = ->
   <nav class='site-nav'>
     <ul>
-      <li><a class="nav-link bp3-button bp3-minimal" href='/admin/'>Admin</a></li>
-      <li><a class="nav-link bp3-button bp3-minimal" href='/api-explorer'>API Explorer</a></li>
+      <li><Link className="nav-link bp3-button bp3-minimal" to='/admin/'>Admin</Link></li>
+      <li><Link className="nav-link bp3-button bp3-minimal" to='/api-explorer'>API Explorer</Link></li>
     </ul>
   </nav>
 
@@ -21,4 +22,4 @@ SiteTitle = ({subPage})->
     v
   ]
 
-export {SiteTitle}
+export {SiteTitle, SiteNav}

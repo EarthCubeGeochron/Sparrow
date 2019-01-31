@@ -126,7 +126,7 @@ class RouteComponent extends Component
 
   apiPath: ->
     {path} = @props.match
-    join '/api', path
+    join '/api', path.replace("/api-explorer","")
 
   getData: ->
     {path} = @props.match
