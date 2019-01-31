@@ -102,7 +102,7 @@ class RouteComponent extends Component
       h 'p.description', data.description
       h ChildRoutesList, {base, routes}
       h APIUsageComponent, {data}
-      h APIDataComponent, {route: api_route}
+      h APIDataComponent, {route: api_route, params: {offset: 0, limit: 10}}
     ]
 
   renderSubRoutes: nullIfError ->
@@ -130,8 +130,7 @@ class RouteComponent extends Component
 
   getData: ->
     {path} = @props.match
-    apiPath = join @apiPath(), 'describe'
-    {data, status} = await get(apiPath)
+    {data, status} = await get(@apiPath())
     @setState {response: data}
 
 export {RouteComponent}

@@ -56,7 +56,7 @@ GROUP BY a.id
 SELECT
   a.id analysis_id,
   coalesce(a.date, s.date) date,
-  data,
+  __a.data,
   a.session_id,
   a.session_index,
   a.is_standard,

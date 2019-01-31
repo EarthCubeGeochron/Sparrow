@@ -4,7 +4,7 @@ rootDir=${0:h:h}
 
 cd "$rootDir"
 
-bin/labdata serve &
+labdata serve &
 $(npm bin)/webpack --watch --mode=development &
 
 wait

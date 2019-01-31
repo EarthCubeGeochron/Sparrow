@@ -6,7 +6,7 @@ for data categorization.
 """
 
 import pandas as P
-from sqlalchemy import create_engine
+from labdata import App
 
 def get_table(category):
     url = f'http://www.earthchem.org/petdbWeb/search/vocabulary.jsp?category={category}'
@@ -18,7 +18,8 @@ def get_table(category):
         'DESCRIPTION': 'description'}, inplace=True)
     return df
 
-conn = create_engine("postgresql:///earthcube_labdata")
+app = App(__name__)
+conn = app.database.engine
 
 def write_table(tbl, name):
     return tbl.to_sql(name, conn, schema='earthchem_vocabulary', if_exists='replace')

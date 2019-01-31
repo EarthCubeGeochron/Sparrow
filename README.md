@@ -95,3 +95,10 @@ Currently, we envision a technology stack consisting of
 ## Possible technologies for backend
 
 - `migra` for PostgreSQL schema migrations?
+- Command-line plugins can be enabled by `click-plugins`.
+
+## Current limitations of the data model
+
+- Publications are linked to individual projects, when a more granular
+  level could be appropriate.
+

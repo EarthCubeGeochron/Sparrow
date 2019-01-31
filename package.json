@@ -1,8 +1,8 @@
 {
-  "name": "lab-data-interface",
+  "name": "@earthcube/lab-data-interface",
   "version": "0.1.0",
   "description": "EarthCube geochronology lab data interface",
-  "main": "index.js",
+  "main": "frontend/index.coffee",
   "directories": {
     "doc": "docs"
   },

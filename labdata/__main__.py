@@ -1,4 +1,4 @@
-#!/usr/bin/env python -W ignore
+#!/usr/bin/env python
 
 from labdata.cli import cli
 

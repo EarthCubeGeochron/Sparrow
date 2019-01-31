@@ -69,8 +69,10 @@ class APIv1(Api):
             key = infer_primary_key(table)
 
         parser = reqparse.RequestParser()
-        parser.add_argument('offset', type=int, help='Query offset', default=0)
-        parser.add_argument('limit', type=int, help='Query limit', default=10)
+        parser.add_argument('offset', type=int, help='Query offset', default=None)
+        parser.add_argument('limit', type=int, help='Query limit', default=None)
+
+        parser.add_argument('all', type=bool, help='Return all rows', default=False)
 
         for name, column in table.c.items():
             try:
@@ -80,48 +82,32 @@ class APIv1(Api):
                     help=f"Column '{name}' of type '{typename}'")
             except: pass
 
-        class TableModel(Resource):
-            def get(self):
-                args = parser.parse_args()
-                print(args)
-                q = db.session.query(table)
-
-                for k,col in table.c.items():
-                    val = args.pop(k, None)
-                    if val is not None:
-                        q = q.filter(col==val)
-
-                for k in ('offset','limit'):
-                    val = args.pop(k, None)
-                    if val is not None:
-                        q = getattr(q,k)(val)
-
-                return q.all()
-
-        class RecordModel(Resource):
-            def get(self, id):
-                # Should fail if more than one record is returned
-                return (db.session.query(table)
-                    .filter(key==id)
-                    .first())
+        # Set up information about
+        # table descriptions
 
         route = f"/{tablename}"
         tname = infer_type(key).__name__
         if tname != 'int':
             tname = 'string'
         get_route = f"/<{tname}:{key.name}>"
-        describe_route = f"{route}/describe"
 
         basicInfo = dict(
             route=route,
             table=table.name,
             schema=table.schema,
-            description=description
+            description=description,
+            usage_info="Pass the parameter `?all=1` to return all rows instead of API description"
         )
         self.route_descriptions.append(basicInfo)
 
-        class DescriptionModel(Resource):
-            def get(self):
+
+        class TableModel(Resource):
+            def describe(self):
+                """
+                If no parameters are passed, return the API route's
+                description object. This conforms to the convention
+                of the Macrostrat API.
+                """
                 args = [dict(
                     name=a.name,
                     default=a.default,
@@ -135,18 +121,51 @@ class APIv1(Api):
                     record=dict(
                         route=get_route,
                         key=key.name,
-                        type=tname
-                    )
-                )
+                        type=tname))
 
+            def get(self):
+                args = parser.parse_args()
+                print(args)
+                q = db.session.query(table)
+
+                should_describe = True
+                for k,col in table.c.items():
+                    val = args.pop(k, None)
+                    if val is not None:
+                        should_describe = False
+                        q = q.filter(col==val)
+
+                if args.pop('all', False):
+                    should_describe = False
+
+                for k in ('offset','limit'):
+                    val = args.pop(k, None)
+                    if val is not None:
+                        should_describe = False
+                        q = getattr(q,k)(val)
+
+                if should_describe:
+                    return self.describe()
+
+                # Save the count of the query
+                count = q.count()
+                response = q.all()
+                status = 200
+                headers = {'x-total-count': count}
+                return response, status, headers
+
+        class RecordModel(Resource):
+            def get(self, id):
+                # Should fail if more than one record is returned
+                return (db.session.query(table)
+                    .filter(key==id)
+                    .first())
 
         # Dynamically change class name,
         # this kind of metaprogrammy wizardry
         # may cause problems later
         TableModel.__name__ = tablename
         RecordModel.__name__ = tablename+'_record'
-        DescriptionModel.__name__ = tablename+'_describe'
 
         self.add_resource(TableModel, route)
         self.add_resource(RecordModel, get_route)
-        self.add_resource(DescriptionModel, describe_route)
