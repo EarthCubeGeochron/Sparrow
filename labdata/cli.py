@@ -55,19 +55,19 @@ def create_views(db):
 @cli.command(name='serve')
 @with_config
 def dev_server(cfg):
-    app = construct_app(cfg)
+    app, db = construct_app(cfg)
     app.run(debug=True)
 
 @cli.command(name='shell')
 @with_config
 def shell(cfg):
     from IPython import embed
-    app = construct_app(cfg)
+    app, db = construct_app(cfg)
     with app.app_context():
         embed()
 
 @cli.command(name='config')
 @with_config
 def config(cfg):
-    app = construct_app(cfg)
+    app, db = construct_app(cfg)
     print(app.config)

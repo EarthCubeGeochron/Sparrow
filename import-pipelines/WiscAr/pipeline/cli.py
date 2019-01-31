@@ -141,14 +141,16 @@ def extract_analysis(db, fn, verbose=False):
     # for creation date (note: sessions will be duplicated
     # if input files are changed)
     mod_time = datetime.fromtimestamp(path.getmtime(fn))
+    cls = db.mapped_classes
+    existing_session = db.session.query(cls.session).filter_by(
+
+    )
 
     incremental_heating, info, results = extract_data_tables(fn)
     if verbose:
         print_dataframe(incremental_heating)
         print_dataframe(info)
     print_dataframe(results.transpose())
-
-    cls = db.mapped_classes
 
     def get(c, **kwargs):
         return get_or_create(db.session, c, **kwargs)
@@ -157,7 +159,7 @@ def extract_analysis(db, fn, verbose=False):
     project.title = project.id
     sample = get(cls.sample,
         id=info.pop('Sample'))
-    sample.project = project.id
+    sample.project_id = project.id
     db.session.add(sample)
     target = get(cls.material, id=info.pop('Material'))
 
@@ -307,6 +309,7 @@ def cli(stop_on_error=False, verbose=False):
                 success += 1
             except Exception as err:
                 if stop_on_error: raise err
+                db.session.rollback()
                 secho(str(err), fg='red')
                 echo("")
                 error += 1

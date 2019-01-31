@@ -53,8 +53,8 @@ def construct_app(config=None):
     api.build_route("sample", schema='core_view')
     api.build_route("project", schema='core_view')
 
-    api.build_route("dz_sample", schema='method_data')
-    api.build_route("ar_age", schema='method_data')
+    #api.build_route("dz_sample", schema='method_data')
+    #api.build_route("ar_age", schema='method_data')
 
     app.api = api
     app.register_blueprint(api.blueprint, url_prefix='/api/v1')
@@ -62,4 +62,4 @@ def construct_app(config=None):
 
     app.register_blueprint(web, url_prefix='/')
 
-    return app
+    return app, db
