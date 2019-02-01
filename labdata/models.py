@@ -6,8 +6,6 @@ tightly coupled to the specific database representation.
 Declarative models for these objects are defined here.
 """
 from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import Column, String
 from werkzeug.security import generate_password_hash, check_password_hash
 from os import environ
 
@@ -15,7 +13,7 @@ Base = automap_base()
 
 class User(Base):
     __tablename__ = "user"
-    # Columns are automagically mapped
+    # Columns are automagically mapped from database
     # *NEVER* directly set the password column.
     def set_password(self, plaintext):
         # 'salt' the passwords to prevent brute forcing
