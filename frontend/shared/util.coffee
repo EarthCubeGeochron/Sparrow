@@ -5,7 +5,7 @@ import {Icon} from '@blueprintjs/core'
 import { Link } from "react-router-dom"
 
 SiteNav = ->
-  <nav class='site-nav'>
+  <nav className='site-nav'>
     <ul>
       <li><Link className="nav-link bp3-button bp3-minimal" to='/admin/'>Admin</Link></li>
       <li><Link className="nav-link bp3-button bp3-minimal" to='/api-explorer'>API Explorer</Link></li>
