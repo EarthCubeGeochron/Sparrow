@@ -1,24 +1,47 @@
 import h from 'react-hyperscript'
-import {SiteTitle} from 'app/shared/util'
 import {StatefulComponent} from '@macrostrat/ui-components'
 import {Component, createContext} from 'react'
-import {Button} from '@blueprintjs/core'
+import {Button, Dialog, Classes, Intent} from '@blueprintjs/core'
+import {LoginForm} from './login-form'
 import './main.styl'
 
 AuthContext = createContext({})
+
+
+class LoginDialog extends Component
+  render: ->
+    {isOpen, onClose} = @props
+    title = "Login"
+    h Dialog, {isOpen, title, onClose}, [
+      h 'div', {className: Classes.DIALOG_BODY}, [
+        h LoginForm
+      ]
+      h 'div', {className: Classes.DIALOG_FOOTER}, [
+        h 'div', {className: Classes.DIALOG_FOOTER_ACTIONS}, [
+          h Button, {intent: Intent.SUCCESS, large: true}, 'Login'
+        ]
+      ]
+    ]
 
 class AuthProvider extends StatefulComponent
   constructor: ->
     super arguments...
     @state = {
       logged_in: false
+      isLoggingIn: false
     }
 
   login: =>
-    @updateState {logged_in: {$set: true}}
+    @setState {isLoggingIn: true}
+
   render: =>
-    value = {@state..., login: @login}
-    h AuthContext.Provider, {value}, @props.children
+    {isLoggingIn, rest...} = @state
+    value = {rest..., login: @login}
+    onClose = => @setState {isLoggingIn: false}
+    h AuthContext.Provider, {value}, [
+      h LoginDialog, {isOpen: isLoggingIn, onClose}
+      h 'div', null, @props.children
+    ]
 
 class AuthStatus extends Component
   @contextType: AuthContext
@@ -31,5 +54,5 @@ class AuthStatus extends Component
         onClick: login}, 'Not logged in'
     ]
 
-export * from './login-page'
-export {AuthStatus}
+export * from './login-form'
+export {AuthProvider, AuthStatus}

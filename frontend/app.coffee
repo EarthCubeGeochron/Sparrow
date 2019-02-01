@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {HomePage} from './homepage'
 import {APIExplorer} from './api-explorer'
 import {ProjectPage} from './admin'
-import {LoginPage, AuthStatus} from './auth'
+import {AuthStatus, AuthProvider} from './auth'
 
-App = ->
+AppMain = ->
   h Router, {basename: '/'}, (
     h 'div.app', [
       h AuthStatus
@@ -17,9 +17,13 @@ App = ->
         }
         h Route, {path: '/admin', component: ProjectPage}
         h Route, {path: '/api-explorer', component: APIExplorer}
-        h Route, {path: '/login', component: LoginPage}
       ]
     ]
+  )
+
+App = ->
+  h AuthProvider, null, (
+    h AppMain
   )
 
 export {App}
