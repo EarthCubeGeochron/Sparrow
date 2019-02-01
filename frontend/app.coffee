@@ -1,6 +1,7 @@
 import h from 'react-hyperscript'
 import { BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {HomePage} from './homepage'
+import {APIProvider} from '@macrostrat/ui-components'
 import {APIExplorer} from './api-explorer'
 import {ProjectPage} from './admin'
 import {AuthStatus, AuthProvider} from './auth'
@@ -22,8 +23,10 @@ AppMain = ->
   )
 
 App = ->
-  h AuthProvider, null, (
-    h AppMain
+  h APIProvider, {baseURL: '/api/v1'}, (
+    h AuthProvider, null, (
+      h AppMain
+    )
   )
 
 export {App}

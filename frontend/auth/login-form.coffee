@@ -45,6 +45,7 @@ class LoginForm extends StatefulComponent
     return true
 
   render: ->
+    {login} = @props
     {isOpen, onClose} = @props
     {data} = @state
 
@@ -62,6 +63,7 @@ class LoginForm extends StatefulComponent
           h Button, {
             intent: Intent.PRIMARY,
             large: true,
+            onClick: =>login(data),
             disabled: not @isValid()}, 'Login'
         ]
       ]

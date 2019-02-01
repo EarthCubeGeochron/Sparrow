@@ -44,7 +44,8 @@ def user_login(self):
         return dict(
             message=f"Logged in as {current_user.username}",
             access_token=access_token,
-            refresh_token=refresh_token)
+            refresh_token=refresh_token,
+            username=current_user.username)
     else:
         return dict(message='Wrong credentials')
 
