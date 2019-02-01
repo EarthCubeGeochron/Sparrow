@@ -3,9 +3,21 @@ A minimal schema
 */
 
 CREATE TABLE researcher (
-  id text PRIMARY KEY,
+  id integer PRIMARY KEY,
   name text NOT NULL,
-  orcid text
+  orcid text UNIQUE
+);
+
+/* The `user` model is parallel to the
+   `researcher` model but used only for application
+   authentication. Thus, we can reset all access by
+   truncating this table, without losing data.
+*/
+CREATE TABLE "user" (
+  username text PRIMARY KEY,
+  /* Store a hashed password */
+  password char(128),
+  researcher_id integer REFERENCES researcher(id)
 );
 
 CREATE TABLE publication (
@@ -65,7 +77,7 @@ CREATE TABLE project (
 
 CREATE TABLE project_researcher (
   project_id text REFERENCES project(id),
-  researcher_id text REFERENCES researcher(id),
+  researcher_id integer REFERENCES researcher(id),
   PRIMARY KEY (project_id, researcher_id)
 );
 
