@@ -1,7 +1,9 @@
 from flask import Flask, Blueprint
-from flask_restful import Resource, Api, reqparse, inputs
+from flask_restful import Resource, reqparse, inputs
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
+
+from .base import API
 
 # eventually should use **Marshmallow** or similar
 # for parsing incoming API requests
@@ -23,7 +25,7 @@ def infer_type(t):
         type = inputs.boolean
     return type
 
-class APIv1(Api):
+class APIv1(API):
     """
     Version 1 API for Lab Data Interface
 

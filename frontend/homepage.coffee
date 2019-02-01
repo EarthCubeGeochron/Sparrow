@@ -6,7 +6,9 @@ HomePage = ->
   h 'div', [
     h SiteTitle
     h SiteNav
-    h 'div', {dangerouslySetInnerHTML: {__html: ix}}
+    h 'div.bp3-running-text.bp3-text-large', {
+      dangerouslySetInnerHTML: {__html: ix}
+    }
   ]
 
 export {HomePage}

@@ -6,6 +6,7 @@ from sqlalchemy.engine.url import make_url
 
 from .encoders import JSONEncoder
 from .api import APIv1
+from .auth import AuthAPI
 from .web import web
 from .util import relative_path
 
@@ -53,6 +54,7 @@ def construct_app(config=None):
     api.build_route("sample", schema='core_view')
     api.build_route("project", schema='core_view')
 
+    api.add_resource(AuthAPI, "/auth")
     #api.build_route("dz_sample", schema='method_data')
     #api.build_route("ar_age", schema='method_data')
 

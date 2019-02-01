@@ -54,10 +54,7 @@ module.exports = {
     }
   },
   entry: {
-    index: './frontend/index.coffee',
-    'api-explorer': './frontend/api-explorer',
-    'dz-samples': './frontend-plugins/dz-samples',
-    'admin': './frontend/admin'
+    index: './frontend/index.coffee'
   },
   output: {
     path: assetsDir,

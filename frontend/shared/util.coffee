@@ -1,6 +1,7 @@
 import h from 'react-hyperscript'
 import cfg from 'site-content/variables'
 import React from 'react'
+import {Icon} from '@blueprintjs/core'
 import { Link } from "react-router-dom"
 
 SiteNav = ->
@@ -12,14 +13,14 @@ SiteNav = ->
   </nav>
 
 SiteTitle = ({subPage})->
-  v = null
   if subPage?
-    v = " – #{subPage}"
-
+    subPage = h 'span.subpage', [":", h('span.inner', subPage)]
   h 'h1.site-title', [
-    h 'a', {href: '/'}, cfg.siteTitle
-    h 'span.subtitle', ' Lab Data Interface'
-    v
+    h Link, {to: '/'}, [
+      h 'span.title', cfg.siteTitle
+      h 'span.subtitle', 'Lab Data Interface'
+    ]
+    subPage
   ]
 
 export {SiteTitle, SiteNav}
