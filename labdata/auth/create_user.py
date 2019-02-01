@@ -15,5 +15,6 @@ def create_user(db):
     user = User(username=username)
     user.set_password(password)
     db.session.add(user)
+    assert user.is_correct_password(password)
     db.session.commit()
     echo("Successfully created user and hashed password!")

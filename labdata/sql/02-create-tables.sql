@@ -16,7 +16,7 @@ CREATE TABLE researcher (
 CREATE TABLE "user" (
   username text PRIMARY KEY,
   /* Store a hashed password */
-  password char(128),
+  password text,
   researcher_id integer REFERENCES researcher(id)
 );
 
