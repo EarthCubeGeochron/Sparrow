@@ -3,8 +3,9 @@
 output="$LABDATA_PATH/output"
 mkdir -p "$output"
 
+dbname=$(labdata config database)
 graph="$output/erd-core.dot"
-sadisplay -u postgresql:///earthcube_labdata \
+sadisplay -u $dbname \
   -r dot \
   -e public.spatial_ref_sys > "$graph"
 cat "$graph" \
@@ -14,7 +15,7 @@ cat "$graph" \
 > "$output/entity-relationship-diagram-core.png"
 
 graph="$output/erd.dot"
-sadisplay -u postgresql:///earthcube_labdata \
+sadisplay -u $dbname \
   -s public,vocabulary \
   -r dot \
   -e public.spatial_ref_sys > "$graph"

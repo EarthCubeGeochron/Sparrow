@@ -3,9 +3,11 @@ from click import echo, style, secho
 from os import path, environ
 from flask import Flask
 from sqlalchemy.engine.url import make_url
+from flask_jwt_extended import JWTManager
 
 from .encoders import JSONEncoder
 from .api import APIv1
+from .auth import AuthAPI
 from .web import web
 from .util import relative_path
 
@@ -33,7 +35,7 @@ class App(Flask):
     def database(self):
         from .database import Database
         if self.db is not None: return self.db
-        self.db = Database(self.db_url)
+        self.db = Database(self)
         return self.db
 
 def construct_app(config=None):
@@ -44,6 +46,9 @@ def construct_app(config=None):
     from .database import Database
 
     db = Database(app)
+
+    # Manage JSON Web tokens
+    jwt = JWTManager(app)
     # Setup API
     api = APIv1(db)
 
@@ -53,6 +58,7 @@ def construct_app(config=None):
     api.build_route("sample", schema='core_view')
     api.build_route("project", schema='core_view')
 
+    api.add_resource(AuthAPI, "/auth")
     #api.build_route("dz_sample", schema='method_data')
     #api.build_route("ar_age", schema='method_data')
 

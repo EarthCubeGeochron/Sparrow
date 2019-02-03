@@ -4,11 +4,11 @@ from os import environ
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.schema import Table
 from sqlalchemy.sql import ClauseElement
 
 from .app import App
+from .models import Base, User
 from .util import run_sql_file, working_directory
 
 metadata = MetaData()
@@ -58,6 +58,8 @@ class Database:
         self.meta = metadata
         self.session = sessionmaker(bind=self.engine)()
         self.automap_base = None
+        # We're having trouble lazily automapping
+        self.automap()
 
     def exec_sql(self, *args):
         run_sql_file(self.engine, *args)
@@ -67,6 +69,11 @@ class Database:
         return Table(tablename, meta,
             autoload=True, autoload_with=self.engine, **kwargs)
 
+    def automap(self):
+        Base.prepare(self.engine, reflect=True,
+            name_for_scalar_relationship=name_for_scalar_relationship)
+        self.automap_base = Base
+
     @property
     def mapped_classes(self):
         """
@@ -74,13 +81,14 @@ class Database:
 
         https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html
         """
-        if self.automap_base is not None:
-            return self.automap_base.classes
-        Base = automap_base()
-        Base.prepare(self.engine, reflect=True,
-            name_for_scalar_relationship=name_for_scalar_relationship)
-        self.automap_base = Base
+        if self.automap_base is None:
+            self.automap()
         return self.automap_base.classes
+
+    def get(self, model, *args, **kwargs):
+        if isinstance(model, str):
+            model = self.mapped_classes[model]
+        return self.session.query(model).get(*args,**kwargs)
 
     def get_or_create(self, model, defaults=None, **kwargs):
         """
