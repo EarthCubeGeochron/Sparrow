@@ -12,28 +12,36 @@ class AuthProvider extends StatefulComponent
   constructor: ->
     super arguments...
     @state = {
-      logged_in: false
+      login: false
       username: null
       isLoggingIn: false
       invalidAttempt: false
-      credentials: null
     }
+
+  componentDidMount: ->
+    @getStatus()
+
+  getStatus: =>
+    {get} = @context
+    {login, username} = await get '/auth/status'
+    @setState {login, username}
 
   requestLogin: =>
     @setState {isLoggingIn: true}
 
   login: (data)=>
     {post} = @context
-    results = await post '/auth/login', data
-    {accessToken, refreshToken, username} = results
-    if not results.username?
-      @setState {invalidAttempt: true}
-      return
+    {login, username} = await post '/auth/login', data
+    invalidAttempt = false
+    isLoggingIn = false
+    if not login
+      invalidAttempt = true
+      isLoggingIn = true
     @setState {
+      login,
       username,
-      credentials: {accessToken, refreshToken},
-      isLoggingIn: false
-      invalidAttempt: false
+      isLoggingIn
+      invalidAttempt
     }
 
   render: =>
