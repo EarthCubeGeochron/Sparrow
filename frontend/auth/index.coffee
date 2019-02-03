@@ -15,6 +15,7 @@ class AuthProvider extends StatefulComponent
       logged_in: false
       username: null
       isLoggingIn: false
+      invalidAttempt: false
       credentials: null
     }
 
@@ -25,18 +26,23 @@ class AuthProvider extends StatefulComponent
     {post} = @context
     results = await post '/auth/login', data
     {accessToken, refreshToken, username} = results
+    if not results.username?
+      @setState {invalidAttempt: true}
+      return
     @setState {
       username,
       credentials: {accessToken, refreshToken},
-      isLoggingIn: false}
+      isLoggingIn: false
+      invalidAttempt: false
+    }
 
   render: =>
-    {isLoggingIn, rest...} = @state
+    {isLoggingIn, invalidAttempt, rest...} = @state
     login = @login
     value = {rest..., login, requestLogin: @requestLogin}
     onClose = => @setState {isLoggingIn: false}
     h AuthContext.Provider, {value}, [
-      h LoginForm, {isOpen: isLoggingIn, onClose, login}
+      h LoginForm, {isOpen: isLoggingIn, invalidAttempt, onClose, login}
       h 'div', null, @props.children
     ]
 
