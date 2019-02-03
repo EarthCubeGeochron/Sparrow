@@ -1,6 +1,7 @@
 import h from 'react-hyperscript'
 import {Component} from 'react'
 import {StatefulComponent} from '@macrostrat/ui-components'
+import {AuthContext} from './context'
 import {Button, Dialog, Callout, Intent, Classes} from '@blueprintjs/core'
 import classNames from 'classnames'
 import './main.styl'
@@ -29,6 +30,7 @@ class LoginFormInner extends Component
     ]
 
 class LoginForm extends StatefulComponent
+  @contextType: AuthContext
   @defaultProps: {
     invalidAttempt: false
   }
@@ -59,7 +61,7 @@ class LoginForm extends StatefulComponent
         intent: Intent.DANGER}, "Invalid credentials were provided"
 
   render: ->
-    {login, isOpen} = @props
+    {doLogin, isLoggingIn: isOpen, requestLoginForm} = @context
     {data} = @state
 
     onChange = (e)=>
@@ -68,7 +70,7 @@ class LoginForm extends StatefulComponent
 
     onClose = =>
       @resetState()
-      @props.onClose()
+      requestLoginForm(false)
 
     title = "Login"
     h Dialog, {isOpen, title, onClose, icon: 'log-in'}, [
@@ -81,8 +83,9 @@ class LoginForm extends StatefulComponent
           h Button, {
             intent: Intent.PRIMARY,
             large: true,
-            onClick: =>login(data),
-            disabled: not @isValid()}, 'Login'
+            onClick: =>doLogin(data),
+            disabled: not @isValid()
+          }, 'Login'
         ]
       ]
     ]
