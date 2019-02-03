@@ -2,6 +2,7 @@ from flask import Flask, Blueprint
 from flask_restful import Resource, reqparse, inputs
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
+from flask_jwt_extended import jwt_required
 
 from .base import API
 
@@ -125,6 +126,7 @@ class APIv1(API):
                         key=key.name,
                         type=tname))
 
+            @jwt_required
             def get(self):
                 args = parser.parse_args()
                 print(args)
@@ -158,6 +160,7 @@ class APIv1(API):
                 return response, status, headers
 
         class RecordModel(Resource):
+            @jwt_required
             def get(self, id):
                 # Should fail if more than one record is returned
                 return (db.session.query(table)
