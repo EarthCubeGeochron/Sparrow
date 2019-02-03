@@ -36,6 +36,7 @@ class UserRegistration(Resource):
 def user_login(self):
     db = current_app.database
     data = parser.parse_args()
+    print(data)
     username = data['username']
     password = data['password']
 

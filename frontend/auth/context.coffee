@@ -24,6 +24,7 @@ class AuthProvider extends StatefulComponent
     @setState {login, username}
 
   requestLoginForm: (v)=>
+    console.log "Requesting login form"
     v ?= true
     @setState {isLoggingIn: v}
 
