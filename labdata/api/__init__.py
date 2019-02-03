@@ -1,7 +1,10 @@
 from flask import Flask, Blueprint
-from flask_restful import Resource, Api, reqparse, inputs
+from flask_restful import Resource, reqparse, inputs
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
+from flask_jwt_extended import jwt_required
+
+from .base import API
 
 # eventually should use **Marshmallow** or similar
 # for parsing incoming API requests
@@ -23,7 +26,7 @@ def infer_type(t):
         type = inputs.boolean
     return type
 
-class APIv1(Api):
+class APIv1(API):
     """
     Version 1 API for Lab Data Interface
 
@@ -123,6 +126,7 @@ class APIv1(Api):
                         key=key.name,
                         type=tname))
 
+            @jwt_required
             def get(self):
                 args = parser.parse_args()
                 print(args)
@@ -138,6 +142,8 @@ class APIv1(Api):
                 if args.pop('all', False):
                     should_describe = False
 
+                count = q.count()
+
                 for k in ('offset','limit'):
                     val = args.pop(k, None)
                     if val is not None:
@@ -148,13 +154,13 @@ class APIv1(Api):
                     return self.describe()
 
                 # Save the count of the query
-                count = q.count()
                 response = q.all()
                 status = 200
                 headers = {'x-total-count': count}
                 return response, status, headers
 
         class RecordModel(Resource):
+            @jwt_required
             def get(self, id):
                 # Should fail if more than one record is returned
                 return (db.session.query(table)
