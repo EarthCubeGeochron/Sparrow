@@ -31,9 +31,6 @@ class LoginFormInner extends Component
 
 class LoginForm extends StatefulComponent
   @contextType: AuthContext
-  @defaultProps: {
-    invalidAttempt: false
-  }
   constructor: ->
     super arguments...
     @resetState()
@@ -53,27 +50,22 @@ class LoginForm extends StatefulComponent
     return true
 
   renderCallout: ->
-    {invalidAttempt} = @props
+    {invalidAttempt, login, username} = @context
     if invalidAttempt
       h Callout, {
         className: 'login-info'
         title: "Invalid credentials",
         intent: Intent.DANGER}, "Invalid credentials were provided"
 
-  render: ->
-    {doLogin, isLoggingIn: isOpen, requestLoginForm} = @context
+  renderLoginForm: ->
+    {doLogin, login, isLoggingIn: isOpen, requestLoginForm} = @context
     {data} = @state
 
     onChange = (e)=>
       return unless e.target?
       @updateState {data: {[e.target.name]: { $set: e.target.value }}}
 
-    onClose = =>
-      @resetState()
-      requestLoginForm(false)
-
-    title = "Login"
-    h Dialog, {isOpen, title, onClose, icon: 'log-in'}, [
+    [
       h 'div.login-form-outer', {className: Classes.DIALOG_BODY}, [
         @renderCallout()
         h LoginFormInner, {data, onChange}
@@ -89,6 +81,50 @@ class LoginForm extends StatefulComponent
         ]
       ]
     ]
+
+  renderLogoutForm: ->
+    {doLogout, username} = @context
+    [
+      h 'div.login-form-outer', {className: Classes.DIALOG_BODY}, [
+        h Callout, {
+          className: 'login-info'
+          title: "Logged in"
+          intent: Intent.SUCCESS
+          icon: 'person'
+        }, (
+          h 'p', [
+            "Logged in as user "
+            h 'em', username
+          ]
+        )
+      ]
+      h 'div', {className: Classes.DIALOG_FOOTER}, [
+        h 'div', {className: Classes.DIALOG_FOOTER_ACTIONS}, [
+          h Button, {
+            large: true,
+            onClick: =>doLogout(),
+          }, 'Log out'
+        ]
+      ]
+    ]
+
+
+  render: ->
+    {doLogin, login, isLoggingIn: isOpen, requestLoginForm} = @context
+    {data} = @state
+
+    onChange = (e)=>
+      return unless e.target?
+      @updateState {data: {[e.target.name]: { $set: e.target.value }}}
+
+    onClose = =>
+      @resetState()
+      requestLoginForm(false)
+
+    title = "Login"
+    h Dialog, {isOpen, title, onClose, icon: 'log-in'}, (
+      if login then @renderLogoutForm() else @renderLoginForm()
+    )
 
 
 export {LoginForm}

@@ -42,8 +42,16 @@ class AuthProvider extends StatefulComponent
       invalidAttempt
     }
 
+  doLogout: =>
+    {post} = @context
+    {login} = await post '/auth/logout', data
+    @setState {
+      login,
+      isLoggingIn: false
+    }
+
   render: =>
-    methods = do => {doLogin, requestLoginForm} = @
+    methods = do => {doLogin, doLogout, requestLoginForm} = @
     value = {methods..., @state...}
     h AuthContext.Provider, {value}, @props.children
 
