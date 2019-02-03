@@ -65,7 +65,7 @@ class Login(Resource):
 @AuthAPI.resource('/logout')
 class Logout(Resource):
     def post(self):
-        resp = jsonify({'logout': True})
+        resp = jsonify({'login': False})
         unset_jwt_cookies(resp)
         return resp
 

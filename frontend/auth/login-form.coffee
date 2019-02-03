@@ -88,7 +88,7 @@ class LoginForm extends StatefulComponent
       h 'div.login-form-outer', {className: Classes.DIALOG_BODY}, [
         h Callout, {
           className: 'login-info'
-          title: "Logged in"
+          title: username
           intent: Intent.SUCCESS
           icon: 'person'
         }, (
@@ -121,8 +121,8 @@ class LoginForm extends StatefulComponent
       @resetState()
       requestLoginForm(false)
 
-    title = "Login"
-    h Dialog, {isOpen, title, onClose, icon: 'log-in'}, (
+    title = "Credentials"
+    h Dialog, {isOpen, title, onClose, icon: 'key'}, (
       if login then @renderLogoutForm() else @renderLoginForm()
     )
 
