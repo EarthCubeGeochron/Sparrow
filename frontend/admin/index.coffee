@@ -6,7 +6,7 @@ import {SiteTitle} from 'app/shared/util'
 import {AuthContext} from 'app/auth/context'
 import {AdminBase} from './base'
 
-class AdminWrapper extends Component
+class ProjectPage extends Component
   @contextType: AuthContext
   renderNotLoggedIn: ->
     {requestLoginForm} = @context
@@ -26,13 +26,6 @@ class AdminWrapper extends Component
     console.log @context
     if not login
       return @renderNotLoggedIn()
-    h AdminBase
-
-
-ProjectPage = ->
-  h 'div', [
-    h SiteTitle, {subPage: 'Admin'}
-    h AdminWrapper
-  ]
+    h AdminBase, @props
 
 export {ProjectPage}

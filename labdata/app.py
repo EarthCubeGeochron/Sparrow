@@ -54,6 +54,7 @@ def construct_app(config=None):
 
     api.build_route("datum", schema='core_view')
     api.build_route("analysis", schema='core_view')
+    api.build_route("session", schema='core_view')
     api.build_route("age_datum", schema='core_view')
     api.build_route("sample", schema='core_view')
     api.build_route("project", schema='core_view')
