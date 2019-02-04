@@ -6,6 +6,7 @@ from click import secho
 from sqlalchemy.exc import ProgrammingError, IntegrityError
 from pathlib import Path
 from contextlib import contextmanager
+from sqlparse import split, format
 
 def run_query(db, filename_or_query, **kwargs):
     """
@@ -34,22 +35,21 @@ def pretty_print(sql, **kwargs):
             return
 
 
-def run_sql_file(db, sql_file):
+def run_sql_file(session, sql_file):
     sql = open(sql_file).read()
-    queries = sql.split(';')
-    conn = db.connect()
+    queries = split(sql)
     for q in queries:
-        sql = q.strip()
+        sql = format(q, strip_comments=True).strip()
         if sql == '':
             continue
         try:
-            conn.execute(sql)
+            session.execute(sql)
+            session.commit()
             pretty_print(sql, dim=True)
         except (ProgrammingError,IntegrityError) as err:
+            session.rollback()
             pretty_print(sql, fg='red')
             secho(str(err.orig), fg='red', dim=True)
-
-    conn.close()
 
 def relative_path(base, *parts):
     if not path.isdir(base):

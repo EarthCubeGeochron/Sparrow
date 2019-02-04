@@ -142,9 +142,7 @@ def extract_analysis(db, fn, verbose=False):
     # if input files are changed)
     mod_time = datetime.fromtimestamp(path.getmtime(fn))
     cls = db.mapped_classes
-    existing_session = db.session.query(cls.session).filter_by(
-
-    )
+    existing_session = db.session.query(cls.session).filter_by()
 
     incremental_heating, info, results = extract_data_tables(fn)
     if verbose:
@@ -155,11 +153,11 @@ def extract_analysis(db, fn, verbose=False):
     def get(c, **kwargs):
         return get_or_create(db.session, c, **kwargs)
 
-    project = get(cls.project,id=info.pop('Project'))
+    project = get(cls.measurement_group,id=info.pop('Project'))
     project.title = project.id
+
     sample = get(cls.sample,
         id=info.pop('Sample'))
-    sample.project_id = project.id
     db.session.add(sample)
     target = get(cls.material, id=info.pop('Material'))
 
@@ -175,6 +173,7 @@ def extract_analysis(db, fn, verbose=False):
         instrument=instrument.id,
         technique=method.id,
         target=target.id)
+    session.measurement_group_id = project.id
     session.data = info.to_dict()
     db.session.add(session)
 

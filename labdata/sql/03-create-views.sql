@@ -29,6 +29,18 @@ SELECT DISTINCT ON (id)
 FROM __r
 ORDER BY id,n_levels DESC;
 
+/*
+A session view with some extra features
+*/
+CREATE VIEW core_view.session AS
+SELECT
+	s.*,
+	i.name instrument_name
+FROM session s
+JOIN instrument i
+  ON i.id = s.instrument
+ORDER BY date DESC;
+
 /* Analysis info with nested JSON data*/
 CREATE VIEW core_view.analysis AS
 WITH __a AS (
@@ -79,7 +91,7 @@ SELECT
     WHERE id = sa.material
   ) sample_material,
   sa.igsn,
-  sa.project_id,
+  s.project_id,
   sa.location,
   '2020-01-01'::timestamptz as embargo_date
 FROM __a
@@ -181,7 +193,9 @@ SELECT
 	to_jsonb((SELECT array_agg(a) FROM (
 		SELECT *
 		FROM core_view.sample s
-		WHERE s.project_id = p.id
+    JOIN session ss
+      ON ss.sample_id = s.id
+		WHERE ss.project_id = p.id
 	) AS a)) AS samples
 FROM project p;
 

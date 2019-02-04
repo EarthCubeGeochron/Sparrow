@@ -10,6 +10,7 @@ from pkg_resources import iter_entry_points
 from .util import working_directory
 from .app import App, construct_app
 from .database import Database
+from .auth.create_user import create_user
 
 @with_plugins(iter_entry_points('labdata.plugins'))
 @click.group()
@@ -69,12 +70,25 @@ def shell(cfg):
 
 @cli.command(name='config')
 @with_config
-def config(cfg):
+@click.argument('key', required=False)
+def config(cfg, key=None):
     app, db = construct_app(cfg)
+    if key is not None:
+        print(app.config.get(key.upper()))
+        return
+
     res = dict()
     for k in ("LAB_NAME","DATABASE","SITE_CONTENT"):
         val = app.config.get(k)
         v = k.lower()
         res[v] = val
     print(dumps(res))
+
+@cli.command(name='create-user')
+@with_database
+def _create_user(db):
+    """
+    Create an authorized user for the web frontend
+    """
+    create_user(db)
 
