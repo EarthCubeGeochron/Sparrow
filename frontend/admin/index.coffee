@@ -1,12 +1,12 @@
 import h from 'react-hyperscript'
 import {Component} from 'react'
-import {ProjectListComponent} from './project-component'
 
 import {NonIdealState, Button, Intent} from '@blueprintjs/core'
 import {SiteTitle} from 'app/shared/util'
 import {AuthContext} from 'app/auth/context'
+import {AdminBase} from './base'
 
-class AdminBase extends Component
+class ProjectPage extends Component
   @contextType: AuthContext
   renderNotLoggedIn: ->
     {requestLoginForm} = @context
@@ -26,13 +26,6 @@ class AdminBase extends Component
     console.log @context
     if not login
       return @renderNotLoggedIn()
-    h ProjectListComponent
-
-
-ProjectPage = ->
-  h 'div', [
-    h SiteTitle, {subPage: 'Admin'}
-    h AdminBase
-  ]
+    h AdminBase, @props
 
 export {ProjectPage}

@@ -87,6 +87,23 @@ CREATE TABLE project_publication (
   PRIMARY KEY (project_id, publication_id)
 );
 
+/*
+Analytical Groups
+
+Groups of sessions for import are less universally
+meaningful than project-based groups. However, these
+can be important for internal lab processes.
+Examples include irradiation IDs for Ar/Ar labs, etc.
+
+Right now, we only support a single measurement group
+for each session. This could potentially be updated
+to support a one-to-many relationship if desired.
+*/
+CREATE TABLE measurement_group (
+  id text PRIMARY KEY,
+  title text NOT NULL
+);
+
 -- Descriptors for types of measurements/techniques
 
 CREATE TABLE instrument (
@@ -124,7 +141,6 @@ CREATE TABLE sample (
   */
   id text PRIMARY KEY,
   igsn text UNIQUE,
-  project_id text REFERENCES project(id),
   material text REFERENCES vocabulary.material(id),
   location geometry
 );
@@ -141,6 +157,8 @@ CREATE TABLE session (
   */
   id serial PRIMARY KEY,
   sample_id text REFERENCES sample(id),
+  project_id text REFERENCES project(id),
+  measurement_group_id text REFERENCES measurement_group(id),
   date timestamptz NOT NULL,
   end_date timestamptz,
   instrument integer REFERENCES instrument(id),
@@ -227,3 +245,4 @@ CREATE TABLE datum (
   is_accepted boolean,
   UNIQUE (analysis, type)
 );
+
