@@ -79,7 +79,7 @@ SELECT
     WHERE id = sa.material
   ) sample_material,
   sa.igsn,
-  sa.project_id,
+  s.project_id,
   sa.location,
   '2020-01-01'::timestamptz as embargo_date
 FROM __a
@@ -181,7 +181,9 @@ SELECT
 	to_jsonb((SELECT array_agg(a) FROM (
 		SELECT *
 		FROM core_view.sample s
-		WHERE s.project_id = p.id
+    JOIN session ss
+      ON ss.sample_id = s.id
+		WHERE ss.project_id = p.id
 	) AS a)) AS samples
 FROM project p;
 
