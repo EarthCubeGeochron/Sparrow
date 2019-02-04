@@ -6,6 +6,7 @@ from click import secho
 from sqlalchemy.exc import ProgrammingError, IntegrityError
 from pathlib import Path
 from contextlib import contextmanager
+from sqlparse import split, format
 
 def run_query(db, filename_or_query, **kwargs):
     """
@@ -36,9 +37,9 @@ def pretty_print(sql, **kwargs):
 
 def run_sql_file(session, sql_file):
     sql = open(sql_file).read()
-    queries = sql.split(';')
+    queries = split(sql)
     for q in queries:
-        sql = q.strip()
+        sql = format(q, strip_comments=True).strip()
         if sql == '':
             continue
         try:

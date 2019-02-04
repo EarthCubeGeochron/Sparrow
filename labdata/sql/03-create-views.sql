@@ -29,6 +29,18 @@ SELECT DISTINCT ON (id)
 FROM __r
 ORDER BY id,n_levels DESC;
 
+/*
+A session view with some extra features
+*/
+CREATE VIEW core_view.session AS
+SELECT
+	s.*,
+	i.name instrument_name
+FROM session s
+JOIN instrument i
+  ON i.id = s.instrument
+ORDER BY date DESC;
+
 /* Analysis info with nested JSON data*/
 CREATE VIEW core_view.analysis AS
 WITH __a AS (
