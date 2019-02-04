@@ -88,7 +88,7 @@ class ProjectListComponent extends Component
 
   render: ->
     {apiEndpoint} = @props
-    return h 'div.projects', [
+    return h 'div.data-view.projects', [
       h 'h2', 'Projects'
       h PagedAPIView, {route: apiEndpoint, perPage: 5}, (data)=>
         h 'div', null, data.map (d)-> h(ProjectComponent, d)

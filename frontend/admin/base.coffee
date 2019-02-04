@@ -1,6 +1,7 @@
 import h from 'react-hyperscript'
 import {Component} from 'react'
 import {ProjectListComponent} from './project-component'
+import {SessionManagerComponent} from './session-component'
 import {Navbar, Button, ButtonGroup} from '@blueprintjs/core'
 import {NavLink, Route, Switch} from 'react-router-dom'
 import cfg from 'site-content/variables'
@@ -36,7 +37,7 @@ class AdminBase extends Component
       h Switch, [
         h Route, {
           path: base+"/session"
-          component: SessionListComponent
+          component: SessionManagerComponent
         }
         h Route, {
           path: base+"/project"
