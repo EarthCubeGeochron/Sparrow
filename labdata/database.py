@@ -62,7 +62,7 @@ class Database:
         self.automap()
 
     def exec_sql(self, *args):
-        run_sql_file(self.engine, *args)
+        run_sql_file(self.session, *args)
 
     def reflect_table(self, tablename, schema='public', **kwargs):
         meta = MetaData(schema=schema)

@@ -34,22 +34,21 @@ def pretty_print(sql, **kwargs):
             return
 
 
-def run_sql_file(db, sql_file):
+def run_sql_file(session, sql_file):
     sql = open(sql_file).read()
     queries = sql.split(';')
-    conn = db.connect()
     for q in queries:
         sql = q.strip()
         if sql == '':
             continue
         try:
-            conn.execute(sql)
+            session.execute(sql)
+            session.commit()
             pretty_print(sql, dim=True)
-        except (ProgrammingError,IntegrityError) as err:
+        except (ProgrammingError,IntegrityError) as err
+            session.rollback(
             pretty_print(sql, fg='red')
             secho(str(err.orig), fg='red', dim=True)
-
-    conn.close()
 
 def relative_path(base, *parts):
     if not path.isdir(base):
