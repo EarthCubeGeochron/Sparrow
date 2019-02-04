@@ -45,8 +45,8 @@ def run_sql_file(session, sql_file):
             session.execute(sql)
             session.commit()
             pretty_print(sql, dim=True)
-        except (ProgrammingError,IntegrityError) as err
-            session.rollback(
+        except (ProgrammingError,IntegrityError) as err:
+            session.rollback()
             pretty_print(sql, fg='red')
             secho(str(err.orig), fg='red', dim=True)
 
