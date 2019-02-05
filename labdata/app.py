@@ -1,7 +1,7 @@
 
 from click import echo, style, secho
 from os import path, environ
-from flask import Flask
+from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
 from flask_jwt_extended import JWTManager
 
@@ -68,5 +68,13 @@ def construct_app(config=None):
     app.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
 
     app.register_blueprint(web, url_prefix='/')
+
+    # If we're serving on a low-key webserver and we
+    # want to just serve assets without a file server...
+    assets = app.config.get("ASSETS_DIRECTORY", None)
+    if assets is not None:
+        @app.route('/assets/<path:filename>')
+        def assets_route(filename):
+            return send_from_directory(assets, filename)
 
     return app, db
