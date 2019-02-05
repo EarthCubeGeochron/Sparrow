@@ -22,19 +22,55 @@ a.publication
 div.samples
   display: table
 
-div.sample
-  display: table-row
-  &>span
-    display table-cell
-  span.name
-    font-weight 600
-    min-width 50px
-    display inline-block
-  span.material
-    font-style italic
+  div.sample
+    display: table-row
+    &>span
+      display table-cell
+    span.name
+      font-weight 600
+      min-width 50px
+      display inline-block
+    span.material
+      font-style italic
 
 a.link-button
   margin-right 0.2em
 
 .data-view
   margin 1em 0.2em
+
+accent=$red3
+
+div#sessions
+  div.session.bp3-card
+    position relative
+    &:first-child
+      margin-top 1em
+    padding 10px
+    margin-bottom 1em
+    h4.date
+      margin-top 0
+      margin-bottom 5px
+      margin-left 10px
+      color: accent
+    div.session-info
+      display flex
+      flex-flow row wrap
+      margin -5px
+      .sample-id
+        font-weight bold
+        color: accent
+      &>div
+        min-width 130px
+        background-color $light-gray5
+        border-radius 5px
+        margin 5px
+        padding 5px 10px
+        flex 1
+        h5
+          margin-top 0
+          margin-bottom 0.2em
+          &.small-info
+            color: $gray1
+            font-weight 400
+
