@@ -9,6 +9,7 @@
   "dependencies": {
     "@blueprintjs/core": "^3.10.0",
     "@blueprintjs/table": "^3.3.0",
+    "@data-ui/histogram": "0.0.75",
     "@macrostrat/ui-components": "file:./deps/ui-components",
     "@vx/axis": "0.0.183",
     "@vx/gradient": "0.0.183",

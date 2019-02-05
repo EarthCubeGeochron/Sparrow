@@ -1,12 +1,13 @@
 import h from 'react-hyperscript'
 import {Component} from 'react'
-import {ProjectListComponent} from './project-component'
-import {SessionManagerComponent} from './session-component'
 import {Navbar, Button, ButtonGroup} from '@blueprintjs/core'
 import {NavLink, Route, Switch} from 'react-router-dom'
 import cfg from 'site-content/variables'
 import classNames from 'classnames'
 
+import {ProjectListComponent} from './project-component'
+import {SessionManagerComponent} from './session-component'
+import {AgeChartComponent} from './age-component'
 
 LinkButton = (props)->
   {to, className, children} = props
@@ -17,7 +18,9 @@ LinkButton = (props)->
 AdminNavbar = ({base})->
   h Navbar, [
     h Navbar.Group, [
-      h Navbar.Heading, "#{cfg.siteTitle} Admin"
+      h Navbar.Heading, null, (
+        h NavLink, {to: base}, "#{cfg.siteTitle} Admin"
+      )
       h Navbar.Divider
       h LinkButton, {to: base+'/session'}, "Data"
       h LinkButton, {to: base+'/project'}, "Projects"
@@ -43,7 +46,11 @@ class AdminBase extends Component
           path: base+"/project"
           component: ProjectListComponent
         }
-
+        h Route, {
+          path: base
+          component: AgeChartComponent
+          exact: true
+        }
       ]
     ]
 
