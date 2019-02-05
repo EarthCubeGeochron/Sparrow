@@ -8,6 +8,7 @@ mkdir -p "$appdir"
 
 cd "$basedir"
 
+rm -rf "$appdir"/*
 cp -r requirements.txt labdata import-pipelines "$appdir"
 
 # Build the docker image

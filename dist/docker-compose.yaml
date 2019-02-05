@@ -13,6 +13,6 @@ services:
     expose:
       - 5432
     volumes:
-      - db-data:/data
+      - pgdata:/data
 volumes:
-  db-data:
+  pgdata:
