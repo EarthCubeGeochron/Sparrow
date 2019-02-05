@@ -28,6 +28,7 @@ RouteName = ({api_route, route, parent})->
   return h 'h2.route-name', [
     backLink
     h 'span.current-route', text
+    h AnchorButton, {minimal: true, icon: 'link', href: api_route}
   ]
 
 ChildRoutesList = ({base, routes})->

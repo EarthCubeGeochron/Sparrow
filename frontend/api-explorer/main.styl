@@ -1,6 +1,18 @@
 @import '../shared/colors'
 @import '../shared/ui-main'
 
+#api-explorer
+  height 100vh
+  margin-top -2em
+  margin 0
+  padding 2em 0 0
+  h1.site-title
+    margin-top 0
+  display flex
+  flex-direction column
+  .api
+    flex-grow 1
+
 .usage
   position relative
 
@@ -43,15 +55,17 @@ ul.routes li
 
 h2.route-name
   .bp3-button.route-parent
-    font-size inherit
     padding-right 2px
-    vertical-align: inherit
   &>span
     display: inline-flex
     padding: 5px 0
   span.home-icon
     padding 5px 10px
-
+  span.current-route
+    padding-right 10px
+  .bp3-button
+    font-size inherit
+    vertical-align: inherit
 
 div.panel-header
   background-color $light-gray4
@@ -75,3 +89,8 @@ div.panel-header
 
 div.collapse-panel div.react-json-view
   max-height 500px
+  overflow-y scroll
+
+div.route-body>div
+  display flex
+  flex-direction column

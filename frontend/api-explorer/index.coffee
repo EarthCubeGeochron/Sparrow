@@ -12,7 +12,7 @@ import './main.styl'
 
 APIExplorer = (props)->
   {match} = props
-  h 'div', [
+  h 'div#api-explorer', [
     h SiteTitle, {subPage: 'API Explorer'}
     h 'div#api', [
       h Route, {
