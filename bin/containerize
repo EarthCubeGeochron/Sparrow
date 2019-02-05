@@ -1,0 +1,16 @@
+#!/usr/bin/env zsh
+
+basedir="$(git rev-parse --show-toplevel)"
+distdir="$basedir/dist"
+appdir="$distdir/app"
+
+mkdir -p "$appdir"
+
+cd "$basedir"
+
+cp -r requirements.txt labdata import-pipelines "$appdir"
+
+# Build the docker image
+cd "$distdir"
+docker-compose up --build
+
