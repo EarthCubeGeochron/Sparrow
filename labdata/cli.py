@@ -58,7 +58,7 @@ def create_views(db):
 @with_config
 def dev_server(cfg):
     app, db = construct_app(cfg)
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
 
 @cli.command(name='shell')
 @with_config
@@ -78,7 +78,7 @@ def config(cfg, key=None):
         return
 
     res = dict()
-    for k in ("LAB_NAME","DATABASE","SITE_CONTENT"):
+    for k in ("LAB_NAME","DBNAME", "DATABASE","SITE_CONTENT"):
         val = app.config.get(k)
         v = k.lower()
         res[v] = val

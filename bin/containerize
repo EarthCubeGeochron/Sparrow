@@ -4,12 +4,20 @@ basedir="$(git rev-parse --show-toplevel)"
 distdir="$basedir/dist"
 appdir="$distdir/app"
 
-mkdir -p "$appdir"
-
 cd "$basedir"
 
-rm -rf "$appdir"/*
-cp -r requirements.txt labdata import-pipelines "$appdir"
+# Could set output dir programmatically if possible
+assets="$basedir/_assets"
+assets_out="$distdir/_assets"
+rm -f "$assets"/*
+$(npm bin)/webpack --mode=production
+
+rm -rf "$appdir" "$assets_out"
+cp -r "$assets" "$assets_out"
+mkdir -p "$appdir"
+
+# Put requirements in appropriate directory
+cp -r requirements.txt labdata import-pipelines setup.py "$appdir"
 
 # Build the docker image
 cd "$distdir"
