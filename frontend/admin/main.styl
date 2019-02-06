@@ -1,4 +1,19 @@
-@import "../shared/colors.styl"
+@import "../shared/colors"
+@import "../shared/mixins"
+
+a.link-card
+  text-decoration none
+  color inherit
+  &:hover div.bp3-card
+    background-color $light-gray5
+
+// API Pagination
+div.pagination-controls
+  margin-top 1em
+  display flex
+  flex-direction row
+  align-items: center
+  justify-content space-between
 
 .bp3-navbar
   margin-top 2em
@@ -46,41 +61,42 @@ a.link-button
 
 accent=$red3
 
-div#sessions
-  div.session.bp3-card
-    position relative
-    &:first-child
-      margin-top 1em
-    padding 10px
-    margin-bottom 1em
-    h4.date
-      margin-top 0
-      margin-bottom 5px
-      margin-left 10px
+div.session-info-card.bp3-card
+  position relative
+  &:first-child
+    margin-top 1em
+  padding 10px
+  margin-bottom 1em
+  h4.date
+    margin-top 0
+    margin-bottom 5px
+    margin-left 10px
+    color: accent
+    font-weight 400
+    font-style italic
+  div.top
+    panel-header()
+  div.session-info
+    display flex
+    flex-flow row wrap
+    margin -5px
+    .sample-id
+      font-weight bold
       color: accent
-      font-weight 400
+    .target
       font-style italic
-    div.session-info
-      display flex
-      flex-flow row wrap
-      margin -5px
-      .sample-id
-        font-weight bold
-        color: accent
-      .target
-        font-style italic
-        color $gray1
-      &>div
-        min-width 130px
-        background-color $light-gray5
-        border-radius 5px
-        margin 5px
-        padding 5px 10px
-        flex 1
-        h5
-          margin-top 0
-          margin-bottom 0.2em
-          &.small-info
-            color: $gray1
-            font-weight 400
+      color $gray1
+    &>div
+      min-width 130px
+      background-color $light-gray4
+      border-radius 5px
+      margin 5px
+      padding 5px 10px
+      flex 1
+      h5
+        margin-top 0
+        margin-bottom 0.2em
+        &.small-info
+          color: $gray1
+          font-weight 400
 

@@ -11,10 +11,13 @@ if SECRET_KEY is None:
     raise KeyError("Environment variable `LABDATA_SECRET_KEY` must be set")
 
 JWT_SECRET_KEY = SECRET_KEY
-
 # We store JWT tokens in cookies because it's more secure.
 # https://flask-jwt-extended.readthedocs.io/en/latest/tokens_in_cookies.html
 JWT_TOKEN_LOCATION = ['cookies']
+
+# Temporary, for development
+JWT_COOKIE_CSRF_PROTECT = False
+
 # Only send access tokens to API endpoints
 JWT_ACCESS_COOKIE_PATH = '/api/v1'
 

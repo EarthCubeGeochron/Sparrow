@@ -57,7 +57,6 @@ class ChartOuter extends Component
     }
   render: ->
     {range} = @state
-    route = "http://localhost:3000/api/v1/datum"
     params = {
       unit: 'Ma'
       parameter: 'plateau_age'
@@ -72,7 +71,7 @@ class ChartOuter extends Component
       v /= 1000
       return "#{v} Ga"
 
-    h APIResultView, {route, params}, (data)=>
+    h APIResultView, {route: '/datum', params}, (data)=>
       h 'div.age-chart-container', {style: {height: 500}}, [
         h Callout, {
           icon: 'scatter-plot', title: "Plateau ages"
@@ -97,7 +96,7 @@ class ChartOuter extends Component
 
 class AgeChartComponent extends Component
   @defaultProps: {
-    apiEndpoint: '/api/v1/session'
+    apiEndpoint: '/session'
   }
   render: ->
     {apiEndpoint} = @props

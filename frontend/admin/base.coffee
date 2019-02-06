@@ -4,17 +4,12 @@ import {Navbar, Button, ButtonGroup, Icon} from '@blueprintjs/core'
 import {NavLink, Route, Switch} from 'react-router-dom'
 import cfg from 'site-content/variables'
 import classNames from 'classnames'
+import {LinkButton} from '@macrostrat/ui-components'
 
 import {ProjectListComponent} from './project-component'
 import {SessionListComponent} from './session-list-component'
 import {AgeChartComponent} from './age-component'
 import {SessionComponent} from './session-component'
-
-LinkButton = (props)->
-  {to, className, children, rest...} = props
-  className = classNames className, "link-button", "bp3-button", "bp3-minimal"
-  activeClassName = classNames className, "bp3-active"
-  h NavLink, {to, className, activeClassName, rest...}, children
 
 AdminNavbar = ({base})->
   h Navbar, [
@@ -39,12 +34,15 @@ SessionMatch = ({match})->
 
 class AdminBase extends Component
   render: ->
-    console.log(@props)
     {match} = @props
     base = match.path
     h 'div#labdata-admin', [
       h AdminNavbar, {base}
       h Switch, [
+        h Route, {
+          path: base+"/session/:id"
+          component: SessionMatch
+        }
         h Route, {
           path: base+"/session"
           component: SessionListComponent
@@ -52,10 +50,6 @@ class AdminBase extends Component
         h Route, {
           path: base+"/project"
           component: ProjectListComponent
-        }
-        h Route, {
-          path: base+"/session/:id"
-          component: SessionMatch
         }
         h Route, {
           path: base

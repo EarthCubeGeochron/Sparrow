@@ -19,8 +19,15 @@ class AuthProvider extends StatefulComponent
     @getStatus()
 
   getStatus: =>
-    {get} = @context
-    {login, username} = await get '/auth/status'
+    # Right now, we get login status from the
+    # /auth/refresh endpoint, which refreshes access
+    # tokens allowing us to extend our session.
+    # It could be desirable for security (especially
+    # when editing information becomes a factor) to
+    # only refresh tokens when access is proactively
+    # granted by the application.
+    {post} = @context
+    {login, username} = await post '/auth/refresh'
     @setState {login, username}
 
   requestLoginForm: (v)=>
