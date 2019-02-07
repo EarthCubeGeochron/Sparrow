@@ -23,7 +23,10 @@ let browserSync = new BrowserSyncPlugin({
 
 let jsLoader = {
   loader: 'babel-loader',
-  options: {presets: ['@babel/preset-env', '@babel/preset-react']}
+  options: {
+    presets: ['@babel/preset-env', '@babel/preset-react'],
+    plugins: ["babel-plugin-styled-components"]
+  }
 };
 
 let fontLoader = {

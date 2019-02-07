@@ -7,6 +7,11 @@ a.link-card
   &:hover div.bp3-card
     background-color $light-gray5
 
+div.bp3-card
+  padding 10px
+  &>:first-child
+    margin-top 0
+
 // API Pagination
 div.pagination-controls
   margin-top 1em
@@ -61,21 +66,24 @@ a.link-button
 
 accent=$red3
 
+div.session-info-card, div.snippet-result
+  margin-bottom 1em
+  h4.date
+    color: accent
+    font-weight 400
+    font-style italic
+
 div.session-info-card.bp3-card
   position relative
   &:first-child
     margin-top 1em
   padding 10px
-  margin-bottom 1em
-  h4.date
-    margin-top 0
-    margin-bottom 5px
-    margin-left 10px
-    color: accent
-    font-weight 400
-    font-style italic
   div.top
     panel-header()
+  h4.date
+    margin-left 10px
+    margin-top 0
+    margin-bottom 5px
   div.session-info
     display flex
     flex-flow row wrap

@@ -3,6 +3,7 @@ import {Component} from 'react'
 import {Breadcrumbs} from '@blueprintjs/core'
 import {Link} from 'react-router-dom'
 
+import {GeoDeepDiveCard} from './gdd-card'
 import {SessionInfoCard} from './info-card'
 import {APIResultView} from '@macrostrat/ui-components'
 
@@ -18,10 +19,15 @@ class SessionComponent extends Component
     h 'div.data-view#session', [
       h Breadcrumbs, {items: breadCrumbs}
       h APIResultView, {
-        route: "/api/v1/session"
+        route: "/session"
         params: {id}
       }, (data)=>
-        h SessionInfoCard, data[0]
+        res = data[0]
+        {sample_id} = res
+        h 'div', [
+          h SessionInfoCard, res
+          h GeoDeepDiveCard, {sample_id}
+        ]
     ]
 
 export {SessionComponent}

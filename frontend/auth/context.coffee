@@ -26,8 +26,8 @@ class AuthProvider extends StatefulComponent
     # when editing information becomes a factor) to
     # only refresh tokens when access is proactively
     # granted by the application.
-    {post} = @context
-    {login, username} = await post '/auth/refresh'
+    {get} = @context
+    {login, username} = await get '/auth/status'
     @setState {login, username}
 
   requestLoginForm: (v)=>
