@@ -5,26 +5,24 @@ import {Parameter} from './parameter'
 import {join} from 'path'
 import {JSONCollapsePanel} from './collapse-panel'
 
-ParamItem = (d)->
-  i = h Parameter, d
-  h 'li', null, i
-
 class APIUsageComponent extends Component
   @defaultProps: {data: null}
   constructor: (props)->
     super props
 
   renderContent: ->
-    {expandParameter, expandedParameter, data} = @props
+    {expandParameter, updateParameters, params, expandedParameter, data} = @props
     {arguments: args, record, api_route} = data
     {route, key: name, type} = record
     route = join api_route, route
     return [
       h 'div.arguments', [
-        h 'h3', 'Arguments'
-        h 'ul.arguments', args.map (d)->
-          expanded = d.name == expandedParameter
-          h ParamItem, {expanded, expandParameter, d...}
+        h 'p', "Click a parameter to adjust"
+        h 'div.arguments-list', args.map (d)->
+          update = updateParameters
+          value = params[d.name] or null
+          expanded = d.name == expandedParameter or value?
+          h Parameter, {expanded, update, value, expand: expandParameter, d...}
       ]
       h 'div.record', [
         h 'h3', route

@@ -7,7 +7,6 @@ nullIfError = (fn)-> ->
   try
     return fn.apply(@, arguments)
   catch error
-    console.log "Ignored '#{error}'', returning null"
     return null
 
 JSONToggle = ({showJSON, onChange})->
