@@ -3,7 +3,7 @@ services:
   web:
     build: .
     ports:
-      - "5000:5000"
+      - "50101:5000"
     depends_on:
       - postgis
     environment:
