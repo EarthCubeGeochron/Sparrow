@@ -1,9 +1,13 @@
 import {Component} from 'react'
 import h from 'react-hyperscript'
 import {Button, Intent, Collapse, NonIdealState} from '@blueprintjs/core'
-import {Argument} from './utils'
+import {Parameter} from './parameter'
 import {join} from 'path'
 import {JSONCollapsePanel} from './collapse-panel'
+
+ParamItem = (d)->
+  i = h Parameter, d
+  h 'li', null, i
 
 class APIUsageComponent extends Component
   @defaultProps: {data: null}
@@ -17,15 +21,12 @@ class APIUsageComponent extends Component
     return [
       h 'div.arguments', [
         h 'h3', 'Arguments'
-        h 'ul.arguments', args.map (d)->
-          h 'li', null, (
-            h Argument, d
-          )
+        h 'ul.arguments', args.map ParamItem
       ]
       h 'div.record', [
         h 'h3', route
         h 'p.description', 'Get a single record'
-        h Argument, {name, type}
+        h Parameter, {name, type}
       ]
     ]
 

@@ -1,9 +1,12 @@
 import {Component} from 'react'
 import h from 'react-hyperscript'
-import {JSONCollapsePanel} from './collapse-panel'
+import {JSONToggle} from './utils'
 import {get} from 'axios'
-import { APIResultView, APIConsumer } from "@macrostrat/ui-components"
+import {JSONCollapsePanel} from './collapse-panel'
+import { PagedAPIView } from "@macrostrat/ui-components"
 import { Cell, Column, Table } from "@blueprintjs/table"
+import ReactJson from 'react-json-view'
+
 import "@blueprintjs/table/lib/css/table.css"
 
 class DataTable extends Component
@@ -28,19 +31,35 @@ class DataTable extends Component
     }, columns
 
 
-class APIDataComponent extends Component
-  @defaultProps: {route: null}
-  render: ->
+class APIDataComponentInner extends JSONCollapsePanel
+  constructor: (props)->
+    super props
+    @state = {showJSON: false}
+
+  renderDataInterior: (data)=>
+    {showJSON} = @state
+    if showJSON
+      return h ReactJson, {src: data}
+    h DataTable, {data}
+
+  renderInterior: ->
     {route, params} = @props
     return null unless route?
-    h APIResultView, {route, params}, (data)=>
-      h JSONCollapsePanel, {
-        data
-        storageID: 'data'
-        className: 'data'
-        title: 'Data'
-      }, (
-        h DataTable, {data}
-      )
+
+    h PagedAPIView, {
+      topPagination: true,
+      bottomPagination: false,
+      route,
+      params,
+      perPage: 20
+    }, @renderDataInterior
+
+APIDataComponent = (props)->
+  h APIDataComponentInner, {
+    storageID: 'data'
+    className: 'data'
+    title: 'Data'
+    props...
+  }
 
 export {APIDataComponent}

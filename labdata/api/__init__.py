@@ -137,7 +137,10 @@ class APIv1(API):
                     val = args.pop(k, None)
                     if val is not None:
                         should_describe = False
-                        q = q.filter(col==val)
+                        if col.type.python_type == str:
+                            q = q.filter(col.like(val))
+                        else:
+                            q = q.filter(col==val)
 
                 if args.pop('all', False):
                     should_describe = False

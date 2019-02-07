@@ -103,7 +103,12 @@ class RouteComponent extends Component
       h 'p.description', data.description
       h ChildRoutesList, {base, routes}
       h APIUsageComponent, {data}
-      h APIDataComponent, {route: api_route, params: {offset: 0, limit: 10}}
+      h APIDataComponent, {
+        route: api_route
+        params: {offset: 0, limit: 10}
+        title: "Data"
+        storageID: 'data'
+      }
     ]
 
   renderSubRoutes: nullIfError ->
