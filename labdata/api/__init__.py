@@ -26,6 +26,29 @@ def infer_type(t):
         type = inputs.boolean
     return type
 
+def build_description(argument):
+    """
+    Build a description for a parser argument
+    """
+    type = argument.type
+    usage = None
+    typename = type.__name__
+    if typename == 'Decimal':
+        typename = 'numeric'
+    elif type == list:
+        typename = 'array'
+        usage = "Match any of the array items"
+    elif type == str:
+        usage = "Use PostgreSQL LIKE wildcards (e.g. %,_,*) for fuzzy matching"
+
+    return dict(
+        name=argument.name,
+        default=argument.default,
+        type=typename,
+        description=argument.help,
+        usage=usage
+    )
+
 class APIv1(API):
     """
     Version 1 API for Lab Data Interface
@@ -80,6 +103,9 @@ class APIv1(API):
         for name, column in table.c.items():
             try:
                 type = infer_type(column)
+                if type == dict:
+                    # We don't yet support dict types
+                    continue
                 typename = type.__name__
                 parser.add_argument(name, type=type,
                     help=f"Column '{name}' of type '{typename}'")
@@ -111,12 +137,7 @@ class APIv1(API):
                 description object. This conforms to the convention
                 of the Macrostrat API.
                 """
-                args = [dict(
-                    name=a.name,
-                    default=a.default,
-                    type=a.type.__name__,
-                    description=a.help
-                ) for a in parser.args]
+                args = [build_description(a) for a in parser.args]
 
                 return dict(
                     **basicInfo,
