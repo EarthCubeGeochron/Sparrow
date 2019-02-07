@@ -26,6 +26,7 @@ class SessionComponent extends Component
         {sample_id} = res
         h 'div', [
           h SessionInfoCard, res
+          h Button, {icon: 'file', intent: Intent.PRIMARY}, "Get data file"
           h GeoDeepDiveCard, {sample_id}
         ]
     ]
