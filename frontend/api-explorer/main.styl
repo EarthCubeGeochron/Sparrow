@@ -50,11 +50,16 @@ ul.routes li
       background-color: $blue5
 
 h2.route-name
+  display flex
+  flex-direction row
   .bp3-button.route-parent
     padding-right 2px
-  &>span
-    display: inline-flex
+  &>span,&>div
     padding: 5px 0
+  .query-string
+    font-weight 400
+    flex 1
+    color: $gray3
   span.home-icon
     padding 5px 10px
   span.current-route

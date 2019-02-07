@@ -10,22 +10,13 @@ import {ProjectListComponent} from './project-component'
 import {SessionListComponent} from './session-list-component'
 import {AgeChartComponent} from './age-component'
 import {SessionComponent} from './session-component'
+import {AppNavbar} from 'app/shared/navbar'
 
-AdminNavbar = ({base})->
-  h Navbar, [
-    h Navbar.Group, [
-      h Navbar.Heading, [
-        h 'h1.site-title', [
-          h NavLink, {to: '/'}, "#{cfg.siteTitle}"
-          ":"
-          h 'span.subtitle', "Admin"
-        ]
-      ]
-      h Navbar.Divider
-      h LinkButton, {to: base, exact: true}, h(Icon, {icon: 'home'})
-      h LinkButton, {to: base+'/session'}, "Data"
-      h LinkButton, {to: base+'/project'}, "Projects"
-    ]
+AdminNavbar = ({base, rest...})->
+  h AppNavbar, {rest, subtitle: 'Admin'}, [
+    h LinkButton, {to: base, exact: true}, h(Icon, {icon: 'home'})
+    h LinkButton, {to: base+'/session'}, "Data"
+    h LinkButton, {to: base+'/project'}, "Projects"
   ]
 
 SessionMatch = ({match})->

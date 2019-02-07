@@ -1,15 +1,65 @@
 import h from 'react-hyperscript'
 import {Component} from 'react'
-import {Callout, Icon, Card} from '@blueprintjs/core'
-import {PagedAPIView} from '@macrostrat/ui-components'
+import {Callout, Icon, Card, InputGroup, Menu, MenuItem, Popover, Button, Position} from '@blueprintjs/core'
+import {PagedAPIView, StatefulComponent} from '@macrostrat/ui-components'
 import {SessionInfoLink} from './session-component/info-card'
 
-class SessionListComponent extends Component
+class SessionListComponent extends StatefulComponent
   @defaultProps: {
     apiEndpoint: '/api/v1/session'
+    filterFields: {
+      'sample_id': "Sample"
+      'target': "Material"
+      'instrument_name': "Instrument"
+      'technique': "Technique"
+      'measurement_group_id': 'Group'
+    }
   }
+  constructor: (props)->
+    super props
+    @state = {
+      filter: ''
+      field: 'sample_id'
+      isSelecting: false
+    }
+
+  updateFilter: (event)=>
+    {value} = event.target
+    @updateState {filter: {$set: value}}
+
   render: ->
-    {apiEndpoint} = @props
+    {apiEndpoint, filterFields} = @props
+    {filter, field} = @state
+    params = {}
+    if filter? and filter != ""
+      val = "%#{filter}%"
+      params = {[field]: val}
+
+
+    menuItems = []
+    onClick = (k)=> => @updateState {
+      field: {$set: k}
+      filter: {$set: ''}
+    }
+
+    for k,v of filterFields
+      menuItems.push h Button, {minimal: true, onClick: onClick(k)}, v
+
+    content = h Menu, menuItems
+    position = Position.BOTTOM_RIGHT
+
+    rightElement = h Popover, {content, position}, [
+      h Button, {minimal: true, rightIcon: "caret-down"}, filterFields[field]
+    ]
+
+    filterBox = h InputGroup, {
+      leftIcon: 'search'
+      placeholder: "Filter values"
+      value: @state.filter
+      onChange: @updateFilter
+      rightElement
+    }
+
 
     h 'div.data-view#session-list', [
       h Callout, {
@@ -18,6 +68,8 @@ class SessionListComponent extends Component
       }, "This page contains the core data view for laboratory analytical data"
       h PagedAPIView, {
         className: 'data-frame'
+        extraPagination: filterBox
+        params
         route: apiEndpoint
         topPagination: true
         bottomPagination: false

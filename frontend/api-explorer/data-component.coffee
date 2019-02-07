@@ -1,5 +1,6 @@
 import {Component} from 'react'
 import h from 'react-hyperscript'
+import styled from '@emotion/styled'
 import {JSONToggle} from './utils'
 import {get} from 'axios'
 import {JSONCollapsePanel} from './collapse-panel'
@@ -9,9 +10,9 @@ import ReactJson from 'react-json-view'
 
 import "@blueprintjs/table/lib/css/table.css"
 
-class DataTable extends Component
+class DataTable__ extends Component
   render: ->
-    {data} = @props
+    {data, className} = @props
     return null if not data?
 
     columns = []
@@ -28,8 +29,12 @@ class DataTable extends Component
     h Table, {
       numRows: data.length
       defaultRowHeight: 30
+      className
     }, columns
 
+DataTable = styled(DataTable__)"""
+  margin: 1em 0 2em 0;
+"""
 
 class APIDataComponentInner extends JSONCollapsePanel
   constructor: (props)->
@@ -44,6 +49,7 @@ class APIDataComponentInner extends JSONCollapsePanel
 
   renderInterior: ->
     {route, params} = @props
+    console.log params
     return null unless route?
 
     h PagedAPIView, {

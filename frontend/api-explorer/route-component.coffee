@@ -38,8 +38,7 @@ RouteName = ({api_route, queryString, route, parent})->
   return h 'h2.route-name', [
     backLink
     h 'span.current-route', text
-    h Text, {className: 'query-string'}, queryString
-    h 'span.expander'
+    h Text, {ellipsize: true, className: 'query-string'}, queryString
     h AnchorButton, {minimal: true, icon: 'link', href: api_route+queryString}
   ]
 

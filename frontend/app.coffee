@@ -6,13 +6,12 @@ import {Intent} from '@blueprintjs/core'
 import {APIProvider} from '@macrostrat/ui-components'
 import {APIExplorer} from './api-explorer'
 import {ProjectPage} from './admin'
-import {AuthStatus, AuthProvider} from './auth'
+import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
 
 AppMain = ->
   h Router, {basename: '/'}, (
     h 'div.app', [
-      h AuthStatus
       h Switch, [
         h Route, {
           path: '/',
