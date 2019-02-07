@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import {Component} from 'react'
 import {Callout, Icon, Card, NonIdealState} from '@blueprintjs/core'
 import {CollapsePanel, APIResultView,

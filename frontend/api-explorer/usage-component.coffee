@@ -15,13 +15,16 @@ class APIUsageComponent extends Component
     super props
 
   renderContent: ->
-    {arguments: args, record, api_route} = @props.data
+    {expandParameter, expandedParameter, data} = @props
+    {arguments: args, record, api_route} = data
     {route, key: name, type} = record
     route = join api_route, route
     return [
       h 'div.arguments', [
         h 'h3', 'Arguments'
-        h 'ul.arguments', args.map ParamItem
+        h 'ul.arguments', args.map (d)->
+          expanded = d.name == expandedParameter
+          h ParamItem, {expanded, expandParameter, d...}
       ]
       h 'div.record', [
         h 'h3', route
@@ -46,7 +49,7 @@ class APIUsageComponent extends Component
       data
       storageID: 'usage',
       className: 'usage',
-      title: 'Usage'
+      title: 'Parameters'
     }, @renderInterior()
 
 export {APIUsageComponent}

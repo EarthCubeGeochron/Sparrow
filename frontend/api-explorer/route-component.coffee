@@ -3,6 +3,8 @@ import h from 'react-hyperscript'
 import {get} from 'axios'
 import {Link, Route} from 'react-router-dom'
 import ReactJson from 'react-json-view'
+import ReactMarkdown from 'react-markdown'
+import {StatefulComponent} from '@macrostrat/ui-components'
 import {Button, AnchorButton, Intent, Icon} from '@blueprintjs/core'
 import {join} from 'path'
 import {nullIfError, Argument} from './utils'
@@ -47,7 +49,7 @@ ChildRoutesList = ({base, routes})->
       ]
   ]
 
-class RouteComponent extends Component
+class RouteComponent extends StatefulComponent
   @defaultProps: {
     parent: null
   }
@@ -55,6 +57,7 @@ class RouteComponent extends Component
     super props
     @state = {
       response: null
+      expandedParameter: null
     }
     @getData()
 
@@ -63,6 +66,9 @@ class RouteComponent extends Component
     response = @state.response or {}
     api_route = @apiPath()
     {parent, api_route, response...}
+
+  expandParameter: (id)=>
+    @setState {expandedParameter: id}
 
   hasSubRoutes: ->
     {routes} = @state.response or {}
@@ -94,15 +100,17 @@ class RouteComponent extends Component
     data = @routeData()
     {routes} = @state.response
     {path: base} = @props.match
+    {expandedParameter} = @props
+    {expandParameter} = @
     api_route = @apiPath()
     if not data.arguments?
       # Basically, tell the data component not to render
       api_route = null
 
     return h 'div', [
-      h 'p.description', data.description
+      h ReactMarkdown, {source: data.description}
       h ChildRoutesList, {base, routes}
-      h APIUsageComponent, {data}
+      h APIUsageComponent, {data, expandedParameter, expandParameter}
       h APIDataComponent, {
         route: api_route
         params: {offset: 0, limit: 10}
