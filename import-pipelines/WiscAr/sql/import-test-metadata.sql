@@ -22,8 +22,9 @@ UPDATE session SET
   project_id = 'delarof-1'
 WHERE sample_id IN (SELECT sample_id FROM method_data.schaen_table_2);
 
---D2315 41.6032° N, 106.9123°W   100 Carbon County, WY Cenomanian — Western Interior Basin    Ma 2014  10.1130/B30922.1
-
+/*
+Importing Cretaceous data
+*/
 
 UPDATE sample SET
   location = ST_SetSRID(ST_MakePoint(-106.9123,41.6032),4326),
@@ -31,3 +32,9 @@ UPDATE sample SET
   material = 'bentonite',
   location_name = 'Carbon County, WY'
 WHERE id = 'D2315';
+
+/* Projects and samples are linked through the analytical sessions,
+   so update those */
+UPDATE session SET
+  project_id = 'cenomanian-turonian-1'
+WHERE sample_id = 'D2315';
