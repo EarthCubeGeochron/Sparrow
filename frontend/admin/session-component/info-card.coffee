@@ -13,6 +13,7 @@ Sample = (props)->
 SessionInfoComponent = (props)->
   {id, sample_id, target} = props
   date = parse(props.date)
+  console.log props
 
   h 'div', [
     h 'div.top', [
@@ -23,7 +24,7 @@ SessionInfoComponent = (props)->
       h Sample, {id: sample_id, target}
       h 'div.project', [
         h 'h5.info', 'Project'
-        h 'div', null, props.project_id or "—"
+        h 'div', null, props.project_name or "—"
       ]
       h 'div.instrument', [
         h 'h5.small-info', 'Instrument'

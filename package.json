@@ -31,6 +31,7 @@
     "react-markdown": "^4.0.6",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
+    "react-simple-maps": "^0.12.1",
     "store": "^2.0.12"
   },
   "devDependencies": {

@@ -9,6 +9,7 @@ class SessionListComponent extends StatefulComponent
     apiEndpoint: '/api/v1/session'
     filterFields: {
       'sample_id': "Sample"
+      'project_name': "Project"
       'target': "Material"
       'instrument_name': "Instrument"
       'technique': "Technique"
