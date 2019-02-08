@@ -1,6 +1,6 @@
 import h from 'react-hyperscript'
 import {Component} from 'react'
-import {Breadcrumbs} from '@blueprintjs/core'
+import {Breadcrumbs, Button, Intent} from '@blueprintjs/core'
 import {Link} from 'react-router-dom'
 
 import {GeoDeepDiveCard} from './gdd-card'
@@ -26,7 +26,7 @@ class SessionComponent extends Component
         {sample_id} = res
         h 'div', [
           h SessionInfoCard, res
-          h Button, {icon: 'file', intent: Intent.PRIMARY}, "Get data file"
+          h Button, {icon: 'document', intent: Intent.PRIMARY}, "Get data file"
           h GeoDeepDiveCard, {sample_id}
         ]
     ]
