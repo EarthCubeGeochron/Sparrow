@@ -10,6 +10,8 @@ import ReactJson from 'react-json-view'
 
 import "@blueprintjs/table/lib/css/table.css"
 
+Bold = styled.span"""font-weight:600;"""
+
 class DataTable__ extends Component
   render: ->
     {data, className} = @props
@@ -21,19 +23,35 @@ class DataTable__ extends Component
       # Special case for JSON rows
       if typeof a is "object"
         a = JSON.stringify a
-      h Cell, null, "#{a}"
+      a = "#{a}"
+      if a == 'false'
+        a = h Bold, null, 'F'
+      if a == 'true'
+        a = h Bold, null, 'T'
+      if a == 'null'
+        a = '—'
 
+      h Cell, null, a
+
+    sizes = []
     for k,v of data[0]
       columns.push h Column, {key: k, name: k, cellRenderer: cellRenderer(k)}
+      if typeof v is 'boolean'
+        sz = 50
+      else
+        sz = 100
+      sizes.push sz
 
     h Table, {
       numRows: data.length
       defaultRowHeight: 30
+      columnWidths: sizes
       className
     }, columns
 
 DataTable = styled(DataTable__)"""
   margin: 1em 0 2em 0;
+  font-size: 1.2em;
 """
 
 class APIDataComponentInner extends JSONCollapsePanel
