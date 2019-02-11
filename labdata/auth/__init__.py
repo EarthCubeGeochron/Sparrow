@@ -84,8 +84,8 @@ class TokenRefresh(Resource):
     def post(self):
         username = get_jwt_identity()
         access_token = create_access_token(identity=username)
-        resp = jsonify(refresh=True, username=username)
-        set_access_cookies(resp)
+        resp = jsonify(login=True, refresh=True, username=username)
+        set_access_cookies(resp, access_token)
         return resp
 
 @AuthAPI.resource('/secret')

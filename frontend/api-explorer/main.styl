@@ -1,5 +1,18 @@
 @import '../shared/colors'
 @import '../shared/ui-main'
+@import '../shared/mixins'
+
+#api-explorer
+  height 100vh
+  margin-top -2em
+  margin 0
+  padding 2em 0 0
+  h1.site-title
+    margin-top 0
+  display flex
+  flex-direction column
+  .api
+    flex-grow 1
 
 .usage
   position relative
@@ -12,7 +25,7 @@
   p
     margin-bottom 0.2em
 
-ul.arguments, ul.routes
+ul.routes
   list-style: none
   padding-left 0
   li
@@ -20,16 +33,11 @@ ul.arguments, ul.routes
   .bp3-card
     @extends .small-card
 
-ul.arguments
+
+div.arguments-list
   display flex
   flex-flow row wrap
   align-items stretch
-  li
-    max-width 20em
-    flex-grow 1
-    margin-right 0.5em
-    .bp3-card
-      height 100%
 
 .argument.bp3-card
   @extends .small-card
@@ -42,24 +50,30 @@ ul.routes li
       background-color: $blue5
 
 h2.route-name
+  display flex
+  flex-direction row
   .bp3-button.route-parent
-    font-size inherit
     padding-right 2px
-    vertical-align: inherit
-  &>span
-    display: inline-flex
+  &>span,&>div
     padding: 5px 0
+  .query-string
+    font-weight 400
+    flex 1
+    color: $gray3
   span.home-icon
     padding 5px 10px
-
+  span.current-route
+    padding-right 10px
+  .bp3-button
+    font-size inherit
+    vertical-align: inherit
 
 div.panel-header
+  panel-header()
   background-color $light-gray4
   //border 1px solid $light-gray1
   padding 6px
   border-radius 6px
-  display flex
-  flex-direction row
   margin-top 1em
   margin-bottom 0.5em
   &>*
@@ -70,8 +84,11 @@ div.panel-header
     color $dark-gray4
     margin-top 0
     margin-bottom 0
-  div.expander
-    flex-grow 1
 
 div.collapse-panel div.react-json-view
   max-height 500px
+  overflow-y scroll
+
+div.route-body>div
+  display flex
+  flex-direction column

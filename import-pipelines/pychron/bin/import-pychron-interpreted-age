@@ -21,3 +21,4 @@ with working_directory(__file__, '..'):
     sql = open('sql/data-insert.sql').read()
     db.session.execute(sql, dict(id=data['uuid'], data=dumps(data)))
     db.session.commit()
+    ## TODO: Normalize data into the proper file format

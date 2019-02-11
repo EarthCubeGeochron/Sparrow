@@ -57,7 +57,9 @@ def construct_app(config=None):
     api.build_route("session", schema='core_view')
     api.build_route("age_datum", schema='core_view')
     api.build_route("sample", schema='core_view')
+    api.build_route("sample_data", schema='core_view')
     api.build_route("project", schema='core_view')
+    api.build_route("material", schema='core_view')
 
     api.add_resource(AuthAPI, "/auth")
     #api.build_route("dz_sample", schema='method_data')

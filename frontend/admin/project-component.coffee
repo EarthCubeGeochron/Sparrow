@@ -1,7 +1,9 @@
 import {Component, createElement} from 'react'
 import h from 'react-hyperscript'
 import {get} from 'axios'
+import {Card, Colors} from '@blueprintjs/core'
 import {PagedAPIView} from '@macrostrat/ui-components'
+import styled from '@emotion/styled'
 import './main.styl'
 
 class Publication extends Component
@@ -50,16 +52,40 @@ ProjectResearchers = ({data})->
     content...
   ]
 
-Sample = (props)->
-  {material_data} = props
-  material = null
-  if material_data?
-    material = h 'span.material', material_data[0].description
+SampleCard = styled.div"""
+  background-color: #{Colors.LIGHT_GRAY4};
+  border-radius: 5px;
+  margin: 5px;
+  padding: 5px 10px;
+  flex-grow: 1;
+  max-width: 15em;
+  .location-name {
+    color: #{Colors.RED1};
+  }
+  h4 {
+    margin-top: 0em;
+    margin-bottom: 0em;
+  }
+"""
 
-  h 'div.sample', [
-    h 'span.name', props.id
+Material = styled.div"""font-style: italic"""
+
+Sample = (props)->
+  {material, sample_id, location_name} = props
+  if material?
+    material = h Material, material
+
+  h SampleCard, {className: 'sample'}, [
+    h 'h4.name', sample_id
+    h 'div.location-name', location_name
     material
   ]
+
+SampleContainer = styled.div"""
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0 -5px;
+"""
 
 ProjectSamples = ({data})->
   content = [ h 'p', 'No samples' ]
@@ -68,7 +94,7 @@ ProjectSamples = ({data})->
       h Sample, d
   h 'div.samples', [
     h 'h4', 'Samples'
-    content...
+    h SampleContainer, content
   ]
 
 ProjectComponent = (props)->

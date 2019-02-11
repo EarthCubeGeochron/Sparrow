@@ -5,7 +5,7 @@ import {render} from 'react-dom'
 import { Route, Link, Redirect } from "react-router-dom"
 import h from 'react-hyperscript'
 
-import {SiteTitle} from '../shared/util'
+import {AppNavbar} from 'app/shared/navbar'
 import {RouteComponent} from './route-component'
 
 import './main.styl'
@@ -13,7 +13,7 @@ import './main.styl'
 APIExplorer = (props)->
   {match} = props
   h 'div', [
-    h SiteTitle, {subPage: 'API Explorer'}
+    h AppNavbar, {subtitle: 'API Explorer', fullTitle: true}
     h 'div#api', [
       h Route, {
         path: "#{match.url}",

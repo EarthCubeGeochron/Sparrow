@@ -142,6 +142,12 @@ CREATE TABLE sample (
   id text PRIMARY KEY,
   igsn text UNIQUE,
   material text REFERENCES vocabulary.material(id),
+  /* Order-of-magnitude precision (in meters)
+     with which this position
+     is known */
+  location_precision integer DEFAULT 0,
+  /* A representative named location */
+  location_name text,
   location geometry
 );
 

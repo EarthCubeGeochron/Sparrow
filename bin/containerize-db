@@ -4,7 +4,7 @@ basedir="$(git rev-parse --show-toplevel)"
 distdir="$basedir/dist"
 
 cd "$distdir"
-docker-compose up -d postgis
+#docker-compose up -d postgis
 
 docker exec -it labdata-database dropdb -Upostgres labdata
 docker exec -it labdata-database createdb -Upostgres labdata
