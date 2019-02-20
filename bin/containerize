@@ -10,7 +10,7 @@ cd "$basedir"
 assets="$basedir/_assets"
 assets_out="$distdir/_assets"
 rm -f "$assets"/*
-$(npm bin)/webpack --mode=production
+$(npm bin)/webpack
 
 rm -rf "$appdir" "$assets_out"
 cp -r "$assets" "$assets_out"

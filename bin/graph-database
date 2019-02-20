@@ -22,5 +22,5 @@ sadisplay -u $dbname \
 cat "$graph" \
 | sed "s/NULLTYPE/GEOMETRY/g" \
 | sed "s/WITH TIME ZONE//g" \
-| dot -Tpdf \
+| dot -Tpng \
 > "$output/entity-relationship-diagram.png"

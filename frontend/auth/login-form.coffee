@@ -9,7 +9,11 @@ import './main.styl'
 class LoginFormInner extends Component
   render: ->
     className = classNames(Classes.INPUT, "bp3-large")
-    {data, onChange} = @props
+    {data, onChange, submitForm} = @props
+    onKeyUp = (e)->
+      return unless e.key == 'Enter'
+      submitForm()
+
     h 'form.login-form', [
       h 'input', {
         type: "text",
@@ -17,6 +21,7 @@ class LoginFormInner extends Component
         value: data.username
         onChange
         className,
+        onKeyUp
         placeholder: "Username"
       }
       h 'input', {
@@ -25,6 +30,7 @@ class LoginFormInner extends Component
         value: data.password
         onChange
         className,
+        onKeyUp
         placeholder: "Password"
       }
     ]
@@ -61,6 +67,8 @@ class LoginForm extends StatefulComponent
     {doLogin, login, isLoggingIn: isOpen, requestLoginForm} = @context
     {data} = @state
 
+    submitForm = =>doLogin(data)
+
     onChange = (e)=>
       return unless e.target?
       @updateState {data: {[e.target.name]: { $set: e.target.value }}}
@@ -68,14 +76,14 @@ class LoginForm extends StatefulComponent
     [
       h 'div.login-form-outer', {className: Classes.DIALOG_BODY}, [
         @renderCallout()
-        h LoginFormInner, {data, onChange}
+        h LoginFormInner, {data, onChange, submitForm}
       ]
       h 'div', {className: Classes.DIALOG_FOOTER}, [
         h 'div', {className: Classes.DIALOG_FOOTER_ACTIONS}, [
           h Button, {
             intent: Intent.PRIMARY,
             large: true,
-            onClick: =>doLogin(data),
+            onClick: submitForm,
             disabled: not @isValid()
           }, 'Login'
         ]

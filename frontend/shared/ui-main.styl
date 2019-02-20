@@ -1,18 +1,25 @@
 *
   box-sizing: border-box
 
+page_margin=2em
+
+body
+  margin 0
+  padding 0
+
 #container
   max-width 60em
-  margin 0 auto 2em
+  margin 0 auto
 
 @import './colors'
 
 h1.site-title
+  color $gray1
   span.subtitle, span.inner
     display: inline-block
-    margin-left 0.5em
+    margin-left 0.3em
   span.subtitle
-    color: $dark-gray5
+    color: $gray1
   span.subpage
     color: $gray1
 
@@ -23,6 +30,13 @@ nav.site-nav ul
   list-style none
   padding-left 0
   li
+    margin-right 1em
     a
       font-size 1.2em
-    margin-right 1em
+
+div.api-result-placeholder
+  padding 2em 4em
+  flex-grow 1
+  display flex
+  justify-content center
+  align-items center

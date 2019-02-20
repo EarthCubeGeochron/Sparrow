@@ -35,10 +35,13 @@ A session view with some extra features
 CREATE VIEW core_view.session AS
 SELECT
 	s.*,
-	i.name instrument_name
+	i.name instrument_name,
+  p.title project_name
 FROM session s
 JOIN instrument i
   ON i.id = s.instrument
+LEFT JOIN project p
+  ON s.project_id = p.id
 ORDER BY date DESC;
 
 /* Analysis info with nested JSON data*/
@@ -140,6 +143,22 @@ SELECT id, description, authority
 FROM vocabulary.material;
 
 CREATE VIEW core_view.sample AS
+SELECT
+  s.id,
+  s.igsn,
+  s.material,
+  ST_AsGeoJSON(s.location) geometry,
+  location_name,
+  location_precision,
+  p.id project_id,
+  p.title project_title
+FROM sample s
+JOIN session ss
+  ON s.id = ss.sample_id
+LEFT JOIN project p
+  ON ss.project_id = p.id;
+
+CREATE VIEW core_view.sample_data AS
 WITH a AS (
 SELECT
 	s.id,
@@ -191,7 +210,7 @@ SELECT
 	-- Note: we might convert this link to *analytical sessions*
 	-- to cover cases when samples are in use by multiple projects
 	to_jsonb((SELECT array_agg(a) FROM (
-		SELECT *
+		SELECT DISTINCT ON (s.id) *
 		FROM core_view.sample s
     JOIN session ss
       ON ss.sample_id = s.id

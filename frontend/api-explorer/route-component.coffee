@@ -3,17 +3,27 @@ import h from 'react-hyperscript'
 import {get} from 'axios'
 import {Link, Route} from 'react-router-dom'
 import ReactJson from 'react-json-view'
-import {Button, AnchorButton, Intent, Icon} from '@blueprintjs/core'
+import update from 'immutability-helper'
+import ReactMarkdown from 'react-markdown'
+import styled from '@emotion/styled'
+import {StatefulComponent, LinkCard, APIContext} from '@macrostrat/ui-components'
+import {Colors, Button, Text, AnchorButton, Intent, Icon} from '@blueprintjs/core'
 import {join} from 'path'
 import {nullIfError, Argument} from './utils'
 import {APIUsageComponent} from './usage-component'
 import {APIDataComponent} from './data-component'
 
-RouteName = ({api_route, route, parent})->
+Description = styled(ReactMarkdown)"""
+  font-size: 1.2em;
+  margin 0.5em 0.2em 1em;
+"""
+
+RouteName = ({api_route, queryString, route, parent})->
   text = api_route
   backLink = h 'span.home-icon', [
     h Icon, {icon: 'home'}
   ]
+  queryString ?= ""
   if parent?
     text = route
     # Have to assemble the button ourselves to make it a react-router link
@@ -28,7 +38,13 @@ RouteName = ({api_route, route, parent})->
   return h 'h2.route-name', [
     backLink
     h 'span.current-route', text
+    h Text, {ellipsize: true, className: 'query-string'}, queryString
+    h AnchorButton, {minimal: true, icon: 'link', href: api_route+queryString}
   ]
+
+StyledLinkCard = styled(LinkCard)"""
+  color: #{Colors.BLUE1}
+"""
 
 ChildRoutesList = ({base, routes})->
   return null unless routes?
@@ -37,16 +53,15 @@ ChildRoutesList = ({base, routes})->
     h 'ul.routes', routes.map (d)->
       to = join(base, d.route)
       h 'li.route', [
-        h Link, {to}, (
-          h 'div.bp3-card.bp3-interactive', [
-            h 'h4', d.route
-            h 'p', d.description
-          ]
-        )
+        h StyledLinkCard, {to}, [
+          h 'h4', d.route
+          h 'p', d.description
+        ]
       ]
   ]
 
-class RouteComponent extends Component
+class RouteComponent extends StatefulComponent
+  @contextType: APIContext
   @defaultProps: {
     parent: null
   }
@@ -54,8 +69,21 @@ class RouteComponent extends Component
     super props
     @state = {
       response: null
+      expandedParameter: null
+      queryString: ""
+      params: {}
     }
     @getData()
+
+  updateParams: (cset)=>
+    {helpers: {buildQueryString}} = @context
+    {params} = @state
+    newParams = update params, cset
+    queryString = buildQueryString newParams
+    @updateState {
+      queryString: {$set: queryString}
+      params: {$set: newParams}
+    }
 
   routeData: ->
     {parent} = @props
@@ -63,14 +91,16 @@ class RouteComponent extends Component
     api_route = @apiPath()
     {parent, api_route, response...}
 
+  expandParameter: (id)=>
+    @updateState {expandedParameter: {$set: id}}
+
   hasSubRoutes: ->
     {routes} = @state.response or {}
     (routes or []).length > 0
 
   renderMatch: =>
-    {response, showJSON} = @state
+    {response, showJSON, params, queryString} = @state
     {match, parent} = @props
-    console.log match
     {path, isExact} = match
     exact = @hasSubRoutes()
     return null unless response?
@@ -81,7 +111,7 @@ class RouteComponent extends Component
     h Route, {path, exact}, [
       h 'div.route-ui', [
         h 'div.panel-header', [
-          h RouteName, {api_route, route, parent}
+          h RouteName, {api_route, route, parent, queryString}
         ]
         h 'div.route-body', [
           @renderBody()
@@ -91,7 +121,8 @@ class RouteComponent extends Component
 
   renderBody: ->
     data = @routeData()
-    {routes} = @state.response
+    {params, response, expandedParameter} = @state
+    {routes} = response
     {path: base} = @props.match
     api_route = @apiPath()
     if not data.arguments?
@@ -99,10 +130,21 @@ class RouteComponent extends Component
       api_route = null
 
     return h 'div', [
-      h 'p.description', data.description
+      h Description, {className: 'description', source: data.description}
       h ChildRoutesList, {base, routes}
-      h APIUsageComponent, {data}
-      h APIDataComponent, {route: api_route, params: {offset: 0, limit: 10}}
+      h APIUsageComponent, {
+        data
+        expandedParameter
+        params
+        updateParameters: @updateParams
+        expandParameter: @expandParameter
+      }
+      h APIDataComponent, {
+        route: api_route
+        params
+        title: "Data"
+        storageID: 'data'
+      }
     ]
 
   renderSubRoutes: nullIfError ->
