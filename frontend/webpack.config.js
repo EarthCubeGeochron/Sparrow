@@ -15,7 +15,7 @@ let assetsRoute = '/assets'
 let browserSync = new BrowserSyncPlugin({
   port: 3000,
   host: 'localhost',
-  proxy: 'http://127.0.0.1:5000',
+  proxy: 'http://0.0.0.0:5000',
   serveStatic: [
     {route: assetsRoute, dir: assetsDir}
   ]
@@ -52,12 +52,12 @@ module.exports = {
   resolve: {
     extensions: [".coffee", ".js", ".styl",".css",".html",".md"],
     alias: {
-      "app": path.resolve(__dirname, "frontend/"),
+      "app": path.resolve(__dirname, "src/"),
       "site-content": path.resolve(cfg.site_content)
     }
   },
   entry: {
-    index: './frontend/index.coffee'
+    index: './src/index.coffee'
   },
   output: {
     path: assetsDir,
