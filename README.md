@@ -102,3 +102,6 @@ Currently, we envision a technology stack consisting of
 - Publications are linked to individual projects, when a more granular
   level could be appropriate.
 
+## Environment variables
+
+`LABDATA_CONFIG`: Location of `.cfg` files containing data.

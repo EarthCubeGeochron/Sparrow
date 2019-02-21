@@ -1,13 +1,8 @@
 #!/usr/bin/env zsh
 
-rootDir=${0:h:h}
+rootDir="${0:h:h}"
 
 cd "$rootdir"
-
-if [ ! -f backend/setup.py ]; then
-  echo "This must be run within the LABDATA code directory"
-  exit 1
-fi
 
 # If labdata is not installed, install it
 if ! labdata >/dev/null 2>&1; then

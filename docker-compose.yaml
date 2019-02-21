@@ -1,21 +1,29 @@
-version: "3"
+version: "3.4"
 services:
   web:
-    build: .
+    build: ./backend
     ports:
       - "50101:5000"
     depends_on:
-      - postgis
+      - database
     environment:
       - LABDATA_SECRET_KEY
-  postgis:
-    image: geographica/postgis:spry_sparrow
-    container_name: labdata-database
+    volumes:
+      # Read-only volume for source code
+      - ./backend/:/app:ro
+      # Nested volume to keep built files
+      # separate from those on our local system
+      - /app/labdata.egg-info
+  database:
+    image: mdillon/postgis:11
     ports:
-      - "54320:5432"
+      - "54321:5432"
     expose:
       - 5432
+    environment:
+      - POSTGRES_DB=sparrow
     volumes:
-      - pgdata:/data
-volumes:
-  pgdata:
+      - ./_docker/pg-cluster:/var/lib/postgresql/data
+      # Expose initialization files to create the database
+      - ./init:/docker-entrypoint-initdb.d:ro
+

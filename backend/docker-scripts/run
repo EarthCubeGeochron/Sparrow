@@ -1,0 +1,11 @@
+#!/bin/sh
+
+while ! psql -h database -p 5432 -U postgres sparrow ; do
+  echo "Waiting for database..."
+  sleep 1
+done
+
+cd /app
+pip3 install -e .
+python3 labdata init
+#python3 labdata serve
