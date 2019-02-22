@@ -33,6 +33,7 @@ let bs_cfg = {
 
 if(process.env.CONTAINERIZED) {
   delete bs_cfg.proxy;
+  bs_cfg.host = "0.0.0.0";
   bs_cfg.server = "./";
 }
 

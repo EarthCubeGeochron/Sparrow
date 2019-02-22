@@ -7,7 +7,6 @@ while ! $(psql -h database -p 5432 -U postgres sparrow > /dev/null 2>&1) ; do
   sleep 1
 done
 
-pip3 install -e .
 # Share configuration with frontend
 python3 labdata config > /cfg/sparrow-config.json
 

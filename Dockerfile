@@ -12,5 +12,9 @@ ENV LABDATA_CONFIG=/config/docker.cfg
 COPY ./bin/import-vocabularies /bin
 COPY ./docker-scripts/run /bin
 EXPOSE 5000
+RUN mkdir /app
 WORKDIR /app
+COPY ./backend/setup.py /app
+COPY ./backend/labdata /app
+RUN pip3 install -e .
 CMD ["/bin/run"]
