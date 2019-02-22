@@ -1,25 +1,42 @@
 let path = require('path');
 let BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 const { execSync } = require('child_process');
+const { readFileSync } = require('fs');
 
 /* Get configuration from labdata backend. This is used
 to centralize configuration and specify the location of frontend
 components. It could be removed in favor of an environment variable
 if desired. This might be necessary if we want frontend development
 to be uncoupled from the backend */
-let cfg = JSON.parse(execSync("labdata config").toString('utf-8'));
 
-let assetsDir = path.resolve(__dirname, "_assets")
-let assetsRoute = '/assets'
+const {SPARROW_CONFIG_JSON} = process.env;
+let cfg;
+if(SPARROW_CONFIG_JSON) {
+  cfg = readFileSync(SPARROW_CONFIG_JSON, 'utf-8');
+} else {
+  cfg = execSync("labdata config").toString('utf-8');
+}
+cfg = JSON.parse(cfg);
 
-let browserSync = new BrowserSyncPlugin({
+let assetsDir = path.resolve(__dirname, "_assets");
+let assetsRoute = '/assets';
+
+let bs_cfg = {
   port: 3000,
   host: 'localhost',
   proxy: 'http://0.0.0.0:5000',
+  open: false,
   serveStatic: [
     {route: assetsRoute, dir: assetsDir}
   ]
-});
+};
+
+if(process.env.CONTAINERIZED) {
+  delete bs_cfg.proxy;
+  bs_cfg.server = "./";
+}
+
+let browserSync = new BrowserSyncPlugin(bs_cfg);
 
 let jsLoader = {
   loader: 'babel-loader',

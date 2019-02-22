@@ -1,0 +1,20 @@
+#!/bin/sh
+
+cd /app
+
+while ! $(psql -h database -p 5432 -U postgres sparrow > /dev/null 2>&1) ; do
+  echo "Waiting for database..."
+  sleep 1
+done
+
+pip3 install -e .
+# Share configuration with frontend
+python3 labdata config > /cfg/sparrow-config.json
+
+# Import EarthChem vocabularies.
+# TODO: Make sure we source them locally; right now they are
+# derived directly from EarthChem which makes them somewhat
+# brittle
+python3 /bin/import-vocabularies
+python3 labdata init
+python3 labdata serve

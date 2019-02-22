@@ -22,7 +22,10 @@ app = App(__name__)
 conn = app.database.engine
 
 def write_table(tbl, name):
-    return tbl.to_sql(name, conn, schema='earthchem_vocabulary', if_exists='replace')
+    try:
+        return tbl.to_sql(name, conn, schema='earthchem_vocabulary', if_exists='fail')
+    except:
+        print(f"Table `earthchem_vocabulary.{name}` already exists.")
 
 def copy_table(category, tbl):
     df = get_table(category)
@@ -30,7 +33,7 @@ def copy_table(category, tbl):
     return df
 
 try:
-    conn.execute("CREATE SCHEMA earthchem_vocabulary")
+    conn.execute("CREATE SCHEMA IF NOT EXISTS earthchem_vocabulary")
 except:
     print("Schema already exists")
 

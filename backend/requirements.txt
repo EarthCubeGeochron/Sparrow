@@ -1,8 +1,10 @@
+beautifulsoup4==4.7.1
 Click==7.0
 click-plugins==1.0.4
 Flask==1.0.2
 Flask-JWT-Extended==3.16.0
 Flask-RESTful==0.3.6
+html5lib==1.0.1
 ipython==7.2.0
 MarkupSafe==1.0
 migra==1.0.1548289315
