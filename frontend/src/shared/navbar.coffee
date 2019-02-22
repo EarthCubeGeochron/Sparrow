@@ -13,7 +13,7 @@ Nav = ({children, fullTitle, subtitle, rest...})->
     divider = h Navbar.Divider
   longInfo = null
   if fullTitle
-    longInfo = h 'span', " Lab Data Interface"
+    longInfo = h 'span', " Sparrow"
   vals = [
     h NavLink, {to: '/'}, "#{cfg.siteTitle}"
     longInfo
