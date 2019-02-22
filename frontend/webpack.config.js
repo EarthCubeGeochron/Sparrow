@@ -13,6 +13,7 @@ const {SPARROW_CONFIG_JSON} = process.env;
 let cfg;
 if(SPARROW_CONFIG_JSON) {
   cfg = readFileSync(SPARROW_CONFIG_JSON, 'utf-8');
+  console.log(cfg);
 } else {
   cfg = execSync("labdata config").toString('utf-8');
 }
