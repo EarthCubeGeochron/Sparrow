@@ -1,9 +1,0 @@
-#!/usr/bin/env zsh
-
-basedir="$LABDATA_PATH"
-cd $basedir
-
-pip install -e .
-pip install -e deps/sadisplay
-
-pip install -e import-pipelines/WiscAr-MAP

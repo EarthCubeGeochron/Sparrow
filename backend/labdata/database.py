@@ -1,4 +1,4 @@
-from click import secho
+from click import echo, secho
 from os import environ
 
 from sqlalchemy import create_engine, MetaData
@@ -59,7 +59,11 @@ class Database:
         self.session = sessionmaker(bind=self.engine)()
         self.automap_base = None
         # We're having trouble lazily automapping
-        self.automap()
+        try:
+            self.automap()
+        except Exception as err:
+            echo("Could not automap at database initialization", err=True)
+            secho(str(err), fg='red')
 
     def exec_sql(self, *args):
         run_sql_file(self.session, *args)

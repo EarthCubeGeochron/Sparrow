@@ -2,7 +2,7 @@
   "name": "@earthcube/lab-data-interface",
   "version": "0.1.0",
   "description": "EarthCube geochronology lab data interface",
-  "main": "frontend/index.coffee",
+  "main": "./src/index.coffee",
   "directories": {
     "doc": "docs"
   },
@@ -12,7 +12,7 @@
     "@data-ui/histogram": "0.0.75",
     "@emotion/core": "^10.0.7",
     "@emotion/styled": "^10.0.7",
-    "@macrostrat/ui-components": "file:./deps/ui-components",
+    "@macrostrat/ui-components": "file:./bundled-deps/ui-components",
     "@vx/axis": "0.0.183",
     "@vx/gradient": "0.0.183",
     "@vx/scale": "0.0.182",
