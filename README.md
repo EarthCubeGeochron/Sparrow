@@ -151,11 +151,13 @@ using the instructions for your platform.
 In the root directory of this repository, run `docker-compose up --build`. This
 should spin up a database engine, frontend, backend, and gateway service
 (details of each service can be found in the `docker-compose.yaml` file). If
-the database hasn't been initialized already, it will be created for you. Note:
-the PostgreSQL database engine can be accessed from `localhost` at port `54321`
-(user `postgres`). This can be useful for data management using local tools
-such as `psql` or [Postico](https://eggerapps.at/postico/). The app itself
-should now be accessible at `http://localhost:5002`.
+the database hasn't been initialized already, it will be created for you. The management frontend
+should now be accessible at `http://localhost:5002`, and the API at `http://localhost:5002/api`.
+
+Note: the PostgreSQL database engine can be accessed from `localhost` at port
+`54321` (user `postgres`). This is useful for schema introspection and data
+management using local tools such as `psql` or
+[Postico](https://eggerapps.at/postico/).
 
 On navigating to the web interface for the first time, you will not be logged
 in — indeed, no user will exist! To solve this, we need to create a username
