@@ -17,9 +17,9 @@ class User(Base):
     # *NEVER* directly set the password column.
     def set_password(self, plaintext):
         # 'salt' the passwords to prevent brute forcing
-        salt = environ.get("LABDATA_SECRET_KEY")
+        salt = environ.get("SPARROW_SECRET_KEY")
         self.password = generate_password_hash(salt+str(plaintext))
     def is_correct_password(self, plaintext):
-        salt = environ.get("LABDATA_SECRET_KEY")
+        salt = environ.get("SPARROW_SECRET_KEY")
         return check_password_hash(self.password, salt+str(plaintext))
 

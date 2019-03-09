@@ -1,10 +1,10 @@
 from setuptools import setup
 
 setup(
-    name='labdata',
+    name='sparrow',
     version='0.1',
-    package_dir={'labdata': 'labdata'},
+    package_dir={'sparrow': 'sparrow'},
     entry_points={
-          'console_scripts': ['labdata = labdata.cli:cli']
+          'console_scripts': ['sparrow = sparrow.cli:cli']
     },
 )

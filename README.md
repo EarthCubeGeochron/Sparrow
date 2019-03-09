@@ -116,7 +116,7 @@ cd Sparrow
 git submodule update --init
 ```
 
-Set the environment variable `LABDATA_SECRET_KEY` before developing.
+Set the environment variable `SPARROW_SECRET_KEY` before developing.
 
 In both local and containerized environments, the frontend and backend server
 both run in development mode — changes to the code are compiled in real time
@@ -174,13 +174,13 @@ the page, to start working with the API.
 
 ## Environment variables index
 
-- `LABDATA_SECRET_KEY="very secret string"`: A secret key used for management
+- `SPARROW_SECRET_KEY="very secret string"`: A secret key used for management
   of passwords. Set this in your **LOCAL** environment (it will be copied to
   the Docker runtime as needed). It is the only variable required to get up and
   running with a basic Dockerized version.
-- `LABDATA_CONFIG="<path>"`: Location of `.cfg` files containing data.
-- `LABDATA_CONFIG_JSON="<path>"`: Location of `.json` file containing frontend
+- `SPARROW_CONFIG="<path>"`: Location of `.cfg` files containing data.
+- `SPARROW_CONFIG_JSON="<path>"`: Location of `.json` file containing frontend
   configuration. This can be manually generated, but is typically set to the
-  output of `labdata config`. It is used when the frontend and backend are on
+  output of `sparrow config`. It is used when the frontend and backend are on
   isolated systems (i.e. when running using Docker).
 

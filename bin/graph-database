@@ -1,9 +1,9 @@
 #!/usr/bin/env zsh
 
-output="$LABDATA_PATH/output"
+output="$SPARROW_PATH/output"
 mkdir -p "$output"
 
-dbname=$(labdata config database)
+dbname=$(sparrow config database)
 graph="$output/erd-core.dot"
 sadisplay -u $dbname \
   -r dot \

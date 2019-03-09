@@ -8,7 +8,7 @@ RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache-dir -r /install/requirements.txt
 
 COPY ./config/docker.cfg /config/docker.cfg
-ENV LABDATA_CONFIG=/config/docker.cfg
+ENV SPARROW_CONFIG=/config/docker.cfg
 COPY ./bin/import-vocabularies /bin
 COPY ./docker-scripts/run /bin
 EXPOSE 5000

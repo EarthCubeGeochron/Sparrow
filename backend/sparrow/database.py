@@ -39,7 +39,7 @@ class Database:
         We can pass a connection string, a FLASK application
         with the appropriate configuration, or nothing, in which
         case we will try to infer the correct database from
-        the LABDATA_CONFIG file, if available.
+        the SPARROW_CONFIG file, if available.
         """
         self.config = None
         if cfg is None:
@@ -50,7 +50,7 @@ class Database:
         self.config = cfg
         db_conn = self.config.get("DATABASE")
         # Override with environment variable
-        envvar = environ.get("LABDATA_DATABASE", None)
+        envvar = environ.get("SPARROW_DATABASE", None)
         if envvar is not None:
             db_conn = envvar
         self.engine = create_engine(db_conn)

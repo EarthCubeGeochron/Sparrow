@@ -7,9 +7,9 @@ DATABASE="postgresql:///earthcube_labdata_test"
 # We want to check most of our config into version control,
 # but we should under no circumstances check in secret keys.
 # Instead, we store it as an environment variable.
-SECRET_KEY = environ.get("LABDATA_SECRET_KEY")
+SECRET_KEY = environ.get("SPARROW_SECRET_KEY")
 if SECRET_KEY is None:
-    raise KeyError("Environment variable `LABDATA_SECRET_KEY` must be set")
+    raise KeyError("Environment variable `SPARROW_SECRET_KEY` must be set")
 
 JWT_SECRET_KEY = SECRET_KEY
 # We store JWT tokens in cookies because it's more secure.

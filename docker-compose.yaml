@@ -16,7 +16,7 @@ services:
     depends_on:
       - database
     environment:
-      - LABDATA_SECRET_KEY
+      - SPARROW_SECRET_KEY
       - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
     volumes:
       # Read-only volume for source code
