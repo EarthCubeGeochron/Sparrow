@@ -113,7 +113,7 @@ Clone this repository and fetch submodules:
 ```
 git clone https://github.com/EarthCubeGeochron/Sparrow.git
 cd Sparrow
-git submodule update --install
+git submodule update --init
 ```
 
 Set the environment variable `LABDATA_SECRET_KEY` before developing.
@@ -151,11 +151,16 @@ using the instructions for your platform.
 In the root directory of this repository, run `docker-compose up --build`. This
 should spin up a database engine, frontend, backend, and gateway service
 (details of each service can be found in the `docker-compose.yaml` file). If
-the database hasn't been initialized already, it will be created for you. Note:
-the PostgreSQL database engine can be accessed from `localhost` at port `54321`
-(user `postgres`). This can be useful for data management using local tools
-such as `psql` or [Postico](https://eggerapps.at/postico/). The app itself
-should now be accessible at `http://localhost:5002`.
+the database hasn't been initialized already, it will be created for you. The management frontend
+should now be accessible at `http://localhost:5002`, and the API at `http://localhost:5002/api`.
+
+By default, the database cluster stores its files in
+`_docker/pg-cluster`. Deleting this directory will wipe the database
+completely, starting it up from scratch.
+Note: the PostgreSQL database engine can be accessed from `localhost` at port
+`54321` (user `postgres`). This is useful for schema introspection and data
+management using local tools such as `psql` or
+[Postico](https://eggerapps.at/postico/).
 
 On navigating to the web interface for the first time, you will not be logged
 in — indeed, no user will exist! To solve this, we need to create a username
@@ -163,7 +168,9 @@ and password. This can be accomplished by running `sparrow create-user` and
 following the prompts. When you are running with Docker, the `sparrow` command
 will not be accessible. We have provided a `sparrow-exec` command for this
 purpose: simply run `bin/sparrow-exec create-user` and follow the prompts.
-There should be a single row in the `user` table after running this command.
+There should be a single row in the `user` table after running this
+command. You will need to log in at the web interface, and then refresh
+the page, to start working with the API.
 
 ## Environment variables index
 
