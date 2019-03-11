@@ -15,7 +15,7 @@ if(SPARROW_CONFIG_JSON) {
   cfg = readFileSync(SPARROW_CONFIG_JSON, 'utf-8');
   console.log(cfg);
 } else {
-  cfg = execSync("labdata config").toString('utf-8');
+  cfg = execSync("sparrow config").toString('utf-8');
 }
 cfg = JSON.parse(cfg);
 

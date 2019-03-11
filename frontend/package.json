@@ -1,5 +1,5 @@
 {
-  "name": "@earthcube/lab-data-interface",
+  "name": "@earthcube/sparrow-frontend",
   "version": "0.1.0",
   "description": "EarthCube geochronology lab data interface",
   "main": "./src/index.coffee",
