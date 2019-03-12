@@ -17,9 +17,9 @@ class App(Flask):
         cfg = kwargs.pop("config", None)
         super().__init__(*args, **kwargs)
 
-        self.config.from_object('labdata.default_config')
+        self.config.from_object('sparrow.default_config')
         if cfg is None:
-            cfg = environ.get("LABDATA_CONFIG", None)
+            cfg = environ.get("SPARROW_CONFIG", None)
         try:
             self.config.from_pyfile(cfg)
         except RuntimeError as err:

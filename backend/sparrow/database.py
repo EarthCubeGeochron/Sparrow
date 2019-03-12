@@ -1,4 +1,4 @@
-from click import secho
+from click import echo, secho
 from os import environ
 
 from sqlalchemy import create_engine, MetaData
@@ -39,7 +39,7 @@ class Database:
         We can pass a connection string, a FLASK application
         with the appropriate configuration, or nothing, in which
         case we will try to infer the correct database from
-        the LABDATA_CONFIG file, if available.
+        the SPARROW_CONFIG file, if available.
         """
         self.config = None
         if cfg is None:
@@ -50,7 +50,7 @@ class Database:
         self.config = cfg
         db_conn = self.config.get("DATABASE")
         # Override with environment variable
-        envvar = environ.get("LABDATA_DATABASE", None)
+        envvar = environ.get("SPARROW_DATABASE", None)
         if envvar is not None:
             db_conn = envvar
         self.engine = create_engine(db_conn)
@@ -59,7 +59,11 @@ class Database:
         self.session = sessionmaker(bind=self.engine)()
         self.automap_base = None
         # We're having trouble lazily automapping
-        self.automap()
+        try:
+            self.automap()
+        except Exception as err:
+            echo("Could not automap at database initialization", err=True)
+            secho(str(err), fg='red')
 
     def exec_sql(self, *args):
         run_sql_file(self.session, *args)

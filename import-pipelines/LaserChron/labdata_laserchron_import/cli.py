@@ -2,9 +2,9 @@ from sys import exit
 from os import environ, listdir, path
 from datetime import datetime
 from click import command, option, echo, secho, style
-import labdata
-from labdata.database import get_or_create
-from labdata.util import relative_path
+import sparrow
+from sparrow.database import get_or_create
+from sparrow.util import relative_path
 from IPython import embed
 from h5py import File
 

@@ -1,0 +1,60 @@
+version: "3.4"
+services:
+  gateway:
+    image: nginx:1.15
+    ports:
+      - "5002:80"
+    depends_on:
+      - sparrow-backend
+      - sparrow-frontend
+    volumes:
+      - ./docker-scripts/nginx.conf:/etc/nginx/nginx.conf:ro
+  sparrow-backend:
+    build: .
+    ports:
+      - "50101:5000"
+    depends_on:
+      - database
+    environment:
+      - SPARROW_SECRET_KEY
+      - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
+    volumes:
+      # Read-only volume for source code
+      - ./backend/:/app:ro
+      # Nested volume to keep built files
+      # separate from those on our local system
+      - /app/labdata.egg-info
+      # Share some configuration between backend
+      # and frontend
+      - ./_docker/cfg:/cfg
+  database:
+    image: mdillon/postgis:11
+    ports:
+      - "54321:5432"
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_DB=sparrow
+    volumes:
+      - ./_docker/pg-cluster:/var/lib/postgresql/data
+      # Expose initialization files to create the database
+      - ./init:/docker-entrypoint-initdb.d:ro
+  sparrow-frontend:
+    build: frontend
+    depends_on:
+      - sparrow-backend
+    environment:
+      - CONTAINERIZED=1
+      - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
+    volumes:
+      - ./frontend:/app:ro
+      - /app/node_modules
+      - frontend_build:/app/_assets
+      - ./_docker/cfg:/cfg:ro
+      # Right now, we configure default site content
+      # rather than allowing any customization
+      - ./config/default-site-content:/site-content
+    expose:
+      - 3000
+volumes:
+  frontend_build:

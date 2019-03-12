@@ -1,7 +1,9 @@
-# EarthCube Lab Data Interface
+# Sparrow
 
-This repository will soon hold software for managing the geochronology data
-created by an individual laboratory. This software has the goal of managing
+## An interface to lab data, supported by NSF EarthCube
+
+**Sparrow** is software for managing the geochronology data
+created by a laboratory. This software has the goal of managing
 analytical data for indexing and public access.
 
 The software is designed for flexibility and extensibility, so that it can
@@ -101,4 +103,84 @@ Currently, we envision a technology stack consisting of
 
 - Publications are linked to individual projects, when a more granular
   level could be appropriate.
+
+# Development
+
+For development, Sparrow can be run locally or in a set of Docker
+containers.
+
+Clone this repository and fetch submodules:
+```
+git clone https://github.com/EarthCubeGeochron/Sparrow.git
+cd Sparrow
+git submodule update --init
+```
+
+Set the environment variable `SPARROW_SECRET_KEY` before developing.
+
+In both local and containerized environments, the frontend and backend server
+both run in development mode — changes to the code are compiled in real time
+and should be available upon browser reload. This will be disabled in the
+future with a `SPARROW_ENV=<development,production>` environment variable that
+will default to `production` and disable development-focused capabilities for
+performance and security.
+
+## Local development
+
+Development on your local machine can be easier than working with
+a containerized version of the application. You must have several dependencies
+installed:
+
+- PostgreSQL v11/PostGIS (the database system)
+- Python >= 3.7
+- Node.js >= 8
+
+It is recommended that you work in a Python virtual environment.
+
+## Development with Docker
+
+In its containerized form, the app can be installed easily
+no matter what environment you are working in. This containerized
+distribution strategy will allow easy deployment on whatever infrastructure
+(local, cloud hosting, AWS/Azure, etc.) your lab uses to run the system.
+The Docker toolchain stable and open-source.
+
+First, [install Docker](https://docs.docker.com/install/)
+using the instructions for your platform.
+
+In the root directory of this repository, run `docker-compose up --build`. This
+should spin up a database engine, frontend, backend, and gateway service
+(details of each service can be found in the `docker-compose.yaml` file). If
+the database hasn't been initialized already, it will be created for you. The management frontend
+should now be accessible at `http://localhost:5002`, and the API at `http://localhost:5002/api`.
+
+By default, the database cluster stores its files in
+`_docker/pg-cluster`. Deleting this directory will wipe the database
+completely, starting it up from scratch.
+Note: the PostgreSQL database engine can be accessed from `localhost` at port
+`54321` (user `postgres`). This is useful for schema introspection and data
+management using local tools such as `psql` or
+[Postico](https://eggerapps.at/postico/).
+
+On navigating to the web interface for the first time, you will not be logged
+in — indeed, no user will exist! To solve this, we need to create a username
+and password. This can be accomplished by running `sparrow create-user` and
+following the prompts. When you are running with Docker, the `sparrow` command
+will not be accessible. We have provided a `sparrow-exec` command for this
+purpose: simply run `bin/sparrow-exec create-user` and follow the prompts.
+There should be a single row in the `user` table after running this
+command. You will need to log in at the web interface, and then refresh
+the page, to start working with the API.
+
+## Environment variables index
+
+- `SPARROW_SECRET_KEY="very secret string"`: A secret key used for management
+  of passwords. Set this in your **LOCAL** environment (it will be copied to
+  the Docker runtime as needed). It is the only variable required to get up and
+  running with a basic Dockerized version.
+- `SPARROW_CONFIG="<path>"`: Location of `.cfg` files containing data.
+- `SPARROW_CONFIG_JSON="<path>"`: Location of `.json` file containing frontend
+  configuration. This can be manually generated, but is typically set to the
+  output of `sparrow config`. It is used when the frontend and backend are on
+  isolated systems (i.e. when running using Docker).
 

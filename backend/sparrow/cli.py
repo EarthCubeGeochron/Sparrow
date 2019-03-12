@@ -12,7 +12,7 @@ from .app import App, construct_app
 from .database import Database
 from .auth.create_user import create_user
 
-@with_plugins(iter_entry_points('labdata.plugins'))
+@with_plugins(iter_entry_points('sparrow.plugins'))
 @click.group()
 def cli():
     pass
@@ -37,7 +37,7 @@ def get_database(ctx, param, value):
                "Please create it before continuing.\n"
               f"Command: `{cmd}`")
 
-kw = dict(type=str, envvar="LABDATA_CONFIG", required=True)
+kw = dict(type=str, envvar="SPARROW_CONFIG", required=True)
 with_config = click.option('--config', 'cfg', **kw)
 with_database = click.option('--config', 'db', callback=get_database, **kw)
 
