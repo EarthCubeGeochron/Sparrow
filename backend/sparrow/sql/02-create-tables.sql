@@ -8,14 +8,15 @@ CREATE TABLE researcher (
   orcid text UNIQUE
 );
 
-/* The `user` model is parallel to the
-   `researcher` model but used only for application
-   authentication. Thus, we can reset all access by
-   truncating this table, without losing data.
+/*
+The `user` model parallels the
+`researcher` model but used only for application
+authentication. Thus, we can reset all access by
+truncating this table, without losing data.
 */
-CREATE TABLE "user" (
+CREATE TABLE "user" ( -- Name must be quoted because it collides with reserved word.
   username text PRIMARY KEY,
-  /* Store a hashed password */
+  /* Stores a hashed password */
   password text,
   researcher_id integer REFERENCES researcher(id)
 );
@@ -24,6 +25,14 @@ CREATE TABLE publication (
   id serial PRIMARY KEY,
   title text NOT NULL,
   doi text NOT NULL
+);
+
+/*
+Embargo custom data type
+*/
+CREATE TYPE embargo_status AS (
+  permanent boolean,
+  end_date date
 );
 
 /*
@@ -72,7 +81,7 @@ CREATE TABLE project (
   id text PRIMARY KEY,
   title text NOT NULL,
   description text,
-  embargo_date timestamptz
+  embargo embargo_status
 );
 
 CREATE TABLE project_researcher (
@@ -88,7 +97,7 @@ CREATE TABLE project_publication (
 );
 
 /*
-Analytical Groups
+### Analytical Groups
 
 Groups of sessions for import are less universally
 meaningful than project-based groups. However, these
@@ -125,20 +134,12 @@ CREATE TABLE datum_type (
           error_metric, is_computed, is_interpreted)
 );
 
+/*
+## Sample
+
+An object to be measured
+*/
 CREATE TABLE sample (
-  /*
-  Sample: an object to be measured
-
-  Potential issues:
-  - Samples potentially have several levels of abstraction
-    (e.g. different replicates or drillings from the same rock sample)
-    (could have a self-referential 'part_of' relation on sample...)
-  - Samples might belong to several projects
-
-  Should the `session` table contain the link to project rather than
-  the `sample` table? This might be more correct -- samples could still
-  be linked to projects through a table relationship
-  */
   id text PRIMARY KEY,
   igsn text UNIQUE,
   material text REFERENCES vocabulary.material(id),
@@ -150,17 +151,31 @@ CREATE TABLE sample (
   location_name text,
   location geometry
 );
+/*
+#### Potential issues:
 
+- Samples potentially have several levels of abstraction
+  (e.g. different replicates or drillings from the same rock sample)
+  (could have a self-referential 'part_of' relation on sample...)
+- Samples might belong to several projects
+
+Should the `session` table contain the link to project rather than
+the `sample` table? This might be more correct, and samples could still
+be linked to projects through a table relationship
+
+## Session
+
+Set of analyses on the same instrument
+with the same technique, at the same or
+closely spaced in time.
+
+#### Examples:
+
+- An entire Ar/Ar step heating experiment
+- A set of detrital single-crystal zircon measurements
+- A multi-grain igneous age determination
+*/
 CREATE TABLE session (
-  /* Set of analyses on the same instrument
-     with the same technique, at the same or
-     closely spaced in time.
-
-     Examples:
-     - An entire Ar/Ar step heating experiment
-     - A set of detrital single-crystal zircon measurements
-     - A multi-grain igneous age determination
-  */
   id serial PRIMARY KEY,
   sample_id text REFERENCES sample(id),
   project_id text REFERENCES project(id),
@@ -170,11 +185,13 @@ CREATE TABLE session (
   instrument integer REFERENCES instrument(id),
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
+  embargo embargo_status,
   UNIQUE (sample_id, date, instrument, technique)
 );
 
 /*
-ANALYTICAL CONSTANTS
+## Analytical constants
+
 Constants, etc. used in measurements, and their relationships
 to individual analytical sessions, etc.
 
@@ -195,18 +212,23 @@ CREATE TABLE session_datum (
 );
 
 /*
-SINGLE ANALYSES
+## Single analyses
+
 These two tables will end up needing data-type specific columns
+
+### `analysis`
+
+Set of data measured together at one time on one instrument
+
+#### Examples:
+
+- A single EPMA analytical spot
+  (different oxides measured on an EPMA are *data* in a single analysis)
+- A heating step for Ar/Ar age determination
+- A single-crystal zircon age measurement
+
 */
 CREATE TABLE analysis (
-  /*
-  Set of data measured together at one time on one instrument
-  Examples:
-  - A single EPMA analytical spot
-    (different oxides measured on an EPMA are *data* in a single analysis)
-  - A heating step for Ar/Ar age determination
-  - A single-crystal zircon age measurement
-  */
   id serial PRIMARY KEY,
   session_id integer REFERENCES session(id) NOT NULL,
   session_index integer, -- captures ordering within a session
@@ -222,7 +244,8 @@ CREATE TABLE analysis (
   Some analytical results can be interpreted from other data, so we
   should explicitly state that this is the case.
 
-  Examples:
+  #### Examples:
+
   - a detrital zircon age spectrum
     (the `datum` table would contain individual probability values at each age)
   - a multi-zircon igneous age
@@ -245,8 +268,11 @@ CREATE TABLE datum (
   /*
   If set, this means that this is an "accepted" value
   among several related measurements.
-  Examples:
+
+  #### Examples:
+
   - Accepted system for U-Pb single-zircon age
+
   */
   is_accepted boolean,
   UNIQUE (analysis, type)
