@@ -5,6 +5,7 @@ import {
   ZoomableGlobe,
   Geographies,
   Geography,
+  Graticule,
   Markers,
   Marker,
 } from "react-simple-maps"
@@ -17,7 +18,7 @@ class MapComponent extends Component
     {markers} = @props
     markers ?= []
     style = {
-      fill: Colors.LIGHT_GRAY1,
+      fill: '#e9fcea',
       stroke: Colors.GRAY5,
       strokeWidth: 0.75,
       outline: "none",
@@ -28,7 +29,7 @@ class MapComponent extends Component
         <ComposableMap
           projection="orthographic"
           projectionConfig={{
-            scale: 500,
+            scale: 400,
           }}
           width={800}
           height={800}
@@ -37,7 +38,8 @@ class MapComponent extends Component
             height: "auto",
             maxHeight: "500px"
           }} >
-          <ZoomableGlobe center={[ -120, 35 ]} fill="#cccccc" stroke="#eceff1">
+          <ZoomableGlobe center={[ -120, 35 ]} fill="#afe6f0" stroke="#eceff1">
+            <circle cx={400} cy={400} r={400} fill="#afe6f0" stroke="#888888" />
             <Geographies geography={worldMap} disableOptimization>
               {(geographies, projection) =>
                   geographies.map (geography, i) =>
@@ -62,6 +64,7 @@ class MapComponent extends Component
                     default: { fill: "#FF5722" },
                     hover: { fill: "#FFFFFF" },
                     pressed: { fill: "#FF5722" },
+                    hidden: { opacity: 0 }
                   }}
                   >
                   <circle
