@@ -15,6 +15,6 @@ EXPOSE 5000
 RUN mkdir /app
 WORKDIR /app
 COPY ./backend/setup.py /app
-COPY ./backend/labdata /app
+COPY ./backend/sparrow /app
 RUN pip3 install -e .
 CMD ["/bin/run"]

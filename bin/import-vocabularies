@@ -6,7 +6,7 @@ for data categorization.
 """
 
 import pandas as P
-from labdata import App
+from sparrow import App
 
 def get_table(category):
     url = f'http://www.earthchem.org/petdbWeb/search/vocabulary.jsp?category={category}'

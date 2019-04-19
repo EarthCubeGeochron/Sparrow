@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
-from labdata.cli import cli
+from sparrow.cli import cli
 
 cli()
