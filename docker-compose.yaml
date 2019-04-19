@@ -23,10 +23,10 @@ services:
       - ./backend/:/app
       # Nested volume to keep built files
       # separate from those on our local system
-      - /app/labdata.egg-info
+      - /app/sparrow.egg-info
       # Share some configuration between backend
       # and frontend
-      - ./_docker/cfg:/cfg
+      - cfg:/cfg
   database:
     image: mdillon/postgis:11
     ports:
@@ -35,10 +35,6 @@ services:
       - 5432
     environment:
       - POSTGRES_DB=sparrow
-    volumes:
-      - ./_docker/pg-cluster:/var/lib/postgresql/data
-      # Expose initialization files to create the database
-      - ./init:/docker-entrypoint-initdb.d:ro
   sparrow-frontend:
     build: frontend
     depends_on:
@@ -50,11 +46,12 @@ services:
       - ./frontend:/app:ro
       - /app/node_modules
       - frontend_build:/app/_assets
-      - ./_docker/cfg:/cfg:ro
+      - cfg:/cfg:ro
       # Right now, we configure default site content
       # rather than allowing any customization
-      - ./config/default-site-content:/site-content
+      - $SPARROW_SITE_CONTENT:/site-content
     expose:
       - 3000
 volumes:
   frontend_build:
+  cfg:

@@ -81,6 +81,7 @@ CREATE TABLE project (
   id text PRIMARY KEY,
   title text NOT NULL,
   description text,
+  embargo_date timestamp without time zone,
   embargo embargo_status
 );
 
