@@ -38,7 +38,11 @@ class MapComponent extends Component
             height: "auto",
             maxHeight: "500px"
           }} >
-          <ZoomableGlobe center={[ -120, 35 ]} fill="#afe6f0" stroke="#eceff1">
+          <ZoomableGlobe
+            center={[ -120, 35 ]}
+            fill="#afe6f0"
+            stroke="#eceff1"
+            style={{cursor: "move"}} >
             <circle cx={400} cy={400} r={400} fill="#afe6f0" stroke="#888888" />
             <Geographies geography={worldMap} disableOptimization>
               {(geographies, projection) =>
