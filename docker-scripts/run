@@ -2,7 +2,7 @@
 
 cd /app
 
-while ! $(psql -h database -p 5432 -U postgres sparrow > /dev/null 2>&1) ; do
+while ! $(psql -h db -p 5432 -U postgres sparrow > /dev/null 2>&1) ; do
   echo "Waiting for database..."
   sleep 1
 done

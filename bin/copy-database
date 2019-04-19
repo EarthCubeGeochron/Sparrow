@@ -6,7 +6,7 @@ basedir="$(git rev-parse --show-toplevel)"
 cd "$basedir"
 #docker-compose up -d postgis
 
-docker-compose exec database dropdb -Upostgres sparrow
-docker-compose exec database createdb -Upostgres sparrow
-pg_dump wiscar_labdata | docker-compose exec -T database  psql -U postgres sparrow
+docker-compose exec db dropdb -Upostgres sparrow
+docker-compose exec db createdb -Upostgres sparrow
+pg_dump wiscar_labdata | docker-compose exec -T db  psql -U postgres sparrow
 

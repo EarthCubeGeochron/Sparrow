@@ -5,16 +5,16 @@ services:
     ports:
       - "5002:80"
     depends_on:
-      - sparrow-backend
-      - sparrow-frontend
+      - backend
+      - frontend
     volumes:
       - ./docker-scripts/nginx.conf:/etc/nginx/nginx.conf:ro
-  sparrow-backend:
+  backend:
     build: .
     ports:
       - "50101:5000"
     depends_on:
-      - database
+      - db
     environment:
       - SPARROW_SECRET_KEY
       - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
@@ -31,7 +31,7 @@ services:
       # Share some configuration between backend
       # and frontend
       - cfg:/cfg
-  database:
+  db:
     image: mdillon/postgis:11
     ports:
       - "54321:5432"
@@ -39,10 +39,12 @@ services:
       - 5432
     environment:
       - POSTGRES_DB=sparrow
-  sparrow-frontend:
+    volumes:
+      - db_cluster:/var/lib/postgresql/data
+  frontend:
     build: frontend
     depends_on:
-      - sparrow-backend
+      - backend
     environment:
       - CONTAINERIZED=1
       - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
@@ -59,3 +61,4 @@ services:
 volumes:
   frontend_build:
   cfg:
+  db_cluster:
