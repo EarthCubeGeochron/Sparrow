@@ -187,6 +187,7 @@ CREATE TABLE session (
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
   embargo embargo_status,
+  data jsonb,
   UNIQUE (sample_id, date, instrument, technique)
 );
 
@@ -241,6 +242,7 @@ CREATE TABLE analysis (
   /* Not really sure that material is the best parameterization
      of this concept... */
   is_standard boolean,
+  in_plateau boolean,
   /*
   Some analytical results can be interpreted from other data, so we
   should explicitly state that this is the case.
@@ -256,6 +258,7 @@ CREATE TABLE analysis (
 
   */
   is_interpreted boolean,
+  data jsonb,
   UNIQUE (session_id, session_index, analysis_type)
 );
 
