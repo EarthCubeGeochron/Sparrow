@@ -1,11 +1,10 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 indb_conn="$(sparrow config database)"
 outdb='sparrow_test'
-outdb_conn="postgresql:///$outdb"
-createdb "$outdb"
-SPARROW_DATABASE="$outdb_conn" sparrow init
+outdb_conn="postgresql://postgres@database/$outdb"
+createdb -Upostgres -h database "$outdb" > /dev/null
+SPARROW_DATABASE="$outdb_conn" sparrow init > /dev/null
 
-migra "$indb_conn" "$outdb_conn" \
-  --unsafe > schema-migration.sql
-dropdb "$outdb"
+migra "$indb_conn" "$outdb_conn" --unsafe
+dropdb -Upostgres -h database "$outdb" > /dev/null
