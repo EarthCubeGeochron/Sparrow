@@ -12,7 +12,7 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 jwt_required, jwt_refresh_token_required,
                                 set_access_cookies, set_refresh_cookies,
-                                unset_jwt_cookies,
+                                unset_jwt_cookies, jwt_optional,
                                 get_jwt_identity, get_raw_jwt)
 from ..api.base import APIResourceCollection
 from ..models import User
@@ -72,11 +72,13 @@ class Logout(Resource):
 
 @AuthAPI.resource('/status')
 class Status(Resource):
-    @jwt_required
+    @jwt_optional
     def get(self):
         username = get_jwt_identity()
-        resp = jsonify(login=True, username=username)
-        return resp
+        if username:
+            resp = jsonify(login=True, username=username)
+            return resp
+        return jsonify(login=False)
 
 @AuthAPI.resource('/refresh')
 class TokenRefresh(Resource):

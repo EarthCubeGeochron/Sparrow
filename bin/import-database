@@ -1,0 +1,16 @@
+#!/bin/bash
+
+fn="$(realpath $1)"
+internal_name=/import/database-dump.pg-dump
+
+cd "$SPARROW_PATH"
+
+cat $fn | docker-compose exec -T db psql -Upostgres postgres
+
+#psql -Upostgres
+
+#while ! $(psql -Upostgres > /dev/null 2>&1) ; do ; echo "Waiting for database..."; sleep 1; done; psql
+
+#pg_restore -Fc -v -Upostgres $internal_name
+
+#cat $1 | docker-compose exec db pg_restore -Upostgres

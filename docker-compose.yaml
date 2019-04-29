@@ -2,13 +2,17 @@ version: "3.4"
 services:
   gateway:
     image: nginx:1.15
-    ports:
-      - "5002:80"
     depends_on:
       - backend
       - frontend
     volumes:
       - ./docker-scripts/nginx.conf:/etc/nginx/nginx.conf:ro
+      - frontend_build:/frontend
+    networks:
+      default:
+      sparrowdataorg_default:
+        aliases:
+          - wiscar_sparrow_gateway
   backend:
     build: .
     ports:
@@ -34,13 +38,14 @@ services:
   db:
     image: mdillon/postgis:11
     ports:
-      - "54321:5432"
+      - "54325:5432"
     expose:
       - 5432
     environment:
       - POSTGRES_DB=sparrow
     volumes:
       - db_cluster:/var/lib/postgresql/data
+      # - ./sparrow-data.pg-dump:/docker-entrypoint-initdb.d/init.sql
   frontend:
     build: frontend
     depends_on:
@@ -49,16 +54,21 @@ services:
       - CONTAINERIZED=1
       - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
     volumes:
-      - ./frontend:/app:ro
+      - ./frontend:/app
       - /app/node_modules
       - frontend_build:/app/_assets
-      - cfg:/cfg:ro
+      - cfg:/cfg
       # Right now, we configure default site content
       # rather than allowing any customization
       - $SPARROW_SITE_CONTENT:/site-content
     expose:
       - 3000
+    ports:
+      - 30011:3000
 volumes:
   frontend_build:
   cfg:
   db_cluster:
+networks:
+  sparrowdataorg_default:
+    external: true

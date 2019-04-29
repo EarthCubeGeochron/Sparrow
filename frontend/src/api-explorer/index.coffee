@@ -12,6 +12,7 @@ import './main.styl'
 
 APIExplorer = (props)->
   {match} = props
+  console.log match
   h 'div', [
     h AppNavbar, {subtitle: 'API Explorer', fullTitle: true}
     h 'div#api', [

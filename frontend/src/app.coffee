@@ -10,7 +10,7 @@ import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
 
 AppMain = ->
-  h Router, {basename: '/'}, (
+  h Router, {basename: '/labs/wiscar'}, (
     h 'div.app', [
       h Switch, [
         h Route, {
@@ -35,7 +35,7 @@ errorHandler = (route, response)->
   AppToaster.show {message, intent: Intent.DANGER}
 
 App = ->
-  h APIProvider, {baseURL: '/api/v1', onError: errorHandler}, (
+  h APIProvider, {baseURL: '/labs/wiscar/api/v1', onError: errorHandler}, (
     h AuthProvider, null, (
       h AppMain
     )
