@@ -11,7 +11,7 @@ CREATE TABLE researcher (
 /*
 The `user` model parallels the
 `researcher` model but used only for application
-authentication. Thus, we can reset all access by
+authentication. We can reset all application access by
 truncating this table, without losing data.
 */
 CREATE TABLE "user" ( -- Name must be quoted because it collides with reserved word.
