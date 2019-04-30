@@ -17,8 +17,6 @@ services:
     build: .
     ports:
       - "50101:5000"
-    depends_on:
-      - db
     environment:
       - SPARROW_SECRET_KEY
       - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json

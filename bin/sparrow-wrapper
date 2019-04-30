@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Drag in configuration in `sparrow-config.sh` from current
+# working directory or parents
+while [ $(pwd) != "/" ]; do
+  if test -e sparrow-config.sh ; then
+    echo "Using $(tput bold)sparrow-config.sh$(tput sgr0) from $(tput bold)$(pwd)$(tput sgr0)"
+    source sparrow-config.sh
+    break
+  fi
+  cd ..
+done
+
+# Get path to sparrow installation from location of current file
+# (even if symlinked)
+export SPARROW_PATH="$(dirname "$(dirname "$(readlink -f "$0")")")"
+cd "$SPARROW_PATH"
+
+dir=bin
+
+# Default to help if nothing is provided
+if [ $# -eq 0 ]; then
+  subcommand='--help'
+else
+  subcommand=$1
+fi
+
+if [ $subcommand = '--help' ]; then
+  # Get help from within sparrow container
+  # and append docker wrapper commands
+  docker-compose run backend python3 sparrow --help
+  echo ""
+  echo "Docker wrapper commands:"
+  ls "$dir" \
+  | grep sparrow- \
+  | sed 's/sparrow-/  /g' \
+  | grep --invert-match wrapper
+  exit 0
+fi
+
+cmd="sparrow-$subcommand"
+
+found_command=0
+for f in $(ls "$dir" | grep sparrow-); do
+  # We don't want to return this file...
+  [ $f == 'sparrow-wrapper' ] && continue
+  [ $f != $cmd ] && continue
+  found_command=1
+  break
+done
+
+if [ $found_command = 0 ]; then
+  # Run a command against sparrow within a docker container
+  echo "Running command in container"
+  docker-compose run backend sparrow $@
+else
+  shift
+  "$dir/$cmd" $@
+fi

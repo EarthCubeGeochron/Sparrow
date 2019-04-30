@@ -66,7 +66,9 @@ def shell(cfg):
     from IPython import embed
     app, db = construct_app(cfg)
     with app.app_context():
-        embed()
+        # `using` is related to this issue:
+        # https://github.com/ipython/ipython/issues/11523
+        embed(using=False)
 
 @cli.command(name='config')
 @with_config
