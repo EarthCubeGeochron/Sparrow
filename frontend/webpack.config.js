@@ -20,7 +20,7 @@ if(SPARROW_CONFIG_JSON) {
 cfg = JSON.parse(cfg);
 
 let assetsDir = path.resolve(__dirname, "_assets");
-let assetsRoute = '/assets';
+let assetsRoute = '/labs/wiscar/assets';
 
 let bs_cfg = {
   port: 3000,
