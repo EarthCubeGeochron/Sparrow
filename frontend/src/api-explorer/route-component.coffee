@@ -133,8 +133,8 @@ class RouteComponent extends StatefulComponent
     if not data.arguments?
       # Basically, tell the data component not to render
       api_route = null
-
-    console.log api_route
+    else
+      api_route = api_route.replace("/api/v1","")
 
     return h 'div', [
       h Description, {className: 'description', source: data.description}
