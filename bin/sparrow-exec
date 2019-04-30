@@ -1,4 +1,0 @@
-#!/bin/bash
-# Run a command against a docker container
-docker-compose run backend \
-  python3 sparrow $@

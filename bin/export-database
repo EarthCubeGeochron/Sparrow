@@ -1,12 +1,10 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
-docker save dist_web | bzip2 > ~/Desktop/dist_web.bz2
+cd "$SPARROW_PATH"
 
-docker run --rm --volumes-from labdata-database busybox tar cv /data \
-| bzip2 > ~/Desktop/data.bz2
+docker-compose exec db \
+  pg_dump -C -Upostgres sparrow > $1
 
-scp ~/Desktop/dist_web.bz2 steno:wiscar-labdata
-scp ~/Desktop/data.bz2 steno:wiscar-labdata
 
 #ssh steno 'bunzip2 | sudo docker load'
 #docker run --rm -v dist_pgdata:/from alpine ash -c "cd /from ; tar -cf - . " \
