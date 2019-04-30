@@ -1,0 +1,4 @@
+#!/bin/bash
+sparrow compose exec db \
+  pg_dump -Fc -C -Upostgres sparrow > $1
+

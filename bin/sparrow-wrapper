@@ -11,7 +11,11 @@ while [ $(pwd) != "/" ]; do
   cd ..
 done
 
+# Get path to sparrow installation from location of current file
+# (even if symlinked)
+export SPARROW_PATH="$(dirname "$(dirname "$(readlink -f "$0")")")"
 cd "$SPARROW_PATH"
+
 dir=bin
 
 # Default to help if nothing is provided

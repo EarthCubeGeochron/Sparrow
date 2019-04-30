@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# A thin wrapper around docker-compose that puts things in the
+# right directory at least
+cd "$SPARROW_PATH"
+
+docker-compose $@
