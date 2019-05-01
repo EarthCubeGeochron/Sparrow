@@ -98,10 +98,14 @@ def _create_user(db):
 # Support arbitrary subcommand loading
 # https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
 # Right now we just program in each subcommand which is ugly and non-extensible
-@cli.command(name='earthchem-vocabulary')
+name='import-earthchem'
+@cli.command(name=name)
 @click.argument('args', nargs=-1, type=click.UNPROCESSED)
 def sparrow_earthchem_vocabulary(args):
+    """
+    Import EarthChem vocabularies
+    """
     __dirname = path.dirname(__file__)
-    cmd = path.abspath(path.join(__dirname,"..","bin","sparrow-earthchem-vocabulary"))
+    cmd = path.abspath(path.join(__dirname,"..","bin","sparrow-"+name))
     run([cmd, *args])
 
