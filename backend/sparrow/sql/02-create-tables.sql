@@ -2,7 +2,7 @@
 A minimal schema
 */
 
-CREATE TABLE researcher (
+CREATE TABLE IF NOT EXISTS researcher (
   id integer PRIMARY KEY,
   name text NOT NULL,
   orcid text UNIQUE
@@ -14,14 +14,14 @@ The `user` model parallels the
 authentication. We can reset all application access by
 truncating this table, without losing data.
 */
-CREATE TABLE "user" ( -- Name must be quoted because it collides with reserved word.
+CREATE TABLE IF NOT EXISTS "user" ( -- Name must be quoted because it collides with reserved word.
   username text PRIMARY KEY,
   /* Stores a hashed password */
   password text,
   researcher_id integer REFERENCES researcher(id)
 );
 
-CREATE TABLE publication (
+CREATE TABLE IF NOT EXISTS publication (
   id serial PRIMARY KEY,
   title text NOT NULL,
   doi text NOT NULL
@@ -34,33 +34,33 @@ from curated collections
 */
 CREATE SCHEMA vocabulary;
 
-CREATE TABLE vocabulary.parameter (
+CREATE TABLE IF NOT EXISTS vocabulary.parameter (
   id text PRIMARY KEY,
   description text,
   authority text
 );
 
-CREATE TABLE vocabulary.material (
+CREATE TABLE IF NOT EXISTS vocabulary.material (
   id text PRIMARY KEY,
   description text,
   authority text,
   type_of text REFERENCES vocabulary.material(id)
 );
 
-CREATE TABLE vocabulary.method (
+CREATE TABLE IF NOT EXISTS vocabulary.method (
   id text PRIMARY KEY,
   description text,
   authority text
 );
 
 
-CREATE TABLE vocabulary.unit (
+CREATE TABLE IF NOT EXISTS vocabulary.unit (
   id text PRIMARY KEY,
   description text,
   authority text
 );
 
-CREATE TABLE vocabulary.error_metric (
+CREATE TABLE IF NOT EXISTS vocabulary.error_metric (
   id text PRIMARY KEY,
   description text,
   authority text
@@ -69,20 +69,20 @@ CREATE TABLE vocabulary.error_metric (
 
 -- Projects
 
-CREATE TABLE project (
+CREATE TABLE IF NOT EXISTS project (
   id text PRIMARY KEY,
   title text NOT NULL,
   description text,
   embargo_date timestamp without time zone
 );
 
-CREATE TABLE project_researcher (
+CREATE TABLE IF NOT EXISTS project_researcher (
   project_id text REFERENCES project(id),
   researcher_id integer REFERENCES researcher(id),
   PRIMARY KEY (project_id, researcher_id)
 );
 
-CREATE TABLE project_publication (
+CREATE TABLE IF NOT EXISTS project_publication (
   project_id text REFERENCES project(id),
   publication_id integer REFERENCES publication(id),
   PRIMARY KEY (project_id, publication_id)
@@ -100,20 +100,20 @@ Right now, we only support a single measurement group
 for each session. This could potentially be updated
 to support a one-to-many relationship if desired.
 */
-CREATE TABLE measurement_group (
+CREATE TABLE IF NOT EXISTS measurement_group (
   id text PRIMARY KEY,
   title text NOT NULL
 );
 
 -- Descriptors for types of measurements/techniques
 
-CREATE TABLE instrument (
+CREATE TABLE IF NOT EXISTS instrument (
   id serial PRIMARY KEY,
   name text UNIQUE NOT NULL,
   description text
 );
 
-CREATE TABLE datum_type (
+CREATE TABLE IF NOT EXISTS datum_type (
   id serial PRIMARY KEY,
   parameter text REFERENCES vocabulary.parameter(id) NOT NULL,
   unit text REFERENCES vocabulary.unit(id) NOT NULL,
@@ -131,7 +131,7 @@ CREATE TABLE datum_type (
 
 An object to be measured
 */
-CREATE TABLE sample (
+CREATE TABLE IF NOT EXISTS sample (
   id text PRIMARY KEY,
   igsn text UNIQUE,
   material text REFERENCES vocabulary.material(id),
@@ -167,7 +167,7 @@ closely spaced in time.
 - A set of detrital single-crystal zircon measurements
 - A multi-grain igneous age determination
 */
-CREATE TABLE session (
+CREATE TABLE IF NOT EXISTS session (
   id serial PRIMARY KEY,
   sample_id text REFERENCES sample(id),
   project_id text REFERENCES project(id),
@@ -200,7 +200,7 @@ Set of data measured together at one time on one instrument
 - A single-crystal zircon age measurement
 
 */
-CREATE TABLE analysis (
+CREATE TABLE IF NOT EXISTS analysis (
   id serial PRIMARY KEY,
   session_id integer REFERENCES session(id) NOT NULL,
   session_index integer, -- captures ordering within a session
@@ -232,7 +232,7 @@ CREATE TABLE analysis (
   UNIQUE (session_id, session_index, analysis_type)
 );
 
-CREATE TABLE datum (
+CREATE TABLE IF NOT EXISTS datum (
   id serial PRIMARY KEY,
   analysis integer REFERENCES analysis(id),
   type integer REFERENCES datum_type(id),
@@ -265,7 +265,7 @@ level. Some coarser (e.g. a table for analytical process) or finer
 In many ways, the column layout mirrors that of the datum table,
 with the exception that there is a many-to-many link on the data.
 */
-CREATE TABLE session_datum (
+CREATE TABLE IF NOT EXISTS session_datum (
   /* Handles many-to-many links between session and datum, which
      is primarily useful for handling analytical parameters
      that remain constant for many sessions.

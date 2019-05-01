@@ -34,9 +34,7 @@ def pretty_print(sql, **kwargs):
             secho(start, **kwargs)
             return
 
-
-def run_sql_file(session, sql_file):
-    sql = open(sql_file).read()
+def run_sql(session, sql):
     queries = split(sql)
     for q in queries:
         sql = format(q, strip_comments=True).strip()
@@ -50,6 +48,10 @@ def run_sql_file(session, sql_file):
             session.rollback()
             pretty_print(sql, fg='red')
             secho(str(err.orig), fg='red', dim=True)
+
+def run_sql_file(session, sql_file):
+    sql = open(sql_file).read()
+    run_sql(session, sql)
 
 def relative_path(base, *parts):
     if not path.isdir(base):

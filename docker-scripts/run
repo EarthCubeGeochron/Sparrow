@@ -14,6 +14,6 @@ python3 sparrow config > /cfg/sparrow-config.json
 # TODO: Make sure we source them locally; right now they are
 # derived directly from EarthChem which makes them somewhat
 # brittle
-python3 /bin/import-vocabularies
+#python3 /bin/import-vocabularies
 python3 sparrow init
 python3 sparrow serve
