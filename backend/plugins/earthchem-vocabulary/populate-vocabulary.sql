@@ -12,3 +12,4 @@ INSERT INTO vocabulary.unit (id, authority)
 SELECT id, 'EarthChem'
 FROM earthchem_vocabulary.unit
 ON CONFLICT DO NOTHING;
+

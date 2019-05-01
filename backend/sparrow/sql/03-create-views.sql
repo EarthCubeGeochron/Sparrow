@@ -1,5 +1,5 @@
 -- TODO: Don't cascade when we become more stable
-DROP SCHEMA core_view CASCADE;
+DROP SCHEMA IF EXISTS core_view CASCADE;
 CREATE SCHEMA core_view;
 
 /* Nested list of materials, ordered from

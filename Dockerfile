@@ -16,6 +16,8 @@ COPY ./docker-scripts/run /bin
 EXPOSE 5000
 RUN mkdir /app
 WORKDIR /app
+
+## Copy app core
 COPY ./backend/setup.py /app
 COPY ./backend/sparrow /app
 RUN pip3 install -e .
