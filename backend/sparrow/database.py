@@ -9,7 +9,7 @@ from sqlalchemy.sql import ClauseElement
 
 from .app import App
 from .models import Base, User
-from .util import run_sql_file, working_directory
+from .util import run_sql_file, run_query, working_directory
 
 metadata = MetaData()
 
@@ -67,6 +67,9 @@ class Database:
 
     def exec_sql(self, *args):
         run_sql_file(self.session, *args)
+
+    def exec_query(self, *args):
+        run_query(self.session, *args)
 
     def reflect_table(self, tablename, schema='public', **kwargs):
         meta = MetaData(schema=schema)

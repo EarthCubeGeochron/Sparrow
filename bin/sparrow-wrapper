@@ -19,11 +19,8 @@ cd "$SPARROW_PATH"
 dir=bin
 
 # Default to help if nothing is provided
-if [ $# -eq 0 ]; then
-  subcommand='--help'
-else
-  subcommand=$1
-fi
+subcommand=$1
+[ -z $subcommand ] && subcommand='--help'
 
 if [ $subcommand = '--help' ]; then
   # Get help from within sparrow container

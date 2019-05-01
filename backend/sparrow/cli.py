@@ -1,4 +1,5 @@
 import click
+from os import path
 from click import echo, style
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
@@ -6,13 +7,13 @@ from sys import exit
 from json import dumps
 from click_plugins import with_plugins
 from pkg_resources import iter_entry_points
+from subprocess import run
 
 from .util import working_directory
 from .app import App, construct_app
 from .database import Database
 from .auth.create_user import create_user
 
-@with_plugins(iter_entry_points('sparrow.plugins'))
 @click.group()
 def cli():
     pass
@@ -93,4 +94,19 @@ def _create_user(db):
     Create an authorized user for the web frontend
     """
     create_user(db)
+
+# Support arbitrary subcommand loading
+# https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
+# Right now we just program in each subcommand which is ugly and non-extensible
+# Ideally, we'd drag in anything we can find.
+name='import-earthchem'
+@cli.command(name=name)
+@click.argument('args', nargs=-1, type=click.UNPROCESSED)
+def sparrow_earthchem_vocabulary(args):
+    """
+    Import EarthChem vocabularies
+    """
+    __dirname = path.dirname(__file__)
+    cmd = path.abspath(path.join(__dirname,"..","bin","sparrow-"+name))
+    run([cmd, *args])
 
