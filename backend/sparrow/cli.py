@@ -98,6 +98,7 @@ def _create_user(db):
 # Support arbitrary subcommand loading
 # https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
 # Right now we just program in each subcommand which is ugly and non-extensible
+# Ideally, we'd drag in anything we can find.
 name='import-earthchem'
 @cli.command(name=name)
 @click.argument('args', nargs=-1, type=click.UNPROCESSED)
