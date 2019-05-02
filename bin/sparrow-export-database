@@ -1,4 +1,11 @@
 #!/bin/bash
-sparrow compose exec -T db \
-  pg_dump -Fc -C -Upostgres sparrow > $1
 
+internal_name=/tmp/database-dump.pg-dump
+container_id=$(sparrow compose ps -q db 2>/dev/null)
+
+docker exec $container_id \
+  pg_dump -Fc -C -Upostgres -f $internal_name sparrow
+
+docker cp "$container_id:$internal_name" "$1"
+
+docker exec $container_id rm -f $internal_name
