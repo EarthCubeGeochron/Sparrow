@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, current_app
+from os.path import join
 
 web = Blueprint('frontend', __name__)
 
@@ -10,4 +11,8 @@ web = Blueprint('frontend', __name__)
 @web.route('/<path:path>')
 def index(path='/'):
     v = current_app.config.get("LAB_NAME")
-    return render_template('page.html', title=v, id='index')
+    base_url = current_app.config.get("BASE_URL")
+    return render_template('page.html',
+            title=v,
+            id='index',
+            asset_dir=join(base_url, 'assets'))

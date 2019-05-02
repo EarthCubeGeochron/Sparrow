@@ -81,7 +81,7 @@ def config(cfg, key=None):
         return
 
     res = dict()
-    for k in ("LAB_NAME","DBNAME", "DATABASE","SITE_CONTENT"):
+    for k in ("LAB_NAME","DBNAME", "DATABASE","SITE_CONTENT","BASE_URL"):
         val = app.config.get(k)
         v = k.lower()
         res[v] = val

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+sparrow compose stop backend
+sparrow wait-for-database
+
+internal_name=/tmp/database-dump.pg-dump
+container_id=$(sparrow compose ps -q db)
+
+docker cp "$1" $container_id:$internal_name
+
+sparrow compose exec -T db bash -s <<EOF
+dropdb --if-exists -Upostgres sparrow
+createdb -Upostgres sparrow
+pg_restore -v -Upostgres -d sparrow $internal_name
+rm -f "$internal_name"
+EOF
+
+sparrow compose start backend

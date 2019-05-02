@@ -201,5 +201,5 @@ class APIv1(API):
         TableModel.__name__ = tablename
         RecordModel.__name__ = tablename+'_record'
 
-        self.add_resource(TableModel, route)
+        self.add_resource(TableModel, route, route+"/")
         self.add_resource(RecordModel, get_route)

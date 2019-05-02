@@ -19,29 +19,33 @@ Description = styled(ReactMarkdown)"""
   margin 0.5em 0.2em 1em;
 """
 
-RouteName = ({api_route, queryString, route, parent})->
-  text = api_route
-  backLink = h 'span.home-icon', [
-    h Icon, {icon: 'home'}
-  ]
-  queryString ?= ""
-  if parent?
-    text = route
-    # Have to assemble the button ourselves to make it a react-router link
-    backLink = h Link, {
-      to: parent
-      className: 'bp3-button bp3-minimal bp3-intent-primary route-parent'
-      role: 'button'
-    }, [
-      h Icon, {icon: 'arrow-left'}
-      h 'span.bp3-button-text', api_route.replace(route, '')
+class RouteName extends Component
+  @contextType: APIContext
+  render: ->
+    {baseURL} = @context
+    {api_route, queryString, route, parent} = @props
+    text = api_route
+    backLink = h 'span.home-icon', [
+      h Icon, {icon: 'home'}
     ]
-  return h 'h2.route-name', [
-    backLink
-    h 'span.current-route', text
-    h Text, {ellipsize: true, className: 'query-string'}, queryString
-    h AnchorButton, {minimal: true, icon: 'link', href: api_route+queryString}
-  ]
+    queryString ?= ""
+    if parent?
+      text = route
+      # Have to assemble the button ourselves to make it a react-router link
+      backLink = h Link, {
+        to: parent
+        className: 'bp3-button bp3-minimal bp3-intent-primary route-parent'
+        role: 'button'
+      }, [
+        h Icon, {icon: 'arrow-left'}
+        h 'span.bp3-button-text', api_route.replace(route, '')
+      ]
+    return h 'h2.route-name', [
+      backLink
+      h 'span.current-route', text
+      h Text, {ellipsize: true, className: 'query-string'}, queryString
+      h AnchorButton, {minimal: true, icon: 'link', href: baseURL+route+queryString}
+    ]
 
 StyledLinkCard = styled(LinkCard)"""
   color: #{Colors.BLUE1}
@@ -129,6 +133,8 @@ class RouteComponent extends StatefulComponent
     if not data.arguments?
       # Basically, tell the data component not to render
       api_route = null
+    else
+      api_route = api_route.replace("/api/v1","")
 
     return h 'div', [
       h Description, {className: 'description', source: data.description}
@@ -173,7 +179,9 @@ class RouteComponent extends StatefulComponent
 
   getData: ->
     {path} = @props.match
-    {data, status} = await get(@apiPath())
+    # This is a really breakable pattern
+    uri = join(process.env.BASE_URL,@apiPath(),"/")
+    {data, status} = await get(uri)
     @setState {response: data}
 
 export {RouteComponent}
