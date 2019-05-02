@@ -36,8 +36,9 @@ errorHandler = (route, response)->
   AppToaster.show {message, intent: Intent.DANGER}
 
 App = ->
-  baseURL = process.env.BASE_URL or ""
+  baseURL = process.env.BASE_URL or "/"
   apiBaseURL = join(baseURL,'/api/v1')
+  console.log apiBaseURL
 
   h APIProvider, {baseURL: apiBaseURL, onError: errorHandler}, (
     h AuthProvider, null, (

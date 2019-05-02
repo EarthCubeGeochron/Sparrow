@@ -179,7 +179,9 @@ class RouteComponent extends StatefulComponent
 
   getData: ->
     {path} = @props.match
-    {data, status} = await get(process.env.BASE_URL+@apiPath()+"/")
+    # This is a really breakable pattern
+    uri = join(process.env.BASE_URL,@apiPath(),"/")
+    {data, status} = await get(uri)
     @setState {response: data}
 
 export {RouteComponent}
