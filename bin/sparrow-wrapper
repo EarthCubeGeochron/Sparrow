@@ -4,7 +4,7 @@
 # working directory or parents
 while [ $(pwd) != "/" ]; do
   if test -e sparrow-config.sh ; then
-    echo "Using $(tput bold)sparrow-config.sh$(tput sgr0) from $(tput bold)$(pwd)$(tput sgr0)"
+    >&2 echo "Using $(tput bold)sparrow-config.sh$(tput sgr0) from $(tput bold)$(pwd)$(tput sgr0)"
     source sparrow-config.sh
     break
   fi
@@ -48,7 +48,7 @@ done
 
 if [ $found_command = 0 ]; then
   # Run a command against sparrow within a docker container
-  echo "Running command in container"
+  >&2 echo "Running command in container"
   docker-compose run backend sparrow $@
 else
   shift
