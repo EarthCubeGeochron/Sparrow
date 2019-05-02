@@ -1,0 +1,26 @@
+#!/bin/sh
+
+cd /app
+
+while ! pg_isready -h db -p 5432 -U postgres ; do
+  echo "Waiting for database..."
+done
+
+# Share configuration with frontend
+python3 sparrow config > /cfg/sparrow-config.json
+
+# We no longer import EarthChem vocabularies by default
+
+# (non-foolproof) check for whether tables exist
+res=$(psql -tA -h db -p 5432 -U postgres sparrow -c "
+SELECT EXISTS (
+  SELECT *
+  FROM information_schema.tables
+  WHERE table_schema = 'public'
+    AND table_name = 'datum'
+);")
+
+# Create tables if they don't exist
+[ ! $res = 't' ] && python3 sparrow init
+
+python3 sparrow serve

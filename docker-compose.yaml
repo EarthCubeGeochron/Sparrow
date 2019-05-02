@@ -5,10 +5,10 @@ services:
     ports:
       - "50101:80"
     volumes:
-      - ./docker-scripts/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - frontend_build:/frontend
   backend:
-    build: .
+    build: backend
     environment:
       - SPARROW_SECRET_KEY
       - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
