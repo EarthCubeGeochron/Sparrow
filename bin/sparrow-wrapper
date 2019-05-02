@@ -2,9 +2,10 @@
 
 # Drag in configuration in `sparrow-config.sh` from current
 # working directory or parents
-while [ $(pwd) != "/" ]; do
+while [ $(pwd) != "/" ] && [ ! -z $SPARROW_ENVFILE ]; do
   if test -e sparrow-config.sh ; then
     echo "Using $(tput bold)sparrow-config.sh$(tput sgr0) from $(tput bold)$(pwd)$(tput sgr0)"
+    export SPARROW_ENVFILE=$(abspath sparrow-config.sh)
     source sparrow-config.sh
     break
   fi
