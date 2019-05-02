@@ -6,6 +6,13 @@ import {AuthStatus} from 'app/auth'
 import styled from "@emotion/styled"
 import {LinkButton} from '@macrostrat/ui-components'
 
+NavButton_ = (props)->
+  h LinkButton, {props..., minimal: true}
+
+NavButton = styled(NavButton_)"""
+margin-right: 1em;
+"""
+
 Nav = ({children, fullTitle, subtitle, rest...})->
   children ?= null
   divider = null
@@ -38,4 +45,4 @@ AppNavbar = styled(Nav)"""
   border-radius: 5px
 """
 
-export {AppNavbar}
+export {AppNavbar, NavButton}

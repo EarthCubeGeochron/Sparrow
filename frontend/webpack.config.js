@@ -68,6 +68,7 @@ module.exports = {
       {test: /\.md$/, use: ["html-loader","markdown-loader"]}
     ]
   },
+  devtool: 'source-map',
   resolve: {
     extensions: [".coffee", ".js", ".styl",".css",".html",".md"],
     alias: {
