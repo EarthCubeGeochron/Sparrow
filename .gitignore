@@ -1,5 +1,4 @@
 *.egg-info
-*.egg-info
 *.pyc
 output
 node_modules
