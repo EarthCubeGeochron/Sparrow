@@ -2,25 +2,25 @@ let path = require('path');
 let BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 const { execSync } = require('child_process');
 const { readFileSync } = require('fs');
+const { EnvironmentPlugin } = require('webpack');
 
-/* Get configuration from labdata backend. This is used
+/* Get configuration from sparrow backend. This is used
 to centralize configuration and specify the location of frontend
 components. It could be removed in favor of an environment variable
 if desired. This might be necessary if we want frontend development
 to be uncoupled from the backend */
-
 const {SPARROW_CONFIG_JSON} = process.env;
 let cfg;
 if(SPARROW_CONFIG_JSON) {
   cfg = readFileSync(SPARROW_CONFIG_JSON, 'utf-8');
-  console.log(cfg);
 } else {
   cfg = execSync("sparrow config").toString('utf-8');
 }
 cfg = JSON.parse(cfg);
+process.env['BASE_URL'] = cfg.base_url;
 
 let assetsDir = path.resolve(__dirname, "_assets");
-let assetsRoute = '/labs/wiscar/assets';
+let assetsRoute = path.join(process.env.BASE_URL,'/assets');
 
 let bs_cfg = {
   port: 3000,
@@ -83,5 +83,8 @@ module.exports = {
     publicPath: assetsRoute,
     filename: "[name].js"
   },
-  plugins: [ browserSync ]
+  plugins: [
+    browserSync,
+    new EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'BASE_URL'])
+  ]
 }

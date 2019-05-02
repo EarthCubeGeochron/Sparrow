@@ -1,4 +1,5 @@
 import h from 'react-hyperscript'
+import {join} from 'path'
 import { BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {HomePage} from './homepage'
 
@@ -9,8 +10,8 @@ import {ProjectPage} from './admin'
 import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
 
-AppMain = ->
-  h Router, {basename: '/labs/wiscar'}, (
+AppMain = ({baseURL})->
+  h Router, {basename: baseURL}, (
     h 'div.app', [
       h Switch, [
         h Route, {
@@ -35,9 +36,12 @@ errorHandler = (route, response)->
   AppToaster.show {message, intent: Intent.DANGER}
 
 App = ->
-  h APIProvider, {baseURL: '/labs/wiscar/api/v1', onError: errorHandler}, (
+  baseURL = process.env.BASE_URL or ""
+  apiBaseURL = join(baseURL,'/api/v1')
+
+  h APIProvider, {baseURL: apiBaseURL, onError: errorHandler}, (
     h AuthProvider, null, (
-      h AppMain
+      h AppMain, {baseURL}
     )
   )
 

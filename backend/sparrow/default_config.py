@@ -3,7 +3,7 @@ from datetime import timedelta
 
 LAB_NAME="Test lab"
 DATABASE="postgresql:///earthcube_labdata_test"
-BASE_URL="/labs/wiscar"
+BASE_URL= environ.get("SPARROW_BASE_URL") or "/"
 
 # We want to check most of our config into version control,
 # but we should under no circumstances check in secret keys.

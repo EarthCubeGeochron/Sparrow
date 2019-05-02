@@ -11,7 +11,7 @@ RUN apk add --no-cache bash
 
 COPY ./config/docker.cfg /config/docker.cfg
 ENV SPARROW_CONFIG=/config/docker.cfg
-COPY ./bin/import-vocabularies /bin
+
 COPY ./docker-scripts/run /bin
 EXPOSE 5000
 RUN mkdir /app

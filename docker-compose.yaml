@@ -2,21 +2,13 @@ version: "3.4"
 services:
   gateway:
     image: nginx:1.15
-    depends_on:
-      - backend
-      - frontend
+    ports:
+      - "50101:80"
     volumes:
       - ./docker-scripts/nginx.conf:/etc/nginx/nginx.conf:ro
       - frontend_build:/frontend
-    networks:
-      default:
-      sparrowdataorg_default:
-        aliases:
-          - wiscar_sparrow_gateway
   backend:
     build: .
-    ports:
-      - "50101:5000"
     environment:
       - SPARROW_SECRET_KEY
       - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
@@ -36,14 +28,13 @@ services:
   db:
     image: mdillon/postgis:11
     ports:
-      - "54325:5432"
+      - "54321:5432"
     expose:
       - 5432
     environment:
       - POSTGRES_DB=sparrow
     volumes:
       - db_cluster:/var/lib/postgresql/data
-      # - ./sparrow-data.pg-dump:/docker-entrypoint-initdb.d/init.sql
   frontend:
     build: frontend
     depends_on:
@@ -61,12 +52,8 @@ services:
       - $SPARROW_SITE_CONTENT:/site-content
     expose:
       - 3000
-    ports:
-      - 30011:3000
 volumes:
   frontend_build:
   cfg:
   db_cluster:
-networks:
-  sparrowdataorg_default:
-    external: true
+

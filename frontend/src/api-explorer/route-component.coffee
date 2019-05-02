@@ -179,7 +179,7 @@ class RouteComponent extends StatefulComponent
 
   getData: ->
     {path} = @props.match
-    {data, status} = await get('/labs/wiscar'+@apiPath()+"/")
+    {data, status} = await get(process.env.BASE_URL+@apiPath()+"/")
     @setState {response: data}
 
 export {RouteComponent}

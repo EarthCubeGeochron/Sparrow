@@ -31,11 +31,6 @@ class App(Flask):
         self.db_url = make_url(dburl)
         self.dbname = self.db_url.database
 
-        # Temporary hack for running at subdomains
-        self.config["JWT_ACCESS_COOKIE_PATH"] = self.config['BASE_URL']
-        self.config["JWT_REFRESH_COOKIE_PATH"] = path.join(
-                self.config['BASE_URL'], '/api/v1/auth/refresh')
-
     @property
     def database(self):
         from .database import Database
