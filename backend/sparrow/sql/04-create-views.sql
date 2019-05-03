@@ -36,7 +36,8 @@ CREATE VIEW core_view.session AS
 SELECT
 	s.*,
 	i.name instrument_name,
-  p.title project_name
+  p.title project_name,
+  is_public(s)
 FROM session s
 JOIN instrument i
   ON i.id = s.instrument
@@ -96,7 +97,7 @@ SELECT
   sa.igsn,
   s.project_id,
   sa.location,
-  '2020-01-01'::timestamptz as embargo_date
+  is_public(s)
 FROM __a
 JOIN analysis a USING (id)
 JOIN session s
@@ -118,8 +119,7 @@ SELECT
   t.is_computed,
   t.is_interpreted,
   d.is_bad,
-  false as is_public,
-  '2020-01-01'::timestamptz as embargo_date,
+  is_public(s),
   a.session_id,
   a.session_index,
   s.sample_id,
@@ -151,7 +151,8 @@ SELECT
   location_name,
   location_precision,
   p.id project_id,
-  p.title project_title
+  p.title project_title,
+  is_public(s)
 FROM sample s
 JOIN session ss
   ON s.id = ss.sample_id
@@ -181,7 +182,8 @@ GROUP BY a.id
 )
 SELECT
   s.*,
-  b.material material_data
+  b.material material_data,
+  is_public(s)
 FROM sample s
 LEFT JOIN b
   ON s.id = b.id;
@@ -191,7 +193,8 @@ SELECT
 	p.id,
 	p.description,
 	p.title,
-	p.embargo_date,
+  p.embargo_date,
+  NOT embargoed(p.embargo_date) AS is_public,
 	-- Get data from researchers table in standard format
 	to_jsonb((SELECT array_agg(a) FROM (
 		SELECT r.* FROM researcher r

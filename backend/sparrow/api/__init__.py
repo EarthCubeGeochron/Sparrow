@@ -1,8 +1,8 @@
 from flask import Flask, Blueprint
-from flask_restful import Resource, reqparse, inputs
+from flask_restful import Resource, reqparse, inputs, abort
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from textwrap import dedent
 
 from .base import API
@@ -104,16 +104,25 @@ class APIv1(API):
 
         parser.add_argument('all', type=bool, help='Return all rows', default=False)
 
+        # Manage row-level permissions
+        is_access_controlled = False
         for name, column in table.c.items():
+            # We handle embargo at the application rather than database level
+            if name == 'is_public':
+                parser.add_argument('private', type=bool,
+                    help='Return private data', default=False)
+                continue
+
             try:
                 type = infer_type(column)
                 if type == dict:
                     # We don't yet support dict types
                     continue
                 typename = type.__name__
-                parser.add_argument(name, type=type,
-                    help=f"Column '{name}' of type '{typename}'")
-            except: pass
+                parser.add_argument(str(name), type=type,
+                    help=f"{name} ({typename})")
+            except:
+                continue
 
         # Set up information about
         # table descriptions
@@ -151,41 +160,77 @@ class APIv1(API):
                         key=key.name,
                         type=tname))
 
-            @jwt_required
+            @jwt_optional
             def get(self):
+
                 args = parser.parse_args()
-                print(args)
-                q = db.session.query(table)
+
+                # Check identity and abort if unauthorized
+                identity = get_jwt_identity()
+                private = args.pop('private',False)
+                if private and not identity:
+                    # Should throw a better error
+                    return abort(401)
 
                 should_describe = True
+
+                # Get offset and limit at outset
+                offset = args.pop('offset', None)
+                limit = args.pop('limit', None)
+                if offset is not None and limit is not None:
+                    should_describe = False
+
+                filters = []
+
                 for k,col in table.c.items():
+                    if k == 'is_public':
+                        # To return embargoed data, we must
+                        # have a valid JSON Web Token
+                        if not private:
+                            filters.append(col == True)
+                        continue
+
                     val = args.pop(k, None)
-                    if val is not None:
-                        should_describe = False
-                        if col.type.python_type == str:
-                            q = q.filter(col.like(val))
-                        else:
-                            q = q.filter(col==val)
+                    if val is None: continue
+
+                    should_describe = False
+                    if col.type.python_type == str:
+                        filters.append(col.like(val))
+                    else:
+                        filters.append(col==val)
 
                 if args.pop('all', False):
                     should_describe = False
 
-                count = q.count()
-
-                for k in ('offset','limit'):
-                    val = args.pop(k, None)
-                    if val is not None:
-                        should_describe = False
-                        q = getattr(q,k)(val)
-
+                # Bail to describing query optionally
                 if should_describe:
                     return self.describe()
 
-                # Save the count of the query
-                response = q.all()
-                status = 200
-                headers = {'x-total-count': count}
-                return response, status, headers
+                # Begin querying after filters are assembled
+
+                try:
+                    q = db.session.query(table)
+                    for filter in filters:
+                        q = q.filter(filter)
+
+                    count = q.count()
+
+                    if offset is not None:
+                        q = q.offset(offset)
+                    if limit is not None:
+                        q = q.limit(limit)
+                    # Save the count of the query
+                    response = q.all()
+
+                    status = 200
+                    headers = {'x-total-count': count}
+                    return response, status, headers
+
+                except:
+                    db.session.rollback()
+                    # Better error handling is a must here
+                    return jsonify(error='Query Error'), 410
+
 
         class RecordModel(Resource):
             @jwt_required

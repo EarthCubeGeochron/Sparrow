@@ -32,7 +32,7 @@ Vocabularies
 Tables to integrate units, etc.
 from curated collections
 */
-CREATE SCHEMA vocabulary;
+CREATE SCHEMA IF NOT EXISTS vocabulary;
 
 CREATE TABLE IF NOT EXISTS vocabulary.parameter (
   id text PRIMARY KEY,
@@ -76,6 +76,10 @@ CREATE TABLE IF NOT EXISTS project (
   embargo_date timestamp without time zone
 );
 
+/*
+If researchers on a project have application user accounts,
+they can see data even if embargoed (not yet implemented).
+*/
 CREATE TABLE IF NOT EXISTS project_researcher (
   project_id text REFERENCES project(id),
   researcher_id integer REFERENCES researcher(id),
@@ -141,7 +145,8 @@ CREATE TABLE IF NOT EXISTS sample (
   location_precision integer DEFAULT 0,
   /* A representative named location */
   location_name text,
-  location geometry
+  location geometry,
+  embargo_date timestamp without time zone
 );
 /*
 #### Potential issues:
