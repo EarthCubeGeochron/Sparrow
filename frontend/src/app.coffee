@@ -6,7 +6,7 @@ import {HomePage} from './homepage'
 import {Intent} from '@blueprintjs/core'
 import {APIProvider} from '@macrostrat/ui-components'
 import {APIExplorer} from './api-explorer'
-import {ProjectPage} from './admin'
+import {Admin} from './admin'
 import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
 
@@ -19,7 +19,7 @@ AppMain = ({baseURL})->
           exact: true,
           render: -> h HomePage
         }
-        h Route, {path: '/admin', component: ProjectPage}
+        h Route, {path: '/admin', component: Admin}
         h Route, {path: '/api-explorer', component: APIExplorer}
       ]
     ]
