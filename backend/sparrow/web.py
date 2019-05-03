@@ -15,4 +15,5 @@ def index(path='/'):
     return render_template('page.html',
             title=v,
             id='index',
+            base_url=base_url,
             asset_dir=join(base_url, 'assets'))

@@ -151,7 +151,7 @@ class APIv1(API):
                         key=key.name,
                         type=tname))
 
-            @jwt_optional
+            @jwt_required
             def get(self):
                 args = parser.parse_args()
                 print(args)

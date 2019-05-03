@@ -1,9 +1,9 @@
-from os import environ, path
+from os import environ
 from datetime import timedelta
 
 LAB_NAME="Test lab"
 DATABASE="postgresql:///earthcube_labdata_test"
-BASE_URL= environ.get("SPARROW_BASE_URL") or "/"
+BASE_URL= environ.get("SPARROW_BASE_URL", "/")
 
 # We want to check most of our config into version control,
 # but we should under no circumstances check in secret keys.
@@ -25,5 +25,7 @@ JWT_COOKIE_CSRF_PROTECT = False
 JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
 
 # Only send access tokens to API endpoints
-JWT_ACCESS_COOKIE_PATH = path.join(BASE_URL, '/api/v1')
-JWT_REFRESH_COOKIE_PATH = path.join(BASE_URL, '/api/v1/auth/refresh')
+# Don't use `os.path.join` for urls as it does weird things with "absolute paths"
+base = BASE_URL.rstrip('/')
+JWT_ACCESS_COOKIE_PATH = f"{base}/api/v1"
+JWT_REFRESH_COOKIE_PATH = f"{base}/api/v1/auth/refresh"
