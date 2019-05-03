@@ -23,18 +23,20 @@ let assetsDir = path.resolve(__dirname, "_assets");
 let assetsRoute = path.join(process.env.BASE_URL,'/assets');
 
 let bs_cfg = {
-  port: 3000,
-  host: 'localhost',
-  proxy: 'http://0.0.0.0:5000',
+  proxy: 'http://backend:5000',
   open: false,
-  serveStatic: [
-    {route: assetsRoute, dir: assetsDir}
-  ]
+  port: 3000,
+  socket: {
+    domain: 'localhost:5002'
+  }
 };
 
-if(process.env.CONTAINERIZED) {
-  delete bs_cfg.proxy;
-  bs_cfg.host = "0.0.0.0";
+if(!process.env.CONTAINERIZED) {
+  // This configuration is probably wrong
+  bs_cfg.proxy = "http://0.0.0.0:5000"
+  bs_cfg.serveStatic = [
+    {route: assetsRoute, dir: assetsDir}
+  ];
   bs_cfg.server = "./";
 }
 

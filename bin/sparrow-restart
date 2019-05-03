@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sparrow compose up --build -d $@
+

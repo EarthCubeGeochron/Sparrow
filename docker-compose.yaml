@@ -3,7 +3,7 @@ services:
   gateway:
     image: nginx:1.15
     ports:
-      - "50101:80"
+      - "5002:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - frontend_build:/frontend
@@ -50,8 +50,6 @@ services:
       # Right now, we configure default site content
       # rather than allowing any customization
       - $SPARROW_SITE_CONTENT:/site-content
-    expose:
-      - 3000
 volumes:
   frontend_build:
   cfg:
