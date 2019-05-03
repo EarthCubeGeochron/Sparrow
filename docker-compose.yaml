@@ -2,13 +2,23 @@ version: "3.4"
 services:
   gateway:
     image: nginx:1.15
+    depends_on:
+      - backend
+      - frontend
     ports:
-      - "5002:80"
+      - "50101:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - frontend_build:/frontend
+    networks:
+      - default
+      - sparrowdataorg_default
   backend:
     build: backend
+    expose:
+      - 5000
+    depends_on:
+      - db
     environment:
       - SPARROW_SECRET_KEY
       - SPARROW_BASE_URL
@@ -28,8 +38,6 @@ services:
       - cfg:/cfg
   db:
     image: mdillon/postgis:11
-    ports:
-      - "54321:5432"
     expose:
       - 5432
     environment:
@@ -50,9 +58,13 @@ services:
       - cfg:/cfg
       # Right now, we configure default site content
       # rather than allowing any customization
-      - $SPARROW_SITE_CONTENT:/site-content
+      - /projects/wiscar-sparrow/site-content:/site-content
 volumes:
   frontend_build:
   cfg:
   db_cluster:
-
+networks:
+  default:
+    driver: bridge
+  sparrowdataorg_default:
+    external: true
