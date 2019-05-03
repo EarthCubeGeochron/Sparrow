@@ -11,6 +11,7 @@ services:
     build: backend
     environment:
       - SPARROW_SECRET_KEY
+      - SPARROW_BASE_URL
       - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
     volumes:
       # Volume for scripts to make things like
