@@ -61,7 +61,8 @@ class LoginForm extends StatefulComponent
       h Callout, {
         className: 'login-info'
         title: "Invalid credentials",
-        intent: Intent.DANGER}, "Invalid credentials were provided"
+        intent: Intent.DANGER
+      }, "Invalid credentials were provided"
 
   renderLoginForm: ->
     {doLogin, login, isLoggingIn: isOpen, requestLoginForm} = @context
