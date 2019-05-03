@@ -23,7 +23,6 @@ let assetsDir = path.resolve(__dirname, "_assets");
 let assetsRoute = path.join(process.env.BASE_URL,'/assets');
 
 let bs_cfg = {
-  proxy: 'http://backend:5000',
   open: false,
   port: 3000,
   socket: {
