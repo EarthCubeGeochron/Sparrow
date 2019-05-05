@@ -295,5 +295,5 @@ CREATE TABLE IF NOT EXISTS data_file (
   */
   session_id integer REFERENCES session(id),
   analysis_id integer REFERENCES analysis(id),
-  sample_id integer REFERENCES sample(id)
+  sample_id text REFERENCES sample(id)
 );

@@ -3,7 +3,6 @@
 from sys import argv, stdout
 from click import echo
 from pandas import read_excel
-from xlrd import open_workbook
 
 infile = argv[1]
 
