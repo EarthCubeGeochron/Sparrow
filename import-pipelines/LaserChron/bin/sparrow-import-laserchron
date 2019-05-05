@@ -1,8 +1,14 @@
 #!/usr/bin/env zsh
 
+# This script runs on the host system and kicks off the
+# import process within a docker container
 import_pipeline="${0:h:h:r}"
 
+# Run within container, mounting LaserChron data directory
+# and importer code.
 sparrow compose run \
+  -e "LASERCHRON_DATA_DIR=/Data" \
+  -v "$LASERCHRON_DATA_DIR:/Data:ro" \
   -v "$import_pipeline:/import-laserchron" \
   backend \
   /import-laserchron/sparrow_import_laserchron/cli.py
