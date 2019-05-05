@@ -14,12 +14,12 @@ if SECRET_KEY is None:
     raise KeyError("Environment variable `SPARROW_SECRET_KEY` must be set")
 
 # Schema extensions
-INIT_SQL = None
-sql = environ.get("SPARROW_INIT_SQL")
+sql = environ.get("SPARROW_INIT_SQL", None)
 if sql is not None:
     p = Path(sql)
+    assert p.exists()
     if p.is_dir():
-        files = p.glob('**/*.sql')
+        files = p.glob('*.sql')
     else:
         files = [p]
     INIT_SQL = [f for f in files if f.is_file()]
