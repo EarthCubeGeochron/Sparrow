@@ -266,12 +266,34 @@ In many ways, the column layout mirrors that of the datum table,
 with the exception that there is a many-to-many link on the data.
 */
 CREATE TABLE IF NOT EXISTS session_datum (
-  /* Handles many-to-many links between session and datum, which
-     is primarily useful for handling analytical parameters
-     that remain constant for many sessions.
+  /*
+  Handles many-to-many links between session and datum, which
+  is primarily useful for handling analytical parameters
+  that remain constant across many sessions.
   */
   session_id integer REFERENCES session(id),
   datum_id integer REFERENCES datum(id)
 );
 
+CREATE TABLE IF NOT EXISTS data_file_type (
+  id serial,
+  name text,
+  description text
+);
 
+CREATE TABLE IF NOT EXISTS data_file (
+  /*
+  Original measurement data file information
+  */
+  hash uuid PRIMARY KEY, -- MD5 hash of data file contents
+  basename text,
+  import_date timestamp,
+  /*
+  Foreign key columns to link to data that was imported from
+  this file; this should be done at the appropriate level (e.g.
+  sample, analysis, session) that fits the data file in question.
+  */
+  session_id integer REFERENCES session(id),
+  analysis_id integer REFERENCES analysis(id),
+  sample_id integer REFERENCES sample(id)
+);
