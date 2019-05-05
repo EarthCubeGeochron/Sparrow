@@ -1,4 +1,6 @@
 #!/bin/bash
 
 sparrow compose up --build -d $@
+# Follow logs for running container(s)
+sparrow compose logs -f $@
 

@@ -1,6 +1,6 @@
 import click
 from os import path
-from click import echo, style
+from click import echo, style, secho
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sys import exit
@@ -74,18 +74,25 @@ def shell(cfg):
 @cli.command(name='config')
 @with_config
 @click.argument('key', required=False)
-def config(cfg, key=None):
+@click.option('--json', is_flag=True, default=False)
+def config(cfg, key=None, json=False):
     app, db = construct_app(cfg)
     if key is not None:
         print(app.config.get(key.upper()))
         return
 
-    res = dict()
-    for k in ("LAB_NAME","DBNAME", "DATABASE","SITE_CONTENT","BASE_URL"):
-        val = app.config.get(k)
-        v = k.lower()
-        res[v] = val
-    print(dumps(res))
+    if json:
+        res = dict()
+        for k in ("LAB_NAME","DBNAME", "DATABASE","SITE_CONTENT","BASE_URL"):
+            val = app.config.get(k)
+            v = k.lower()
+            res[v] = val
+        print(dumps(res))
+        return
+
+    for k,v in app.config.items():
+        secho(f"{k:30}", nl=False, dim=True)
+        secho(f"{v}")
 
 @cli.command(name='create-user')
 @with_database
