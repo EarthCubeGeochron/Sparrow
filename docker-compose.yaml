@@ -35,6 +35,7 @@ services:
       # and frontend
       - cfg:/cfg
       - $SPARROW_INIT_SQL:/init-sql/
+      - $SPARROW_COMMANDS:/sparrow-commands/
   db:
     image: mdillon/postgis:11
     expose:

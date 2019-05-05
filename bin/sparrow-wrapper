@@ -28,6 +28,14 @@ if [ $subcommand = '--help' ]; then
   # and append docker wrapper commands
   docker-compose run backend python3 sparrow --help
   echo ""
+  echo "Lab-specific commands:"
+  ls "$SPARROW_COMMANDS" \
+  | grep sparrow- \
+  | sed 's/sparrow-/  /g' \
+  | grep --invert-match wrapper
+  exit 0
+
+  echo ""
   echo "Docker wrapper commands:"
   ls "$dir" \
   | grep sparrow- \
@@ -36,16 +44,25 @@ if [ $subcommand = '--help' ]; then
   exit 0
 fi
 
-cmd="sparrow-$subcommand"
-
+full_command="sparrow-$subcommand"
 found_command=0
 for f in $(ls "$dir" | grep sparrow-); do
+  [ $found_command = 1 ] && break
   # We don't want to return this file...
   [ $f == 'sparrow-wrapper' ] && continue
-  [ $f != $cmd ] && continue
+  [ $f != $full_command ] && continue
+  cmd="$dir/$full_command"
   found_command=1
-  break
 done
+
+for f in $(ls "$SPARROW_COMMANDS" | grep sparrow-); do
+  [ $found_command = 1 ] && break
+  # We don't want to return this file...
+  [ $f != $full_command ] && continue
+  cmd="$SPARROW_COMMANDS/$full_command"
+  found_command=1
+done
+
 
 if [ $found_command = 0 ]; then
   # Run a command against sparrow within a docker container
@@ -53,5 +70,5 @@ if [ $found_command = 0 ]; then
   docker-compose run backend sparrow $@
 else
   shift
-  "$dir/$cmd" $@
+  "$cmd" $@
 fi

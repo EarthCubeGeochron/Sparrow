@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+import_pipeline="${0:h:h:r}"
+
+sparrow compose run \
+  -v "$import_pipeline:/import-laserchron" \
+  backend \
+  /import-laserchron/sparrow_import_laserchron/cli.py
