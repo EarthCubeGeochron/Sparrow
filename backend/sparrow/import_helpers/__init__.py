@@ -1,0 +1,2 @@
+class SparrowImportError(Exception):
+    pass

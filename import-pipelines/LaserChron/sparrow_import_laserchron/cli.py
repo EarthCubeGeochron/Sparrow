@@ -3,8 +3,9 @@
 from os import environ
 from click import command, echo, secho, style
 from pathlib import Path
+from sparrow.import_helpers import SparrowImportError
 
-from sparrow_import_laserchron.extract_datatable import extract_datatable
+from .extract_datatable import extract_datatable
 
 @command()
 def cli(test=True):
@@ -24,6 +25,10 @@ def cli(test=True):
     v = path.glob("**/*.xls")
     for fn in v:
         print(str(fn))
+        try:
+            out = extract_datatable(fn)
+        except SparrowImportError as e:
+            secho(str(e), fg='red')
 
     v = path.glob("**/*.xls[xm]")
     for fn in v:
