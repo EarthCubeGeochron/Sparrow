@@ -4,6 +4,8 @@ from os import environ
 from click import command, echo, secho, style
 from pathlib import Path
 
+from sparrow_import_laserchron.extract_datatable import extract_datatable
+
 @command()
 def cli(test=True):
     """
@@ -19,4 +21,10 @@ def cli(test=True):
     path = Path(env)
     assert path.is_dir()
 
-cli()
+    v = path.glob("**/*.xls")
+    for fn in v:
+        print(str(fn))
+
+    v = path.glob("**/*.xls[xm]")
+    for fn in v:
+        print(str(fn))
