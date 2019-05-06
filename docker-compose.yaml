@@ -2,6 +2,9 @@ version: "3.4"
 services:
   gateway:
     image: nginx:1.15
+    depends_on:
+      - backend
+      - frontend
     ports:
       - "5002:80"
     volumes:
@@ -9,8 +12,14 @@ services:
       - frontend_build:/frontend
   backend:
     build: backend
+    expose:
+      - 5000
+    depends_on:
+      - db
     environment:
       - SPARROW_SECRET_KEY
+      - SPARROW_BASE_URL
+      - SPARROW_INIT_SQL=/init-sql
       - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
     volumes:
       # Volume for scripts to make things like
@@ -25,10 +34,10 @@ services:
       # Share some configuration between backend
       # and frontend
       - cfg:/cfg
+      - $SPARROW_INIT_SQL:/init-sql/
+      - $SPARROW_COMMANDS:/sparrow-commands/
   db:
     image: mdillon/postgis:11
-    ports:
-      - "54321:5432"
     expose:
       - 5432
     environment:
@@ -54,4 +63,3 @@ volumes:
   frontend_build:
   cfg:
   db_cluster:
-

@@ -14,7 +14,7 @@ let cfg;
 if(SPARROW_CONFIG_JSON) {
   cfg = readFileSync(SPARROW_CONFIG_JSON, 'utf-8');
 } else {
-  cfg = execSync("sparrow config").toString('utf-8');
+  cfg = execSync("sparrow config --json").toString('utf-8');
 }
 cfg = JSON.parse(cfg);
 process.env['BASE_URL'] = cfg.base_url;
@@ -26,7 +26,7 @@ let bs_cfg = {
   open: false,
   port: 3000,
   socket: {
-    domain: 'localhost:5002'
+    domain: "https://sparrow-data.org/labs/wiscar"
   }
 };
 

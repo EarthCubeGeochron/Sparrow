@@ -1,12 +1,8 @@
 from setuptools import setup
 
 setup(
-    name='sparrow_laserchron_import',
+    name='sparrow_import_laserchron',
     version='0.1',
-    package_dir={'sparrow_laserchron_import': 'sparrow_laserchron_import'},
-    install_requires=['sqlalchemy', 'h5py', 'click', 'click_plugins'],
-    entry_points='''
-        [sparrow.plugins]
-        import-e2=sparrow_laserchron_import.cli:cli
-    '''
+    package_dir={'sparrow_import_laserchron': 'sparrow_import_laserchron'},
+    install_requires=['sqlalchemy', 'pandas', 'xlrd', 'click']
 )
