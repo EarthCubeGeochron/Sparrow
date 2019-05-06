@@ -1,4 +1,4 @@
-FROM python:3.7-alpine
+FROM amancevice/pandas:0.24.2-alpine
 
 COPY ./docker-scripts/build-deps /install/build-deps
 RUN /install/build-deps

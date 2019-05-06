@@ -13,9 +13,6 @@ ln -s /usr/include/locale.h /usr/include/xlocale.h
 
 # On a normal system, these installation commands
 # would likely work fine out of the box
-pip3 install --no-cache-dir lxml
-pip3 install --no-cache-dir numpy
-pip3 install --no-cache-dir pandas
 pip3 install --no-cache-dir psycopg2
 
 # Get rid of extra dependencies
