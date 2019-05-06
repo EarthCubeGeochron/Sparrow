@@ -58,7 +58,7 @@ services:
       - cfg:/cfg
       # Right now, we configure default site content
       # rather than allowing any customization
-      - /projects/wiscar-sparrow/site-content:/site-content
+      - $SPARROW_SITE_CONTENT:/site-content
 volumes:
   frontend_build:
   cfg:
