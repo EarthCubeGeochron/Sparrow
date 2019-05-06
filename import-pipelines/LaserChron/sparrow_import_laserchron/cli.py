@@ -4,8 +4,9 @@ from os import environ
 from click import command, echo, secho, style
 from pathlib import Path
 from sparrow.import_helpers import SparrowImportError
+from itertools import chain
 
-from .extract_datatable import extract_datatable
+from .extract_datatable import import_datafile
 
 @command()
 def cli(test=True):
@@ -22,14 +23,10 @@ def cli(test=True):
     path = Path(env)
     assert path.is_dir()
 
-    v = path.glob("**/*.xls")
-    for fn in v:
-        print(str(fn))
+    files = chain(path.glob("**/*.xls"), path.glob("**/*.xls[xm]"))
+    for f in files:
         try:
-            out = extract_datatable(fn)
-        except SparrowImportError as e:
+            secho(str(f), dim=True)
+            import_datafile(f)
+        except (SparrowImportError, NotImplementedError) as e:
             secho(str(e), fg='red')
-
-    v = path.glob("**/*.xls[xm]")
-    for fn in v:
-        print(str(fn))
