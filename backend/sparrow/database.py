@@ -113,7 +113,8 @@ class Database:
                 self.exec_sql("sql/00-drop-tables.sql")
             self.exec_sql("sql/01-setup-database.sql")
             self.exec_sql("sql/02-create-tables.sql")
-            self.exec_sql("sql/03-create-views.sql")
+            self.exec_sql("sql/03-create-functions.sql")
+            self.exec_sql("sql/04-create-views.sql")
 
         init_sql = self.config.get("INIT_SQL", None)
         if init_sql is not None:
