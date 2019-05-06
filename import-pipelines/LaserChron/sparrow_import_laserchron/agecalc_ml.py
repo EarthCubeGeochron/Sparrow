@@ -8,9 +8,7 @@ from sparrow.util import relative_path
 from IPython import embed
 from h5py import File
 
-@command(name="import-e2")
-@option('--test', is_flag=True, default=True)
-def cli(test=True):
+def import_agecalc_ml(test=True):
     """
     Import Matlab save file for E2 in bulk.
     """
@@ -22,4 +20,3 @@ def cli(test=True):
     # Load file as a pre-7.3 matlab file
     mat = loadmat(fn)
     embed()
-
