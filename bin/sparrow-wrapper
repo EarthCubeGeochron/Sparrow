@@ -33,7 +33,6 @@ if [ $subcommand = '--help' ]; then
   | grep sparrow- \
   | sed 's/sparrow-/  /g' \
   | grep --invert-match wrapper
-  exit 0
 
   echo ""
   echo "Docker wrapper commands:"
