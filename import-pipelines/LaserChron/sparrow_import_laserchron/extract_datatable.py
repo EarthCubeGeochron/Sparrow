@@ -18,26 +18,42 @@ def extract_datatable(infile):
     b = StringIO()
     df.to_csv(b, compression='gzip')
     b.seek(0)
+    # Convert to a binary representation
     return b.read().encode()
 
 def import_datafile(db, infile):
+    """
+    Import the `datafile` Excel sheet to a CSV representation
+    stored within the database that can be further processed without
+    large filesystem operations. This also stores the original file's
+    hash in order to skip importing unchanged data.
 
+    Returns boolean (whether file was imported).
+    """
     hash = md5hash(infile)
 
     data_file = db.mapped_classes.data_file
 
+    # Should maybe make sure error is not set
     rec = db.get(data_file, hash)
     # We are done if we've already imported
-    if rec is not None: return
+    if rec is not None:
+        return False
 
-    dt = extract_datatable(infile)
-
-    # Run query to insert values
+    # Values to insert
     cols = dict(
-        hash=hash,
+        file_hash=hash,
         basename=infile.stem,
         import_date=None,
-        csv_data=dt)
+        import_error=None,
+        csv_data=None)
+
+    try:
+        cols['csv_data'] = extract_datatable(infile)
+    except NotImplementedError as e:
+        cols['import_error'] = str(e)
+        secho(str(e), fg='red', dim=True)
+
     tbl = data_file.__table__
     sql = (insert(tbl)
         .values(file_path=str(infile), **cols)
@@ -45,3 +61,4 @@ def import_datafile(db, infile):
             index_elements=[tbl.c.file_path],
             set_=dict(**cols)))
     db.session.execute(sql)
+    return True

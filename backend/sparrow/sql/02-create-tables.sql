@@ -276,8 +276,7 @@ CREATE TABLE IF NOT EXISTS session_datum (
 );
 
 CREATE TABLE IF NOT EXISTS data_file_type (
-  id serial PRIMARY KEY,
-  name text,
+  id text PRIMARY KEY,
   description text
 );
 
@@ -285,11 +284,12 @@ CREATE TABLE IF NOT EXISTS data_file (
   /*
   Original measurement data file information
   */
-  hash uuid PRIMARY KEY, -- MD5 hash of data file contents
+  file_hash uuid PRIMARY KEY, -- MD5 hash of data file contents
   basename text,
   file_path text UNIQUE,
   import_date timestamp,
-  type integer REFERENCES data_file_type(id),
+  import_error text,
+  type_id text REFERENCES data_file_type(id),
   /*
   Foreign key columns to link to data that was imported from
   this file; this should be done at the appropriate level (e.g.

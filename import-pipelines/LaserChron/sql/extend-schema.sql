@@ -1,4 +1,4 @@
-INSERT INTO data_file_type (name) VALUES
+INSERT INTO data_file_type (id) VALUES
   ('ETAgeCalc'),
   ('NuAgeCalc');
 

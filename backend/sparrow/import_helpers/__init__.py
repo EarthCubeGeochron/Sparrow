@@ -1,5 +1,7 @@
 from hashlib import md5
 
+from ..util import working_directory
+
 class SparrowImportError(Exception):
     pass
 
