@@ -12,6 +12,10 @@ RUN apk add --no-cache bash
 COPY ./docker.cfg /config/docker.cfg
 ENV SPARROW_CONFIG=/config/docker.cfg
 
+# Make sure we don't litter our mounted code directories
+# with useless bytecode
+ENV PYTHONDONTWRITEBYTECODE=1
+
 COPY ./docker-scripts/run /bin
 EXPOSE 5000
 RUN mkdir /app
