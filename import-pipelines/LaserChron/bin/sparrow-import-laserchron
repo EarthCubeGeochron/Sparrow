@@ -6,12 +6,9 @@ import_pipeline="${0:h:h:r}"
 
 # Run within container, mounting LaserChron data directory
 # and importer code.
-# Make sure we don't litter our code with useless bytecode
-# (should probably set this on the base docker image instead)
 sparrow compose run \
   -e "LASERCHRON_DATA_DIR=/Data" \
   -e "PYTHONPATH=/import-laserchron" \
-  -e "PYTHONDONTWRITEBYTECODE=1" \
   -v "$LASERCHRON_DATA_DIR:/Data:ro" \
   -v "$import_pipeline:/import-laserchron" \
   backend \
