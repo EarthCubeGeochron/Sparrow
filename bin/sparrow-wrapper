@@ -1,23 +1,41 @@
 #!/bin/bash
 
 # Drag in configuration in `sparrow-config.sh` from current
-# working directory or parents
-while [ $(pwd) != "/" ] && [ -z $SPARROW_ENVFILE ]; do
+# working directory or parents.
+# Alternately, the location of this file can be specified using
+# the SPARROW_CONFIG environment variable.
+
+config_file="$SPARROW_CONFIG"
+
+# Search for configuration file if it isn't found.
+while [ $(pwd) != "/" ] && [ -z $config_file ]; do
   if [ -f sparrow-config.sh ] ; then
-    echo "Using $(tput bold)sparrow-config.sh$(tput sgr0) from $(tput bold)$(pwd)$(tput sgr0)" >&2
-    export SPARROW_ENVFILE=$(readlink -f sparrow-config.sh)
-    source sparrow-config.sh
+    export config_file="$(readlink -f sparrow-config.sh)"
     break
   fi
   cd ..
 done
+
+_cfg="$(tput bold)sparrow-config.sh$(tput sgr0)"
+# Bail if we haven't found a configuration file.
+if [ -z $config_file ]; then
+  echo "Error. No $_cfg found" >&2
+  exit 1
+fi
+
+# If we haven't yet sourced the config file at a higher-level script
+if [ "$sparrow_config_loaded" = false ]; then
+  echo "Using $_cfg from $(tput bold)$(pwd)$(tput sgr0)" >&2
+  export SPARROW_CONFIG="$config_file"
+  source "$config_file"
+fi
 
 # Get path to sparrow installation from location of current file
 # (even if symlinked)
 export SPARROW_PATH="$(dirname "$(dirname "$(readlink -f "$0")")")"
 cd "$SPARROW_PATH"
 
-dir=bin
+dir="bin"
 
 # Default to help if nothing is provided
 subcommand=$1

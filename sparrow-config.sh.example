@@ -1,6 +1,21 @@
-# This is the default
-export PROJECT_DIR="/projects/wiscar-sparrow"
-export SPARROW_SECRET_KEY="GraniteAndesiteBasaltGabbro"
+# An example config file for the Dockerized Sparrow application.
+# This file contains environment variables that control the
+# application setup.
 
-export SPARROW_BACKEND_CONFIG="$SPARROW_PATH/config/WiscAr.cfg"
-export SPARROW_SITE_CONTENT=$PROJECT_DIR/site-content
+# Configures environment for LaserChron lab
+laserchron="$PROJECT_DIR/LaserChron"
+
+# If not overridden, this value sets the `COMPOSE_PROJECT_NAME`
+# environment variable
+export SPARROW_LAB_NAME="LaserChron"
+
+export SPARROW_SITE_CONTENT="$laserchron/site-content"
+export SPARROW_BACKUP_DIR="$laserchron/backups"
+# Need to figure out a better way to do this, but it'll be finicky
+# because of docker container nonsense
+pipeline=$PROJECT_DIR/Sparrow/import-pipelines/LaserChron
+export SPARROW_INIT_SQL="$pipeline/sql"
+export SPARROW_COMMANDS="$pipeline/bin"
+
+# Needed for import script
+export LASERCHRON_DATA_DIR="$laserchron/test-data"
