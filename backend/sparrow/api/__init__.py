@@ -2,6 +2,7 @@ from flask import Flask, Blueprint
 from flask_restful import Resource, reqparse, inputs, abort
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
+from flask import jsonify
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from textwrap import dedent
 

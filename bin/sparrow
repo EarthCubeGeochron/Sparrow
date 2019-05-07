@@ -43,6 +43,7 @@ default="$SPARROW_PATH/config/default-site-content"
 export SPARROW_LAB_NAME="${SPARROW_LAB_NAME:-"Test Lab"}"
 export SPARROW_INIT_SQL="${SPARROW_INIT_SQL:-"placeholder"}"
 export SPARROW_SITE_CONTENT="${SPARROW_SITE_CONTENT:-"$default"}"
+export SPARROW_HTTP_PORT="${SPARROW_HTTP_PORT:-5002}"
 
 # The docker-compose volume for sparrow commands needs to be set
 # even if a SPARROW_COMMANDS directory is not provided.
