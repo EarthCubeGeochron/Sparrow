@@ -116,9 +116,9 @@ git submodule update --init
 ## Development with Docker
 
 In its containerized form, the app can be installed easily
-no matter what environment you are working in. This containerized
-distribution strategy will allow easy deployment on whatever infrastructure
-(local, cloud hosting, AWS/Azure, etc.) your lab uses to run the system.
+on any Unix-y environment. This containerized
+distribution strategy will allow easy deployment on any infrastructure
+(local, cloud hosting, AWS/Azure, etc.).
 The Docker toolchain is stable and open-source.
 
 The only installation requirements on Unix host
@@ -132,7 +132,7 @@ Installation has not yet been tested on Windows.
 
 ### The command-line interface
 
-The administration of **Sparrow** is centered around the `sparrow` command-line
+**Sparrow** is administered using the `sparrow` command-line
 interface. This command wraps application management, database management,
 `docker-compose` orchestration subcommands in a single executable, simplifying
 basic management tasks. If defined, lab-specific subcommands (e.g. for import
