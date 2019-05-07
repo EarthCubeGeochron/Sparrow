@@ -71,7 +71,6 @@ echo-help() {
   for c in $(ls "$2" \
     | grep sparrow- \
     | sed 's/sparrow-//g') ; do
-    [ $c = 'wrapper' ] && continue
     printf "  %-18s" $c
     echo-description "$2/sparrow-$c"
   done
@@ -83,7 +82,7 @@ if [ $subcommand = '--help' ]; then
   sparrow compose run backend python3 sparrow --help
   [ ! -z $SPARROW_COMMANDS ] && \
     echo-help "Lab-specific commands" "$SPARROW_COMMANDS"
-  echo-help "Docker wrapper commands" "$dir"
+  echo-help "Docker orchestration commands" "$dir"
   exit 0
 fi
 
@@ -91,8 +90,6 @@ full_command="sparrow-$subcommand"
 found_command=0
 for f in $(ls "$dir" | grep sparrow-); do
   [ $found_command = 1 ] && break
-  # We don't want to return this file...
-  [ $f == 'sparrow-wrapper' ] && continue
   [ $f != $full_command ] && continue
   cmd="$dir/$full_command"
   found_command=1
