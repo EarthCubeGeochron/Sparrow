@@ -11,11 +11,11 @@ export SPARROW_LAB_NAME="LaserChron"
 
 export SPARROW_SITE_CONTENT="$laserchron/site-content"
 export SPARROW_BACKUP_DIR="$laserchron/backups"
-# Need to figure out a better way to do this, but it'll be finicky
-# because of docker container nonsense
+
 pipeline=$PROJECT_DIR/Sparrow/import-pipelines/LaserChron
 export SPARROW_INIT_SQL="$pipeline/sql"
 export SPARROW_COMMANDS="$pipeline/bin"
+export SPARROW_BASE_URL="/" # This is the default
 
 # Needed for import script
 export LASERCHRON_DATA_DIR="$laserchron/test-data"
