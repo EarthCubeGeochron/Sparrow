@@ -178,9 +178,8 @@ the page, to start working with the API.
   of passwords. Set this in your **LOCAL** environment (it will be copied to
   the Docker runtime as needed). It is the only variable required to get up and
   running with a basic Dockerized version.
-- `SPARROW_CONFIG="<path>"`: Location of `.cfg` files containing data.
+- `SPARROW_BACKEND_CONFIG="<path>"`: Location of `.cfg` files containing data.
 - `SPARROW_CONFIG_JSON="<path>"`: Location of `.json` file containing frontend
   configuration. This can be manually generated, but is typically set to the
   output of `sparrow config`. It is used when the frontend and backend are on
   isolated systems (i.e. when running using Docker).
-

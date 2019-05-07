@@ -38,7 +38,7 @@ def get_database(ctx, param, value):
                "Please create it before continuing.\n"
               f"Command: `{cmd}`")
 
-kw = dict(type=str, envvar="SPARROW_CONFIG", required=True)
+kw = dict(type=str, envvar="SPARROW_BACKEND_CONFIG", required=True)
 with_config = click.option('--config', 'cfg', **kw)
 with_database = click.option('--config', 'db', callback=get_database, **kw)
 
@@ -116,4 +116,3 @@ def sparrow_earthchem_vocabulary(args):
     __dirname = path.dirname(__file__)
     cmd = path.abspath(path.join(__dirname,"..","bin","sparrow-"+name))
     run([cmd, *args])
-
