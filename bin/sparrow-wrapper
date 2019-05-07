@@ -51,30 +51,34 @@ export SPARROW_SECRET_KEY="${SPARROW_SECRET_KEY:-""}"
 # even if a SPARROW_COMMANDS directory is not provided.
 export SPARROW_COMMANDS_VOLUME="${SPARROW_COMMANDS:-"placeholder"}"
 
-
 dir="bin"
 
+# HELP SUBCOMMAND
 # Default to help if nothing is provided
 subcommand=$1
 [ -z $subcommand ] && subcommand='--help'
+
+# Echo the description of a subcommand. $1 is the script file.
+echo-description() {
+  local descline=$(grep -E "#\s+Description" "$1")
+  echo "${descline##*Description: }"
+}
+
+echo-help() {
+  echo -e "\n$1:"
+  ls "$2" \
+  | grep sparrow- \
+  | sed 's/sparrow-/  /g' \
+  | grep --invert-match wrapper
+}
 
 if [ $subcommand = '--help' ]; then
   # Get help from within sparrow container
   # and append docker wrapper commands
   sparrow compose run backend python3 sparrow --help
-  if [ ! -z $SPARROW_COMMANDS ]; then
-    echo -e "\nLab-specific commands:"
-    ls "$SPARROW_COMMANDS" \
-    | grep sparrow- \
-    | sed 's/sparrow-/  /g' \
-    | grep --invert-match wrapper
-  fi
-
-  echo -e "\nDocker wrapper commands:"
-  ls "$dir" \
-  | grep sparrow- \
-  | sed 's/sparrow-/  /g' \
-  | grep --invert-match wrapper
+  [ ! -z $SPARROW_COMMANDS ] && \
+    echo-help "Lab-specific commands" "$SPARROW_COMMANDS"
+  echo-help "Docker wrapper commands" "$dir"
   exit 0
 fi
 
