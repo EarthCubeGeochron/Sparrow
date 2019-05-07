@@ -5,21 +5,19 @@
 # Alternately, the location of this file can be specified using
 # the SPARROW_CONFIG environment variable.
 
-config_file="$SPARROW_CONFIG"
-
 # Search for configuration file if it isn't found.
 while [ $(pwd) != "/" ] && \
-      [ -z $config_file ] && \
+      [ -z $SPARROW_CONFIG ] && \
       [ -z $_SPARROW_CONFIG_UNSET ]; do
   if [ -f sparrow-config.sh ] ; then
-    export config_file="$(readlink -f sparrow-config.sh)"
+    export SPARROW_CONFIG="$(readlink -f sparrow-config.sh)"
     break
   fi
   cd ..
 done
 
 # We might want to bail here if no config file is found.
-if [ -z $config_file ] && [ -z $_SPARROW_CONFIG_UNSET ]; then
+if [ -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_UNSET ]; then
   echo "No configuration file found. Running using default values." >&2
   export _SPARROW_CONFIG_UNSET=1
 fi
@@ -31,10 +29,11 @@ export SPARROW_PATH="$(dirname "$(dirname "$(readlink -f "$0")")")"
 cd "$SPARROW_PATH"
 
 # If we haven't yet sourced the config file in a higher-level script
-if [ -z $SPARROW_CONFIG ] && [ ! -z $config_file ] ; then
-  echo "Using config file $(tput bold)$config_file$(tput sgr0)" >&2
-  export SPARROW_CONFIG="$config_file"
-  source "$config_file"
+if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
+  echo "Using config file $(tput bold)$SPARROW_CONFIG$(tput sgr0)" >&2
+  export SPARROW_CONFIG="$SPARROW_CONFIG"
+  source "$SPARROW_CONFIG"
+  export _SPARROW_CONFIG_SOURCED=1
 fi
 
 # ENVIRONMENT VARIABLE DEFAULTS
