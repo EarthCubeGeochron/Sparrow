@@ -141,7 +141,8 @@ scripts) are included as well.
 To install the command-line application, symlink the `bin/sparrow` executable
 from this repository to somewhere on your path
 (e.g. `sudo ln -s $(pwd)/bin/sparrow /usr/local/bin`).
-Typing `sparrow` will download and build containers (this will take a long time on initial run) and then show the command's help page:
+Typing `sparrow` will download and build containers (this will take a long
+time on initial run) and then show the command's help page:
 
 ```
 Usage: sparrow [OPTIONS] COMMAND [ARGS]...
@@ -188,7 +189,8 @@ This command will spin up a database engine, frontend, backend,
 and gateway service (details of each service can be found in
 `docker-compose.yaml`) and automatically run the `sparrow init`
 command to set up database tables.
-The **Sparrow** web interface can then be accessed at `http://localhost:5002`; the API can be found at `http://localhost:5002/api`.
+The **Sparrow** web interface can then be accessed at `http://localhost:5002`;
+the API can be found at `http://localhost:5002/api`.
 
 ### Configuring the application
 
@@ -220,8 +222,9 @@ Several `sparrow` subcommands allow inspection of the running
 - `sparrow psql` allows interaction with the **Sparrow** database
   using the standard `psql` management tool that ships with PostgreSQL.
 - `sparrow db-tunnel` exposes the PostgreSQL database engine
-  on `localhost` port `54321` (database `sparrow`, user `postgres`). This is useful for schema introspection and data management using GUI tools such as
-  [Postico](https://eggerapps.at/postico/).
+  on `localhost` port `54321` (database `sparrow`, user `postgres`).
+  This is useful for schema introspection and data management
+  using GUI tools such as [Postico](https://eggerapps.at/postico/).
 - `sparrow shell` creates a Python shell within the application,
   allowing inspection of the API server runtime.
 - `sparrow config` prints the API server configuration.
@@ -231,19 +234,20 @@ Several `sparrow` subcommands allow inspection of the running
 ## Local development
 
 In certain situations, development on your local machine can be easier than
-working with a containerized version of the application. However, configuration bugs will be more likely, as this setup is not tested.
+working with a containerized version of the application. However, configuration
+bugs will be more likely, as this setup is not tested.
 
-You must have several
-dependencies installed:
+You must have several dependencies installed:
 
 - PostgreSQL v11/PostGIS (the database system)
 - Python >= 3.7
 - Node.js~> 11
 
-It is recommended that you work in a Python virtual environment.
+Working in a Python virtual environment is recommended.
 
 When developing locally, the `sparrow-config.sh` file is not used, and the
-frontend and backend must be configured directly. Orchestration and database management commands from the `sparrow` command-line interface
+frontend and backend must be configured directly. Orchestration and database
+management commands from the `sparrow` command-line interface
 are also unavailable; these could be implemented separately from the
 Docker versions of the commands if there is demand.
 
@@ -267,4 +271,3 @@ real time and should be available upon browser reload. This will be disabled in
 the future with a `SPARROW_ENV=<development,production>` environment variable
 that will default to `production` and disable development-focused features such
 as live code reloading and sourcemaps for performance and security.
-
