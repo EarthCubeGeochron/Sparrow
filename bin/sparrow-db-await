@@ -1,4 +1,5 @@
 #!/bin/bash
+# Description: Utility that blocks until database is ready
 
 sparrow compose up -d db
 # We are running in a docker container

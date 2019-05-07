@@ -32,7 +32,7 @@ Vocabularies
 Tables to integrate units, etc.
 from curated collections
 */
-CREATE SCHEMA vocabulary;
+CREATE SCHEMA IF NOT EXISTS vocabulary;
 
 CREATE TABLE IF NOT EXISTS vocabulary.parameter (
   id text PRIMARY KEY,
@@ -76,6 +76,10 @@ CREATE TABLE IF NOT EXISTS project (
   embargo_date timestamp without time zone
 );
 
+/*
+If researchers on a project have application user accounts,
+they can see data even if embargoed (not yet implemented).
+*/
 CREATE TABLE IF NOT EXISTS project_researcher (
   project_id text REFERENCES project(id),
   researcher_id integer REFERENCES researcher(id),
@@ -141,7 +145,8 @@ CREATE TABLE IF NOT EXISTS sample (
   location_precision integer DEFAULT 0,
   /* A representative named location */
   location_name text,
-  location geometry
+  location geometry,
+  embargo_date timestamp without time zone
 );
 /*
 #### Potential issues:
@@ -266,12 +271,36 @@ In many ways, the column layout mirrors that of the datum table,
 with the exception that there is a many-to-many link on the data.
 */
 CREATE TABLE IF NOT EXISTS session_datum (
-  /* Handles many-to-many links between session and datum, which
-     is primarily useful for handling analytical parameters
-     that remain constant for many sessions.
+  /*
+  Handles many-to-many links between session and datum, which
+  is primarily useful for handling analytical parameters
+  that remain constant across many sessions.
   */
   session_id integer REFERENCES session(id),
   datum_id integer REFERENCES datum(id)
 );
 
+CREATE TABLE IF NOT EXISTS data_file_type (
+  id text PRIMARY KEY,
+  description text
+);
 
+CREATE TABLE IF NOT EXISTS data_file (
+  /*
+  Original measurement data file information
+  */
+  file_hash uuid PRIMARY KEY, -- MD5 hash of data file contents
+  basename text,
+  file_path text UNIQUE,
+  import_date timestamp,
+  import_error text,
+  type_id text REFERENCES data_file_type(id),
+  /*
+  Foreign key columns to link to data that was imported from
+  this file; this should be done at the appropriate level (e.g.
+  sample, analysis, session) that fits the data file in question.
+  */
+  session_id integer REFERENCES session(id),
+  analysis_id integer REFERENCES analysis(id),
+  sample_id text REFERENCES sample(id)
+);

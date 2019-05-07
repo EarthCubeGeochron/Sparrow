@@ -1,0 +1,115 @@
+#!/usr/bin/env zsh
+
+# Drag in configuration in `sparrow-config.sh` from current
+# working directory or parents.
+# Alternately, the location of this file can be specified using
+# the SPARROW_CONFIG environment variable.
+
+# Search for configuration file if it isn't found.
+while [ $(pwd) != "/" ] && \
+      [ -z $SPARROW_CONFIG ] && \
+      [ -z $_SPARROW_CONFIG_UNSET ]; do
+  if [ -f sparrow-config.sh ] ; then
+    cfg="sparrow-config.sh"
+    export SPARROW_CONFIG="${cfg:A}"
+    break
+  fi
+  cd ..
+done
+
+# We might want to bail here if no config file is found.
+if [ -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_UNSET ]; then
+  echo "No configuration file found. Running using default values." >&2
+  export _SPARROW_CONFIG_UNSET=1
+fi
+
+# Get path to sparrow installation from location of current file
+# (even if symlinked)
+export SPARROW_PATH="${0:A:h:h}"
+cd "$SPARROW_PATH"
+
+# If we haven't yet sourced the config file in a higher-level script
+if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
+  echo "Using config file $(tput bold)$SPARROW_CONFIG$(tput sgr0)" >&2
+  export SPARROW_CONFIG="$SPARROW_CONFIG"
+  source "$SPARROW_CONFIG"
+  export _SPARROW_CONFIG_SOURCED=1
+fi
+
+# ENVIRONMENT VARIABLE DEFAULTS
+# Set variables that might not be created in the config file
+# to default values
+default="$SPARROW_PATH/config/default-site-content"
+export SPARROW_LAB_NAME="${SPARROW_LAB_NAME:-"Test Lab"}"
+export SPARROW_INIT_SQL="${SPARROW_INIT_SQL:-"placeholder"}"
+export SPARROW_SITE_CONTENT="${SPARROW_SITE_CONTENT:-"$default"}"
+
+# The docker-compose volume for sparrow commands needs to be set
+# even if a SPARROW_COMMANDS directory is not provided.
+export SPARROW_COMMANDS_VOLUME="${SPARROW_COMMANDS:-"placeholder"}"
+
+[ -z $SPARROW_SECRET_KEY ] && echo \
+  "You $(tput bold)must$(tput sgr0) set SPARROW_SECRET_KEY. Exiting..." && \
+  exit 1
+
+dir="bin"
+
+# HELP SUBCOMMAND
+# Default to help if nothing is provided
+subcommand=$1
+[ -z $subcommand ] && subcommand='--help'
+
+# Echo the description of a subcommand. $1 is the script file.
+echo-description() {
+  local descline=$(grep -E "#\s+Description" "$1")
+  echo "${descline##*Description: }" \
+  | perl -pe "s|\`(.+?)\`|$(tput setaf 6)\1$(tput sgr0)|g"
+}
+
+echo-help() {
+  echo -e "\n$1:"
+  for c in $(ls "$2" \
+    | grep sparrow- \
+    | sed 's/sparrow-//g') ; do
+    printf "  %-18s" $c
+    echo-description "$2/sparrow-$c"
+  done
+}
+
+if [ $subcommand = '--help' ]; then
+  # Get help from within sparrow container
+  # and append docker wrapper commands
+  sparrow compose run backend python3 sparrow --help
+  [ ! -z $SPARROW_COMMANDS ] && \
+    echo-help "Lab-specific commands" "$SPARROW_COMMANDS"
+  echo-help "Docker orchestration commands" "$dir"
+  exit 0
+fi
+
+full_command="sparrow-$subcommand"
+found_command=0
+for f in $(ls "$dir" | grep sparrow-); do
+  [ $found_command = 1 ] && break
+  [ $f != $full_command ] && continue
+  cmd="$dir/$full_command"
+  found_command=1
+done
+
+if [ ! -z $SPARROW_COMMANDS ]; then
+  for f in $(ls "$SPARROW_COMMANDS" | grep sparrow-); do
+    [ $found_command = 1 ] && break
+    # We don't want to return this file...
+    [ $f != $full_command ] && continue
+    cmd="$SPARROW_COMMANDS/$full_command"
+    found_command=1
+  done
+fi
+
+if [ $found_command = 0 ]; then
+  # Run a command against sparrow within a docker container
+  >&2 echo "Running command in container"
+  sparrow compose run backend sparrow $@
+else
+  shift
+  "$cmd" $@
+fi

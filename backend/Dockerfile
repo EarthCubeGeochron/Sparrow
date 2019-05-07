@@ -10,7 +10,12 @@ RUN pip3 install --no-cache-dir -r /install/requirements.txt
 RUN apk add --no-cache bash
 
 COPY ./docker.cfg /config/docker.cfg
-ENV SPARROW_CONFIG=/config/docker.cfg
+# These values should not change between installations
+ENV SPARROW_BACKEND_CONFIG=/config/docker.cfg
+
+# Make sure we don't litter our mounted code directories
+# with useless bytecode
+ENV PYTHONDONTWRITEBYTECODE=1
 
 COPY ./docker-scripts/run /bin
 EXPOSE 5000

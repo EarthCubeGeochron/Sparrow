@@ -36,10 +36,10 @@ def get_or_create(session, model, defaults=None, **kwargs):
 class Database:
     def __init__(self, cfg=None):
         """
-        We can pass a connection string, a FLASK application
+        We can pass a connection string, a **Flask** application object
         with the appropriate configuration, or nothing, in which
         case we will try to infer the correct database from
-        the SPARROW_CONFIG file, if available.
+        the SPARROW_BACKEND_CONFIG file, if available.
         """
         self.config = None
         if cfg is None:
@@ -113,7 +113,8 @@ class Database:
                 self.exec_sql("sql/00-drop-tables.sql")
             self.exec_sql("sql/01-setup-database.sql")
             self.exec_sql("sql/02-create-tables.sql")
-            self.exec_sql("sql/03-create-views.sql")
+            self.exec_sql("sql/03-create-functions.sql")
+            self.exec_sql("sql/04-create-views.sql")
 
         init_sql = self.config.get("INIT_SQL", None)
         if init_sql is not None:
