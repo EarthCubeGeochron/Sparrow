@@ -6,13 +6,10 @@ services:
       - backend
       - frontend
     ports:
-      - "50101:80"
+      - "5002:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - frontend_build:/frontend
-    networks:
-      - default
-      - sparrowdataorg_default
   backend:
     build: backend
     expose:
@@ -68,8 +65,3 @@ volumes:
   db_cluster:
   # Placeholder volumes in case we don't have these volumes to mount
   placeholder:
-networks:
-  default:
-    driver: bridge
-  sparrowdataorg_default:
-    external: true
