@@ -1,0 +1,4 @@
+#!/bin/bash
+# Description: Alias to `docker-compose` that respects `sparrow` config
+cd "$SPARROW_PATH"
+docker-compose $@

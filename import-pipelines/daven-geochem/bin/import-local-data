@@ -6,7 +6,7 @@ directly from the local project-specific PostgreSQL database on `daven-quinn.loc
 
 from sqlalchemy import create_engine
 from subprocess import run
-from labdata.util import run_query, run_sql_file, working_directory
+from sparrow.util import run_query, run_sql_file, working_directory
 import click
 from click import secho
 from os import path

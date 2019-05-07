@@ -1,16 +1,17 @@
 import h from 'react-hyperscript'
+import {join} from 'path'
 import { BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {HomePage} from './homepage'
 
 import {Intent} from '@blueprintjs/core'
 import {APIProvider} from '@macrostrat/ui-components'
 import {APIExplorer} from './api-explorer'
-import {ProjectPage} from './admin'
+import {Admin} from './admin'
 import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
 
-AppMain = ->
-  h Router, {basename: '/'}, (
+AppMain = ({baseURL})->
+  h Router, {basename: baseURL}, (
     h 'div.app', [
       h Switch, [
         h Route, {
@@ -18,7 +19,7 @@ AppMain = ->
           exact: true,
           render: -> h HomePage
         }
-        h Route, {path: '/admin', component: ProjectPage}
+        h Route, {path: '/admin', component: Admin}
         h Route, {path: '/api-explorer', component: APIExplorer}
       ]
     ]
@@ -35,9 +36,13 @@ errorHandler = (route, response)->
   AppToaster.show {message, intent: Intent.DANGER}
 
 App = ->
-  h APIProvider, {baseURL: '/api/v1', onError: errorHandler}, (
+  baseURL = process.env.BASE_URL or "/"
+  apiBaseURL = join(baseURL,'/api/v1')
+  console.log apiBaseURL
+
+  h APIProvider, {baseURL: apiBaseURL, onError: errorHandler}, (
     h AuthProvider, null, (
-      h AppMain
+      h AppMain, {baseURL}
     )
   )
 

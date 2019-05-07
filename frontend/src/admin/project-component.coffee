@@ -109,7 +109,7 @@ ProjectComponent = (props)->
 
 class ProjectListComponent extends Component
   @defaultProps: {
-    apiEndpoint: '/api/v1/project'
+    apiEndpoint: '/project'
   }
 
   render: ->

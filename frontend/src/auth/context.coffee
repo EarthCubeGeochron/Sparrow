@@ -52,7 +52,7 @@ class AuthProvider extends StatefulComponent
 
   doLogout: =>
     {post} = @context
-    {login} = await post '/auth/logout'
+    {login} = await post '/auth/logout', {}
     @setState {
       login,
       username: null,

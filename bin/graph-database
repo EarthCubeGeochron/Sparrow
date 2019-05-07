@@ -1,9 +1,11 @@
 #!/usr/bin/env zsh
 
-output="$LABDATA_PATH/output"
+pip install git+https://github.com/davenquinn/sadisplay.git
+
+output="$SPARROW_PATH/output"
 mkdir -p "$output"
 
-dbname=$(labdata config database)
+dbname=$(sparrow config database)
 graph="$output/erd-core.dot"
 sadisplay -u $dbname \
   -r dot \

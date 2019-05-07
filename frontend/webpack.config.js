@@ -2,39 +2,40 @@ let path = require('path');
 let BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 const { execSync } = require('child_process');
 const { readFileSync } = require('fs');
+const { EnvironmentPlugin } = require('webpack');
 
-/* Get configuration from labdata backend. This is used
+/* Get configuration from sparrow backend. This is used
 to centralize configuration and specify the location of frontend
 components. It could be removed in favor of an environment variable
 if desired. This might be necessary if we want frontend development
 to be uncoupled from the backend */
-
 const {SPARROW_CONFIG_JSON} = process.env;
 let cfg;
 if(SPARROW_CONFIG_JSON) {
   cfg = readFileSync(SPARROW_CONFIG_JSON, 'utf-8');
-  console.log(cfg);
 } else {
-  cfg = execSync("labdata config").toString('utf-8');
+  cfg = execSync("sparrow config --json").toString('utf-8');
 }
 cfg = JSON.parse(cfg);
+process.env['BASE_URL'] = cfg.base_url;
 
 let assetsDir = path.resolve(__dirname, "_assets");
-let assetsRoute = '/assets';
+let assetsRoute = path.join(process.env.BASE_URL,'/assets');
 
 let bs_cfg = {
-  port: 3000,
-  host: 'localhost',
-  proxy: 'http://0.0.0.0:5000',
   open: false,
-  serveStatic: [
-    {route: assetsRoute, dir: assetsDir}
-  ]
+  port: 3000,
+  socket: {
+    domain: "https://sparrow-data.org/labs/wiscar"
+  }
 };
 
-if(process.env.CONTAINERIZED) {
-  delete bs_cfg.proxy;
-  bs_cfg.host = "0.0.0.0";
+if(!process.env.CONTAINERIZED) {
+  // This configuration is probably wrong
+  bs_cfg.proxy = "http://0.0.0.0:5000"
+  bs_cfg.serveStatic = [
+    {route: assetsRoute, dir: assetsDir}
+  ];
   bs_cfg.server = "./";
 }
 
@@ -68,6 +69,7 @@ module.exports = {
       {test: /\.md$/, use: ["html-loader","markdown-loader"]}
     ]
   },
+  devtool: 'source-map',
   resolve: {
     extensions: [".coffee", ".js", ".styl",".css",".html",".md"],
     alias: {
@@ -83,5 +85,8 @@ module.exports = {
     publicPath: assetsRoute,
     filename: "[name].js"
   },
-  plugins: [ browserSync ]
+  plugins: [
+    browserSync,
+    new EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'BASE_URL'])
+  ]
 }

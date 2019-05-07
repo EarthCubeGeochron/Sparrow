@@ -6,8 +6,8 @@ Usage: import-pychron-interpreted-age <jsonfile> <dbname (optional)>
 """
 from json import load, dumps
 from sys import argv
-from labdata import Database
-from labdata.util import working_directory
+from sparrow import Database
+from sparrow.util import working_directory
 
 fn = argv[1]
 

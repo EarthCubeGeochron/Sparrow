@@ -6,7 +6,7 @@ import {SessionInfoLink} from './session-component/info-card'
 
 class SessionListComponent extends StatefulComponent
   @defaultProps: {
-    apiEndpoint: '/api/v1/session'
+    apiEndpoint: '/session'
     filterFields: {
       'sample_id': "Sample"
       'project_name': "Project"

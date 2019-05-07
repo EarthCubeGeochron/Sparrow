@@ -7,6 +7,5 @@ while [ ! -f $SPARROW_CONFIG_JSON ]; do
   sleep 1
 done
 
-$(npm bin)/webpack \
+webpack \
   --watch --mode=development
-

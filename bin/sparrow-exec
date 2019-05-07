@@ -1,4 +1,3 @@
 #!/bin/bash
-# Run a command against a docker container
-docker-compose run sparrow-backend \
-  python3 labdata $@
+# Description: Quick shortcut to `docker-compose exec`
+sparrow compose exec $@

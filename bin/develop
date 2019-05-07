@@ -2,11 +2,11 @@
 
 rootDir="${0:h:h}"
 
-cd "$rootdir"
+cd "$rootDir"
 
 # If labdata is not installed, install it
-if ! labdata >/dev/null 2>&1; then
-  echo "$(tput bold)labdata$(tput sgr0) command is not found"
+if ! sparrow >/dev/null 2>&1; then
+  echo "$(tput bold)sparrow$(tput sgr0) command is not found"
   pip install -e backend
   pip install -e deps/sadisplay
   pip install -e import-pipelines/WiscAr-MAP
@@ -15,7 +15,7 @@ fi
 cd "$rootDir/frontend"
 npm install
 
-labdata serve &
+sparrow serve &
 $(npm bin)/webpack --watch --mode=development &
 
 wait

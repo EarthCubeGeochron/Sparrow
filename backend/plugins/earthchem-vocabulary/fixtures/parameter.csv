@@ -1,0 +1,516 @@
+id,description
+AB,albite
+AC,acmite
+ACC,accessory minerals
+ACT,actinolite
+ALM,almandine
+ALT,alteration product
+AMG,amygdule
+AMPH,amphibole
+AN,anorthite
+ANAL,analcite
+AND,andalusite
+ANDR,andradite
+ANH,anhydrite
+APA,apatite
+AUG,augite
+Ag,silver
+Age,sample age
+Al,aluminum
+Al2O3,aluminium oxide
+Ar,argon
+Ar36,argon isotope Ar36
+Ar36_Ar38,ratio of argon isotopes Ar36 to Ar38
+Ar36_Ar40,ratio of argon isotopes Ar36 to Ar40
+Ar37_Ar40,ratio of Ar37 to Ar40
+Ar38,argon isotope Ar38
+Ar38_Ar36,ratio of argon isotopes Ar38 to Ar36
+Ar39,argon isotope Ar39
+Ar39_Ar40,ratio of argon isotopes Ar39 to Ar40
+Ar40,argon isotope Ar40
+Ar40RG_Ar39K,ratio of radiogenic Ar40 to Ar39 produced from k
+Ar40_ATM,atmospheric argon isotope Ar40
+Ar40_Ar36,ratio of argon isotopes Ar40 to Ar36
+Ar40_Ar36(I),initial Ar40 to Ar36 ratio
+Ar40_Ar39,ratio of argon isotopes Ar40 to Ar39
+Ar40_He4,ratio of argon isotopes Ar40 to helium isotope He4
+Ar40_RG,radiogenic Ar40
+As,arsenic
+Au,gold
+B,boron
+B11_B10,boron isotope
+BIO,biotite
+BST,bastite
+BZT,bronzite
+Ba,barium
+BaO,barium oxide
+Be,beryllium
+Be10,beryllium isotope Be10
+Be10_Be9,ratio of beryllium isotopes Be10 to Be9
+Be9,beryllium isotope Be9
+Bi,bismuth
+Br,bromium
+C,carbon
+CALC,calcite
+CAP_DELTA_S33,"deviation of Delta_S33 from the terrestrial fractionation array, calculated as Delta_S33 minus 1000 times ((Delta_S34 divided by 1000 then plus one) taken to the 0.515th power) minus 1 or CAP_DELTA_33S=DELTA_S33-1000Ã[(DELTA_S34/1000+1)^0.515-1]"
+CAP_DELTA_S36,"deviation of Delta_S36 from the terrestrial fractionation array, calculated as Delta_36S minus 1000 times (((one plus Delta_S34 divided by 1000) taken to the 1.9th power) minus 1)"" or ""CAP_DELTA_36S=DELTA_S36-1000Ã[(DELTA_S34/1000+1)^1.9-1"
+CARB,carbonate
+CASU,calcium sulfate
+CATS,calcium tschermak molecule
+CCR,calcium chromium clinopyroxene
+CELS,celsian
+CH4,methane
+CHL/SMEC,chlorite/smectite
+CHLOR,chlorite
+CHROM,chromite
+CLAY,clay
+CLY,clay mineral
+CO1,carbon monoxide
+CO2,carbon dioxide
+CO2_umol,carbon dioxide measured in micromols
+COR,corundum
+CPX,clinopyroxene
+CPY,chalcopyrite
+CST,coesite
+CTD,chloritoid
+CTI,calcium titanium tschermak molecule
+C_(non-carb),non-carbonate carbon
+Ca,calcium
+Ca-OL,calcium-olivine
+CaCO3,calcium carbonate
+CaO,calcium oxide
+Cd,cadmium
+Ce,cerium
+Ce136_Ce142,ratio of cerium isotopes Ce136 to Ce142
+Ce138_Ce142,ratio of cerium isotopes Ce138 to Ce142
+Ce140_Nd146,ratio of cerium to neodymium isotopes Ce140 to Nd146
+Ce2O3,cerium oxide
+Cl,chlorine
+Co,cobalt
+CoO,cobalt oxide
+Cr,chromium
+Cr2O3,chromium oxide
+Cs,cesium
+Cu,copper
+Cu2O,copper(I) oxide
+CuO,copper oxide
+DELTA_B11,"equals: (ratio of boron isotopes B11/B10 in the sample divided by ratio of B11/B10 in reference material srm951) minus 1, multiplied by 1000"
+DELTA_C13,"equals: (ratio of carbon isotopes C13/C12 in the sample divided by ratio of C13/C12 of the pee dee belemnite) minus 1, multiplied by 1000"
+DELTA_Ca44,"equals: (ratio of calcium isotopes Ca44/Ca40 in the sample divided by ratio of Ca44/Ca40 of NIST-SRM-915a) minus 1, multiplied by 1000"
+DELTA_Cl37,"equals: (ratio of chlorine isotopes Cl37/Cl35 in the sample divided by ratio of Cl37/Cl35 of the standard mean ocean chlorine) minus 1, multiplied by 1000"
+DELTA_Cu65,"equals: (ratio of copper isotopes Cu65/Cu63 in the sample divided by ratio of Cu65/Cu63 of the standard NIST-976) minus 1, multiplied by 1000"
+DELTA_D,"equals: (ratio of hydrogen isotopes H2/H1 in the sample divided by ratio of H2/H1 in reference material ) minus 1, multiplied by 1000"
+DELTA_Fe56,"equals: (ratio of iron isotopes Fe56/Fe54 in the sample divided by ratio of Fe56/Fe54 of irmm-014) minus 1, multiplied by 1000"
+DELTA_Fe57,"equals: (ratio of iron isotopes Fe57/Fe54 in the sample divided by ratio of Fe57/Fe54 of irmm-014) minus 1, multiplied by 1000"
+DELTA_Li6,"equals: (ratio of lithium isotopes Li6/Li7 in the sample divided by ratio of Li6/Li7 of the standard) minus 1, multiplied by 1000"
+DELTA_Li7,"equals: (ratio of lithium isotopes Li7/Li6 in the sample divided by ratio of Li7/Li6 of the standard) minus 1, multiplied by 1000"
+DELTA_Mg25,"equals: (ratio of magnesium isotopes Mg25/Mg24 in the sample divided by ratio of Mg25/Mg24 in the reference material) minus 1, multiplied by 1000"
+DELTA_Mg26,"equals: (ratio of magnesium isotopes Mg26/Mg24 in the sample divided by ratio of Mg26/Mg24 in the reference material) minus 1, multiplied by 1000"
+DELTA_Mo98,"equals: (ratio of molybdenum isotopes Mo98/Mo95 in the sample divided by ratio of Mo98/Mo95 in the reference material) minus 1, multiplied by 1000"
+DELTA_N15,"equals: (ratio of nitrogen isotopes N15/N14 in the sample divided by ratio of N15/N14 in the reference material) minus 1, multiplied by 1000"
+DELTA_Ni60,"equals: (ratio of nickel isotopes Ni60/Ni58 in the sample divided by ratio of Ni60/Ni58 in the reference material) minus 1, multiplied by 1000"
+DELTA_O18,"equals: (ratio of oxygen isotopes O18/O16 in the sample divided by ratio of O18/O16 of the standard) minus 1, multiplied by 1000"
+DELTA_S33,"equals: (ratio of sulfur isotopes S33/S32 in the sample divided by ratio of S33/S32 in the reference material) minus 1, multiplied by 1000"
+DELTA_S34,"equals: (ratio of sulphur isotopes S34/S32 in the sample divided by ratio of S34/S32 in reference material ) minus 1, multiplied by 1000"
+DELTA_S36,"equals: (ratio of sulphur isotopes S36/S32 in the sample divided by ratio of S36/S32 in reference material) minus 1, multiplied by 1000"
+DELTA_Si29,"equals: (ratio of silicon isotopes Si29/Si28 in the sample divided by ratio of Si29/Si28 in reference material) minus 1, multiplied by 1000"
+DELTA_Si30,"equals: (ratio of silicon isotopes Si30/Si28 in the sample divided by ratio of Si30/Si28 in reference material) minus 1, multiplied by 1000"
+DELTA_U234,"equals: (ratio of uranium isotopes U234/U238 in the sample divided by ratio of U234/U238 in the secular equilibrium) minus 1, multiplied by 1000"
+DELTA_U238,"equals: (ratio of uranium isotopes U238/U235 in the sample divided by ratio of U238/U235 in the secular equilibrium) minus 1, multiplied by 1000"
+DELTA_Zn66,"equals: (ratio of zinc isotopes Zn66/Zn64 in the sample divided by ratio of Zn66/Zn64 of the standard Lyon JMC) minus 1, multiplied by 1000"
+DELTA_Zn68,"equals: (ratio of zinc isotopes Zn68/Zn64 in the sample divided by ratio of Zn68/Zn64 of the standard Lyon JMC) minus 1, multiplied by 1000"
+DI,diopside
+Dy,dysprosium
+Dy2O3,dysprosium oxide
+EN,enstatite
+EP,epidote
+E_Ce,epsilon Ce = [(138Ce/142Ce)sample/(138Ce/142Ce)chur - 1]x10E4
+E_Hf,epsilon Hf = [(176Hf/177Hf)sample/(176Hf/177Hf)chur - 1]x10E4
+E_Hf(T),"epsilon Hf = [(176Hf/177Hf)sample/(176Hf/177Hf)chur - 1]x10E4, time corrected"
+E_Nd,epsilon Nd = [(Nd143/Nd144)sample/(Nd143/Nd144)reference - 1]x10E4
+E_Nd(JUV),"epsilon Nd(JUV) = [(Nd143/Nd144)sample/(Nd143/Nd144)JUV - 1]x10E4, where JUV is Juvinas achondrite"
+E_Nd(T),"epsilon Nd = [(Nd143/Nd144)sample/(Nd143/Nd144)reference - 1]x10E4, time corrected"
+E_Sr,epsilon sr= [(Sr87/Sr86)sample/(Sr87/Sr86)reference - 1]x10E4
+E_Sr(T),"epsilon Sr= [(Sr87/Sr86)sample/(Sr87/Sr86)reference - 1]x10E4, time corrected"
+E_Tl,"epsilon Tl-205 is the deviation in parts per 10,000 of a sample Tl-205/Tl-203 ratio compared to NIST SRM 997 Tl standard"
+Er,erbium
+Eu,europium
+F,fluorine
+FA,fayalite
+FE-ORE,iron ore
+FE-OX,fe-oxide
+FETI-OX,iron titanium oxide
+FO,forsterite
+FS,ferrosilite
+FSP,feldspar
+Fe,iron
+Fe-Fe,iron ferrite = FeFe2O4
+Fe2O3,ferric iron oxide (tri-valent iron)
+Fe2O3T,total iron oxide content reported as ferric (tri-valent) iron
+Fe3P_FeT,feric iron total iron ratio
+Fe3_SUMFe,ratio of Fe3+ to total Fe
+FeCO3,siderite
+FeO,ferrous iron oxide (di-valent)
+FeOT,total iron oxide content reported as ferrous (di-valent) iron
+FeS2,iron sulfide
+GAL,galaxite = MnAl2O4
+GAR,garnet
+GKL,geikilite
+GL,glass
+GM,groundmass
+GM-GL,glassy groundmass
+GRAPH,graphite
+GROS,grossular
+G_Os,gamma osmium
+G_Os(T),"gamma osmium, time corrected"
+Ga,gallium
+Gd,gadolinium
+Gd2O3,gadolinium oxide
+Ge,germanium
+H,hydrogen
+H2,hydrogen
+H2O,water
+H2OM,crystal water (H2O-)
+H2OP,crystal water (H2O+)
+H2S,hydrogen sulfide
+HAUS,hausmannite
+HEDN,hedenbergite
+HEM,hematite
+HERC,hercynite
+HORN,hornblende
+He,helium
+He3,helium isotope He3
+He3_He4,ratio of helium isotopes He3 to He4
+He3_He4(R/Ra),ratio of helium isotopes He3 to He4 expressed relative to the helium isotope ratio of the atmosphere
+He4,helium isotope He4
+He4(NCC),helium isotope He4 measured by neutron coincidence counting
+He4_Ar40,ratio of helium isotope He4 to argon isotope Ar40
+He4_He3,ratio of helium isotopes He4 to He3
+He4_Ne20,ratio of helium isotope He4 to neon isotope Ne20
+He4_Ne21,ratio of helium isotope He4 to neon isotope Ne21
+Hf,hafnium
+Hf176_Hf177,ratio of hafnium isotopes Hf176 to Hf177
+Hf176_Hf177(I),ratio of hafnium isotopes Hf176 to Hf177 at initial time
+Hf176_Hf177(T),"ratio of hafnium isotopes Hf176 to Hf177, time corrected"
+Hf177_Hf178,ratio of hafnium isotopes Hf177 to Hf178
+Hf179_Hf177,ratio of hafnium isotopes Hf179 to Hf177
+HfO,hafnium oxide
+HfO2,hafnium oxide
+Hg,mercury
+Ho,holmium
+I,iodine
+IDD,iddingsite
+ILM,ilmenite
+In,indium
+Ir,iridium
+JAC,jacobsite
+JD,jadeite
+K,potassium
+K2O,potassium oxide
+KELY,kelyphite
+KF,potassium feldspar
+KS,kalsilite
+KY,kyanite
+Kr,krypton
+Kr78,krypton isotope Kr78
+Kr78_Kr84,ratio of krypton isotopes Kr78 to Kr84
+Kr80,krypton isotope Kr80
+Kr80_Kr84,ratio of krypton isotopes Kr80 to Kr84
+Kr82,krypton isotope Kr82
+Kr82_Kr84,ratio of krypton isotopes Kr82 to Kr84
+Kr83,krypton isotope Kr83
+Kr83_Kr84,ratio of krypton isotopes Kr83 to Kr84
+Kr84,krypton isotope Kr84
+Kr86,krypton isotope Kr86
+Kr86_Kr84,ratio of krypton isotopes Kr86 to Kr84
+Kr90,krypton isotope Kr90
+LEU,leucite
+LOI,loss on ignition
+LW,lawsonite
+La,lanthanum
+La2O3,lanthanum oxide
+Li,lithium
+Lu,lutetium
+Lu176_Hf177,ratio of lutetium isotope Lu176 to hafnium isotope Hf177
+Lu176_Hf177(T),"ratio of lutetium isotope Lu176 to hafnium isotope Hf177, time corrected"
+MAF,mafic minerals
+MGCR,magnesiochromite
+MGF,mg-ferrite
+MICA,mica
+MNCR,manganese chromite
+MT,magnetite
+MUS,muscovite
+Mg,magnesium
+MgCO3,magnesium carbonate
+MgO,magnesium oxide
+Mn,manganese
+Mn-OL,manganese olivine
+MnCO3,manganese carbonate
+MnO,manganese oxide
+Mo,molybdenum
+N,nitrogen
+N(A),percent nitrogen in the A defect site of diamonds
+N(B),percent nitrogen in the B defect site of diamonds
+N2,nitrogen
+N2[nmol],nitrogen measured in nanomols
+N2_Ar36,ratio of nitrogen isotope N2 to argon isotope Ar36
+N2_He3,ratio of nitrogen isotope N2 to helium isotope He3
+NAC,clinopyroxene end-member nacr (Si2O6)
+NEPH,nepheline
+NN,unknown
+Na,sodium
+Na2O,sodium oxide
+Nb,niobium
+Nb2O3,niobium oxide
+Nb2O5,niobium pentoxide
+Nd,neodymium
+Nd142_Nd144,ratio of neodymium isotopes Nd142 to Nd144
+Nd143_Nd144,ratio of neodymium isotopes Nd143 to Nd144
+Nd143_Nd144(I),ratio of neodymium isotopes Nd143 to Nd144 at initial age
+Nd143_Nd144(T),"ratio of neodymium isotopes Nd143 to Nd144, time corrected"
+Nd144_Nd146,ratio of neodymium isotopes Nd144 to Nd146
+Nd145_Nd144,ratio of neodymium isotopes Nd145 to Nd144
+Nd146_Nd142,ratio of neodymium isotopes Nd146 to Nd142
+Nd146_Nd144,ratio of neodymium isotopes Nd146 to Nd144
+Nd146_Nd145,ratio of neodymium isotopes Nd146 to Nd145
+Nd148O_Nd144O,ratio of neodymium Nd148 oxide to neodymium Nd144 oxide
+Nd148_Nd144,ratio of neodymium isotopes Nd148 to Nd144
+Nd150_Nd144,ratio of neodymium isotopes Nd150 to Nd144
+Nd2O3,neodymium oxide
+Ne,neon
+Ne20,neon isotope Ne20
+Ne20_Ne22,ratio of neon isotope Ne20 to Ne22
+Ne21,neon isotope Ne21
+Ne21_He4,ratio of neon isotope Ne21 to helium isotope He4
+Ne21_Ne20,ratio of neon isotope Ne21 to Ne20
+Ne21_Ne22,ratio of neon isotope Ne21 to Ne22
+Ne22,neon isotope Ne22
+Ne22_Ne20,ratio of neon isotope Ne22 to Ne20
+Ne23,neon isotope Ne23
+Ni,nickel
+NiO,nickel oxide
+O,oxygen
+O2,dioxygen
+OH,hydroxide
+OL,olivine
+OL(R),ol(r)
+OLIG,oligoclase
+OLXC,olivine xenocryst
+OPAQ,opaque mineral
+OPX,orthopyroxene
+OR,orthoclase
+ORE,ore
+OX,oxide
+Os,osmium
+Os(I),common osmium at initial age
+Os184_Os188,ratio of osmium isotopes Os184 to Os188
+Os186_Os188,ratio of osmium isotopes Os186 to Os188
+Os187_Os186,ratio of osmium isotopes Os187 to Os186
+Os187_Os188,ratio of osmium isotopes Os187 to Os188
+Os187_Os188(I),ratio of osmium isotopes Os187 to Os188 at initial age
+Os187_Os188(T),"ratio of osmium isotopes Os187 to Os188, time corrected"
+Os188,osmium isotope Os188
+Os188_Os192,ratio of osmium isotopes Os188 to Os192
+Os189_Os188,ratio of osmium isotopes Os189 to Os188
+Os190_Os188,ratio of osmium isotopes Os190 to Os188
+Os192_Os188,ratio of osmium isotopes Os192 to Os188
+P,phosphorus
+P2O5,phosphorus oxide
+PARG,pargasite
+PENT,pentlandite
+PEROV,perovskite
+PGN,pigeonite
+PHEN,phengite
+PHLOG,phlogopite
+PHYLL,phyllosilicate
+PL-XC,plagioclase xenocryst
+PLAG,plagioclase
+PLEO,pleonaste
+PRESS,pressure
+PX,pyroxene (not classified)
+PY,pyrite
+PYPH,pyrophanite
+PYR,pyrope
+PYRH,pyrrhotite
+Pa,protactinium
+Pa231,protactinium isotope Pa231
+Pa231_ACTIVITY,"protactinium isotope Pa231, reported as activity"
+Pa231_U235_ACTIVITY,"ratio of protactinium isotope Pa231 to uranium isotope U235, reported as activity"
+Pb,lead
+Pb204,lead isotope Pb204
+Pb204_Pb206,ratio of lead isotopes Pb204 to Pb206
+Pb206,lead isotope 206
+Pb206_Pb204,ratio of lead isotopes Pb206 to Pb204
+Pb206_Pb204(I),ratio of lead isotopes Pb206 to Pb204 at initial age
+Pb206_Pb204(T),"ratio of lead isotopes Pb206 to Pb204, time corrected"
+Pb206_Pb207,ratio of lead isotopes Pb206 to Pb207
+Pb206_U235,ratio of lead isotope Pb206 to uranium isotope U235
+Pb206_U238,ratio of lead isotope Pb206 to uranium isotope U238
+Pb207_Pb204,ratio of lead isotopes Pb207 to Pb204
+Pb207_Pb204(I),initial Pb207_Pb204 ratio (age-corrected)
+Pb207_Pb204(T),"ratio of lead isotopes Pb207 to Pb204, time corrected"
+Pb207_Pb206,ratio of lead isotopes Pb207 to Pb206
+Pb207_Pb206(I),ratio of lead isotopes Pb207 to Pb206 at initial age
+Pb207_Pb208,ratio of lead isotopes Pb207 to Pb208
+Pb207_U235,ratio of lead isotope Pb207 to uranium isotope U235
+Pb208_Pb204,ratio of lead isotopes Pb208 to Pb204
+Pb208_Pb204(I),ratio of lead isotopes Pb208 to Pb204 at initial age
+Pb208_Pb204(T),"ratio of lead isotopes Pb208 to Pb204, time corrected"
+Pb208_Pb206,ratio of lead isotopes Pb208 to Pb206
+Pb208_Pb206(I),ratio of lead isotopes Pb208 to Pb206 at initial age
+Pb208_Th232,ratio of lead isotope Pb208 to thorium isotope Th232
+Pb210,lead isotope Pb210
+Pb210_ACTIVITY,"lead isotope Pb210, reported as activity"
+Pb210_Ra226,ratio of lead isotope Pb210 to radium isotope Ra226
+Pb210_Ra226_ACTIVITY,"ratio of lead isotope 210 to radium isotope 226, reported as activity"
+Pb210_U238,ratio of lead isotope Pb210 to uranium isotope U238
+Pd,palladium
+Po210_ACTIVITY,"polonium isotope Po210, reported as activity"
+Pr,praseodymium
+Pt,platinum
+Pt190_Os188,ratio of platinum isotope Pt190 to osmium isotope Os188
+QZ,quartz
+RUT,rutile
+Ra,radium
+Ra226,radium isotope Ra226
+Ra226_ACTIVITY,"radium 226, reported as activity"
+Ra226_Th230,ratio of radium isotope 226 to thorium isotope 230
+Ra226_Th230_ACTIVITY,"ratio of radium isotope 226 to thorium isotope 230, reported as activity"
+Rb,rubidium
+Rb87_Sr86,ratio of rubidium isotope Rb87 to strontium isotope Sr86
+Re,rhenium
+Re185_Re187,ratio of rhenium isotope Re185 to rhenium isotope Re187
+Re187_Os186,ratio of rhenium isotope Re187 to osmium isotope Os186
+Re187_Os188,ratio of rhenium isotope Re187 to osmium isotope Os188
+Rh,rhodium
+Ru,ruthenium
+S,sulfur
+SCAP,scapolite
+SEP,SEPIOLITE
+SERP,serpentine
+SID,sideromelane
+SILM,sillimanite
+SLFA,sulfate
+SLFI,sulfide
+SMEC,smectite
+SO2,sulfur dioxide
+SO3,sulfur trioxide
+SP,spinel
+SPES,spessartine
+SPH,sphene
+S_(SLFI),sulfur present as sulfide
+S_PY,sulfur present in pyrite form
+Sb,antimony
+Sc,scandium
+Sc2O3,scandium oxide
+Se,selenium
+Si,silicon
+SiO2,silicon dioxide
+Sm,samarium
+Sm147_Nd144,ration of samarium isotope Sm147 to neodymium isotope Nd144
+Sm147_Nd146,ratio of samarium to neodymium isotopes Sm147 to Nd146
+Sm147_Sm152,ratio of strontium isotopes Sm147 to Sm152
+Sm2O3,samarium oxide
+Sn,tin
+Sr,strontium
+Sr84_Sr86,ratio of strontium isotopes Sr84 to Sr86
+Sr84_Sr88,ratio of strontium isotopes Sr84 to Sr88
+Sr86_Sr88,ratio of strontium isotopes Sr86 to Sr88
+Sr87_Sr86,ratio of strontium isotopes Sr87 to Sr86
+Sr87_Sr86(I),ratio of strontium isotopes Sr87 to Sr86 at initial age
+Sr87_Sr86(T),"ratio of strontium isotopes Sr87 to Sr86, time corrected"
+Sr88_Sr86,ratio of strontium isotopes Sr88 to Sr86
+SrO,strontium oxide
+TACH,tachylite
+TALC,talc
+TEMP,temperature
+TI,titanite
+TI-MT,ti-magnetite
+TOC,total organic carbon
+Ta,tantalum
+Ta2O5,tantalum oxide
+Tb,terbium
+Te,tellurium
+Th,thorium
+Th228_Th232,ratio of thorium isotopes Th228 to Th232
+Th230,thorium isotope Th230
+Th230_ACTIVITY,"thorium isotope Th230, reported as activity"
+Th230_Th232,ratio of thorium isotopes Th230 to Th232
+Th230_Th232_ACTIVITY,"ratio of thorium isotopes Th230 to Th232, reported as activity"
+Th230_U238,ratio of thorium isotope Th230 to uranium isotope U238
+Th230_U238_ACTIVITY,"ratio of thorium isotope Th230 to uranium isotope U238, reported as activity"
+Th232_ACTIVITY,"thorium isotope Th232, reported as activity"
+Th232_Pb204,ratio of thorium isotope Th232 to lead isotope Pb204
+Th232_U238,ratio of thorium isotope Th232 to uranium isotope U238
+Th238_Th232_ACTIVITY,"ratio of thorium isotopes Th238 to Th232, reported as activity"
+ThO,thorium oxide
+ThO2,thorium oxide
+Ti,titanium
+TiO2,titanium oxide
+Tl,thallium
+Tl203_Tl205,ratio of thallium isotopes Tl203 to Tl205
+Tl205_Tl203,ratio of thallium isotopes Tl205 to Tl203
+Tm,thulium
+U,uranium
+U230_Th232_ACTIVITY,"ratio of uranium isotope U230 to thorium isotope Th232, reported as activity"
+U234_ACTIVITY,"uranium isotope U234, reported as activity"
+U234_U238,ratio of uranium isotopes U234 to U238
+U234_U238_ACTIVITY,"ratio of uranium isotopes U234 to U238, reported as activity"
+U235_Pb204,ratio of uranium isotope U235 to lead isotope Pb204
+U238_ACTIVITY,"uranium isotope U238, reported as activity"
+U238_Pb204,ratio of uranium isotope U238 to lead isotope Pb204
+U238_Pb206,ratio of uranium isotope U238 to lead isotope Pb206
+U238_Th230,ratio of uranium isotope U238 to thorium isotope Th230
+U238_Th230_ACTIVITY,"ratio of uranium isotope U238 to thorium isotope Th230, reported as activity"
+U238_Th232,ratio of uranium isotope U238 to thorium isotope Th232
+U238_Th232_ACTIVITY,"ratio of uranium isotope U238 to thorium isotope Th232, reported as activity"
+ULSP,ulvospinel
+UO2,uranium oxide
+UVR,uvarovite
+V,vanadium
+V2O3,vanadium sesquioxide
+V2O5,vanadium pentoxide
+VES,vesicles
+W,tungsten
+WO,wollastonite
+WO3,tungsten trioxide
+Xe,xenon
+Xe124,xenon isotope Xe124
+Xe124_Xe130,ratio of xenon isotopes Xe124 to Xe130
+Xe124_Xe132,ratio of xenon isotopes Xe124 to Xe132
+Xe126,xenon isotope Xe126
+Xe126_Xe130,ratio of xenon isotopes Xe126 to Xe130
+Xe126_Xe132,ratio of xenon isotopes Xe126 to Xe132
+Xe128,xenon isotope Xe128
+Xe128_Xe130,ratio of xenon isotopes Xe128 to Xe130
+Xe128_Xe132,ratio of xenon isotopes Xe128 to Xe132
+Xe129,xenon isotope Xe129
+Xe129_Xe130,ratio of xenon isotopes Xe129 to Xe130
+Xe129_Xe132,ratio of xenon isotopes Xe129 to Xe132
+Xe129_Xe136,ratio of xenon isotopes Xe129 to Xe136
+Xe130,xenon isotope Xe130
+Xe130_Xe132,ratio of xenon isotopes Xe130 to Xe132
+Xe131,xenon isotope Xe131
+Xe131_Xe130,ratio of xenon isotopes Xe131 to Xe130
+Xe131_Xe132,ratio of xenon isotopes Xe131 to Xe132
+Xe132,xenon isotope Xe132
+Xe132_Xe130,ratio of xenon isotopes Xe132 to Xe130
+Xe134,xenon isotope Xe134
+Xe134_Xe130,ratio of xenon isotopes Xe134 to Xe130
+Xe134_Xe132,ratio of xenon isotopes Xe134 to Xe132
+Xe136,xenon isotope Xe136
+Xe136_He4,ratio of xenon isotope Xe136 to helium isotope He4
+Xe136_Xe130,ratio of xenon isotopes Xe136 to Xe130
+Xe136_Xe132,ratio of xenon isotopes Xe136 to Xe132
+Y,yttrium
+Y2O3,yttrium oxide
+Yb,ytterbium
+Yb176_Hf177,ratio of ytterbium isotope Yb176 to hafnium isotope Hf177
+ZEOL,zeolite
+ZIRC,zircon
+ZO,zoisite
+Zn,zinc
+ZnO,zinc oxide
+Zr,zirconium
+Zr2O3,zirconium pentoxide
+ZrO2,zirconium oxide

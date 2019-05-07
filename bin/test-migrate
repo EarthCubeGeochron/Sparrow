@@ -1,8 +1,0 @@
-#!/usr/bin/env zsh
-db='labdata_test'
-conn="postgresql:///$db"
-createdb "$db"
-LABDATA_DATABASE="$conn" labdata init
-
-migra "postgresql:///wiscar_labdata" "$conn" --unsafe > test.sql
-dropdb "$db"

@@ -1,0 +1,18 @@
+#!/bin/bash
+# Description: Generate a changeset against the optimal database schema
+# Ensure that we are running in the `backend` docker container
+if [ ! -f /.dockerenv ]; then
+  # We are not running this in a docker container
+  sparrow compose run backend \
+    /sparrow-bin/sparrow-generate-migration $@
+  exit 0
+fi
+
+indb_conn="$(sparrow config database)"
+outdb='sparrow_test'
+outdb_conn="postgresql://postgres@db/$outdb"
+createdb -Upostgres -h db "$outdb" > /dev/null 2>&1
+SPARROW_DATABASE="$outdb_conn" sparrow init >/dev/null 2>&1
+
+migra "$indb_conn" "$outdb_conn" --unsafe
+dropdb -Upostgres -h db "$outdb" > /dev/null 2>&1

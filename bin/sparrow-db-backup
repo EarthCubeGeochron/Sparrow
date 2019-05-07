@@ -1,0 +1,17 @@
+#!/bin/bash
+# Description: Backup database to `SPARROW_BACKUP_DIR`
+if [ -z "$SPARROW_BACKUP_DIR" ] ; then
+  echo "Please set environment variable \
+$(tput bold)SPARROW_BACKUP_DIR$(tput sgr0) \
+in order to use backup functionality."
+  exit 1
+fi
+
+now="$(date +%Y-%m-%d:%H:%M:%S)"
+backup_file="$SPARROW_BACKUP_DIR/$now.pg-dump"
+
+echo "Backing up to $backup_file"
+
+mkdir -p "$SPARROW_BACKUP_DIR"
+
+pg_dump -Fc -d sparrow -f $backup_file
