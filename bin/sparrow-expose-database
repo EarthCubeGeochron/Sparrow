@@ -1,6 +1,0 @@
-#!/bin/bash
-# Description: Expose database on a port (54321 by default)
-
-port="${1:-54321}"
-
-sparrow compose run -p $port:5432 db

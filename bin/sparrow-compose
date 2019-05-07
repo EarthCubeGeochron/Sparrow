@@ -1,7 +1,4 @@
 #!/bin/bash
-
-# A thin wrapper around docker-compose that puts things in the
-# right directory at least
+# Description: Alias to `docker-compose` that respects `sparrow` config
 cd "$SPARROW_PATH"
-
 docker-compose $@

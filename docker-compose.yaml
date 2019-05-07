@@ -35,7 +35,7 @@ services:
       # and frontend
       - cfg:/cfg
       - $SPARROW_INIT_SQL:/init-sql/
-      - $SPARROW_COMMANDS:/sparrow-commands/
+      - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
   db:
     image: mdillon/postgis:11
     expose:
@@ -63,3 +63,5 @@ volumes:
   frontend_build:
   cfg:
   db_cluster:
+  # Placeholder volumes in case we don't have these volumes to mount
+  placeholder:

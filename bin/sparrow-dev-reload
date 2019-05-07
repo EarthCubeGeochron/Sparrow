@@ -1,5 +1,5 @@
 #!/bin/bash
-# Reloads the web browser if app is in development mode
+# Description: Reload web browser if app is in development mode
 # This will eventually be folded into a `sparrow dev` command
 
 sparrow compose exec frontend \

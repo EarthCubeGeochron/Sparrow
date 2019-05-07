@@ -19,7 +19,7 @@ class App(Flask):
 
         self.config.from_object('sparrow.default_config')
         if cfg is None:
-            cfg = environ.get("SPARROW_CONFIG", None)
+            cfg = environ.get("SPARROW_BACKEND_CONFIG", None)
         try:
             self.config.from_pyfile(cfg)
         except RuntimeError as err:

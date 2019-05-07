@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Description: Generate a changeset against the optimal database schema
 # Ensure that we are running in the `backend` docker container
 if [ ! -f /.dockerenv ]; then
   # We are not running this in a docker container

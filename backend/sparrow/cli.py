@@ -38,7 +38,7 @@ def get_database(ctx, param, value):
                "Please create it before continuing.\n"
               f"Command: `{cmd}`")
 
-kw = dict(type=str, envvar="SPARROW_CONFIG", required=True)
+kw = dict(type=str, envvar="SPARROW_BACKEND_CONFIG", required=True)
 with_config = click.option('--config', 'cfg', **kw)
 with_database = click.option('--config', 'db', callback=get_database, **kw)
 
@@ -46,11 +46,17 @@ with_database = click.option('--config', 'db', callback=get_database, **kw)
 @with_database
 @click.option('--drop', is_flag=True, default=False)
 def init_database(db, drop=False):
+    """
+    Initialize database schema (non-destructive)
+    """
     db.initialize(drop=drop)
 
 @cli.command(name='create-views')
 @with_database
 def create_views(db):
+    """
+    Recreate views only (without building rest of schema)
+    """
     # Don't need to build the app just for this
     with working_directory(__file__):
         db.exec_sql("sql/03-create-views.sql")
@@ -58,12 +64,18 @@ def create_views(db):
 @cli.command(name='serve')
 @with_config
 def dev_server(cfg):
+    """
+    Run a development WSGI server
+    """
     app, db = construct_app(cfg)
     app.run(debug=True, host='0.0.0.0')
 
 @cli.command(name='shell')
 @with_config
 def shell(cfg):
+    """
+    Get a Python shell within the application
+    """
     from IPython import embed
     app, db = construct_app(cfg)
     with app.app_context():
@@ -76,6 +88,9 @@ def shell(cfg):
 @click.argument('key', required=False)
 @click.option('--json', is_flag=True, default=False)
 def config(cfg, key=None, json=False):
+    """
+    Print configuration of backend
+    """
     app, db = construct_app(cfg)
     if key is not None:
         print(app.config.get(key.upper()))
@@ -116,4 +131,3 @@ def sparrow_earthchem_vocabulary(args):
     __dirname = path.dirname(__file__)
     cmd = path.abspath(path.join(__dirname,"..","bin","sparrow-"+name))
     run([cmd, *args])
-

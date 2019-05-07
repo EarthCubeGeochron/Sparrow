@@ -1,4 +1,7 @@
 #!/bin/bash
+# Description: Export database to a binary `pg_dump` archive
+
+[ -z $1 ] && echo "Please specify a file" >&2
 
 internal_name=/tmp/database-dump.pg-dump
 container_id=$(sparrow compose ps -q db 2>/dev/null)
