@@ -66,10 +66,13 @@ echo-description() {
 
 echo-help() {
   echo -e "\n$1:"
-  ls "$2" \
-  | grep sparrow- \
-  | sed 's/sparrow-/  /g' \
-  | grep --invert-match wrapper
+  for c in $(ls "$2" \
+    | grep sparrow- \
+    | sed 's/sparrow-//g') ; do
+    [ $c = 'wrapper' ] && continue
+    printf "%-20s" $c
+    echo-description "$2/sparrow-$c"
+  done
 }
 
 if [ $subcommand = '--help' ]; then
