@@ -1,7 +1,7 @@
 #!/bin/bash
-
+# Description: Import database from binary `pg_dump` archive
 sparrow compose stop backend
-sparrow wait-for-database
+sparrow db-await
 
 internal_name=/tmp/database-dump.pg-dump
 container_id=$(sparrow compose ps -q db)

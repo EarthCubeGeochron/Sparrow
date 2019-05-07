@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Description: Backup database to `SPARROW_BACKUP_DIR`
 if [ -z "$SPARROW_BACKUP_DIR" ] ; then
   echo "Please set environment variable \
 $(tput bold)SPARROW_BACKUP_DIR$(tput sgr0) \

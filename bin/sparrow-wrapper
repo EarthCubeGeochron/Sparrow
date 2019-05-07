@@ -44,12 +44,14 @@ default="$SPARROW_PATH/config/default-site-content"
 export SPARROW_LAB_NAME="${SPARROW_LAB_NAME:-"Test Lab"}"
 export SPARROW_INIT_SQL="${SPARROW_INIT_SQL:-"placeholder"}"
 export SPARROW_SITE_CONTENT="${SPARROW_SITE_CONTENT:-"$default"}"
-# We should maybe *REQUIRE* this to be set
-export SPARROW_SECRET_KEY="${SPARROW_SECRET_KEY:-""}"
 
 # The docker-compose volume for sparrow commands needs to be set
 # even if a SPARROW_COMMANDS directory is not provided.
 export SPARROW_COMMANDS_VOLUME="${SPARROW_COMMANDS:-"placeholder"}"
+
+[ -z $SPARROW_SECRET_KEY ] && echo \
+  "You $(tput bold)must$(tput sgr0) set SPARROW_SECRET_KEY. Exiting..." && \
+  exit 1
 
 dir="bin"
 
@@ -61,7 +63,8 @@ subcommand=$1
 # Echo the description of a subcommand. $1 is the script file.
 echo-description() {
   local descline=$(grep -E "#\s+Description" "$1")
-  echo "${descline##*Description: }"
+  echo "${descline##*Description: }" \
+  | perl -pe "s|\`(.+?)\`|$(tput setaf 6)\1$(tput sgr0)|g"
 }
 
 echo-help() {
@@ -70,7 +73,7 @@ echo-help() {
     | grep sparrow- \
     | sed 's/sparrow-//g') ; do
     [ $c = 'wrapper' ] && continue
-    printf "%-20s" $c
+    printf "  %-18s" $c
     echo-description "$2/sparrow-$c"
   done
 }

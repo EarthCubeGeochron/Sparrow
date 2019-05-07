@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description: Build containers (if necessary), spin up, and follow logs.
+# Description: Build containers, start, detach, and follow logs.
 
 sparrow compose up --build -d $@
 # Follow logs for running container(s)
