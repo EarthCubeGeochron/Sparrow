@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
 # Drag in configuration in `sparrow-config.sh` from current
 # working directory or parents.
@@ -10,7 +10,8 @@ while [ $(pwd) != "/" ] && \
       [ -z $SPARROW_CONFIG ] && \
       [ -z $_SPARROW_CONFIG_UNSET ]; do
   if [ -f sparrow-config.sh ] ; then
-    export SPARROW_CONFIG="$(readlink -f sparrow-config.sh)"
+    cfg="sparrow-config.sh"
+    export SPARROW_CONFIG="${cfg:A}"
     break
   fi
   cd ..
@@ -24,8 +25,7 @@ fi
 
 # Get path to sparrow installation from location of current file
 # (even if symlinked)
-# NOTE: This appears to only work on Linux right now.
-export SPARROW_PATH="$(dirname "$(dirname "$(readlink -f "$0")")")"
+export SPARROW_PATH="${0:A:h:h}"
 cd "$SPARROW_PATH"
 
 # If we haven't yet sourced the config file in a higher-level script

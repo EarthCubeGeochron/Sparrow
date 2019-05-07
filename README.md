@@ -119,12 +119,18 @@ In its containerized form, the app can be installed easily
 no matter what environment you are working in. This containerized
 distribution strategy will allow easy deployment on whatever infrastructure
 (local, cloud hosting, AWS/Azure, etc.) your lab uses to run the system.
-The Docker toolchain stable and open-source.
+The Docker toolchain is stable and open-source.
 
+The only installation requirements on Unix host
+systems (e.g. Linux and MacOS) are `docker`, `docker-compose`, and `zsh`.
 First, [install Docker](https://docs.docker.com/install/) and
-`docker-compose` using the instructions for your platform.
+`docker-compose` using the instructions for your platform, and
+make sure your user can run `docker` without root permissions (typically
+`sudo usermod -aG docker ${USER}`).
+If `zsh` is not present on your system, install it as well.
+Installation has not yet been tested on Windows.
 
-### Installing the command-line interface
+### The command-line interface
 
 The administration of **Sparrow** is centered around the `sparrow` command-line
 interface. This command wraps application management, database management,
@@ -132,11 +138,10 @@ interface. This command wraps application management, database management,
 basic management tasks. If defined, lab-specific subcommands (e.g. for import
 scripts) are included as well.
 
-The only requirements on the host system are `docker`, `docker-compose`, and `bash`; `zsh` may be added in the future.
 To install the command-line application, symlink the `bin/sparrow` executable
 from this repository to somewhere on your path
 (e.g. `sudo ln -s $(pwd)/bin/sparrow /usr/local/bin`).
-Typing `sparrow` will then show the command's help page:
+Typing `sparrow` will download and build containers (this will take a long time on initial run) and then show the command's help page:
 
 ```
 Usage: sparrow [OPTIONS] COMMAND [ARGS]...
