@@ -65,8 +65,9 @@ class BaseImporter(object):
             **kwargs)
 
     def datum(self, parameter, value, error=None, **kwargs):
+            type = self.datum_type(parameter, **kwargs)
             datum = self.models.datum(
                 value=value,
                 error=error)
-            datum.datum_type=self.datum_type(parameter, **kwargs).id
+            datum.datum_type=type.id
             return datum

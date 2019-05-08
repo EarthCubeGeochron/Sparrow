@@ -21,7 +21,7 @@ class CosmoImporter(BaseImporter):
         session = self.models.session()
         nuclide = row.loc['Nuclide']
 
-        session.technique = self.method("r{nuclide} cosmogenic nuclide dating").id
+        session.technique = self.method("f{nuclide} cosmogenic nuclide dating").id
         session.material = self.material(row.loc['Min Phase']).id
         session.date = datetime(year=row.loc['Collection Date'], month=1, day=1)
         session.sample_id = sample.id
