@@ -20,6 +20,15 @@ def cli(stop_on_error=False, verbose=False):
     path = Path(env)
     assert path.is_dir()
 
+    db = Database()
+
+    # Temporary
+    db.engine.execute("TRUNCATE TABLE datum CASCADE;")
+    db.engine.execute("TRUNCATE TABLE datum_type CASCADE;")
+    db.engine.execute("TRUNCATE TABLE analysis CASCADE;")
+    db.engine.execute("TRUNCATE TABLE session CASCADE;")
+    db.engine.execute("TRUNCATE TABLE sample CASCADE;")
+
     files = path.glob("**/*_simplified.xlsx")
     files = (i for i in files if not i.stem.startswith('~$'))
     iterfiles(import_datafile, files)
