@@ -17,10 +17,13 @@ metadata = MetaData()
 def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
     return "_"+referred_cls.__name__.lower()
 
+
 def get_or_create(session, model, defaults=None, **kwargs):
     """
     Get an instance of a model, or create it if it doesn't
     exist.
+
+    https://stackoverflow.com/questions/2546207
     """
     instance = session.query(model).filter_by(**kwargs).first()
     if instance:

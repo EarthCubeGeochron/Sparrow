@@ -5,7 +5,7 @@
 # import process within a docker container
 import_pipeline="${0:h:h:r}"
 
-# Run within container, mounting LaserChron data directory
+# Run within container, mounting Sparrow data directory
 # and importer code.
 sparrow compose run \
   -e "SPARROW_DATA_DIR=/Data" \

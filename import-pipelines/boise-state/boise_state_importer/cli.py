@@ -3,12 +3,21 @@ from click import command, option, echo, secho, style
 from pathlib import Path
 from sparrow import Database
 from sparrow.import_helpers import SparrowImportError, working_directory
+from .import_datafile import import_datafile
 
-def extract_data(path):
+def iterfiles(import_function, file_sequence):
     db = Database()
-    files = path.glob("**/*.xml")
-    for f in files:
-        secho(str(f), dim=True)
+    for f in file_sequence:
+        try:
+            secho(str(f), dim=True)
+            imported = import_datafile(db, f)
+            db.session.commit()
+            if not imported:
+                secho("Already imported", fg='green', dim=True)
+        except (SparrowImportError, NotImplementedError) as e:
+            if stop_on_error: raise e
+            db.session.rollback()
+            secho(str(e), fg='red')
 
 @command()
 def cli(stop_on_error=False, verbose=False):
@@ -24,4 +33,6 @@ def cli(stop_on_error=False, verbose=False):
         return
     path = Path(env)
     assert path.is_dir()
-    extract_data(path)
+
+    files = path.glob("**/*.xml")
+    iterfiles(import_datafile, files)
