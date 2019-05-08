@@ -14,4 +14,4 @@ echo "Backing up to $backup_file"
 
 mkdir -p "$SPARROW_BACKUP_DIR"
 
-pg_dump -Fc -d sparrow -f $backup_file
+sparrow db-export $backup_file

@@ -1,9 +1,6 @@
-FROM python:3.7-alpine
+FROM sparrowdata/backend-base:1.0
 
-COPY ./docker-scripts/build-deps /install/build-deps
-RUN /install/build-deps
 COPY ./requirements.txt /install/requirements.txt
-
 RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache-dir -r /install/requirements.txt
 
