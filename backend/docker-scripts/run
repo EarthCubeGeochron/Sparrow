@@ -7,10 +7,6 @@ while ! pg_isready -h db -p 5432 -U postgres ; do
   sleep 1
 done
 
-# Share configuration with frontend (this is pretty brittle
-# but works for now...
-python3 sparrow config --json > /cfg/sparrow-config.json
-
 # We no longer import EarthChem vocabularies by default
 
 # (non-foolproof) check for whether tables exist
