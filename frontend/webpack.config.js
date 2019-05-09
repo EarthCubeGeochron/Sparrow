@@ -4,23 +4,12 @@ const { execSync } = require('child_process');
 const { readFileSync } = require('fs');
 const { EnvironmentPlugin } = require('webpack');
 
-/* Get configuration from sparrow backend. This is used
-to centralize configuration and specify the location of frontend
-components. It could be removed in favor of an environment variable
-if desired. This might be necessary if we want frontend development
-to be uncoupled from the backend */
-const {SPARROW_CONFIG_JSON} = process.env;
-let cfg;
-if(SPARROW_CONFIG_JSON) {
-  cfg = readFileSync(SPARROW_CONFIG_JSON, 'utf-8');
-} else {
-  cfg = execSync("sparrow config --json").toString('utf-8');
-}
-cfg = JSON.parse(cfg);
-process.env['BASE_URL'] = cfg.base_url;
+process.env['BASE_URL'] = process.env.SPARROW_BASE_URL;
 
 let assetsDir = path.resolve(__dirname, "_assets");
-let assetsRoute = path.join(process.env.BASE_URL,'/assets');
+let siteContent = process.env.SPARROW_SITE_CONTENT;
+
+let assetsRoute = path.join(process.env.SPARROW_BASE_URL,'/assets');
 
 let bs_cfg = {
   open: false,
@@ -74,7 +63,7 @@ module.exports = {
     extensions: [".coffee", ".js", ".styl",".css",".html",".md"],
     alias: {
       "app": path.resolve(__dirname, "src/"),
-      "site-content": path.resolve(cfg.site_content)
+      "site-content": siteContent
     }
   },
   entry: {

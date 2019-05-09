@@ -1,11 +1,4 @@
 #!/bin/sh
 
 npm install
-
-while [ ! -f $SPARROW_CONFIG_JSON ]; do
-  echo "Waiting for configuration.."
-  sleep 1
-done
-
-webpack \
-  --watch --mode=development
+webpack --watch --mode=development
