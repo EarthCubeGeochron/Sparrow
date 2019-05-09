@@ -93,7 +93,7 @@ class MapComponent extends Component
 class SampleMap extends Component
   render: ->
     route = "/sample"
-    params = {project_id: "%"}
+    params = {geometry: "%"}
     h APIResultView, {route, params}, (data)=>
       markers = data.map (d)->
         {
