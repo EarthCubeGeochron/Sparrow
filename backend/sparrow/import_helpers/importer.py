@@ -57,17 +57,18 @@ class BaseImporter(object):
         # Error values are *assumed* to be at the 1s level, apparently
         parameter = self.parameter(parameter)
 
-        return self.db.get_or_create(
+        dt =  self.db.get_or_create(
             self.models.datum_type,
             parameter=parameter.id,
             error_metric=error_metric_id,
             unit=unit.id,
             **kwargs)
+        return dt
 
     def datum(self, parameter, value, error=None, **kwargs):
             type = self.datum_type(parameter, **kwargs)
             datum = self.models.datum(
                 value=value,
                 error=error)
-            datum.datum_type=type.id
+            datum._datum_type=type
             return datum

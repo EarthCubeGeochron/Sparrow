@@ -21,21 +21,20 @@ class CosmoImporter(BaseImporter):
         session = self.models.session()
         nuclide = row.loc['Nuclide']
 
-        session.technique = self.method("f{nuclide} cosmogenic nuclide dating").id
+        session.technique = self.method(f"{nuclide} cosmogenic nuclide dating").id
         session.material = self.material(row.loc['Min Phase']).id
         session.date = datetime(year=row.loc['Collection Date'], month=1, day=1)
         session.sample_id = sample.id
 
-        session.analysis_collection = [
-            self.measured_parameters(row),
-            self.model_output(row)
-        ]
-
         self.db.session.add(session)
+
+        self.measured_parameters(session, row)
+        self.model_output(session, row)
+
         self.db.session.commit()
 
 
-    def measured_parameters(self, row):
+    def measured_parameters(self, session, row):
         nuclide = row.loc['Nuclide']
 
         analysis = self.models.analysis(
@@ -67,10 +66,11 @@ class CosmoImporter(BaseImporter):
         dc.append(val)
 
         analysis.datum_collection = dc
-
+        analysis._session = session
+        self.db.session.add(analysis)
         return analysis
 
-    def model_output(self, row):
+    def model_output(self, session, row):
         nuclide = row.loc['Nuclide']
 
         analysis = self.models.analysis(
@@ -90,6 +90,8 @@ class CosmoImporter(BaseImporter):
             d.interror = row.loc[k+'_Interr']
             dc.append(d)
         analysis.datum_collection = dc
+        analysis._session = session
+        self.db.session.add(analysis)
         return analysis
 
 def import_datafile(db, fn):
