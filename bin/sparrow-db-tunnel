@@ -1,6 +1,6 @@
 #!/bin/bash
 # Description: Tunnel database connection to local port [default: `54321`]
 
-port="${1:-54321}"
+port="${1:-"54321"}"
 
-sparrow compose run -p $port:5432 db
+sparrow compose run -p $port:5432 backend
