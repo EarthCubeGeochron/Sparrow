@@ -103,6 +103,8 @@ Examples include irradiation IDs for Ar/Ar labs, etc.
 Right now, we only support a single measurement group
 for each session. This could potentially be updated
 to support a one-to-many relationship if desired.
+
+This might be a good candidate to drop from the core schema
 */
 CREATE TABLE IF NOT EXISTS measurement_group (
   id text PRIMARY KEY,

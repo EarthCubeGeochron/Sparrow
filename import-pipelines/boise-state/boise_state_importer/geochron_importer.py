@@ -1,63 +1,58 @@
 from lxml.etree import tostring
 from itertools import chain
+from sparrow.import_helpers import BaseImporter
+from datetime import datetime
 
 def text(et, key):
     v = et.findtext(key)
     if v == '': return None
     return v
 
-class GeochronImporter(object):
+class GeochronImporter(BaseImporter):
     """
     A basic Sparrow importer for Geochron.org XML
     """
-    def __init__(self, db):
-        self.db = db
-        self.models = self.db.mapped_classes
+    authority = "Boise State"
 
     def import_datafile(self, et):
         """
-        Aliquot -> analysis_session
+        Aliquot -> session
         """
-        session = self.models.session()
-        fractions = et.find("analysisFractions")
+        dates = [i.text for i in et.findall('.//dateCertified')]
+        date = max(set(dates), key=dates.count)
+        if not date:
+            date = datetime.min()
 
-        analysis_collection = []
-        for i,f in enumerate(fractions):
-            v = self.import_analysis(f, session_index=i, analysis_type="analysisFraction")
-            analysis_collection.append(v)
-
-        analysis_collection.append(self.import_dates(et.find("sampleDateModels")))
-
-        session.analysis_collection = analysis_collection
+        session = self.models.session(date=date)
 
         # Set publication
         ref = text(et, "aliquotReference")
-        if ref: session.publication = self.publication(ref)
+        if ref: session._publication = self.publication(ref)
 
         # Set IGSN
         igsn = text(et, "aliquotIGSN")
         if str(igsn) == '0': igsn = None
         session.igsn = igsn
 
-        dates = [i.text for i in et.findall('.//dateCertified')]
-        date = max(set(dates), key=dates.count)
-        session.date = date
-
+        # Import analysis sessions
         igsn = text(et, "sampleIGSN")
         if str(igsn) == '0': igsn = None
         name = text(et, "aliquotName")
         if igsn or name:
-            session.sample = self.sample(id=name, igsn=igsn)
+            session._sample = self.sample(id=name, igsn=igsn)
+
+        fractions = et.find("analysisFractions")
+
+        for i,f in enumerate(fractions):
+            s = self.import_analysis(f, session_index=i, analysis_type="analysisFraction")
+            s._session = session
+            self.db.session.add(s)
+
+        s1 = self.import_dates(et.find("sampleDateModels"))
+        s1._session = session
+        self.db.session.add(s1)
 
         self.db.session.add(session)
-
-    def sample(self, **kwargs):
-        self.db.get_or_create(self.models.sample, **kwargs)
-
-    def publication(self, doi, title=None):
-        return self.db.get_or_create(
-            self.models.publication,
-            doi=doi, defaults=dict(title=title))
 
     def import_dates(self, et):
         """
@@ -72,7 +67,7 @@ class GeochronImporter(object):
             is_interpreted=True,
             is_standard=False,
             analysis_type="Interpreted Age")
-        analysis.datum_collection = values
+        analysis.datum_collection = [v for v in values if v is not None]
         return analysis
 
     def import_analysis(self, et, **kwargs):
@@ -91,38 +86,20 @@ class GeochronImporter(object):
         analysis = self.models.analysis(**kwargs)
 
         analysis.datum_collection = [d for d in values if d is not None]
-
         return analysis
-
-    def error_metric(self, id):
-        return self.db.get_or_create(
-            self.models.error_metric,
-            id=id, authority="Boise State")
-
-    def parameter(self, id):
-        return self.db.get_or_create(
-            self.models.parameter,
-            id=id, authority="Boise State")
-
-    def datum_type(self, et, unit='unknown'):
-        error_metric = self.error_metric(et.find('uncertaintyType').text)
-        # Error values are *assumed* to be at the 1s level, apparently
-        parameter = self.parameter(et.find('name').text)
-
-        return self.db.get_or_create(
-            self.models.datum_type,
-            parameter=parameter.id,
-            error_metric=error_metric.id,
-            unit=unit)
 
     def import_datum(self, et):
         """
         ValueModel -> datum
         """
-        v = et.find('value').text
-        if not v: return None
-        datum = self.models.datum(
-            value=v,
-            error=et.find('oneSigma').text)
-        datum.datum_type=self.datum_type(et)
-        return datum
+        parameter = et.find('name').text
+        try:
+            value = et.find('value').text
+            assert float(value) is not None
+        except:
+            return None
+
+
+        return self.datum(parameter, value,
+            error=text(et, 'oneSigma'),
+            error_metric=text(et, 'uncertaintyType'))

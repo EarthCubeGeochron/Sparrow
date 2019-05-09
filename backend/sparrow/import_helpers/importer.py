@@ -1,7 +1,7 @@
 
 class BaseImporter(object):
     """
-    A basic Sparrow importer for Geochron.org XML
+    A basic Sparrow importer to be subclassed.
     """
     authority = None
     def __init__(self, db):
@@ -22,28 +22,28 @@ class BaseImporter(object):
     def unit(self, id):
         return self.db.get_or_create(
             self.models.unit,
-            id=id, authority=self.authority)
+            id=id, defaults=dict(authority=self.authority))
 
     def error_metric(self, id):
         if not id: return None
         return self.db.get_or_create(
             self.models.error_metric,
-            id=id, authority=self.authority)
+            id=id, defaults=dict(authority=self.authority))
 
     def parameter(self, id):
         return self.db.get_or_create(
             self.models.parameter,
-            id=id, authority=self.authority)
+            id=id, defaults=dict(authority=self.authority))
 
     def method(self, id):
         return self.db.get_or_create(
             self.models.method,
-            id=id, authority=self.authority)
+            id=id, defaults=dict(authority=self.authority))
 
     def material(self, id):
         return self.db.get_or_create(
             self.models.material,
-            id=id, authority=self.authority)
+            id=id, defaults=dict(authority=self.authority))
 
     def datum_type(self, parameter, unit='unknown', error_metric=None, **kwargs):
         error_metric = self.error_metric(error_metric)
