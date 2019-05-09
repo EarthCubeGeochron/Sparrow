@@ -109,7 +109,15 @@ fi
 if [ $found_command = 0 ]; then
   # Run a command against sparrow within a docker container
   >&2 echo "Running command in container"
-  sparrow compose run backend sparrow $@
+  # This exec/run switch is added because there are apparently
+  # database/locking issues caused by spinning up arbitrary
+  # backend containers when containers are already running.
+  # TODO: We need a better understanding of best practices here.
+  if docker-compose exec backend sh ; then
+    sparrow compose exec backend sparrow $@
+  else
+    sparrow compose run backend sparrow $@
+  fi
 else
   shift
   "$cmd" $@
