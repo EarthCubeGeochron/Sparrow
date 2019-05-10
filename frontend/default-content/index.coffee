@@ -1,7 +1,8 @@
-import {Markdown} from
+import {Markdown} from '@macrostrat/ui-components'
 import aboutText from './about.md'
+import h from 'react-hyperscript'
 
-export {
+export default {
   landingText: h Markdown, {src: aboutText}
-  siteTitle: 'Fab Lab 🔬'
+  siteTitle: 'Fab Lab 🔬 🌈'
 }

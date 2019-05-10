@@ -1,11 +1,10 @@
 import h from 'react-hyperscript'
 import {Navbar, Button, ButtonGroup, Icon} from '@blueprintjs/core'
 import {NavLink, Route, Switch} from 'react-router-dom'
-import cfg from 'site-content/variables'
 import {AuthStatus} from 'app/auth'
 import styled from "@emotion/styled"
 import {LinkButton} from '@macrostrat/ui-components'
-import {Frame} from 'app/frame'
+import {Frame} from '../frame'
 
 NavButton_ = (props)->
   h LinkButton, {props..., minimal: true}

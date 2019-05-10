@@ -1,7 +1,7 @@
-import ix from 'site-content/index.md'
 import h from 'react-hyperscript'
 import {AppNavbar, NavButton} from 'app/shared/navbar'
 import {SampleMap} from './map'
+import {Frame} from './frame'
 
 HomePage = ->
   h 'div', [
@@ -9,10 +9,10 @@ HomePage = ->
       h NavButton, {to: '/admin'}, "Admin"
       h NavButton, {to: '/api-explorer/v1'}, "API Explorer"
     ]
-    h 'div.bp3-running-text.bp3-text-large', {
-      dangerouslySetInnerHTML: {__html: ix}
-    }
-    h SampleMap
+    h Frame, {id: "landingText"}, "Landing page text goes here."
+    h Frame, {id: "landingGraphic"}, (
+      h SampleMap
+    )
   ]
 
 export {HomePage}

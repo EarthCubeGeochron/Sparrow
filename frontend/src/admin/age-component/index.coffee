@@ -8,7 +8,7 @@ import { Histogram, DensitySeries, BarSeries, withParentSize, XAxis, YAxis } fro
 import md from './plateau-ages.md'
 import './main.styl'
 
-import {ErrorBoundary} from 'app/util/error-boundary.js'
+import {ErrorBoundary} from '../../util/error-boundary.js'
 
 ResponsiveHistogram = withParentSize ({ parentWidth, parentHeight, ...rest})->
   h Histogram, {
