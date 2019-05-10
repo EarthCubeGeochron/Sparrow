@@ -63,6 +63,7 @@ module.exports = {
     extensions: [".coffee", ".js", ".styl",".css",".html",".md"],
     alias: {
       "app": path.resolve(__dirname, "src/"),
+      "sparrow": path.resolve(__dirname, "src/"),
       "site-content": siteContent
     }
   },
@@ -76,6 +77,6 @@ module.exports = {
   },
   plugins: [
     browserSync,
-    new EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'BASE_URL'])
+    new EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'BASE_URL', 'SPARROW_LAB_NAME'])
   ]
 }

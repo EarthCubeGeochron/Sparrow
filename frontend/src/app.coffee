@@ -1,29 +1,39 @@
 import h from 'react-hyperscript'
+import {Component} from 'react'
 import {join} from 'path'
 import { BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {HomePage} from './homepage'
 
+import SiteContent from 'site-content'
+import {FrameProvider} from './frame'
 import {Intent} from '@blueprintjs/core'
 import {APIProvider} from '@macrostrat/ui-components'
 import {APIExplorer} from './api-explorer'
 import {Admin} from './admin'
 import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
+import {PageFooter} from './shared/footer'
 
-AppMain = ({baseURL})->
-  h Router, {basename: baseURL}, (
-    h 'div.app', [
-      h Switch, [
-        h Route, {
-          path: '/',
-          exact: true,
-          render: -> h HomePage
-        }
-        h Route, {path: '/admin', component: Admin}
-        h Route, {path: '/api-explorer', component: APIExplorer}
+class AppMain extends Component
+  render: ->
+    {baseURL} = @props
+    h Router, {basename: baseURL}, (
+      h 'div.app', [
+        h Switch, [
+          h Route, {
+            path: '/',
+            exact: true,
+            render: -> h HomePage
+          }
+          h Route, {path: '/admin', component: Admin}
+          h Route, {path: '/api-explorer', component: APIExplorer}
+        ]
+        h PageFooter
       ]
-    ]
-  )
+    )
+  componentDidMount: ->
+    labname = process.env.SPARROW_LAB_NAME
+    document.title = if labname? then "#{labname} – Sparrow" else "Sparrow"
 
 errorHandler = (route, response)->
   {error} = response
@@ -40,9 +50,11 @@ App = ->
   apiBaseURL = join(baseURL,'/api/v1')
   console.log apiBaseURL
 
-  h APIProvider, {baseURL: apiBaseURL, onError: errorHandler}, (
-    h AuthProvider, null, (
-      h AppMain, {baseURL}
+  h FrameProvider, {overrides: SiteContent}, (
+    h APIProvider, {baseURL: apiBaseURL, onError: errorHandler}, (
+      h AuthProvider, null, (
+        h AppMain, {baseURL}
+      )
     )
   )
 

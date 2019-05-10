@@ -2,7 +2,6 @@ import h from 'react-hyperscript'
 import {Component} from 'react'
 import {NonIdealState, Intent, Button, ButtonGroup, Icon} from '@blueprintjs/core'
 import {Route, Switch} from 'react-router-dom'
-import cfg from 'site-content/variables'
 import classNames from 'classnames'
 
 import {AuthContext} from 'app/auth/context'
