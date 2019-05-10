@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS researcher (
 
 /*
 The `user` model parallels the
-`researcher` model but used only for application
+`researcher` model but is used only for application
 authentication. We can reset all application access by
 truncating this table, without losing data.
 */
@@ -138,7 +138,8 @@ CREATE TABLE IF NOT EXISTS datum_type (
 An object to be measured
 */
 CREATE TABLE IF NOT EXISTS sample (
-  id text PRIMARY KEY,
+  id serial PRIMARY KEY,
+  sample_name text,
   igsn text UNIQUE,
   material text REFERENCES vocabulary.material(id),
   /* Order-of-magnitude precision (in meters)
@@ -148,7 +149,9 @@ CREATE TABLE IF NOT EXISTS sample (
   /* A representative named location */
   location_name text,
   location geometry,
-  embargo_date timestamp without time zone
+  elevation numeric,
+  embargo_date timestamp without time zone,
+  CHECK ((sample_id IS NOT null) OR (igsn IS NOT null))
 );
 /*
 #### Potential issues:
@@ -176,8 +179,8 @@ closely spaced in time.
 */
 CREATE TABLE IF NOT EXISTS session (
   id serial PRIMARY KEY,
-  sample_id text REFERENCES sample(id),
   project_id text REFERENCES project(id),
+  sample_id integer REFERENCES sample(id),
   publication_id integer REFERENCES publication(id),
   measurement_group_id text REFERENCES measurement_group(id),
   date timestamptz NOT NULL,
@@ -220,7 +223,6 @@ CREATE TABLE IF NOT EXISTS analysis (
   /* Not really sure that material is the best parameterization
      of this concept... */
   is_standard boolean,
-  in_plateau boolean,
   /*
   Some analytical results can be interpreted from other data, so we
   should explicitly state that this is the case.
@@ -305,5 +307,5 @@ CREATE TABLE IF NOT EXISTS data_file (
   */
   session_id integer REFERENCES session(id),
   analysis_id integer REFERENCES analysis(id),
-  sample_id text REFERENCES sample(id)
+  sample_id integer REFERENCES sample(id)
 );
