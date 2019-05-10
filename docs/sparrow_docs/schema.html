@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sparrow</title>
+  <link rel="stylesheet" href="./main.styl" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script>
+    $(function(){
+      $("#includedContent").load("./schema-body.html");
+    });
+    </script>
+  </head>
+  <body>
+    <div id="wrap">
+      <a href="/"><h1>Sparrow</h1></a>
+      <h2>Core schema</h2>
+      <p>This is the minimal database schema that drives <i>Sparrow</i>.</p>
+      <div id="includedContent"></div>
+    <div>
+  </body>
+</html>
+
