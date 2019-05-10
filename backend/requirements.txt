@@ -16,3 +16,4 @@ sqlparse==0.2.4
 traitlets==4.3.2
 Werkzeug==0.14.1
 xlrd==1.2.0
+requests==2.21.0
