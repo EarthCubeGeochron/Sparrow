@@ -11,6 +11,7 @@ import {APIExplorer} from './api-explorer'
 import {Admin} from './admin'
 import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
+import {PageFooter} from './shared/footer'
 
 AppMain = ({baseURL})->
   h Router, {basename: baseURL}, (
@@ -24,6 +25,7 @@ AppMain = ({baseURL})->
         h Route, {path: '/admin', component: Admin}
         h Route, {path: '/api-explorer', component: APIExplorer}
       ]
+      h PageFooter
     ]
   )
 
