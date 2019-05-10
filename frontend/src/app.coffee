@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {HomePage} from './homepage'
 
 import SiteContent from 'site-content'
+import {FrameProvider} from './frame'
 import {Intent} from '@blueprintjs/core'
 import {APIProvider} from '@macrostrat/ui-components'
 import {APIExplorer} from './api-explorer'
@@ -41,11 +42,7 @@ App = ->
   apiBaseURL = join(baseURL,'/api/v1')
   console.log apiBaseURL
 
-<<<<<<< Updated upstream
   h FrameProvider, {overrides: SiteContent}, (
-=======
-  h FrameProvider, {overrides: siteContent}, (
->>>>>>> Stashed changes
     h APIProvider, {baseURL: apiBaseURL, onError: errorHandler}, (
       h AuthProvider, null, (
         h AppMain, {baseURL}

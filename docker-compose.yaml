@@ -38,8 +38,6 @@ services:
     image: mdillon/postgis:11
     expose:
       - 5432
-    ports:
-      - $SPARROW_DB_PORT:5432
     environment:
       - POSTGRES_DB=sparrow
     volumes:
@@ -53,14 +51,14 @@ services:
       - SPARROW_BASE_URL
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container
-      - SPARROW_SITE_CONTENT=/site-content
+      - SPARROW_SITE_CONTENT=/app/site-content
     volumes:
       - ./frontend:/app
       - /app/node_modules
       - frontend_build:/app/_assets
       # Right now, we configure default site content
       # rather than allowing any customization
-      - $SPARROW_SITE_CONTENT:/site-content
+      - $SPARROW_SITE_CONTENT:/app/site-content
 volumes:
   frontend_build:
   db_cluster:
