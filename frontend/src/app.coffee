@@ -3,6 +3,7 @@ import {join} from 'path'
 import { BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {HomePage} from './homepage'
 
+import SiteContent from 'site-content'
 import {Intent} from '@blueprintjs/core'
 import {APIProvider} from '@macrostrat/ui-components'
 import {APIExplorer} from './api-explorer'
@@ -40,9 +41,11 @@ App = ->
   apiBaseURL = join(baseURL,'/api/v1')
   console.log apiBaseURL
 
-  h APIProvider, {baseURL: apiBaseURL, onError: errorHandler}, (
-    h AuthProvider, null, (
-      h AppMain, {baseURL}
+  h FrameProvider, {overrides: SiteContent}, (
+    h APIProvider, {baseURL: apiBaseURL, onError: errorHandler}, (
+      h AuthProvider, null, (
+        h AppMain, {baseURL}
+      )
     )
   )
 

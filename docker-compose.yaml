@@ -38,6 +38,8 @@ services:
     image: mdillon/postgis:11
     expose:
       - 5432
+    ports:
+      - $SPARROW_DB_PORT:5432
     environment:
       - POSTGRES_DB=sparrow
     volumes:

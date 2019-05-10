@@ -5,6 +5,7 @@ import cfg from 'site-content/variables'
 import {AuthStatus} from 'app/auth'
 import styled from "@emotion/styled"
 import {LinkButton} from '@macrostrat/ui-components'
+import {Frame} from 'app/frame'
 
 NavButton_ = (props)->
   h LinkButton, {props..., minimal: true}
@@ -18,14 +19,11 @@ Nav = ({children, fullTitle, subtitle, rest...})->
   divider = null
   if children?
     divider = h Navbar.Divider
-  longInfo = null
-  if fullTitle
-    longInfo = h 'span', " Sparrow"
   vals = [
-    h NavLink, {to: '/'}, "#{cfg.siteTitle}"
-    longInfo
+    h NavLink, {to: '/'}, (
+      h Frame, {id: 'siteTitle'}, "Test Lab"
+    )
   ]
-  console.log vals
   if subtitle?
     vals.push h 'span', ":"
     vals.push h 'span.subtitle', subtitle

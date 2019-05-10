@@ -63,6 +63,7 @@ module.exports = {
     extensions: [".coffee", ".js", ".styl",".css",".html",".md"],
     alias: {
       "app": path.resolve(__dirname, "src/"),
+      "sparrow": path.resolve(__dirname, "src/"),
       "site-content": siteContent
     }
   },
