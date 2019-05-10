@@ -1,0 +1,31 @@
+#!/usr/bin/env zsh
+
+if [ -z $SPARROW_PATH ]; then
+  echo -e "\
+Environment variable \033[1mSPARROW_PATH\033[0m must \
+point to the \033[1mSparrow\033[0m code directory to \
+build documentation."
+exit 0
+fi
+
+cd "${0:A:h:h}"
+
+# Install the parcel bundler
+if ! which parcel > /dev/null; then
+  npm install -g parcel-bundler
+fi
+
+# Schema
+schema=$SPARROW_PATH/Sparrow/backend/sparrow/sql/02-create-tables.sql
+echo $schema
+
+function watch-schema() {
+  cat "$schema" \
+  bin/sql-to-markdown \
+  | pandoc -f markdown -o dist/schema-body.html
+}
+
+# Run the two watchers in parallel
+parcel build index.html --public-url=./
+watch-schema 
+
