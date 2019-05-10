@@ -48,7 +48,7 @@ export SPARROW_LAB_NAME="${SPARROW_LAB_NAME:-"My Lab"}"
 export SPARROW_INIT_SQL="${SPARROW_INIT_SQL:-"placeholder"}"
 export SPARROW_SITE_CONTENT="${SPARROW_SITE_CONTENT:-"$default"}"
 export SPARROW_HTTP_PORT="${SPARROW_HTTP_PORT:-5002}"
-export SPARROW_DB_PORT="${SPARROW_DB_PORT:-"54320-54350"}"
+export SPARROW_DB_PORT="${SPARROW_DB_PORT:-"54321-54351"}"
 # This will be settable in the future
 export SPARROW_ENV="development"
 
