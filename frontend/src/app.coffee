@@ -41,7 +41,11 @@ App = ->
   apiBaseURL = join(baseURL,'/api/v1')
   console.log apiBaseURL
 
+<<<<<<< Updated upstream
   h FrameProvider, {overrides: SiteContent}, (
+=======
+  h FrameProvider, {overrides: siteContent}, (
+>>>>>>> Stashed changes
     h APIProvider, {baseURL: apiBaseURL, onError: errorHandler}, (
       h AuthProvider, null, (
         h AppMain, {baseURL}
