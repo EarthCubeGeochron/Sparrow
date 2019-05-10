@@ -19,6 +19,7 @@ services:
     environment:
       - SPARROW_SECRET_KEY
       - SPARROW_BASE_URL
+      - SPARROW_LAB_NAME
       - SPARROW_INIT_SQL=/init-sql
     volumes:
       # Volume for scripts to make things like
@@ -48,6 +49,7 @@ services:
       - backend
     environment:
       - CONTAINERIZED=1
+      - SPARROW_LAB_NAME
       - SPARROW_BASE_URL
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container

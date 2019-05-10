@@ -3,7 +3,6 @@
 Welcome to the default implementation of
 [**Sparrow**](https://github.com/EarthCubeGeochron/Sparrow)!
 
-
 ## A container for your lab's data
 
 **Sparrow** holds a lab's data archive and makes it accessible via this web interface

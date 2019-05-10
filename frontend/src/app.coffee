@@ -1,4 +1,5 @@
 import h from 'react-hyperscript'
+import {Component} from 'react'
 import {join} from 'path'
 import { BrowserRouter as Router, Route, Switch} from "react-router-dom"
 import {HomePage} from './homepage'
@@ -13,21 +14,26 @@ import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
 import {PageFooter} from './shared/footer'
 
-AppMain = ({baseURL})->
-  h Router, {basename: baseURL}, (
-    h 'div.app', [
-      h Switch, [
-        h Route, {
-          path: '/',
-          exact: true,
-          render: -> h HomePage
-        }
-        h Route, {path: '/admin', component: Admin}
-        h Route, {path: '/api-explorer', component: APIExplorer}
+class AppMain extends Component
+  render: ->
+    {baseURL} = @props
+    h Router, {basename: baseURL}, (
+      h 'div.app', [
+        h Switch, [
+          h Route, {
+            path: '/',
+            exact: true,
+            render: -> h HomePage
+          }
+          h Route, {path: '/admin', component: Admin}
+          h Route, {path: '/api-explorer', component: APIExplorer}
+        ]
+        h PageFooter
       ]
-      h PageFooter
-    ]
-  )
+    )
+  componentDidMount: ->
+    labname = process.env.SPARROW_LAB_NAME
+    document.title = if labname? then "#{labname} – Sparrow" else "Sparrow"
 
 errorHandler = (route, response)->
   {error} = response

@@ -77,6 +77,6 @@ module.exports = {
   },
   plugins: [
     browserSync,
-    new EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'BASE_URL'])
+    new EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'BASE_URL', 'SPARROW_LAB_NAME'])
   ]
 }

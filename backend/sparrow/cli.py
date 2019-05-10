@@ -98,7 +98,7 @@ def config(cfg, key=None, json=False):
 
     if json:
         res = dict()
-        for k in ("LAB_NAME","DBNAME", "DATABASE","SITE_CONTENT","BASE_URL"):
+        for k in ("LAB_NAME","DBNAME", "DATABASE","BASE_URL"):
             val = app.config.get(k)
             v = k.lower()
             res[v] = val
