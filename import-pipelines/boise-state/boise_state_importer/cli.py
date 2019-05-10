@@ -1,12 +1,15 @@
 from os import environ
-from click import command, option, echo, secho, style
+from click import Group, option, echo, secho, style
 from pathlib import Path
 from sparrow import Database
 from sparrow.import_helpers import SparrowImportError, working_directory, iterfiles
 from .import_datafile import import_datafile
+from .import_metadata import import_metadata
 
-@command()
-def cli(stop_on_error=False, verbose=False):
+cli = Group()
+
+@cli.command(name='import-xml')
+def import_xml():
     """
     Import Boise State XML files
     """
@@ -22,3 +25,10 @@ def cli(stop_on_error=False, verbose=False):
 
     files = path.glob("**/*.xml")
     iterfiles(import_datafile, files)
+
+@cli.command(name='import-metadata')
+def __import_metadata():
+    """
+    Import IGSN metadata from SESAR
+    """
+    import_metadata()

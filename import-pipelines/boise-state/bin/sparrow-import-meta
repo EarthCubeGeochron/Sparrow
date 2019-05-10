@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-# Description: Import XMLs from Boise State data archive
+# Description: Import sample metadata from SESAR
 
 # This script runs on the host system and kicks off the
 # import process within a docker container
@@ -13,4 +13,4 @@ sparrow compose run \
   -v "$SPARROW_DATA_DIR:/Data:ro" \
   -v "$import_pipeline:/boise-state-importer" \
   backend \
-  python -m boise_state_importer import-xml
+  python -m boise_state_importer import-metadata
