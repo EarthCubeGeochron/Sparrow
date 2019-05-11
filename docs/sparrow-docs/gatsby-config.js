@@ -5,6 +5,15 @@ module.exports = {
     author: `@gatsbyjs`,
   },
   plugins: [
+    // no configuration
+    `gatsby-plugin-coffeescript`,
+    // custom configuration
+    {
+      resolve: `gatsby-plugin-coffeescript`,
+      // options are passed directly to the compiler
+      options: {},
+    },
+    `gatsby-mdx`,
     `gatsby-plugin-react-helmet`,
     {
       resolve: `gatsby-source-filesystem`,
