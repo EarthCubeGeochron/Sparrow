@@ -39,7 +39,7 @@ SELECT
   p.title project_name,
   is_public(s)
 FROM session s
-JOIN instrument i
+LEFT JOIN instrument i
   ON i.id = s.instrument
 LEFT JOIN project p
   ON s.project_id = p.id

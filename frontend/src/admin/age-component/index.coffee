@@ -8,6 +8,8 @@ import { Histogram, DensitySeries, BarSeries, withParentSize, XAxis, YAxis } fro
 import md from './plateau-ages.md'
 import './main.styl'
 
+import {ErrorBoundary} from '../../util/error-boundary.js'
+
 ResponsiveHistogram = withParentSize ({ parentWidth, parentHeight, ...rest})->
   h Histogram, {
     width: parentWidth
@@ -72,6 +74,7 @@ class ChartOuter extends Component
       return "#{v} Ga"
 
     h APIResultView, {route: '/datum', params}, (data)=>
+      return null unless data?
       h 'div.age-chart-container', {style: {height: 500}}, [
         h Callout, {
           icon: 'scatter-plot', title: "Plateau ages"
@@ -102,8 +105,10 @@ class AgeChartComponent extends Component
     {apiEndpoint} = @props
 
     h 'div.data-view#age-chart', [
-      h ChartOuter
+      h ErrorBoundary, [
+        h ChartOuter
+      ]
     ]
 
-export {AgeChartComponent}
 
+export {AgeChartComponent}

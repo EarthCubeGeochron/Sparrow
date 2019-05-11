@@ -17,10 +17,13 @@ metadata = MetaData()
 def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
     return "_"+referred_cls.__name__.lower()
 
+
 def get_or_create(session, model, defaults=None, **kwargs):
     """
     Get an instance of a model, or create it if it doesn't
     exist.
+
+    https://stackoverflow.com/questions/2546207
     """
     instance = session.query(model).filter_by(**kwargs).first()
     if instance:
@@ -33,6 +36,17 @@ def get_or_create(session, model, defaults=None, **kwargs):
         session.add(instance)
         return instance
 
+class TableCollection(object):
+    """
+    Table collection object that returns automapped tables
+    """
+    def __init__(self, automap_base):
+        self.models = automap_base.classes
+    def __getattr__(self, name):
+        return getattr(self.models, name).__table__
+    def __iter__(self):
+            for model in self.models:
+                yield model.__table__
 class Database:
     def __init__(self, cfg=None):
         """
@@ -72,6 +86,9 @@ class Database:
         run_query(self.session, *args)
 
     def reflect_table(self, tablename, schema='public', **kwargs):
+        """
+        Use the automapped `table` object instead.
+        """
         meta = MetaData(schema=schema)
         return Table(tablename, meta,
             autoload=True, autoload_with=self.engine, **kwargs)
@@ -79,10 +96,12 @@ class Database:
     def automap(self):
         Base.prepare(self.engine, reflect=True,
             name_for_scalar_relationship=name_for_scalar_relationship)
+
+        self.table = TableCollection(Base)
         self.automap_base = Base
 
     @property
-    def mapped_classes(self):
+    def model(self):
         """
         Map all tables in the database to SQLAlchemy models
 
@@ -92,9 +111,13 @@ class Database:
             self.automap()
         return self.automap_base.classes
 
+    @property
+    def mapped_classes(self):
+        return self.model
+
     def get(self, model, *args, **kwargs):
         if isinstance(model, str):
-            model = self.mapped_classes[model]
+            model = getattr(self.model, model)
         return self.session.query(model).get(*args,**kwargs)
 
     def get_or_create(self, model, defaults=None, **kwargs):
@@ -103,7 +126,7 @@ class Database:
         exist.
         """
         if isinstance(model, str):
-            model = self.mapped_classes[model]
+            model = getattr(self.model, model)
         return get_or_create(self.session, model, defaults=None, **kwargs)
 
     def initialize(self, drop=False):

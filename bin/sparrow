@@ -23,11 +23,6 @@ if [ -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_UNSET ]; then
   export _SPARROW_CONFIG_UNSET=1
 fi
 
-# Get path to sparrow installation from location of current file
-# (even if symlinked)
-export SPARROW_PATH="${0:A:h:h}"
-cd "$SPARROW_PATH"
-
 # If we haven't yet sourced the config file in a higher-level script
 if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
   echo "Using config file $(tput bold)$SPARROW_CONFIG$(tput sgr0)" >&2
@@ -36,14 +31,26 @@ if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
   export _SPARROW_CONFIG_SOURCED=1
 fi
 
+# Get path to sparrow installation from location of current file
+# (even if symlinked)
+# Note: if SPARROW_PATH is set in the config, we use that version
+# of sparrow (except for this wrapper script).
+this_install_root="${0:A:h:h}"
+export SPARROW_PATH="${SPARROW_PATH:-"$this_install_root"}"
+cd "$SPARROW_PATH"
+
 # ENVIRONMENT VARIABLE DEFAULTS
 # Set variables that might not be created in the config file
 # to default values
-default="$SPARROW_PATH/config/default-site-content"
-export SPARROW_LAB_NAME="${SPARROW_LAB_NAME:-"Test Lab"}"
+default="$SPARROW_PATH/frontend/default-content"
+export SPARROW_BASE_URL="${SPARROW_BASE_URL:-"/"}"
+export SPARROW_LAB_NAME="${SPARROW_LAB_NAME:-"My Lab"}"
 export SPARROW_INIT_SQL="${SPARROW_INIT_SQL:-"placeholder"}"
 export SPARROW_SITE_CONTENT="${SPARROW_SITE_CONTENT:-"$default"}"
 export SPARROW_HTTP_PORT="${SPARROW_HTTP_PORT:-5002}"
+export SPARROW_DB_PORT="${SPARROW_DB_PORT:-"54321-54351"}"
+# This will be settable in the future
+export SPARROW_ENV="development"
 
 # The docker-compose volume for sparrow commands needs to be set
 # even if a SPARROW_COMMANDS directory is not provided.
@@ -109,7 +116,15 @@ fi
 if [ $found_command = 0 ]; then
   # Run a command against sparrow within a docker container
   >&2 echo "Running command in container"
-  sparrow compose run backend sparrow $@
+  # This exec/run switch is added because there are apparently
+  # database/locking issues caused by spinning up arbitrary
+  # backend containers when containers are already running.
+  # TODO: We need a better understanding of best practices here.
+  if docker-compose exec backend echo "Backend is up." ; then
+    sparrow compose exec backend sparrow $@
+  else
+    sparrow compose run backend sparrow $@
+  fi
 else
   shift
   "$cmd" $@

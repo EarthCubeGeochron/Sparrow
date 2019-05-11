@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS "user" ( -- Name must be quoted because it collides w
 
 CREATE TABLE IF NOT EXISTS publication (
   id serial PRIMARY KEY,
-  title text NOT NULL,
-  doi text NOT NULL
+  doi text NOT NULL,
+  title text
 );
 
 /*
@@ -103,6 +103,8 @@ Examples include irradiation IDs for Ar/Ar labs, etc.
 Right now, we only support a single measurement group
 for each session. This could potentially be updated
 to support a one-to-many relationship if desired.
+
+This might be a good candidate to drop from the core schema
 */
 CREATE TABLE IF NOT EXISTS measurement_group (
   id text PRIMARY KEY,
@@ -176,6 +178,7 @@ CREATE TABLE IF NOT EXISTS session (
   id serial PRIMARY KEY,
   sample_id text REFERENCES sample(id),
   project_id text REFERENCES project(id),
+  publication_id integer REFERENCES publication(id),
   measurement_group_id text REFERENCES measurement_group(id),
   date timestamptz NOT NULL,
   end_date timestamptz,

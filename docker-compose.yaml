@@ -19,8 +19,8 @@ services:
     environment:
       - SPARROW_SECRET_KEY
       - SPARROW_BASE_URL
+      - SPARROW_LAB_NAME
       - SPARROW_INIT_SQL=/init-sql
-      - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
     volumes:
       # Volume for scripts to make things like
       # migrations work...
@@ -33,13 +33,14 @@ services:
       - /app/sparrow.egg-info
       # Share some configuration between backend
       # and frontend
-      - cfg:/cfg
       - $SPARROW_INIT_SQL:/init-sql/
       - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
   db:
     image: mdillon/postgis:11
     expose:
       - 5432
+    ports:
+      - $SPARROW_DB_PORT:5432
     environment:
       - POSTGRES_DB=sparrow
     volumes:
@@ -50,18 +51,20 @@ services:
       - backend
     environment:
       - CONTAINERIZED=1
-      - SPARROW_CONFIG_JSON=/cfg/sparrow-config.json
+      - SPARROW_LAB_NAME
+      - SPARROW_BASE_URL
+      # SPARROW_SITE_CONTENT variable is different
+      # inside and outside of the container
+      - SPARROW_SITE_CONTENT=/app/site-content
     volumes:
       - ./frontend:/app
       - /app/node_modules
       - frontend_build:/app/_assets
-      - cfg:/cfg
       # Right now, we configure default site content
       # rather than allowing any customization
-      - $SPARROW_SITE_CONTENT:/site-content
+      - $SPARROW_SITE_CONTENT:/app/site-content
 volumes:
   frontend_build:
-  cfg:
   db_cluster:
   # Placeholder volumes in case we don't have these volumes to mount
   placeholder:
