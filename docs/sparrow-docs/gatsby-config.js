@@ -14,6 +14,7 @@ module.exports = {
       options: {},
     },
     `gatsby-mdx`,
+    `gatsby-plugin-stylus`,
     `gatsby-plugin-react-helmet`,
     {
       resolve: `gatsby-source-filesystem`,
