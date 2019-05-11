@@ -1,18 +1,11 @@
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Default Starter`,
-    description: `Kick off your next, great Gatsby project with this default starter. This barebones starter ships with the main Gatsby configuration files you might need.`,
-    author: `@gatsbyjs`,
+    title: "Sparrow",
+    description: "A geochronology-focused laboratory information management system",
+    author: "Daven Quinn and the EarthCube Geochronology Frontiers team"
   },
   plugins: [
-    // no configuration
-    `gatsby-plugin-coffeescript`,
     // custom configuration
-    {
-      resolve: `gatsby-plugin-coffeescript`,
-      // options are passed directly to the compiler
-      options: {},
-    },
     `gatsby-mdx`,
     `gatsby-plugin-stylus`,
     `gatsby-plugin-react-helmet`,
@@ -31,6 +24,8 @@ module.exports = {
       },
     },
     `gatsby-transformer-remark`,
+    // no configuration
+    `gatsby-plugin-coffeescript`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     {
