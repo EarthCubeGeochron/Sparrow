@@ -64,6 +64,7 @@ module.exports = {
     alias: {
       "app": path.resolve(__dirname, "src/"),
       "sparrow": path.resolve(__dirname, "src/"),
+      "plugins": path.resolve(__dirname, "plugins/"),
       "site-content": siteContent
     }
   },

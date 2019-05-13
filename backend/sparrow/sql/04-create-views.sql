@@ -76,6 +76,7 @@ SELECT
   a.session_id,
   a.session_index,
   a.is_standard,
+  a.is_bad,
   s.technique,
   ( SELECT
       name
@@ -83,7 +84,7 @@ SELECT
     WHERE id = s.instrument
   ) instrument,
   sa.id sample_id,
-  (	SELECT
+  ( SELECT
       tree
     FROM
       core_view.material_tree

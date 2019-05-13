@@ -212,6 +212,7 @@ CREATE TABLE IF NOT EXISTS analysis (
   id serial PRIMARY KEY,
   session_id integer REFERENCES session(id) NOT NULL,
   session_index integer, -- captures ordering within a session
+  -- Should key this to a foreign key table
   analysis_type text,
   /* If `session_index` is not set, `analysis_type` allows the
     unique identification of a record within the session */
@@ -220,7 +221,7 @@ CREATE TABLE IF NOT EXISTS analysis (
   /* Not really sure that material is the best parameterization
      of this concept... */
   is_standard boolean,
-  in_plateau boolean,
+  is_bad boolean,
   /*
   Some analytical results can be interpreted from other data, so we
   should explicitly state that this is the case.
