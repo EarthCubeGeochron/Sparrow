@@ -4,7 +4,7 @@
 if [ ! -f /.dockerenv ]; then
   # We are not running this in a docker container
   sparrow compose run backend \
-    /sparrow-bin/sparrow-generate-migration $@
+    /sparrow-bin/sparrow-db-migration $@
   exit 0
 fi
 

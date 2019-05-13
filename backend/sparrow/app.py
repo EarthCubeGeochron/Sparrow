@@ -38,7 +38,7 @@ class App(Flask):
         self.db = Database(self)
         return self.db
 
-def construct_app(config=None):
+def construct_app(config=None, minimal=False):
     # Should allow configuration of template path
     app = App(__name__, config=config,
             template_folder=relative_path(__file__, "templates"))
@@ -46,6 +46,9 @@ def construct_app(config=None):
     from .database import Database
 
     db = Database(app)
+
+    if minimal:
+        return app, db
 
     # Manage JSON Web tokens
     jwt = JWTManager(app)
