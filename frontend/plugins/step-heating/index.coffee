@@ -36,10 +36,14 @@ class StepHeatingChart extends Component
     heatingSteps = data.filter (d)-> d.session_index?
     heatingSteps.sort (a,b)-> b.session_index-a.session_index
 
-    ageValues = heatingSteps.map (d)->
-      d.data.find (v)->v.parameter == 'step_age'
+    interpretedAges = data.filter (d)-> not d.session_index?
 
-    yExtent = errorExtent ageValues
+    ages = heatingSteps.map (d)-> {
+        in_plateau: not d.is_bad
+        age: d.data.find (v)->v.parameter == 'step_age'
+      }
+
+    yExtent = errorExtent ages.map (d)->d.age
 
     xScale = scaleLinear({
       range: [0, innerWidth]
@@ -60,18 +64,18 @@ class StepHeatingChart extends Component
         transform: "translate(#{margin},#{margin})"
       }, [
         h 'g.data-area', [
-          h 'g.heating-steps', ageValues.map (d,i)->
-            console.log d
-            mn = d.value-d.error
-            mx = d.value+d.error
+          h 'g.heating-steps', ages.map (d,i)->
+            {age, in_plateau} = d
+            mn = age.value-age.error
+            mx = age.value+age.error
             y = yScale(mx)
-            console.log y
 
             h 'rect', {
               x: xScale(i),
               y,
               width: deltaX,
               height: yScale(mn)-y
+              fill: if in_plateau then "#888" else "#aaa"
             }
         ]
         h AxisBottom, {
