@@ -4,14 +4,11 @@ import h from "react-hyperscript"
 import Layout from "../components/layout"
 import Image from "../components/image"
 import SEO from "../components/seo"
-import md from '../../text/installation.mdx'
-console.log md
+import md from '../text/installation.mdx'
 
-IndexPage = ->
+InstallationPage = ->
   h Layout, [
-    h SEO, {title: "Home",  keywords: ['gatsby', 'application', 'react']}
     h md
-    h Link, {to: "/page-2/"}, "Go to page 2"
   ]
 
-export default IndexPage
+export default InstallationPage

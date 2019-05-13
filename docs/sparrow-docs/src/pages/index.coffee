@@ -1,4 +1,3 @@
-import React from "react"
 import { Link } from "gatsby"
 import h from "react-hyperscript"
 import Layout from "../components/layout"
@@ -17,7 +16,6 @@ IndexPage = ->
       )
     ]
     h md
-    h Link, {to: "/installation/"}, "Go to page 2"
   ]
 
 export default IndexPage
