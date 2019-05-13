@@ -4,20 +4,14 @@ import h from "react-hyperscript"
 import Layout from "../components/layout"
 import Image from "../components/image"
 import SEO from "../components/seo"
-import md from './home.mdx'
-import introText from './intro-text.mdx'
+import md from '../../text/installation.mdx'
+console.log md
 
 IndexPage = ->
   h Layout, [
     h SEO, {title: "Home",  keywords: ['gatsby', 'application', 'react']}
-    h 'div.index-top', [
-      h 'div.intro-text', null, h(introText)
-      h 'div', style: { maxWidth: '400px', marginBottom: '1.45rem' }, (
-        h Image
-      )
-    ]
     h md
-    h Link, {to: "/installation/"}, "Go to page 2"
+    h Link, {to: "/page-2/"}, "Go to page 2"
   ]
 
 export default IndexPage
