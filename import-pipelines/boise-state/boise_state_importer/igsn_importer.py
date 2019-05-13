@@ -1,5 +1,6 @@
 from sparrow.import_helpers import BaseImporter
 from json import dumps
+import html
 
 class IGSNImporter(BaseImporter):
     def import_data(self, all=True):
@@ -23,16 +24,18 @@ class IGSNImporter(BaseImporter):
         except KeyError:
             location = None
 
+
         igsn = s['igsn']
-        name = s['name']
+        name = html.unescape(s['name'])
+        print(igsn, name)
         if not name:
             name = igsn
 
-        v = self.sample(
+        sample = self.sample(
             igsn=igsn,
             defaults=dict(
-                id=name,
-                location=location
+                id=name
             ))
 
+        self.db.session.add(sample)
         self.db.session.commit()
