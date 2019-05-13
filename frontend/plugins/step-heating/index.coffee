@@ -6,7 +6,7 @@ import { scaleLinear } from '@vx/scale'
 import { AreaClosed } from '@vx/shape'
 import { AxisLeft, AxisBottom } from '@vx/axis'
 import { APIResultView } from '@macrostrat/ui-components'
-import { min, max } from 'd3-array'
+import { min, max, extent } from 'd3-array'
 import T from 'prop-types'
 
 d = styled.div"""
@@ -25,6 +25,14 @@ class StepHeatingChart extends Component
   constructor: (props)->
     super props
 
+  findPlateauAge: (data)=>
+    interpretedAges = data.filter (d)-> not d.session_index?
+    # Find plateau age
+    for a in interpretedAges
+      for datum in a.data
+        if datum.parameter == 'plateau_age'
+          return datum
+
   renderChart: (data)=>
     width = 800
     height = 450
@@ -36,12 +44,17 @@ class StepHeatingChart extends Component
     heatingSteps = data.filter (d)-> d.session_index?
     heatingSteps.sort (a,b)-> b.session_index-a.session_index
 
-    interpretedAges = data.filter (d)-> not d.session_index?
 
     ages = heatingSteps.map (d)-> {
         in_plateau: not d.is_bad
         age: d.data.find (v)->v.parameter == 'step_age'
       }
+    plateauAge = @findPlateauAge(data)
+    plateauIx = []
+    for d,i in ages
+      if d.in_plateau then plateauIx.push i
+    plateauIx = extent(plateauIx)
+
 
     yExtent = errorExtent ages.map (d)->d.age
 
@@ -75,8 +88,19 @@ class StepHeatingChart extends Component
               y,
               width: deltaX,
               height: yScale(mn)-y
-              fill: if in_plateau then "#888" else "#aaa"
+              fill: if in_plateau then "#444" else "#aaa"
             }
+          h 'g.plateau-age', [
+            h 'rect', {
+              x: xScale(plateauIx[0]),
+              y: yScale(plateauAge.value+plateauAge.error),
+              width: deltaX*(1+plateauIx[1]-plateauIx[0]),
+              height: yScale(0)-yScale(2*plateauAge.error)
+              stroke: '#222'
+              'stroke-width': '2px'
+              fill: 'transparent'
+            }
+          ]
         ]
         h AxisBottom, {
           scale: xScale
