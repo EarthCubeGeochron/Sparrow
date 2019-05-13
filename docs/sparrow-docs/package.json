@@ -27,9 +27,13 @@
     "react-dom": "^16.8.6",
     "react-helmet": "^5.2.1",
     "react-hyperscript": "^3.2.0",
-    "react-markdown": "^4.0.8"
+    "react-markdown": "^4.0.8",
+    "stylus": "^0.54.5"
   },
   "devDependencies": {
+    "@emotion/babel-preset-css-prop": "^10.0.9",
+    "babel-plugin-emotion": "^10.0.9",
+    "babel-preset-gatsby": "^0.1.11",
     "prettier": "^1.17.0"
   },
   "keywords": [

@@ -3,24 +3,15 @@ import PropTypes from "prop-types"
 import React from "react"
 import { css, jsx } from '@emotion/core'
 
-const style = css`
-max-width 960px;
-`
-
 const Header = ({ siteTitle }) => (
-  <header css={style}
-    style={{
-      marginBottom: `1.45rem`,
-    }}
-  >
+  <header>
     <div>
       <h1 style={{ margin: 0 }}>
         <Link
           to="/"
           style={{
             textDecoration: `none`,
-          }}
-        >
+          }}>
           {siteTitle}
         </Link>
       </h1>

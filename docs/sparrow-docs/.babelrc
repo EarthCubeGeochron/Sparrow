@@ -1,0 +1,13 @@
+{
+  "presets": [
+    "@emotion/babel-preset-css-prop",
+    [
+      "babel-preset-gatsby",
+      {
+        "targets": {
+          "browsers": [">0.25%", "not dead"]
+        }
+      }
+    ]
+  ]
+}
