@@ -294,6 +294,7 @@ CREATE TABLE IF NOT EXISTS data_file (
   Original measurement data file information
   */
   file_hash uuid PRIMARY KEY, -- MD5 hash of data file contents
+  file_mtime timestamp,
   basename text,
   file_path text UNIQUE,
   import_date timestamp,

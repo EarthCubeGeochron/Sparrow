@@ -7,10 +7,9 @@ from click import command, echo, secho, style
 from sparrow.import_helpers import SparrowImportError, md5hash
 from sparrow import Database
 from sqlalchemy.dialects.postgresql import insert, BYTEA
+from datetime import datetime
 
 def extract_datatable(infile):
-    stat(infile)
-
     try:
         wb = open_workbook(infile, on_demand=True)
         df = read_excel(wb, sheet_name="datatable", header=None)
@@ -34,6 +33,9 @@ def import_datafile(db, infile):
 
     Returns boolean (whether file was imported).
     """
+    res = stat(infile)
+    mtime = datetime.utcfromtimestamp(res.st_mtime)
+
     hash = md5hash(infile)
 
     data_file = db.mapped_classes.data_file
@@ -47,6 +49,7 @@ def import_datafile(db, infile):
     # Values to insert
     cols = dict(
         file_hash=hash,
+        file_mtime=mtime,
         basename=infile.stem,
         import_date=None,
         import_error=None,

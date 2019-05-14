@@ -29,8 +29,9 @@ def extract_data(stop_on_error=False):
 @command()
 @option('--stop-on-error', is_flag=True, default=False)
 @option('--verbose','-v', is_flag=True, default=False)
-@option('--extract', is_flag=True, default=False)
-def cli(stop_on_error=False, verbose=False, extract=False):
+@option('--extract/--no-extract', default=False)
+@option('--normalize/--no-normalize', default=True)
+def cli(stop_on_error=False, verbose=False, extract=False, normalize=True):
     """
     Import LaserChron files
     """
@@ -47,5 +48,5 @@ def cli(stop_on_error=False, verbose=False, extract=False):
     if extract:
         with working_directory(path):
             extract_data()
-
-    normalize_data()
+    if normalize:
+        normalize_data()
