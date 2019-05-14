@@ -12,4 +12,4 @@ sparrow compose run \
   -v "$LASERCHRON_DATA_DIR:/Data:ro" \
   -v "$import_pipeline:/import-laserchron" \
   backend \
-  python -m sparrow_import_laserchron
+  python3 -m sparrow_import_laserchron
