@@ -8,6 +8,7 @@ from sparrow.import_helpers import SparrowImportError, working_directory
 from itertools import chain
 
 from .extract_datatable import import_datafile
+from .normalize_data import normalize_data
 
 def extract_data():
     path = Path('.')
@@ -28,7 +29,8 @@ def extract_data():
 @command()
 @option('--stop-on-error', is_flag=True, default=False)
 @option('--verbose','-v', is_flag=True, default=False)
-def cli(stop_on_error=False, verbose=False):
+@option('--extract', is_flag=True, default=False)
+def cli(stop_on_error=False, verbose=False, extract=False):
     """
     Import LaserChron files
     """
@@ -42,5 +44,8 @@ def cli(stop_on_error=False, verbose=False):
     path = Path(env)
     assert path.is_dir()
 
-    with working_directory(path):
-        extract_data()
+    if extract:
+        with working_directory(path):
+            extract_data()
+
+    normalize_data()
