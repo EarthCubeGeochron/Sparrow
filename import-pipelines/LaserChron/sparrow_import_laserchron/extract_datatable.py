@@ -1,15 +1,19 @@
 import gzip
 from io import StringIO
+from os import stat
 from pandas import read_excel
-from xlrd import XLRDError
+from xlrd import open_workbook, XLRDError
 from click import command, echo, secho, style
 from sparrow.import_helpers import SparrowImportError, md5hash
 from sparrow import Database
 from sqlalchemy.dialects.postgresql import insert, BYTEA
 
 def extract_datatable(infile):
+    stat(infile)
+
     try:
-        df = read_excel(infile, sheet_name="datatable", header=None)
+        wb = open_workbook(infile, on_demand=True)
+        df = read_excel(wb, sheet_name="datatable", header=None)
     except XLRDError:
         if "AGE PICK" in infile.stem:
             raise NotImplementedError("AGE PICK files are not yet handled")

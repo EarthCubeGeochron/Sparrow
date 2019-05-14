@@ -10,7 +10,7 @@ from itertools import chain
 from .extract_datatable import import_datafile
 from .normalize_data import normalize_data
 
-def extract_data():
+def extract_data(stop_on_error=False):
     path = Path('.')
     db = Database()
     files = chain(path.glob("**/*.xls"), path.glob("**/*.xls[xm]"))
