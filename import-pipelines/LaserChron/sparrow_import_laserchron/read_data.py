@@ -61,12 +61,42 @@ def merge_cols(d):
         return "/".join(v)
     return " ".join(v)
 
+def is_concentration(column):
+    return (
+        str(column.iloc[0]).lower() == 'conc'
+        and '%' in str(column.iloc[1]))
+    return True
+
+def get_columns_and_units(df):
+    headers = df.iloc[1:3, 1:].dropna(axis=1, how='all')
+    h1 = headers.apply(merge_cols, axis=0)
+
+    units = h1.str.extract('\((.+)\)').iloc[:,0]
+    for i, u in enumerate(units):
+        if str(u) != 'nan': continue
+        next = units.iat[i+1]
+        print(next)
+        if next == 'Ma':
+            units.iat[i] = 'Ma'
+            h1.iat[i] = str(h1.iat[i])+" age"
+            continue
+        if next == '%':
+            units.iat[i] = 'ratio'
+            continue
+        if "/" in h1.iat[i] and not "age" in h1.iat[i]:
+            units.iat[i] = 'ratio'
+
+
+    import IPython; IPython.embed(); raise
+
 def extract_data(df):
     if df.iloc[0,0].startswith("Table"):
         df = df[1:]
 
     df = df.dropna(how='all')
-    head = df.iloc[:3]
+    get_columns_and_units(df)
+    headers = df.iloc[1:3].dropna(axis=1, how='all')
+    print(len(headers.columns))
 
     try:
         last_col_ix = find_last_column(df)
@@ -77,8 +107,10 @@ def extract_data(df):
 
         #print(head.transpose())
         if len(df.columns) == 28:
-            secho("Extra output block was dropped", fg='red')
+            import IPython; IPython.embed(); raise
+            secho("Extra output block ignored")
         else:
+            print(headers.transpose())
             secho("Data frame too long", fg='red')
         df = df.iloc[:, :20]
     except StopIteration:
@@ -86,15 +118,14 @@ def extract_data(df):
         return False
 
     # For now we don't do comments
-    headers = df.iloc[1:3]
+    #print(headers.transpose())
     h1 = headers.apply(merge_cols, axis=0)
 
     try:
         assert len(df.columns) == 20
     except AssertionError:
-        print(df)
+        print(headers.transpose())
 
-    head = df.iloc[:3]
     df1 = df.iloc[3:]
 
     return True
