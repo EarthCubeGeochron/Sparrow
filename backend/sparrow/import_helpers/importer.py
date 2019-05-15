@@ -72,3 +72,19 @@ class BaseImporter(object):
                 error=error)
             datum._datum_type=type
             return datum
+
+    def import_datafile(self, rec):
+        raise NotImplementedError()
+
+    def iterfiles(self, file_sequence):
+        for f in file_sequence:
+            try:
+                secho(str(f), dim=True)
+                imported = self.import_datafile(f)
+                self.db.session.commit()
+                if not imported:
+                    secho("Already imported", fg='green', dim=True)
+            except (SparrowImportError, NotImplementedError) as e:
+                if stop_on_error: raise e
+                self.db.session.rollback()
+                secho(str(e), fg='red')
