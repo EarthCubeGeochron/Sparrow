@@ -92,7 +92,8 @@ def normalize_data(df):
     body = df.iloc[3:].set_index(df.columns[0])
     body.index.name = 'Analysis'
     # Make sure data is the same shape as headers
-    data = body.drop(body.columns.difference(header.columns), 1)
+    data = (body.drop(body.columns.difference(header.columns), 1)
+                .dropna(how='all'))
 
     # We've found a few empty data frames
     if data.empty:
@@ -103,6 +104,9 @@ def normalize_data(df):
     except AssertionError:
         raise SparrowImportError('Data frame is not correct shape')
 
+    # For some reason we have a lot of these closed brackets in data files
+    data.index = data.index.str.replace(' <>','')
+
     data.columns = meta.columns
 
     ncols = 19
@@ -110,7 +114,7 @@ def normalize_data(df):
         return data, meta
 
     if len(data.columns[:ncols].intersection(data.columns[ncols:])) > 0:
-        secho("Ignoring duplicated output block.")
+        secho("Ignoring duplicate output columns.")
         data = data.iloc[:,:ncols]
         meta = meta.iloc[:,:ncols]
 

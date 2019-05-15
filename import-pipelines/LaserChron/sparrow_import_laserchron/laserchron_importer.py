@@ -22,6 +22,11 @@ def infer_project_name(fp):
     folders = fp.split("/")[:-1]
     return max(folders, key=len)
 
+def infer_sample_name(df):
+    print(list(df.index))
+    if df.index[0] == "FARADAYS":
+        import IPython; IPython.embed(); raise
+
 class LaserchronImporter(BaseImporter):
     """
     A basic Sparrow importer for cleaned ETAgeCalc and NUPM AgeCalc files.
@@ -42,6 +47,8 @@ class LaserchronImporter(BaseImporter):
             raise SparrowImportError("CSV data not extracted")
         data, meta = extract_table(rec.csv_data)
         project = infer_project_name(rec.file_path)
+
+        infer_sample_name(data)
 
         return False
 
