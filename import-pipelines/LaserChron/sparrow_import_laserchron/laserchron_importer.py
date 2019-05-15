@@ -4,6 +4,7 @@ from sparrow.import_helpers import BaseImporter, SparrowImportError
 from datetime import datetime
 from io import StringIO
 from pandas import read_csv, concat
+import re
 
 from .normalize_data import normalize_data
 
@@ -22,10 +23,24 @@ def infer_project_name(fp):
     folders = fp.split("/")[:-1]
     return max(folders, key=len)
 
-def infer_sample_name(df):
-    print(list(df.index))
-    if df.index[0] == "FARADAYS":
-        import IPython; IPython.embed(); raise
+def extract_session_index(sample_name):
+    pat = r"[\.\:_\s-](\w+)$"
+    s = re.search(pat, sample_name)
+    if s is not None:
+        return s.group(1)
+
+    pat = r"(\d+)$"
+    s = re.search(pat, sample_name)
+    if s is not None:
+        return s.group(1)
+    return None
+
+def strip_session_index(row):
+    v = (row.at['sample_id']
+        .rstrip(row.at['session_ix'])
+        .rstrip('.:_- '))
+    row.at['sample_id'] = v
+    return row
 
 class LaserchronImporter(BaseImporter):
     """
@@ -54,15 +69,12 @@ class LaserchronImporter(BaseImporter):
         # Create sample name columns
         pat = r"[\.\:_\s-](\w+)$"
         ix = data.index.to_series().str.strip()
-        session_ix = ix.str.extract(pat)[0]
-        sample_id = (ix
-            .str.replace(pat, "")
-            .str.replace(r"[-\:-](0\d+)", r"-\1"))
-        sample_id.name = "sample_id"
+        session_ix = ix.apply(extract_session_index)
+        #session_ix = ix.str.extract(pat)[0]
+        ix.name = "sample_id"
         session_ix.name = "session_ix"
-        ax = concat((sample_id, session_ix), axis=1)
-
-        # If session ix is not set, set it from
+        ax = concat((ix, session_ix), axis=1)
+        ax = ax.apply(strip_session_index, axis=1)
 
         data = ax.join(data)
         data = data.reset_index()
@@ -70,7 +82,10 @@ class LaserchronImporter(BaseImporter):
         data = data.set_index(["sample_id", "session_ix"], drop=True)
 
         #data.index = ax.index
-        sample_ids = "  ".join(list(data.index.unique(level=0)))
+        ids = list(data.index.unique(level=0))
+        if len(ids) > 10:
+            import IPython; IPython.embed(); raise
+        sample_ids = "  ".join(ids)
         print(sample_ids)
 
         return False
