@@ -212,10 +212,11 @@ CREATE TABLE IF NOT EXISTS analysis (
   id serial PRIMARY KEY,
   session_id integer REFERENCES session(id) NOT NULL,
   session_index integer, -- captures ordering within a session
-  -- Should key this to a foreign key table
-  analysis_type text,
   /* If `session_index` is not set, `analysis_type` allows the
     unique identification of a record within the session */
+  analysis_name text,
+  -- Should key this to a foreign key table
+  analysis_type text,
   date timestamptz,
   material text REFERENCES vocabulary.material(id),
   /* Not really sure that material is the best parameterization
@@ -238,7 +239,7 @@ CREATE TABLE IF NOT EXISTS analysis (
   */
   is_interpreted boolean,
   data jsonb,
-  UNIQUE (session_id, session_index, analysis_type)
+  UNIQUE (session_id, session_index, analysis_name)
 );
 
 CREATE TABLE IF NOT EXISTS datum (

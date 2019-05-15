@@ -83,10 +83,7 @@ class LaserchronImporter(BaseImporter):
 
         #data.index = ax.index
         ids = list(data.index.unique(level=0))
-        if len(ids) > 10:
-            import IPython; IPython.embed(); raise
         sample_ids = "  ".join(ids)
-        print(sample_ids)
 
         return False
 
