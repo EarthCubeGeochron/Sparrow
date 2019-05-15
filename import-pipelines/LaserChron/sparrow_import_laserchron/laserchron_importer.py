@@ -3,7 +3,7 @@ from itertools import chain
 from sparrow.import_helpers import BaseImporter, SparrowImportError
 from datetime import datetime
 from io import StringIO
-from pandas import read_csv
+from pandas import read_csv, concat
 
 from .normalize_data import normalize_data
 
@@ -46,9 +46,32 @@ class LaserchronImporter(BaseImporter):
         if not rec.csv_data:
             raise SparrowImportError("CSV data not extracted")
         data, meta = extract_table(rec.csv_data)
+        data.index.name = 'analysis'
+
+        # Start inferring things
         project = infer_project_name(rec.file_path)
 
-        infer_sample_name(data)
+        # Create sample name columns
+        pat = r"[\.\:_\s-](\w+)$"
+        ix = data.index.to_series().str.strip()
+        session_ix = ix.str.extract(pat)[0]
+        sample_id = (ix
+            .str.replace(pat, "")
+            .str.replace(r"[-\:-](0\d+)", r"-\1"))
+        sample_id.name = "sample_id"
+        session_ix.name = "session_ix"
+        ax = concat((sample_id, session_ix), axis=1)
+
+        # If session ix is not set, set it from
+
+        data = ax.join(data)
+        data = data.reset_index()
+
+        data = data.set_index(["sample_id", "session_ix"], drop=True)
+
+        #data.index = ax.index
+        sample_ids = "  ".join(list(data.index.unique(level=0)))
+        print(sample_ids)
 
         return False
 
