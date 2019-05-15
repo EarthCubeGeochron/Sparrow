@@ -72,7 +72,7 @@ def table_metadata(headers):
 
     return meta
 
-def extract_data(df):
+def normalize_data(df):
     if df.iloc[0,0].startswith("Table"):
         df = df[1:]
 

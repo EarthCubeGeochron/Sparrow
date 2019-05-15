@@ -2,6 +2,10 @@ from lxml.etree import tostring
 from itertools import chain
 from sparrow.import_helpers import BaseImporter, SparrowImportError
 from datetime import datetime
+from io import StringIO
+from pandas import read_csv
+
+from .normalize_data import normalize_data
 
 def extract_table(csv_data):
     tbl = csv_data
@@ -12,7 +16,7 @@ def extract_table(csv_data):
     f.seek(0)
     df = read_csv(f)
     df = df.iloc[:,1:]
-    return extract_data(df)
+    return normalize_data(df)
 
 def infer_project_name(fp):
     folders = fp.split("/")[:-1]
@@ -26,7 +30,7 @@ class LaserchronImporter(BaseImporter):
 
     def import_all(self):
         q = self.db.session.query(self.db.model.data_file)
-        self.iterfiles(q)
+        self.iteritems(q)
 
     def import_datafile(self, rec):
         """

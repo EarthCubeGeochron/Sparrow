@@ -1,3 +1,7 @@
+from click import secho
+
+class SparrowImportError(Exception):
+    pass
 
 class BaseImporter(object):
     """
@@ -76,10 +80,16 @@ class BaseImporter(object):
     def import_datafile(self, rec):
         raise NotImplementedError()
 
-    def iterfiles(self, file_sequence):
-        for f in file_sequence:
+    def iterfiles(self, file_sequence, **kwargs):
+        kwargs['parse_filename'] = lambda f: str(f)
+        self.iteritems(file_sequence, **kwargs)
+
+    def iteritems(self, seq, **kwargs):
+        fn = kwargs.pop("parse_filename", lambda f: str(f.file_path))
+        stop_on_error = kwargs.pop("stop_on_error", False)
+        for f in seq:
             try:
-                secho(str(f), dim=True)
+                secho(fn(f), dim=True)
                 imported = self.import_datafile(f)
                 self.db.session.commit()
                 if not imported:
