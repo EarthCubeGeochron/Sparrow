@@ -1,6 +1,8 @@
 from math import isnan
 from click import secho
 from pandas import concat
+import re
+
 from sparrow.import_helpers import SparrowImportError
 
 def merge_cols(d):
@@ -119,3 +121,38 @@ def normalize_data(df):
         meta = meta.iloc[:,:ncols]
 
     return data, meta
+
+def extract_session_index(sample_name):
+    pat = r"[\.\:_\s-](\w+)$"
+    s = re.search(pat, sample_name)
+    if s is not None:
+        return s.group(1)
+
+    pat = r"(\d+)$"
+    s = re.search(pat, sample_name)
+    if s is not None:
+        return s.group(1)
+    return None
+
+def strip_session_index(row):
+    v = (row.at['sample_id']
+        .rstrip(row.at['session_ix'])
+        .rstrip('.:_- '))
+    row.at['sample_id'] = v
+    return row
+
+def generalize_samples(data):
+    # Create sample name columns
+    pat = r"[\.\:_\s-](\w+)$"
+    ix = data.index.to_series().str.strip()
+    session_ix = ix.apply(extract_session_index)
+    #session_ix = ix.str.extract(pat)[0]
+    ix.name = "sample_id"
+    session_ix.name = "session_ix"
+    ax = concat((ix, session_ix), axis=1)
+    ax = ax.apply(strip_session_index, axis=1)
+
+    data = ax.join(data)
+    data = data.reset_index()
+
+    return data.set_index(["sample_id", "session_ix"], drop=True)

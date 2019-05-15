@@ -6,7 +6,7 @@ from io import StringIO
 from pandas import read_csv, concat
 import re
 
-from .normalize_data import normalize_data
+from .normalize_data import normalize_data, generalize_samples
 
 def extract_table(csv_data):
     tbl = csv_data
@@ -22,25 +22,6 @@ def extract_table(csv_data):
 def infer_project_name(fp):
     folders = fp.split("/")[:-1]
     return max(folders, key=len)
-
-def extract_session_index(sample_name):
-    pat = r"[\.\:_\s-](\w+)$"
-    s = re.search(pat, sample_name)
-    if s is not None:
-        return s.group(1)
-
-    pat = r"(\d+)$"
-    s = re.search(pat, sample_name)
-    if s is not None:
-        return s.group(1)
-    return None
-
-def strip_session_index(row):
-    v = (row.at['sample_id']
-        .rstrip(row.at['session_ix'])
-        .rstrip('.:_- '))
-    row.at['sample_id'] = v
-    return row
 
 class LaserchronImporter(BaseImporter):
     """
@@ -66,20 +47,7 @@ class LaserchronImporter(BaseImporter):
         # Start inferring things
         project = infer_project_name(rec.file_path)
 
-        # Create sample name columns
-        pat = r"[\.\:_\s-](\w+)$"
-        ix = data.index.to_series().str.strip()
-        session_ix = ix.apply(extract_session_index)
-        #session_ix = ix.str.extract(pat)[0]
-        ix.name = "sample_id"
-        session_ix.name = "session_ix"
-        ax = concat((ix, session_ix), axis=1)
-        ax = ax.apply(strip_session_index, axis=1)
-
-        data = ax.join(data)
-        data = data.reset_index()
-
-        data = data.set_index(["sample_id", "session_ix"], drop=True)
+        data = generalize_samples(data)
 
         #data.index = ax.index
         ids = list(data.index.unique(level=0))

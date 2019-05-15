@@ -300,13 +300,17 @@ CREATE TABLE IF NOT EXISTS data_file (
   file_path text UNIQUE,
   import_date timestamp,
   import_error text,
-  type_id text REFERENCES data_file_type(id),
+  type_id text REFERENCES data_file_type(id)
+);
+
+CREATE TABLE IF NOT EXISTS data_file_link (
   /*
   Foreign key columns to link to data that was imported from
   this file; this should be done at the appropriate level (e.g.
   sample, analysis, session) that fits the data file in question.
   */
-  session_id integer REFERENCES session(id),
-  analysis_id integer REFERENCES analysis(id),
-  sample_id text REFERENCES sample(id)
+  file_hash uuid REFERENCES data_file(file_hash) ON DELETE CASCADE,
+  session_id integer REFERENCES session(id) ON DELETE CASCADE,
+  analysis_id integer REFERENCES analysis(id)  ON DELETE CASCADE,
+  sample_id text REFERENCES sample(id) ON DELETE CASCADE
 );
