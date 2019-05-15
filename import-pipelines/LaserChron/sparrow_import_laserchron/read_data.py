@@ -1,5 +1,6 @@
 from math import isnan
 from click import secho
+from pandas import concat
 
 def itercells(df):
     for i, r in df.iterrows():
@@ -57,45 +58,85 @@ def merge_cols(d):
         pass
 
     v = (v1,v2)
-    if "Pb" in v1:
+    if "Pb" in v1 or "Th" in v1:
         return "/".join(v)
     return " ".join(v)
 
-def is_concentration(column):
-    return (
-        str(column.iloc[0]).lower() == 'conc'
-        and '%' in str(column.iloc[1]))
-    return True
+def columns_units(headers):
+    columns = headers.apply(merge_cols, axis=0)
+    units = columns.str.extract('\((.+)\)').iloc[:,0]
 
-def get_columns_and_units(df):
-    headers = df.iloc[1:3, 1:].dropna(axis=1, how='all')
-    h1 = headers.apply(merge_cols, axis=0)
-
-    units = h1.str.extract('\((.+)\)').iloc[:,0]
+    # Extract units and make sure all are defined
     for i, u in enumerate(units):
         if str(u) != 'nan': continue
-        next = units.iat[i+1]
-        print(next)
-        if next == 'Ma':
+        next_col_unit = units.iat[i+1]
+        c = columns.iat[i]
+        this_unit = None
+        if next_col_unit == 'Ma':
+            # Set this unit to Ma...
             units.iat[i] = 'Ma'
-            h1.iat[i] = str(h1.iat[i])+" age"
-            continue
-        if next == '%':
+            columns.iat[i] = str(c)+" age"
+        elif next == '%':
             units.iat[i] = 'ratio'
-            continue
-        if "/" in h1.iat[i] and not "age" in h1.iat[i]:
+        elif "/" in c and not "age" in c:
             units.iat[i] = 'ratio'
+        elif 'error corr' in c:
+            units.iat[i] = 'dimensionless'
 
+    # Get rid of units
+    columns = columns.str.replace(' \(.+\)$',"")
 
-    import IPython; IPython.embed(); raise
+    for i,col in enumerate(columns):
+        if col.strip() != '±': continue
+        columns.iat[i] = columns.iat[i-1]+" error"
+
+    # Make sure that we have defined units for all columns
+    try:
+        assert not units.isnull().values.any()
+        assert not columns.isnull().values.any()
+    except AssertionError:
+        print(columns, units)
+
+    # Clean columns
+    # ...this is kinda ridiculous
+    ix = (columns
+        .str.replace("[\*\/\s\.]+"," ")
+        .str.strip()
+        .str.replace("^(\d{3}\w{1,2}\s\d{3}\w{1,2}) age", r"age \1")
+        .str.replace("Best age", "best age")
+        .str.replace("^Conc$","concordance")
+        .str.replace("\s+","_"))
+
+    meta = (concat((columns, units), axis=1)
+            .transpose()
+            .rename(columns=ix))
+    meta.columns.name = "Column"
+    meta.index = ["Description", "Unit"]
+    meta.at["Description", "U"] = "Uranium concentration"
+    meta.at["Description", "concordance"] = "Concordance"
+
+    return meta
 
 def extract_data(df):
     if df.iloc[0,0].startswith("Table"):
         df = df[1:]
 
+    # Drop empty rows
     df = df.dropna(how='all')
-    get_columns_and_units(df)
-    headers = df.iloc[1:3].dropna(axis=1, how='all')
+
+    # Drop columns that are empty in the header
+    # Note: this does not preserve comments and some other metadata;
+    # we may want to.
+    header = df.iloc[1:3, 1:].dropna(axis=1, how='all')
+    columns = columns_units(header)
+
+    body = df.iloc[3:].set_index(df.columns[0])
+    body.index.name = 'Analysis'
+    body.drop(body.columns.difference(header.columns), 1, inplace=True)
+
+    assert body.shape[1] == columns.shape[1]
+
+
     print(len(headers.columns))
 
     try:
