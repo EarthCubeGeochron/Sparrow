@@ -3,6 +3,7 @@ from pandas import read_csv
 from io import StringIO
 from click import echo, secho
 from .read_data import extract_data
+from sparrow.import_helpers import SparrowImportError
 
 def normalize_table(db, rec):
     tbl = rec.csv_data
@@ -15,13 +16,18 @@ def normalize_table(db, rec):
     df = df.iloc[:,1:]
     df = extract_data(df)
 
+def import_datafile(db, rec):
+    if "NUPM-MON" in rec.basename:
+        raise SparrowImportError("NUPM-MON files are not handled yet")
+    data = normalize_table(db, rec)
+
 def normalize_data():
     db = Database()
     query = db.session.query(db.model.data_file)
 
     for rec in query:
         secho(rec.file_path, fg="cyan")
-        if "NUPM-MON" in rec.basename:
-            secho("NUPM-MON files are not handled yet", fg='red')
-            continue
-        normalize_table(db, rec)
+        try:
+            import_datafile(db, rec)
+        except SparrowImportError as err:
+            secho(str(err), fg='red')
