@@ -30,7 +30,7 @@ def pretty_print(sql, **kwargs):
         for i in ["SELECT", "INSERT","UPDATE","CREATE", "DROP","DELETE", "ALTER"]:
             if not line.startswith(i):
                 continue
-            start = line.split("(")[0].strip()
+            start = line.split("(")[0].strip().rstrip(';').replace(" AS","")
             secho(start, **kwargs)
             return
 

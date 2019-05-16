@@ -27,13 +27,6 @@ CREATE TABLE IF NOT EXISTS publication (
   title text
 );
 
-/*
-Vocabularies
-Tables to integrate units, etc.
-from curated collections
-*/
-CREATE SCHEMA IF NOT EXISTS vocabulary;
-
 CREATE TABLE IF NOT EXISTS vocabulary.parameter (
   id text PRIMARY KEY,
   description text,
