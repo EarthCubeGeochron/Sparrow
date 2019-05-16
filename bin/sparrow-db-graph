@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-# Description: Graph database schema
+# Description: Graph database schema to `dot` format.
 
 if ! type "sadisplay" > /dev/null; then
   pip install git+https://github.com/davenquinn/sadisplay.git
