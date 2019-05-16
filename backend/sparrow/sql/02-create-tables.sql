@@ -119,7 +119,8 @@ CREATE TABLE IF NOT EXISTS datum_type (
 An object to be measured
 */
 CREATE TABLE IF NOT EXISTS sample (
-  id text PRIMARY KEY,
+  id serial PRIMARY KEY,
+  name text,
   igsn text UNIQUE,
   material text REFERENCES vocabulary.material(id),
   /* Order-of-magnitude precision (in meters)
@@ -129,7 +130,9 @@ CREATE TABLE IF NOT EXISTS sample (
   /* A representative named location */
   location_name text,
   location geometry,
-  embargo_date timestamp without time zone
+  elevation numeric,
+  embargo_date timestamp,
+  CHECK ((name IS NOT null) OR (igsn IS NOT null))
 );
 /*
 #### Potential issues:
@@ -157,7 +160,7 @@ closely spaced in time.
 */
 CREATE TABLE IF NOT EXISTS session (
   id serial PRIMARY KEY,
-  sample_id text REFERENCES sample(id)
+  sample_id integer REFERENCES sample(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
   project_id integer REFERENCES project(id),
   publication_id integer REFERENCES publication(id),
@@ -308,7 +311,7 @@ CREATE TABLE IF NOT EXISTS import_tracker (
   analysis_id integer
     REFERENCES analysis(id)
     ON DELETE CASCADE,
-  sample_id text
+  sample_id integer
     REFERENCES sample(id)
     ON DELETE CASCADE
 );

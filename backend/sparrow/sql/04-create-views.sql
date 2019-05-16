@@ -83,7 +83,6 @@ SELECT
     FROM instrument
     WHERE id = s.instrument
   ) instrument,
-  sa.id sample_id,
   ( SELECT
       tree
     FROM
@@ -95,7 +94,9 @@ SELECT
     FROM core_view.material_tree
     WHERE id = sa.material
   ) sample_material,
+  sa.id sample_id,
   sa.igsn,
+  sa.name sample_name,
   s.project_id,
   sa.location,
   is_public(s)
@@ -124,6 +125,7 @@ SELECT
   a.session_id,
   a.session_index,
   s.sample_id,
+  sa.name sample_name,
   s.technique
 FROM datum d
 JOIN analysis a
@@ -132,6 +134,8 @@ JOIN datum_type t
   ON d.type = t.id
 JOIN session s
   ON a.session_id = s.id
+JOIN sample sa
+  ON s.sample_id = sa.id
 ORDER BY d.id;
 
 CREATE VIEW core_view.age_datum AS
@@ -147,6 +151,7 @@ CREATE VIEW core_view.sample AS
 SELECT
   s.id,
   s.igsn,
+  s.name,
   s.material,
   ST_AsGeoJSON(s.location) geometry,
   location_name,
