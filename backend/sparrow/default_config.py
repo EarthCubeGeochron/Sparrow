@@ -2,7 +2,7 @@ from os import environ
 from datetime import timedelta
 from pathlib import Path
 
-LAB_NAME="Test lab"
+LAB_NAME= environ.get("SPARROW_LAB_NAME", "Test lab")
 DATABASE="postgresql:///earthcube_labdata_test"
 BASE_URL= environ.get("SPARROW_BASE_URL", "/")
 

@@ -9,3 +9,9 @@ VALUES
 ('Ma', 'Boise State'),
 ('unknown', 'Daven Quinn')
 ON CONFLICT DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS igsn_data (
+  igsn text PRIMARY KEY,
+  import_date timestamp DEFAULT now(),
+  data jsonb
+);

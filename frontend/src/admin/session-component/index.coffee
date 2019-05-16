@@ -2,14 +2,18 @@ import h from 'react-hyperscript'
 import {Component} from 'react'
 import {Breadcrumbs, Button, Intent} from '@blueprintjs/core'
 import {Link} from 'react-router-dom'
+import {Frame} from 'app/frame'
 
 import {GeoDeepDiveCard} from './gdd-card'
 import {SessionInfoCard} from './info-card'
 import {APIResultView} from '@macrostrat/ui-components'
+import {StepHeatingChart} from '../../../plugins/step-heating'
 
 class SessionComponent extends Component
   render: ->
     {id} = @props
+    return null unless id?
+    console.log id
 
     breadCrumbs = [
       { text: h(Link, {to: '/admin/session'}, "Analytical Sessions") },
@@ -26,6 +30,9 @@ class SessionComponent extends Component
         {sample_id} = res
         h 'div', [
           h SessionInfoCard, res
+          h Frame, {id: 'sessionDetail'}, (props)=>
+            # This should be passed through the component tree
+            h StepHeatingChart, {session_id: id}
           h Button, {icon: 'document', intent: Intent.PRIMARY}, "Get data file"
           h GeoDeepDiveCard, {sample_id}
         ]

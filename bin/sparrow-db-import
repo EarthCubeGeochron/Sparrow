@@ -6,7 +6,7 @@ sparrow db-await
 internal_name=/tmp/database-dump.pg-dump
 container_id=$(sparrow compose ps -q db)
 
-cat "$1" | docker cp - $container_id:$internal_name
+docker cp "$1" $container_id:$internal_name
 
 sparrow compose exec -T db bash -s <<EOF
 dropdb --if-exists -Upostgres sparrow

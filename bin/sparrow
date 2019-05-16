@@ -25,7 +25,7 @@ fi
 
 # If we haven't yet sourced the config file in a higher-level script
 if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
-  echo "Using config file $(tput bold)$SPARROW_CONFIG$(tput sgr0)" >&2
+  echo "Config file: $(tput bold)$SPARROW_CONFIG$(tput sgr0)" >&2
   export SPARROW_CONFIG="$SPARROW_CONFIG"
   source "$SPARROW_CONFIG"
   export _SPARROW_CONFIG_SOURCED=1
@@ -42,12 +42,13 @@ cd "$SPARROW_PATH"
 # ENVIRONMENT VARIABLE DEFAULTS
 # Set variables that might not be created in the config file
 # to default values
-default="$SPARROW_PATH/config/default-site-content"
+default="$SPARROW_PATH/frontend/default-content"
 export SPARROW_BASE_URL="${SPARROW_BASE_URL:-"/"}"
 export SPARROW_LAB_NAME="${SPARROW_LAB_NAME:-"My Lab"}"
 export SPARROW_INIT_SQL="${SPARROW_INIT_SQL:-"placeholder"}"
 export SPARROW_SITE_CONTENT="${SPARROW_SITE_CONTENT:-"$default"}"
 export SPARROW_HTTP_PORT="${SPARROW_HTTP_PORT:-5002}"
+export SPARROW_DB_PORT="${SPARROW_DB_PORT:-"54321-54351"}"
 # This will be settable in the future
 export SPARROW_ENV="development"
 
@@ -83,10 +84,10 @@ echo-help() {
   done
 }
 
-if [ $subcommand = '--help' ]; then
+if [ $subcommand = '--help' ] || [ $subcommand = 'help' ]; then
   # Get help from within sparrow container
   # and append docker wrapper commands
-  sparrow compose run backend python3 sparrow --help
+  sparrow compose run --no-deps backend python3 sparrow --help
   [ ! -z $SPARROW_COMMANDS ] && \
     echo-help "Lab-specific commands" "$SPARROW_COMMANDS"
   echo-help "Docker orchestration commands" "$dir"
