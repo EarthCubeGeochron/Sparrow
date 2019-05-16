@@ -309,6 +309,7 @@ CREATE TABLE IF NOT EXISTS data_file_link (
   this file; this should be done at the appropriate level (e.g.
   sample, analysis, session) that fits the data file in question.
   */
+  id serial PRIMARY KEY,
   file_hash uuid REFERENCES data_file(file_hash) ON DELETE CASCADE,
   session_id integer REFERENCES session(id) ON DELETE CASCADE,
   analysis_id integer REFERENCES analysis(id)  ON DELETE CASCADE,

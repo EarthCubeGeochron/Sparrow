@@ -4,7 +4,8 @@ from sparrow.import_helpers import BaseImporter, SparrowImportError
 from datetime import datetime
 from io import StringIO
 from pandas import read_csv, concat
-import re
+from math import isnan
+from sqlalchemy.exc import IntegrityError, DataError
 
 from .normalize_data import normalize_data, generalize_samples
 
@@ -42,6 +43,7 @@ class LaserchronImporter(BaseImporter):
         if not rec.csv_data:
             raise SparrowImportError("CSV data not extracted")
         data, meta = extract_table(rec.csv_data)
+        self.meta = meta
         data.index.name = 'analysis'
 
         # Start inferring things
@@ -51,83 +53,88 @@ class LaserchronImporter(BaseImporter):
 
         #data.index = ax.index
         ids = list(data.index.unique(level=0))
-        sample_ids = "  ".join(ids)
 
-        return False
+        for sample_id in ids:
+            print(sample_id)
+            df = data.xs(sample_id, level='sample_id', drop_level=False)
+            try:
+                session = self.import_session(rec, df)
+            except DataError as err:
+                raise SparrowImportError("Data error")
+            except IntegrityError as err:
+                raise SparrowImportError("Integrity error")
+            return True
 
 
-    def import_session(self, df, date):
+    def import_session(self, rec, df):
+
         date = rec.file_mtime or datetime.min()
+
+        sample_id = df.index.unique(level=0)[0]
+        sample = self.sample(id=sample_id)
         session = self.models.session(date=date)
+        session._sample = sample
         # Add this to our data file model
-        rec._session = session
+        dt = self.db.get_or_create(self.db.model.data_file_type)
+        dt._session = session
+        dt._sample = sample
+        dt._data_file = rec
 
-        # Import analysis sessions
-        igsn = text(et, "sampleIGSN")
-        if str(igsn) == '0': igsn = None
-        name = text(et, "aliquotName")
-        if igsn or name:
-            session._sample = self.sample(id=name, igsn=igsn)
-
-        fractions = et.find("analysisFractions")
-
-        for i,f in enumerate(fractions):
-            s = self.import_analysis(f, session_index=i, analysis_type="analysisFraction")
-            s._session = session
-            self.db.session.add(s)
-
-        s1 = self.import_dates(et.find("sampleDateModels"))
-        s1._session = session
-        self.db.session.add(s1)
-
+        self.db.session.add(sample)
         self.db.session.add(session)
+        self.db.session.add(dt)
 
-    def import_dates(self, et):
-        """
-        SampleDateModel -> analysis(interpreted: true)
-        """
-        models = et.findall("SampleDateModel")
+        for i, row in df.iterrows():
+            analysis = self.import_analysis(row)
+            analysis._session = session
+            self.db.session.add(analysis)
 
-        # Need to specify unit somehow
-        values = [self.import_datum(f) for f in models]
+    def import_analysis(self, row):
+        """
+        row -> analysis
+        """
 
         analysis = self.models.analysis(
-            is_interpreted=True,
-            is_standard=False,
-            analysis_type="Interpreted Age")
-        analysis.datum_collection = [v for v in values if v is not None]
+            session_index=row.name[1],
+            analysis_name=row['analysis'])
+
+        analysis.datum_collection = list(self.import_data(row))
         return analysis
 
-    def import_analysis(self, et, **kwargs):
-        """
-        AnalysisFraction -> analysis
-        """
-        def data_iterator(et, key, unit, model="ValueModel"):
-            return (self.import_datum(f)
-                for f in et.find(key).findall(model))
+    def import_data(self, row):
+        for i in row.iteritems():
+            d = self.import_datum(*i, row)
+            if d is None: continue
+            yield d
 
-        values = chain(
-            data_iterator(et, 'analysisMeasures', 'unknown'),
-            data_iterator(et, "measuredRatios", 'ratio_measured', model='MeasuredRatioModel'),
-            data_iterator(et, "radiogenicIsotopeRatios", 'ratio_radiogenic'))
-
-        analysis = self.models.analysis(**kwargs)
-
-        analysis.datum_collection = [d for d in values if d is not None]
-        return analysis
-
-    def import_datum(self, et):
+    def import_datum(self, key, value, row):
         """
         ValueModel -> datum
         """
-        parameter = et.find('name').text
-        try:
-            value = et.find('value').text
-            assert float(value) is not None
-        except:
+        if key == 'analysis':
+            return None
+        if key.endswith("_error"):
+            return None
+        value = float(value)
+        if isnan(value):
             return None
 
+        m = self.meta[key]
+        parameter = m.name
+
+        unit = self.unit(m.at['Unit']).id
+
+        err = None
+        err_unit = None
+        try:
+            err_ix = key+"_error"
+            err = row.at[err_ix]
+            err_unit = self.unit(self.meta[err_ix].at['Unit']).id
+        except KeyError:
+            pass
 
         return self.datum(parameter, value,
-            error=text(et, 'oneSigma'),
-            error_metric=text(et, 'uncertaintyType'))
+            unit=unit,
+            error=err,
+            error_unit=err_unit,
+            error_metric="2s")

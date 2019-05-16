@@ -1,6 +1,6 @@
 from math import isnan
 from click import secho
-from pandas import concat
+from pandas import concat, to_numeric
 import re
 
 from sparrow.import_helpers import SparrowImportError
@@ -108,7 +108,6 @@ def normalize_data(df):
 
     # For some reason we have a lot of these closed brackets in data files
     data.index = data.index.str.replace(' <>','')
-
     data.columns = meta.columns
 
     ncols = 19
@@ -153,6 +152,9 @@ def generalize_samples(data):
     ax = ax.apply(strip_session_index, axis=1)
 
     data = ax.join(data)
+
+    # Session index should be integer
+    data['session_ix'] = to_numeric(data['session_ix'], errors='coerce')
     data = data.reset_index()
 
     return data.set_index(["sample_id", "session_ix"], drop=True)
