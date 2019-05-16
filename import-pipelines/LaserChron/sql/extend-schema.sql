@@ -6,3 +6,6 @@ INSERT INTO data_file_type (id) VALUES
   so we don't have to carry along the entire ETAgeCalc/
   NuAgeCalc apparatus in memory */
 ALTER TABLE data_file ADD COLUMN csv_data bytea;
+
+-- Embargo permanantly by default
+ALTER TABLE project ALTER COLUMN embargo_date SET DEFAULT 'infinity';
