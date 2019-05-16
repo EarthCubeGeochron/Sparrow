@@ -76,7 +76,7 @@ class LaserchronImporter(BaseImporter):
         session = self.models.session(date=date)
         session._sample = sample
         # Add this to our data file model
-        dt = self.db.get_or_create(self.db.model.data_file_type)
+        dt = self.db.model.data_file_link()
         dt._session = session
         dt._sample = sample
         dt._data_file = rec

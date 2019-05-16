@@ -92,25 +92,6 @@ CREATE TABLE IF NOT EXISTS project_publication (
   PRIMARY KEY (project_id, publication_id)
 );
 
-/*
-### Analytical Groups
-
-Groups of sessions for import are less universally
-meaningful than project-based groups. However, these
-can be important for internal lab processes.
-Examples include irradiation IDs for Ar/Ar labs, etc.
-
-Right now, we only support a single measurement group
-for each session. This could potentially be updated
-to support a one-to-many relationship if desired.
-
-This might be a good candidate to drop from the core schema
-*/
-CREATE TABLE IF NOT EXISTS measurement_group (
-  id text PRIMARY KEY,
-  title text NOT NULL
-);
-
 -- Descriptors for types of measurements/techniques
 
 CREATE TABLE IF NOT EXISTS instrument (
@@ -176,16 +157,16 @@ closely spaced in time.
 */
 CREATE TABLE IF NOT EXISTS session (
   id serial PRIMARY KEY,
-  sample_id text REFERENCES sample(id),
+  sample_id text REFERENCES sample(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
   project_id text REFERENCES project(id),
   publication_id integer REFERENCES publication(id),
-  measurement_group_id text REFERENCES measurement_group(id),
-  date timestamptz NOT NULL,
-  end_date timestamptz,
+  date timestamp NOT NULL,
+  end_date timestamp,
   instrument integer REFERENCES instrument(id),
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
-  embargo_date timestamp without time zone,
+  embargo_date timestamp,
   /* A field to store extra, unstructured session data */
   data jsonb,
   UNIQUE (sample_id, date, instrument, technique)
@@ -210,14 +191,16 @@ Set of data measured together at one time on one instrument
 */
 CREATE TABLE IF NOT EXISTS analysis (
   id serial PRIMARY KEY,
-  session_id integer REFERENCES session(id) NOT NULL,
+  session_id integer NOT NULL
+    REFERENCES session(id)
+    ON DELETE CASCADE,
   session_index integer, -- captures ordering within a session
   /* If `session_index` is not set, `analysis_type` allows the
     unique identification of a record within the session */
   analysis_name text,
   -- Should key this to a foreign key table
   analysis_type text,
-  date timestamptz,
+  date timestamp,
   material text REFERENCES vocabulary.material(id),
   /* Not really sure that material is the best parameterization
      of this concept... */
@@ -244,7 +227,8 @@ CREATE TABLE IF NOT EXISTS analysis (
 
 CREATE TABLE IF NOT EXISTS datum (
   id serial PRIMARY KEY,
-  analysis integer REFERENCES analysis(id),
+  analysis integer REFERENCES analysis(id)
+    ON DELETE CASCADE,
   type integer REFERENCES datum_type(id),
   value numeric NOT NULL,
   error numeric,
@@ -279,9 +263,11 @@ CREATE TABLE IF NOT EXISTS session_datum (
   /*
   Handles many-to-many links between session and datum, which
   is primarily useful for handling analytical parameters
-  that remain constant across many sessions.
+  that remain constant across many sessions (e.g. decay constants,
+  assumed physical parameters).
   */
-  session_id integer REFERENCES session(id),
+  session_id integer REFERENCES session(id)
+    ON DELETE CASCADE,
   datum_id integer REFERENCES datum(id)
 );
 
@@ -298,20 +284,31 @@ CREATE TABLE IF NOT EXISTS data_file (
   file_mtime timestamp,
   basename text,
   file_path text UNIQUE,
-  import_date timestamp,
-  import_error text,
   type_id text REFERENCES data_file_type(id)
 );
 
-CREATE TABLE IF NOT EXISTS data_file_link (
+CREATE TABLE IF NOT EXISTS import_tracker (
   /*
   Foreign key columns to link to data that was imported from
   this file; this should be done at the appropriate level (e.g.
   sample, analysis, session) that fits the data file in question.
+
+  Note: this table is part of the internal import process
+  and could change at more or less any time.
   */
   id serial PRIMARY KEY,
-  file_hash uuid REFERENCES data_file(file_hash) ON DELETE CASCADE,
-  session_id integer REFERENCES session(id) ON DELETE CASCADE,
-  analysis_id integer REFERENCES analysis(id)  ON DELETE CASCADE,
-  sample_id text REFERENCES sample(id) ON DELETE CASCADE
+  file_hash uuid NOT NULL
+    REFERENCES data_file(file_hash)
+    ON DELETE CASCADE,
+  date timestamp NOT NULL,
+  error text,
+  session_id integer
+    REFERENCES session(id)
+    ON DELETE CASCADE,
+  analysis_id integer
+    REFERENCES analysis(id)
+    ON DELETE CASCADE,
+  sample_id text
+    REFERENCES sample(id)
+    ON DELETE CASCADE
 );
