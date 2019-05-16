@@ -86,7 +86,6 @@ class LaserchronImporter(BaseImporter):
 
         return True
 
-
     def import_session(self, rec, df):
 
         date = rec.file_mtime or datetime.min()
