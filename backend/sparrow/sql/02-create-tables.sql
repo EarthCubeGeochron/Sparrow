@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS researcher (
 
 /*
 The `user` model parallels the
-`researcher` model but used only for application
+`researcher` model but is used only for application
 authentication. We can reset all application access by
 truncating this table, without losing data.
 */
@@ -300,7 +300,7 @@ CREATE TABLE IF NOT EXISTS import_tracker (
   file_hash uuid NOT NULL
     REFERENCES data_file(file_hash)
     ON DELETE CASCADE,
-  date timestamp NOT NULL,
+  date timestamp NOT NULL DEFAULT now(),
   error text,
   session_id integer
     REFERENCES session(id)

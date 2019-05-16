@@ -6,6 +6,7 @@ from io import StringIO
 from pandas import read_csv, concat
 from math import isnan
 import numpy as N
+from click import secho
 from sqlalchemy.exc import IntegrityError, DataError
 
 from .normalize_data import normalize_data, generalize_samples
@@ -35,7 +36,7 @@ class LaserchronImporter(BaseImporter):
         q = self.db.session.query(self.db.model.data_file)
         self.iteritems(q)
 
-    def import_datafile(self, rec):
+    def import_datafile(self, rec, redo=True):
         """
         data file -> sample(s)
         """
@@ -55,16 +56,35 @@ class LaserchronImporter(BaseImporter):
         #data.index = ax.index
         ids = list(data.index.unique(level=0))
 
+        imported = (self.db.session.query(self.db.model.import_tracker)
+            .filter_by(file_hash=rec.file_hash).count())
+        if imported > 0 and not redo:
+            return False
+        # Delete previous iteration
+        self.delete_session(rec)
+
         for sample_id in ids:
-            print(sample_id)
+            dt = self.db.model.import_tracker()
+            dt._data_file = rec
+
+            session = None
             df = data.xs(sample_id, level='sample_id', drop_level=False)
+
             try:
                 session = self.import_session(rec, df)
-            except DataError as err:
-                raise SparrowImportError("Data error")
+                self.db.session.commit()
+                dt._session = session
+                dt._sample = session._sample
             except IntegrityError as err:
-                raise SparrowImportError("Integrity error")
-            return True
+                self.db.session.rollback()
+                dt.error = "Integrity Error"
+                secho(dt.error, fg='red')
+                dt.date = None
+
+            self.db.session.add(dt)
+            self.db.session.commit()
+
+        return True
 
 
     def import_session(self, rec, df):
@@ -75,20 +95,15 @@ class LaserchronImporter(BaseImporter):
         sample = self.sample(id=sample_id)
         session = self.models.session(date=date)
         session._sample = sample
-        # Add this to our data file model
-        dt = self.db.model.data_file_link()
-        dt._session = session
-        dt._sample = sample
-        dt._data_file = rec
 
         self.db.session.add(sample)
-        self.db.session.add(session)
-        self.db.session.add(dt)
 
         for i, row in df.iterrows():
             analysis = self.import_analysis(row)
             analysis._session = session
-            self.db.session.add(analysis)
+
+        self.db.session.add(session)
+        return session
 
     def import_analysis(self, row):
         """

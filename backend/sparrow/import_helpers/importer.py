@@ -1,4 +1,6 @@
 from click import secho
+from ..util import relative_path
+from sqlalchemy import text
 
 class SparrowImportError(Exception):
     pass
@@ -79,6 +81,15 @@ class BaseImporter(object):
 
     def import_datafile(self, rec):
         raise NotImplementedError()
+
+    def delete_session(self, rec):
+        """
+        Delete session(s) given a data file model
+        """
+        fn = relative_path(__file__, 'sql', 'delete-session.sql')
+        sql = text(open(fn).read())
+        self.db.session.execute(sql, {'file_hash': rec.file_hash})
+        self.db.session.commit()
 
     def iterfiles(self, file_sequence, **kwargs):
         kwargs['parse_filename'] = lambda f: str(f)

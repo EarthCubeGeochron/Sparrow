@@ -1,5 +1,5 @@
 DELETE
 FROM session s
-USING data_file_import d
+USING import_tracker d
 WHERE d.file_hash = :file_hash
   AND d.session_id = s.id;
