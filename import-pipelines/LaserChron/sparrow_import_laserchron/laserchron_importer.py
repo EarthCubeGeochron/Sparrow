@@ -5,6 +5,7 @@ from datetime import datetime
 from io import StringIO
 from pandas import read_csv, concat
 from math import isnan
+import numpy as N
 from sqlalchemy.exc import IntegrityError, DataError
 
 from .normalize_data import normalize_data, generalize_samples
@@ -93,9 +94,14 @@ class LaserchronImporter(BaseImporter):
         """
         row -> analysis
         """
+        # session index should not be nan
+        try:
+            ix = int(row.name[1])
+        except ValueError:
+            ix = None
 
         analysis = self.models.analysis(
-            session_index=row.name[1],
+            session_index=ix,
             analysis_name=row['analysis'])
 
         analysis.datum_collection = list(self.import_data(row))
@@ -115,6 +121,11 @@ class LaserchronImporter(BaseImporter):
             return None
         if key.endswith("_error"):
             return None
+        if key == 'best_age':
+            # We test for best ages separately, since they
+            # must be one of the other ages
+            return None
+
         value = float(value)
         if isnan(value):
             return None
@@ -129,12 +140,22 @@ class LaserchronImporter(BaseImporter):
         try:
             err_ix = key+"_error"
             err = row.at[err_ix]
-            err_unit = self.unit(self.meta[err_ix].at['Unit']).id
+            i = self.meta[err_ix].at['Unit']
+            err_unit = self.unit(i).id
         except KeyError:
             pass
 
-        return self.datum(parameter, value,
+        is_age = key.startswith("age_")
+
+        datum = self.datum(parameter, value,
             unit=unit,
             error=err,
             error_unit=err_unit,
-            error_metric="2s")
+            error_metric="2s",
+            is_interpreted=is_age)
+
+        if is_age:
+            # Test if it is best age
+            best_age = float(row.at['best_age'])
+            datum.is_accepted = N.allclose(value, best_age)
+        return datum
