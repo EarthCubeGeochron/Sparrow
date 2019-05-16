@@ -36,7 +36,7 @@ CREATE VIEW core_view.session AS
 SELECT
 	s.*,
 	i.name instrument_name,
-  p.title project_name,
+  p.name project_name,
   is_public(s)
 FROM session s
 LEFT JOIN instrument i
@@ -152,7 +152,7 @@ SELECT
   location_name,
   location_precision,
   p.id project_id,
-  p.title project_title,
+  p.name project_name,
   is_public(s)
 FROM sample s
 JOIN session ss
@@ -193,7 +193,7 @@ CREATE VIEW core_view.project AS
 SELECT
 	p.id,
 	p.description,
-	p.title,
+	p.name,
   p.embargo_date,
   NOT embargoed(p.embargo_date) AS is_public,
 	-- Get data from researchers table in standard format

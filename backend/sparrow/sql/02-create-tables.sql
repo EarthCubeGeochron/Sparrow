@@ -70,10 +70,10 @@ CREATE TABLE IF NOT EXISTS vocabulary.error_metric (
 -- Projects
 
 CREATE TABLE IF NOT EXISTS project (
-  id text PRIMARY KEY,
-  title text NOT NULL,
+  id serial PRIMARY KEY,
+  name text NOT NULL,
   description text,
-  embargo_date timestamp without time zone
+  embargo_date timestamp
 );
 
 /*
@@ -81,13 +81,13 @@ If researchers on a project have application user accounts,
 they can see data even if embargoed (not yet implemented).
 */
 CREATE TABLE IF NOT EXISTS project_researcher (
-  project_id text REFERENCES project(id),
+  project_id integer REFERENCES project(id),
   researcher_id integer REFERENCES researcher(id),
   PRIMARY KEY (project_id, researcher_id)
 );
 
 CREATE TABLE IF NOT EXISTS project_publication (
-  project_id text REFERENCES project(id),
+  project_id integer REFERENCES project(id),
   publication_id integer REFERENCES publication(id),
   PRIMARY KEY (project_id, publication_id)
 );
@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS session (
   id serial PRIMARY KEY,
   sample_id text REFERENCES sample(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
-  project_id text REFERENCES project(id),
+  project_id integer REFERENCES project(id),
   publication_id integer REFERENCES publication(id),
   date timestamp NOT NULL,
   end_date timestamp,

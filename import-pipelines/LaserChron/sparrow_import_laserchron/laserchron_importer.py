@@ -32,11 +32,12 @@ class LaserchronImporter(BaseImporter):
     """
     authority = "ALC"
 
-    def import_all(self):
+    def import_all(self, redo=False):
+        self.redo = redo
         q = self.db.session.query(self.db.model.data_file)
         self.iteritems(q)
 
-    def import_datafile(self, rec, redo=True):
+    def import_datafile(self, rec, redo=False):
         """
         data file -> sample(s)
         """
@@ -44,24 +45,23 @@ class LaserchronImporter(BaseImporter):
             raise SparrowImportError("NUPM-MON files are not handled yet")
         if not rec.csv_data:
             raise SparrowImportError("CSV data not extracted")
+
+        n_imported = (self.db.session.query(self.db.model.import_tracker)
+            .filter_by(file_hash=rec.file_hash).count())
+        # The below is false
+        if n_imported > 0 and not self.redo:
+            return False
+        # Delete previous iteration
+        self.delete_session(rec)
+
         data, meta = extract_table(rec.csv_data)
         self.meta = meta
         data.index.name = 'analysis'
-
-        # Start inferring things
-        project = infer_project_name(rec.file_path)
 
         data = generalize_samples(data)
 
         #data.index = ax.index
         ids = list(data.index.unique(level=0))
-
-        imported = (self.db.session.query(self.db.model.import_tracker)
-            .filter_by(file_hash=rec.file_hash).count())
-        if imported > 0 and not redo:
-            return False
-        # Delete previous iteration
-        self.delete_session(rec)
 
         for sample_id in ids:
             dt = self.db.model.import_tracker()
@@ -88,13 +88,19 @@ class LaserchronImporter(BaseImporter):
 
     def import_session(self, rec, df):
 
+        # Infer project name
+        project_name = infer_project_name(rec.file_path)
+        project = self.project(project_name)
+
         date = rec.file_mtime or datetime.min()
 
         sample_id = df.index.unique(level=0)[0]
         sample = self.sample(id=sample_id)
         session = self.models.session(date=date)
         session._sample = sample
+        session._project = project
 
+        self.db.session.add(project)
         self.db.session.add(sample)
 
         for i, row in df.iterrows():

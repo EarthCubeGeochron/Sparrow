@@ -30,7 +30,8 @@ def extract_data(db, stop_on_error=False):
 @option('--verbose','-v', is_flag=True, default=False)
 @option('--extract/--no-extract', default=False)
 @option('--normalize/--no-normalize', default=True)
-def cli(stop_on_error=False, verbose=False, extract=False, normalize=True):
+@option('--redo', default=False, is_flag=True)
+def cli(stop_on_error=False, verbose=False, extract=False, normalize=True, redo=False):
     """
     Import LaserChron files
     """
@@ -50,4 +51,4 @@ def cli(stop_on_error=False, verbose=False, extract=False, normalize=True):
             extract_data(db)
     if normalize:
         importer = LaserchronImporter(db)
-        importer.import_all()
+        importer.import_all(redo=redo)

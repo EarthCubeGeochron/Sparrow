@@ -25,6 +25,9 @@ class BaseImporter(object):
             self.models.publication,
             doi=doi, defaults=dict(title=title))
 
+    def project(self, name):
+        return self.db.get_or_create(self.db.model.project, name=name)
+
     def unit(self, id):
         return self.db.get_or_create(
             self.models.unit,
