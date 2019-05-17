@@ -31,7 +31,7 @@ services:
       # Nested volume to keep built files
       # separate from those on our local system
       - /app/sparrow.egg-info
-      # Share some configuration between backend
+      # Share some configuration between backend.
       # and frontend
       - $SPARROW_INIT_SQL:/init-sql/
       - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
