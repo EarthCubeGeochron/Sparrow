@@ -24,14 +24,14 @@ WHERE d.is_accepted
 ),
 b AS (
 SELECT
- width_bucket(value, 0, 4500, 450) AS bucket,
+ width_bucket(value, 0, 4500, 900) AS bucket,
  count(*)
 FROM a
 GROUP BY bucket
 ORDER BY bucket
 )
 SELECT
-	(bucket-1)*10 min_age,
-	bucket*10 max_age,
+	(bucket-1)*5 min_age,
+	bucket*5 max_age,
 	count
 FROM b;

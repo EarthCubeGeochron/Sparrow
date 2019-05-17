@@ -5,8 +5,7 @@ import {Callout, Icon, RangeSlider} from '@blueprintjs/core'
 import {APIResultView} from '@macrostrat/ui-components'
 import { scaleLinear } from '@vx/scale'
 import { Histogram, DensitySeries, BarSeries, withParentSize, XAxis, YAxis } from '@data-ui/histogram';
-import md from './plateau-ages.md'
-import './main.styl'
+import {sum} from 'd3-array'
 
 ResponsiveHistogram = withParentSize ({ parentWidth, parentHeight, ...rest})->
   h Histogram, {
@@ -18,35 +17,46 @@ ResponsiveHistogram = withParentSize ({ parentWidth, parentHeight, ...rest})->
 class AgeChart extends Component
   render: ->
     {data, width, range} = @props
-    return null unless data?
     range ?= [0,2000]
+    return unless data?
+    data = data.filter (d)->
+      d.min_age >= range[0] and d.max_age <= range[1]
 
-    #renderTooltip = ({ event, datum, data, color }) => (
-      #h 'div', [
-        #h 'strong', {style: {color}}, "#{datum.bin0} to #{datum.bin1}"
-          #<div><strong>count </strong>{datum.count}</div>
-          #<div><strong>cumulative </strong>{datum.cumulative}</div>
-          #<div><strong>density </strong>{datum.density}</div>
-      #]
-      #
+    binnedData = data.map (d, i)->
+      {count} = d
+      {id: i, bin0: d.min_age, bin1: d.max_age, count}
 
-    rawData = data.map (d)->d.value
-      .filter (d)-> d > range[0]
-      .filter (d)-> d < range[1]
+    v = binnedData.length//100
+    if v > 1
+      bd2 = []
+      for d,i in binnedData
+        console.log i//v
+        if i%v == 0
+          bd2.push d
+          continue
+        bd2[i//v]['bin1'] = d.bin1
+        bd2[i//v]['count'] += d.count
+      console.log bd2
+
+      binnedData = bd2
 
     h ResponsiveHistogram, {
       ariaLabel: "Histogram of ages"
       orientation: "vertical"
       cumulative: false
       normalized: false
-      binCount: 50
       valueAccessor: (datum)->datum
       binType: "numeric"
       limits: range
     }, [
-      h BarSeries, {animated: true, rawData, fill: '#0f9960', stroke: '#0a6640'}
-      h XAxis, {label: "Age"}
-      h YAxis, {label: "Measurements"}
+      h BarSeries, {
+        animated: true, binnedData,
+        fill: '#f1f1f1', stroke: '#f5e1da'}
+      h DensitySeries, {
+        animated: false, binnedData,
+        fill: '#49beb7', stroke: '#085f63'}
+      h XAxis, {label: "Age (Ma)"}
+      h YAxis, {label: "Number of grains"}
     ]
 
 class ChartOuter extends Component
@@ -57,32 +67,31 @@ class ChartOuter extends Component
     }
   render: ->
     {range} = @state
-    params = {
-      unit: 'Ma'
-      parameter: 'plateau_age'
-      technique: "Ar/Ar Incremental Heating"
-    }
 
     min = 0
-    max = 2000
+    max = 4500
     labelRenderer = (v)->
       if v < 1000
         return "#{v} Ma"
       v /= 1000
       return "#{v} Ga"
 
-    h APIResultView, {route: '/datum', params}, (data)=>
+    params = {all: true}
+    h APIResultView, {route: '/aggregate_histogram', params}, (data)=>
       return null unless data?
-      h 'div.age-chart-container', {style: {height: 500}}, [
+      num = sum(data, (d)->d.count)
+
+      h 'div.age-chart-container', [
         h Callout, {
-          icon: 'scatter-plot', title: "Plateau ages"
+          icon: 'scatter-plot', title: "Accepted ages"
         }, [
-          h 'p', "All of the plateau ages ingested into the lab data system"
+          h 'p', "#{num} accepted ages ingested into the lab data system"
           h 'div.controls', [
             h 'h4', 'Age range'
             h RangeSlider, {
-              value: @state.range, min, max
-              labelStepSize: 200
+              value: @state.range,
+              min, max
+              labelStepSize: 500
               labelRenderer
               onChange: (range)=>
                 console.log range
@@ -92,14 +101,16 @@ class ChartOuter extends Component
             }
           ]
         ]
-        h AgeChart, {data, range}
+        h 'div.chart-container', {style: {height: 500}}, [
+          h AgeChart, {data, range}
+        ]
       ]
 
-class PlateauAgesComponent extends Component
+class AggregateHistogram extends Component
   render: ->
     h 'div.data-view#age-chart', [
       h ChartOuter
     ]
 
 
-export {PlateauAgesComponent}
+export {AggregateHistogram}
