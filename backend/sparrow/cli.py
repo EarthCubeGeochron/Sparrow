@@ -91,14 +91,14 @@ def config(cfg, key=None, json=False):
     """
     Print configuration of backend
     """
-    app, db = construct_app(cfg)
+    app, db = construct_app(cfg, minimal=True)
     if key is not None:
         print(app.config.get(key.upper()))
         return
 
     if json:
         res = dict()
-        for k in ("LAB_NAME","DBNAME", "DATABASE","SITE_CONTENT","BASE_URL"):
+        for k in ("LAB_NAME","DBNAME", "DATABASE","BASE_URL"):
             val = app.config.get(k)
             v = k.lower()
             res[v] = val

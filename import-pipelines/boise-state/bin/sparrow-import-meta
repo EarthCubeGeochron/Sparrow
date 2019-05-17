@@ -1,0 +1,16 @@
+#!/usr/bin/env zsh
+# Description: Import sample metadata from SESAR
+
+# This script runs on the host system and kicks off the
+# import process within a docker container
+import_pipeline="${0:h:h:r}"
+
+# Run within container, mounting Sparrow data directory
+# and importer code.
+sparrow compose run \
+  -e "SPARROW_DATA_DIR=/Data" \
+  -e "PYTHONPATH=/boise-state-importer" \
+  -v "$SPARROW_DATA_DIR:/Data:ro" \
+  -v "$import_pipeline:/boise-state-importer" \
+  backend \
+  python -m boise_state_importer import-metadata $@
