@@ -27,13 +27,6 @@ CREATE TABLE IF NOT EXISTS publication (
   title text
 );
 
-/*
-Vocabularies
-Tables to integrate units, etc.
-from curated collections
-*/
-CREATE SCHEMA IF NOT EXISTS vocabulary;
-
 CREATE TABLE IF NOT EXISTS vocabulary.parameter (
   id text PRIMARY KEY,
   description text,
@@ -130,6 +123,8 @@ CREATE TABLE IF NOT EXISTS sample (
   /* A representative named location */
   location_name text,
   location geometry,
+  /* The elevation column could potentially be recast as a *datum* tied directly
+     to the sample. */
   elevation numeric,
   embargo_date timestamp,
   CHECK ((name IS NOT null) OR (igsn IS NOT null))
@@ -160,6 +155,15 @@ closely spaced in time.
 */
 CREATE TABLE IF NOT EXISTS session (
   id serial PRIMARY KEY,
+  /* UUID column to provide a globally unique, immutable reference
+     to an analytical dataset. When combined with a lab-specific
+     namespace (not yet implemented), this provides an identifier
+     that can be traced back to the origin facility, maintaining
+     data provenance. This fulfills similar functions to IGSNs and
+     DOIs, and the preliminary implementation here can be changed
+     for interoperability without affecting the internal organization
+     of the *Sparrow* database. */
+  uuid uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
   sample_id integer REFERENCES sample(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
   project_id integer REFERENCES project(id),
@@ -170,7 +174,7 @@ CREATE TABLE IF NOT EXISTS session (
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
   embargo_date timestamp,
-  /* A field to store extra, unstructured session data */
+  /* A field to store extra, semi-structured session data in a key/value format */
   data jsonb,
   UNIQUE (sample_id, date, instrument, technique)
 );

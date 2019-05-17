@@ -123,18 +123,21 @@ def normalize_data(df):
 
 def extract_session_index(sample_name):
     pat = r"[\.\:_\s-](\w+)$"
-    s = re.search(pat, sample_name)
+    try:
+        s = re.search(pat, str(sample_name))
+    except TypeError:
+        return None
     if s is not None:
         return s.group(1)
 
     pat = r"(\d+)$"
-    s = re.search(pat, sample_name)
+    s = re.search(pat, str(sample_name))
     if s is not None:
         return s.group(1)
     return None
 
 def strip_session_index(row):
-    v = (row.at['sample_id']
+    v = (str(row.at['sample_id'])
         .rstrip(row.at['session_ix'])
         .rstrip('.:_- '))
     row.at['sample_id'] = v

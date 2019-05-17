@@ -6,10 +6,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.schema import Table
 from sqlalchemy.sql import ClauseElement
+from pathlib import Path
 
-from .app import App
-from .models import Base, User
-from .util import run_sql_file, run_query, working_directory
+from ..app import App
+from ..models import Base, User
+from ..util import run_sql_file, run_query, relative_path
 
 metadata = MetaData()
 
@@ -131,16 +132,19 @@ class Database:
 
     def initialize(self, drop=False):
         secho("Creating core schema...", bold=True)
-        with working_directory(__file__):
-            if drop:
-                self.exec_sql("sql/00-drop-tables.sql")
-            self.exec_sql("sql/01-setup-database.sql")
-            self.exec_sql("sql/02-create-tables.sql")
-            self.exec_sql("sql/03-create-functions.sql")
-            self.exec_sql("sql/04-create-views.sql")
+
+        p = Path(relative_path(__file__, "fixtures"))
+        filenames = list(p.glob("*.sql"))
+        filenames.sort()
+        pretty_print = lambda x: secho(x, fg='cyan', bold=True)
+
+        for fn in filenames:
+            pretty_print(fn.name)
+            self.exec_sql(str(fn))
 
         init_sql = self.config.get("INIT_SQL", None)
         if init_sql is not None:
             secho("\nCreating schema extensions...", bold=True)
             for s in init_sql:
+                pretty_print(Path(s).name)
                 self.exec_sql(s)

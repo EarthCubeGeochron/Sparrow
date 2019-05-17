@@ -19,7 +19,6 @@ class IGSNImporter(BaseImporter):
         if 'status' in s: return
         self.num += 1
         v = dumps(s, indent=4, sort_keys=True)
-        print(v)
 
         # Could set location precision from number of
         # decimal places in lat/lon string

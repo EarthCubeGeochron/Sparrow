@@ -121,6 +121,7 @@ SELECT
   t.is_computed,
   t.is_interpreted,
   d.is_bad,
+  d.is_accepted,
   is_public(s),
   a.session_id,
   a.session_index,
