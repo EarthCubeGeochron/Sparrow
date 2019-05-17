@@ -2,12 +2,7 @@ import h from 'react-hyperscript'
 import {AppNavbar, NavButton} from 'app/shared/navbar'
 import {SampleMap} from './map'
 import {Frame} from './frame'
-
-import styled from '@emotion/styled'
-
-InsetText = styled.div"""
-margin: 2em 0.5em 1em;
-"""
+import {InsetText} from 'app/layout'
 
 HomePage = ->
   h 'div', [
