@@ -25,7 +25,7 @@ class SessionComponent extends Component
       h Breadcrumbs, {items: breadCrumbs}
       h APIResultView, {
         route: "/session"
-        params: {id}
+        params: {id, private: true}
       }, (data)=>
         res = data[0]
         {sample_id} = res
@@ -33,7 +33,6 @@ class SessionComponent extends Component
           h SessionInfoCard, res
           h Frame, {id: 'sessionDetail', session_id: id}, (props)=>
             # This should be passed through the component tree
-            console.log props
             h DetritalZirconComponent, props
           h Button, {icon: 'document', intent: Intent.PRIMARY}, "Get data file"
           h GeoDeepDiveCard, {sample_id}
