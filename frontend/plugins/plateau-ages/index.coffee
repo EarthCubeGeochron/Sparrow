@@ -21,15 +21,6 @@ class AgeChart extends Component
     return null unless data?
     range ?= [0,2000]
 
-    #renderTooltip = ({ event, datum, data, color }) => (
-      #h 'div', [
-        #h 'strong', {style: {color}}, "#{datum.bin0} to #{datum.bin1}"
-          #<div><strong>count </strong>{datum.count}</div>
-          #<div><strong>cumulative </strong>{datum.cumulative}</div>
-          #<div><strong>density </strong>{datum.density}</div>
-      #]
-      #
-
     rawData = data.map (d)->d.value
       .filter (d)-> d > range[0]
       .filter (d)-> d < range[1]
