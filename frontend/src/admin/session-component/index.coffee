@@ -8,7 +8,7 @@ import {GeoDeepDiveCard} from './gdd-card'
 import {SessionInfoCard} from './info-card'
 import {APIResultView} from '@macrostrat/ui-components'
 import {StepHeatingChart} from 'plugins/step-heating'
-import {DetritalZirconComponent} from 'plugins/dz-samples'
+import {DetritalZirconComponent} from 'plugins/dz-spectrum'
 
 class SessionComponent extends Component
   render: ->
