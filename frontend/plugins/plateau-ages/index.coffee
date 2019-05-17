@@ -8,8 +8,6 @@ import { Histogram, DensitySeries, BarSeries, withParentSize, XAxis, YAxis } fro
 import md from './plateau-ages.md'
 import './main.styl'
 
-import {ErrorBoundary} from '../../util/error-boundary.js'
-
 ResponsiveHistogram = withParentSize ({ parentWidth, parentHeight, ...rest})->
   h Histogram, {
     width: parentWidth
@@ -97,18 +95,11 @@ class ChartOuter extends Component
         h AgeChart, {data, range}
       ]
 
-class AgeChartComponent extends Component
-  @defaultProps: {
-    apiEndpoint: '/session'
-  }
+class PlateauAgesComponent extends Component
   render: ->
-    {apiEndpoint} = @props
-
     h 'div.data-view#age-chart', [
-      h ErrorBoundary, [
-        h ChartOuter
-      ]
+      h ChartOuter
     ]
 
 
-export {AgeChartComponent}
+export {PlateauAgesComponent}

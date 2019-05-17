@@ -4,6 +4,7 @@ from os import path, environ
 from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
 from flask_jwt_extended import JWTManager
+from sqlalchemy.exc import NoSuchTableError
 
 from .encoders import JSONEncoder
 from .api import APIv1
@@ -65,7 +66,11 @@ def construct_app(config=None, minimal=False):
     api.build_route("material", schema='core_view')
 
     api.add_resource(AuthAPI, "/auth")
-    #api.build_route("dz_sample", schema='method_data')
+
+    try:
+        api.build_route("aggregate_histogram", schema='lab_view')
+    except NoSuchTableError:
+        pass
     #api.build_route("ar_age", schema='method_data')
 
     app.api = api

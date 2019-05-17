@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS researcher (
 
 /*
 The `user` model parallels the
-`researcher` model but used only for application
+`researcher` model but is used only for application
 authentication. We can reset all application access by
 truncating this table, without losing data.
 */
@@ -26,13 +26,6 @@ CREATE TABLE IF NOT EXISTS publication (
   doi text NOT NULL,
   title text
 );
-
-/*
-Vocabularies
-Tables to integrate units, etc.
-from curated collections
-*/
-CREATE SCHEMA IF NOT EXISTS vocabulary;
 
 CREATE TABLE IF NOT EXISTS vocabulary.parameter (
   id text PRIMARY KEY,
@@ -70,10 +63,10 @@ CREATE TABLE IF NOT EXISTS vocabulary.error_metric (
 -- Projects
 
 CREATE TABLE IF NOT EXISTS project (
-  id text PRIMARY KEY,
-  title text NOT NULL,
+  id serial PRIMARY KEY,
+  name text NOT NULL,
   description text,
-  embargo_date timestamp without time zone
+  embargo_date timestamp
 );
 
 /*
@@ -81,34 +74,15 @@ If researchers on a project have application user accounts,
 they can see data even if embargoed (not yet implemented).
 */
 CREATE TABLE IF NOT EXISTS project_researcher (
-  project_id text REFERENCES project(id),
+  project_id integer REFERENCES project(id),
   researcher_id integer REFERENCES researcher(id),
   PRIMARY KEY (project_id, researcher_id)
 );
 
 CREATE TABLE IF NOT EXISTS project_publication (
-  project_id text REFERENCES project(id),
+  project_id integer REFERENCES project(id),
   publication_id integer REFERENCES publication(id),
   PRIMARY KEY (project_id, publication_id)
-);
-
-/*
-### Analytical Groups
-
-Groups of sessions for import are less universally
-meaningful than project-based groups. However, these
-can be important for internal lab processes.
-Examples include irradiation IDs for Ar/Ar labs, etc.
-
-Right now, we only support a single measurement group
-for each session. This could potentially be updated
-to support a one-to-many relationship if desired.
-
-This might be a good candidate to drop from the core schema
-*/
-CREATE TABLE IF NOT EXISTS measurement_group (
-  id text PRIMARY KEY,
-  title text NOT NULL
 );
 
 -- Descriptors for types of measurements/techniques
@@ -138,7 +112,8 @@ CREATE TABLE IF NOT EXISTS datum_type (
 An object to be measured
 */
 CREATE TABLE IF NOT EXISTS sample (
-  id text PRIMARY KEY,
+  id serial PRIMARY KEY,
+  name text,
   igsn text UNIQUE,
   material text REFERENCES vocabulary.material(id),
   /* Order-of-magnitude precision (in meters)
@@ -148,7 +123,11 @@ CREATE TABLE IF NOT EXISTS sample (
   /* A representative named location */
   location_name text,
   location geometry,
-  embargo_date timestamp without time zone
+  /* The elevation column could potentially be recast as a *datum* tied directly
+     to the sample. */
+  elevation numeric,
+  embargo_date timestamp,
+  CHECK ((name IS NOT null) OR (igsn IS NOT null))
 );
 /*
 #### Potential issues:
@@ -176,17 +155,26 @@ closely spaced in time.
 */
 CREATE TABLE IF NOT EXISTS session (
   id serial PRIMARY KEY,
-  sample_id text REFERENCES sample(id),
-  project_id text REFERENCES project(id),
+  /* UUID column to provide a globally unique, immutable reference
+     to an analytical dataset. When combined with a lab-specific
+     namespace (not yet implemented), this provides an identifier
+     that can be traced back to the origin facility, maintaining
+     data provenance. This fulfills similar functions to IGSNs and
+     DOIs, and the preliminary implementation here can be changed
+     for interoperability without affecting the internal organization
+     of the *Sparrow* database. */
+  uuid uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
+  sample_id integer REFERENCES sample(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  project_id integer REFERENCES project(id),
   publication_id integer REFERENCES publication(id),
-  measurement_group_id text REFERENCES measurement_group(id),
-  date timestamptz NOT NULL,
-  end_date timestamptz,
+  date timestamp NOT NULL,
+  end_date timestamp,
   instrument integer REFERENCES instrument(id),
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
-  embargo_date timestamp without time zone,
-  /* A field to store extra, unstructured session data */
+  embargo_date timestamp,
+  /* A field to store extra, semi-structured session data in a key/value format */
   data jsonb,
   UNIQUE (sample_id, date, instrument, technique)
 );
@@ -210,13 +198,16 @@ Set of data measured together at one time on one instrument
 */
 CREATE TABLE IF NOT EXISTS analysis (
   id serial PRIMARY KEY,
-  session_id integer REFERENCES session(id) NOT NULL,
+  session_id integer NOT NULL
+    REFERENCES session(id)
+    ON DELETE CASCADE,
   session_index integer, -- captures ordering within a session
-  -- Should key this to a foreign key table
-  analysis_type text,
   /* If `session_index` is not set, `analysis_type` allows the
     unique identification of a record within the session */
-  date timestamptz,
+  analysis_name text,
+  -- Should key this to a foreign key table
+  analysis_type text,
+  date timestamp,
   material text REFERENCES vocabulary.material(id),
   /* Not really sure that material is the best parameterization
      of this concept... */
@@ -238,12 +229,13 @@ CREATE TABLE IF NOT EXISTS analysis (
   */
   is_interpreted boolean,
   data jsonb,
-  UNIQUE (session_id, session_index, analysis_type)
+  UNIQUE (session_id, session_index, analysis_name)
 );
 
 CREATE TABLE IF NOT EXISTS datum (
   id serial PRIMARY KEY,
-  analysis integer REFERENCES analysis(id),
+  analysis integer REFERENCES analysis(id)
+    ON DELETE CASCADE,
   type integer REFERENCES datum_type(id),
   value numeric NOT NULL,
   error numeric,
@@ -278,9 +270,11 @@ CREATE TABLE IF NOT EXISTS session_datum (
   /*
   Handles many-to-many links between session and datum, which
   is primarily useful for handling analytical parameters
-  that remain constant across many sessions.
+  that remain constant across many sessions (e.g. decay constants,
+  assumed physical parameters).
   */
-  session_id integer REFERENCES session(id),
+  session_id integer REFERENCES session(id)
+    ON DELETE CASCADE,
   datum_id integer REFERENCES datum(id)
 );
 
@@ -294,17 +288,34 @@ CREATE TABLE IF NOT EXISTS data_file (
   Original measurement data file information
   */
   file_hash uuid PRIMARY KEY, -- MD5 hash of data file contents
+  file_mtime timestamp,
   basename text,
   file_path text UNIQUE,
-  import_date timestamp,
-  import_error text,
-  type_id text REFERENCES data_file_type(id),
+  type_id text REFERENCES data_file_type(id)
+);
+
+CREATE TABLE IF NOT EXISTS import_tracker (
   /*
   Foreign key columns to link to data that was imported from
   this file; this should be done at the appropriate level (e.g.
   sample, analysis, session) that fits the data file in question.
+
+  Note: this table is part of the internal import process
+  and could change at more or less any time.
   */
-  session_id integer REFERENCES session(id),
-  analysis_id integer REFERENCES analysis(id),
-  sample_id text REFERENCES sample(id)
+  id serial PRIMARY KEY,
+  file_hash uuid NOT NULL
+    REFERENCES data_file(file_hash)
+    ON DELETE CASCADE,
+  date timestamp NOT NULL DEFAULT now(),
+  error text,
+  session_id integer
+    REFERENCES session(id)
+    ON DELETE CASCADE,
+  analysis_id integer
+    REFERENCES analysis(id)
+    ON DELETE CASCADE,
+  sample_id integer
+    REFERENCES sample(id)
+    ON DELETE CASCADE
 );

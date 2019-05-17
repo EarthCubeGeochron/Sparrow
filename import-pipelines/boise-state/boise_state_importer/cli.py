@@ -32,4 +32,4 @@ def __import_metadata(download=False):
     """
     Import IGSN metadata from SESAR
     """
-    import_metadata(download=False)
+    import_metadata(download=download)

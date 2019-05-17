@@ -3,10 +3,7 @@ from click import echo, secho
 
 from ..database import Database
 from ..util import working_directory
-from .importer import BaseImporter
-
-class SparrowImportError(Exception):
-    pass
+from .importer import BaseImporter, SparrowImportError
 
 def md5hash(fname):
     """
