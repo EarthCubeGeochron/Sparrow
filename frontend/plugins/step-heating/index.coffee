@@ -106,10 +106,12 @@ class StepHeatingChart extends Component
           scale: xScale
           numTicks: 10
           top: innerHeight
+          label: "Heating step"
         }
         h AxisLeft, {
           scale: yScale
           numTicks: 10
+          label: "Age (Ma)"
         }
       ]
     ]

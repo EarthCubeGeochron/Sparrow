@@ -73,7 +73,7 @@ class ChartOuter extends Component
 
     h APIResultView, {route: '/datum', params}, (data)=>
       return null unless data?
-      h 'div.age-chart-container', {style: {height: 500}}, [
+      h 'div.age-chart-container', [
         h Callout, {
           icon: 'scatter-plot', title: "Plateau ages"
         }, [
@@ -92,7 +92,9 @@ class ChartOuter extends Component
             }
           ]
         ]
-        h AgeChart, {data, range}
+        h 'div.chart-container', {style: {height: 500}}, [
+          h AgeChart, {data, range}
+        ]
       ]
 
 class PlateauAgesComponent extends Component
