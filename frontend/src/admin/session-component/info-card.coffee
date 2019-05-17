@@ -10,6 +10,27 @@ Sample = (props)->
     h 'div.target', props.target
   ]
 
+Instrument = ({instrument_name})->
+  return null unless instrument_name?
+  h 'div.instrument', [
+    h 'h5.small-info', 'Instrument'
+    h 'div',instrument_name
+  ]
+
+Technique = ({technique})->
+  return null unless technique?
+  h 'div.technique', [
+    h 'h5.small-info', 'Technique'
+    h 'div', technique
+  ]
+
+MeasurementGroup = ({measurement_group_id})->
+  return null unless measurement_group?
+  h 'div.group', [
+    h 'h5.small-info', 'Group'
+    h 'div', measurement_group_id
+  ]
+
 SessionInfoComponent = (props)->
   {id, sample_id, target} = props
   date = parse(props.date)
@@ -26,18 +47,9 @@ SessionInfoComponent = (props)->
         h 'h5.info', 'Project'
         h 'div', null, props.project_name or "—"
       ]
-      h 'div.instrument', [
-        h 'h5.small-info', 'Instrument'
-        h 'div', props.instrument_name
-      ]
-      h 'div.technique', [
-        h 'h5.small-info', 'Technique'
-        h 'div', props.technique
-      ]
-      h 'div.group', [
-        h 'h5.small-info', 'Group'
-        h 'div', props.measurement_group_id
-      ]
+      h Instrument, props
+      h Technique, props
+      h MeasurementGroup, props
     ]
   ]
 
