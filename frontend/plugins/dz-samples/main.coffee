@@ -7,70 +7,72 @@ import { AreaClosed } from '@vx/shape'
 import { AxisLeft, AxisBottom } from '@vx/axis'
 import { extent, min, max, histogram } from 'd3-array'
 import gradients from './gradients'
-import {kernelDensityEstimator, kernelEpanechnikov} from './kernel-density'
+import {kernelDensityEstimator, kernelEpanechnikov, kernelGaussian} from './kernel-density'
 
 import './main.styl'
 
 class DetritalZirconBase extends Component
   render: ->
-    {data} = @props
+    {data, session_id} = @props
     return null unless data?
 
+    accessor = (d)-> d.value
 
-    accessor = (d)-> d.best_age
-    minMax = data.map (d)->
-      [min(d.grain_data, accessor),
-       min(d.grain_data, accessor)]
-
-    __ = [
-      min(minMax, (d)->d[0])
-      max(minMax, (d)->d[1])
-    ]
+    minmax = extent data, accessor
+    minmax = [minmax[0] - 5, minmax[1] + 5]
 
     hist = histogram()
-      .domain([0,4000])
+      .domain(minmax)
       .thresholds(80)
-      .value (d)->d.best_age
+      .value accessor
 
-    width = 900
-    eachHeight = 60
-    height = eachHeight*data.length
+    margin = 10
+    marginTop = 10
+    marginBottom = 50
+    innerWidth = 750
+    eachHeight = 150
+    height = eachHeight+marginTop+marginBottom
+    width = innerWidth+2*margin
+
     xScale = scaleLinear({
       range: [0, width]
-      domain: [0,4000]
+      domain: minmax
+    })
+    delta = minmax[1]-minmax[0]
+    bandwidth = delta/50
+
+    label = "Age (Ma)"
+    tickFormat = (d)->d
+    if delta > 1000
+      label = "Age (Ga)"
+      tickFormat = (d)->d/1000
+
+
+    xTicks = xScale.ticks(400)
+    kde = kernelDensityEstimator(kernelGaussian(bandwidth), xTicks)
+    kdeData = kde(data.map(accessor))
+
+    # All KDEs should have same height
+    maxProbability = max kdeData, (d)->d[1]
+
+    yScale = scaleLinear({
+      range: [eachHeight, 0]
+      domain: [0, maxProbability]
     })
 
-    margin = 30
-    h 'svg', { width: width+2*margin, height: height+2*margin}, data.map (sampleData, i)->
-      {grain_data, sample_id} = sampleData
+    labelProps = {label}
 
-      xTicks = xScale.ticks(400)
-      kde = kernelDensityEstimator(kernelEpanechnikov(50), xTicks)
-      fn = (d)->d.best_age
-      kdeData = kde(grain_data.map(fn))
-      console.log sampleData
+    id = "gradient_1"
 
-      # All KDEs should have same height
-      maxProbability = max kdeData, (d)->d[1]
-
-      yScale = scaleLinear({
-        range: [eachHeight-10, 0]
-        domain: [0, maxProbability]
-      })
-
-      labelProps = {label: "Age (Ga)"}
-      if i != data.length-1
-        labelProps.label = null
-        labelProps.tickLabelProps = -> {visibility: 'hidden'}
-
-      id = "gradient_#{i}"
+    h 'svg', { width, height}, [
       h 'g', {
-        key: sample_id
-        transform: "translate(0,#{i*eachHeight})"
+        transform: "translate(#{margin},#{marginTop})"
       }, [
-        h gradients[i], {id}
-        createElement 'foreignObject', {x: 0, y: 0, width: 100, height: 50}, (
-          h 'h2.sample-name', null, sample_id
+        h gradients[0], {id}
+        createElement 'foreignObject', {x: 0, y: -20, width: 500, height: 50}, (
+          h 'h4', null, [
+            "#{data.length} grains"
+          ]
         )
         h AreaClosed, {
           data: kdeData
@@ -83,16 +85,20 @@ class DetritalZirconBase extends Component
           scale: xScale
           numTicks: 10
           tickLength: 4
-          tickFormat: (d)->d/1000
+          tickFormat
           strokeWidth: 1.5
-          top: 50
+          top: eachHeight
           labelProps...
         }
       ]
+    ]
 
 DetritalZirconComponent = (props)->
-  route = '/api/v1/dz_sample'
-  h APIResultView, {route, params: {all: 1}, props...}, (data)->
-    h DetritalZirconBase, {data}
+  route = '/datum'
+  h APIResultView, {
+    route,
+    params: {unit: 'Ma', is_accepted: true, props...}
+  }, (data)->
+    h DetritalZirconBase, {data, props...}
 
 export {DetritalZirconComponent}

@@ -8,6 +8,7 @@ import {GeoDeepDiveCard} from './gdd-card'
 import {SessionInfoCard} from './info-card'
 import {APIResultView} from '@macrostrat/ui-components'
 import {StepHeatingChart} from '../../../plugins/step-heating'
+import {DetritalZirconComponent} from '../../../plugins/dz-samples/main'
 
 class SessionComponent extends Component
   render: ->
@@ -32,7 +33,7 @@ class SessionComponent extends Component
           h SessionInfoCard, res
           h Frame, {id: 'sessionDetail'}, (props)=>
             # This should be passed through the component tree
-            h StepHeatingChart, {session_id: id}
+            h DetritalZirconComponent, {session_id: id}
           h Button, {icon: 'document', intent: Intent.PRIMARY}, "Get data file"
           h GeoDeepDiveCard, {sample_id}
         ]
