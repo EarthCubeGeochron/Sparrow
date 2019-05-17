@@ -27,8 +27,9 @@ def import_xml():
     iterfiles(import_datafile, files)
 
 @cli.command(name='import-metadata')
-def __import_metadata():
+@option('--download', is_flag=True, default=False)
+def __import_metadata(download=False):
     """
     Import IGSN metadata from SESAR
     """
-    import_metadata()
+    import_metadata(download=download)

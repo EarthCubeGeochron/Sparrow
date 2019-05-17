@@ -1,18 +1,29 @@
 #!/usr/bin/env zsh
+# Description: Graph database schema to `dot` format.
 
-pip install git+https://github.com/davenquinn/sadisplay.git
+if ! type "sadisplay" > /dev/null; then
+  pip install git+https://github.com/davenquinn/sadisplay.git
+fi
 
-output="$SPARROW_PATH/output"
+output="$1"
+
+if [ -z $output ]; then
+  echo "Please specify an output directory"
+  exit 1
+fi
+
 mkdir -p "$output"
 
-dbname=$(sparrow config database)
+host=$(sparrow compose port db 5432)
+dbname="postgresql://postgres@$host/sparrow"
+
 graph="$output/erd-core.dot"
 sadisplay -u $dbname \
   -r dot \
   -e public.spatial_ref_sys > "$graph"
 cat "$graph" \
 | sed "s/NULLTYPE/GEOMETRY/g" \
-| sed "s/WITH TIME ZONE//g" \
+| sed 's/ WITH\(OUT\)\? TIME ZONE//g' \
 | dot -Tpng \
 > "$output/entity-relationship-diagram-core.png"
 
@@ -23,6 +34,6 @@ sadisplay -u $dbname \
   -e public.spatial_ref_sys > "$graph"
 cat "$graph" \
 | sed "s/NULLTYPE/GEOMETRY/g" \
-| sed "s/WITH TIME ZONE//g" \
+| sed 's/ WITH\(OUT\)\? TIME ZONE//g' \
 | dot -Tpng \
 > "$output/entity-relationship-diagram.png"

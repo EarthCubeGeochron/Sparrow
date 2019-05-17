@@ -168,7 +168,12 @@ class APIv1(API):
 
                 # Check identity and abort if unauthorized
                 identity = get_jwt_identity()
-                private = args.pop('private',False)
+                # If we are logged in, always request private
+                # (this should probably be handled better in the long term)
+                #private = identity is not None
+                private = args.pop('private', False)
+                if identity:
+                    private = True
                 if private and not identity:
                     # Should throw a better error
                     return abort(401)

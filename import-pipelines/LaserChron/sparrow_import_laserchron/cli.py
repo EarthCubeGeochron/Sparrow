@@ -8,10 +8,10 @@ from sparrow.import_helpers import SparrowImportError, working_directory
 from itertools import chain
 
 from .extract_datatable import import_datafile
+from .laserchron_importer import LaserchronImporter
 
-def extract_data():
+def extract_data(db, stop_on_error=False):
     path = Path('.')
-    db = Database()
     files = chain(path.glob("**/*.xls"), path.glob("**/*.xls[xm]"))
     for f in files:
         try:
@@ -28,7 +28,10 @@ def extract_data():
 @command()
 @option('--stop-on-error', is_flag=True, default=False)
 @option('--verbose','-v', is_flag=True, default=False)
-def cli(stop_on_error=False, verbose=False):
+@option('--extract/--no-extract', default=False)
+@option('--normalize/--no-normalize', default=True)
+@option('--redo', default=False, is_flag=True)
+def cli(stop_on_error=False, verbose=False, extract=False, normalize=True, redo=False):
     """
     Import LaserChron files
     """
@@ -42,5 +45,10 @@ def cli(stop_on_error=False, verbose=False):
     path = Path(env)
     assert path.is_dir()
 
-    with working_directory(path):
-        extract_data()
+    db = Database()
+    if extract:
+        with working_directory(path):
+            extract_data(db)
+    if normalize:
+        importer = LaserchronImporter(db)
+        importer.import_all(redo=redo)

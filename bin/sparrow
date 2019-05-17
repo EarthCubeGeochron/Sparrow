@@ -25,7 +25,7 @@ fi
 
 # If we haven't yet sourced the config file in a higher-level script
 if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
-  echo "Using config file $(tput bold)$SPARROW_CONFIG$(tput sgr0)" >&2
+  echo "Config file: $(tput bold)$SPARROW_CONFIG$(tput sgr0)" >&2
   export SPARROW_CONFIG="$SPARROW_CONFIG"
   source "$SPARROW_CONFIG"
   export _SPARROW_CONFIG_SOURCED=1
@@ -84,10 +84,10 @@ echo-help() {
   done
 }
 
-if [ $subcommand = '--help' ]; then
+if [ $subcommand = '--help' ] || [ $subcommand = 'help' ]; then
   # Get help from within sparrow container
   # and append docker wrapper commands
-  sparrow compose run backend python3 sparrow --help
+  sparrow compose run --no-deps backend python3 sparrow --help
   [ ! -z $SPARROW_COMMANDS ] && \
     echo-help "Lab-specific commands" "$SPARROW_COMMANDS"
   echo-help "Docker orchestration commands" "$dir"

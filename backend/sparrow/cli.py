@@ -91,7 +91,7 @@ def config(cfg, key=None, json=False):
     """
     Print configuration of backend
     """
-    app, db = construct_app(cfg)
+    app, db = construct_app(cfg, minimal=True)
     if key is not None:
         print(app.config.get(key.upper()))
         return

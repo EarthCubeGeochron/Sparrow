@@ -31,7 +31,7 @@ class Frame extends Component
     rest: T.object
   }
   render: ->
-    {id, iface, children, rest} = @props
+    {id, iface, children, rest...} = @props
     el = @context.getElement(id)
     child = if el? then el else children
     if typeof child is 'function'
