@@ -5,18 +5,6 @@ AS $$
 $$
 LANGUAGE sql STABLE;
 
-CREATE OR REPLACE FUNCTION embargo_date(ss sample)
-RETURNS timestamp
-AS $$
-  SELECT coalesce(ss.embargo_date, s.embargo_date, p.embargo_date)
-  FROM (SELECT (ss).*) ss
-  LEFT JOIN session s
-    ON ss.id = s.sample_id
-  LEFT JOIN project p
-    ON p.id = s.project_id
-$$
-LANGUAGE sql STABLE;
-
 CREATE OR REPLACE FUNCTION is_public(p project)
 RETURNS boolean
 AS $$ SELECT NOT embargoed(p.embargo_date) $$
@@ -56,8 +44,8 @@ END IF;
 /* A sample gains its public/private status
   primarily from whether it has any public
   sessions. */
-IF (NOT EXISTS (
-  SELECT sample_id FROM session WHERE sample_id = s.id)
+IF NOT EXISTS (
+  SELECT sample_id FROM session WHERE sample_id = s.id
 ) THEN
   RETURN true;
 END IF;
