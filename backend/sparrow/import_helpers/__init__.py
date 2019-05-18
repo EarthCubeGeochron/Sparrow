@@ -1,19 +1,9 @@
-from hashlib import md5
 from click import echo, secho
 
 from ..database import Database
 from ..util import working_directory
-from .importer import BaseImporter, SparrowImportError
-
-def md5hash(fname):
-    """
-    Compute the md5 hash of a file (given by its name)
-    """
-    hash = md5()
-    with open(fname, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash.update(chunk)
-    return hash.hexdigest()
+from .util import md5hash, SparrowImportError
+from .importer import BaseImporter
 
 def iterfiles(import_function, file_sequence):
     db = Database()

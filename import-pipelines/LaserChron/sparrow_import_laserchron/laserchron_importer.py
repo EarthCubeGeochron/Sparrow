@@ -1,4 +1,3 @@
-from lxml.etree import tostring
 from itertools import chain
 from sparrow.import_helpers import BaseImporter, SparrowImportError
 from datetime import datetime
@@ -46,7 +45,7 @@ class LaserchronImporter(BaseImporter):
         if not rec.csv_data:
             raise SparrowImportError("CSV data not extracted")
 
-        n_imported = (self.db.session.query(self.db.model.import_tracker)
+        n_imported = (self.db.session.query(self.db.model.data_file_import)
             .filter_by(file_hash=rec.file_hash).count())
         # The below is false
         if n_imported > 0 and not self.redo:
@@ -60,11 +59,10 @@ class LaserchronImporter(BaseImporter):
 
         data = generalize_samples(data)
 
-        #data.index = ax.index
         ids = list(data.index.unique(level=0))
 
         for sample_id in ids:
-            dt = self.db.model.import_tracker()
+            dt = self.db.model.data_file_import()
             dt._data_file = rec
 
             session = None
