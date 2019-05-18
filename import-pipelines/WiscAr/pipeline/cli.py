@@ -2,8 +2,8 @@ from sys import exit
 from os import environ, listdir, path
 from datetime import datetime
 from click import command, option, echo, secho, style
-from labdata import Database
-from labdata.database import get_or_create
+from sparrow import Database
+from sparrow.database import get_or_create
 
 from  .extract_tables import extract_data_tables
 
@@ -153,11 +153,11 @@ def extract_analysis(db, fn, verbose=False):
     def get(c, **kwargs):
         return get_or_create(db.session, c, **kwargs)
 
-    project = get(cls.measurement_group,id=info.pop('Project'))
+    project = get(cls.irradiation,id=info.pop('Project'))
     project.title = project.id
 
     sample = get(cls.sample,
-        id=info.pop('Sample'))
+        name=info.pop('Sample'))
     db.session.add(sample)
     target = get(cls.material, id=info.pop('Material'))
 
@@ -173,7 +173,7 @@ def extract_analysis(db, fn, verbose=False):
         instrument=instrument.id,
         technique=method.id,
         target=target.id)
-    session.measurement_group_id = project.id
+    session.irradiation_id = project.id
     session.data = info.to_dict()
     db.session.add(session)
 
@@ -184,9 +184,9 @@ def extract_analysis(db, fn, verbose=False):
     param_data = {
         'Tstep': "Temperature of heating step",
         'power': "Laser power of heating step",
-        '36Ar(a)': "36Ar, reactor corrected for air interference",
-        '37Ar(ca)': "37Ar, reactor corrected for Ca interference",
-        '38Ar(cl)': "38Ar, reactor corrected for Cl interference",
+        '36Ar(a)': "36Ar, corrected for air interference",
+        '37Ar(ca)': "37Ar, corrected for Ca interference",
+        '38Ar(cl)': "38Ar, corrected for Cl interference",
         '39Ar(k)': "39Ar, corrected for amount produced by K",
         '40Ar(r)': "Radiogenic 40Ar measured abundance",
         '40(r)/39(k)': "Ratio of radiogenic 40Ar to 39Ar from K",
@@ -289,7 +289,10 @@ def cli(stop_on_error=False, verbose=False):
     """
     Import WiscAr MAP spectrometer data (ArArCalc files) in bulk.
     """
-    directory = environ.get("WISCAR_MAP_DATA")
+    directory = path.join(
+        environ.get("SPARROW_DATA_DIR"),
+        "MAP-Irradiations")
+
     db = Database()
 
     success = 0
