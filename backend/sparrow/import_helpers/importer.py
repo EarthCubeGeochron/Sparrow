@@ -108,7 +108,6 @@ class BaseImporter(object):
         fn = relative_path(__file__, 'sql', 'delete-session.sql')
         sql = text(open(fn).read())
         self.db.session.execute(sql, {'file_hash': rec.file_hash})
-        self.db.session.commit()
 
     def iterfiles(self, file_sequence, **kwargs):
         """
@@ -174,7 +173,6 @@ class BaseImporter(object):
                 self.db.session.add(created_model)
                 # Track the import of the resulting models
                 self.__track_model(im, created_model)
-            self.db.session.commit()
         except (SparrowImportError, NotImplementedError) as err:
             self.db.session.rollback()
             error = str(err)

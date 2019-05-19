@@ -332,6 +332,6 @@ CREATE TABLE IF NOT EXISTS data_file_link (
   CHECK (
       (session_id IS NOT NULL)::int
     + (analysis_id IS NOT NULL)::int
-    + (sample_id IS NOT NULL)::int = 1
+    + (sample_id IS NOT NULL)::int <= 1
   )
 );

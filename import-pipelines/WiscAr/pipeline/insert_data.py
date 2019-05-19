@@ -3,6 +3,7 @@ from os import environ, listdir, path
 from datetime import datetime
 from click import command, option, echo, secho, style
 from sparrow import Database
+from sparrow.import_helpers import SparrowImportError
 from sparrow.database import get_or_create
 
 from  .extract_tables import extract_data_tables
@@ -144,7 +145,10 @@ def extract_analysis(db, fn, verbose=False):
     cls = db.mapped_classes
     existing_session = db.session.query(cls.session).filter_by()
 
-    incremental_heating, info, results = extract_data_tables(fn)
+    try:
+        incremental_heating, info, results = extract_data_tables(fn)
+    except Exception as exc:
+        raise SparrowImportError(str(exc))
     if verbose:
         print_dataframe(incremental_heating)
         print_dataframe(info)
