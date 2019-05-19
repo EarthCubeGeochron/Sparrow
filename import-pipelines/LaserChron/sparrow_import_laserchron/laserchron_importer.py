@@ -34,7 +34,12 @@ class LaserchronImporter(BaseImporter):
     def import_all(self, redo=False):
         self.redo = redo
         q = self.db.session.query(self.db.model.data_file)
-        self.iter_records(q)
+        self.iter_records(q, redo=redo)
+
+    def import_one(self, basename):
+        q = (self.db.session.query(self.db.model.data_file)
+                .filter_by(basename=basename))
+        self.iter_records(q, redo=True)
 
     def import_datafile(self, fn, rec, redo=False):
         """
@@ -61,7 +66,7 @@ class LaserchronImporter(BaseImporter):
             try:
                 yield self.import_session(rec, df)
             except IntegrityError as err:
-                raise SparrowImportError(str(err))
+                raise SparrowImportError(str(err.orig))
 
     def import_session(self, rec, df):
 
@@ -99,7 +104,7 @@ class LaserchronImporter(BaseImporter):
 
         analysis = self.models.analysis(
             session_index=ix,
-            analysis_name=row['analysis'])
+            analysis_name=row['analysis'].strip())
 
         analysis.datum_collection = list(self.import_data(row))
         return analysis

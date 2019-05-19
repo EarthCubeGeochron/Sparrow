@@ -144,15 +144,17 @@ class BaseImporter(object):
         if added:
             rec = self.m.data_file(file_hash=hash)
         self.__set_file_info(fn, rec)
-        return rec
+        return rec, added
 
     def __import_datafile(self, fn, rec=None, **kwargs):
         """
         A wrapper for data file import that tracks data files through
         the import process and builds links to data file types.
         """
+        redo = kwargs.pop("redo", False)
+        added = False
         if rec is None:
-            rec = self.__create_data_file_record(fn)
+            rec, added = self.__create_data_file_record(fn)
 
         prev_imports = (
             self.db.session
