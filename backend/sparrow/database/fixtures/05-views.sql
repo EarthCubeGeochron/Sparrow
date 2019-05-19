@@ -161,7 +161,7 @@ SELECT
   p.name project_name,
   is_public(s)
 FROM sample s
-JOIN session ss
+LEFT JOIN session ss
   ON s.id = ss.sample_id
 LEFT JOIN project p
   ON ss.project_id = p.id;

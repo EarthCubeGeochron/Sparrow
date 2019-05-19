@@ -25,10 +25,10 @@ fi
 
 # If we haven't yet sourced the config file in a higher-level script
 if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
-  echo "Config file: $(tput bold)$SPARROW_CONFIG$(tput sgr0)" >&2
   export SPARROW_CONFIG="$SPARROW_CONFIG"
   source "$SPARROW_CONFIG"
   export _SPARROW_CONFIG_SOURCED=1
+  _SPARROW_CONFIG_SOURCED_HERE=1
 fi
 
 # Get path to sparrow installation from location of current file
@@ -67,11 +67,15 @@ dir="bin"
 subcommand=$1
 [ -z $subcommand ] && subcommand='--help'
 
+prettify() {
+  perl -pe "s|\`(.+?)\`|$(tput setaf 6)\1$(tput sgr0)|g"
+}
+
 # Echo the description of a subcommand. $1 is the script file.
 echo-description() {
   local descline=$(grep -E "#\s+Description" "$1")
   echo "${descline##*Description: }" \
-  | perl -pe "s|\`(.+?)\`|$(tput setaf 6)\1$(tput sgr0)|g"
+  | prettify
 }
 
 echo-help() {
@@ -87,10 +91,15 @@ echo-help() {
 if [ $subcommand = '--help' ] || [ $subcommand = 'help' ]; then
   # Get help from within sparrow container
   # and append docker wrapper commands
-  sparrow compose run --no-deps backend python3 sparrow --help
+  echo "Usage: $(tput bold)sparrow$(tput sgr0) [options] <command> [args]..." >&2
+  echo "" >&2
+  echo "Config: $(tput setaf 6)$SPARROW_CONFIG$(tput sgr0)" >&2
+  echo "Lab name: $(tput setaf 6)$(tput bold)$SPARROW_LAB_NAME$(tput sgr0)" >&2
+  sparrow compose run --no-deps -T backend cat /cache/sparrow-help.txt | (read; cat)
+  labname=${SPARROW_LAB_NAME:-"Lab-specific"}
   [ ! -z $SPARROW_COMMANDS ] && \
-    echo-help "Lab-specific commands" "$SPARROW_COMMANDS"
-  echo-help "Docker orchestration commands" "$dir"
+    echo-help "$labname commands" "$SPARROW_COMMANDS"
+  echo-help "Container-management commands" "$dir"
   exit 0
 fi
 
@@ -115,12 +124,11 @@ fi
 
 if [ $found_command = 0 ]; then
   # Run a command against sparrow within a docker container
-  >&2 echo "Running command in container"
   # This exec/run switch is added because there are apparently
   # database/locking issues caused by spinning up arbitrary
   # backend containers when containers are already running.
   # TODO: We need a better understanding of best practices here.
-  if docker-compose exec backend echo "Backend is up." ; then
+  if docker-compose exec backend true > /dev/null 2>&1 ; then
     sparrow compose exec backend sparrow $@
   else
     sparrow compose run backend sparrow $@
