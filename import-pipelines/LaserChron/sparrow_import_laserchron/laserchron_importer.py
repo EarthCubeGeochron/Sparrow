@@ -84,10 +84,17 @@ class LaserchronImporter(BaseImporter):
 
         self.db.session.add(project)
         self.db.session.add(sample)
+        self.db.session.add(session)
+
+        dup = df.index.duplicated(keep='first')
+        if dup.astype(bool).sum() > 0:
+            self.warn(f"Duplicate analyses found for sample {sample_id}")
+        df = df[~dup]
 
         for i, row in df.iterrows():
             analysis = self.import_analysis(row)
             analysis._session = session
+            self.db.session.add(analysis)
 
         self.db.session.add(session)
         return session
@@ -104,7 +111,7 @@ class LaserchronImporter(BaseImporter):
 
         analysis = self.models.analysis(
             session_index=ix,
-            analysis_name=row['analysis'].strip())
+            analysis_name=row['analysis'])
 
         analysis.datum_collection = list(self.import_data(row))
         return analysis

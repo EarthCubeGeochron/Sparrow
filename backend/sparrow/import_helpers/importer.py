@@ -97,6 +97,9 @@ class BaseImporter(object):
     # Data file importing
     ###
 
+    def warn(self, message):
+        secho(str(message), fg='yellow')
+
     def import_datafile(self, fn, rec, **kwargs):
         raise NotImplementedError()
 

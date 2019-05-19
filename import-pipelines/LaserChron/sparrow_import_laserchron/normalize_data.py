@@ -151,20 +151,14 @@ def strip_session_index(row):
 
 def generalize_samples(data):
     # Create sample name columns
-    pat = r"[\.\:_\s-](\w+)$"
-    ix = data.index.to_series().str.strip()
-    session_ix = ix.apply(extract_session_index)
-    #session_ix = ix.str.extract(pat)[0]
-    ix.name = "sample_id"
-    session_ix.name = "session_ix"
-    ax = concat((ix, session_ix), axis=1)
-    ax = ax.apply(strip_session_index, axis=1)
-
-    data = ax.join(data)
+    data.reset_index(inplace=True)
+    samples = data['analysis'].str.strip()
+    session_ix = samples.apply(extract_session_index)
 
     # Session index should be integer, so we set things that don't match
     # to NaNs
-    data['session_ix'] = to_numeric(data['session_ix'], errors='coerce')
-    data = data.reset_index()
+    data['session_ix'] = to_numeric(session_ix, errors='coerce')
+    data['sample_id'] = samples
+    data = data.apply(strip_session_index, axis=1)
 
     return data.set_index(["sample_id", "session_ix"], drop=True)
