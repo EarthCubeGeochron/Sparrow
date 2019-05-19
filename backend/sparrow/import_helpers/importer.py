@@ -3,6 +3,7 @@ from sqlalchemy import text
 from datetime import datetime
 from pathlib import Path
 from os import environ
+from sqlalchemy import event
 
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
@@ -19,6 +20,22 @@ class BaseImporter(object):
         # This is kinda unsatisfying
         self.basedir = environ.get("SPARROW_DATA_DIR", None)
 
+        self.__dirty = set()
+        self.__new = set()
+        self.__deleted = set()
+        @event.listens_for(self.db.session, 'before_flush')
+        def on_before_flush(session, flush_context, instances):
+            self.__dirty |= set([i for i in session.dirty
+                if session.is_modified(i)])
+            self.__new |= set(i for i in session.new
+                if session.is_modified(i))
+            self.__deleted |= set(session.deleted)
+
+        @event.listens_for(self.db.session, 'after_commit')
+        def on_after_commit(session):
+            self.__dirty = set()
+            self.__new = set()
+            self.__deleted = set()
         # Deprecated
         self.models = self.m
 
@@ -85,12 +102,20 @@ class BaseImporter(object):
             **kwargs)
         return dt
 
-    def datum(self, parameter, value, error=None, **kwargs):
+    def add_analysis(self, session, **kwargs):
+        return self.db.get_or_create(
+            self.m.analysis,
+            session_id=session.id,
+            **kwargs
+        )
+
+    def datum(self, analysis, parameter, value, error=None, **kwargs):
             type = self.datum_type(parameter, **kwargs)
-            datum = self.m.datum(
-                value=value,
-                error=error)
-            datum._datum_type=type
+            datum = self.db.get_or_create(self.m.datum,
+                type=type.id, analysis=analysis.id)
+            datum.value = value
+            datum.error = error
+
             return datum
 
     ###
@@ -118,8 +143,6 @@ class BaseImporter(object):
         checks if they have been imported, and potentially imports
         if needed.
         """
-        redo = kwargs.pop("redo", False)
-
         for fn in file_sequence:
             secho(str(fn), dim=True)
             self.__import_datafile(fn, None, **kwargs)
@@ -175,10 +198,17 @@ class BaseImporter(object):
         # It might get ugly here if we're trying to overwrite
         # old records but haven't deleted the appropriate
         # data_file_import models
+        if prev_imports > 0 and rec is not None:
+            self.delete_session(rec)
 
         # Create a "data_file_import" object to track model-datafile links
-        im = self.m.data_file_link()
-        im._data_file = rec
+        im = self.db.get_or_create(
+            self.m.data_file_link,
+            file_hash=rec.file_hash,
+            session_id=None,
+            analysis_id=None,
+            sample_id=None)
+
 
         try:
             # import_datafile needs to return the top-level model(s)
@@ -189,11 +219,19 @@ class BaseImporter(object):
                 self.db.session.add(created_model)
                 # Track the import of the resulting models
                 self.__track_model(im, created_model)
+                self.db.session.flush()
         except (SparrowImportError, NotImplementedError) as err:
             self.db.session.rollback()
             error = str(err)
             im.error = error
             secho(error, fg='red')
+
+        if redo:
+            dirty = self.__dirty | self.__new
+            if len(dirty) == 0:
+                secho("No modifications", fg='green')
+            else:
+                secho(f"{len(dirty)} records modified")
 
         # File records and trackers are added at the end,
         # outside of the try/except block so they occur

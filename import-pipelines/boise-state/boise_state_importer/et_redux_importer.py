@@ -44,72 +44,80 @@ class ETReduxImporter(BaseImporter):
         if not date:
             date = datetime.min()
 
-        session = self.models.session(date=date)
+        # Set IGSN
+        igsn = text(et, "aliquotIGSN")
+        if str(igsn) == '0': igsn = None
+
+        sample = None
+        # Import analysis sessions
+        sample_igsn = text(et, "sampleIGSN")
+        if str(igsn) == '0': igsn = None
+        name = text(et, "aliquotName")
+        if igsn or name:
+            sample = self.sample(igsn=sample_igsn, name=name)
+
+        session = self.db.get_or_create(
+            self.m.session,
+            date=date,
+            igsn=igsn,
+            sample_id=sample.id)
+        self.db.session.add(session)
+        self.db.session.flush()
 
         # Set publication
         ref = text(et, "aliquotReference")
         if ref: session._publication = self.publication(ref)
 
-        # Set IGSN
-        igsn = text(et, "aliquotIGSN")
-        if str(igsn) == '0': igsn = None
-        session.igsn = igsn
-
-        # Import analysis sessions
-        igsn = text(et, "sampleIGSN")
-        if str(igsn) == '0': igsn = None
-        name = text(et, "aliquotName")
-        if igsn or name:
-            session._sample = self.sample(igsn=igsn, name=name)
-
         fractions = et.find("analysisFractions")
 
         for i,f in enumerate(fractions):
-            s = self.import_analysis(f, session_index=i, analysis_type="analysisFraction")
-            s._session = session
+            s = self.import_analysis(f, session, session_index=i, analysis_type="analysisFraction")
             self.db.session.add(s)
 
-        s1 = self.import_dates(et.find("sampleDateModels"))
-        s1._session = session
+        s1 = self.import_dates(et.find("sampleDateModels"), session)
+
         self.db.session.add(s1)
         self.db.session.add(session)
         return session
 
-    def import_dates(self, et):
+    def import_dates(self, et, session):
         """
         SampleDateModel -> analysis(interpreted: true)
         """
         models = et.findall("SampleDateModel")
 
-        # Need to specify unit somehow
-        values = [self.import_datum(f) for f in models]
-
-        analysis = self.models.analysis(
+        analysis = self.add_analysis(
+            session,
             is_interpreted=True,
             is_standard=False,
             analysis_type="Interpreted Age")
-        analysis.datum_collection = [v for v in values if v is not None]
+        self.db.session.flush()
+
+        for d in models:
+            self.import_datum(analysis, d)
+
         return analysis
 
-    def import_analysis(self, et, **kwargs):
+    def import_analysis(self, et, session,  **kwargs):
         """
         AnalysisFraction -> analysis
         """
         def data_iterator(et, key, unit, model="ValueModel"):
-            return (self.import_datum(f)
-                for f in et.find(key).findall(model))
+            return iter(et.find(key).findall(model))
 
-        values = chain(
+        data = chain(
             data_iterator(et, 'analysisMeasures', 'unknown'),
             data_iterator(et, "measuredRatios", 'ratio_measured', model='MeasuredRatioModel'),
             data_iterator(et, "radiogenicIsotopeRatios", 'ratio_radiogenic'))
 
-        analysis = self.models.analysis(**kwargs)
+        analysis = self.add_analysis(session, **kwargs)
 
-        analysis.datum_collection = [d for d in values if d is not None]
+        for d in data:
+            res = self.import_datum(analysis, d)
+
         return analysis
 
-    def import_datum(self, et):
+    def import_datum(self, analysis, et):
         """
         ValueModel -> datum
         """
@@ -121,7 +129,7 @@ class ETReduxImporter(BaseImporter):
             return None
 
         try:
-            return self.datum(parameter, value,
+            return self.datum(analysis, parameter, value,
                 error=text(et, 'oneSigma'),
                 error_metric=text(et, 'uncertaintyType'))
         except DataError as err:
