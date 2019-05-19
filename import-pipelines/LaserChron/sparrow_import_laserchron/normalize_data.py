@@ -156,7 +156,8 @@ def generalize_samples(data):
 
     data = ax.join(data)
 
-    # Session index should be integer
+    # Session index should be integer, so we set things that don't match
+    # to NaNs
     data['session_ix'] = to_numeric(data['session_ix'], errors='coerce')
     data = data.reset_index()
 

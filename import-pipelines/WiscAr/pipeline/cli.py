@@ -16,7 +16,7 @@ class ArArCalcImporter(BaseImporter):
         super().__init__(db)
         self.verbose = kwargs.pop("verbose", False)
 
-    def import_datafile(self, fn):
+    def import_datafile(self, fn, rec, **kwargs):
         return extract_analysis(self.db, fn, verbose=self.verbose)
 
 @command(name="import-map")

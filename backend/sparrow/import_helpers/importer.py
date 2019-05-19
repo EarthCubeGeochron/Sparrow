@@ -97,7 +97,7 @@ class BaseImporter(object):
     # Data file importing
     ###
 
-    def import_datafile(self, fn):
+    def import_datafile(self, fn, rec, **kwargs):
         raise NotImplementedError()
 
     def delete_session(self, rec):
@@ -133,11 +133,8 @@ class BaseImporter(object):
         rec.basename = infile.name
         rec.file_path = str(infile)
 
-    def __import_datafile(self, fn, redo=False):
-        """
-        A wrapper for data file import that tracks data files through
-        the import process and builds links to data file types.
-        """
+    def __create_data_file_record(self, fn):
+
         # Get file mtime and hash
         hash = md5hash(str(fn))
 
@@ -147,6 +144,15 @@ class BaseImporter(object):
         if added:
             rec = self.m.data_file(file_hash=hash)
         self.__set_file_info(fn, rec)
+        return rec
+
+    def __import_datafile(self, fn, rec=None, **kwargs):
+        """
+        A wrapper for data file import that tracks data files through
+        the import process and builds links to data file types.
+        """
+        if rec is None:
+            rec = self.__create_data_file_record(fn)
 
         prev_imports = (
             self.db.session
@@ -167,7 +173,7 @@ class BaseImporter(object):
         try:
             # import_datafile needs to return the top-level model(s)
             # created or modified during import.
-            items = ensure_sequence(self.import_datafile(fn))
+            items = ensure_sequence(self.import_datafile(fn, rec, **kwargs))
 
             for created_model in items:
                 self.db.session.add(created_model)
@@ -201,20 +207,10 @@ class BaseImporter(object):
                 "Only sessions, samples, and analyses "
                 "can be tracked independently on import.")
 
-    def iteritems(self, seq, **kwargs):
+    def iter_records(self, seq, **kwargs):
         """
         This is kind of outmoded by the new version of iterfiles
         """
-        fn = kwargs.pop("parse_filename", lambda f: str(f.file_path))
-        stop_on_error = kwargs.pop("stop_on_error", False)
-        for f in seq:
-            try:
-                secho(fn(f), dim=True)
-                imported = self.import_datafile(f)
-                self.db.session.commit()
-                if not imported:
-                    secho("Already imported", fg='green', dim=True)
-            except (SparrowImportError, NotImplementedError) as e:
-                if stop_on_error: raise e
-                self.db.session.rollback()
-                secho(str(e), fg='red')
+        for rec in seq:
+            secho(str(rec.file_path), dim=True)
+            self.__import_datafile(None, rec, **kwargs)
