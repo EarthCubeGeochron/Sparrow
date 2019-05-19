@@ -61,7 +61,6 @@ class ETReduxImporter(BaseImporter):
             date=date,
             igsn=igsn,
             sample_id=sample.id)
-        self.db.session.add(session)
         self.db.session.flush()
 
         # Set publication
@@ -72,11 +71,9 @@ class ETReduxImporter(BaseImporter):
 
         for i,f in enumerate(fractions):
             s = self.import_analysis(f, session, session_index=i, analysis_type="analysisFraction")
-            self.db.session.add(s)
 
         s1 = self.import_dates(et.find("sampleDateModels"), session)
 
-        self.db.session.add(s1)
         self.db.session.add(session)
         return session
 

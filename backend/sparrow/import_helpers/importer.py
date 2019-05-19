@@ -6,16 +6,17 @@ from os import environ
 from sqlalchemy import event
 
 from .util import md5hash, SparrowImportError, ensure_sequence
-from ..util import relative_path
+from ..util import relative_path, pretty_print
 
 class BaseImporter(object):
     """
     A basic Sparrow importer to be subclassed.
     """
     authority = None
-    def __init__(self, db):
+    def __init__(self, db, **kwargs):
         self.db = db
         self.m = self.db.model
+        print_sql = kwargs.pop("print_sql", False)
 
         # This is kinda unsatisfying
         self.basedir = environ.get("SPARROW_DATA_DIR", None)
@@ -34,6 +35,14 @@ class BaseImporter(object):
             self.__dirty = set()
             self.__new = set()
             self.__deleted = set()
+
+        if print_sql:
+            @event.listens_for(self.db.engine, 'after_cursor_execute', named=True)
+            def receive_after_cursor_execute(**kw):
+                statement = kw.pop('statement')
+                if statement.startswith("SELECT"): return
+                secho(str(statement).strip())
+
         # Deprecated
         self.models = self.m
 
@@ -196,16 +205,11 @@ class BaseImporter(object):
         # It might get ugly here if we're trying to overwrite
         # old records but haven't deleted the appropriate
         # data_file_import models
-        if prev_imports > 0 and rec is not None:
-            self.delete_session(rec)
+        #if prev_imports > 0 and rec is not None:
+        #    self.delete_session(rec)
 
         # Create a "data_file_import" object to track model-datafile links
-        im = self.db.get_or_create(
-            self.m.data_file_link,
-            file_hash=rec.file_hash,
-            session_id=None,
-            analysis_id=None,
-            sample_id=None)
+
 
 
         try:
@@ -214,45 +218,48 @@ class BaseImporter(object):
             items = ensure_sequence(self.import_datafile(fn, rec, **kwargs))
 
             for created_model in items:
-                self.db.session.add(created_model)
                 # Track the import of the resulting models
-                self.__track_model(im, created_model)
+                self.__track_model(rec, created_model)
                 self.db.session.flush()
         except (SparrowImportError, NotImplementedError) as err:
             self.db.session.rollback()
-            error = str(err)
-            im.error = error
-            secho(error, fg='red')
+            self.__track_model(rec, None, error=str(err))
+            secho(str(err), fg='red')
 
-        # if redo:
-        #     dirty = [i for i in self.__dirty | self.__new
-        #              if self.db.session.is_modified(i)]
-        #     if len(dirty) == 0:
-        #         secho("No modifications", fg='green')
-        #     else:
-        #         secho(f"{len(dirty)} records modified")
+        if redo:
+            dirty = set(i for i in set(self.__dirty) if self.db.session.is_modified(i))
+            dirty = list(dirty | self.__new)
+            if len(dirty) == 0:
+                secho("No modifications", fg='green')
+            else:
+                secho(f"{len(dirty)} records modified")
 
         # File records and trackers are added at the end,
         # outside of the try/except block, so they occur
         # regardness of error status
-        self.db.session.add(rec)
-        self.db.session.add(im)
         self.db.session.commit()
 
-    def __track_model(self, im, model):
+    def __track_model(self, rec, model=None, **kw):
         """
         Track the import of a given model from a data file
         """
-        if isinstance(model, self.m.session):
-            im._session = model
+        if model is None:
+            pass
+        elif isinstance(model, self.m.session):
+            kw['session_id'] = model.id
         elif isinstance(model, self.m.analysis):
-            im._analysis = model
+            kw['analysis_id'] = model.id
         elif isinstance(model, self.m.sample):
-            im._sample = model
+            kw['sample_id'] = model.id
         else:
             raise NotImplementedError(
                 "Only sessions, samples, and analyses "
                 "can be tracked independently on import.")
+
+        return self.db.get_or_create(
+            self.m.data_file_link,
+            file_hash=rec.file_hash,
+            **kw)
 
     def iter_records(self, seq, **kwargs):
         """
