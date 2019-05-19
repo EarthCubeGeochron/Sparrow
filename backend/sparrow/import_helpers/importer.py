@@ -25,10 +25,8 @@ class BaseImporter(object):
         self.__deleted = set()
         @event.listens_for(self.db.session, 'before_flush')
         def on_before_flush(session, flush_context, instances):
-            self.__dirty |= set([i for i in session.dirty
-                if session.is_modified(i)])
-            self.__new |= set(i for i in session.new
-                if session.is_modified(i))
+            self.__dirty |= set(session.dirty)
+            self.__new |= set(session.new)
             self.__deleted |= set(session.deleted)
 
         @event.listens_for(self.db.session, 'after_commit')
@@ -226,15 +224,16 @@ class BaseImporter(object):
             im.error = error
             secho(error, fg='red')
 
-        if redo:
-            dirty = self.__dirty | self.__new
-            if len(dirty) == 0:
-                secho("No modifications", fg='green')
-            else:
-                secho(f"{len(dirty)} records modified")
+        # if redo:
+        #     dirty = [i for i in self.__dirty | self.__new
+        #              if self.db.session.is_modified(i)]
+        #     if len(dirty) == 0:
+        #         secho("No modifications", fg='green')
+        #     else:
+        #         secho(f"{len(dirty)} records modified")
 
         # File records and trackers are added at the end,
-        # outside of the try/except block so they occur
+        # outside of the try/except block, so they occur
         # regardness of error status
         self.db.session.add(rec)
         self.db.session.add(im)
