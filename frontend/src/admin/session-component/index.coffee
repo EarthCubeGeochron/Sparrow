@@ -7,7 +7,6 @@ import {Frame} from 'app/frame'
 import {GeoDeepDiveCard} from './gdd-card'
 import {SessionInfoCard} from './info-card'
 import {APIResultView} from '@macrostrat/ui-components'
-import {StepHeatingChart} from '../../../plugins/step-heating'
 
 class SessionComponent extends Component
   render: ->
@@ -24,15 +23,15 @@ class SessionComponent extends Component
       h Breadcrumbs, {items: breadCrumbs}
       h APIResultView, {
         route: "/session"
-        params: {id}
+        params: {id, private: true}
       }, (data)=>
         res = data[0]
         {sample_id} = res
         h 'div', [
           h SessionInfoCard, res
-          h Frame, {id: 'sessionDetail'}, (props)=>
-            # This should be passed through the component tree
-            h StepHeatingChart, {session_id: id}
+          h Frame, {id: 'sessionDetail', session_id: id}, (
+            h 'div', "This is where a session detail component would go"
+          )
           h Button, {icon: 'document', intent: Intent.PRIMARY}, "Get data file"
           h GeoDeepDiveCard, {sample_id}
         ]

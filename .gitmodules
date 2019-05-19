@@ -1,3 +1,6 @@
 [submodule "deps/ui-components"]
-    path = frontend/bundled-deps/ui-components
-    url = git://github.com/UW-Macrostrat/ui-components.git
+	path = frontend/bundled-deps/ui-components
+	url = git://github.com/UW-Macrostrat/ui-components.git
+[submodule "deps/sadisplay"]
+	path = deps/sadisplay
+	url = git://github.com/davenquinn/sadisplay.git

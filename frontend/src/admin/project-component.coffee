@@ -98,9 +98,10 @@ ProjectSamples = ({data})->
   ]
 
 ProjectComponent = (props)->
-  {id, title, description} = props
+  console.log props
+  {id, name, description} = props
   h 'div.project.bp3-card', {key: id}, [
-    h 'h3', title
+    h 'h3', name
     h 'p.description', description
     h ProjectPublications, {data: props.publications}
     h ProjectResearchers, {data: props.researchers}
@@ -114,9 +115,10 @@ class ProjectListComponent extends Component
 
   render: ->
     {apiEndpoint} = @props
+    params = {private: true}
     return h 'div.data-view.projects', [
       h 'h2', 'Projects'
-      h PagedAPIView, {route: apiEndpoint, perPage: 5}, (data)=>
+      h PagedAPIView, {route: apiEndpoint, params, perPage: 5}, (data)=>
         h 'div', null, data.map (d)-> h(ProjectComponent, d)
     ]
 

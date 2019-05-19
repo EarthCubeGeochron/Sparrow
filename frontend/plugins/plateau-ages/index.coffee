@@ -8,8 +8,6 @@ import { Histogram, DensitySeries, BarSeries, withParentSize, XAxis, YAxis } fro
 import md from './plateau-ages.md'
 import './main.styl'
 
-import {ErrorBoundary} from '../../util/error-boundary.js'
-
 ResponsiveHistogram = withParentSize ({ parentWidth, parentHeight, ...rest})->
   h Histogram, {
     width: parentWidth
@@ -22,15 +20,6 @@ class AgeChart extends Component
     {data, width, range} = @props
     return null unless data?
     range ?= [0,2000]
-
-    #renderTooltip = ({ event, datum, data, color }) => (
-      #h 'div', [
-        #h 'strong', {style: {color}}, "#{datum.bin0} to #{datum.bin1}"
-          #<div><strong>count </strong>{datum.count}</div>
-          #<div><strong>cumulative </strong>{datum.cumulative}</div>
-          #<div><strong>density </strong>{datum.density}</div>
-      #]
-      #
 
     rawData = data.map (d)->d.value
       .filter (d)-> d > range[0]
@@ -75,7 +64,7 @@ class ChartOuter extends Component
 
     h APIResultView, {route: '/datum', params}, (data)=>
       return null unless data?
-      h 'div.age-chart-container', {style: {height: 500}}, [
+      h 'div.age-chart-container', [
         h Callout, {
           icon: 'scatter-plot', title: "Plateau ages"
         }, [
@@ -94,21 +83,16 @@ class ChartOuter extends Component
             }
           ]
         ]
-        h AgeChart, {data, range}
+        h 'div.chart-container', {style: {height: 500}}, [
+          h AgeChart, {data, range}
+        ]
       ]
 
-class AgeChartComponent extends Component
-  @defaultProps: {
-    apiEndpoint: '/session'
-  }
+class PlateauAgesComponent extends Component
   render: ->
-    {apiEndpoint} = @props
-
     h 'div.data-view#age-chart', [
-      h ErrorBoundary, [
-        h ChartOuter
-      ]
+      h ChartOuter
     ]
 
 
-export {AgeChartComponent}
+export {PlateauAgesComponent}

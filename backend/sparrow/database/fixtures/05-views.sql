@@ -36,7 +36,7 @@ CREATE VIEW core_view.session AS
 SELECT
 	s.*,
 	i.name instrument_name,
-  p.title project_name,
+  p.name project_name,
   is_public(s)
 FROM session s
 LEFT JOIN instrument i
@@ -83,7 +83,6 @@ SELECT
     FROM instrument
     WHERE id = s.instrument
   ) instrument,
-  sa.id sample_id,
   ( SELECT
       tree
     FROM
@@ -95,7 +94,9 @@ SELECT
     FROM core_view.material_tree
     WHERE id = sa.material
   ) sample_material,
+  sa.id sample_id,
   sa.igsn,
+  sa.name sample_name,
   s.project_id,
   sa.location,
   is_public(s)
@@ -120,10 +121,12 @@ SELECT
   t.is_computed,
   t.is_interpreted,
   d.is_bad,
+  d.is_accepted,
   is_public(s),
   a.session_id,
   a.session_index,
   s.sample_id,
+  sa.name sample_name,
   s.technique
 FROM datum d
 JOIN analysis a
@@ -132,6 +135,8 @@ JOIN datum_type t
   ON d.type = t.id
 JOIN session s
   ON a.session_id = s.id
+JOIN sample sa
+  ON s.sample_id = sa.id
 ORDER BY d.id;
 
 CREATE VIEW core_view.age_datum AS
@@ -147,12 +152,13 @@ CREATE VIEW core_view.sample AS
 SELECT
   s.id,
   s.igsn,
+  s.name,
   s.material,
   ST_AsGeoJSON(s.location) geometry,
   location_name,
   location_precision,
   p.id project_id,
-  p.title project_title,
+  p.name project_name,
   is_public(s)
 FROM sample s
 JOIN session ss
@@ -193,7 +199,7 @@ CREATE VIEW core_view.project AS
 SELECT
 	p.id,
 	p.description,
-	p.title,
+	p.name,
   p.embargo_date,
   NOT embargoed(p.embargo_date) AS is_public,
 	-- Get data from researchers table in standard format

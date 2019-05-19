@@ -4,12 +4,13 @@ import {NonIdealState, Intent, Button, ButtonGroup, Icon} from '@blueprintjs/cor
 import {Route, Switch} from 'react-router-dom'
 import classNames from 'classnames'
 
+import {Frame} from 'app/frame'
 import {AuthContext} from 'app/auth/context'
 import {ProjectListComponent} from './project-component'
 import {SessionListComponent} from './session-list-component'
-import {AgeChartComponent} from './age-component'
 import {SessionComponent} from './session-component'
 import {AppNavbar, NavButton} from 'app/shared/navbar'
+import {InsetText} from 'app/layout'
 
 AdminNavbar = ({base, rest...})->
   h AppNavbar, {rest, subtitle: 'Admin'}, [
@@ -33,6 +34,11 @@ LoginRequired = (props)->
     icon: 'blocked-person'
     action: h Button, {onClick}, "Login"
   }
+
+AdminMain = (props)->
+  h Frame, {id: 'adminBase', props...}, (
+    h InsetText, "An admin base component goes here"
+  )
 
 class AdminBody extends Component
   @contextType: AuthContext
@@ -58,7 +64,7 @@ class AdminBody extends Component
       }
       h Route, {
         path: base
-        component: AgeChartComponent
+        component: AdminMain
         exact: true
       }
     ]

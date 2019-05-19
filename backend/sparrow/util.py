@@ -30,7 +30,7 @@ def pretty_print(sql, **kwargs):
         for i in ["SELECT", "INSERT","UPDATE","CREATE", "DROP","DELETE", "ALTER"]:
             if not line.startswith(i):
                 continue
-            start = line.split("(")[0].strip()
+            start = line.split("(")[0].strip().rstrip(';').replace(" AS","")
             secho(start, **kwargs)
             return
 
@@ -45,9 +45,14 @@ def run_sql(session, sql):
             session.commit()
             pretty_print(sql, dim=True)
         except (ProgrammingError,IntegrityError) as err:
+            err = str(err.orig).strip()
+            dim = "already exists" in err
             session.rollback()
-            pretty_print(sql, fg='red')
-            secho(str(err.orig), fg='red', dim=True)
+            pretty_print(sql,
+                fg=None if dim else "red",
+                dim=True)
+            if dim: err = "  "+err
+            secho(err, fg='red', dim=dim)
 
 def run_sql_file(session, sql_file):
     sql = open(sql_file).read()
