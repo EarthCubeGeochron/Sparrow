@@ -84,9 +84,8 @@ class LaserchronImporter(BaseImporter):
 
         self.db.session.add(project)
         self.db.session.add(sample)
-        self.db.session.add(session)
 
-        dup = df.index.duplicated(keep='first')
+        dup = df['analysis'].duplicated(keep='first')
         if dup.astype(bool).sum() > 0:
             self.warn(f"Duplicate analyses found for sample {sample_id}")
         df = df[~dup]
