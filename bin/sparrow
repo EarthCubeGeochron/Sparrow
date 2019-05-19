@@ -25,9 +25,6 @@ fi
 
 # If we haven't yet sourced the config file in a higher-level script
 if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
-  echo "Usage: $(tput bold)sparrow$(tput sgr0) [options] <command> [args]..." >&2
-  echo "" >&2
-  echo "Config: $(tput setaf 6)$SPARROW_CONFIG$(tput sgr0)" >&2
   export SPARROW_CONFIG="$SPARROW_CONFIG"
   source "$SPARROW_CONFIG"
   export _SPARROW_CONFIG_SOURCED=1
@@ -58,11 +55,6 @@ export SPARROW_ENV="development"
 # The docker-compose volume for sparrow commands needs to be set
 # even if a SPARROW_COMMANDS directory is not provided.
 export SPARROW_COMMANDS_VOLUME="${SPARROW_COMMANDS:-"placeholder"}"
-
-# Echo lab name
-[ ! -z $_SPARROW_CONFIG_SOURCED_HERE ] && \
-  echo "Lab name: $(tput setaf 6)$(tput bold)$SPARROW_LAB_NAME$(tput sgr0)" >&2
-
 
 [ -z $SPARROW_SECRET_KEY ] && echo \
   "You $(tput bold)must$(tput sgr0) set SPARROW_SECRET_KEY. Exiting..." && \
@@ -99,7 +91,11 @@ echo-help() {
 if [ $subcommand = '--help' ] || [ $subcommand = 'help' ]; then
   # Get help from within sparrow container
   # and append docker wrapper commands
-  sparrow compose run --no-deps -T backend python3 sparrow --help | (read; cat)
+  echo "Usage: $(tput bold)sparrow$(tput sgr0) [options] <command> [args]..." >&2
+  echo "" >&2
+  echo "Config: $(tput setaf 6)$SPARROW_CONFIG$(tput sgr0)" >&2
+  echo "Lab name: $(tput setaf 6)$(tput bold)$SPARROW_LAB_NAME$(tput sgr0)" >&2
+  sparrow compose run --no-deps -T backend cat /cache/sparrow-help.txt | (read; cat)
   labname=${SPARROW_LAB_NAME:-"Lab-specific"}
   [ ! -z $SPARROW_COMMANDS ] && \
     echo-help "$labname commands" "$SPARROW_COMMANDS"
