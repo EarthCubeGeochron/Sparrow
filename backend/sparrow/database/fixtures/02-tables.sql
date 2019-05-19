@@ -294,14 +294,17 @@ CREATE TABLE IF NOT EXISTS data_file (
   type_id text REFERENCES data_file_type(id)
 );
 
-CREATE TABLE IF NOT EXISTS import_tracker (
+CREATE TABLE IF NOT EXISTS data_file_link (
   /*
   Foreign key columns to link to data that was imported from
   this file; this should be done at the appropriate level (e.g.
   sample, analysis, session) that fits the data file in question.
 
-  Note: this table is part of the internal import process
-  and could change at more or less any time.
+  The linked data file is then considered the *primary source*
+  for all data corresponding to this model.
+
+  Note: this table and its assumptions are part of the import
+  process and could change significantly at this early stage.
   */
   id serial PRIMARY KEY,
   file_hash uuid NOT NULL
@@ -310,12 +313,25 @@ CREATE TABLE IF NOT EXISTS import_tracker (
   date timestamp NOT NULL DEFAULT now(),
   error text,
   session_id integer
+    UNIQUE
     REFERENCES session(id)
     ON DELETE CASCADE,
   analysis_id integer
+    UNIQUE
     REFERENCES analysis(id)
     ON DELETE CASCADE,
   sample_id integer
+    UNIQUE
     REFERENCES sample(id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+  /* Only one of the linked data file columns should be
+     set at a time (a data file can only be packaged at
+     one level, even if it encompasses information about
+     other entities)
+  */
+  CHECK (
+      (session_id IS NOT NULL)::int
+    + (analysis_id IS NOT NULL)::int
+    + (sample_id IS NOT NULL)::int <= 1
+  )
 );
