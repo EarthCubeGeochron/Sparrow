@@ -122,7 +122,7 @@ class BaseImporter(object):
 
         for fn in file_sequence:
             secho(str(fn), dim=True)
-            self.__import_datafile(fn)
+            self.__import_datafile(fn, None, **kwargs)
 
     def __set_file_info(self, fn, rec):
         infile = Path(fn)
@@ -159,10 +159,15 @@ class BaseImporter(object):
         if rec is None:
             rec, added = self.__create_data_file_record(fn)
 
+        err_filter = True
+        m = self.m.data_file_link
+        if kwargs.pop("fix_errors", False):
+            err_filter = m.error.is_(None)
         prev_imports = (
             self.db.session
-                .query(self.m.data_file_link)
+                .query(m)
                 .filter_by(file_hash=rec.file_hash)
+                .filter(err_filter)
                 .count())
         if prev_imports > 0 and not added and not redo:
             secho("Already imported", fg='green', dim=True)

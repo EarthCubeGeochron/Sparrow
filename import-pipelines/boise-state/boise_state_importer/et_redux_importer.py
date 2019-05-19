@@ -1,20 +1,41 @@
-from lxml.etree import tostring
+"""
+Import script for *ET-Redux* xml-formatted data
+from Boise State Geochronology Laboratory
+"""
+from lxml.etree import tostring, XML, QName
+from click import echo
 from itertools import chain
-from sparrow.import_helpers import BaseImporter
+from sparrow.import_helpers import BaseImporter, SparrowImportError
 from datetime import datetime
+from sqlalchemy.exc import DataError
 
 def text(et, key):
     v = et.findtext(key)
     if v == '': return None
     return v
 
-class GeochronImporter(BaseImporter):
+def strip_ns_prefix(tree):
+    #xpath query for selecting all element nodes in namespace
+    query = "descendant-or-self::*[namespace-uri()!='']"
+    #for each element returned by the above xpath query...
+    for element in tree.xpath(query):
+        #replace element name with its local name
+        element.tag = QName(element).localname
+    return tree
+
+class ETReduxImporter(BaseImporter):
     """
-    A basic Sparrow importer for Geochron.org XML
+    A Sparrow importer for Geochron.org ETRedux XML
     """
     authority = "Boise State"
 
-    def import_datafile(self, et):
+    def import_datafile(self, fn, rec):
+        # Read in XML
+        et = XML(open(fn, 'rb').read())
+        et = strip_ns_prefix(et)
+        return self.__import_element_tree(et)
+
+    def __import_element_tree(self, et):
         """
         Aliquot -> session
         """
@@ -39,7 +60,7 @@ class GeochronImporter(BaseImporter):
         if str(igsn) == '0': igsn = None
         name = text(et, "aliquotName")
         if igsn or name:
-            session._sample = self.sample(id=name, igsn=igsn)
+            session._sample = self.sample(igsn=igsn, name=name)
 
         fractions = et.find("analysisFractions")
 
@@ -51,8 +72,8 @@ class GeochronImporter(BaseImporter):
         s1 = self.import_dates(et.find("sampleDateModels"))
         s1._session = session
         self.db.session.add(s1)
-
         self.db.session.add(session)
+        return session
 
     def import_dates(self, et):
         """
@@ -99,7 +120,9 @@ class GeochronImporter(BaseImporter):
         except:
             return None
 
-
-        return self.datum(parameter, value,
-            error=text(et, 'oneSigma'),
-            error_metric=text(et, 'uncertaintyType'))
+        try:
+            return self.datum(parameter, value,
+                error=text(et, 'oneSigma'),
+                error_metric=text(et, 'uncertaintyType'))
+        except DataError as err:
+            raise SparrowImportError(str(err.orig).strip())
