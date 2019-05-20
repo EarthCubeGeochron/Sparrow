@@ -1,4 +1,4 @@
-from flask import Blueprint, make_response, render_template, current_app, abort
+from flask import Blueprint, make_response, Response, render_template, current_app, abort
 from os.path import join
 
 web = Blueprint('frontend', __name__)
@@ -21,6 +21,30 @@ def stream_data(uuid):
     res = make_response()
     res.headers['X-Accel-Redirect'] = '/data/'+datafile.file_path
     return res
+
+# This route is only for LaserChron but we don't have a good
+# plugin interface for the backend yet so it'll just be dead code
+# for other users
+@web.route('/data-table/<string:uuid>.csv')
+def get_csv(uuid):
+    v = current_app.config.get("LAB_NAME")
+    if v != "Arizona LaserChron Center":
+        abort(404)
+    db = current_app.database
+    m = db.model.data_file
+
+    datafile = db.session.query(m).get(uuid)
+    if datafile is None:
+        abort(404)
+
+    csv = datafile.csv_data.decode()
+    basename = datafile.basename
+
+    res = Response(csv,
+            mimetype="text/csv",
+            headers={"Content-disposition": f"attachment; 'filename={basename}.csv'"})
+    return res
+
 
 @web.route('/')
 # This route is a catch-all route for anything
