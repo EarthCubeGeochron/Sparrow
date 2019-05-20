@@ -2,14 +2,16 @@ from os import environ
 from click import Group, option, echo, secho, style
 from pathlib import Path
 from sparrow import Database
-from sparrow.import_helpers import SparrowImportError, working_directory, iterfiles
-from .import_datafile import import_datafile
+
+from .et_redux_importer import ETReduxImporter
 from .import_metadata import import_metadata
 
 cli = Group()
 
 @cli.command(name='import-xml')
-def import_xml():
+@option('--fix-errors', is_flag=True, default=False)
+@option('--redo', is_flag=True, default=False)
+def import_xml(**kwargs):
     """
     Import Boise State XML files
     """
@@ -23,8 +25,10 @@ def import_xml():
     path = Path(env)
     assert path.is_dir()
 
+    db = Database()
+    importer = ETReduxImporter(db)
     files = path.glob("**/*.xml")
-    iterfiles(import_datafile, files)
+    importer.iterfiles(files, **kwargs)
 
 @cli.command(name='import-metadata')
 @option('--download', is_flag=True, default=False)

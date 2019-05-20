@@ -35,6 +35,8 @@ A session view with some extra features
 CREATE VIEW core_view.session AS
 SELECT
 	s.*,
+	f.file_hash,
+	f.type_id file_type,
 	i.name instrument_name,
   p.name project_name,
   is_public(s)
@@ -43,6 +45,10 @@ LEFT JOIN instrument i
   ON i.id = s.instrument
 LEFT JOIN project p
   ON s.project_id = p.id
+LEFT JOIN data_file_link l
+  ON s.id = l.session_id
+LEFT JOIN data_file f
+  ON l.file_hash = f.file_hash
 ORDER BY date DESC;
 
 /* Analysis info with nested JSON data*/
@@ -161,7 +167,7 @@ SELECT
   p.name project_name,
   is_public(s)
 FROM sample s
-JOIN session ss
+LEFT JOIN session ss
   ON s.id = ss.sample_id
 LEFT JOIN project p
   ON ss.project_id = p.id;

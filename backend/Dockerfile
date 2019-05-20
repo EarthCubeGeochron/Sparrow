@@ -21,6 +21,7 @@ WORKDIR /app
 
 ## Copy app core
 COPY ./setup.py /app
-COPY ./sparrow /app
+COPY ./sparrow /app/sparrow
 RUN pip3 install -e .
+RUN mkdir /cache && python3 sparrow --help > /cache/sparrow-help.txt
 CMD ["/bin/run"]

@@ -4,6 +4,7 @@ import {NonIdealState, Intent, Button, ButtonGroup, Icon} from '@blueprintjs/cor
 import {Route, Switch} from 'react-router-dom'
 import classNames from 'classnames'
 
+import {LinkButton} from '@macrostrat/ui-components'
 import {Frame} from 'app/frame'
 import {AuthContext} from 'app/auth/context'
 import {ProjectListComponent} from './project-component'
@@ -11,12 +12,40 @@ import {SessionListComponent} from './session-list-component'
 import {SessionComponent} from './session-component'
 import {AppNavbar, NavButton} from 'app/shared/navbar'
 import {InsetText} from 'app/layout'
+import styled from '@emotion/styled'
+
+MinimalNavbar = styled.div"""
+display: flex;
+flex-direction: row;
+align-items: baseline;
+margin: 8px 0 10px;
+padding: 0.3em 1em;
+background-color: #f5f8fa;
+border-radius: 5px;
+vertical-align: baseline;
+box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0), 0 1px 1px rgba(16, 22, 26, 0.2);
+
+h4 {
+  margin: 0;
+  padding: 0.1em 1em 0.1em 0.4em;
+  color: #5c7080;
+  min-width: 5em;
+}
+"""
+
+HomeButton = styled(LinkButton)"""
+margin-right: 1em;
+vertical-align: baseline;
+baseline-shift: -4px;
+"""
 
 AdminNavbar = ({base, rest...})->
-  h AppNavbar, {rest, subtitle: 'Admin'}, [
-    h NavButton, {to: base, icon: 'home'}
-    h NavButton, {to: base+'/session'}, "Data"
+  h MinimalNavbar, {rest, subtitle: 'Admin'}, [
+    h 'h4', "Admin views"
+    #h HomeButton, {to: base, icon: 'home', minimal: true}
+    h NavButton, {to: base, exact: true }, "Base"
     h NavButton, {to: base+'/project'}, "Projects"
+    h NavButton, {to: base+'/session'}, "Sessions"
   ]
 
 SessionMatch = ({match})->

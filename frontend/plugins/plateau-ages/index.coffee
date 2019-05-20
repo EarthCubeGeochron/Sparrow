@@ -83,7 +83,7 @@ class ChartOuter extends Component
             }
           ]
         ]
-        h 'div.chart-container', {style: {height: 500}}, [
+        h 'div.chart-container', {style: {height: 460}}, [
           h AgeChart, {data, range}
         ]
       ]

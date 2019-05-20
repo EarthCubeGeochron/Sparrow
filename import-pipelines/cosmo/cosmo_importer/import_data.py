@@ -12,7 +12,7 @@ class CosmoImporter(BaseImporter):
         data points. For instance, elevation could be a sample parameter
         or analysis parameter.
         """
-        sample = self.sample(id=row.loc['index'])
+        sample = self.sample(name=row.loc['index'])
         lon = row.loc['Long (DD)']
         lat = row.loc['Lat (DD)']
         sample.location = self.location(lon, lat)
@@ -45,29 +45,27 @@ class CosmoImporter(BaseImporter):
 
         dc = []
         v = row.loc['Thickness (cm)']
-        val = self.datum("Thickness", v, unit='cm')
+        val = self.datum(analysis, "Thickness", v, unit='cm')
         dc.append(val)
 
         v = row.loc['Density (g/cm^3)']
-        val = self.datum("Density", v, unit='g/cm^3')
+        val = self.datum(analysis,"Density", v, unit='g/cm^3')
         dc.append(val)
 
         v = row.loc['Shielding']
-        val = self.datum("Shielding", v)
+        val = self.datum(analysis,"Shielding", v)
         dc.append(val)
 
         v = row.loc['Erosion']
-        val = self.datum("Erosion", v)
+        val = self.datum(analysis,"Erosion", v)
         dc.append(val)
 
         v = row.loc['Be-concent']
         e = row.loc['Be-concent error']
-        val = self.datum('Be-concent', v, error=e, unit='concentration')
+        val = self.datum(analysis, 'Be-concent', v, error=e, unit='concentration')
         dc.append(val)
 
-        analysis.datum_collection = dc
         analysis._session = session
-        self.db.session.add(analysis)
         return analysis
 
     def model_output(self, session, row):
@@ -77,19 +75,16 @@ class CosmoImporter(BaseImporter):
             analysis_type='CRONUS model output',
             is_interpreted=True)
         analysis.material = self.material(nuclide).id
-        dc = []
         for k in ['St', 'Lm', 'LSDn']:
             v = row.loc[k+'_Age']
             e = row.loc[k+'_Exterr']
-            d = self.datum(k+"_Age", v,
+            d = self.datum(analysis, k+"_Age", v,
                 error=e, unit='yr',
                 error_metric='absolute',
                 is_computed=True,
                 is_interpreted=True)
             # Special row for interror
             d.interror = row.loc[k+'_Interr']
-            dc.append(d)
-        analysis.datum_collection = dc
         analysis._session = session
         self.db.session.add(analysis)
         return analysis
