@@ -48,8 +48,8 @@ class GLMap extends Component
     @state = {
       viewport: {
         latitude: 43.6150
-        longitude: -116.2023,
-        zoom: 4
+        longitude: -140.2023,
+        zoom: 2
       }
     }
 
