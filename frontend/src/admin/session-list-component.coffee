@@ -75,7 +75,7 @@ class SessionListComponent extends StatefulComponent
         params
         route: apiEndpoint
         topPagination: true
-        bottomPagination: false
+        bottomPagination: true
         perPage: 10
       }, (data)->
         h 'div', null, data.map (d)-> h(SessionInfoLink, d)

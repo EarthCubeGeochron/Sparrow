@@ -31,8 +31,8 @@ class MapComponent extends Component
           projectionConfig={{
             scale: 400,
           }}
-          width={800}
-          height={800}
+          width={820}
+          height={820}
           style={{
             width: "100%",
             height: "auto",
@@ -43,7 +43,7 @@ class MapComponent extends Component
             fill="#afe6f0"
             stroke="#eceff1"
             style={{cursor: "move"}} >
-            <circle cx={400} cy={400} r={400} fill="#afe6f0" stroke="#888888" />
+            <circle cx={410} cy={410} r={400} fill="#afe6f0" stroke="#888888" />
             <Geographies geography={worldMap} disableOptimization>
               {(geographies, projection) =>
                   geographies.map (geography, i) =>
@@ -65,8 +65,8 @@ class MapComponent extends Component
                   key={i}
                   marker={marker}
                   style={{
-                    default: { fill: "#FF5722" },
-                    hover: { fill: "#FFFFFF" },
+                    default: { fill: "#ad99ff" },
+                    hover: { fill: "#634dbf" },
                     pressed: { fill: "#FF5722" },
                     hidden: { opacity: 0 }
                   }}
@@ -76,7 +76,7 @@ class MapComponent extends Component
                     cy={0}
                     r={10}
                     style={{
-                      stroke: "#FF5722",
+                      stroke: "#634dbf",
                       strokeWidth: 3,
                       opacity: 0.9,
                     }}

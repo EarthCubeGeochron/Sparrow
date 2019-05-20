@@ -77,7 +77,7 @@ class APIv1(API):
             def get(self):
                 return dict(
                     route='/api/v1',
-                    description='Version 1 API for Lab Data Interface',
+                    description='Version 1 API for Sparrow',
                     routes=route_descriptions)
 
         self.add_resource(APIDescriptionModel, '/', '/describe')
