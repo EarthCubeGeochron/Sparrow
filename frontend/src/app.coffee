@@ -13,6 +13,7 @@ import {Admin} from './admin'
 import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
 import {PageFooter} from './shared/footer'
+import {AppNavbar, NavButton} from './shared/navbar'
 import styled from '@emotion/styled'
 
 AppHolder = styled.div"""
@@ -25,12 +26,19 @@ Expander = styled.div"""
 flex-grow: 1;
 """
 
+MainNavbar = ->
+  h AppNavbar, {fullTitle: true}, [
+    h NavButton, {to: '/admin'}, "Admin"
+    h NavButton, {to: '/api-explorer/v1'}, "API Explorer"
+  ]
+
 class AppMain extends Component
   render: ->
     {baseURL} = @props
     h Router, {basename: baseURL}, (
       h AppHolder, [
         h Expander, [
+          h MainNavbar
           h Switch, [
             h Route, {
               path: '/',

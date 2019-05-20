@@ -13,7 +13,6 @@ import './main.styl'
 APIExplorer = (props)->
   {match} = props
   h 'div', [
-    h AppNavbar, {subtitle: 'API Explorer', fullTitle: true}
     h 'div#api', [
       h Route, {
         path: "#{match.url}",
