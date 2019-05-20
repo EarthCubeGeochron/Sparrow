@@ -21,7 +21,6 @@ class DownloadButton extends Component
       ]
 
     href = "#{process.env.BASE_URL}data-file/#{file_hash}"
-
     h AnchorButton, {href, icon: 'document', intent: Intent.PRIMARY}, text
 
 class SessionComponent extends Component
