@@ -18,7 +18,10 @@ def stream_data(uuid):
     if datafile is None:
         abort(404)
 
-    res = make_response()
+    basename = datafile.basename
+    res = Response()
+    res.headers['Content-Type'] = ''
+    res.headers['Content-Disposition'] = 'attachment; filename="'+basename+'"'
     res.headers['X-Accel-Redirect'] = '/data/'+datafile.file_path
     return res
 
