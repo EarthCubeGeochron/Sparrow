@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from os import environ
 from sqlalchemy import event
+from sqlalchemy.exc import IntegrityError
 
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path, pretty_print
@@ -221,7 +222,7 @@ class BaseImporter(object):
                 # Track the import of the resulting models
                 self.__track_model(rec, created_model)
                 self.db.session.flush()
-        except (SparrowImportError, NotImplementedError) as err:
+        except (SparrowImportError, NotImplementedError, IntegrityError) as err:
             self.db.session.rollback()
             self.__track_model(rec, None, error=str(err))
             secho(str(err), fg='red')

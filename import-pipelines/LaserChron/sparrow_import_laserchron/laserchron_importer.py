@@ -50,9 +50,6 @@ class LaserchronImporter(BaseImporter):
         if not rec.csv_data:
             raise SparrowImportError("CSV data not extracted")
 
-        # Delete previous iteration
-        self.delete_session(rec)
-
         data, meta = extract_table(rec.csv_data)
         self.meta = meta
         data.index.name = 'analysis'
@@ -78,12 +75,16 @@ class LaserchronImporter(BaseImporter):
 
         sample_id = df.index.unique(level=0)[0]
         sample = self.sample(name=sample_id)
-        session = self.models.session(date=date)
-        session._sample = sample
-        session._project = project
-
         self.db.session.add(project)
         self.db.session.add(sample)
+
+        session = self.db.get_or_create(
+            self.m.session,
+            date=date,
+            project_id=project.id,
+            sample_id=sample.id)
+
+        self.db.session.flush()
 
         dup = df['analysis'].duplicated(keep='first')
         if dup.astype(bool).sum() > 0:
@@ -91,14 +92,11 @@ class LaserchronImporter(BaseImporter):
         df = df[~dup]
 
         for i, row in df.iterrows():
-            analysis = self.import_analysis(row)
-            analysis._session = session
-            self.db.session.add(analysis)
+            list(self.import_analysis(row, session))
 
-        self.db.session.add(session)
         return session
 
-    def import_analysis(self, row):
+    def import_analysis(self, row, session):
         """
         row -> analysis
         """
@@ -108,20 +106,17 @@ class LaserchronImporter(BaseImporter):
         except ValueError:
             ix = None
 
-        analysis = self.models.analysis(
+        analysis = self.add_analysis(
+            session,
             session_index=ix,
-            analysis_name=row['analysis'])
+            analysis_name=str(row['analysis']))
 
-        analysis.datum_collection = list(self.import_data(row))
-        return analysis
-
-    def import_data(self, row):
         for i in row.iteritems():
-            d = self.import_datum(*i, row)
+            d = self.import_datum(analysis, *i, row)
             if d is None: continue
             yield d
 
-    def import_datum(self, key, value, row):
+    def import_datum(self, analysis, key, value, row):
         """
         Each value in a table row -> datum
         """
@@ -155,7 +150,7 @@ class LaserchronImporter(BaseImporter):
 
         is_age = key.startswith("age_")
 
-        datum = self.datum(parameter, value,
+        datum = self.datum(analysis, parameter, value,
             unit=unit,
             error=err,
             error_unit=err_unit,
