@@ -15,12 +15,14 @@ it is only applicable to a few use cases. Such data can also
 be stored in unstructured JSONB in the `data` column that has since
 been added to the core schema.
 */
-CREATE TABLE IF NOT EXISTS measurement_group (
+CREATE TABLE IF NOT EXISTS irradiation (
   id text PRIMARY KEY,
   title text NOT NULL
 );
 
-ALTER TABLE session ADD COLUMN measurement_group_id text REFERENCES measurement_group(id),
+ALTER TABLE session
+ ADD COLUMN irradiation text
+ REFERENCES irradiation(id);
 
 ALTER TABLE analysis ADD COLUMN in_plateau boolean;
 ALTER TABLE analysis ADD COLUMN data jsonb;

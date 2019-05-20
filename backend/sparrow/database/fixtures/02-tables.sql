@@ -266,17 +266,29 @@ level. Some coarser (e.g. a table for analytical process) or finer
 In many ways, the column layout mirrors that of the datum table,
 with the exception that there is a many-to-many link on the data.
 */
-CREATE TABLE IF NOT EXISTS session_datum (
+CREATE TABLE IF NOT EXISTS constant (
   /*
-  Handles many-to-many links between session and datum, which
-  is primarily useful for handling analytical parameters
-  that remain constant across many sessions (e.g. decay constants,
-  assumed physical parameters).
+  Analytical parameters, calibration types, etc.
+  that remain constant across many sessions
+  (e.g. decay constants, assumed physical parameters).
   */
-  session_id integer REFERENCES session(id)
-    ON DELETE CASCADE,
-  datum_id integer REFERENCES datum(id)
+  id serial PRIMARY KEY,
+  text_value text UNIQUE,
+  value numeric,
+  error numeric,
+  type integer REFERENCES datum_type(id),
+  CHECK ((text_value IS NULL) OR (value IS NULL AND error IS NULL))
 );
+
+CREATE TABLE IF NOT EXISTS constant_link (
+  constant_id integer NOT NULL REFERENCES constant(id),
+  session_id integer NOT NULL REFERENCES session(id),
+  PRIMARY KEY (constant_id, session_id)
+);
+
+/*
+## Data files
+*/
 
 CREATE TABLE IF NOT EXISTS data_file_type (
   id text PRIMARY KEY,
@@ -294,14 +306,17 @@ CREATE TABLE IF NOT EXISTS data_file (
   type_id text REFERENCES data_file_type(id)
 );
 
-CREATE TABLE IF NOT EXISTS import_tracker (
+CREATE TABLE IF NOT EXISTS data_file_link (
   /*
   Foreign key columns to link to data that was imported from
   this file; this should be done at the appropriate level (e.g.
   sample, analysis, session) that fits the data file in question.
 
-  Note: this table is part of the internal import process
-  and could change at more or less any time.
+  The linked data file is then considered the *primary source*
+  for all data corresponding to this model.
+
+  Note: this table and its assumptions are part of the import
+  process and could change significantly at this early stage.
   */
   id serial PRIMARY KEY,
   file_hash uuid NOT NULL
@@ -310,12 +325,25 @@ CREATE TABLE IF NOT EXISTS import_tracker (
   date timestamp NOT NULL DEFAULT now(),
   error text,
   session_id integer
+    UNIQUE
     REFERENCES session(id)
     ON DELETE CASCADE,
   analysis_id integer
+    UNIQUE
     REFERENCES analysis(id)
     ON DELETE CASCADE,
   sample_id integer
+    UNIQUE
     REFERENCES sample(id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+  /* Only one of the linked data file columns should be
+     set at a time (a data file can only be packaged at
+     one level, even if it encompasses information about
+     other entities)
+  */
+  CHECK (
+      (session_id IS NOT NULL)::int
+    + (analysis_id IS NOT NULL)::int
+    + (sample_id IS NOT NULL)::int <= 1
+  )
 );

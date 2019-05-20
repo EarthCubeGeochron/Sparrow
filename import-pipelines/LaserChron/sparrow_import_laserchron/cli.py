@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from os import environ
-from click import command, option, echo, secho, style
+from click import command, option, argument, echo, secho, style
 from pathlib import Path
 from sparrow import Database
 from sparrow.import_helpers import SparrowImportError, working_directory
@@ -31,11 +31,12 @@ def extract_data(db, stop_on_error=False):
 @option('--extract/--no-extract', default=False)
 @option('--normalize/--no-normalize', default=True)
 @option('--redo', default=False, is_flag=True)
-def cli(stop_on_error=False, verbose=False, extract=False, normalize=True, redo=False):
+@argument('basename', required=False, nargs=-1)
+def cli(basename=None, stop_on_error=False, verbose=False, extract=False, normalize=True, redo=False):
     """
     Import LaserChron files
     """
-    varname = "LASERCHRON_DATA_DIR"
+    varname = "SPARROW_DATA_DIR"
     env = environ.get(varname, None)
     if env is None:
         v = style(varname, fg='cyan', bold=True)
@@ -49,6 +50,10 @@ def cli(stop_on_error=False, verbose=False, extract=False, normalize=True, redo=
     if extract:
         with working_directory(path):
             extract_data(db)
-    if normalize:
-        importer = LaserchronImporter(db)
+    importer = LaserchronImporter(db)
+    if normalize and not basename:
         importer.import_all(redo=redo)
+        return
+    basename = 'CONOR 010205, 123001, CDO-308-6 NUPMagecalc'
+    if basename:
+        importer.import_one(basename)

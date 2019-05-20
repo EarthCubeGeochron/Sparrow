@@ -38,7 +38,7 @@ def import_datafile(db, infile):
 
     hash = md5hash(infile)
 
-    data_file = db.mapped_classes.data_file
+    data_file = db.model.data_file
 
     # Should maybe make sure error is not set
     rec = db.get(data_file, hash)
