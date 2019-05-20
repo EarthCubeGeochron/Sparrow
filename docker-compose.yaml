@@ -54,7 +54,7 @@ services:
       - CONTAINERIZED=1
       - SPARROW_LAB_NAME
       - SPARROW_BASE_URL
-      - MAPBOX_API_KEY
+      - MAPBOX_API_TOKEN
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container
       - SPARROW_SITE_CONTENT=/app/site-content

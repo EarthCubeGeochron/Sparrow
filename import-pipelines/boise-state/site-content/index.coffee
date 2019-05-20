@@ -6,5 +6,4 @@ import {GLMap} from 'plugins/gl-map'
 export default {
   landingText: h Markdown, {src: aboutText}
   siteTitle: 'Boise State IGL'
-  landingGraphic: h GLMap, {accessToken: process.env.MAPBOX_API_TOKEN}
 }
