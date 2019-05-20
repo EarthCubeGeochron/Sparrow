@@ -159,6 +159,6 @@ def generalize_samples(data):
     # to NaNs
     data['session_ix'] = to_numeric(session_ix, errors='coerce')
     data['sample_id'] = samples
-    data = data.apply(strip_session_index, axis=1)
+    d1 = data.apply(strip_session_index, axis=1)
 
-    return data.set_index(["sample_id", "session_ix"], drop=True)
+    return d1.set_index(["sample_id", "session_ix"], drop=True)
