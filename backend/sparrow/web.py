@@ -1,7 +1,26 @@
-from flask import Blueprint, render_template, current_app
+from flask import Blueprint, make_response, render_template, current_app, abort
 from os.path import join
 
 web = Blueprint('frontend', __name__)
+
+@web.route('/data-file/<string:uuid>')
+def stream_data(uuid):
+    # def generate():
+    #     # create and return your data in small parts here
+    #     for i in xrange(10000):
+    #         yield str(i)
+    #Response(stream_with_context(generate()))
+    # Send the user to the "protected" data dir to get the file with NGINX
+    db = current_app.database
+    m = db.model.data_file
+
+    datafile = db.session.query(m).get(uuid)
+    if datafile is None:
+        abort(404)
+
+    res = make_response()
+    res.headers['X-Accel-Redirect'] = '/data/'+datafile.file_path
+    return res
 
 @web.route('/')
 # This route is a catch-all route for anything
