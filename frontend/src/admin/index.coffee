@@ -18,12 +18,12 @@ MinimalNavbar = styled.div"""
 display: flex;
 flex-direction: row;
 align-items: baseline;
-margin: 0.5em 0 1em;
+margin: 8px 0 10px;
 padding: 0.3em 1em;
 background-color: #f5f8fa;
-border-radius: 6px;
+border-radius: 5px;
 vertical-align: baseline;
-box-shadow: 0px 1px 0.5px 0px rgba(138,155,168,0.75);
+box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0), 0 1px 1px rgba(16, 22, 26, 0.2);
 
 h4 {
   margin: 0;
@@ -44,8 +44,8 @@ AdminNavbar = ({base, rest...})->
     h 'h4', "Admin views"
     #h HomeButton, {to: base, icon: 'home', minimal: true}
     h NavButton, {to: base, exact: true }, "Base"
-    h NavButton, {to: base+'/session'}, "Data"
     h NavButton, {to: base+'/project'}, "Projects"
+    h NavButton, {to: base+'/session'}, "Sessions"
   ]
 
 SessionMatch = ({match})->
