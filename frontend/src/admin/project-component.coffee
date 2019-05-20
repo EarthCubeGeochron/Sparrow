@@ -118,7 +118,12 @@ class ProjectListComponent extends Component
     params = {private: true}
     return h 'div.data-view.projects', [
       h 'h2', 'Projects'
-      h PagedAPIView, {route: apiEndpoint, params, perPage: 5}, (data)=>
+      h PagedAPIView, {
+        route: apiEndpoint,
+        params,
+        perPage: 5,
+        topPagination: true
+      }, (data)=>
         h 'div', null, data.map (d)-> h(ProjectComponent, d)
     ]
 

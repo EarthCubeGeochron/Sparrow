@@ -30,7 +30,7 @@ class SessionComponent extends Component
     console.log id
 
     breadCrumbs = [
-      { text: h(Link, {to: '/admin/session'}, "Analytical Sessions") },
+      { text: h(Link, {to: '/admin/session'}, "Sessions") },
       { icon: "document", text: h('code.session-id', id) }
     ]
 

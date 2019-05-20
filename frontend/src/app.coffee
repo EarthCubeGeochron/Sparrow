@@ -13,20 +13,33 @@ import {Admin} from './admin'
 import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
 import {PageFooter} from './shared/footer'
+import styled from '@emotion/styled'
+
+AppHolder = styled.div"""
+display: flex;
+flex-direction: column;
+min-height: 100vh;
+"""
+
+Expander = styled.div"""
+flex-grow: 1;
+"""
 
 class AppMain extends Component
   render: ->
     {baseURL} = @props
     h Router, {basename: baseURL}, (
-      h 'div.app', [
-        h Switch, [
-          h Route, {
-            path: '/',
-            exact: true,
-            render: -> h HomePage
-          }
-          h Route, {path: '/admin', component: Admin}
-          h Route, {path: '/api-explorer', component: APIExplorer}
+      h AppHolder, [
+        h Expander, [
+          h Switch, [
+            h Route, {
+              path: '/',
+              exact: true,
+              render: -> h HomePage
+            }
+            h Route, {path: '/admin', component: Admin}
+            h Route, {path: '/api-explorer', component: APIExplorer}
+          ]
         ]
         h PageFooter
       ]
