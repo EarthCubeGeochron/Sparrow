@@ -38,11 +38,14 @@ SELECT
 	f.file_hash,
 	f.type_id file_type,
 	i.name instrument_name,
+  ss.name sample_name,
   p.name project_name,
   is_public(s)
 FROM session s
 LEFT JOIN instrument i
   ON i.id = s.instrument
+LEFT JOIN sample ss
+  ON s.sample_id = ss.id
 LEFT JOIN project p
   ON s.project_id = p.id
 LEFT JOIN data_file_link l

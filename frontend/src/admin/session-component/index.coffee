@@ -41,7 +41,7 @@ class SessionComponent extends Component
         params: {id, private: true}
       }, (data)=>
         res = data[0]
-        {sample_id} = res
+        {sample_name} = res
         h 'div', [
           h SessionInfoCard, res
           h Frame, {id: 'sessionDetail', session_id: id}, (
@@ -49,7 +49,7 @@ class SessionComponent extends Component
           )
           h Frame, {id: 'dataFileDownloadButton', res...}, (props)=>
             h DownloadButton, props
-          h GeoDeepDiveCard, {sample_id}
+          h GeoDeepDiveCard, {sample_id: sample_name}
         ]
     ]
 
