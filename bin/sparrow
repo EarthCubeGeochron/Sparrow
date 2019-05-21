@@ -55,6 +55,7 @@ export SPARROW_ENV="development"
 # The docker-compose volume for sparrow commands needs to be set
 # even if a SPARROW_COMMANDS directory is not provided.
 export SPARROW_COMMANDS_VOLUME="${SPARROW_COMMANDS:-"placeholder"}"
+export SPARROW_DATA_DIR="${SPARROW_DATA_DIR:-"placeholder"}"
 
 [ -z $SPARROW_SECRET_KEY ] && echo \
   "You $(tput bold)must$(tput sgr0) set SPARROW_SECRET_KEY. Exiting..." && \
