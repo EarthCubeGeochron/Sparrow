@@ -51,14 +51,11 @@ def import_datafile(db, infile):
         file_hash=hash,
         file_mtime=mtime,
         basename=infile.stem,
-        import_date=None,
-        import_error=None,
         csv_data=None)
 
     try:
         cols['csv_data'] = extract_datatable(infile)
     except NotImplementedError as e:
-        cols['import_error'] = str(e)
         secho(str(e), fg='red', dim=True)
 
     tbl = data_file.__table__
