@@ -1,0 +1,26 @@
+#!/bin/sh
+
+build_dir=.build_deps
+install_dir=/install/mysql_fdw
+
+BUILD_PACKAGES="wget make gcc"
+
+apt-get -y update
+apt-get -y install default-libmysqlclient-dev \
+  postgresql-server-dev-11 $BUILD_PACKAGES
+
+mkdir $install_dir
+wget -O - https://github.com/EnterpriseDB/mysql_fdw/tarball/master \
+| tar xvz --strip-components=1 -C $install_dir
+
+cd $install_dir
+ls
+make USE_PGXS=1
+make USE_PGXS=1 install
+cd /
+
+apt-get remove \
+  --purge -y $BUILD_PACKAGES $(apt-mark showauto)
+
+rm -rf $install_dir
+rm -rf /var/lib/apt/lists/*
