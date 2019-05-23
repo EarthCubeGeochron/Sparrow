@@ -6,6 +6,11 @@ sparrow db-await
 internal_name=/tmp/database-dump.pg-dump
 container_id=$(sparrow compose ps -q db)
 
+sparrow compose exec -T db bash -s <<EOF
+mkdir -p /tmp
+rm -f "$internal_name"
+EOF
+
 docker cp "$1" $container_id:$internal_name
 
 sparrow compose exec -T db bash -s <<EOF
