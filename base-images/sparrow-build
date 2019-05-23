@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+# Description: Build docker base images
+cd "${0:A:h}"
+
+image=$1
+
+if [ -z $1 ]; then
+  cat <<EOM
+Usage: sparrow-build <image>
+
+<image> should be one of
+- backend
+- database
+EOM
+  exit 0
+fi
+
+if [ $image = 'backend' ]; then
+  docker build -t sparrowdata/backend-base:1.0 backend
+elif [ $image = 'database' ]; then
+  docker build -t sparrowdata/database:1.0 database
+fi

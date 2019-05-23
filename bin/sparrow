@@ -132,7 +132,7 @@ if [ $found_command = 0 ]; then
   if docker-compose exec backend true > /dev/null 2>&1 ; then
     sparrow compose exec backend sparrow $@
   else
-    sparrow compose run backend sparrow $@
+    sparrow compose run -rm backend sparrow $@
   fi
 else
   shift
