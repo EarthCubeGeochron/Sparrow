@@ -1,4 +1,3 @@
-from lxml.etree import tostring
 from itertools import chain
 from sparrow.import_helpers import BaseImporter, SparrowImportError
 from datetime import datetime
@@ -35,9 +34,14 @@ class LaserchronImporter(BaseImporter):
     def import_all(self, redo=False):
         self.redo = redo
         q = self.db.session.query(self.db.model.data_file)
-        self.iteritems(q)
+        self.iter_records(q, redo=redo)
 
-    def import_datafile(self, rec, redo=False):
+    def import_one(self, basename):
+        q = (self.db.session.query(self.db.model.data_file)
+                .filter_by(basename=basename))
+        self.iter_records(q, redo=True)
+
+    def import_datafile(self, fn, rec, redo=False):
         """
         data file -> sample(s)
         """
@@ -46,45 +50,20 @@ class LaserchronImporter(BaseImporter):
         if not rec.csv_data:
             raise SparrowImportError("CSV data not extracted")
 
-        n_imported = (self.db.session.query(self.db.model.import_tracker)
-            .filter_by(file_hash=rec.file_hash).count())
-        # The below is false
-        if n_imported > 0 and not self.redo:
-            return False
-        # Delete previous iteration
-        self.delete_session(rec)
-
         data, meta = extract_table(rec.csv_data)
         self.meta = meta
         data.index.name = 'analysis'
 
         data = generalize_samples(data)
 
-        #data.index = ax.index
         ids = list(data.index.unique(level=0))
 
         for sample_id in ids:
-            dt = self.db.model.import_tracker()
-            dt._data_file = rec
-
-            session = None
             df = data.xs(sample_id, level='sample_id', drop_level=False)
-
             try:
-                session = self.import_session(rec, df)
-                self.db.session.commit()
-                dt._session = session
-                dt._sample = session._sample
+                yield self.import_session(rec, df)
             except IntegrityError as err:
-                self.db.session.rollback()
-                dt.error = "Integrity Error"
-                secho(dt.error, fg='red')
-                dt.date = None
-
-            self.db.session.add(dt)
-            self.db.session.commit()
-
-        return True
+                raise SparrowImportError(str(err.orig))
 
     def import_session(self, rec, df):
 
@@ -95,22 +74,29 @@ class LaserchronImporter(BaseImporter):
         date = rec.file_mtime or datetime.min()
 
         sample_id = df.index.unique(level=0)[0]
-        sample = self.sample(id=sample_id)
-        session = self.models.session(date=date)
-        session._sample = sample
-        session._project = project
-
+        sample = self.sample(name=sample_id)
         self.db.session.add(project)
         self.db.session.add(sample)
 
-        for i, row in df.iterrows():
-            analysis = self.import_analysis(row)
-            analysis._session = session
+        session = self.db.get_or_create(
+            self.m.session,
+            date=date,
+            project_id=project.id,
+            sample_id=sample.id)
 
-        self.db.session.add(session)
+        self.db.session.flush()
+
+        dup = df['analysis'].duplicated(keep='first')
+        if dup.astype(bool).sum() > 0:
+            self.warn(f"Duplicate analyses found for sample {sample_id}")
+        df = df[~dup]
+
+        for i, row in df.iterrows():
+            list(self.import_analysis(row, session))
+
         return session
 
-    def import_analysis(self, row):
+    def import_analysis(self, row, session):
         """
         row -> analysis
         """
@@ -120,22 +106,19 @@ class LaserchronImporter(BaseImporter):
         except ValueError:
             ix = None
 
-        analysis = self.models.analysis(
+        analysis = self.add_analysis(
+            session,
             session_index=ix,
-            analysis_name=row['analysis'])
+            analysis_name=str(row['analysis']))
 
-        analysis.datum_collection = list(self.import_data(row))
-        return analysis
-
-    def import_data(self, row):
         for i in row.iteritems():
-            d = self.import_datum(*i, row)
+            d = self.import_datum(analysis, *i, row)
             if d is None: continue
             yield d
 
-    def import_datum(self, key, value, row):
+    def import_datum(self, analysis, key, value, row):
         """
-        ValueModel -> datum
+        Each value in a table row -> datum
         """
         if key == 'analysis':
             return None
@@ -167,7 +150,7 @@ class LaserchronImporter(BaseImporter):
 
         is_age = key.startswith("age_")
 
-        datum = self.datum(parameter, value,
+        datum = self.datum(analysis, parameter, value,
             unit=unit,
             error=err,
             error_unit=err_unit,
@@ -175,7 +158,7 @@ class LaserchronImporter(BaseImporter):
             is_interpreted=is_age)
 
         if is_age:
-            # Test if it is best age
+            # Test if it is a "best age"
             best_age = float(row.at['best_age'])
             datum.is_accepted = N.allclose(value, best_age)
         return datum

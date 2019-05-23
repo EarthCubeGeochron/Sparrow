@@ -71,12 +71,12 @@ SampleCard = styled.div"""
 Material = styled.div"""font-style: italic"""
 
 Sample = (props)->
-  {material, sample_id, location_name} = props
+  {material, sample_id, name, location_name} = props
   if material?
     material = h Material, material
 
   h SampleCard, {className: 'sample'}, [
-    h 'h4.name', sample_id
+    h 'h4.name', name
     h 'div.location-name', location_name
     material
   ]
@@ -118,7 +118,12 @@ class ProjectListComponent extends Component
     params = {private: true}
     return h 'div.data-view.projects', [
       h 'h2', 'Projects'
-      h PagedAPIView, {route: apiEndpoint, params, perPage: 5}, (data)=>
+      h PagedAPIView, {
+        route: apiEndpoint,
+        params,
+        perPage: 5,
+        topPagination: true
+      }, (data)=>
         h 'div', null, data.map (d)-> h(ProjectComponent, d)
     ]
 

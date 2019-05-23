@@ -107,7 +107,7 @@ def normalize_data(df):
         raise SparrowImportError('Data frame is not correct shape')
 
     # For some reason we have a lot of these closed brackets in data files
-    data.index = data.index.str.replace(' <>','')
+    data.index = data.index.str.replace(' <>','').str.strip()
     data.columns = meta.columns
 
     ncols = 19
@@ -136,28 +136,29 @@ def extract_session_index(sample_name):
         return s.group(1)
     return None
 
+def remove_suffix(s1, s2):
+    if s1.endswith(s2):
+        return s1[:-len(s2)]
+    return s1
+
 def strip_session_index(row):
-    v = (str(row.at['sample_id'])
-        .rstrip(row.at['session_ix'])
+    s1 = str(row.at['sample_id'])
+    s2 = str(row.at['session_ix'])
+    v = (remove_suffix(s1,s2)
         .rstrip('.:_- '))
     row.at['sample_id'] = v
     return row
 
 def generalize_samples(data):
     # Create sample name columns
-    pat = r"[\.\:_\s-](\w+)$"
-    ix = data.index.to_series().str.strip()
-    session_ix = ix.apply(extract_session_index)
-    #session_ix = ix.str.extract(pat)[0]
-    ix.name = "sample_id"
-    session_ix.name = "session_ix"
-    ax = concat((ix, session_ix), axis=1)
-    ax = ax.apply(strip_session_index, axis=1)
+    data.reset_index(inplace=True)
+    samples = data['analysis'].str.strip()
+    session_ix = samples.apply(extract_session_index)
 
-    data = ax.join(data)
+    # Session index should be integer, so we set things that don't match
+    # to NaNs
+    data['session_ix'] = to_numeric(session_ix, errors='coerce')
+    data['sample_id'] = samples
+    d1 = data.apply(strip_session_index, axis=1)
 
-    # Session index should be integer
-    data['session_ix'] = to_numeric(data['session_ix'], errors='coerce')
-    data = data.reset_index()
-
-    return data.set_index(["sample_id", "session_ix"], drop=True)
+    return d1.set_index(["sample_id", "session_ix"], drop=True)

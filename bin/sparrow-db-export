@@ -6,6 +6,11 @@
 internal_name=/tmp/database-dump.pg-dump
 container_id=$(sparrow compose ps -q db 2>/dev/null)
 
+if [ -z $container_id ]; then
+  echo "Sparrow db container must be running"
+  exit 1
+fi
+
 docker exec $container_id \
   pg_dump -Fc -C -Upostgres -f $internal_name sparrow
 

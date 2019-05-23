@@ -9,6 +9,7 @@ class IGSNImporter(BaseImporter):
         self.num = 0
         for i, igsn_data in enumerate(q):
             self.import_igsn(igsn_data)
+            print(igsn_data.igsn)
         echo(f"Imported {self.num} of {i+1} measurements")
 
     def import_igsn(self, model):
@@ -30,13 +31,8 @@ class IGSNImporter(BaseImporter):
 
         igsn = s['igsn']
         name = html.unescape(s['name'])
-        print(igsn, name)
-        if not name:
-            name = igsn
-
         sample = self.sample(igsn=igsn)
-        if not sample.id:
-            sample.id = name
+        sample.name = name
         sample.location = location
         sample.location_name = s.get(
         'primary_location_name', s.get(

@@ -6,7 +6,7 @@ import {parse,format} from 'date-fns'
 Sample = (props)->
   h 'div.sample', [
     h 'h5.info', 'Sample'
-    h 'div.sample-id', props.id
+    h 'div.sample-id', props.name
     h 'div.target', props.target
   ]
 
@@ -32,7 +32,7 @@ MeasurementGroup = ({measurement_group_id})->
   ]
 
 SessionInfoComponent = (props)->
-  {id, sample_id, target} = props
+  {id, sample_id, sample_name, target} = props
   date = parse(props.date)
   console.log props
 
@@ -42,7 +42,7 @@ SessionInfoComponent = (props)->
       h 'div.expander'
     ]
     h 'div.session-info', [
-      h Sample, {id: sample_id, target}
+      h Sample, {id: sample_id, name: sample_name, target}
       h 'div.project', [
         h 'h5.info', 'Project'
         h 'div', null, props.project_name or "—"

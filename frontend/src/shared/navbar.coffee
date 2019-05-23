@@ -3,14 +3,17 @@ import {Navbar, Button, ButtonGroup, Icon} from '@blueprintjs/core'
 import {NavLink, Route, Switch} from 'react-router-dom'
 import {AuthStatus} from 'app/auth'
 import styled from "@emotion/styled"
-import {LinkButton} from '@macrostrat/ui-components'
+import {LinkButton, NavLinkButton} from '@macrostrat/ui-components'
 import {Frame} from '../frame'
 
 NavButton_ = (props)->
-  h LinkButton, {props..., minimal: true}
+  h NavLinkButton, {props...}
 
 NavButton = styled(NavButton_)"""
 margin-right: 1em;
+&.active {
+  background-color: #d8e1e8;
+}
 """
 
 Nav = ({children, fullTitle, subtitle, rest...})->

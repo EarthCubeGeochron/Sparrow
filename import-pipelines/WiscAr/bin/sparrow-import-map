@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+# Description: Import `WiscAr MAP` data from `SPARROW_DATA_DIR`
+
+# This script runs on the host system and kicks off the
+# import process within a docker container
+import_pipeline="${0:h:h:r}"
+
+# Run within container, mounting data directory
+# and importer code.
+# We should probably create a dockerfile for this case.
+sparrow compose run \
+  -e "SPARROW_DATA_DIR=/Data" \
+  -e "PYTHONPATH=/pipeline" \
+  -v "$SPARROW_DATA_DIR:/Data:ro" \
+  -v "$import_pipeline:/pipeline" \
+  backend \
+  python3 -m pipeline $@
