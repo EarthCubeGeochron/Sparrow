@@ -37,7 +37,7 @@ services:
       - $SPARROW_INIT_SQL:/init-sql/
       - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
   db:
-    image: sparrowdata/database:1.0
+    image: mdillon/postgis:11
     expose:
       - 5432
     ports:

@@ -17,6 +17,6 @@ fi
 
 if [ $image = 'backend' ]; then
   docker build -t sparrowdata/backend-base:1.0 backend
-elif [ $image = 'database' ]; then
-  docker build -t sparrowdata/database:1.0 database
+elif [ $image = 'db-mysql-fdw' ]; then
+  docker build -t sparrowdata/db-mysql-fdw:1.0 db-mysql-fdw
 fi
