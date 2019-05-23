@@ -293,3 +293,7 @@ SPARROW_COMPOSE_OVERRIDES=(<path>/<to>/docker-compose-overrides.yaml)
 ```
 This will update the Sparrow configuration transparently to use the
 new image in place of the default.
+
+Once the image builds, you can run `CREATE EXTENSION mysql_fdw` in the
+sparrow database, or add this command to your `SPARROW_INIT_SQL` file.
+
