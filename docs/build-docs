@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+export SPARROW_SECRET_KEY="Freedom!!"
+sphinx-autobuild -p 8001 "python-api/source" "python-api/build/html" &
+gatsby develop &
+
+wait

@@ -1,3 +1,5 @@
+var proxy = require("http-proxy-middleware");
+
 module.exports = {
   siteMetadata: {
     title: "Sparrow",
@@ -5,9 +7,16 @@ module.exports = {
     author: "Daven Quinn and the EarthCube Geochronology Frontiers team"
   },
   // for development server
-  proxy: {
-    prefix: "/python-api",
-    url: "http://examplesite.com/api/",
+  developMiddleware: app => {
+    app.use(
+      "/python-api/",
+      proxy({
+        target: "http://127.0.0.1:8001",
+        pathRewrite: {
+          "/python-api/": "",
+        },
+      })
+    )
   },
   plugins: [
     // custom configuration
