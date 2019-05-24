@@ -4,6 +4,11 @@ module.exports = {
     description: "A geochronology-focused laboratory information management system",
     author: "Daven Quinn and the EarthCube Geochronology Frontiers team"
   },
+  // for development server
+  proxy: {
+    prefix: "/python-api",
+    url: "http://examplesite.com/api/",
+  },
   plugins: [
     // custom configuration
     `gatsby-mdx`,
