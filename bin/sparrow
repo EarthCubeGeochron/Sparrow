@@ -113,6 +113,9 @@ for f in $(ls "$dir" | grep sparrow-); do
   found_command=1
 done
 
+# Search through user-provided subcommands
+# (only one directory allowed for now; should replace
+#  with a more flexible PATH representation).
 if [ ! -z $SPARROW_COMMANDS ]; then
   for f in $(ls "$SPARROW_COMMANDS" | grep sparrow-); do
     [ $found_command = 1 ] && break
