@@ -11,7 +11,7 @@ IndexPage = ->
     h SEO, {title: "Home",  keywords: ['gatsby', 'application', 'react']}
     h 'div.index-top', [
       h 'div.intro-text', null, h(introText)
-      h 'div', style: { maxWidth: '400px', marginBottom: '1.45rem' }, (
+      h 'div', style: { maxWidth: '500px', marginBottom: '1.45rem' }, (
         h Image
       )
     ]

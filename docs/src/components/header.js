@@ -30,6 +30,11 @@ const NavLink = styled(Link)`
 margin: 0.2em 1em;
 `;
 
+const NavAnchor = styled.a`
+margin: 0.2em 1em;
+`;
+
+
 const style = css`
 margin-bottom: 10em;
 `
@@ -54,6 +59,7 @@ const Header = ({ siteTitle }) => (
     <Navbar>
       <NavLink to="/motivation-and-design/">Motivation and design</NavLink>
       <NavLink to="/installation/">Installation</NavLink>
+      <NavAnchor href="/python-api">Python API</NavAnchor>
     </Navbar>
   </StyledHeader>
 )
