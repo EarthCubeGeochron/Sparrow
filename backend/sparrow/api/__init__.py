@@ -5,11 +5,15 @@ from sqlalchemy import MetaData
 from flask import jsonify
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from textwrap import dedent
+from datetime import datetime
 
 from .base import API
 
 # eventually should use **Marshmallow** or similar
 # for parsing incoming API requests
+
+def parse_date(date_string):
+    return datetime.strptime(date_string, "%Y-%m-%d").date()
 
 def infer_primary_key(table):
     pk = table.primary_key
@@ -102,7 +106,6 @@ class APIv1(API):
         parser = reqparse.RequestParser()
         parser.add_argument('offset', type=int, help='Query offset', default=None)
         parser.add_argument('limit', type=int, help='Query limit', default=None)
-
         parser.add_argument('all', type=bool, help='Return all rows', default=False)
 
         # Manage row-level permissions
@@ -142,7 +145,6 @@ class APIv1(API):
             usage_info="Pass the parameter `?all=1` to return all rows instead of API description"
         )
         self.route_descriptions.append(basicInfo)
-
 
         class TableModel(Resource):
             def describe(self):

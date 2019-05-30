@@ -4,6 +4,7 @@ import {Component} from 'react'
 import ReactMarkdown from 'react-markdown'
 import {Tag, Card, Checkbox,
         Intent, InputGroup, NumericInput} from '@blueprintjs/core'
+import {DateRangePicker} from '@blueprintjs/datetime'
 import classNames from 'classnames'
 
 class StatefulCheckbox extends Component
@@ -24,6 +25,10 @@ class StatefulCheckbox extends Component
       onChange: f
       rest...
     }
+
+class DateInput extends Component
+  render: ->
+    h DateRangePicker
 
 class InputForType extends Component
   render: ->
@@ -65,6 +70,9 @@ class InputForType extends Component
         value
         onValueChange
       }
+    if type == 'date'
+      return h DateInput, {}
+    console.log type
     return null
 
 STag = styled(Tag)"""
