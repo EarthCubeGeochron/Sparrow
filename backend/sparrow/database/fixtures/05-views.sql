@@ -136,7 +136,8 @@ SELECT
   a.session_index,
   s.sample_id,
   sa.name sample_name,
-  s.technique
+  s.technique,
+  coalesce(a.date, s.date) date
 FROM datum d
 JOIN analysis a
   ON d.analysis = a.id
