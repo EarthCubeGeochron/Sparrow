@@ -5,11 +5,15 @@ from sqlalchemy import MetaData
 from flask import jsonify
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from textwrap import dedent
+from datetime import datetime
 
 from .base import API
 
 # eventually should use **Marshmallow** or similar
 # for parsing incoming API requests
+
+def parse_date(date_string):
+    return datetime.strptime(date_string, "%Y-%m-%d").date()
 
 def infer_primary_key(table):
     pk = table.primary_key
@@ -23,10 +27,13 @@ def infer_primary_key(table):
 
 def infer_type(t):
     # Really hackish
-    type = t.type.python_type
-    if type == bool:
-        type = inputs.boolean
-    return type
+    try:
+        type = t.type.python_type
+        if type == bool:
+            type = inputs.boolean
+        return type
+    except NotImplementedError:
+        return None
 
 def build_description(argument):
     """
@@ -102,7 +109,6 @@ class APIv1(API):
         parser = reqparse.RequestParser()
         parser.add_argument('offset', type=int, help='Query offset', default=None)
         parser.add_argument('limit', type=int, help='Query limit', default=None)
-
         parser.add_argument('all', type=bool, help='Return all rows', default=False)
 
         # Manage row-level permissions
@@ -118,6 +124,14 @@ class APIv1(API):
                 type = infer_type(column)
                 if type == dict:
                     # We don't yet support dict types
+                    continue
+                if type == datetime:
+                    start = str(name)+"_start"
+                    end = str(name)+"_end"
+                    parser.add_argument(start, type=str,
+                        help=f"Beginning date (e.g. 2017-01-02)")
+                    parser.add_argument(end, type=str,
+                        help=f"End date (e.g. 2017-01-02)")
                     continue
                 typename = type.__name__
                 parser.add_argument(str(name), type=type,
@@ -142,7 +156,6 @@ class APIv1(API):
             usage_info="Pass the parameter `?all=1` to return all rows instead of API description"
         )
         self.route_descriptions.append(basicInfo)
-
 
         class TableModel(Resource):
             def describe(self):
@@ -196,11 +209,23 @@ class APIv1(API):
                             filters.append(col == True)
                         continue
 
+                    # Should have a better way to do this
+                    if infer_type(col) == datetime:
+                        date_start = args.pop(str(k)+"_start", None)
+                        date_end = args.pop(str(k)+"_end", None)
+                        if date_start is not None:
+                            filters.append(col >= date_start)
+                            should_describe = False
+                        if date_end is not None:
+                            filters.append(col <= date_end)
+                            should_describe = False
+                        continue
+
                     val = args.pop(k, None)
                     if val is None: continue
 
                     should_describe = False
-                    if col.type.python_type == str:
+                    if infer_type(col) == str:
                         filters.append(col.like(val))
                     else:
                         filters.append(col==val)
