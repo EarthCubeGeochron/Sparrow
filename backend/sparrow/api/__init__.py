@@ -27,10 +27,13 @@ def infer_primary_key(table):
 
 def infer_type(t):
     # Really hackish
-    type = t.type.python_type
-    if type == bool:
-        type = inputs.boolean
-    return type
+    try:
+        type = t.type.python_type
+        if type == bool:
+            type = inputs.boolean
+        return type
+    except NotImplementedError:
+        return None
 
 def build_description(argument):
     """
@@ -207,7 +210,7 @@ class APIv1(API):
                         continue
 
                     # Should have a better way to do this
-                    if k == 'date':
+                    if infer_type(col) == datetime:
                         date_start = args.pop(str(k)+"_start", None)
                         date_end = args.pop(str(k)+"_end", None)
                         if date_start is not None:
@@ -222,7 +225,7 @@ class APIv1(API):
                     if val is None: continue
 
                     should_describe = False
-                    if col.type.python_type == str:
+                    if infer_type(col) == str:
                         filters.append(col.like(val))
                     else:
                         filters.append(col==val)
