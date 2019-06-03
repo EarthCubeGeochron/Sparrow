@@ -122,6 +122,14 @@ class APIv1(API):
                 if type == dict:
                     # We don't yet support dict types
                     continue
+                if type == datetime:
+                    start = str(name)+"_start"
+                    end = str(name)+"_end"
+                    parser.add_argument(start, type=str,
+                        help=f"Beginning date (e.g. 2017-01-02)")
+                    parser.add_argument(end, type=str,
+                        help=f"End date (e.g. 2017-01-02)")
+                    continue
                 typename = type.__name__
                 parser.add_argument(str(name), type=type,
                     help=f"{name} ({typename})")
@@ -196,6 +204,17 @@ class APIv1(API):
                         # have a valid JSON Web Token
                         if not private:
                             filters.append(col == True)
+                        continue
+
+                    # Should have a better way to do this
+                    if k == 'date':
+                        should_describe = False
+                        date_start = args.pop(str(k)+"_start", None)
+                        date_end = args.pop(str(k)+"_end", None)
+                        if date_start is not None:
+                            filters.append(col >= date_start)
+                        if date_end is not None:
+                            filters.append(col <= date_end)
                         continue
 
                     val = args.pop(k, None)
