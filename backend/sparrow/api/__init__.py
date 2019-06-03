@@ -208,13 +208,14 @@ class APIv1(API):
 
                     # Should have a better way to do this
                     if k == 'date':
-                        should_describe = False
                         date_start = args.pop(str(k)+"_start", None)
                         date_end = args.pop(str(k)+"_end", None)
                         if date_start is not None:
                             filters.append(col >= date_start)
+                            should_describe = False
                         if date_end is not None:
                             filters.append(col <= date_end)
+                            should_describe = False
                         continue
 
                     val = args.pop(k, None)
