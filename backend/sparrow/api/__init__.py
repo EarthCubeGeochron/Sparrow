@@ -12,7 +12,7 @@ from .base import API
 # eventually should use **Marshmallow** or similar
 # for parsing incoming API requests
 
-def parse_date(date_string):
+def date(date_string):
     return datetime.strptime(date_string, "%Y-%m-%d").date()
 
 def infer_primary_key(table):
@@ -128,9 +128,9 @@ class APIv1(API):
                 if type == datetime:
                     start = str(name)+"_start"
                     end = str(name)+"_end"
-                    parser.add_argument(start, type=str,
+                    parser.add_argument(start, type=date,
                         help=f"Beginning date (e.g. 2017-01-02)")
-                    parser.add_argument(end, type=str,
+                    parser.add_argument(end, type=date,
                         help=f"End date (e.g. 2017-01-02)")
                     continue
                 typename = type.__name__
