@@ -1,4 +1,4 @@
 #!/bin/sh
 
 webpack \
-  --watch --mode=${MODE:-development}
+  --watch --mode=${SPARROW_ENV:-development}
