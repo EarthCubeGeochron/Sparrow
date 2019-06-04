@@ -1,0 +1,3 @@
+script:
+  # test the container build
+  - docker-compose build 
