@@ -2,6 +2,7 @@ beautifulsoup4==4.7.1
 Click==7.0
 click-plugins==1.0.4
 Flask==1.0.2
+Flask-GraphQL==2.0.0
 Flask-JWT-Extended==3.16.0
 Flask-RESTful==0.3.6
 html5lib==1.0.1
@@ -17,3 +18,5 @@ traitlets==4.3.2
 Werkzeug==0.14.1
 xlrd==1.2.0
 requests==2.21.0
+graphene==2.1.5
+graphene_sqlalchemy==2.2.0
