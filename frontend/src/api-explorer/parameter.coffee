@@ -9,6 +9,9 @@ import classNames from 'classnames'
 import {format} from 'date-fns'
 
 class TernaryCheckbox extends Component
+  ###
+  This doesn't work correctly; it's unclear why
+  ###
   @defaultProps: {
     onChange: ->
   }
