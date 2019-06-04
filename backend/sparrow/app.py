@@ -5,7 +5,9 @@ from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
 from flask_jwt_extended import JWTManager
 from sqlalchemy.exc import NoSuchTableError
+from flask_graphql import GraphQLView
 
+from .graph import schema
 from .encoders import JSONEncoder
 from .api import APIv1
 from .auth import AuthAPI
@@ -38,6 +40,10 @@ class App(Flask):
         if self.db is not None: return self.db
         self.db = Database(self)
         return self.db
+
+    def setup_graphql(self):
+        view_func = GraphQLView.as_view('graphql', schema=schema, graphiql=True)
+        self.add_url_rule('/graphql', view_func=view_func)
 
 def construct_app(config=None, minimal=False):
     # Should allow configuration of template path
@@ -78,6 +84,8 @@ def construct_app(config=None, minimal=False):
     app.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
 
     app.register_blueprint(web, url_prefix='/')
+
+    app.setup_graphql()
 
     # If we're serving on a low-key webserver and we
     # want to just serve assets without a file server...
