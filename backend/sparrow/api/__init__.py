@@ -51,7 +51,7 @@ def build_description(argument):
         usage = dedent("""
         Use [*PostgreSQL* **LIKE** wildcards](https://www.postgresql.org/docs/current/functions-matching.html)
         (e.g. %,_,*) for fuzzy matching
-        """)
+        """).strip()
 
     return dict(
         name=argument.name,
@@ -135,7 +135,7 @@ class APIv1(API):
                     continue
                 typename = type.__name__
                 parser.add_argument(str(name), type=type,
-                    help=f"{name} ({typename})")
+                    help=None)
             except:
                 continue
 

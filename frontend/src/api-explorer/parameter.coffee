@@ -2,29 +2,30 @@ import styled from '@emotion/styled'
 import h from 'react-hyperscript'
 import {Component} from 'react'
 import ReactMarkdown from 'react-markdown'
-import {Tag, Card, Checkbox,
+import {Tag, Card, Checkbox, Button
         Intent, InputGroup, NumericInput} from '@blueprintjs/core'
 import {DatePicker} from '@blueprintjs/datetime'
 import classNames from 'classnames'
 import {format} from 'date-fns'
 
-class StatefulCheckbox extends Component
-  constructor: (props)->
-    super props
-    @state = {ix: 0}
+class TernaryCheckbox extends Component
+  @defaultProps: {
+    onChange: ->
+  }
+  options: [null, true, false]
+  onChange: =>
+    {onChange, value} = @props
+    ix = @options.indexOf(value)
+    newIx = (ix+1)%3
+    onChange(@options[newIx])
+
   render: ->
-    {ix} = @state
-    {onChange, rest...} = @props
-    f = =>
-      ix = (ix+1)%3
-      @setState({ix})
-      v = [null, true, false][ix]
-      onChange(v)
+    {value} = @props
+    ix = @options.indexOf(value)
     return h Checkbox, {
+      onChange: @onChange
       checked: ix == 1
       indeterminate: ix == 0
-      onChange: f
-      rest...
     }
 
 class DateInput extends Component
@@ -36,21 +37,17 @@ class InputForType extends Component
   render: ->
     {type, value, update, name} = @props
     updateSt = (val)->
-      if val == ""
+      if not val? or val == ""
         cset = {$unset: [name]}
       else
         cset = {[name]: {$set: val}}
       update(cset)
 
     if type == 'bool'
-      opts = [true, false, null]
-      ix = opts.indexOf(value)
-      onChange = (checked)->
-        checked ?= ""
-        updateSt(checked)
-      indeterminate = not value?
-      return h StatefulCheckbox, {
-        onChange
+      return h TernaryCheckbox, {
+        onChange: (val)=>
+          update {[name]: {$set: val}}
+        value
       }
     if type == 'str'
       value ?= ""
@@ -82,6 +79,15 @@ class InputForType extends Component
 STag = styled(Tag)"""
   margin-right: 0.3em;
   margin-bottom: 0.2em;
+"""
+
+DeleteButton_ = (props)->
+  h Button, {icon: 'cross', intent: Intent.DANGER, minimal: true, small: true, props...}
+
+DeleteButton = styled(DeleteButton_)"""
+  position: absolute;
+  top: 5px;
+  right: 5px;
 """
 
 BaseParameter = (props)->
@@ -123,22 +129,33 @@ BaseParameter = (props)->
       h InputForType, {type, value, update, name}
     ]
 
-  el = h Card, {
+  deleteButton = null
+  if value?
+    deleteButton = h DeleteButton, {
+      onClick: ->
+        update {$unset: [name]}
+    }
+
+  h Card, {
     interactive: not expanded,
     key: name,
     className,
     onClick
   }, [
-    h 'h5.name', name
-    h 'div.attributes', attrs
+    h 'div.top', [
+      h 'h5.name', name
+      h 'div.attributes', attrs
+    ]
     h('p.description', description) if description?
     details
+    deleteButton
   ]
 
 Parameter = styled(BaseParameter)"""
   margin-bottom: 1em;
   margin-right: 1em;
   transition: width 0.5s;
+  position: relative;
   flex-grow: #{(p)->if p.type == 'string' then '2' else '1'};
 """
 

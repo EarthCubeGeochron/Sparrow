@@ -27,7 +27,6 @@ class SessionComponent extends Component
   render: ->
     {id} = @props
     return null unless id?
-    console.log id
 
     breadCrumbs = [
       { text: h(Link, {to: '/admin/session'}, "Sessions") },
