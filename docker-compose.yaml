@@ -6,7 +6,7 @@ services:
       - backend
       - frontend
     ports:
-      - ${SPARROW_HTTP_PORT:-80}
+      - ${SPARROW_HTTP_PORT}:80
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - frontend_build:/frontend
@@ -41,7 +41,7 @@ services:
     expose:
       - 5432
     ports:
-      - ${SPARROW_DB_PORT:-5432}
+      - ${SPARROW_DB_PORT}:5432
     environment:
       - POSTGRES_DB=sparrow
     volumes:
