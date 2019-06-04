@@ -2,7 +2,7 @@ from click import echo, secho
 from os import environ
 
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.schema import Table
 from sqlalchemy.sql import ClauseElement
@@ -71,7 +71,7 @@ class Database:
         self.engine = create_engine(db_conn)
         metadata.create_all(bind=self.engine)
         self.meta = metadata
-        self.session = sessionmaker(bind=self.engine)()
+        self.session = scoped_session(sessionmaker(bind=self.engine))
         self.automap_base = None
         # We're having trouble lazily automapping
         try:
@@ -95,6 +95,7 @@ class Database:
             autoload=True, autoload_with=self.engine, **kwargs)
 
     def automap(self):
+        Base.query = self.session.query_property()
         Base.prepare(self.engine, reflect=True,
             name_for_scalar_relationship=name_for_scalar_relationship)
 

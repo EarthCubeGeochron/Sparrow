@@ -7,7 +7,7 @@ from flask_jwt_extended import JWTManager
 from sqlalchemy.exc import NoSuchTableError
 from flask_graphql import GraphQLView
 
-from .graph import schema
+from .graph import build_schema
 from .encoders import JSONEncoder
 from .api import APIv1
 from .auth import AuthAPI
@@ -42,7 +42,8 @@ class App(Flask):
         return self.db
 
     def setup_graphql(self):
-        view_func = GraphQLView.as_view('graphql', schema=schema, graphiql=True)
+        s = build_schema(self.database)
+        view_func = GraphQLView.as_view('graphql', schema=s, graphiql=True)
         self.add_url_rule('/graphql', view_func=view_func)
 
 def construct_app(config=None, minimal=False):
