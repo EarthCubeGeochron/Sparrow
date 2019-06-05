@@ -42,8 +42,13 @@ class App(Flask):
         return self.db
 
     def setup_graphql(self):
+        ctx = dict(session=self.database.session)
         s = build_schema(self.database)
-        view_func = GraphQLView.as_view('graphql', schema=s, graphiql=True)
+        view_func = GraphQLView.as_view('graphql',
+            schema=s,
+            graphiql=True,
+            context=ctx)
+
         self.add_url_rule('/graphql', view_func=view_func)
 
 def construct_app(config=None, minimal=False):
