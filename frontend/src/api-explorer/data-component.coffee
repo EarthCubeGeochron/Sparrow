@@ -67,7 +67,6 @@ class APIDataComponentInner extends JSONCollapsePanel
 
   renderInterior: ->
     {route, params} = @props
-    console.log params
     return null unless route?
 
     h PagedAPIView, {
