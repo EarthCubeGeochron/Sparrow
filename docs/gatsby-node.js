@@ -4,6 +4,7 @@ exports.createPages = ({ actions, graphql }) => {
   const { createPage } = actions
 
   const markdownTemplate = path.resolve(`src/templates/markdownTemplate.js`)
+  const markdownPage = path.resolve(`src/templates/markdownPage.js`)
 
   return graphql(`
     {
@@ -29,7 +30,7 @@ exports.createPages = ({ actions, graphql }) => {
       console.log(node);
       createPage({
         path: node.childMarkdownRemark.frontmatter.path,
-        component: markdownTemplate,
+        component: markdownPage,
         context: {}, // additional data can be passed via context
       })
     })
@@ -38,6 +39,7 @@ exports.createPages = ({ actions, graphql }) => {
 
 
 exports.onCreateWebpackConfig = ({
+  stage,
   actions,
 }) => {
   actions.setWebpackConfig({

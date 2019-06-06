@@ -10,7 +10,6 @@ trap finish INT
 export SPARROW_SECRET_KEY="Freedom!!"
 
 schema=${0:A:h:h}/backend/sparrow/sql/02-create-tables.sql
-echo $schema
 
 function build-schema() {
   cat "$schema" \
@@ -19,10 +18,14 @@ function build-schema() {
     -o static/schema-body.html
 }
 
-${0:h}/bin/build-schema
+if [ $1 != '--only-frontend' ]; then
 
-sphinx-autobuild -p 8001 "python-api/source" "python-api/build/html" &
-pid1=$!
+  echo $schema
+  ${0:h}/bin/build-schema
+  sphinx-autobuild -p 8001 "python-api/source" "python-api/build/html" &
+  pid1=$!
+
+fi
 
 gatsby develop &
 pid2=$!

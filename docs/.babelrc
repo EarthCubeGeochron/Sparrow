@@ -1,4 +1,5 @@
 {
+  "plugins": ["import-graphql"],
   "presets": [
     "@emotion/babel-preset-css-prop",
     [

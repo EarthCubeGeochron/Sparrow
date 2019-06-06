@@ -10,6 +10,7 @@
     "@mdx-js/mdx": "^1.0.18",
     "@mdx-js/react": "^1.0.16",
     "@mdx-js/tag": "^0.20.3",
+    "babel-plugin-import-graphql": "^2.7.0",
     "gatsby": "^2.4.3",
     "gatsby-image": "^2.0.41",
     "gatsby-mdx": "^0.6.3",
@@ -31,7 +32,8 @@
     "react-hyperscript": "^3.2.0",
     "react-markdown": "^4.0.8",
     "remark-loader": "^0.3.2",
-    "stylus": "^0.54.5"
+    "stylus": "^0.54.5",
+    "webpack-graphql-loader": "^1.0.2"
   },
   "devDependencies": {
     "@emotion/babel-preset-css-prop": "^10.0.9",
