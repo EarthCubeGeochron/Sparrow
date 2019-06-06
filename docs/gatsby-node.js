@@ -7,14 +7,13 @@ exports.createPages = ({ actions, graphql }) => {
 
   return graphql(`
     {
-      allMarkdownRemark(
-        sort: { order: DESC, fields: [frontmatter___date] }
-        limit: 1000
-      ) {
+      allFile(filter: {sourceInstanceName: {eq: "markdown-pages"}, extension: {eq: "md"}}) {
         edges {
           node {
-            frontmatter {
-              path
+            childMarkdownRemark {
+              frontmatter {
+                path
+              }
             }
           }
         }
@@ -25,12 +24,41 @@ exports.createPages = ({ actions, graphql }) => {
       return Promise.reject(result.errors)
     }
 
-    result.data.allMarkdownRemark.edges.forEach(({ node }) => {
+    result.data.allFile.edges.forEach(({ node }) => {
+
+      console.log(node);
       createPage({
-        path: node.frontmatter.path,
+        path: node.childMarkdownRemark.frontmatter.path,
         component: markdownTemplate,
         context: {}, // additional data can be passed via context
       })
     })
+  })
+}
+
+
+exports.onCreateWebpackConfig = ({
+  actions,
+}) => {
+  actions.setWebpackConfig({
+    module: {
+      rules: [
+        {
+          test: /\.md$/,
+          use: [
+            {
+              loader: 'remark-loader'
+            }
+          ],
+        },
+        {
+          test: /\.html$/,
+          loader: 'html-loader',
+          options: {
+            minimize: false,
+          },
+        },
+      ],
+    },
   })
 }

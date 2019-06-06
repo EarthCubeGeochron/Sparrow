@@ -33,11 +33,27 @@ module.exports = {
     {
       resolve: `gatsby-source-filesystem`,
       options: {
-        path: `${__dirname}/src/text`,
+        path: `${__dirname}/src/posts`,
+        name: "markdown-posts",
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/src/pages`,
         name: "markdown-pages",
       },
     },
-    `gatsby-transformer-remark`,
+    {
+      resolve: "gatsby-transformer-remark",
+      // options: {
+      //   plugins: [
+      //     {
+      //       resolve: `gatsby-remark-prismjs`
+      //     }
+      //   ]
+      // }
+    },
     // no configuration
     `gatsby-plugin-coffeescript`,
     `gatsby-transformer-sharp`,

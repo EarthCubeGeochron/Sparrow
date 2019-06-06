@@ -19,7 +19,7 @@ function build-schema() {
     -o static/schema-body.html
 }
 
-${0:h}/build-schema
+${0:h}/bin/build-schema
 
 sphinx-autobuild -p 8001 "python-api/source" "python-api/build/html" &
 pid1=$!
@@ -28,4 +28,3 @@ gatsby develop &
 pid2=$!
 
 wait $pid1 $pid2
-

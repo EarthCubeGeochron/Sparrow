@@ -1,3 +1,8 @@
+---
+path: "/motivation-and-design"
+date: 2019-01-01
+---
+
 ## An interface to lab data, supported by NSF EarthCube
 
 **Sparrow** is software for managing the geochronology data
