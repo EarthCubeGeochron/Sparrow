@@ -2,6 +2,7 @@ import graphene
 from graphene import String
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+from .filterable_query import FilterableConnectionField
 
 # https://github.com/alexisrolland/flask-graphene-sqlalchemy/wiki/Flask-Graphene-SQLAlchemy-Tutorial
 
@@ -20,6 +21,6 @@ def build_schema(db):
     class Query(graphene.ObjectType):
         node = relay.Node.Field()
         datum = relay.Node.Field(Datum)
-        data = SQLAlchemyConnectionField(DatumConnection)
+        data = FilterableConnectionField(DatumConnection)
 
     return graphene.Schema(query=Query, types=[Datum])
