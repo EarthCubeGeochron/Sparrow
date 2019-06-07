@@ -29,7 +29,7 @@ const Layout = ({ children }) => (
         <div id="page-body">
           <main>{children}</main>
           <footer>
-            © {new Date().getFullYear()}
+            © {new Date().getFullYear()} — the Sparrow team
           </footer>
         </div>
       </div>
