@@ -18,7 +18,7 @@ function build-schema() {
     -o static/schema-body.html
 }
 
-if [ $1 != '--only-frontend' ]; then
+if [ ${1:-""} != '--only-frontend' ]; then
 
   echo $schema
   ${0:h}/bin/build-schema
