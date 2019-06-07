@@ -8,7 +8,9 @@ import md from '../text/installation.mdx'
 
 InstallationPage = ->
   h Layout, [
-    h md
+    h 'div.page-content', [
+      h md
+    ]
   ]
 
 export default InstallationPage

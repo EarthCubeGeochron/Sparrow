@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Fira+Mono|Merriweather|Montserrat:400,500,600&display=swap')
+@import url('https://fonts.googleapis.com/css?family=Fira+Mono:500|Merriweather|Montserrat:400,500,600,800&display=swap')
 //font-family: 'Merriweather', serif;
 //font-family: 'Montserrat', sans-serif;
 //font-family: 'Fira Mono', monospace;
@@ -44,6 +44,9 @@ h1,h2,h3,h4,h5,h6
   font-family: sans
   font-weight: 600
   color c9
+h1
+  font-weight 800
+  font-size 1.5em
 
 header
   header_color=c7
@@ -64,8 +67,9 @@ header
 
   #site-title
     margin-right 1em
-  h1 a
-    color text_color !important
+  h1
+    font-size 1.7em
+    color text_color
 
   nav
     display flex
@@ -78,8 +82,8 @@ header
       font-size 1.2em
       display block
       &[aria-current="page"]
-        font-weight 600
         background-color lighten(header_color, 10%)
+        text-decoration underline
 
 
 footer
@@ -95,8 +99,12 @@ div.index-top
   div.image
     flex-grow 1.5
 
-div.page-content>*
-  width 760px
+div.page-content
+  margin 0 0.5em
+  &>*
+    width 760px
+  &>pre
+    width inherit
 
 // Homepage boxes
 
@@ -148,3 +156,18 @@ a
     background: none
     color: inherit
     border: none
+
+code, pre
+  background-color #fafafa
+  font-size 16px
+  font-family "Fira Mono", monospace
+  border-radius 3px
+  border 1px solid #eee
+  padding 0 0.2em
+
+code
+  display inline-block
+
+pre
+  code
+    border none
