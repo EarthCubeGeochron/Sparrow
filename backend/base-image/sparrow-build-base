@@ -1,4 +1,0 @@
-#!/usr/bin/env zsh
-# Description: Build the `sparrowdata/backend-base` image
-cd "${0:A:h}"
-docker build -t sparrowdata/backend-base:1.0 .

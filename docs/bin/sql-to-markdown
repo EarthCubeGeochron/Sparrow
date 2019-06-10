@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import fileinput
+import pyparsing
+from textwrap import dedent
+
+print("~~~sql")
+in_doc = False
+docs = ""
+for line in fileinput.input():
+    docstart = "/*" in line
+    docend = "*/" in line
+    if docstart:
+        in_doc = True
+    if not in_doc:
+        print(line, end="")
+        continue
+
+    if in_doc:
+        docs += line
+    if docend:
+        in_doc = False
+    if not in_doc and docs != "":
+        docs = (dedent(docs)
+            .replace("/*","\n~~~\n\n")
+            .replace("*/","\n\n~~~sql\n"))
+        print(dedent(docs), end="")
+        docs = ""
+print("~~~")
+

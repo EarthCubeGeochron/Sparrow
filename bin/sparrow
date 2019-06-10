@@ -48,9 +48,12 @@ export SPARROW_LAB_NAME="${SPARROW_LAB_NAME:-"My Lab"}"
 export SPARROW_INIT_SQL="${SPARROW_INIT_SQL:-"placeholder"}"
 export SPARROW_SITE_CONTENT="${SPARROW_SITE_CONTENT:-"$default"}"
 export SPARROW_HTTP_PORT="${SPARROW_HTTP_PORT:-5002}"
-export SPARROW_DB_PORT="${SPARROW_DB_PORT:-"54321-54351"}"
-# This will be settable in the future
-export SPARROW_ENV="development"
+
+# A port range can be specified, but only with recent versions of Docker,
+# so we default to a single port.
+export SPARROW_DB_PORT="${SPARROW_DB_PORT:-54321}"
+# should be `development` or `production`
+export SPARROW_ENV="${SPARROW_ENV:-"development"}"
 
 # The docker-compose volume for sparrow commands needs to be set
 # even if a SPARROW_COMMANDS directory is not provided.
@@ -113,6 +116,9 @@ for f in $(ls "$dir" | grep sparrow-); do
   found_command=1
 done
 
+# Search through user-provided subcommands
+# (only one directory allowed for now; should replace
+#  with a more flexible PATH representation).
 if [ ! -z $SPARROW_COMMANDS ]; then
   for f in $(ls "$SPARROW_COMMANDS" | grep sparrow-); do
     [ $found_command = 1 ] && break
@@ -132,7 +138,7 @@ if [ $found_command = 0 ]; then
   if docker-compose exec backend true > /dev/null 2>&1 ; then
     sparrow compose exec backend sparrow $@
   else
-    sparrow compose run backend sparrow $@
+    sparrow compose run -rm backend sparrow $@
   fi
 else
   shift
