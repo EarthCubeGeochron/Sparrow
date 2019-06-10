@@ -71,8 +71,8 @@ and provides an externally accessible, standardized access layer.
 This application programming interface (API) can be accessed by users including
 centralized archives.
 
-Atop this data interface, **Sparrow** bundles an extensible, web-based management
-interface that streamlines tasks such as controlling data embargo,
+Atop this data interface, **Sparrow** bundles an extensible, web-based
+management tool that streamlines tasks such as controlling data embargo,
 identifying and linking geologic and publication metadata, and generating
 aggregate summaries of analytical data.
 
@@ -149,18 +149,31 @@ views can be implemented for different labs. For instance, age spectrum views
 are available for detrital zircon datasets and step heating curves can be
 plotted for Ar/Ar measurements.
 
-
-
 ### Containerization
+
+The **Sparrow** application is packaged as a set of [Docker][https://docker.com]
+containers that enable it to run on a variety of platforms with minimal setup.
+This allows the implementation to be shared between multiple labs running the
+software on different hardware. A single codebase supports
+multiple custom implementations deployed by different labs.
 
 ## Implementation progress
 
-
-it is built to be lightweight, flexible, and standards-compliant.
-
 Sparrow is now being deployed atop several distinct data-reduction pipelines
 at laboratories specializing in U-Pb, $^{40}$Ar/$^{39}$Ar, and cosmogenic nuclide dating.
-Where implemented, the software will automate the incorporation of lab-curated
-geochemical data into synthesis and archival facilities.
+Beta instances are deployed for [**WiscAr**](https://sparrow-data.org/labs/wiscar),
+[**Arizona Laserchron Center**](http://upbtoolbox.com), and the
+[**Boise State Isotope Geochronology Laboratory**](http://sparrow.boisestate.edu).
+More implementations are underway for cosmogenic nuclide labs, the British Geological
+Survey, and others.
+
+Currently, the core database system and import infrastructure are relatively
+advanced, allowing flexible ingestion and indexing of analytical data. Management and
+curation interfaces are not public yet, but are being created and tested
+during summer 2019.
+
+Where fully implemented, **Sparrow** will automate the incorporation of lab-curated
+geochemical data into synthesis and archival facilities, and provide an interface
+to manage this integration.
 
 [1](https://sparrow-data.org)

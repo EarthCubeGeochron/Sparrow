@@ -3,4 +3,4 @@
 docs_dir="${0:h:h:A}"
 v="$docs_dir/public/"
 
-rsync -azv --delete "$v" birdnest:"/projects/sparrow-data.org/htdocs/"
+rsync -rltgoD -zv -L --delete "$v" birdnest:"/projects/sparrow-data.org/htdocs/"
