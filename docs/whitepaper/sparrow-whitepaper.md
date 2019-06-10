@@ -97,12 +97,12 @@ At its core, **Sparrow** is a fairly standard web application that includes a
 database engine, web server, and user-facing website.
 The database engine, powered by [PostgreSQL](https://postgresql.org), stores
 analytical data and metadata.
-The server, implemented in [Python](https://www.python.org) handles
+The backend server, implemented in [Python](https://www.python.org), interfaces
+with the database and handles
 user authentication, data filtering, and the publicly accessible API. The
-web frontend, implemented as a [React](https://reactjs.org) Javascript
-application, provides interfaces for data management, embargo control,
+web frontend provides interfaces for data management, embargo control,
 and rich data-driven aggregates of lab data such as web maps, age summaries,
-and potentially other lab-specific views.
+and other lab-specific views.
 
 ### Database schema
 
@@ -132,8 +132,8 @@ about losing connection to the raw analytical information.
 
 ### Web server
 
-The Python-based web server primarily handles transfer from the database
-to the API. It manages authentication, filtering, and embargo, and provides
+The Python-based web server implements a public API atop the **Sparrow** database.
+It manages authentication, filtering, and embargo, and provides
 a command-line management interface. This core is intentionally lightweight
 and simplistic, with most of the logic encapsulated in ~500 lines of Python code.
 Most of the application's structure is represented directly in the database,
@@ -141,11 +141,17 @@ which allows interoperability with external tools.
 
 ### Frontend interface
 
-The frontend interface to **Sparrow** is decoupled from the backend but provides
-a set of standard user-interface components that enable metadata management
-and display. It is modular and pluggable, so that different views can be implemented
-for different labs. For instance, age spectrum views are available for
-detrital zircon datasets and step heating curves can be plotted for Ar/Ar measurements.
+The frontend interface to **Sparrow**, implemented as
+a [React](https://reactjs.org) Javascript application, is decoupled from the
+backend but provides a default set of user-interface components that enable
+metadata management and display. It is modular and pluggable, so that different
+views can be implemented for different labs. For instance, age spectrum views
+are available for detrital zircon datasets and step heating curves can be
+plotted for Ar/Ar measurements.
+
+
+
+### Containerization
 
 ## Implementation progress
 
