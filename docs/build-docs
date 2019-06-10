@@ -1,0 +1,33 @@
+#!/usr/bin/env zsh
+
+function finish {
+  echo "Exiting..."
+  kill $pid1 $pid2
+}
+
+trap finish INT
+
+export SPARROW_SECRET_KEY="Freedom!!"
+
+schema=${0:A:h:h}/backend/sparrow/sql/02-create-tables.sql
+
+function build-schema() {
+  cat "$schema" \
+  | bin/sql-to-markdown \
+  | pandoc -f markdown \
+    -o static/schema-body.html
+}
+
+if [ ${1:-""} != '--only-frontend' ]; then
+
+  echo $schema
+  ${0:h}/bin/build-schema
+  sphinx-autobuild -p 8001 "python-api/source" "python-api/build/html" &
+  pid1=$!
+
+fi
+
+gatsby develop &
+pid2=$!
+
+wait $pid1 $pid2
