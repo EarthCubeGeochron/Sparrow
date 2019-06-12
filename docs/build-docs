@@ -21,7 +21,7 @@ function build-schema() {
 if [ ${1:-""} != '--only-frontend' ]; then
 
   echo $schema
-  ${0:h}/bin/build-schema
+  ${0:h}/bin/build-schema > build/schema.html
   sphinx-autobuild -p 8001 "python-api/source" "python-api/build/html" &
   pid1=$!
 
