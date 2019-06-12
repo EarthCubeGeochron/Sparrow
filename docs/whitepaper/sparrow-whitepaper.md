@@ -1,6 +1,6 @@
 ---
 title: >
-  Sparrow: a geochronology laboratory data management system
+  Sparrow: a laboratory data management system
   supporting interchange between geochronology laboratories
 author: D.P. Quinn, S.E. Peters
 ---
