@@ -83,9 +83,9 @@ and a reasonably small and stable code footprint for the
 core functionality, with clear "hooks" for lab specific
 functionality.
 
-**Sparrow**'s technology stack consist of
+**Sparrow**'s technology stack consists of
 
-- Python-based API server
+- a Python-based API server
   - `sqlalchemy` for database access
   - `Flask` web-application framework
 - PostgreSQL database backend
@@ -97,4 +97,4 @@ functionality.
 - Software packaged primarily fro lightweight, containerized
   (e.g. Docker) instances.
 
-Code and issues for this project are tracked on Github.
+Code and issues for this project are tracked [on Github](https://github.com/EarthCubeGeochron/Sparrow).
