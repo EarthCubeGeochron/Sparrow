@@ -5,4 +5,3 @@ schema=${0:A:h:h:h}/core-schema/02-tables.sql
 cat $schema \
 | ${0:h}/sql-to-markdown \
 | pandoc -f markdown -t html
-

@@ -18,17 +18,10 @@ export SPARROW_SECRET_KEY="Freedom!!"
 
 schema=${0:A:h:h}/backend/sparrow/sql/02-create-tables.sql
 
-function build-schema() {
-  cat "$schema" \
-  | bin/sql-to-markdown \
-  | pandoc -f markdown \
-    -o static/schema-body.html
-}
-
 if [ ${1:-""} != '--only-frontend' ]; then
 
   echo $schema
-  ${0:h}/bin/build-schema > build/schema.html
+  ${0:h}/build-schema > build/schema.html
   sphinx-autobuild -p 8001 "python-api/source" "python-api/build/html" &
   pid1=$!
 
