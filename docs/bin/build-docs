@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+
+docs_dir="${0:h:h:A}"
+cd "$docs_dir"
+
+rm -rf .cache
+rm -rf public
+mkdir -p public
+mkdir -p build
+
+export SPARROW_SECRET_KEY="Freedom!!"
+
+schema=../backend/sparrow/sql/02-create-tables.sql
+
+bin/build-schema > build/schema.html
+(cd python-api && make html)
+gatsby build

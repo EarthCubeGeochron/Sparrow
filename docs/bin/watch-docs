@@ -1,5 +1,12 @@
 #!/usr/bin/env zsh
 
+docs_dir="${0:h:h:A}"
+cd "$docs_dir"
+
+rm -rf public
+mkdir -p public
+mkdir -p build
+
 function finish {
   echo "Exiting..."
   kill $pid1 $pid2
