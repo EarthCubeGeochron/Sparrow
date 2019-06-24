@@ -1,25 +1,25 @@
 ---
 title: >
   Sparrow: a laboratory data management system
-  supporting interchange between geochronology laboratories
+  supporting a geochronology data infrastructure
 author: D.P. Quinn, S.E. Peters
 ---
 
-Best practices for data accessibility and archiving are a key concern within
-the geochronology community. Meanwhile, robust, global age datasets are sought
-as references by communities constructing time-integrated digital Earth models
-at a variety of scales and time resolutions. Although essential, integrating
+Best practices for data accessibility and archiving are a key concern within the
+geochronology community. Meanwhile, robust, global age datasets are sought as
+references by communities constructing time-integrated digital Earth models at a
+variety of scales and time resolutions. Although essential, integrating
 analytical and interpreted age data into community repositories is costly,
-uncompensated work for geochronologists. **Sparrow** strives to build an
-automated system to manage data integrations while preserving the link to
-original laboratory data.
+uncompensated work for geochronologists. [**Sparrow**](https://sparrow-data.org)
+strives to build an automated system to manage data integrations while
+preserving the link to original laboratory data.
 
 ## Background and motivation
 
 Currently, geochronological data is mostly handled within focused studies.
 Laboratories have devised innovative systems and processes to measure
 high-precision ages on a variety of isotope systems; these data underpin
-studies that drive discovery in all branches of the geosciences. Within the
+important discoveries affecting all branches of the geosciences. Within the
 geochemistry community, standards for data accessibility and reporting are
 essential to enable reproducibility and cross-comparability [e.g. @Renne2009].
 In many cases, assumptions such as decay constants and standard ages are
@@ -52,13 +52,14 @@ with high community participation and long-term support.
 These network and sustainability problems present a huge barrier to uptake
 of a community-wide data system.
 
-**Sparrow**, a new open-source software component funded by NSF EarthCube^[1],
+**Sparrow**, a new open-source software component funded by NSF EarthCube,
 attempts to improve the situation by building a modern data system
 within individual labs, instead of at the community level. High-level data-management
-tools can benefit labs by streamlining sample management workflows. However,
-**Sparrow** decouples data management from analytical procedures, allow labs to
-maintain complete control of their measurement and data-reduction workflows
-while automating dissemination and contextualization of results.
+tools can benefit labs by streamlining sample management workflows.
+**Sparrow** goes further to decouple data management from analytical procedures,
+allowing labs to maintain complete control of their measurement and
+data-reduction workflows while automating dissemination and
+contextualization of results.
 
 ## Design
 
@@ -176,4 +177,4 @@ Where fully implemented, **Sparrow** will automate the incorporation of lab-cura
 geochemical data into synthesis and archival facilities, and provide an interface
 to manage this integration.
 
-[1](https://sparrow-data.org) The **Sparrow** documentation website
+## References
