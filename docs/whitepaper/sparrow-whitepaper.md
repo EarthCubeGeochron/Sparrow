@@ -151,7 +151,7 @@ plotted for Ar/Ar measurements.
 
 ### Containerization
 
-The **Sparrow** application is packaged as a set of [Docker][https://docker.com]
+The **Sparrow** application is packaged as a set of [Docker](https://docker.com)
 containers that enable it to run on a variety of platforms with minimal setup.
 This allows the implementation to be shared between multiple labs running the
 software on different hardware. A single codebase supports
@@ -176,4 +176,4 @@ Where fully implemented, **Sparrow** will automate the incorporation of lab-cura
 geochemical data into synthesis and archival facilities, and provide an interface
 to manage this integration.
 
-[1](https://sparrow-data.org)
+[1](https://sparrow-data.org) The **Sparrow** documentation website
