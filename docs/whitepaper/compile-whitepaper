@@ -8,15 +8,22 @@ cat sparrow-whitepaper.md \
 
 BIBTEX_LIBRARY="/Users/Daven/Resources/Papers/library.bib"
 
-if [ ! -z $BIBTEX_LIBRARY ]; then
-  if [ ! bib-filter >/dev/null 2>&1 ]; then
-    pip install git+https://github.com/davenquinn/bib-filter.git
-  fi
-
-  bib-filter --clean --keys $keys $BIBTEX_LIBRARY references.bib
-fi
+# if [ ! -z $BIBTEX_LIBRARY ]; then
+#   if [ ! bib-filter >/dev/null 2>&1 ]; then
+#     pip install git+https://github.com/davenquinn/bib-filter.git
+#   fi
+#
+#   bib-filter --clean --keys $keys $BIBTEX_LIBRARY references.bib
+# fi
 
 cat sparrow-whitepaper.md \
 | pandoc \
-  --metadata bibliography=references.bib \
-> build/sparrow-whitepaper.html
+  --metadata bibliography=$BIBTEX_LIBRARY \
+> build/sparrow-description.html
+
+
+cat sparrow-whitepaper.md \
+| pandoc \
+  --metadata bibliography=$BIBTEX_LIBRARY \
+  -t docx \
+> build/sparrow-description-$(git rev-parse --short HEAD).docx

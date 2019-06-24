@@ -4,6 +4,7 @@
 //font-family: 'Fira Mono', monospace;
 
 sans = "Montserrat", sans-serif
+main = "Merriweather", serif
 
 c1 = #085f63
 c2 = #49beb7
@@ -22,7 +23,7 @@ c9 = #ff8364
 
 body, html
   font-size: 17px
-  font-family: "Merriweather", serif
+  font-family: main
   color black
   line-height 1.5
 
@@ -138,6 +139,10 @@ div.page-content .boxes
       font-weight 600
       color c2
 
+div.page-content
+  img
+    max-width: full_width
+
 // Typography
 
 a
@@ -157,13 +162,16 @@ a
     color: inherit
     border: none
 
-code, pre
-  background-color #fafafa
-  font-size 16px
-  font-family "Fira Mono", monospace
+code_box()
   border-radius 3px
   border 1px solid #eee
   padding 0 0.2em
+  background-color #fafafa
+
+code, pre
+  font-size 16px
+  font-family "Fira Mono", monospace
+  code_box()
 
 code
   display inline-block
@@ -171,3 +179,31 @@ code
 pre
   code
     border none
+
+.page-content>.schema
+  width inherit
+  a.sourceLine
+    background inherit
+    color inherit
+    &:visited
+      color inherit
+    &:hover
+      color inherit
+  code, pre
+    background-color inherit
+    border none
+    padding none
+    margin 0
+  p, ul
+    margin 0
+    color: #888
+  p, h4
+    margin-left 1.5em
+  h4
+    margin-bottom 0.2em
+  .sourceLine
+    span.co
+      color: #888
+      font-family main
+    span.kw
+      color: c2

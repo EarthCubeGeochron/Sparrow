@@ -24,7 +24,7 @@ const Header = ({ siteTitle }) => (
     <nav>
       <Link to="/motivation-and-design/">Motivation and design</Link>
       <Link to="/installation/">Get started</Link>
-      <a href="/python-api">Docs</a>
+      <a href="/docs/">Docs</a>
     </nav>
   </header>
 )

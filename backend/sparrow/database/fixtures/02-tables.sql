@@ -1,5 +1,8 @@
 /*
-A minimal schema
+# Database schema
+
+The set of table definitions here builds the fundamental structures
+for data in the **Sparrow** system.
 */
 
 CREATE TABLE IF NOT EXISTS researcher (
@@ -15,8 +18,7 @@ authentication. We can reset all application access by
 truncating this table, without losing data.
 */
 CREATE TABLE IF NOT EXISTS "user" ( -- Name must be quoted because it collides with reserved word.
-  username text PRIMARY KEY,
-  /* Stores a hashed password */
+  username text PRIMARY KEY, -- Stores a hashed password
   password text,
   researcher_id integer REFERENCES researcher(id)
 );
@@ -59,8 +61,9 @@ CREATE TABLE IF NOT EXISTS vocabulary.error_metric (
   authority text
 );
 
-
--- Projects
+/*
+## Projects
+*/
 
 CREATE TABLE IF NOT EXISTS project (
   id serial PRIMARY KEY,
@@ -85,7 +88,9 @@ CREATE TABLE IF NOT EXISTS project_publication (
   PRIMARY KEY (project_id, publication_id)
 );
 
--- Descriptors for types of measurements/techniques
+/*
+### Descriptors for types of measurements/techniques
+*/
 
 CREATE TABLE IF NOT EXISTS instrument (
   id serial PRIMARY KEY,
@@ -107,6 +112,7 @@ CREATE TABLE IF NOT EXISTS datum_type (
 );
 
 /*
+
 ## Sample
 
 An object to be measured
@@ -184,7 +190,7 @@ CREATE TABLE IF NOT EXISTS session (
 
 These two tables will end up needing data-type specific columns
 
-### `analysis`
+### Analysis
 
 Set of data measured together at one time on one instrument
 
@@ -209,12 +215,11 @@ CREATE TABLE IF NOT EXISTS analysis (
   analysis_type text,
   date timestamp,
   material text REFERENCES vocabulary.material(id),
-  /* Not really sure that material is the best parameterization
+  /* Not really sure that "material" is the best parameterization
      of this concept... */
   is_standard boolean,
   is_bad boolean,
-  /*
-  Some analytical results can be interpreted from other data, so we
+  /* Some analytical results can be interpreted from other data, so we
   should explicitly state that this is the case.
 
   #### Examples:
@@ -224,9 +229,7 @@ CREATE TABLE IF NOT EXISTS analysis (
   - a multi-zircon igneous age
     (the `datum` table would include jointly-fitted age determinations
      for each relevant system)
-  - a calculated plateau age for a stepped-heating Ar-Ar experiment.
-
-  */
+  - a calculated plateau age for a stepped-heating Ar-Ar experiment. */
   is_interpreted boolean,
   data jsonb,
   UNIQUE (session_id, session_index, analysis_name)
@@ -247,7 +250,7 @@ CREATE TABLE IF NOT EXISTS datum (
   #### Examples:
 
   - Accepted system for U-Pb single-zircon age
-
+  - Heating steps accepted in the final age analysis
   */
   is_accepted boolean,
   UNIQUE (analysis, type)
@@ -267,11 +270,9 @@ In many ways, the column layout mirrors that of the datum table,
 with the exception that there is a many-to-many link on the data.
 */
 CREATE TABLE IF NOT EXISTS constant (
-  /*
-  Analytical parameters, calibration types, etc.
+  /* Analytical parameters, calibration types, etc.
   that remain constant across many sessions
-  (e.g. decay constants, assumed physical parameters).
-  */
+  (e.g. decay constants, assumed physical parameters). */
   id serial PRIMARY KEY,
   text_value text UNIQUE,
   value numeric,
