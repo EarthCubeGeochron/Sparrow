@@ -10,6 +10,8 @@ import {AuthContext} from 'app/auth/context'
 import {ProjectListComponent} from './project-component'
 import {SessionListComponent} from './session-list-component'
 import {SessionComponent} from './session-component'
+import {SampleList} from './sample-list'
+
 import {AppNavbar, NavButton} from 'app/shared/navbar'
 import {InsetText} from 'app/layout'
 import styled from '@emotion/styled'
@@ -45,6 +47,7 @@ AdminNavbar = ({base, rest...})->
     #h HomeButton, {to: base, icon: 'home', minimal: true}
     h NavButton, {to: base, exact: true }, "Base"
     h NavButton, {to: base+'/project'}, "Projects"
+    h NavButton, {to: base+'/samples'}, "Samples"
     h NavButton, {to: base+'/session'}, "Sessions"
   ]
 
@@ -86,6 +89,10 @@ class AdminBody extends Component
       h Route, {
         path: base+"/session"
         component: SessionListComponent
+      }
+      h Route, {
+        path: base+"/sample"
+        component: SampleList
       }
       h Route, {
         path: base+"/project"

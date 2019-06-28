@@ -98,7 +98,6 @@ ProjectSamples = ({data})->
   ]
 
 ProjectComponent = (props)->
-  console.log props
   {id, name, description} = props
   h 'div.project.bp3-card', {key: id}, [
     h 'h3', name
