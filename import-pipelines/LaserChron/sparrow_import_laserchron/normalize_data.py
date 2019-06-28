@@ -1,7 +1,9 @@
 from math import isnan
-from click import secho
+from click import echo, secho, style
 from pandas import concat, to_numeric
 import re
+from os.path import commonprefix
+from numpy import nan
 
 from sparrow.import_helpers import SparrowImportError
 
@@ -78,20 +80,39 @@ def normalize_data(df):
     if df.iloc[0,0].startswith("Table"):
         df = df[1:]
 
+    df["block_prefix"] = nan
+    df["block_suffix"] = nan
+
+
     # Drop empty rows
-    df = df.dropna(how='all')
+    #df = df.dropna(how='all')
+
+    header_split_ix = 6
 
     # Drop columns that are empty in the header
     # Note: this does not preserve comments and some other metadata;
     # we may want to.
-    header = df.iloc[1:3, 1:]
+    header = df[:header_split_ix].dropna(how='all').iloc[1:3, 1:]
     # Make sure second row of header (chiefly units) is set to null
     # if first row is null (this helps get rid of trailing end matter)
     header.iloc[1] = header.iloc[1].mask(header.iloc[0].isnull())
     header = header.dropna(axis=1, how='all')
     meta = table_metadata(header)
 
-    body = df.iloc[3:].set_index(df.columns[0])
+    body = df.iloc[header_split_ix:].set_index(df.columns[0])
+
+    # A way to find output blocks separated by empty rows
+    # even though we drop empty rows
+    row_has_values = (~body.isnull()).sum(axis=1) != 0
+    sparse = row_has_values.to_sparse().sp_index
+    for i, (block, length) in enumerate(zip(sparse.blocs, sparse.blengths)):
+        ix = slice(block,block+length)
+        segment = body.iloc[ix]
+        prefix = commonprefix([str(i) for i in segment.index]).strip(":-_ ")
+        d = lambda x: style(str(x), dim=True)
+        echo("  "+d("Block ")+str(i+1)+d(" with prefix ")+prefix)
+        segment["block_prefix"] = prefix
+
     body.index.name = 'Analysis'
     # Make sure data is the same shape as headers
     data = (body.drop(body.columns.difference(header.columns), 1)
@@ -106,10 +127,12 @@ def normalize_data(df):
     except AssertionError:
         raise SparrowImportError('Data frame is not correct shape')
 
+
     # For some reason we have a lot of these closed brackets in data files
     data.index = data.index.str.replace(' <>','').str.strip()
     data.columns = meta.columns
 
+    # 19 columns in data, but we added block_id column
     ncols = 19
     if data.shape[1] == ncols:
         return data, meta
