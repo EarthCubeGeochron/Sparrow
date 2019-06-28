@@ -3,23 +3,19 @@ path: "/motivation-and-design"
 date: 2019-01-01
 ---
 
-## An interface to lab data, supported by NSF EarthCube
+# Motivation and design: public interface for lab data
 
-**Sparrow** is software for managing the geochronology data
-created by a laboratory. This software has the goal of managing
-analytical data for indexing and public access.
+**Sparrow** is software for managing the geochemica data
+created by an individual geochronology laboratory. This software has the goal of managing analytical data for indexing and public access.
+It is designed for flexibility and extensibility, so that it can
+be tailored to the needs of individual analytical labs that manage a
+wide variety of data.
 
-The software is designed for flexibility and extensibility, so that it can
-be tailored to the needs of individual analytical labs that manage a wide
-variety of data. Currently, we are testing the software with Ar and detrital
-zircon geochronology data.
-
-This is both a software implementation and a specification of the default
-interface that the "Lab Data Interface" will expose.
+![Chart](/images/simplified-chart.png)
 
 ## Principles
 
-- Federated
+- *Lab-level* data store
 - Standardized basic schema
 - Standardized web-facing API
 - Flexible and extensible
@@ -72,7 +68,9 @@ to the server. Data collection, storage, and analysis tools
 such as [`PyChron`](https://github.com/NMGRL/PyChron)
 sit immediately prior to this system in a typical lab's data production pipeline.
 
-## Design
+![Chart](/images/Lab-Data-Interface.png)
+
+# Design
 
 We want this software to be useful to many labs, so a
 strong and flexible design is crucial. **Sparrow** will have an
@@ -83,9 +81,9 @@ and a reasonably small and stable code footprint for the
 core functionality, with clear "hooks" for lab specific
 functionality.
 
-**Sparrow**'s technology stack consist of
+**Sparrow**'s technology stack consists of several parts:
 
-- Python-based API server
+- a Python-based API server
   - `sqlalchemy` for database access
   - `Flask` web-application framework
 - PostgreSQL database backend
@@ -97,4 +95,37 @@ functionality.
 - Software packaged primarily fro lightweight, containerized
   (e.g. Docker) instances.
 
-Code and issues for this project are tracked on Github.
+Code and issues for this project are tracked [on Github](https://github.com/EarthCubeGeochron/Sparrow).
+
+
+## Data model
+
+### Hierarchical levels of analytical data
+
+![Chart](/images/model-levels.png)
+
+- **`datum`**: an individual data point (any numerical parameter and its error)
+- **`analysis`**: an collection of data points measured at the same time
+  (roughly synonymous with *aliquot*)
+- **`session`**: a set of measurements conducted on the same sample
+  at the same time
+- **`sample`**: A geological sample
+
+
+### Database schema
+
+- A data-storage schema to store heterogeneous geochronology data
+- **Flexible** to store lab-specific data shapes
+- A common core of standardized tables
+- Standard *vocabularies* to manage meaning
+
+Data must be loaded into this standardized core in order to be
+exposed to the outside world.
+
+![Chart](/images/erd-core.png)
+
+### Schema → API
+
+The **Sparrow** API will map lab-specific vocabulary to community standards.
+
+<img src="/images/vocabulary-mapping.png" width="500" />

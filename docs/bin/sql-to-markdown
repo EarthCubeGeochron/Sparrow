@@ -23,8 +23,8 @@ for line in fileinput.input():
     if not in_doc and docs != "":
         docs = (dedent(docs)
             .replace("/*","\n~~~\n\n")
-            .replace("*/","\n\n~~~sql\n"))
+            .replace("*/","\n\n~~~sql\n")
+            .replace("~~~sql\n\n","~~~sql\n"))
         print(dedent(docs), end="")
         docs = ""
 print("~~~")
-
