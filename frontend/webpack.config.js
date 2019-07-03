@@ -47,13 +47,25 @@ let stylusLoader = {
   loader: 'stylus-relative-loader'
 };
 
+const cssLoader = {
+  loader: 'css-loader',
+  options: {
+    /* CSS Module support with global scope by default
+       This means that module support needs to be explicitly turned
+       on with a `:local` flag
+    */
+    modules: 'global'
+  }
+};
+
 module.exports = {
   module: {
     rules: [
       {test: /\.coffee$/, use: [ jsLoader, "coffee-loader" ]},
       {test: /\.(js|jsx)$/, use: [ jsLoader ], exclude: /node_modules/ },
-      {test: /\.styl$/, use: ["style-loader", "css-loader", stylusLoader]},
-      {test: /\.css$/, use: ["style-loader", 'css-loader' ]},
+      // CSS compilation supports local CSS modules
+      {test: /\.styl$/, use: ["style-loader", cssLoader, stylusLoader]},
+      {test: /\.css$/, use: ["style-loader", cssLoader ]},
       {test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader]},
       {test: /\.md$/, use: ["html-loader","markdown-loader"]}
     ]
