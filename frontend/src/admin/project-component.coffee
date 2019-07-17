@@ -1,9 +1,10 @@
 import {Component, createElement} from 'react'
 import h from 'react-hyperscript'
-import {get} from 'axios'
 import {Card, Colors} from '@blueprintjs/core'
 import {PagedAPIView} from '@macrostrat/ui-components'
 import styled from '@emotion/styled'
+
+import {SampleCard} from './sample/detail-card'
 import './main.styl'
 
 class Publication extends Component
@@ -52,35 +53,6 @@ ProjectResearchers = ({data})->
     content...
   ]
 
-SampleCard = styled.div"""
-  background-color: #{Colors.LIGHT_GRAY4};
-  border-radius: 5px;
-  margin: 5px;
-  padding: 5px 10px;
-  flex-grow: 1;
-  max-width: 15em;
-  .location-name {
-    color: #{Colors.RED1};
-  }
-  h4 {
-    margin-top: 0em;
-    margin-bottom: 0em;
-  }
-"""
-
-Material = styled.div"""font-style: italic"""
-
-Sample = (props)->
-  {material, sample_id, name, location_name} = props
-  if material?
-    material = h Material, material
-
-  h SampleCard, {className: 'sample'}, [
-    h 'h4.name', name
-    h 'div.location-name', location_name
-    material
-  ]
-
 SampleContainer = styled.div"""
   display: flex;
   flex-flow: row wrap;
@@ -91,14 +63,13 @@ ProjectSamples = ({data})->
   content = [ h 'p', 'No samples' ]
   if data?
     content = data.map (d)->
-      h Sample, d
+      h SampleCard, d
   h 'div.samples', [
     h 'h4', 'Samples'
     h SampleContainer, content
   ]
 
 ProjectComponent = (props)->
-  console.log props
   {id, name, description} = props
   h 'div.project.bp3-card', {key: id}, [
     h 'h3', name
