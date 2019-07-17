@@ -1,7 +1,6 @@
 #!/bin/bash
 # Description: Build containers, start, detach, and follow logs.
 
-sparrow compose up --build -d $@
+sparrow compose up --force-recreate --build -d $@
 # Follow logs for running container(s)
 sparrow compose logs -f $@
-
