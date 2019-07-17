@@ -47,7 +47,7 @@ AdminNavbar = ({base, rest...})->
     #h HomeButton, {to: base, icon: 'home', minimal: true}
     h NavButton, {to: base, exact: true }, "Base"
     h NavButton, {to: base+'/project'}, "Projects"
-    h NavButton, {to: base+'/samples'}, "Samples"
+    h NavButton, {to: base+'/sample'}, "Samples"
     h NavButton, {to: base+'/session'}, "Sessions"
   ]
 
