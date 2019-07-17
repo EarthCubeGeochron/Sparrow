@@ -19,12 +19,18 @@ import styles from './module.styl'
 
 h = hyperStyled(styles)
 
-HomeButton = classed(LinkButton, styles["home-link-button"])
+HomeButton = (props)->
+  h LinkButton, {
+    className: "home-link-button"
+    icon: "home"
+    minimal: true
+    props...
+  }
 
 AdminNavbar = ({base, rest...})->
   h 'div.minimal-navbar', {rest..., subtitle: 'Admin'}, [
     h 'h4', "Admin"
-    h HomeButton, {to: base, icon: 'home', minimal: true, exact: true}
+    h HomeButton, {to: base, exact: true}
     h NavButton, {to: base+'/project'}, "Projects"
     h NavButton, {to: base+'/sample'}, "Samples"
     h NavButton, {to: base+'/session'}, "Sessions"
@@ -35,15 +41,13 @@ SessionMatch = ({match})->
   h SessionComponent, {id}
 
 LoginRequired = (props)->
-  {requestLoginForm} = props
-  onClick = ->
-    console.log "Clicked"
-    requestLoginForm()
+  {requestLoginForm: onClick, rest...} = props
   h NonIdealState, {
     title: "Not logged in"
     description: "You must be authenticated to use the administration interface."
     icon: 'blocked-person'
-    action: h Button, {onClick}, "Login"
+    action: h(Button, {onClick}, "Login")
+    rest...
   }
 
 AdminMain = (props)->
