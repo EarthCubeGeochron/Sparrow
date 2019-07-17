@@ -1,4 +1,4 @@
-import h from 'react-hyperscript'
+import {hyperStyled, classed} from '@macrostrat/hyper'
 import {Component} from 'react'
 import {NonIdealState, Intent, Button, ButtonGroup, Icon} from '@blueprintjs/core'
 import {Route, Switch} from 'react-router-dom'
@@ -15,37 +15,16 @@ import {SampleList} from './sample-list'
 import {AppNavbar, NavButton} from 'app/shared/navbar'
 import {InsetText} from 'app/layout'
 import styled from '@emotion/styled'
+import styles from './module.styl'
 
-MinimalNavbar = styled.div"""
-display: flex;
-flex-direction: row;
-align-items: baseline;
-margin: 8px 0 10px;
-padding: 0.3em 1em;
-background-color: #f5f8fa;
-border-radius: 5px;
-vertical-align: baseline;
-box-shadow: 0 0 0 1px rgba(16, 22, 26, 0.1), 0 0 0 rgba(16, 22, 26, 0), 0 1px 1px rgba(16, 22, 26, 0.2);
+h = hyperStyled(styles)
 
-h4 {
-  margin: 0;
-  padding: 0.1em 1em 0.1em 0.4em;
-  color: #5c7080;
-  min-width: 5em;
-}
-"""
-
-HomeButton = styled(LinkButton)"""
-margin-right: 1em;
-vertical-align: baseline;
-baseline-shift: -4px;
-"""
+HomeButton = classed(LinkButton, styles["home-link-button"])
 
 AdminNavbar = ({base, rest...})->
-  h MinimalNavbar, {rest, subtitle: 'Admin'}, [
-    h 'h4', "Admin views"
-    #h HomeButton, {to: base, icon: 'home', minimal: true}
-    h NavButton, {to: base, exact: true }, "Base"
+  h 'div.minimal-navbar', {rest..., subtitle: 'Admin'}, [
+    h 'h4', "Admin"
+    h HomeButton, {to: base, icon: 'home', minimal: true, exact: true}
     h NavButton, {to: base+'/project'}, "Projects"
     h NavButton, {to: base+'/sample'}, "Samples"
     h NavButton, {to: base+'/session'}, "Sessions"
