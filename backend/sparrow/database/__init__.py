@@ -9,9 +9,11 @@ from sqlalchemy.sql import ClauseElement
 from pathlib import Path
 
 from ..app import App
-from ..models import Base, User
+from ..models import Base, User, Project
 from ..util import run_sql_file, run_query, relative_path
 from .helpers import JointModelCollection, TableCollection
+
+extended_models = [User, Project]
 
 metadata = MetaData()
 
@@ -93,7 +95,7 @@ class Database:
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since they are not
         #  included by default)
-        additional_models = {t.__tablename__:t for t in [User]}
+        additional_models = {t.__tablename__:t for t in extended_models}
         self.__model_collection__ = JointModelCollection(
             self.automap_base.classes,
             additional_models)
