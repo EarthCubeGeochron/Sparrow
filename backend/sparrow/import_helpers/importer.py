@@ -64,6 +64,9 @@ class BaseImporter(object):
     def project(self, name):
         return self.db.get_or_create(self.m.project, name=name)
 
+    def researcher(self, **kwargs):
+        return self.db.get_or_create(self.m.researcher, **kwargs)
+
     def unit(self, id):
         return self.db.get_or_create(
             self.m.unit,
@@ -225,7 +228,7 @@ class BaseImporter(object):
         except (SparrowImportError, NotImplementedError, IntegrityError) as err:
             self.db.session.rollback()
             self.__track_model(rec, None, error=str(err))
-            secho(str(err), fg='red')
+            secho(str(err)+"\n", fg='red')
 
         if redo:
             dirty = set(i for i in set(self.__dirty) if self.db.session.is_modified(i))

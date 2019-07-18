@@ -11,13 +11,13 @@ from pathlib import Path
 from ..app import App
 from ..models import Base, User
 from ..util import run_sql_file, run_query, relative_path
+from .helpers import JointModelCollection, TableCollection
 
 metadata = MetaData()
 
 # For automapping
 def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
     return "_"+referred_cls.__name__.lower()
-
 
 def get_or_create(session, model, defaults=None, **kwargs):
     """
@@ -37,17 +37,6 @@ def get_or_create(session, model, defaults=None, **kwargs):
         session.add(instance)
         return instance
 
-class TableCollection(object):
-    """
-    Table collection object that returns automapped tables
-    """
-    def __init__(self, automap_base):
-        self.models = automap_base.classes
-    def __getattr__(self, name):
-        return getattr(self.models, name).__table__
-    def __iter__(self):
-            for model in self.models:
-                yield model.__table__
 class Database:
     def __init__(self, cfg=None):
         """
@@ -73,6 +62,8 @@ class Database:
         self.meta = metadata
         self.session = sessionmaker(bind=self.engine)()
         self.automap_base = None
+        self.__model_collection__ = None
+        self.__table_collection__ = None
         # We're having trouble lazily automapping
         try:
             self.automap()
@@ -98,8 +89,25 @@ class Database:
         Base.prepare(self.engine, reflect=True,
             name_for_scalar_relationship=name_for_scalar_relationship)
 
-        self.table = TableCollection(Base)
         self.automap_base = Base
+        # Database models we have extended with our own functions
+        # (we need to add these to the automapped classes since they are not
+        #  included by default)
+        additional_models = {t.__tablename__:t for t in [User]}
+        self.__model_collection__ = JointModelCollection(
+            self.automap_base.classes,
+            additional_models)
+        self.__table_collection__ = TableCollection(
+            self.__model_collection__)
+
+    @property
+    def table(self):
+        """
+        Map all tables in the database to SQLAlchemy table objects
+        """
+        if self.__table_collection__ is None:
+            self.automap()
+        return self.__table_collection__
 
     @property
     def model(self):
@@ -108,9 +116,9 @@ class Database:
 
         https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html
         """
-        if self.automap_base is None:
+        if self.__model_collection__ is None:
             self.automap()
-        return self.automap_base.classes
+        return self.__model_collection__
 
     @property
     def mapped_classes(self):

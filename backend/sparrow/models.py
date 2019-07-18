@@ -22,4 +22,3 @@ class User(Base):
     def is_correct_password(self, plaintext):
         salt = environ.get("SPARROW_SECRET_KEY")
         return check_password_hash(self.password, salt+str(plaintext))
-
