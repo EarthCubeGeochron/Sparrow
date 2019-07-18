@@ -245,7 +245,7 @@ class BaseImporter(object):
         Track the import of a given model from a data file
         """
         if model is None:
-            pass
+            return
         elif isinstance(model, self.m.session):
             kw['session_id'] = model.id
         elif isinstance(model, self.m.analysis):
