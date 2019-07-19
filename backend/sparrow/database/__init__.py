@@ -11,7 +11,8 @@ from pathlib import Path
 from ..app import App
 from ..models import Base, User, Project
 from ..util import run_sql_file, run_query, relative_path
-from .helpers import JointModelCollection, TableCollection
+from .helpers import (
+    JointModelCollection, TableCollection, get_or_create)
 
 extended_models = [User, Project]
 
@@ -20,24 +21,6 @@ metadata = MetaData()
 # For automapping
 def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
     return "_"+referred_cls.__name__.lower()
-
-def get_or_create(session, model, defaults=None, **kwargs):
-    """
-    Get an instance of a model, or create it if it doesn't
-    exist.
-
-    https://stackoverflow.com/questions/2546207
-    """
-    instance = session.query(model).filter_by(**kwargs).first()
-    if instance:
-        return instance
-    else:
-        params = dict((k, v) for k, v in kwargs.items()
-            if not isinstance(v, ClauseElement))
-        params.update(defaults or {})
-        instance = model(**params)
-        session.add(instance)
-        return instance
 
 class Database:
     def __init__(self, cfg=None):

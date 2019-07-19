@@ -1,3 +1,23 @@
+from sqlalchemy.sql import ClauseElement
+
+def get_or_create(session, model, defaults=None, **kwargs):
+    """
+    Get an instance of a model, or create it if it doesn't
+    exist.
+
+    https://stackoverflow.com/questions/2546207
+    """
+    instance = session.query(model).filter_by(**kwargs).first()
+    if instance:
+        return instance
+    else:
+        params = dict((k, v) for k, v in kwargs.items()
+            if not isinstance(v, ClauseElement))
+        params.update(defaults or {})
+        instance = model(**params)
+        session.add(instance)
+        return instance
+
 class JointModelCollection(object):
     def __init__(self, *collections):
         self.collections = collections

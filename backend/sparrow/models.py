@@ -9,7 +9,13 @@ from sqlalchemy.ext.automap import automap_base
 from werkzeug.security import generate_password_hash, check_password_hash
 from os import environ
 
-Base = automap_base()
+from sqlalchemy.ext.declarative import declared_attr
+
+class Base(object):
+    pass
+    # Shim for future expansion
+
+Base = automap_base(cls=Base)
 
 class User(Base):
     __tablename__ = "user"
@@ -27,3 +33,6 @@ class Project(Base):
     __tablename__ = "project"
     def add_researcher(self, researcher):
         self.researcher_collection.append(researcher)
+
+    def add_session(self, session):
+        self.session_collection.append(session)

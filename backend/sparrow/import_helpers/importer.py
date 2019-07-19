@@ -180,6 +180,7 @@ class BaseImporter(object):
         added = rec is None
         if added:
             rec = self.m.data_file(file_hash=hash)
+            self.db.session.add(rec)
         self.__set_file_info(fn, rec)
         return rec, added
 
