@@ -8,6 +8,8 @@ Declarative models for these objects are defined here.
 from sqlalchemy.ext.automap import automap_base
 from werkzeug.security import generate_password_hash, check_password_hash
 from os import environ
+from sqlalchemy.schema import Column
+from sqlalchemy.types import Integer
 
 Base = automap_base()
 
@@ -23,3 +25,7 @@ class User(Base):
         salt = environ.get("SPARROW_SECRET_KEY")
         return check_password_hash(self.password, salt+str(plaintext))
 
+class DatumExtended(Base):
+    __table_args__ = {'schema': 'core_view'}
+    __tablename__ = 'datum'
+    datum_id = Column(Integer, primary_key=True)
