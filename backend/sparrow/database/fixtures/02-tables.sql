@@ -6,7 +6,7 @@ for data in the **Sparrow** system.
 */
 
 CREATE TABLE IF NOT EXISTS researcher (
-  id integer PRIMARY KEY,
+  id serial PRIMARY KEY,
   name text NOT NULL,
   orcid text UNIQUE
 );

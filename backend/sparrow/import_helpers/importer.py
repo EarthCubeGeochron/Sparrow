@@ -64,6 +64,9 @@ class BaseImporter(object):
     def project(self, name):
         return self.db.get_or_create(self.m.project, name=name)
 
+    def researcher(self, **kwargs):
+        return self.db.get_or_create(self.m.researcher, **kwargs)
+
     def unit(self, id):
         return self.db.get_or_create(
             self.m.unit,
@@ -177,6 +180,7 @@ class BaseImporter(object):
         added = rec is None
         if added:
             rec = self.m.data_file(file_hash=hash)
+            self.db.session.add(rec)
         self.__set_file_info(fn, rec)
         return rec, added
 
@@ -225,7 +229,7 @@ class BaseImporter(object):
         except (SparrowImportError, NotImplementedError, IntegrityError) as err:
             self.db.session.rollback()
             self.__track_model(rec, None, error=str(err))
-            secho(str(err), fg='red')
+            secho(str(err)+"\n", fg='red')
 
         if redo:
             dirty = set(i for i in set(self.__dirty) if self.db.session.is_modified(i))
@@ -245,7 +249,7 @@ class BaseImporter(object):
         Track the import of a given model from a data file
         """
         if model is None:
-            pass
+            return
         elif isinstance(model, self.m.session):
             kw['session_id'] = model.id
         elif isinstance(model, self.m.analysis):

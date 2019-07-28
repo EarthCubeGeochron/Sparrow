@@ -9,8 +9,12 @@ from sqlalchemy.sql import ClauseElement
 from pathlib import Path
 
 from ..app import App
-from ..models import Base, User
+from ..models import Base, User, Project
 from ..util import run_sql_file, run_query, relative_path
+from .helpers import (
+    JointModelCollection, TableCollection, get_or_create)
+
+extended_models = [User, Project]
 
 metadata = MetaData()
 
@@ -18,36 +22,11 @@ metadata = MetaData()
 def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
     return "_"+referred_cls.__name__.lower()
 
+def classname_for_table(cls, table_name, table):
+    if hasattr(cls, '__model_name__'):
+        return cls.__model_name__
+    return table_name
 
-def get_or_create(session, model, defaults=None, **kwargs):
-    """
-    Get an instance of a model, or create it if it doesn't
-    exist.
-
-    https://stackoverflow.com/questions/2546207
-    """
-    instance = session.query(model).filter_by(**kwargs).first()
-    if instance:
-        return instance
-    else:
-        params = dict((k, v) for k, v in kwargs.items()
-            if not isinstance(v, ClauseElement))
-        params.update(defaults or {})
-        instance = model(**params)
-        session.add(instance)
-        return instance
-
-class TableCollection(object):
-    """
-    Table collection object that returns automapped tables
-    """
-    def __init__(self, automap_base):
-        self.models = automap_base.classes
-    def __getattr__(self, name):
-        return getattr(self.models, name).__table__
-    def __iter__(self):
-            for model in self.models:
-                yield model.__table__
 class Database:
     def __init__(self, cfg=None):
         """
@@ -73,12 +52,14 @@ class Database:
         self.meta = metadata
         self.session = scoped_session(sessionmaker(bind=self.engine))
         self.automap_base = None
+        self.__model_collection__ = None
+        self.__table_collection__ = None
         # We're having trouble lazily automapping
         try:
             self.automap()
         except Exception as err:
             echo("Could not automap at database initialization", err=True)
-            secho(str(err), fg='red')
+            raise err
 
     def exec_sql(self, *args):
         run_sql_file(self.session, *args)
@@ -97,10 +78,29 @@ class Database:
     def automap(self):
         Base.query = self.session.query_property()
         Base.prepare(self.engine, reflect=True,
-            name_for_scalar_relationship=name_for_scalar_relationship)
+            name_for_scalar_relationship=name_for_scalar_relationship,
+            classname_for_table=classname_for_table)
 
-        self.table = TableCollection(Base)
         self.automap_base = Base
+        # Database models we have extended with our own functions
+        # (we need to add these to the automapped classes since they are not
+        #  included by default)
+
+        additional_models = {classname_for_table(t,t.__table__.name, t.__table__):t for t in extended_models}
+        self.__model_collection__ = JointModelCollection(
+            self.automap_base.classes,
+            additional_models)
+        self.__table_collection__ = TableCollection(
+            self.__model_collection__)
+
+    @property
+    def table(self):
+        """
+        Map all tables in the database to SQLAlchemy table objects
+        """
+        if self.__table_collection__ is None:
+            self.automap()
+        return self.__table_collection__
 
     @property
     def model(self):
@@ -109,9 +109,9 @@ class Database:
 
         https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html
         """
-        if self.automap_base is None:
+        if self.__model_collection__ is None:
             self.automap()
-        return self.automap_base.classes
+        return self.__model_collection__
 
     @property
     def mapped_classes(self):
