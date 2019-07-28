@@ -9,12 +9,12 @@ from sqlalchemy.sql import ClauseElement
 from pathlib import Path
 
 from ..app import App
-from ..models import Base, User, Project
+from ..models import Base, User, Project, DatumExtended
 from ..util import run_sql_file, run_query, relative_path
 from .helpers import (
     JointModelCollection, TableCollection, get_or_create)
 
-extended_models = [User, Project]
+extended_models = [User, Project, DatumExtended]
 
 metadata = MetaData()
 
@@ -76,10 +76,12 @@ class Database:
             autoload=True, autoload_with=self.engine, **kwargs)
 
     def automap(self):
+        # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
         Base.query = self.session.query_property()
         Base.prepare(self.engine, reflect=True,
             name_for_scalar_relationship=name_for_scalar_relationship,
             classname_for_table=classname_for_table)
+        Base.metadata.reflect(schema='core_view', bind=self.engine)
 
         self.automap_base = Base
         # Database models we have extended with our own functions
