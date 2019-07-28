@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Mono:500|Merriweather|Montserrat:400,500,600,800&display=swap')
+//font-family: 'Merriweather', serif;
+//font-family: 'Montserrat', sans-serif;
+//font-family: 'Fira Mono', monospace;
+
+sans = "Montserrat", sans-serif
+main = "Merriweather", serif
+
+c1 = #085f63
+c2 = #49beb7
+c3 = #f5e1da
+c4 = #f1f1f1
+c5 = #eeeeee
+c6 = #d8cbbb
+c7 = #ffd98e
+c8 = #ffb677
+c9 = #ff8364
+
+//#ff8364
+//#ffb677
+//#ffd98e
+//#616f39
+
+body, html
+  font-size: 17px
+  font-family: main
+  color black
+  line-height 1.5
+
+full_width=980px
+
+#main
+  width full_width
+  margin auto
+  header
+    margin-top: 1.2em;
+    margin-bottom: 1.45rem;
+
+  #id
+    margin: 0 auto
+    padding: 0px 1.0875rem 1.45rem
+    paddingTop: 0
+
+h1,h2,h3,h4,h5,h6
+  font-family: sans
+  font-weight: 600
+  color c9
+h1
+  font-weight 800
+  font-size 1.5em
+
+header
+  header_color=c7
+  text_color=c9
+  background-color: lighten(header_color, 40%)
+  border-radius 6px
+  border 2px solid lighten(header_color, 30%)
+  padding 0 5px
+  display: flex;
+  flex-direction: row
+  align-items: baseline
+  box-shadow: 0px 1px 1px 1px lighten(header_color, 70%)
+
+  a
+    background-color inherit//lighten(header_color, 30%)
+    &:hover
+       background-color lighten(header_color, 10%)
+
+  #site-title
+    margin-right 1em
+  h1
+    font-size 1.7em
+    color text_color
+
+  nav
+    display flex
+    align-items: baseline
+    a
+      margin-right 1em
+      color text_color !important
+      font-family: sans
+      font-weight 500
+      font-size 1.2em
+      display block
+      &[aria-current="page"]
+        background-color lighten(header_color, 10%)
+        text-decoration underline
+
+
+footer
+  margin-top 2em
+  color #888
+  font-size 15px
+
+div.index-top
+  display flex
+  flex-direction row
+  div
+    flex 1
+  div.image
+    flex-grow 1.5
+
+div.page-content
+  margin 0 0.5em
+  &>*
+    width 760px
+  &>pre
+    width inherit
+
+// Homepage boxes
+
+div.tagline
+  font-family: sans
+  font-weight: 400
+  font-size 1.4em
+  font-style italic
+  text-align: center
+  color c2
+
+div.page-content .boxes
+  margin=8px
+  display: flex
+  width full_width
+  flex-flow: row wrap
+  margin 0 -margin
+  &>.box
+    flex 1
+    max-width 50%
+    min-width 40%
+    margin 0 margin 2*margin
+    background-color color4
+    border-radius: 6px
+    padding 0 1em
+    background-color lighten(c7, 85%)
+    border 1px solid lighten(c7, 50%)
+    box-shadow: 0px 2px 2px 1px lighten(c7, 80%)
+    h2
+      font-size 1.2em
+      font-weight 600
+      color c2
+
+div.page-content
+  img
+    max-width: full_width
+
+// Typography
+
+a
+  __c = c2
+  padding: 0 0.2em
+  text-decoration: none
+  background: lighten(__c,90%)
+  color: __c
+  border-radius 0.2em
+  &:visited
+    color: darken(__c,20%)
+  &:hover
+    background: desaturate(lighten(__c,80%),10%)
+  code
+    display: inline
+    background: none
+    color: inherit
+    border: none
+
+code_box()
+  border-radius 3px
+  border 1px solid #eee
+  padding 0 0.2em
+  background-color #fafafa
+
+code, pre
+  font-size 16px
+  font-family "Fira Mono", monospace
+  code_box()
+
+code
+  display inline-block
+
+pre
+  code
+    border none
+
+.page-content>.schema
+  width inherit
+  a.sourceLine
+    background inherit
+    color inherit
+    &:visited
+      color inherit
+    &:hover
+      color inherit
+  code, pre
+    background-color inherit
+    border none
+    padding none
+    margin 0
+  p, ul
+    margin 0
+    color: #888
+  p, h4
+    margin-left 1.5em
+  h4
+    margin-bottom 0.2em
+  .sourceLine
+    span.co
+      color: #888
+      font-family main
+    span.kw
+      color: c2

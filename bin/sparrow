@@ -60,6 +60,12 @@ export SPARROW_ENV="${SPARROW_ENV:-"development"}"
 export SPARROW_COMMANDS_VOLUME="${SPARROW_COMMANDS:-"placeholder"}"
 export SPARROW_DATA_DIR="${SPARROW_DATA_DIR:-"placeholder"}"
 
+# Make sure all commands can be referenced by name from
+# within these scripts (even if `sparrow` command itself isn't
+# on the PATH)
+export PATH="$SPARROW_PATH:$PATH"
+[ ! -z $SPARROW_COMMANDS ] && export PATH="$SPARROW_COMMANDS:$PATH"
+
 [ -z $SPARROW_SECRET_KEY ] && echo \
   "You $(tput bold)must$(tput sgr0) set SPARROW_SECRET_KEY. Exiting..." && \
   exit 1
@@ -116,6 +122,9 @@ for f in $(ls "$dir" | grep sparrow-); do
   found_command=1
 done
 
+# Search through user-provided subcommands
+# (only one directory allowed for now; should replace
+#  with a more flexible PATH representation).
 if [ ! -z $SPARROW_COMMANDS ]; then
   for f in $(ls "$SPARROW_COMMANDS" | grep sparrow-); do
     [ $found_command = 1 ] && break

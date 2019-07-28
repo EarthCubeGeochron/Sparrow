@@ -4,3 +4,6 @@ output
 node_modules
 _assets
 _docker
+.pyenv/
+.DS_STORE
+.cache/

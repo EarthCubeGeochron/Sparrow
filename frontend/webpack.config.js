@@ -47,13 +47,49 @@ let stylusLoader = {
   loader: 'stylus-relative-loader'
 };
 
+const cssModuleLoader = {
+  loader: 'css-loader',
+  options: {
+    /* CSS Module support with local scope by default
+       This means that module support needs to be explicitly turned
+       off with a `:global` flag
+    */
+    modules: 'local'
+  }
+};
+
+// Remember that, counterintuitively, loaders load bottom-to-top
+const styleRules = [
+  {
+    test: /\.(styl|css)$/,
+    use: "style-loader"
+  },
+  // CSS compilation supporting local CSS modules
+  {
+    test: /\.(styl|css)$/,
+    oneOf: [
+      // Match css modules (.module.(css|styl) files)
+      {
+        test: /\.?module\.(css|styl)$/,
+        use: cssModuleLoader,
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(styl|css)$/,
+        use: "css-loader"
+      }
+    ]
+  },
+  // Fallback for raw CSS and stylus from node_modules
+  {test: /\.styl$/, use: stylusLoader}
+]
+
 module.exports = {
   module: {
     rules: [
+      ...styleRules,
       {test: /\.coffee$/, use: [ jsLoader, "coffee-loader" ]},
       {test: /\.(js|jsx)$/, use: [ jsLoader ], exclude: /node_modules/ },
-      {test: /\.styl$/, use: ["style-loader", "css-loader", stylusLoader]},
-      {test: /\.css$/, use: ["style-loader", 'css-loader' ]},
       {test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader]},
       {test: /\.md$/, use: ["html-loader","markdown-loader"]}
     ]

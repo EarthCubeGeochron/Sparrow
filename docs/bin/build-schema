@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+
+docs_dir=${0:A:h:h}
+schema=${docs_dir:h}/core-schema/02-tables.sql
+echo $schema
+
+cd $docs_dir
+rm -f build/schema.html
+cat $schema \
+| ${0:h}/sql-to-markdown \
+| pandoc -f markdown -t html --section-divs \
+| sed 's/-- //g' \
+| tail -n +2 \
+> build/schema.html
