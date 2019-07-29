@@ -25,33 +25,22 @@ def connection_field_factory(relationship, registry, **field_kwargs):
     model_type = registry.get_type_for_model(model)
     return connection(model_type)
 
+def graphql_object_factory(_model, id_param=None):
+    class Meta:
+        model = _model
+        interfaces = (relay.Node, )
+        connection_field_factory = connection_field_factory
+    return type(_model.__name__, (SQLAlchemyObjectType,), dict(Meta=Meta))
+
 def build_schema(db):
+    types = []
+    fields = dict(
+        node = relay.Node.Field())
+    for model in db.automap_base.classes:
+        obj = graphql_object_factory(model)
+        types.append(obj)
+        fields[model.__name__] = connection(obj)
 
-    class Datum(SQLAlchemyObjectType):
-        class Meta:
-            model = db.model.datum
-            model.db_id = model.id
-            interfaces = (relay.Node, )
-            connection_field_factory = connection_field_factory
+    Query = type("Query", (graphene.ObjectType,), fields)
 
-    class DatumType(SQLAlchemyObjectType):
-        class Meta:
-            model = db.model.datum_type
-            model.db_id = model.id
-            interfaces = (relay.Node,)
-            connection_field_factory = connection_field_factory
-
-    class Analysis(SQLAlchemyObjectType):
-        class Meta:
-            model = db.model.analysis
-            model.db_id = model.id
-            interfaces = (relay.Node,)
-            connection_field_factory = connection_field_factory
-
-    class Query(graphene.ObjectType):
-        node = relay.Node.Field()
-        datum = connection(Datum)
-        datum_type = connection(DatumType)
-        analysis = connection(Analysis)
-
-    return graphene.Schema(query=Query, types=[Datum, DatumType, Analysis])
+    return graphene.Schema(query=Query, types=types)
