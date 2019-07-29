@@ -42,5 +42,4 @@ class Project(Base):
 class DatumExtended(Base):
     __table_args__ = {'schema': 'core_view', 'extend_existing': True}
     __tablename__ = 'datum'
-    __model_name__ = 'datum_extended'
     datum_id = Column('datum_id', Integer, primary_key=True)

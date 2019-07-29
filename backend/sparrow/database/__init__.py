@@ -23,8 +23,8 @@ def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
     return "_"+referred_cls.__name__.lower()
 
 def classname_for_table(cls, table_name, table):
-    if hasattr(cls, '__model_name__'):
-        return cls.__model_name__
+    if table.schema is not None:
+        return f"{table.schema}_{table_name}"
     return table_name
 
 class Database:
@@ -78,10 +78,13 @@ class Database:
     def automap(self):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
         Base.query = self.session.query_property()
+
+        Base.metadata.reflect(bind=self.engine)
+        Base.metadata.reflect(bind=self.engine, schema='vocabulary')
+        Base.metadata.reflect(bind=self.engine, schema='core_view')
         Base.prepare(self.engine, reflect=True,
             name_for_scalar_relationship=name_for_scalar_relationship,
             classname_for_table=classname_for_table)
-        Base.metadata.reflect(schema='core_view', bind=self.engine)
 
         self.automap_base = Base
         # Database models we have extended with our own functions
