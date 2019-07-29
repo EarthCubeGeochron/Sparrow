@@ -4,17 +4,18 @@ from os import environ
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.schema import Table
+from sqlalchemy.schema import Table, ForeignKey, Column
 from sqlalchemy.sql import ClauseElement
+from sqlalchemy.types import Integer
 from pathlib import Path
 
 from ..app import App
-from ..models import Base, User, Project, DatumExtended
+from ..models import Base, User, Project
 from ..util import run_sql_file, run_query, relative_path
 from .helpers import (
     JointModelCollection, TableCollection, get_or_create)
 
-extended_models = [User, Project, DatumExtended]
+extended_models = [User, Project]
 
 metadata = MetaData()
 
@@ -22,10 +23,14 @@ metadata = MetaData()
 def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
     return "_"+referred_cls.__name__.lower()
 
-def classname_for_table(cls, table_name, table):
+def classname_for_table(table):
     if table.schema is not None:
-        return f"{table.schema}_{table_name}"
-    return table_name
+        return f"{table.schema}_{table.name}"
+    return table.name
+
+def _classname_for_table(cls, table_name, table):
+    # We have to be fancy for SQLAlchemy
+    return classname_for_table(table)
 
 class Database:
     def __init__(self, cfg=None):
@@ -86,26 +91,45 @@ class Database:
 
     def automap(self):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
+        # TODO: add the process flow described below:
+        # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
         Base.query = self.session.query_property()
 
-        Base.metadata.reflect(bind=self.engine)
-        Base.metadata.reflect(bind=self.engine, schema='vocabulary')
-        Base.metadata.reflect(bind=self.engine, schema='core_view')
+        # This stuff should be placed outside of core (one likely extension point).
         Base.prepare(self.engine, reflect=True,
             name_for_scalar_relationship=name_for_scalar_relationship,
-            classname_for_table=classname_for_table)
+            classname_for_table=_classname_for_table)
+        Base.metadata.reflect(bind=self.engine, schema='vocabulary')
+        Base.metadata.reflect(bind=self.engine, schema='core_view')
 
         self.automap_base = Base
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since they are not
         #  included by default)
 
-        additional_models = {classname_for_table(t,t.__table__.name, t.__table__):t for t in extended_models}
+        # Automap the core_view.datum relationship
+        cls = self.automap_view("datum",
+            Column("datum_id", Integer, primary_key=True),
+            Column("analysis_id", Integer, ForeignKey(self.automap_base.classes.analysis.__table__.c.id)),
+            Column("session_id", Integer, ForeignKey(self.automap_base.classes.session.__table__.c.id)),
+            schema='core_view')
+        extended_models.append(cls)
+
+        additional_models = {classname_for_table(t.__table__):t for t in extended_models}
         self.__model_collection__ = JointModelCollection(
             self.automap_base.classes,
             additional_models)
         self.__table_collection__ = TableCollection(
             self.__model_collection__)
+
+    def automap_view(db, table_name, *column_args, **kwargs):
+        """
+        Views cannot be directly automapped, because they don't have primary keys.
+        So we have to use a workaround of specifying a primary key ourselves
+        """
+        tbl = db.reflect_table(table_name, *column_args, **kwargs)
+        name = classname_for_table(tbl)
+        return type(name, (Base,), dict(__table__ = tbl))
 
     @property
     def table(self):
