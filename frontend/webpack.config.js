@@ -55,7 +55,8 @@ module.exports = {
       {test: /\.styl$/, use: ["style-loader", "css-loader", stylusLoader]},
       {test: /\.css$/, use: ["style-loader", 'css-loader' ]},
       {test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader]},
-      {test: /\.md$/, use: ["html-loader","markdown-loader"]}
+      {test: /\.md$/, use: ["html-loader","markdown-loader"]},
+      {test: /\.html$/, use: ["html-loader"]}
     ]
   },
   devtool: 'source-map',
