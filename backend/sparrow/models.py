@@ -38,8 +38,3 @@ class Project(Base):
 
     def add_session(self, session):
         self.session_collection.append(session)
-
-class DatumExtended(Base):
-    __table_args__ = {'schema': 'core_view', 'extend_existing': True}
-    __tablename__ = 'datum'
-    datum_id = Column('datum_id', Integer, primary_key=True)

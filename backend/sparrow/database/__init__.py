@@ -67,12 +67,21 @@ class Database:
     def exec_query(self, *args):
         run_query(self.session, *args)
 
-    def reflect_table(self, tablename, schema='public', **kwargs):
+    def reflect_table(self, tablename, *column_args, **kwargs):
         """
-        Use the automapped `table` object instead.
+        One-off reflection of a database table or view. Note: for most purposes,
+        it will be better to use the database tables automapped at runtime in the
+        `self.tables` object. However, this function can be useful for views (which
+        are not reflected automatically), or to customize type definitions for mapped
+        tables.
+
+        A set of `column_args` can be used to pass columns to override with the mapper, for
+        instance to set up foreign and primary key constraints.
+        https://docs.sqlalchemy.org/en/13/core/reflection.html#reflecting-views
         """
-        meta = MetaData(schema=schema)
-        return Table(tablename, meta,
+        schema = kwargs.pop('schema', 'public')
+        meta = MetaData(schema = schema)
+        return Table(tablename, meta, *column_args,
             autoload=True, autoload_with=self.engine, **kwargs)
 
     def automap(self):
@@ -101,7 +110,7 @@ class Database:
     @property
     def table(self):
         """
-        Map all tables in the database to SQLAlchemy table objects
+        Map of all tables in the database as SQLAlchemy table objects
         """
         if self.__table_collection__ is None:
             self.automap()
@@ -110,7 +119,7 @@ class Database:
     @property
     def model(self):
         """
-        Map all tables in the database to SQLAlchemy models
+        Map of all tables in the database as SQLAlchemy models
 
         https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html
         """
