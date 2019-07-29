@@ -118,13 +118,13 @@ class BaseImporter(object):
         )
 
     def datum(self, analysis, parameter, value, error=None, **kwargs):
-            type = self.datum_type(parameter, **kwargs)
-            datum = self.db.get_or_create(self.m.datum,
-                type=type.id, analysis=analysis.id)
-            datum.value = value
-            datum.error = error
+        type = self.datum_type(parameter, **kwargs)
+        datum = self.db.get_or_create(self.m.datum,
+            type=type.id, analysis=analysis.id)
+        datum.value = value
+        datum.error = error
 
-            return datum
+        return datum
 
     ###
     # Data file importing
