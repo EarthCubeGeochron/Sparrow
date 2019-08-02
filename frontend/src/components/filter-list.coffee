@@ -17,7 +17,7 @@ class FilterListComponent extends StatefulComponent
     super props
     @state = {
       filter: ''
-      field: @props.filterFields[0]
+      field: Object.keys(@props.filterFields)[0]
       isSelecting: false
     }
 

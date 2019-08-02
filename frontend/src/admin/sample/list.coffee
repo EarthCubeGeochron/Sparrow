@@ -9,10 +9,10 @@ import styles from './module.styl'
 h = hyper.styled(styles)
 
 SampleListCard = (props)->
-  {material, sample_id, name, location_name} = props
+  {material, id, name, location_name} = props
   h LinkCard, {
-    to: "/admin/sample/#{sample_id}"
-    key: sample_id,
+    to: "/admin/sample/#{id}"
+    key: id,
     className: 'sample-list-card'
   }, [
     h 'h4', [
@@ -26,7 +26,7 @@ SampleListCard = (props)->
 SampleList = ->
   route = '/sample'
   filterFields = {
-    'name': "Name"
+    'name': "Sample name"
     'material': "Material"
     'project_name': "Project"
   }
