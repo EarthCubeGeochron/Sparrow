@@ -171,6 +171,10 @@ class Database:
     def initialize(self, drop=False):
         secho("Creating core schema...", bold=True)
 
+        if drop:
+            fp = relative_path(__file__, "procedures", "drop-all-tables.sql")
+            self.exec_sql(fp)
+
         p = Path(relative_path(__file__, "fixtures"))
         filenames = list(p.glob("*.sql"))
         filenames.sort()

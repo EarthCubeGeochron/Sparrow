@@ -18,6 +18,8 @@ class BaseImporter(object):
         self.db = db
         self.m = self.db.model
         print_sql = kwargs.pop("print_sql", False)
+        # We shouldn't have to do this,
+        #self.db.automap()
 
         # This is kinda unsatisfying
         self.basedir = environ.get("SPARROW_DATA_DIR", None)
@@ -67,6 +69,8 @@ class BaseImporter(object):
     def researcher(self, **kwargs):
         return self.db.get_or_create(self.m.researcher, **kwargs)
 
+    ## Vocabulary
+
     def unit(self, id):
         return self.db.get_or_create(
             self.m.vocabulary_unit,
@@ -89,12 +93,20 @@ class BaseImporter(object):
             id=id, defaults=dict(authority=self.authority))
 
     def material(self, id, type_of=None):
+        if id is None: return None
         m = self.db.get_or_create(
             self.m.vocabulary_material,
             id=id, defaults=dict(authority=self.authority))
         if type_of is not None:
             m._material = self.material(type_of)
         return m
+
+    def analysis_type(self, id, **kwargs):
+        return self.db.get_or_create(
+            self.m.vocabulary_analysis_type,
+            id=id,
+            defaults=dict(authority=self.authority),
+            **kwargs)
 
     def datum_type(self, parameter, unit='unknown', error_metric=None, **kwargs):
         error_metric = self.error_metric(error_metric)
@@ -116,12 +128,19 @@ class BaseImporter(object):
             **kwargs)
         return dt
 
+    def analysis(self, type=None, **kwargs):
+        m = self.db.get_or_create(
+            self.m.analysis, **kwargs)
+        if type is not None:
+            m._analysis_type = self.analysis_type(type)
+        return m
+
     def add_analysis(self, session, **kwargs):
+        """Deprecated"""
         return self.db.get_or_create(
             self.m.analysis,
             session_id=session.id,
-            **kwargs
-        )
+            **kwargs)
 
     def datum(self, analysis, parameter, value, error=None, **kwargs):
         type = self.datum_type(parameter, **kwargs)
