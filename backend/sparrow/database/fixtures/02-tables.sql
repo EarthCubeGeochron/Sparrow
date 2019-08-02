@@ -82,10 +82,12 @@ CREATE TABLE IF NOT EXISTS vocabulary.error_metric (
   authority text
 );
 
+-- Conceptually, this could be combined with `method`...
 CREATE TABLE IF NOT EXISTS vocabulary.analysis_type (
   id text PRIMARY KEY,
   description text,
-  authority text
+  authority text,
+  type_of text REFERENCES vocabulary.analysis_type(id)
 );
 
 /*

@@ -101,12 +101,14 @@ class BaseImporter(object):
             m._material = self.material(type_of)
         return m
 
-    def analysis_type(self, id, **kwargs):
-        return self.db.get_or_create(
+    def analysis_type(self, id, type_of= None):
+        m = self.db.get_or_create(
             self.m.vocabulary_analysis_type,
             id=id,
-            defaults=dict(authority=self.authority),
-            **kwargs)
+            defaults=dict(authority=self.authority))
+        if type_of is not None:
+            m._analysis_type = self.analysis_type(type_of)
+        return m
 
     def datum_type(self, parameter, unit='unknown', error_metric=None, **kwargs):
         error_metric = self.error_metric(error_metric)
@@ -135,17 +137,15 @@ class BaseImporter(object):
             m._analysis_type = self.analysis_type(type)
         return m
 
-    def add_analysis(self, session, **kwargs):
+    def add_analysis(self, session, type=None, **kwargs):
         """Deprecated"""
-        return self.db.get_or_create(
-            self.m.analysis,
-            session_id=session.id,
-            **kwargs)
+        return self.analysis(session_id=session.id, type=type, **kwargs)
 
     def datum(self, analysis, parameter, value, error=None, **kwargs):
         type = self.datum_type(parameter, **kwargs)
         datum = self.db.get_or_create(self.m.datum,
-            type=type.id, analysis=analysis.id)
+            analysis=analysis.id,
+            type=type.id)
         datum.value = value
         datum.error = error
 
