@@ -29,6 +29,27 @@ CREATE TABLE IF NOT EXISTS publication (
   title text
 );
 
+/*
+# Enums
+*/
+CREATE TABLE IF NOT EXISTS enum.date_precision (
+  id text PRIMARY KEY
+);
+
+INSERT INTO enum.date_precision(id) VALUES
+  ('year'),
+  ('month'),
+  ('day')
+ON CONFLICT DO NOTHING;
+
+
+/*
+# Vocabularies
+
+Controlled vocabularies for terms defining data
+semantics.
+*/
+
 CREATE TABLE IF NOT EXISTS vocabulary.parameter (
   id text PRIMARY KEY,
   description text,
@@ -56,6 +77,12 @@ CREATE TABLE IF NOT EXISTS vocabulary.unit (
 );
 
 CREATE TABLE IF NOT EXISTS vocabulary.error_metric (
+  id text PRIMARY KEY,
+  description text,
+  authority text
+);
+
+CREATE TABLE IF NOT EXISTS vocabulary.analysis_type (
   id text PRIMARY KEY,
   description text,
   authority text
@@ -176,6 +203,7 @@ CREATE TABLE IF NOT EXISTS session (
   publication_id integer REFERENCES publication(id),
   date timestamp NOT NULL,
   end_date timestamp,
+  date_precision text REFERENCES enum.date_precision(id),
   instrument integer REFERENCES instrument(id),
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
@@ -212,7 +240,7 @@ CREATE TABLE IF NOT EXISTS analysis (
     unique identification of a record within the session */
   analysis_name text,
   -- Should key this to a foreign key table
-  analysis_type text,
+  analysis_type text REFERENCES vocabulary.analysis_type(id),
   date timestamp,
   material text REFERENCES vocabulary.material(id),
   /* Not really sure that "material" is the best parameterization

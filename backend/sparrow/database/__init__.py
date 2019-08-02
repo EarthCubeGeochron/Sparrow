@@ -21,7 +21,7 @@ metadata = MetaData()
 
 # For automapping
 def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
-    return "_"+referred_cls.__name__.lower()
+    return "_"+referred_cls.__table__.name.lower()
 
 def classname_for_table(table):
     if table.schema is not None:
@@ -64,7 +64,6 @@ class Database:
             self.automap()
         except Exception as err:
             echo("Could not automap at database initialization", err=True)
-            raise err
 
     def exec_sql(self, *args):
         run_sql_file(self.session, *args)
@@ -160,14 +159,14 @@ class Database:
             model = getattr(self.model, model)
         return self.session.query(model).get(*args,**kwargs)
 
-    def get_or_create(self, model, defaults=None, **kwargs):
+    def get_or_create(self, model, **kwargs):
         """
         Get an instance of a model, or create it if it doesn't
         exist.
         """
         if isinstance(model, str):
             model = getattr(self.model, model)
-        return get_or_create(self.session, model, defaults=None, **kwargs)
+        return get_or_create(self.session, model, **kwargs)
 
     def initialize(self, drop=False):
         secho("Creating core schema...", bold=True)

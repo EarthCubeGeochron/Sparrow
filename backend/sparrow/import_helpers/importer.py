@@ -69,29 +69,32 @@ class BaseImporter(object):
 
     def unit(self, id):
         return self.db.get_or_create(
-            self.m.unit,
+            self.m.vocabulary_unit,
             id=id, defaults=dict(authority=self.authority))
 
     def error_metric(self, id):
         if not id: return None
         return self.db.get_or_create(
-            self.m.error_metric,
+            self.m.vocabulary_error_metric,
             id=id, defaults=dict(authority=self.authority))
 
     def parameter(self, id):
         return self.db.get_or_create(
-            self.m.parameter,
+            self.m.vocabulary_parameter,
             id=id, defaults=dict(authority=self.authority))
 
     def method(self, id):
         return self.db.get_or_create(
-            self.m.method,
+            self.m.vocabulary_method,
             id=id, defaults=dict(authority=self.authority))
 
-    def material(self, id):
-        return self.db.get_or_create(
-            self.m.material,
+    def material(self, id, type_of=None):
+        m = self.db.get_or_create(
+            self.m.vocabulary_material,
             id=id, defaults=dict(authority=self.authority))
+        if type_of is not None:
+            m._material = self.material(type_of)
+        return m
 
     def datum_type(self, parameter, unit='unknown', error_metric=None, **kwargs):
         error_metric = self.error_metric(error_metric)
