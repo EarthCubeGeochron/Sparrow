@@ -91,7 +91,8 @@ module.exports = {
       {test: /\.coffee$/, use: [ jsLoader, "coffee-loader" ]},
       {test: /\.(js|jsx)$/, use: [ jsLoader ], exclude: /node_modules/ },
       {test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader]},
-      {test: /\.md$/, use: ["html-loader","markdown-loader"]}
+      {test: /\.md$/, use: ["html-loader","markdown-loader"]},
+      {test: /\.html$/, use: ["html-loader"]}
     ]
   },
   devtool: 'source-map',

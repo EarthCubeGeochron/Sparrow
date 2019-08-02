@@ -8,7 +8,7 @@ class SessionListComponent extends StatefulComponent
   @defaultProps: {
     apiEndpoint: '/session'
     filterFields: {
-      'sample_id': "Sample"
+      'sample_name': "Sample"
       'project_name': "Project"
       'target': "Material"
       'instrument_name': "Instrument"
@@ -20,7 +20,7 @@ class SessionListComponent extends StatefulComponent
     super props
     @state = {
       filter: ''
-      field: 'sample_id'
+      field: 'sample_name'
       isSelecting: false
     }
 
