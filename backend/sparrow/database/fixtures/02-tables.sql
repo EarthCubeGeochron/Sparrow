@@ -313,8 +313,8 @@ CREATE TABLE IF NOT EXISTS constant (
 
 CREATE TABLE IF NOT EXISTS constant_link (
   constant_id integer NOT NULL REFERENCES constant(id),
-  session_id integer NOT NULL REFERENCES session(id),
-  PRIMARY KEY (constant_id, session_id)
+  analysis_id integer NOT NULL REFERENCES analysis(id),
+  PRIMARY KEY (constant_id, analysis_id)
 );
 
 /*
