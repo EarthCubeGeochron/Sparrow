@@ -206,6 +206,7 @@ CREATE TABLE IF NOT EXISTS session (
   date timestamp NOT NULL,
   end_date timestamp,
   date_precision text REFERENCES enum.date_precision(id),
+  name text, -- This column can store an (optional) internal lab id
   instrument integer REFERENCES instrument(id),
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
@@ -301,10 +302,16 @@ CREATE TABLE IF NOT EXISTS attribute (
   UNIQUE (value, parameter)
 );
 
-CREATE TABLE IF NOT EXISTS analysis_attribute (
+CREATE TABLE IF NOT EXISTS __analysis_attribute (
   analysis_id integer NOT NULL REFERENCES analysis(id),
   attribute_id integer NOT NULL REFERENCES attribute(id),
   PRIMARY KEY (analysis_id, attribute_id)
+);
+
+CREATE TABLE IF NOT EXISTS __session_attribute (
+  session_id integer NOT NULL REFERENCES session(id),
+  attribute_id integer NOT NULL REFERENCES attribute(id),
+  PRIMARY KEY (session_id, attribute_id)
 );
 
 /*
@@ -331,7 +338,7 @@ CREATE TABLE IF NOT EXISTS constant (
   description text
 );
 
-CREATE TABLE IF NOT EXISTS analysis_constant (
+CREATE TABLE IF NOT EXISTS __analysis_constant (
   analysis_id integer NOT NULL REFERENCES analysis(id),
   constant_id integer NOT NULL REFERENCES constant(id),
   PRIMARY KEY (analysis_id, constant_id)

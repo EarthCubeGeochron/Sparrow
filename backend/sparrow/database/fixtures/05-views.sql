@@ -154,10 +154,9 @@ SELECT
 	a0.id,
 	a0.parameter,
 	a0.value,
-	a1.id analysis_id,
-	a1.session_id
+	a1.id analysis_id
 FROM attribute a0
-JOIN analysis_attribute aa
+JOIN __analysis_attribute aa
   ON a0.id = aa.attribute_id
 JOIN analysis a1
   ON a1.id = aa.analysis_id;
