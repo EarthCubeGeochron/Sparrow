@@ -1,0 +1,36 @@
+@require "~app/shared/colors"
+
+.session-detail
+  color black
+
+.analysis-details
+  h3
+    margin-top 0
+  margin-bottom 1em
+  h4
+    margin-bottom 0
+    color $gray1
+
+.material
+  margin-bottom 0.5em
+  :global
+    .bp3-breadcrumb-current
+      font-weight inherit
+
+ul.data
+  list-style-type none
+  padding-left 0
+
+li.datum
+  font-size 16px
+  margin-bottom 0.5em
+  &>*
+    display inline-block
+  .title
+    font-weight 500
+    min-width 10em
+  .error
+    margin-left 0.5em
+    color $gray1
+  .error-metric
+    color $gray5

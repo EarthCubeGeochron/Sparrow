@@ -113,12 +113,7 @@ SELECT
   a.is_standard,
   a.is_bad,
   s.technique,
-  ( SELECT
-      tree
-    FROM
-      core_view.analysis_type_tree
-    WHERE id = a.analysis_type
-  ) analysis_type,
+  a.analysis_type,
   ( SELECT
       name
     FROM instrument

@@ -61,6 +61,9 @@ def build_description(argument):
         usage=usage
     )
 
+errors = dict(
+    TypeError=dict(message="Could not serialize JSON data"))
+
 class APIv1(API):
     """
     Version 1 API for Lab Data Interface
@@ -74,7 +77,7 @@ class APIv1(API):
     def __init__(self, database):
         self.db = database
         self.blueprint = Blueprint('api', __name__)
-        super().__init__(self.blueprint)
+        super().__init__(self.blueprint, errors=errors)
         self.route_descriptions = []
         self.create_description_model()
 
