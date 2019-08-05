@@ -133,10 +133,11 @@ class BaseImporter(object):
         return dt
 
     def analysis(self, type=None, **kwargs):
-        m = self.db.get_or_create(
-            self.m.analysis, **kwargs)
         if type is not None:
-            m._analysis_type = self.analysis_type(type)
+            type = self.analysis_type(type).id
+        m = self.db.get_or_create(
+            self.m.analysis, analysis_type=type, **kwargs)
+        self.db.session.flush()
         return m
 
     def add_analysis(self, session, type=None, **kwargs):

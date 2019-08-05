@@ -76,6 +76,7 @@ def construct_app(config=None, minimal=False):
     api.build_route("sample_data", schema='core_view')
     api.build_route("project", schema='core_view')
     api.build_route("material", schema='core_view')
+    api.build_route("attribute", schema='core_view')
 
     api.add_resource(AuthAPI, "/auth")
 
