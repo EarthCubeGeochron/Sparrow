@@ -6,8 +6,10 @@ from os import environ
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 
-from .util import md5hash, SparrowImportError, ensure_sequence
+from .util import md5hash, SparrowImportError, ensure_sequence, is_number, coalesce_nan
 from ..util import relative_path, pretty_print
+
+
 
 class BaseImporter(object):
     """
@@ -141,15 +143,41 @@ class BaseImporter(object):
         """Deprecated"""
         return self.analysis(session_id=session.id, type=type, **kwargs)
 
+    def attribute(self, analysis, parameter, value):
+        if value is None: return None
+        self.db.session.commit()
+        param = self.parameter(parameter)
+        attr = self.db.get_or_create(self.m.attribute,
+            parameter=param.id,
+            value=value)
+        analysis.attribute_collection.append(attr)
+        return attr
+
     def datum(self, analysis, parameter, value, error=None, **kwargs):
+        value = coalesce_nan(value)
+        if value is None: return None
         type = self.datum_type(parameter, **kwargs)
+        self.db.session.commit()
         datum = self.db.get_or_create(self.m.datum,
             analysis=analysis.id,
             type=type.id)
         datum.value = value
         datum.error = error
-
         return datum
+
+    def constant(self, analysis, parameter, value, error=None, **kwargs):
+        args = dict()
+        value = coalesce_nan(value)
+        if value is None: return None
+        type = self.datum_type(parameter, **kwargs).id
+        self.db.session.commit()
+        const = self.db.get_or_create(self.m.constant,
+            value = value,
+            error = error,
+            type = type.id)
+        analysis.constant_collection.append(const)
+        self.db.session.flush()
+        return const
 
     ###
     # Data file importing
