@@ -11,26 +11,46 @@
     margin-bottom 0
     color $gray1
 
+  .main
+    display flex
+    flex-direction row
+    margin 0 -1em
+    &>*
+      flex-grow 1
+      margin 0 1em
+
 .material
   margin-bottom 0.5em
   :global
     .bp3-breadcrumb-current
       font-weight inherit
 
-ul.data
+ul.data,ul.attributes,ul.values
   list-style-type none
   padding-left 0
 
-li.datum
+li.datum,li.attribute
   font-size 16px
   margin-bottom 0.5em
-  &>*
-    display inline-block
-  .title
+  .title,.parameter
     font-weight 500
     min-width 10em
+
+li.datum
+  &>*
+    display inline-block
+  .value
+    margin-left 1em
   .error
     margin-left 0.5em
     color $gray1
   .error-metric
     color $gray5
+
+li.attribute
+  display flex
+  flex-direction row
+  ul.values
+    margin-left 1em
+    padding-left 0px
+    //flex-grow 1

@@ -5,6 +5,7 @@ import {Card, Breadcrumbs} from '@blueprintjs/core'
 import {APIResultView} from '@macrostrat/ui-components'
 import ReactJson from 'react-json-view'
 import {format} from 'd3-format'
+import {group} from 'd3-array'
 
 fmt = format(".3g")
 
@@ -23,10 +24,29 @@ Material = (props)->
     h Breadcrumbs, {items}
   ]
 
+
+AnalysisAttributes = (props)->
+  {analysis_id} = props
+  h APIResultView, {route: "/attribute", params: {analysis_id}, placeholder: null }, (data)=>
+    return null unless data?
+    return null if data.length == 0
+    groupedData = group data, (d)->d.parameter
+
+    h "div.attributes", [
+      h "h4", "Attributes"
+      h "ul.attributes", null, Array.from groupedData, ([k,v])->
+        h "li.attribute", [
+          h 'span.parameter', "#{k}:"
+          h 'ul.values', v.map (d)->
+            h 'li.value', d.value
+        ]
+    ]
+
+
 Datum = (props)->
   {value: d} = props
   h 'li.datum.bp3-text', [
-    h 'span.title', "#{d.parameter}:"
+    h 'span.parameter', "#{d.parameter}:"
     " "
     h 'span.value', fmt(d.value)
     h.if(d.error?) 'span.error', [
@@ -42,14 +62,19 @@ Datum = (props)->
 
 AnalysisDetails = (props)->
   {data: a} = props
+  {analysis_id} = a
 
   h Card, {className: 'analysis-details'}, [
-    h 'div.id', a.id
     h.if(a.analysis_type?) 'h3.analysis-type', toTitleCase(a.analysis_type)
     h Material, {data: a.material}
-    h 'h4', "Data"
-    h 'ul.data', a.data.map (d)->
-      h Datum, {value: d}
+    h 'div.main', [
+      h 'div.data', [
+        h 'h4', "Data"
+        h 'ul.data', a.data.map (d)->
+          h Datum, {value: d}
+      ]
+      h AnalysisAttributes, {analysis_id}
+    ]
   ]
 
 SessionDetails = (props)->
