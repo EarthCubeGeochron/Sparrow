@@ -260,10 +260,10 @@ class APIv1(API):
                     headers = {'x-total-count': count}
                     return response, status, headers
 
-                except:
+                except Exception as err:
                     db.session.rollback()
                     # Better error handling is a must here
-                    return jsonify(error='Query Error'), 410
+                    return abort(410, error_message='Query Error')
 
 
         class RecordModel(Resource):
