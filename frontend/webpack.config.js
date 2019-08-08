@@ -11,7 +11,7 @@ let siteContent = process.env.SPARROW_SITE_CONTENT;
 
 console.log("Site content:", siteContent);
 
-let assetsRoute = path.join(process.env.SPARROW_BASE_URL,'/assets');
+let assetsRoute = path.join(process.env.SPARROW_BASE_URL,'/assets/');
 
 let bs_cfg = {
   open: false,
@@ -98,7 +98,12 @@ module.exports = {
       {
         test: /\.(png|jpe?g|gif)$/i,
         use: [
-          {loader: 'file-loader'},
+          {
+            loader: 'file-loader',
+            options: {
+              useRelativePath: true
+            }
+          },
         ],
       },
     ]
