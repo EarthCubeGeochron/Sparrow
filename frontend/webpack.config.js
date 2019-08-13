@@ -9,7 +9,9 @@ process.env['BASE_URL'] = process.env.SPARROW_BASE_URL;
 let assetsDir = path.resolve(__dirname, "_assets");
 let siteContent = process.env.SPARROW_SITE_CONTENT;
 
-let assetsRoute = path.join(process.env.SPARROW_BASE_URL,'/assets');
+console.log("Site content:", siteContent);
+
+let assetsRoute = path.join(process.env.SPARROW_BASE_URL,'/assets/');
 
 let bs_cfg = {
   open: false,
@@ -92,7 +94,18 @@ module.exports = {
       {test: /\.(js|jsx)$/, use: [ jsLoader ], exclude: /node_modules/ },
       {test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader]},
       {test: /\.md$/, use: ["html-loader","markdown-loader"]},
-      {test: /\.html$/, use: ["html-loader"]}
+      {test: /\.html$/, use: ["html-loader"]},
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              useRelativePath: true
+            }
+          },
+        ],
+      },
     ]
   },
   devtool: 'source-map',
