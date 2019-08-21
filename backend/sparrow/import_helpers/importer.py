@@ -183,12 +183,12 @@ class BaseImporter(object):
         args = dict()
         value = coalesce_nan(value)
         if value is None: return None
-        type = self.datum_type(parameter, **kwargs).id
+        type = self.datum_type(parameter, **kwargs)
         self.db.session.commit()
         const = self.db.get_or_create(self.m.constant,
-            value = value,
-            error = error,
-            type = type.id)
+            value=value,
+            error=error,
+            type=type.id)
         analysis.constant_collection.append(const)
         self.db.session.flush()
         return const
