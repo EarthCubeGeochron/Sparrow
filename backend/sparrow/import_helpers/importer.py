@@ -51,6 +51,10 @@ class BaseImporter(object):
         # Deprecated
         self.models = self.m
 
+    def add(self, *models):
+        for model in models:
+            self.db.session.add(model)
+
     ###
     # Helpers to insert various types of analytical data
     ###
@@ -73,21 +77,30 @@ class BaseImporter(object):
 
     ## Vocabulary
 
-    def unit(self, id):
-        return self.db.get_or_create(
+    def unit(self, id, description=None):
+        u = self.db.get_or_create(
             self.m.vocabulary_unit,
             id=id, defaults=dict(authority=self.authority))
+        if u is not None:
+            u.description = description
+        return u
 
-    def error_metric(self, id):
+    def error_metric(self, id, description=None):
         if not id: return None
-        return self.db.get_or_create(
+        em = self.db.get_or_create(
             self.m.vocabulary_error_metric,
             id=id, defaults=dict(authority=self.authority))
+        if description is not None:
+            em.description = description
+        return em
 
-    def parameter(self, id):
-        return self.db.get_or_create(
+    def parameter(self, id, description=None):
+        p = self.db.get_or_create(
             self.m.vocabulary_parameter,
             id=id, defaults=dict(authority=self.authority))
+        if description is not None:
+            p.description = description
+        return p
 
     def method(self, id):
         return self.db.get_or_create(
