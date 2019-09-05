@@ -3,82 +3,29 @@ import {Component} from 'react'
 import {Callout, Icon, Card, InputGroup, Menu, MenuItem, Popover, Button, Position} from '@blueprintjs/core'
 import {PagedAPIView, StatefulComponent} from '@macrostrat/ui-components'
 import {SessionInfoLink} from './session-component/info-card'
+import {FilterListComponent} from '../components/filter-list'
 
-class SessionListComponent extends StatefulComponent
-  @defaultProps: {
-    apiEndpoint: '/session'
-    filterFields: {
-      'sample_name': "Sample"
-      'project_name': "Project"
-      'target': "Material"
-      'instrument_name': "Instrument"
-      'technique': "Technique"
-      'measurement_group_id': 'Group'
-    }
+SessionListComponent = ->
+  route = '/session'
+  filterFields = {
+    'sample_name': "Sample"
+    'project_name': "Project"
+    'target': "Material"
+    'instrument_name': "Instrument"
+    'technique': "Technique"
+    'measurement_group_id': 'Group'
   }
-  constructor: (props)->
-    super props
-    @state = {
-      filter: ''
-      field: 'sample_name'
-      isSelecting: false
+
+  h 'div.data-view#session-list', [
+    h Callout, {
+      icon: 'info-sign',
+      title: "Analytical sessions"
+    }, "This page lists analytical sessions (individual instrument runs on a single sample)"
+    h FilterListComponent, {
+      route,
+      filterFields,
+      itemComponent: SessionInfoLink
     }
-
-  updateFilter: (event)=>
-    {value} = event.target
-    @updateState {filter: {$set: value}}
-
-  render: ->
-    {apiEndpoint, filterFields} = @props
-    {filter, field} = @state
-    params = {}
-    if filter? and filter != ""
-      val = "%#{filter}%"
-      params = {[field]: val}
-
-    params['private'] = true
-
-
-    menuItems = []
-    onClick = (k)=> => @updateState {
-      field: {$set: k}
-      filter: {$set: ''}
-    }
-
-    for k,v of filterFields
-      menuItems.push h Button, {minimal: true, onClick: onClick(k)}, v
-
-    content = h Menu, menuItems
-    position = Position.BOTTOM_RIGHT
-
-    rightElement = h Popover, {content, position}, [
-      h Button, {minimal: true, rightIcon: "caret-down"}, filterFields[field]
-    ]
-
-    filterBox = h InputGroup, {
-      leftIcon: 'search'
-      placeholder: "Filter values"
-      value: @state.filter
-      onChange: @updateFilter
-      rightElement
-    }
-
-
-    h 'div.data-view#session-list', [
-      h Callout, {
-        icon: 'info-sign',
-        title: "Analytical sessions"
-      }, "This page contains the core data view for laboratory analytical data"
-      h PagedAPIView, {
-        className: 'data-frame'
-        extraPagination: filterBox
-        params
-        route: apiEndpoint
-        topPagination: true
-        bottomPagination: true
-        perPage: 10
-      }, (data)->
-        h 'div', null, data.map (d)-> h(SessionInfoLink, d)
-    ]
+  ]
 
 export {SessionListComponent}

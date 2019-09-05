@@ -10,7 +10,7 @@ import {AuthContext} from 'app/auth/context'
 import {ProjectListComponent} from './project-component'
 import {SessionListComponent} from './session-list-component'
 import {SessionComponent} from './session-component'
-import {SampleList} from './sample-list'
+import {SampleMain} from './sample'
 
 import {AppNavbar, NavButton} from 'app/shared/navbar'
 import {InsetText} from 'app/layout'
@@ -27,13 +27,19 @@ HomeButton = (props)->
     props...
   }
 
-AdminNavbar = ({base, rest...})->
-  h 'div.minimal-navbar', {rest..., subtitle: 'Admin'}, [
-    h 'h4', "Admin"
-    h HomeButton, {to: base, exact: true}
+AdminNavLinks = ({base, rest...})->
+  h [
     h NavButton, {to: base+'/project'}, "Projects"
     h NavButton, {to: base+'/sample'}, "Samples"
     h NavButton, {to: base+'/session'}, "Sessions"
+  ]
+
+AdminNavbar = ({base, rest...})->
+  # A standalone navbar for the admin panel, can be enabled by default
+  h 'div.minimal-navbar', {rest..., subtitle: 'Admin'}, [
+    h 'h4', "Admin"
+    h HomeButton, {to: base, exact: true}
+    h AdminNavLinks, {base}
   ]
 
 SessionMatch = ({match})->
@@ -74,12 +80,12 @@ class AdminBody extends Component
         component: SessionListComponent
       }
       h Route, {
-        path: base+"/sample"
-        component: SampleList
-      }
-      h Route, {
         path: base+"/project"
         component: ProjectListComponent
+      }
+      h Route, {
+        path: base+"/sample"
+        component: SampleMain
       }
       h Route, {
         path: base
@@ -90,8 +96,7 @@ class AdminBody extends Component
 
 class Admin extends Component
   render: ->
-    {match} = @props
-    base = match.path
+    base = "/admin"
     h 'div#labdata-admin', [
       h AdminNavbar, {base}
       h AdminBody, {base}

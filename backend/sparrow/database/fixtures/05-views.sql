@@ -29,6 +29,32 @@ SELECT DISTINCT ON (id)
 FROM __r
 ORDER BY id,n_levels DESC;
 
+/* Nested list of analysis type, ordered from
+   most specific to most general */
+CREATE VIEW core_view.analysis_type_tree AS
+WITH RECURSIVE __r (id, type_of, hierarchy, n_levels) AS (
+SELECT
+  id::text,
+  type_of,
+  ARRAY[id]::text[] hierarchy,
+  1 n_levels
+FROM vocabulary.analysis_type m -- non-recursive term
+UNION ALL
+SELECT
+  __r.id,
+  m2.type_of,
+  hierarchy || m2.id::text,
+  n_levels + 1
+FROM __r -- recursive term
+JOIN vocabulary.analysis_type m2
+  ON __r.type_of = m2.id
+)
+SELECT DISTINCT ON (id)
+	id,
+	hierarchy tree
+FROM __r
+ORDER BY id,n_levels DESC;
+
 /*
 A session view with some extra features
 */
@@ -87,6 +113,7 @@ SELECT
   a.is_standard,
   a.is_bad,
   s.technique,
+  a.analysis_type,
   ( SELECT
       name
     FROM instrument
@@ -116,6 +143,18 @@ JOIN session s
 JOIN sample sa
   ON s.sample_id = sa.id
 ORDER BY a.id;
+
+CREATE VIEW core_view.attribute AS
+SELECT
+	a0.id,
+	a0.parameter,
+	a0.value,
+	a1.id analysis_id
+FROM attribute a0
+JOIN __analysis_attribute aa
+  ON a0.id = aa.attribute_id
+JOIN analysis a1
+  ON a1.id = aa.analysis_id;
 
 CREATE VIEW core_view.datum AS
 SELECT

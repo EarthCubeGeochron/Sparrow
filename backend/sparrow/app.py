@@ -5,7 +5,9 @@ from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
 from flask_jwt_extended import JWTManager
 from sqlalchemy.exc import NoSuchTableError
+from flask_graphql import GraphQLView
 
+from .graph import build_schema
 from .encoders import JSONEncoder
 from .api import APIv1
 from .auth import AuthAPI
@@ -39,6 +41,16 @@ class App(Flask):
         self.db = Database(self)
         return self.db
 
+    def setup_graphql(self):
+        ctx = dict(session=self.database.session)
+        s = build_schema(self.database)
+        view_func = GraphQLView.as_view('graphql',
+            schema=s,
+            graphiql=True,
+            context=ctx)
+
+        self.add_url_rule('/graphql', view_func=view_func)
+
 def construct_app(config=None, minimal=False):
     # Should allow configuration of template path
     app = App(__name__, config=config,
@@ -64,6 +76,7 @@ def construct_app(config=None, minimal=False):
     api.build_route("sample_data", schema='core_view')
     api.build_route("project", schema='core_view')
     api.build_route("material", schema='core_view')
+    api.build_route("attribute", schema='core_view')
 
     api.add_resource(AuthAPI, "/auth")
 
@@ -78,6 +91,8 @@ def construct_app(config=None, minimal=False):
     app.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
 
     app.register_blueprint(web, url_prefix='/')
+
+    app.setup_graphql()
 
     # If we're serving on a low-key webserver and we
     # want to just serve assets without a file server...
