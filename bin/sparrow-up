@@ -7,6 +7,11 @@ if [ ! -f frontend/bundled-deps/ui-components/.git ]; then
   git submodule update --init --recursive
 fi
 
+# Clear container logs so we don't get old output
+for c in $(docker-compose ps -q); do
+  #echo "" > $(docker inspect --format='{{.LogPath}}' "$c")
+  docker inspect --format='{{.LogPath}}' "$c"
+done
 sparrow compose up --force-recreate --build -d $@
 # Follow logs for running container(s)
 sparrow compose logs -f $@
