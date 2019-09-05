@@ -7,10 +7,10 @@ from sqlalchemy.orm.query import Query
 from graphene.relay import Connection, ConnectionField
 from graphene.relay.connection import PageInfo
 from graphql_relay.connection.arrayconnection import connection_from_list_slice
+from graphene_sqlalchemy import SQLAlchemyConnectionField
+from flask_jwt_extended import jwt_required
 
 from .filters import filter_class_for_module, Filter
-
-from graphene_sqlalchemy import SQLAlchemyConnectionField
 
 class FilterableConnectionField(SQLAlchemyConnectionField):
     def __init__(self, type, *args, **kwargs):
@@ -21,7 +21,10 @@ class FilterableConnectionField(SQLAlchemyConnectionField):
             del kwargs["filter"]
         super(FilterableConnectionField, self).__init__(type, *args, **kwargs)
 
+    # For now, we require logged-in state to use ANY graphql API functions.
+    # This could change for compatibility with the REST API.
     @classmethod
+    @jwt_required
     def get_query(cls, model, info, filter=None, **kwargs):
         query = super(FilterableConnectionField, cls).get_query(model, info, **kwargs)
         if filter:
