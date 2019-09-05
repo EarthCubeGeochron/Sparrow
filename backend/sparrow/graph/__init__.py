@@ -5,6 +5,7 @@ from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .filterable_query import FilterableConnectionField
 
 # https://github.com/alexisrolland/flask-graphene-sqlalchemy/wiki/Flask-Graphene-SQLAlchemy-Tutorial
+# https://github.com/flavors/django-graphql-jwt/issues/6
 
 connection_fields = dict()
 
