@@ -26,9 +26,9 @@ Expander = styled.div"""
 flex-grow: 1;
 """
 
-MainNavbar = ->
+MainNavbar = (props)->
   h AppNavbar, {fullTitle: true}, [
-    h NavButton, {to: '/admin'}, "Admin"
+    h NavButton, {to: '/data'}, "Data"
     h NavButton, {to: '/api-explorer/v1'}, "API Explorer"
   ]
 
@@ -45,7 +45,10 @@ class AppMain extends Component
               exact: true,
               render: -> h HomePage
             }
-            h Route, {path: '/admin', component: Admin}
+            h Route, {
+              path: '/data',
+              render: -> h Admin, {base: '/data'}
+            }
             h Route, {path: '/api-explorer', component: APIExplorer}
           ]
         ]

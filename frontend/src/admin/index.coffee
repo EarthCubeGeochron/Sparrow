@@ -3,6 +3,7 @@ import {Component} from 'react'
 import {NonIdealState, Intent, Button, ButtonGroup, Icon} from '@blueprintjs/core'
 import {Route, Switch} from 'react-router-dom'
 import classNames from 'classnames'
+import T from 'prop-types'
 
 import {LinkButton} from '@macrostrat/ui-components'
 import {Frame} from 'app/frame'
@@ -95,8 +96,13 @@ class AdminBody extends Component
     ]
 
 class Admin extends Component
+  # An admin component that is nested
+  # and access-controlled beneath the root
+  @propTypes: {
+    base: T.string.isRequired
+  }
   render: ->
-    base = "/admin"
+    {base} = @props
     h 'div#labdata-admin', [
       h AdminNavbar, {base}
       h AdminBody, {base}
