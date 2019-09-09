@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 # Description: Run tests for Sparrow
 
+# This should be run in a separate container eventually
 sparrow compose run backend tavern-ci test_minimal.tavern.yaml

@@ -7,3 +7,4 @@ _docker
 .pyenv/
 .DS_STORE
 .cache/
+.pytest_cache
