@@ -66,7 +66,7 @@ errors = dict(
 
 class APIv1(API):
     """
-    Version 1 API for Lab Data Interface
+    Version 1 API for Sparrow
 
     Includes functionality for autogenerating routes
     from database tables and views.

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Description: Run tests for Sparrow
+
+sparrow exec backend tavern-ci test_minimal.tavern.yaml
