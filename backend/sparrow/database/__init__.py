@@ -1,7 +1,7 @@
 from click import echo, secho
 from os import environ
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, inspect, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.schema import Table, ForeignKey, Column
@@ -59,6 +59,7 @@ class Database:
         self.automap_base = None
         self.__model_collection__ = None
         self.__table_collection__ = None
+        self.__inspector__ = None
         # We're having trouble lazily automapping
         try:
             self.automap()
@@ -124,11 +125,25 @@ class Database:
     def automap_view(db, table_name, *column_args, **kwargs):
         """
         Views cannot be directly automapped, because they don't have primary keys.
-        So we have to use a workaround of specifying a primary key ourselves
+        So we have to use a workaround of specifying a primary key ourselves.
         """
         tbl = db.reflect_table(table_name, *column_args, **kwargs)
         name = classname_for_table(tbl)
         return type(name, (Base,), dict(__table__ = tbl))
+
+    @property
+    def inspector(self):
+        if self.__inspector__ is None:
+            self.__inspector__ = inspect(self.engine)
+        return self.__inspector__
+
+    def entity_names(self, **kwargs):
+        """
+        Returns an iterator of names of *schema objects*
+        (both tables and views) from a the database.
+        """
+        yield from self.inspector.get_table_names(**kwargs)
+        yield from self.inspector.get_view_names(**kwargs)
 
     @property
     def table(self):
