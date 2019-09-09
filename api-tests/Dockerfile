@@ -1,0 +1,15 @@
+FROM sparrowdata/backend-base:1.0
+
+## This should probably go in backend-base
+RUN apk add --no-cache bash
+
+RUN pip3 install --upgrade pip
+COPY ./requirements.txt /install/requirements.txt
+RUN pip3 install --no-cache-dir -r /install/requirements.txt
+
+WORKDIR /api-tests
+
+## Copy API testing data (this could maybe go elsewhere)
+COPY ./*.tavern.yaml /api-tests
+
+CMD ["/bin/run"]
