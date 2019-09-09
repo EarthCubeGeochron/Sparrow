@@ -1,10 +1,19 @@
-test_name: Get some fake data from the JSON placeholder API
+test_name: Test basic API
 stages:
-  - name: Make sure we have the right ID
+  - name: Make sure that API is accessible
     request:
-      url: https://jsonplaceholder.typicode.com/posts/1
+      url: http://backend/api/v1/datum
+      method: GET
+    response:
+      status_code: 200
+  - name: Description page is accessible
+    request:
+      url: http://backend/api/v1
       method: GET
     response:
       status_code: 200
       body:
-        id: 1
+        routes:
+          - route: '/session'
+          - route: '/analysis'
+          - route: '/datum'
