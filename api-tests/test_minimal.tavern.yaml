@@ -2,7 +2,7 @@ test_name: Test basic API
 stages:
   - name: Make sure that API is accessible
     request:
-      url: http://backend/api/v1/datum
+      url: http://backend:5000/api/v1/datum
       method: GET
     response:
       status_code: 200
