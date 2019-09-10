@@ -19,9 +19,6 @@ EXPOSE 5000
 RUN mkdir /app
 WORKDIR /app
 
-## Copy API testing data (this could maybe go elsewhere)
-COPY ./test_minimal.tavern.yaml /app
-
 ## Copy app core
 COPY ./setup.py /app
 COPY ./sparrow /app/sparrow
