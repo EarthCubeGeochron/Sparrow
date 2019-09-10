@@ -1,5 +1,6 @@
 import requests
 import pytest
+from schema import Schema
 
 def get(url, *args, **kwargs):
     uri = "http://backend:5000/api/v1"+url
@@ -18,7 +19,14 @@ def test_api_base_exists(path):
     body = res.json()
     assert 'routes' in body
 
+    # Test that routes info dict matches expected structure
+    Schema([{
+        'route': str,
+        'description': str,
+        str: object
+    }]).validate(body['routes'])
 
-def test_datum_exists():
-    res = get("/datum")
+@pytest.mark.parametrize("route", routes)
+def test_basic_route_exists(route):
+    res = get(route)
     assert res.status_code == 200
