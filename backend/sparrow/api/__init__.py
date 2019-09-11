@@ -66,7 +66,7 @@ errors = dict(
 
 class APIv1(API):
     """
-    Version 1 API for Lab Data Interface
+    Version 1 API for Sparrow
 
     Includes functionality for autogenerating routes
     from database tables and views.
@@ -263,8 +263,12 @@ class APIv1(API):
                 except Exception as err:
                     db.session.rollback()
                     # Better error handling is a must here
-                    return abort(410, error_message='Query Error')
-
+                    print(str(err))
+                    return abort(410,
+                        error_message='Query Error',
+                        debug_message=str(err))
+                finally:
+                    db.session.close()
 
         class RecordModel(Resource):
             @jwt_required
