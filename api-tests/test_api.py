@@ -30,3 +30,11 @@ def test_api_base_exists(path):
 def test_basic_route_exists(route):
     res = get(route)
     assert res.status_code == 200
+
+def test_api_sustained_load():
+    """
+    API currently fails on large numbers of requests
+    """
+    for i in range(200):
+        res = get("/sample", params=dict(geometry="%"))
+        assert res.status_code == 200
