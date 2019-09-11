@@ -6,7 +6,7 @@ for data in the **Sparrow** system.
 */
 
 CREATE TABLE IF NOT EXISTS researcher (
-  id integer PRIMARY KEY,
+  id serial PRIMARY KEY,
   name text NOT NULL,
   orcid text UNIQUE
 );
@@ -28,6 +28,27 @@ CREATE TABLE IF NOT EXISTS publication (
   doi text NOT NULL,
   title text
 );
+
+/*
+# Enums
+*/
+CREATE TABLE IF NOT EXISTS enum.date_precision (
+  id text PRIMARY KEY
+);
+
+INSERT INTO enum.date_precision(id) VALUES
+  ('year'),
+  ('month'),
+  ('day')
+ON CONFLICT DO NOTHING;
+
+
+/*
+# Vocabularies
+
+Controlled vocabularies for terms defining data
+semantics.
+*/
 
 CREATE TABLE IF NOT EXISTS vocabulary.parameter (
   id text PRIMARY KEY,
@@ -59,6 +80,14 @@ CREATE TABLE IF NOT EXISTS vocabulary.error_metric (
   id text PRIMARY KEY,
   description text,
   authority text
+);
+
+-- Conceptually, this could be combined with `method`...
+CREATE TABLE IF NOT EXISTS vocabulary.analysis_type (
+  id text PRIMARY KEY,
+  description text,
+  authority text,
+  type_of text REFERENCES vocabulary.analysis_type(id)
 );
 
 /*
@@ -176,6 +205,8 @@ CREATE TABLE IF NOT EXISTS session (
   publication_id integer REFERENCES publication(id),
   date timestamp NOT NULL,
   end_date timestamp,
+  date_precision text REFERENCES enum.date_precision(id),
+  name text, -- This column can store an (optional) internal lab id
   instrument integer REFERENCES instrument(id),
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
@@ -212,7 +243,7 @@ CREATE TABLE IF NOT EXISTS analysis (
     unique identification of a record within the session */
   analysis_name text,
   -- Should key this to a foreign key table
-  analysis_type text,
+  analysis_type text REFERENCES vocabulary.analysis_type(id),
   date timestamp,
   material text REFERENCES vocabulary.material(id),
   /* Not really sure that "material" is the best parameterization
@@ -235,11 +266,12 @@ CREATE TABLE IF NOT EXISTS analysis (
   UNIQUE (session_id, session_index, analysis_name)
 );
 
+
 CREATE TABLE IF NOT EXISTS datum (
   id serial PRIMARY KEY,
   analysis integer REFERENCES analysis(id)
     ON DELETE CASCADE,
-  type integer REFERENCES datum_type(id),
+  type integer REFERENCES datum_type(id) NOT NULL,
   value numeric NOT NULL,
   error numeric,
   is_bad boolean,
@@ -257,12 +289,38 @@ CREATE TABLE IF NOT EXISTS datum (
 );
 
 /*
+## Attributes
+
+Text attributes associated with analyses (e.g.
+standard names, calibration types). These should
+be numerical, unitless values.
+*/
+CREATE TABLE IF NOT EXISTS attribute (
+  id serial PRIMARY KEY,
+  parameter text REFERENCES vocabulary.parameter(id) NOT NULL,
+  value text NOT NULL,
+  UNIQUE (value, parameter)
+);
+
+CREATE TABLE IF NOT EXISTS __analysis_attribute (
+  analysis_id integer NOT NULL REFERENCES analysis(id),
+  attribute_id integer NOT NULL REFERENCES attribute(id),
+  PRIMARY KEY (analysis_id, attribute_id)
+);
+
+CREATE TABLE IF NOT EXISTS __session_attribute (
+  session_id integer NOT NULL REFERENCES session(id),
+  attribute_id integer NOT NULL REFERENCES attribute(id),
+  PRIMARY KEY (session_id, attribute_id)
+);
+
+/*
 ## Analytical constants
 
 Constants, etc. used in measurements, and their relationships
-to individual analytical sessions, etc.
+to individual analyses, etc.
 
-Right now, we support linking these parameters at the session
+Right now, we support linking these parameters at the analysis
 level. Some coarser (e.g. a table for analytical process) or finer
 (linked parameters for each datum) abstraction might be desired.
 
@@ -274,17 +332,16 @@ CREATE TABLE IF NOT EXISTS constant (
   that remain constant across many sessions
   (e.g. decay constants, assumed physical parameters). */
   id serial PRIMARY KEY,
-  text_value text UNIQUE,
-  value numeric,
+  value numeric NOT NULL,
   error numeric,
-  type integer REFERENCES datum_type(id),
-  CHECK ((text_value IS NULL) OR (value IS NULL AND error IS NULL))
+  type integer REFERENCES datum_type(id) NOT NULL,
+  description text
 );
 
-CREATE TABLE IF NOT EXISTS constant_link (
+CREATE TABLE IF NOT EXISTS __analysis_constant (
+  analysis_id integer NOT NULL REFERENCES analysis(id),
   constant_id integer NOT NULL REFERENCES constant(id),
-  session_id integer NOT NULL REFERENCES session(id),
-  PRIMARY KEY (constant_id, session_id)
+  PRIMARY KEY (analysis_id, constant_id)
 );
 
 /*

@@ -14,5 +14,10 @@ outdb_conn="postgresql://postgres@db/$outdb"
 createdb -Upostgres -h db "$outdb" > /dev/null 2>&1
 SPARROW_DATABASE="$outdb_conn" sparrow init >/dev/null 2>&1
 
-migra "$indb_conn" "$outdb_conn" --unsafe
+if [ "$1" = '--safe' ]; then
+  migra "$indb_conn" "$outdb_conn" --unsafe \
+  | grep -v -e "^drop" | grep '\S'
+else
+  migra "$indb_conn" "$outdb_conn" --unsafe
+fi
 dropdb -Upostgres -h db "$outdb" > /dev/null 2>&1

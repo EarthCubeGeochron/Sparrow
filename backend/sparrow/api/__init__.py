@@ -61,9 +61,12 @@ def build_description(argument):
         usage=usage
     )
 
+errors = dict(
+    TypeError=dict(message="Could not serialize JSON data"))
+
 class APIv1(API):
     """
-    Version 1 API for Lab Data Interface
+    Version 1 API for Sparrow
 
     Includes functionality for autogenerating routes
     from database tables and views.
@@ -74,7 +77,7 @@ class APIv1(API):
     def __init__(self, database):
         self.db = database
         self.blueprint = Blueprint('api', __name__)
-        super().__init__(self.blueprint)
+        super().__init__(self.blueprint, errors=errors)
         self.route_descriptions = []
         self.create_description_model()
 
@@ -257,11 +260,15 @@ class APIv1(API):
                     headers = {'x-total-count': count}
                     return response, status, headers
 
-                except:
+                except Exception as err:
                     db.session.rollback()
                     # Better error handling is a must here
-                    return jsonify(error='Query Error'), 410
-
+                    print(str(err))
+                    return abort(410,
+                        error_message='Query Error',
+                        debug_message=str(err))
+                finally:
+                    db.session.close()
 
         class RecordModel(Resource):
             @jwt_required

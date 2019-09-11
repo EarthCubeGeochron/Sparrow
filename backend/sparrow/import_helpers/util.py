@@ -1,4 +1,5 @@
 from hashlib import md5
+from numpy import isnan
 
 class SparrowImportError(Exception):
     pass
@@ -18,3 +19,15 @@ def ensure_sequence(possible_iterator):
         return iter(possible_iterator)
     except TypeError:
         return [possible_iterator]
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+def coalesce_nan(value):
+    if isnan(value):
+        return None
+    return value

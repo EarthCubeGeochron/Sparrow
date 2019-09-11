@@ -6,6 +6,7 @@ import {Frame} from 'app/frame'
 
 import {GeoDeepDiveCard} from './gdd-card'
 import {SessionInfoCard} from './info-card'
+import {SessionDetailPanel} from './detail-panel'
 import {APIResultView} from '@macrostrat/ui-components'
 
 class DownloadButton extends Component
@@ -40,13 +41,12 @@ class SessionComponent extends Component
         params: {id, private: true}
       }, (data)=>
         res = data[0]
-        {sample_name} = res
+        {sample_name, id, rest...} = res
         h 'div', [
           h SessionInfoCard, res
-          h Frame, {id: 'sessionDetail', session_id: id}, (
-            h 'div', "This is where a session detail component would go"
-          )
-          h Frame, {id: 'dataFileDownloadButton', res...}, (props)=>
+          h Frame, {id: 'sessionDetail', session_id: id}, (props)=>
+            h SessionDetailPanel, props
+          h Frame, {id: 'dataFileDownloadButton', rest...}, (props)=>
             h DownloadButton, props
           h GeoDeepDiveCard, {sample_id: sample_name}
         ]

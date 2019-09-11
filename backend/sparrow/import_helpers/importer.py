@@ -6,8 +6,10 @@ from os import environ
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 
-from .util import md5hash, SparrowImportError, ensure_sequence
+from .util import md5hash, SparrowImportError, ensure_sequence, is_number, coalesce_nan
 from ..util import relative_path, pretty_print
+
+
 
 class BaseImporter(object):
     """
@@ -18,6 +20,8 @@ class BaseImporter(object):
         self.db = db
         self.m = self.db.model
         print_sql = kwargs.pop("print_sql", False)
+        # We shouldn't have to do this,
+        #self.db.automap()
 
         # This is kinda unsatisfying
         self.basedir = environ.get("SPARROW_DATA_DIR", None)
@@ -64,31 +68,49 @@ class BaseImporter(object):
     def project(self, name):
         return self.db.get_or_create(self.m.project, name=name)
 
+    def researcher(self, **kwargs):
+        return self.db.get_or_create(self.m.researcher, **kwargs)
+
+    ## Vocabulary
+
     def unit(self, id):
         return self.db.get_or_create(
-            self.m.unit,
+            self.m.vocabulary_unit,
             id=id, defaults=dict(authority=self.authority))
 
     def error_metric(self, id):
         if not id: return None
         return self.db.get_or_create(
-            self.m.error_metric,
+            self.m.vocabulary_error_metric,
             id=id, defaults=dict(authority=self.authority))
 
     def parameter(self, id):
         return self.db.get_or_create(
-            self.m.parameter,
+            self.m.vocabulary_parameter,
             id=id, defaults=dict(authority=self.authority))
 
     def method(self, id):
         return self.db.get_or_create(
-            self.m.method,
+            self.m.vocabulary_method,
             id=id, defaults=dict(authority=self.authority))
 
-    def material(self, id):
-        return self.db.get_or_create(
-            self.m.material,
+    def material(self, id, type_of=None):
+        if id is None: return None
+        m = self.db.get_or_create(
+            self.m.vocabulary_material,
             id=id, defaults=dict(authority=self.authority))
+        if type_of is not None:
+            m._material = self.material(type_of)
+        return m
+
+    def analysis_type(self, id, type_of= None):
+        m = self.db.get_or_create(
+            self.m.vocabulary_analysis_type,
+            id=id,
+            defaults=dict(authority=self.authority))
+        if type_of is not None:
+            m._analysis_type = self.analysis_type(type_of)
+        return m
 
     def datum_type(self, parameter, unit='unknown', error_metric=None, **kwargs):
         error_metric = self.error_metric(error_metric)
@@ -110,21 +132,53 @@ class BaseImporter(object):
             **kwargs)
         return dt
 
-    def add_analysis(self, session, **kwargs):
-        return self.db.get_or_create(
-            self.m.analysis,
-            session_id=session.id,
-            **kwargs
-        )
+    def analysis(self, type=None, **kwargs):
+        if type is not None:
+            type = self.analysis_type(type).id
+        m = self.db.get_or_create(
+            self.m.analysis, analysis_type=type, **kwargs)
+        self.db.session.flush()
+        return m
+
+    def add_analysis(self, session, type=None, **kwargs):
+        """Deprecated"""
+        return self.analysis(session_id=session.id, type=type, **kwargs)
+
+    def attribute(self, analysis, parameter, value):
+        if value is None: return None
+        self.db.session.commit()
+        param = self.parameter(parameter)
+        attr = self.db.get_or_create(self.m.attribute,
+            parameter=param.id,
+            value=value)
+        analysis.attribute_collection.append(attr)
+        return attr
 
     def datum(self, analysis, parameter, value, error=None, **kwargs):
-            type = self.datum_type(parameter, **kwargs)
-            datum = self.db.get_or_create(self.m.datum,
-                type=type.id, analysis=analysis.id)
-            datum.value = value
-            datum.error = error
+        value = coalesce_nan(value)
+        if value is None: return None
+        type = self.datum_type(parameter, **kwargs)
+        self.db.session.commit()
+        datum = self.db.get_or_create(self.m.datum,
+            analysis=analysis.id,
+            type=type.id)
+        datum.value = value
+        datum.error = error
+        return datum
 
-            return datum
+    def constant(self, analysis, parameter, value, error=None, **kwargs):
+        args = dict()
+        value = coalesce_nan(value)
+        if value is None: return None
+        type = self.datum_type(parameter, **kwargs).id
+        self.db.session.commit()
+        const = self.db.get_or_create(self.m.constant,
+            value = value,
+            error = error,
+            type = type.id)
+        analysis.constant_collection.append(const)
+        self.db.session.flush()
+        return const
 
     ###
     # Data file importing
@@ -177,6 +231,7 @@ class BaseImporter(object):
         added = rec is None
         if added:
             rec = self.m.data_file(file_hash=hash)
+            self.db.session.add(rec)
         self.__set_file_info(fn, rec)
         return rec, added
 
@@ -225,7 +280,7 @@ class BaseImporter(object):
         except (SparrowImportError, NotImplementedError, IntegrityError) as err:
             self.db.session.rollback()
             self.__track_model(rec, None, error=str(err))
-            secho(str(err), fg='red')
+            secho(str(err)+"\n", fg='red')
 
         if redo:
             dirty = set(i for i in set(self.__dirty) if self.db.session.is_modified(i))
@@ -245,7 +300,7 @@ class BaseImporter(object):
         Track the import of a given model from a data file
         """
         if model is None:
-            pass
+            return
         elif isinstance(model, self.m.session):
             kw['session_id'] = model.id
         elif isinstance(model, self.m.analysis):
