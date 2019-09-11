@@ -9,6 +9,8 @@ laserchron="$PROJECT_DIR/LaserChron"
 # environment variable
 export SPARROW_LAB_NAME="LaserChron"
 
+export SPARROW_SECRET_KEY="A test secret key"
+
 export SPARROW_SITE_CONTENT="$laserchron/site-content"
 export SPARROW_BACKUP_DIR="$laserchron/backups"
 
