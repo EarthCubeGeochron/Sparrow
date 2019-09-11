@@ -1,7 +1,6 @@
 from click import echo, secho
 from os import environ
 
-
 from sqlalchemy import create_engine, inspect, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,7 +8,7 @@ from sqlalchemy.schema import Table, ForeignKey, Column
 from sqlalchemy.sql import ClauseElement
 from sqlalchemy.types import Integer
 from pathlib import Path
-
+from contextlib import contextmanager
 
 from ..app import App
 from ..models import Base, User, Project
@@ -76,7 +75,18 @@ class Database:
         except Exception as err:
             echo("Could not automap at database initialization", err=True)
 
-
+    @contextmanager
+    def session_scope():
+        """Provide a transactional scope around a series of operations."""
+        session = self.__session_factory()
+        try:
+            yield session
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
     def exec_sql(self, *args):
         run_sql_file(self.session, *args)
