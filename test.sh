@@ -1,1 +1,1 @@
-curl -X GET localhost:5002
+curl -X GET localhost
