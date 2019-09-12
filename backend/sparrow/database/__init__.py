@@ -8,6 +8,7 @@ from sqlalchemy.schema import Table, ForeignKey, Column
 from sqlalchemy.sql import ClauseElement
 from sqlalchemy.types import Integer
 from pathlib import Path
+from contextlib import contextmanager
 
 from ..app import App
 from ..models import Base, User, Project
@@ -55,7 +56,15 @@ class Database:
         self.engine = create_engine(db_conn)
         metadata.create_all(bind=self.engine)
         self.meta = metadata
-        self.session = scoped_session(sessionmaker(bind=self.engine))
+
+        # Scoped session for database
+        # https://docs.sqlalchemy.org/en/13/orm/contextual.html#unitofwork-contextual
+        # https://docs.sqlalchemy.org/en/13/orm/session_basics.html#session-faq-whentocreate
+        self.__session_factory = sessionmaker(bind=self.engine)
+        self.session = scoped_session(self.__session_factory)
+        # Use the self.session_scope function to more explicitly manage sessions.
+
+        # Automapping of database tables
         self.automap_base = None
         self.__model_collection__ = None
         self.__table_collection__ = None
@@ -65,6 +74,19 @@ class Database:
             self.automap()
         except Exception as err:
             echo("Could not automap at database initialization", err=True)
+
+    @contextmanager
+    def session_scope():
+        """Provide a transactional scope around a series of operations."""
+        session = self.__session_factory()
+        try:
+            yield session
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
     def exec_sql(self, *args):
         run_sql_file(self.session, *args)

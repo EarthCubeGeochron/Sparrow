@@ -2,5 +2,6 @@
 # Description: Run tests for Sparrow
 
 # This should be run in a separate container eventually
+sparrow compose build backend
 sparrow compose build api-tests
-sparrow compose run api-tests pytest /tests
+sparrow compose run api-tests pytest /tests $@
