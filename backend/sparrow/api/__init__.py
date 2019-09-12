@@ -262,9 +262,7 @@ class APIv1(API):
 
                 except Exception as err:
                     db.session.rollback()
-                    # Better error handling is a must here
-                    print(str(err))
-                    return abort(410,
+                    return abort(500,
                         error_message='Query Error',
                         debug_message=str(err))
                 finally:
