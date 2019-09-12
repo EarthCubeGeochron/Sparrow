@@ -3,6 +3,7 @@ from graphene import String, Field
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from .filterable_query import FilterableConnectionField
+from .util import camelize
 
 # https://github.com/alexisrolland/flask-graphene-sqlalchemy/wiki/Flask-Graphene-SQLAlchemy-Tutorial
 # https://github.com/flavors/django-graphql-jwt/issues/6
@@ -10,7 +11,7 @@ from .filterable_query import FilterableConnectionField
 connection_fields = dict()
 
 def connection(model_type):
-    class_name = model_type.__name__+"Connection"
+    class_name = camelize(model_type.__name__)+"Connection"
     cls = connection_fields.get(class_name, None)
     if not cls:
         class Meta:
@@ -31,7 +32,7 @@ def graphql_object_factory(_model, id_param=None):
         model = _model
         interfaces = (relay.Node, )
         connection_field_factory = connection_field_factory
-    return type(_model.__name__, (SQLAlchemyObjectType,), dict(Meta=Meta))
+    return type(camelize(_model.__name__), (SQLAlchemyObjectType,), dict(Meta=Meta))
 
 def build_schema(db):
     types = []

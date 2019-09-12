@@ -24,7 +24,6 @@ class FilterableConnectionField(SQLAlchemyConnectionField):
     # For now, we require logged-in state to use ANY graphql API functions.
     # This could change for compatibility with the REST API.
     @classmethod
-    @jwt_required
     def get_query(cls, model, info, filter=None, **kwargs):
         query = super(FilterableConnectionField, cls).get_query(model, info, **kwargs)
         if filter:

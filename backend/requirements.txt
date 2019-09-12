@@ -22,6 +22,7 @@ requests==2.21.0
 # For GraphQL API
 graphene==2.1.5
 graphene_sqlalchemy==2.2.0
+inflection==0.3.1
 
 # For testing
 tavern==0.30.3

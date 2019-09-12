@@ -6,6 +6,7 @@ import graphene
 from collections import OrderedDict
 from graphene import Argument, Field
 from sqlalchemy import inspect
+from .util import camelize
 
 # Cache for the generated classes, to avoid name clash
 _INPUT_CACHE = {}
@@ -30,7 +31,7 @@ class Filter:
 
 
 def filter_class_for_module(cls):
-    name = cls.__name__ + "InputFilter"
+    name = camelize(cls.__name__)+ "InputFilter"
     if name in _INPUT_CACHE:
         return Argument(_INPUT_CACHE[name])
 
