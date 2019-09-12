@@ -1,6 +1,10 @@
 services:
   - docker
 
+env:
+  - SPARROW_DB_PORT=5433
+  - SPARROW_HTTP_PORT=80
+  - SPARROW_SECRET_KEY="TemporaryKey"
 
 before_script:
   - docker-compose up --build -d
