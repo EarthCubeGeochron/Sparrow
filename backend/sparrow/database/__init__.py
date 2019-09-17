@@ -1,13 +1,14 @@
 from click import echo, secho
 from os import environ
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, inspect, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.schema import Table, ForeignKey, Column
 from sqlalchemy.sql import ClauseElement
 from sqlalchemy.types import Integer
 from pathlib import Path
+from contextlib import contextmanager
 
 from ..app import App
 from ..models import Base, User, Project
@@ -55,15 +56,37 @@ class Database:
         self.engine = create_engine(db_conn)
         metadata.create_all(bind=self.engine)
         self.meta = metadata
-        self.session = scoped_session(sessionmaker(bind=self.engine))
+
+        # Scoped session for database
+        # https://docs.sqlalchemy.org/en/13/orm/contextual.html#unitofwork-contextual
+        # https://docs.sqlalchemy.org/en/13/orm/session_basics.html#session-faq-whentocreate
+        self.__session_factory = sessionmaker(bind=self.engine)
+        self.session = scoped_session(self.__session_factory)
+        # Use the self.session_scope function to more explicitly manage sessions.
+
+        # Automapping of database tables
         self.automap_base = None
         self.__model_collection__ = None
         self.__table_collection__ = None
+        self.__inspector__ = None
         # We're having trouble lazily automapping
         try:
             self.automap()
         except Exception as err:
             echo("Could not automap at database initialization", err=True)
+
+    @contextmanager
+    def session_scope():
+        """Provide a transactional scope around a series of operations."""
+        session = self.__session_factory()
+        try:
+            yield session
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
 
     def exec_sql(self, *args):
         run_sql_file(self.session, *args)
@@ -124,11 +147,25 @@ class Database:
     def automap_view(db, table_name, *column_args, **kwargs):
         """
         Views cannot be directly automapped, because they don't have primary keys.
-        So we have to use a workaround of specifying a primary key ourselves
+        So we have to use a workaround of specifying a primary key ourselves.
         """
         tbl = db.reflect_table(table_name, *column_args, **kwargs)
         name = classname_for_table(tbl)
         return type(name, (Base,), dict(__table__ = tbl))
+
+    @property
+    def inspector(self):
+        if self.__inspector__ is None:
+            self.__inspector__ = inspect(self.engine)
+        return self.__inspector__
+
+    def entity_names(self, **kwargs):
+        """
+        Returns an iterator of names of *schema objects*
+        (both tables and views) from a the database.
+        """
+        yield from self.inspector.get_table_names(**kwargs)
+        yield from self.inspector.get_view_names(**kwargs)
 
     @property
     def table(self):

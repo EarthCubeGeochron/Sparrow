@@ -2,6 +2,7 @@
 from click import echo, style, secho
 from os import path, environ
 from flask import Flask, send_from_directory
+from sqlalchemy import inspect
 from sqlalchemy.engine.url import make_url
 from flask_jwt_extended import JWTManager
 from sqlalchemy.exc import NoSuchTableError
@@ -68,23 +69,15 @@ def construct_app(config=None, minimal=False):
     # Setup API
     api = APIv1(db)
 
-    api.build_route("datum", schema='core_view')
-    api.build_route("analysis", schema='core_view')
-    api.build_route("session", schema='core_view')
-    api.build_route("age_datum", schema='core_view')
-    api.build_route("sample", schema='core_view')
-    api.build_route("sample_data", schema='core_view')
-    api.build_route("project", schema='core_view')
-    api.build_route("material", schema='core_view')
-    api.build_route("attribute", schema='core_view')
-
     api.add_resource(AuthAPI, "/auth")
 
-    try:
-        api.build_route("aggregate_histogram", schema='lab_view')
-    except NoSuchTableError:
-        pass
-    #api.build_route("ar_age", schema='method_data')
+    # Register all views in schema
+    for tbl in db.entity_names(schema='core_view'):
+        if tbl.endswith("_tree"): continue
+        api.build_route(tbl, schema='core_view')
+
+    for tbl in db.entity_names(schema='lab_view'):
+        api.build_route(tbl, schema='lab_view')
 
     app.api = api
     app.register_blueprint(api.blueprint, url_prefix='/api/v1')
