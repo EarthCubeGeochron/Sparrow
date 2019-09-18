@@ -24,6 +24,7 @@ class BaseImporter(object):
         # This is kinda unsatisfying
         self.basedir = environ.get("SPARROW_DATA_DIR", None)
 
+        # Allow us to turn of change-tracking for speed
         self.__dirty = set()
         self.__new = set()
         self.__deleted = set()
@@ -48,6 +49,15 @@ class BaseImporter(object):
 
         # Deprecated
         self.models = self.m
+
+    def session_changes(self):
+        changed = lambda i: self.db.session.is_modified(i, include_collections=True)
+        # Bug: For some reason, changes on many-to-many links are not recorded.
+        return dict(
+            dirty=self.__dirty,
+            modified=set(i for i in set(self.__dirty) if changed(i)),
+            new=self.__new,
+            deleted=self.__deleted)
 
     def add(self, *models):
         for model in models:
@@ -156,7 +166,7 @@ class BaseImporter(object):
 
     def attribute(self, analysis, parameter, value):
         if value is None: return None
-        self.db.session.commit()
+        self.db.session.flush()
         param = self.parameter(parameter)
         attr = self.db.get_or_create(self.m.attribute,
             parameter=param.id,
@@ -168,7 +178,7 @@ class BaseImporter(object):
         value = coalesce_nan(value)
         if value is None: return None
         type = self.datum_type(parameter, **kwargs)
-        self.db.session.commit()
+        self.db.session.flush()
         datum = self.db.get_or_create(self.m.datum,
             analysis=analysis.id,
             type=type.id)
@@ -181,7 +191,7 @@ class BaseImporter(object):
         value = coalesce_nan(value)
         if value is None: return None
         type = self.datum_type(parameter, **kwargs)
-        self.db.session.commit()
+        self.db.session.flush()
         const = self.db.get_or_create(self.m.constant,
             value=value,
             error=error,
