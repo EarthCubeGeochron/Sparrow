@@ -116,6 +116,7 @@ class Database:
         # TODO: add the process flow described below:
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
         Base.query = self.session.query_property()
+        Base.db = self
 
         # This stuff should be placed outside of core (one likely extension point).
         Base.prepare(self.engine, reflect=True,

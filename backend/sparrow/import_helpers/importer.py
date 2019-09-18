@@ -9,8 +9,6 @@ from sqlalchemy.exc import IntegrityError
 from .util import md5hash, SparrowImportError, ensure_sequence, is_number, coalesce_nan
 from ..util import relative_path, pretty_print
 
-
-
 class BaseImporter(object):
     """
     A basic Sparrow importer to be subclassed.
@@ -150,7 +148,6 @@ class BaseImporter(object):
             type = self.analysis_type(type).id
         m = self.db.get_or_create(
             self.m.analysis, analysis_type=type, **kwargs)
-        self.db.session.flush()
         return m
 
     def add_analysis(self, session, type=None, **kwargs):
