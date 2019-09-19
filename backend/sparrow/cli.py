@@ -59,7 +59,7 @@ def create_views(db):
     """
     # Don't need to build the app just for this
     with working_directory(__file__):
-        db.exec_sql("sql/03-create-views.sql")
+        db.exec_sql("database/fixtures/05-views.sql")
 
 @cli.command(name='serve')
 @with_config
