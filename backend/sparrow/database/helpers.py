@@ -31,38 +31,31 @@ def get_or_create(session, model, defaults=None, **kwargs):
         return instance
 
 class ModelCollection(object):
-    def __init__(self, base, overrides):
-        self.automap_base = base
-        self.base_classes = base.classes
-        self.__overrides = {}
-
-    @property
-    def __not_overridden(self):
-        return {k:c for k,c
-                in self.base_classes.items()
-                if k not in self.__overrides}
+    def __init__(self, models=None):
+        self.__models = {}
+        if models is None:
+            return
+        self.register(*models)
 
     def register(self, *classes):
         for cls in classes:
             k = classname_for_table(cls.__table__)
-            self.__overrides[k] = cls
+            self.__models[k] = cls
 
     def __getattr__(self, name):
-        if name in self.__overrides:
-            return self.__overrides[name]
-        return getattr(self.base_classes, name)
+        try:
+            return self.__models[name]
+        except KeyError:
+            raise AttributeError(name)
 
     def __len__(self):
-        return len(self.__overrides)+len(self.__not_overridden)
+        return len(self.__models)
 
     def __iter__(self):
-        yield from self.__not_overridden
-        yield from self.__overrides
+        yield from self.__models
 
     def keys(self):
-        return list(chain(
-            self.__not_overridden.keys(),
-            self.__overrides.keys()))
+        return [k for k in self.__models.keys()]
 
 class TableCollection(object):
     """

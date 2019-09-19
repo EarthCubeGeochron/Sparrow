@@ -56,8 +56,8 @@ class Database:
 
         # Automapping of database tables
         self.automap_base = None
-        self.__model_collection__ = None
-        self.__table_collection__ = None
+        self.__model_c:ollection__ = None
+        self.__tables__ = None
         self.__inspector__ = None
         # We're having trouble lazily automapping
         try:
@@ -66,6 +66,7 @@ class Database:
             echo("Could not automap at database initialization", err=True)
             # TODO: We should raise this error, and find another way to
             # test if we've initialized the database yet.
+            raise err
 
     @contextmanager
     def session_scope():
@@ -111,29 +112,42 @@ class Database:
         Base.db = self
 
         # This stuff should be placed outside of core (one likely extension point).
-        Base.prepare(self.engine, reflect=True,
+        reflection_kwargs = dict(
             name_for_scalar_relationship=name_for_scalar_relationship,
             classname_for_table=_classname_for_table)
-        Base.metadata.reflect(bind=self.engine, schema='vocabulary')
-        Base.metadata.reflect(bind=self.engine, schema='core_view')
+
+        Base.prepare(self.engine, reflect=True, **reflection_kwargs)
+        for schema in ('vocabulary', 'core_view'):
+            # Reflect tables in schemas we care about
+            # Note: this will not reflect views because they don't have
+            # primary keys.
+            Base.metadata.reflect(
+                    bind=self.engine,
+                    schema=schema,
+                    **reflection_kwargs)
 
         self.automap_base = Base
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since they are not
         #  included by default)
 
-        self.__model_collection__ = ModelCollection(self.automap_base, [])
-        self.__table_collection__ = TableCollection(self.__model_collection__)
-        self.__model_collection__.register(User, Project, Session)
+        self.__models__ = ModelCollection(self.automap_base.classes)
+        self.__tables__ = TableCollection(self.__models__)
+        self.__models__.register(User, Project, Session)
 
         # Register a new class
         # Automap the core_view.datum relationship
         cls = self.automap_view("datum",
             Column("datum_id", Integer, primary_key=True),
-            Column("analysis_id", Integer, ForeignKey(self.__table_collection__.analysis.c.id)),
-            Column("session_id", Integer, ForeignKey(self.__table_collection__.session.c.id)),
+            Column("analysis_id", Integer, ForeignKey(self.__tables__.analysis.c.id)),
+            Column("session_id", Integer, ForeignKey(self.__tables__.session.c.id)),
             schema='core_view')
-        self.__model_collection__.register(cls)
+        self.__models__.register(cls)
+
+    def register_models(self, *models):
+        # Could allow overriding name functions etc.
+        self.__models__.register(*models)
+
 
     def automap_view(db, table_name, *column_args, **kwargs):
         """
@@ -163,9 +177,9 @@ class Database:
         """
         Map of all tables in the database as SQLAlchemy table objects
         """
-        if self.__table_collection__ is None:
+        if self.__tables__ is None:
             self.automap()
-        return self.__table_collection__
+        return self.__tables__
 
     @property
     def model(self):
@@ -174,9 +188,9 @@ class Database:
 
         https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html
         """
-        if self.__model_collection__ is None:
+        if self.__models__ is None:
             self.automap()
-        return self.__model_collection__
+        return self.__models__
 
     @property
     def mapped_classes(self):
