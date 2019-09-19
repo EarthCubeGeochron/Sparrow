@@ -269,10 +269,12 @@ CREATE TABLE IF NOT EXISTS analysis (
 
 CREATE TABLE IF NOT EXISTS datum (
   id serial PRIMARY KEY,
+  session integer REFERENCES session(id),
   analysis integer REFERENCES analysis(id)
     ON DELETE CASCADE,
   type integer REFERENCES datum_type(id) NOT NULL,
   value numeric NOT NULL,
+  "text" text NOT NULL,
   error numeric,
   is_bad boolean,
   /*
@@ -285,7 +287,13 @@ CREATE TABLE IF NOT EXISTS datum (
   - Heating steps accepted in the final age analysis
   */
   is_accepted boolean,
-  UNIQUE (analysis, type)
+  UNIQUE (analysis, type),
+  UNIQUE (session, type),
+  CHECK ((value IS NOT NULL) or ("text" IS NOT NULL)),
+  CHECK (
+      (session IS NOT NULL)::int
+    + (analysis IS NOT NULL)::int <= 1
+  )
 );
 
 /*
