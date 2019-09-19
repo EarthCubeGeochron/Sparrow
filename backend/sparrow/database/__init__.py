@@ -19,6 +19,9 @@ from .helpers import (
 
 metadata = MetaData()
 
+class AutomapError(Exception):
+    pass
+
 # For automapping
 def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
     return "_"+referred_cls.__table__.name.lower()
@@ -56,9 +59,10 @@ class Database:
 
         # Automapping of database tables
         self.automap_base = None
-        self.__model_c:ollection__ = None
+        self.__models__ = None
         self.__tables__ = None
         self.__inspector__ = None
+        self.automap_error = None
         # We're having trouble lazily automapping
         try:
             self.automap()
@@ -66,7 +70,7 @@ class Database:
             echo("Could not automap at database initialization", err=True)
             # TODO: We should raise this error, and find another way to
             # test if we've initialized the database yet.
-            raise err
+            self.automap_error = err
 
     @contextmanager
     def session_scope():
