@@ -13,11 +13,11 @@ from sqlalchemy.types import Integer
 
 from sqlalchemy.ext.declarative import declared_attr
 
-class Base(object):
+class BaseClass(object):
     pass
     # Shim for future expansion
 
-Base = automap_base(cls=Base)
+Base = automap_base(cls=BaseClass)
 
 class User(Base):
     __tablename__ = "user"
@@ -38,3 +38,8 @@ class Project(Base):
 
     def add_session(self, session):
         self.session_collection.append(session)
+
+class Session(Base):
+    __tablename__ = "session"
+    def get_attribute(self, type):
+        pass

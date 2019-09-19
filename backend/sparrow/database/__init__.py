@@ -1,37 +1,27 @@
+from contextlib import contextmanager
+from pathlib import Path
 from click import echo, secho
 from os import environ
 
 from sqlalchemy import create_engine, inspect, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.schema import Table, ForeignKey, Column
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import ClauseElement
 from sqlalchemy.types import Integer
-from pathlib import Path
-from contextlib import contextmanager
 
 from ..app import App
-from ..models import Base, User, Project
 from ..util import run_sql_file, run_query, relative_path
+from ..models import Base, User, Project, Session
 from .helpers import (
-    JointModelCollection, TableCollection, get_or_create)
-
-extended_models = [User, Project]
+    ModelCollection, TableCollection, get_or_create,
+    classname_for_table, _classname_for_table)
 
 metadata = MetaData()
 
 # For automapping
 def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
     return "_"+referred_cls.__table__.name.lower()
-
-def classname_for_table(table):
-    if table.schema is not None:
-        return f"{table.schema}_{table.name}"
-    return table.name
-
-def _classname_for_table(cls, table_name, table):
-    # We have to be fancy for SQLAlchemy
-    return classname_for_table(table)
 
 class Database:
     def __init__(self, cfg=None):
@@ -74,6 +64,8 @@ class Database:
             self.automap()
         except Exception as err:
             echo("Could not automap at database initialization", err=True)
+            # TODO: We should raise this error, and find another way to
+            # test if we've initialized the database yet.
 
     @contextmanager
     def session_scope():
@@ -130,20 +122,18 @@ class Database:
         # (we need to add these to the automapped classes since they are not
         #  included by default)
 
+        self.__model_collection__ = ModelCollection(self.automap_base, [])
+        self.__table_collection__ = TableCollection(self.__model_collection__)
+        self.__model_collection__.register(User, Project, Session)
+
+        # Register a new class
         # Automap the core_view.datum relationship
         cls = self.automap_view("datum",
             Column("datum_id", Integer, primary_key=True),
-            Column("analysis_id", Integer, ForeignKey(self.automap_base.classes.analysis.__table__.c.id)),
-            Column("session_id", Integer, ForeignKey(self.automap_base.classes.session.__table__.c.id)),
+            Column("analysis_id", Integer, ForeignKey(self.__table_collection__.analysis.c.id)),
+            Column("session_id", Integer, ForeignKey(self.__table_collection__.session.c.id)),
             schema='core_view')
-        extended_models.append(cls)
-
-        additional_models = {classname_for_table(t.__table__):t for t in extended_models}
-        self.__model_collection__ = JointModelCollection(
-            self.automap_base.classes,
-            additional_models)
-        self.__table_collection__ = TableCollection(
-            self.__model_collection__)
+        self.__model_collection__.register(cls)
 
     def automap_view(db, table_name, *column_args, **kwargs):
         """

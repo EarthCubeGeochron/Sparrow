@@ -1,4 +1,14 @@
 from sqlalchemy.sql import ClauseElement
+from itertools import chain
+
+def classname_for_table(table):
+    if table.schema is not None:
+        return f"{table.schema}_{table.name}"
+    return table.name
+
+def _classname_for_table(cls, table_name, table):
+    # We have to be fancy for SQLAlchemy
+    return classname_for_table(table)
 
 def get_or_create(session, model, defaults=None, **kwargs):
     """
@@ -9,6 +19,7 @@ def get_or_create(session, model, defaults=None, **kwargs):
     """
     instance = session.query(model).filter_by(**kwargs).first()
     if instance:
+        instance._created = False
         return instance
     else:
         params = dict((k, v) for k, v in kwargs.items()
@@ -16,30 +27,42 @@ def get_or_create(session, model, defaults=None, **kwargs):
         params.update(defaults or {})
         instance = model(**params)
         session.add(instance)
+        instance._created = True
         return instance
 
-class JointModelCollection(object):
-    def __init__(self, *collections):
-        self.collections = collections
+class ModelCollection(object):
+    def __init__(self, base, overrides):
+        self.automap_base = base
+        self.base_classes = base.classes
+        self.__overrides = {}
+
+    @property
+    def __not_overridden(self):
+        return {k:c for k,c
+                in self.base_classes.items()
+                if k not in self.__overrides}
+
+    def register(self, *classes):
+        for cls in classes:
+            k = classname_for_table(cls.__table__)
+            self.__overrides[k] = cls
 
     def __getattr__(self, name):
-        for coll in self.collections:
-            try:
-                return coll[name]
-            except KeyError:
-                continue
-        raise KeyError(name)
+        if name in self.__overrides:
+            return self.__overrides[name]
+        return getattr(self.base_classes, name)
+
+    def __len__(self):
+        return len(self.__overrides)+len(self.__not_overridden)
 
     def __iter__(self):
-        for coll in self.collections:
-            for model in coll:
-                yield model
+        yield from self.__not_overridden
+        yield from self.__overrides
 
     def keys(self):
-        k = []
-        for coll in self.collections:
-            k += coll.keys()
-        return k
+        return list(chain(
+            self.__not_overridden.keys(),
+            self.__overrides.keys()))
 
 class TableCollection(object):
     """
