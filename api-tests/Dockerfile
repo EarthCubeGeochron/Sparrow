@@ -11,4 +11,4 @@ WORKDIR /tests
 ## Copy API testing data (this could maybe go elsewhere)
 COPY ./test_api.py /tests
 
-CMD /bin/true
+CMD ["true"]
