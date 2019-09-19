@@ -229,29 +229,37 @@ class BaseImporter(object):
             secho(str(fn), dim=True)
             self.__import_datafile(fn, None, **kwargs)
 
-    def __set_file_info(self, fn, rec):
-        infile = Path(fn)
+    def __set_file_info(self, infile, rec):
         _ = infile.stat().st_mtime
         mtime = datetime.utcfromtimestamp(_)
-
-        if self.basedir is not None:
-            infile = infile.relative_to(self.basedir)
-
         rec.file_mtime = mtime
         rec.basename = infile.name
-        rec.file_path = str(infile)
 
     def __create_data_file_record(self, fn):
 
-        # Get file mtime and hash
-        hash = md5hash(str(fn))
+        # Get the path location (this must be unique)
+        infile = Path(fn)
+        if self.basedir is not None:
+            infile = infile.relative_to(self.basedir)
+        file_path = str(infile)
 
         # Get data file record if it exists
-        rec = self.db.get(self.m.data_file, hash)
+        rec = (self.db.session.query(self.m.data_file)
+                .filter_by(file_path=file_path)).first()
         added = rec is None
         if added:
-            rec = self.m.data_file(file_hash=hash)
-            self.db.session.add(rec)
+            rec = self.m.data_file(
+                file_path=file_path,
+                file_hash=hash)
+
+        # Get file mtime and hash
+        hash = md5hash(str(fn))
+        updated = rec.file_hash != hash
+        if updated:
+            rec.file_hash = hash
+
+        self.db.session.add(rec)
+
         self.__set_file_info(fn, rec)
         return rec, added
 
