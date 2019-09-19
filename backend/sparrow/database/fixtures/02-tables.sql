@@ -269,12 +269,13 @@ CREATE TABLE IF NOT EXISTS analysis (
 
 CREATE TABLE IF NOT EXISTS datum (
   id serial PRIMARY KEY,
-  session integer REFERENCES session(id),
+  session integer REFERENCES session(id)
+    ON DELETE CASCADE,
   analysis integer REFERENCES analysis(id)
     ON DELETE CASCADE,
   type integer REFERENCES datum_type(id) NOT NULL,
-  value numeric NOT NULL,
-  "text" text NOT NULL,
+  value numeric,
+  text_value text,
   error numeric,
   is_bad boolean,
   /*
@@ -289,37 +290,13 @@ CREATE TABLE IF NOT EXISTS datum (
   is_accepted boolean,
   UNIQUE (analysis, type),
   UNIQUE (session, type),
-  CHECK ((value IS NOT NULL) or ("text" IS NOT NULL)),
+  CHECK (
+    (value IS NOT NULL)::int +
+    (text_value IS NOT NULL)::int = 1),
   CHECK (
       (session IS NOT NULL)::int
     + (analysis IS NOT NULL)::int <= 1
   )
-);
-
-/*
-## Attributes
-
-Text attributes associated with analyses (e.g.
-standard names, calibration types). These should
-be numerical, unitless values.
-*/
-CREATE TABLE IF NOT EXISTS attribute (
-  id serial PRIMARY KEY,
-  parameter text REFERENCES vocabulary.parameter(id) NOT NULL,
-  value text NOT NULL,
-  UNIQUE (value, parameter)
-);
-
-CREATE TABLE IF NOT EXISTS __analysis_attribute (
-  analysis_id integer NOT NULL REFERENCES analysis(id),
-  attribute_id integer NOT NULL REFERENCES attribute(id),
-  PRIMARY KEY (analysis_id, attribute_id)
-);
-
-CREATE TABLE IF NOT EXISTS __session_attribute (
-  session_id integer NOT NULL REFERENCES session(id),
-  attribute_id integer NOT NULL REFERENCES attribute(id),
-  PRIMARY KEY (session_id, attribute_id)
 );
 
 /*
