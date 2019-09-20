@@ -19,8 +19,11 @@ from sqlalchemy.types import Integer
 from sqlalchemy.ext.declarative import declared_attr
 
 class BaseClass(object):
-    pass
-    # Shim for future expansion
+    @classmethod
+    def get_or_create(cls, **kwargs):
+        from .database.helpers import get_or_create
+        defaults = kwargs.pop('defaults', None)
+        return get_or_create(cls.db.session, cls, defaults, **kwargs)
 
 Base = automap_base(cls=BaseClass)
 

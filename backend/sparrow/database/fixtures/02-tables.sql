@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS publication (
   title text,
   year integer,
   journal text,
-  author_string text,
+  author text,
   link text,
   -- Additional, unstructured data
   data jsonb
@@ -113,14 +113,14 @@ If researchers on a project have application user accounts,
 they can see data even if embargoed (not yet implemented).
 */
 CREATE TABLE IF NOT EXISTS project_researcher (
-  project_id integer REFERENCES project(id),
-  researcher_id integer REFERENCES researcher(id),
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
   PRIMARY KEY (project_id, researcher_id)
 );
 
 CREATE TABLE IF NOT EXISTS project_publication (
-  project_id integer REFERENCES project(id),
-  publication_id integer REFERENCES publication(id),
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  publication_id integer REFERENCES publication(id) ON DELETE CASCADE,
   PRIMARY KEY (project_id, publication_id)
 );
 
