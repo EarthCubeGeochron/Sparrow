@@ -212,8 +212,7 @@ CREATE TABLE IF NOT EXISTS session (
      for interoperability without affecting the internal organization
      of the *Sparrow* database. */
   uuid uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
-  sample_id integer REFERENCES sample(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
+  sample_id integer REFERENCES sample(id),
   project_id integer REFERENCES project(id)
     ON DELETE SET NULL,
   publication_id integer REFERENCES publication(id)
