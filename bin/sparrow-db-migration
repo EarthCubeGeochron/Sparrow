@@ -13,6 +13,10 @@ outdb='sparrow_test'
 outdb_conn="postgresql://postgres@db/$outdb"
 createdb -Upostgres -h db "$outdb" > /dev/null 2>&1
 SPARROW_DATABASE="$outdb_conn" sparrow init > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "Initialization of Sparrow database failed."
+  exit 1
+fi
 
 if [ "$1" = '--safe' ]; then
   migra "$indb_conn" "$outdb_conn" --unsafe \

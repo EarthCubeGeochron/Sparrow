@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS "user" ( -- Name must be quoted because it collides w
 CREATE TABLE IF NOT EXISTS publication (
   -- A basic model for tracked publications
   id serial PRIMARY KEY,
-  doi text NOT NULL,
+  doi text,
   title text,
   year integer,
   journal text,
