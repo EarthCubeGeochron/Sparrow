@@ -32,16 +32,17 @@ AnalysisAttributes = (props)->
     return null if data.length == 0
     groupedData = group data, (d)->d.parameter
 
-    h "div.attributes", [
-      h "h4", "Attributes"
-      h "ul.attributes", null, Array.from groupedData, ([k,v])->
-        h "li.attribute", [
-          h 'span.parameter', "#{k}:"
-          h 'ul.values', v.map (d)->
-            h 'li.value', d.value
-        ]
-    ]
+    h Array.from groupedData, ([k,v])->
+      h "li.attribute", [
+        h 'span.parameter', "#{k}:"
+        h 'ul.values', v.map (d)->
+          h 'li.value', d.value
+      ]
 
+Unit = ({unit})->
+  if ['unknown','ratio'].includes(unit)
+    return null
+  h 'span.unit', unit
 
 Datum = (props)->
   {value: d} = props
@@ -57,8 +58,18 @@ Datum = (props)->
       )
     ]
     " "
-    h 'span.unit', d.unit
+    h Unit, {unit: d.unit}
   ]
+
+DataCollection = ({data, analysis_id})->
+  datumList = h data.map (d)->
+    h Datum, {value: d}
+
+  h 'ul.data', [
+    datumList,
+    h AnalysisAttributes, {analysis_id}
+  ]
+
 
 AnalysisDetails = (props)->
   {data: a} = props
@@ -70,10 +81,8 @@ AnalysisDetails = (props)->
     h 'div.main', [
       h 'div.data', [
         h 'h4', "Data"
-        h 'ul.data', a.data.map (d)->
-          h Datum, {value: d}
+        h DataCollection, {data: a.data, analysis_id}
       ]
-      h AnalysisAttributes, {analysis_id}
     ]
   ]
 

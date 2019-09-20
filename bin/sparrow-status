@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+# Description: Get the status of the running Sparrow instance.
+sparrow compose ps

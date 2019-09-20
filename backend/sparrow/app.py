@@ -57,10 +57,11 @@ def construct_app(config=None, minimal=False):
     app = App(__name__, config=config,
             template_folder=relative_path(__file__, "templates"))
 
-    from .database import Database
+    from .database import Database, AutomapError
 
     db = Database(app)
-
+    if db.automap_error is not None:
+        return app, db
     if minimal:
         return app, db
 

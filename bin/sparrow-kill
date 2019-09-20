@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+# Description: Like `sparrow down`, but for people in a hurry.
+
+# Note: this command should probably be hidden in production.
+docker kill $(sparrow compose ps -q)

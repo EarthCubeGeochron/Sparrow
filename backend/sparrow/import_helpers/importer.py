@@ -9,8 +9,6 @@ from sqlalchemy.exc import IntegrityError
 from .util import md5hash, SparrowImportError, ensure_sequence, is_number, coalesce_nan
 from ..util import relative_path, pretty_print
 
-
-
 class BaseImporter(object):
     """
     A basic Sparrow importer to be subclassed.
@@ -26,6 +24,7 @@ class BaseImporter(object):
         # This is kinda unsatisfying
         self.basedir = environ.get("SPARROW_DATA_DIR", None)
 
+        # Allow us to turn of change-tracking for speed
         self.__dirty = set()
         self.__new = set()
         self.__deleted = set()
@@ -51,6 +50,19 @@ class BaseImporter(object):
         # Deprecated
         self.models = self.m
 
+    def session_changes(self):
+        changed = lambda i: self.db.session.is_modified(i, include_collections=True)
+        # Bug: For some reason, changes on many-to-many links are not recorded.
+        return dict(
+            dirty=self.__dirty,
+            modified=set(i for i in set(self.__dirty) if changed(i)),
+            new=self.__new,
+            deleted=self.__deleted)
+
+    def add(self, *models):
+        for model in models:
+            self.db.session.add(model)
+
     ###
     # Helpers to insert various types of analytical data
     ###
@@ -73,21 +85,30 @@ class BaseImporter(object):
 
     ## Vocabulary
 
-    def unit(self, id):
-        return self.db.get_or_create(
+    def unit(self, id, description=None):
+        u = self.db.get_or_create(
             self.m.vocabulary_unit,
             id=id, defaults=dict(authority=self.authority))
+        if u is not None:
+            u.description = description
+        return u
 
-    def error_metric(self, id):
+    def error_metric(self, id, description=None):
         if not id: return None
-        return self.db.get_or_create(
+        em = self.db.get_or_create(
             self.m.vocabulary_error_metric,
             id=id, defaults=dict(authority=self.authority))
+        if description is not None:
+            em.description = description
+        return em
 
-    def parameter(self, id):
-        return self.db.get_or_create(
+    def parameter(self, id, description=None):
+        p = self.db.get_or_create(
             self.m.vocabulary_parameter,
             id=id, defaults=dict(authority=self.authority))
+        if description is not None:
+            p.description = description
+        return p
 
     def method(self, id):
         return self.db.get_or_create(
@@ -137,7 +158,6 @@ class BaseImporter(object):
             type = self.analysis_type(type).id
         m = self.db.get_or_create(
             self.m.analysis, analysis_type=type, **kwargs)
-        self.db.session.flush()
         return m
 
     def add_analysis(self, session, type=None, **kwargs):
@@ -146,7 +166,7 @@ class BaseImporter(object):
 
     def attribute(self, analysis, parameter, value):
         if value is None: return None
-        self.db.session.commit()
+        self.db.session.flush()
         param = self.parameter(parameter)
         attr = self.db.get_or_create(self.m.attribute,
             parameter=param.id,
@@ -158,7 +178,7 @@ class BaseImporter(object):
         value = coalesce_nan(value)
         if value is None: return None
         type = self.datum_type(parameter, **kwargs)
-        self.db.session.commit()
+        self.db.session.flush()
         datum = self.db.get_or_create(self.m.datum,
             analysis=analysis.id,
             type=type.id)
@@ -170,12 +190,12 @@ class BaseImporter(object):
         args = dict()
         value = coalesce_nan(value)
         if value is None: return None
-        type = self.datum_type(parameter, **kwargs).id
-        self.db.session.commit()
+        type = self.datum_type(parameter, **kwargs)
+        self.db.session.flush()
         const = self.db.get_or_create(self.m.constant,
-            value = value,
-            error = error,
-            type = type.id)
+            value=value,
+            error=error,
+            type=type.id)
         analysis.constant_collection.append(const)
         self.db.session.flush()
         return const
@@ -209,29 +229,37 @@ class BaseImporter(object):
             secho(str(fn), dim=True)
             self.__import_datafile(fn, None, **kwargs)
 
-    def __set_file_info(self, fn, rec):
-        infile = Path(fn)
+    def __set_file_info(self, infile, rec):
         _ = infile.stat().st_mtime
         mtime = datetime.utcfromtimestamp(_)
-
-        if self.basedir is not None:
-            infile = infile.relative_to(self.basedir)
-
         rec.file_mtime = mtime
         rec.basename = infile.name
-        rec.file_path = str(infile)
 
     def __create_data_file_record(self, fn):
 
-        # Get file mtime and hash
-        hash = md5hash(str(fn))
+        # Get the path location (this must be unique)
+        infile = Path(fn)
+        if self.basedir is not None:
+            infile = infile.relative_to(self.basedir)
+        file_path = str(infile)
 
+        # Get file hash
+        hash = md5hash(str(fn))
         # Get data file record if it exists
-        rec = self.db.get(self.m.data_file, hash)
+        rec = (self.db.session.query(self.m.data_file)
+                .filter_by(file_path=file_path)).first()
         added = rec is None
         if added:
-            rec = self.m.data_file(file_hash=hash)
-            self.db.session.add(rec)
+            rec = self.m.data_file(
+                file_path=file_path,
+                file_hash=hash)
+
+        updated = rec.file_hash != hash
+        if updated:
+            rec.file_hash = hash
+
+        self.db.session.add(rec)
+
         self.__set_file_info(fn, rec)
         return rec, added
 
