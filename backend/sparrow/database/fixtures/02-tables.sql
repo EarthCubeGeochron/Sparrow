@@ -124,6 +124,12 @@ CREATE TABLE IF NOT EXISTS project_publication (
   PRIMARY KEY (project_id, publication_id)
 );
 
+CREATE TABLE IF NOT EXISTS project_sample (
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  sample_id integer REFERENCES sample(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, sample_id)
+);
+
 /*
 ### Descriptors for types of measurements/techniques
 */
@@ -208,8 +214,10 @@ CREATE TABLE IF NOT EXISTS session (
   uuid uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
   sample_id integer REFERENCES sample(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
-  project_id integer REFERENCES project(id),
-  publication_id integer REFERENCES publication(id),
+  project_id integer REFERENCES project(id)
+    ON DELETE SET NULL,
+  publication_id integer REFERENCES publication(id)
+    ON DELETE SET NULL,
   date timestamp NOT NULL,
   end_date timestamp,
   date_precision text REFERENCES enum.date_precision(id),
