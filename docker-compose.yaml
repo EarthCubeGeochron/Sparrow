@@ -65,6 +65,11 @@ services:
       # Right now, we configure default site content
       # rather than allowing any customization
       - $SPARROW_SITE_CONTENT:/app/site-content
+  api-tests:
+    build: api-tests
+    command: bin/true
+    depends_on:
+      - backend
 volumes:
   frontend_build:
   db_cluster:

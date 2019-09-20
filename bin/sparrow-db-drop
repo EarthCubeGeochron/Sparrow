@@ -1,0 +1,24 @@
+#!/usr/bin/env zsh
+# Description: Drop the `Sparrow` database. `DANGEROUS`
+
+db_container=$(sparrow compose ps -q db)
+db_volume=$(docker inspect -f '{{ (index .Mounts 0).Name }}' $db_container)
+
+phrase="I'm positive."
+
+echo "Are you sure you want to drop the $(tput bold)Sparrow$(tput sgr0) database?" >&2
+echo "This will completely remove Docker volume $(tput setaf 6)$(tput bold)$db_volume$(tput sgr0)!" >&2
+echo "You probably want to run $(tput setaf 6)sparrow db-backup$(tput sgr0) first, at a minimum."
+echo ""
+echo "Are you sure? If so, type '$(tput setaf 6)$phrase$(tput sgr0)'"
+read
+echo    # (optional) move to a new line
+if [[ $REPLY = $phrase ]]; then
+  echo "Okay, as you wish..."
+  echo "Removing container $(tput setaf 6)$(docker rm -f $db_container)$(tput sgr0)..."
+  echo "Removing volume $(tput setaf 6)$(docker volume rm $db_volume)$(tput sgr0)..."
+  echo "Done."
+  # do dangerous stuff
+else
+  echo "Doing nothing! You made the right choice."
+fi
