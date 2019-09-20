@@ -5,11 +5,6 @@ web = Blueprint('frontend', __name__)
 
 @web.route('/data-file/<string:uuid>')
 def stream_data(uuid):
-    # def generate():
-    #     # create and return your data in small parts here
-    #     for i in xrange(10000):
-    #         yield str(i)
-    #Response(stream_with_context(generate()))
     # Send the user to the "protected" data dir to get the file with NGINX
     db = current_app.database
     m = db.model.data_file

@@ -126,6 +126,14 @@ module.exports = {
     publicPath: assetsRoute,
     filename: "[name].js"
   },
+  // Always split chunks
+  // We could turn this off in development if we wanted.
+  // https://medium.com/hackernoon/the-100-correct-way-to-split-your-chunks-with-webpack-f8a9df5b7758
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
+  },
   plugins: [
     browserSync,
     new EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'BASE_URL', 'SPARROW_LAB_NAME', 'MAPBOX_API_TOKEN'])

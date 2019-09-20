@@ -37,8 +37,8 @@
     "react-leaflet": "^2.3.0",
     "react-map-gl": "^4.1.2",
     "react-markdown": "^4.0.6",
-    "react-router": "^4.3.1",
-    "react-router-dom": "^4.3.1",
+    "react-router": "^5.0.1",
+    "react-router-dom": "^5.0.1",
     "react-simple-maps": "^0.12.1",
     "store": "^2.0.12"
   },
