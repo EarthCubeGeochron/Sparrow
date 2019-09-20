@@ -243,6 +243,8 @@ class BaseImporter(object):
             infile = infile.relative_to(self.basedir)
         file_path = str(infile)
 
+        # Get file hash
+        hash = md5hash(str(fn))
         # Get data file record if it exists
         rec = (self.db.session.query(self.m.data_file)
                 .filter_by(file_path=file_path)).first()
@@ -252,8 +254,6 @@ class BaseImporter(object):
                 file_path=file_path,
                 file_hash=hash)
 
-        # Get file mtime and hash
-        hash = md5hash(str(fn))
         updated = rec.file_hash != hash
         if updated:
             rec.file_hash = hash
