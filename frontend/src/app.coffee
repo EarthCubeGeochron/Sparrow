@@ -9,10 +9,10 @@ import {FrameProvider} from './frame'
 import {Intent} from '@blueprintjs/core'
 import {APIProvider} from '@macrostrat/ui-components'
 import {APIExplorer} from './api-explorer'
-import {Admin} from './admin'
+import {PageFooter} from './shared/footer'
 import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
-import {PageFooter} from './shared/footer'
+import {Catalog} from './admin'
 import {AppNavbar, NavButton} from './shared/navbar'
 import styled from '@emotion/styled'
 
@@ -28,8 +28,8 @@ flex-grow: 1;
 
 MainNavbar = (props)->
   h AppNavbar, {fullTitle: true}, [
-    h NavButton, {to: '/data'}, "Data"
-    h NavButton, {to: '/api-explorer/v1'}, "API Explorer"
+    h NavButton, {to: '/catalog'}, "Catalog"
+    h NavButton, {to: '/api-explorer/v1'}, "API"
   ]
 
 class AppMain extends Component
@@ -46,8 +46,8 @@ class AppMain extends Component
               render: -> h HomePage
             }
             h Route, {
-              path: '/data',
-              render: -> h Admin, {base: '/data'}
+              path: '/catalog',
+              render: -> h Catalog, {base: '/catalog'}
             }
             h Route, {path: '/api-explorer', component: APIExplorer}
           ]
