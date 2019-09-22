@@ -55,14 +55,14 @@ InfoCallout = styled(Callout)"""
 
 class GeoDeepDiveCard extends Component
   render: ->
-    {sample_id} = @props
+    {sample_name} = @props
     route = 'https://geodeepdive.org/api/v1/snippets'
-    params = {term: sample_id}
+    params = {term: sample_name}
     h CollapsePanel, {title: "GeoDeepDive results", storageID: 'gdd-results'}, (
       h ResultsPanel, [
         h InfoCallout, {
           icon: 'book'
-          title: 'Snippets containing sample ID'
+          title: 'Snippets containing sample name'
         }, [
           h 'p', "The GeoDeepDive API can be used to aid
                   the linking of sample names to their containing
@@ -76,4 +76,3 @@ class GeoDeepDiveCard extends Component
 
 
 export {GeoDeepDiveCard}
-

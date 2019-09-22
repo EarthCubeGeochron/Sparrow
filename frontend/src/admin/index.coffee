@@ -72,7 +72,7 @@ LoginSuggest = ->
     className: 'login-callout'
   }, [
     h 'p', 'Embargoed data and management tools are hidden.'
-    h LoginButton, {intent: 'warning'}
+    h LoginButton, {intent: 'warning', minimal: true}
   ]
 
 AdminMain = (props)->

@@ -198,12 +198,12 @@ SELECT id, description, authority
 FROM vocabulary.material;
 
 CREATE VIEW core_view.sample AS
-SELECT DISTINCT ON (s.name)
+SELECT DISTINCT ON (s.id)
   s.id,
   s.igsn,
   s.name,
   s.material,
-  ST_AsGeoJSON(s.location) geometry,
+  ST_AsGeoJSON(s.location)::jsonb geometry,
   location_name,
   location_precision,
   p.id project_id,
@@ -301,7 +301,8 @@ SELECT
 	-- Note: we might convert this link to *analytical sessions*
 	-- to cover cases when samples are in use by multiple projects
 	to_jsonb((SELECT array_agg(a) FROM (
-		SELECT DISTINCT ON (s.id) *
+		SELECT DISTINCT ON (s.id)
+      s.*
 		FROM core_view.sample s
     JOIN session ss
       ON ss.sample_id = s.id

@@ -38,7 +38,7 @@ SessionInfoComponent = (props)->
 
   h 'div', [
     h 'div.top', [
-      h 'h4.date', format(date, 'dddd, MMMM Do, YYYY')
+      h 'h4.date', format(date, 'MMMM D, YYYY')
       h 'div.expander'
     ]
     h 'div.session-info', [
@@ -56,7 +56,7 @@ SessionInfoComponent = (props)->
 SessionInfoLink = (props)->
   {id} = props
   h LinkCard, {
-    to: "/admin/session/#{id}"
+    to: "/catalog/session/#{id}"
     key: id,
     className: 'session-info-card'
   }, (

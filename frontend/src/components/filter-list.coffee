@@ -33,9 +33,6 @@ class FilterListComponent extends StatefulComponent
       val = "%#{filter}%"
       params = {[field]: val}
 
-    params['private'] = true
-
-
     menuItems = []
     onClick = (k)=> => @updateState {
       field: {$set: k}

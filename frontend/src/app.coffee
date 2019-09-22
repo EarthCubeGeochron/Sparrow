@@ -12,7 +12,7 @@ import {APIExplorer} from './api-explorer'
 import {PageFooter} from './shared/footer'
 import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
-import {Catalog} from './admin'
+import {Catalog, CatalogNavLinks} from './admin'
 import {AppNavbar, NavButton} from './shared/navbar'
 import styled from '@emotion/styled'
 
@@ -28,7 +28,7 @@ flex-grow: 1;
 
 MainNavbar = (props)->
   h AppNavbar, {fullTitle: true}, [
-    h NavButton, {to: '/catalog'}, "Catalog"
+    h CatalogNavLinks, {base: '/catalog'}
     h NavButton, {to: '/api-explorer/v1'}, "API"
   ]
 

@@ -1,6 +1,6 @@
 import {Component, createElement} from 'react'
 import h from 'react-hyperscript'
-import {Card, Colors} from '@blueprintjs/core'
+import {Card, Colors, Callout} from '@blueprintjs/core'
 import {PagedAPIView} from '@macrostrat/ui-components'
 import styled from '@emotion/styled'
 
@@ -86,12 +86,14 @@ class ProjectListComponent extends Component
 
   render: ->
     {apiEndpoint} = @props
-    params = {private: true}
     return h 'div.data-view.projects', [
-      h 'h2', 'Projects'
+      h Callout, {
+        icon: 'info-sign',
+        title: "Projects"
+      }, "This page lists projects of related samples, measurements, and publications.
+          Projects can be imported into Sparrow or defined using the managment interface."
       h PagedAPIView, {
         route: apiEndpoint,
-        params,
         perPage: 5,
         topPagination: true
       }, (data)=>
