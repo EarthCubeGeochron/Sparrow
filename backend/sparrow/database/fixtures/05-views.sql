@@ -215,6 +215,38 @@ LEFT JOIN session ss
 LEFT JOIN project p
   ON ss.project_id = p.id;
 
+CREATE VIEW core_view.age_context AS
+SELECT
+	s.id sample_id,
+	ss.id session_id,
+	d.id datum_id,
+	s.name sample_name,
+	s.material,
+	ss.target,
+  'Feature' AS type,
+	ST_AsGeoJSON(s.location)::jsonb geometry,
+	s.location_name,
+	s.location_precision,
+	d.value,
+	d.error,
+	dt.parameter,
+	dt.unit,
+	dt.error_unit,
+	dt.error_metric
+FROM sample s
+JOIN session ss
+  ON ss.sample_id = s.id
+JOIN analysis a
+  ON a.session_id = ss.id
+JOIN datum d
+  ON d.analysis = a.id
+JOIN datum_type dt
+  ON dt.id = d.type
+WHERE location IS NOT NULL
+  AND dt.unit = 'Ma' -- Poor proxy for age right now
+  AND d.is_accepted
+  AND NOT coalesce(d.is_bad, false);
+
 CREATE VIEW core_view.sample_data AS
 WITH a AS (
 SELECT
