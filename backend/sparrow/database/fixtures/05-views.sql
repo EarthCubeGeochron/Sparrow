@@ -215,7 +215,7 @@ LEFT JOIN session ss
 LEFT JOIN project p
   ON ss.project_id = p.id;
 
-CREATE VIEW core_view.contextualized_age AS
+CREATE VIEW core_view.age_context AS
 SELECT
 	s.id sample_id,
 	ss.id session_id,
