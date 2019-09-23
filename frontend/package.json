@@ -13,6 +13,7 @@
     "@data-ui/histogram": "0.0.75",
     "@emotion/core": "^10.0.7",
     "@emotion/styled": "^10.0.7",
+    "@loadable/component": "^5.10.2",
     "@macrostrat/hyper": "^1.1.0",
     "@macrostrat/ui-components": "file:./bundled-deps/ui-components",
     "@mongodb-js/react-mapbox-gl-leaflet": "^1.0.0",
