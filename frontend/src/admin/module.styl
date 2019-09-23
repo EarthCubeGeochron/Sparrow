@@ -1,17 +1,10 @@
+@require '~app/shared/mixins'
+
 .minimal-navbar
   display: flex
   flex-direction: row
   align-items: baseline
-  margin: 8px 0 10px
-  padding: 0.3em 1em
-  background-color: #f5f8fa
-  border-radius: 5px
-  vertical-align: baseline
-  box-shadow:
-    0 0 0 1px rgba(16, 22, 26, 0.1),
-    0 0 0 rgba(16, 22, 26, 0),
-    0 1px 1px rgba(16, 22, 26, 0.2)
-
+  minimal-navbar()
   h4
     margin: 0
     padding: 0.1em 1em 0.1em 0.4em
@@ -22,3 +15,13 @@
   margin-right: 1em
   vertical-align: baseline
   transform: translateY(3px)
+
+.admin,.catalog
+  margin-top 1em
+
+.login-callout
+  position relative
+  .login-button
+    position absolute
+    top 0.5em
+    right 0.5em

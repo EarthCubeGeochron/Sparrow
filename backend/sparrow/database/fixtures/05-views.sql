@@ -198,12 +198,12 @@ SELECT id, description, authority
 FROM vocabulary.material;
 
 CREATE VIEW core_view.sample AS
-SELECT DISTINCT ON (s.name)
+SELECT DISTINCT ON (s.id)
   s.id,
   s.igsn,
   s.name,
   s.material,
-  ST_AsGeoJSON(s.location) geometry,
+  ST_AsGeoJSON(s.location)::jsonb geometry,
   location_name,
   location_precision,
   p.id project_id,
@@ -214,6 +214,38 @@ LEFT JOIN session ss
   ON s.id = ss.sample_id
 LEFT JOIN project p
   ON ss.project_id = p.id;
+
+CREATE VIEW core_view.age_context AS
+SELECT
+	s.id sample_id,
+	ss.id session_id,
+	d.id datum_id,
+	s.name sample_name,
+	s.material,
+	ss.target,
+  'Feature' AS type,
+	ST_AsGeoJSON(s.location)::jsonb geometry,
+	s.location_name,
+	s.location_precision,
+	d.value,
+	d.error,
+	dt.parameter,
+	dt.unit,
+	dt.error_unit,
+	dt.error_metric
+FROM sample s
+JOIN session ss
+  ON ss.sample_id = s.id
+JOIN analysis a
+  ON a.session_id = ss.id
+JOIN datum d
+  ON d.analysis = a.id
+JOIN datum_type dt
+  ON dt.id = d.type
+WHERE location IS NOT NULL
+  AND dt.unit = 'Ma' -- Poor proxy for age right now
+  AND d.is_accepted
+  AND NOT coalesce(d.is_bad, false);
 
 CREATE VIEW core_view.sample_data AS
 WITH a AS (
@@ -269,7 +301,8 @@ SELECT
 	-- Note: we might convert this link to *analytical sessions*
 	-- to cover cases when samples are in use by multiple projects
 	to_jsonb((SELECT array_agg(a) FROM (
-		SELECT DISTINCT ON (s.id) *
+		SELECT DISTINCT ON (s.id)
+      s.*
 		FROM core_view.sample s
     JOIN session ss
       ON ss.sample_id = s.id

@@ -45,4 +45,6 @@ AppNavbar = styled(Nav)"""
   border-radius: 5px
 """
 
+AppNavbar.Divider = Navbar.Divider
+
 export {AppNavbar, NavButton}

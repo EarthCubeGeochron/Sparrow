@@ -11,7 +11,7 @@ h = hyper.styled(styles)
 SampleListCard = (props)->
   {material, id, name, location_name} = props
   h LinkCard, {
-    to: "/admin/sample/#{id}"
+    to: "/catalog/sample/#{id}"
     key: id,
     className: 'sample-list-card'
   }, [

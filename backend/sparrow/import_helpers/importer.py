@@ -14,6 +14,7 @@ class BaseImporter(object):
     A basic Sparrow importer to be subclassed.
     """
     authority = None
+    file_type = None
     def __init__(self, db, **kwargs):
         self.db = db
         self.m = self.db.model
@@ -46,6 +47,11 @@ class BaseImporter(object):
                 statement = kw.pop('statement')
                 if statement.startswith("SELECT"): return
                 secho(str(statement).strip())
+
+        if self.file_type is not None:
+            v = self.db.get_or_create(self.m.data_file_type, id=self.file_type)
+            self.add(v)
+            self.db.session.commit()
 
         # Deprecated
         self.models = self.m
@@ -257,6 +263,8 @@ class BaseImporter(object):
         updated = rec.file_hash != hash
         if updated:
             rec.file_hash = hash
+
+        rec.file_type = self.file_type
 
         self.db.session.add(rec)
 

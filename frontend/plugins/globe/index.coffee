@@ -93,16 +93,18 @@ class MapComponent extends Component
 class SampleMap extends Component
   render: ->
     route = "/sample"
-    params = {geometry: "%"}
+    params = {geometry: "%", all: true}
     h APIResultView, {route, params}, (data)=>
-      markers = data.map (d)->
-        {
-          coordinates: JSON.parse(d.geometry).coordinates
-          name: d.id
-        }
+      markers = data
+        .filter (d)->d.geometry?
+        .map (d)->
+          {
+            coordinates: d.geometry.coordinates
+            name: d.id
+          }
 
       h 'div', [
-        h 'h4', "#{data.length} measurements have been linked to their geologic metadata"
+        h 'h4', "#{markers.length} measurements have been linked to their geologic metadata"
         h MapComponent, {markers}
       ]
 

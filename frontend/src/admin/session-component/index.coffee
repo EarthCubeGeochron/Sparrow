@@ -1,10 +1,9 @@
 import h from 'react-hyperscript'
 import {Component} from 'react'
-import {Breadcrumbs, Button, AnchorButton, Intent} from '@blueprintjs/core'
+import {Breadcrumbs, Button, AnchorButton, Intent, Tab, Tabs} from '@blueprintjs/core'
 import {Link} from 'react-router-dom'
 import {Frame} from 'app/frame'
 
-import {GeoDeepDiveCard} from './gdd-card'
 import {SessionInfoCard} from './info-card'
 import {SessionDetailPanel} from './detail-panel'
 import {APIResultView} from '@macrostrat/ui-components'
@@ -13,12 +12,11 @@ class DownloadButton extends Component
   render: ->
     {file_hash, file_type} = @props
 
-    text = "Download data file"
+    text = "Data file"
     if file_type?
       text = h [
-        "Download "
         h 'b', file_type
-        " data file"
+        " file"
       ]
 
     href = "#{process.env.BASE_URL}data-file/#{file_hash}"
@@ -30,7 +28,7 @@ class SessionComponent extends Component
     return null unless id?
 
     breadCrumbs = [
-      { text: h(Link, {to: '/admin/session'}, "Sessions") },
+      { text: h(Link, {to: '/catalog/session'}, "Sessions") },
       { icon: "document", text: h('code.session-id', id) }
     ]
 
@@ -38,17 +36,19 @@ class SessionComponent extends Component
       h Breadcrumbs, {items: breadCrumbs}
       h APIResultView, {
         route: "/session"
-        params: {id, private: true}
+        params: {id}
       }, (data)=>
         res = data[0]
         {sample_name, id, rest...} = res
         h 'div', [
           h SessionInfoCard, res
+          h 'div.data-files', [
+            h 'h3', 'Data sources'
+            h Frame, {id: 'dataFileDownloadButton', rest...}, (props)=>
+              h DownloadButton, props
+          ]
           h Frame, {id: 'sessionDetail', session_id: id}, (props)=>
-            h SessionDetailPanel, props
-          h Frame, {id: 'dataFileDownloadButton', rest...}, (props)=>
-            h DownloadButton, props
-          h GeoDeepDiveCard, {sample_id: sample_name}
+            h(SessionDetailPanel, {showTitle: true, props...})
         ]
     ]
 

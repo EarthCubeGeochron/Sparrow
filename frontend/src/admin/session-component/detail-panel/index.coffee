@@ -87,9 +87,10 @@ AnalysisDetails = (props)->
   ]
 
 SessionDetails = (props)->
-  {data} = props
+  {data, showTitle} = props
+  showTitle ?= false
   h 'div.session-details', [
-    h 'h2', "Analysis details"
+    h.if(showTitle) 'h2', "Analysis details"
     data.map (d)->
       h AnalysisDetails, {data: d}
   ]
