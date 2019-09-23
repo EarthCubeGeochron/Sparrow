@@ -33,9 +33,16 @@ class Frame extends Component
   render: ->
     {id, iface, children, rest...} = @props
     el = @context.getElement(id)
-    child = if el? then el else children
+
+    # By default we just render the children
+    defaultContent = children
+    child = defaultContent
+    if el?
+      # We have an override
+      child = el
+
     if typeof child is 'function'
-      child = child(rest)
+      child = child({rest..., defaultContent})
 
     h ErrorBoundary, null, child
 

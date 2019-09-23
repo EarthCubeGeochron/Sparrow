@@ -1,6 +1,6 @@
 import h from 'react-hyperscript'
 import {Component} from 'react'
-import {Breadcrumbs, Button, AnchorButton, Intent} from '@blueprintjs/core'
+import {Breadcrumbs, Button, AnchorButton, Intent, Tab, Tabs} from '@blueprintjs/core'
 import {Link} from 'react-router-dom'
 import {Frame} from 'app/frame'
 
@@ -48,7 +48,7 @@ class SessionComponent extends Component
               h DownloadButton, props
           ]
           h Frame, {id: 'sessionDetail', session_id: id}, (props)=>
-            h SessionDetailPanel, props
+            h(SessionDetailPanel, {showTitle: true, props...})
         ]
     ]
 
