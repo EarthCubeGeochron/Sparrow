@@ -6,15 +6,16 @@
 # the SPARROW_CONFIG environment variable.
 
 # Search for configuration file if it isn't found.
-while [ $(pwd) != "/" ] && \
-      [ -z $SPARROW_CONFIG ] && \
+__dirname=$(pwd)
+while [ -z $SPARROW_CONFIG ] && \
       [ -z $_SPARROW_CONFIG_UNSET ]; do
-  if [ -f sparrow-config.sh ] ; then
-    cfg="sparrow-config.sh"
-    export SPARROW_CONFIG="${cfg:A}"
+  cfg="${__dirname}/sparrow-config.sh"
+  if [ -f "$cfg" ] ; then
+    export SPARROW_CONFIG="$cfg"
     break
   fi
-  cd ..
+  [ __dirname = "/" ] && break
+  __dirname="${__dirname:h}"
 done
 
 # We might want to bail here if no config file is found.
