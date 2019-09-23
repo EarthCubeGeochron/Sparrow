@@ -1,8 +1,8 @@
 #!/bin/bash
 # Description: Get a `psql` session to the database
 if [ -t 0 ]; then
-  docker-compose exec db psql -Upostgres sparrow $@
+  sparrow compose exec db psql -Upostgres sparrow $@
 else
-  docker-compose exec -T db psql -Upostgres sparrow $@
+  sparrow compose exec -T db psql -Upostgres sparrow $@
 fi
 
