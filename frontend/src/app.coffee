@@ -29,6 +29,7 @@ flex-grow: 1;
 MainNavbar = (props)->
   h AppNavbar, {fullTitle: true}, [
     h CatalogNavLinks, {base: '/catalog'}
+    h AppNavbar.Divider
     h NavButton, {to: '/api-explorer/v1'}, "API"
   ]
 
