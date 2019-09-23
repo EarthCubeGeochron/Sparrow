@@ -6,15 +6,17 @@
 # the SPARROW_CONFIG environment variable.
 
 # Search for configuration file if it isn't found.
-while [ $(pwd) != "/" ] && \
-      [ -z $SPARROW_CONFIG ] && \
+export SPARROW_WORKDIR="$(pwd)"
+__dirname="$(pwd)"
+while [ -z $SPARROW_CONFIG ] && \
       [ -z $_SPARROW_CONFIG_UNSET ]; do
-  if [ -f sparrow-config.sh ] ; then
-    cfg="sparrow-config.sh"
-    export SPARROW_CONFIG="${cfg:A}"
+  cfg="${__dirname}/sparrow-config.sh"
+  if [ -f "$cfg" ] ; then
+    export SPARROW_CONFIG="$cfg"
     break
   fi
-  cd ..
+  [ __dirname = "/" ] && break
+  __dirname="${__dirname:h}"
 done
 
 # We might want to bail here if no config file is found.
@@ -37,7 +39,6 @@ fi
 # of sparrow (except for this wrapper script).
 this_install_root="${0:A:h:h}"
 export SPARROW_PATH="${SPARROW_PATH:-"$this_install_root"}"
-cd "$SPARROW_PATH"
 
 # ENVIRONMENT VARIABLE DEFAULTS
 # Set variables that might not be created in the config file
@@ -70,7 +71,7 @@ export PATH="$SPARROW_PATH:$PATH"
   "You $(tput bold)must$(tput sgr0) set SPARROW_SECRET_KEY. Exiting..." && \
   exit 1
 
-dir="bin"
+dir="$SPARROW_PATH/bin"
 
 # HELP SUBCOMMAND
 # Default to help if nothing is provided
