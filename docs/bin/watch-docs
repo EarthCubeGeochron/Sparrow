@@ -26,7 +26,7 @@ if [ ${1:-""} != '--only-frontend' ]; then
 
 fi
 
-gatsby develop &
+$(npm bin)/gatsby develop &
 pid2=$!
 
 wait $pid1 $pid2
