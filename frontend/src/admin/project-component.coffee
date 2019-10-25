@@ -1,8 +1,10 @@
 import {Component, createElement} from 'react'
 import h from 'react-hyperscript'
 import {Card, Colors, Callout} from '@blueprintjs/core'
-import {PagedAPIView} from '@macrostrat/ui-components'
 import styled from '@emotion/styled'
+import T from 'prop-types'
+import {FilterListComponent} from '../components/filter-list'
+import {LinkCard, APIResultView} from '@macrostrat/ui-components'
 
 import {SampleCard} from './sample/detail-card'
 import './main.styl'
@@ -69,9 +71,9 @@ ProjectSamples = ({data})->
     h SampleContainer, content
   ]
 
-ProjectComponent = (props)->
+ProjectCard = (props)->
   {id, name, description} = props
-  h 'div.project.bp3-card', {key: id}, [
+  h 'div.project', [
     h 'h3', name
     h 'p.description', description
     h ProjectPublications, {data: props.publications}
@@ -79,25 +81,54 @@ ProjectComponent = (props)->
     h ProjectSamples, {data: props.samples}
   ]
 
-class ProjectListComponent extends Component
-  @defaultProps: {
-    apiEndpoint: '/project'
+ProjectInfoLink = (props)->
+  {id} = props
+  h LinkCard, {
+    to: "/catalog/project/#{id}"
+    key: id,
+    className: 'project-info-card'
+  }, [
+    h ProjectCard, props
+  ]
+
+ProjectListComponent = ->
+  route = '/project'
+  filterFields = {
+    'name': "Name"
+    'description': "Description"
   }
 
-  render: ->
-    {apiEndpoint} = @props
-    return h 'div.data-view.projects', [
+  h 'div.data-view.projects', [
       h Callout, {
         icon: 'info-sign',
         title: "Projects"
       }, "This page lists projects of related samples, measurements, and publications.
           Projects can be imported into Sparrow or defined using the managment interface."
-      h PagedAPIView, {
-        route: apiEndpoint,
-        perPage: 5,
-        topPagination: true
-      }, (data)=>
-        h 'div', null, data.map (d)-> h(ProjectComponent, d)
-    ]
+    h FilterListComponent, {
+      route,
+      filterFields,
+      itemComponent: ProjectInfoLink
+    }
+  ]
 
-export {ProjectListComponent}
+
+ProjectComponent = (props)->
+  {id} = props
+  return null unless id?
+
+  h 'div.data-view.project', [
+    h APIResultView, {
+      route: "/project"
+      params: {id}
+    }, (data)=>
+      res = data[0]
+      {sample_name, id, rest...} = res
+      h(ProjectCard, res)
+  ]
+
+ProjectComponent.propTypes = {
+  id: T.number
+}
+
+
+export {ProjectListComponent, ProjectComponent}

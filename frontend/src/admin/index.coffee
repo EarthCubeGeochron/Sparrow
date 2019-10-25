@@ -9,7 +9,7 @@ import T from 'prop-types'
 import {LinkButton, LinkCard} from '@macrostrat/ui-components'
 import {Frame} from 'app/frame'
 import {AuthContext} from 'app/auth/context'
-import {ProjectListComponent} from './project-component'
+import {ProjectListComponent, ProjectComponent} from './project-component'
 import {SessionListComponent} from './session-list-component'
 import {SessionComponent} from './session-component'
 import {SampleMain} from './sample'
@@ -47,6 +47,10 @@ CatalogNavbar = ({base, rest...})->
 SessionMatch = ({match})->
   {id} = match.params
   h SessionComponent, {id}
+
+ProjectMatch = ({match})->
+  {id} = match.params
+  h ProjectComponent, {id}
 
 LoginButton = (props)->
   {requestLoginForm: onClick} = useContext(AuthContext)
@@ -102,6 +106,10 @@ CatalogBody = ({base})->
     h Route, {
       path: base+"/session"
       component: SessionListComponent
+    }
+    h Route, {
+      path: base+"/project/:id"
+      component: ProjectMatch
     }
     h Route, {
       path: base+"/project"
