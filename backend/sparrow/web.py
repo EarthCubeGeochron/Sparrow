@@ -53,6 +53,10 @@ def get_csv(uuid):
 def index(path='/'):
     v = current_app.config.get("LAB_NAME")
     base_url = current_app.config.get("BASE_URL")
+    # Hack to make browserSync work
+    if base_url == "/":
+        base_url = ""
+
     return render_template('page.html',
             title=v,
             id='index',

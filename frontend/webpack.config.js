@@ -15,13 +15,20 @@ let assetsRoute = path.join(process.env.SPARROW_BASE_URL,'/assets/');
 
 let bs_cfg = {
   open: false,
+  // Actual external port
   port: 3000,
+  //proxy: "http://backend:5000"
+  // socket: {
+  //   // Client-side port for socket IO
+  //   port: process.env.SPARROW_HTTP_PORT
+  // }
   socket: {
-    domain: "https://sparrow-data.org/labs/wiscar"
+    domain: "localhost:5002"
   }
 };
 
 if(!process.env.CONTAINERIZED) {
+  // Configuration for running locally
   // This configuration is probably wrong
   bs_cfg.proxy = "http://0.0.0.0:5000"
   bs_cfg.serveStatic = [
