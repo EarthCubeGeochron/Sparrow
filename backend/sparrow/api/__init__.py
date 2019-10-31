@@ -225,7 +225,8 @@ class APIv1(API):
                         continue
 
                     val = args.pop(k, None)
-                    if val is None: continue
+                    if val is None:
+                        continue
 
                     should_describe = False
                     if infer_type(col) == str:
