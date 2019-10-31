@@ -1,88 +1,19 @@
-import graphene
-from graphene import String, Field
-from graphene import relay
-from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
-from graphene_sqlalchemy.utils import to_type_name
-from .filterable_query import FilterableConnectionField
-from sqlalchemy.types import INTEGER
+from ..plugins import SparrowCorePlugin
 
-# https://github.com/alexisrolland/flask-graphene-sqlalchemy/wiki/Flask-Graphene-SQLAlchemy-Tutorial
-# https://github.com/flavors/django-graphql-jwt/issues/6
+class GraphQLPlugin(SparrowCorePlugin):
+    name = "graphql"
+    def setup_graphql(self):
+        from flask_graphql import GraphQLView
+        from .schema import build_schema
 
-connection_fields = dict()
+        ctx = dict(session=self.db.session)
+        s = build_schema(self.db)
+        view_func = GraphQLView.as_view('graphql',
+                                        schema=s,
+                                        graphiql=True,
+                                        context=ctx)
 
-def connection(model_type):
-    class_name = to_type_name(model_type.__name__+"_connection")
-    cls = connection_fields.get(class_name, None)
-    if not cls:
-        class Meta:
-            node = model_type
-        # Create a class dynamically
-        cls = type(class_name, (relay.Connection,), {"Meta": Meta})
-        connection_fields[class_name] = cls
-    return FilterableConnectionField(cls)
+        self.app.add_url_rule('/graphql', view_func=view_func)
 
-def connection_field_factory(relationship, registry, **field_kwargs):
-    # https://github.com/graphql-python/graphene-sqlalchemy/blob/master/graphene_sqlalchemy/fields.py
-    model = relationship.mapper.entity
-    model_type = registry.get_type_for_model(model)
-    return connection(model_type)
-
-def resolve_primary_key(self, info):
-    """
-    This is basically the same as the default ID resolver
-    """
-    keys = self.__mapper__.primary_key_from_instance(self)
-    return tuple(keys) if len(keys) > 1 else keys[0]
-
-def is_integer(v):
-    return issubclass(INTEGER, type(v))
-
-class DatabaseIntegerID(graphene.Interface):
-    primary_key = graphene.Int()
-
-class DatabaseStringID(graphene.Interface):
-    primary_key = graphene.String()
-
-def primary_key_interface(model):
-    v = model.__mapper__.primary_key
-    if len(v) > 1:
-        return
-    # We only provide a primary key item if there is a *single*
-    # primary key. We may implement multikey if we need it
-    if is_integer(v[0].type):
-        return (DatabaseIntegerID,)
-    else:
-        return (DatabaseStringID,)
-
-def graphql_object_factory(_model, id_param=None):
-    """
-    ID Resolution: [https://github.com/graphql-python/graphene-sqlalchemy/blob/89c37265012b0e296147a1631b44d8f5d943dc59/graphene_sqlalchemy/types.py#L312]
-    This is a straightforward reimplementation the default id
-    resolver for SQLAlchemy objects in Graphene-SQLAlchemy.
-
-    GraphQL IDs are represented as Base64-encodings of the format
-    <model_name>:<primary_key> for single-key values.
-    """
-
-    class Meta:
-        model = _model
-        interfaces = (relay.Node, *primary_key_interface(model))
-        connection_field_factory = connection_field_factory
-
-    return type(to_type_name(_model.__name__), (SQLAlchemyObjectType,), dict(
-        Meta=Meta,
-        resolve_primary_key=resolve_primary_key))
-
-def build_schema(db):
-    types = []
-    fields = dict(
-        node = relay.Node.Field())
-    for model in db.automap_base.classes:
-        obj = graphql_object_factory(model)
-        types.append(obj)
-        fields[model.__name__] = connection(obj)
-
-    Query = type("Query", (graphene.ObjectType,), fields)
-
-    return graphene.Schema(query=Query, types=types)
+    def on_database_ready(self):
+        self.setup_graphql()
