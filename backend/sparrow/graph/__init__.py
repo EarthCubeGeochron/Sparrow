@@ -2,6 +2,7 @@ import graphene
 from graphene import String, Field
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+from graphene_sqlalchemy.utils import to_type_name
 from .filterable_query import FilterableConnectionField
 from sqlalchemy.types import INTEGER
 
@@ -11,7 +12,7 @@ from sqlalchemy.types import INTEGER
 connection_fields = dict()
 
 def connection(model_type):
-    class_name = model_type.__name__+"Connection"
+    class_name = to_type_name(model_type.__name__+"_connection")
     cls = connection_fields.get(class_name, None)
     if not cls:
         class Meta:
@@ -69,7 +70,7 @@ def graphql_object_factory(_model, id_param=None):
         interfaces = (relay.Node, *primary_key_interface(model))
         connection_field_factory = connection_field_factory
 
-    return type(_model.__name__, (SQLAlchemyObjectType,), dict(
+    return type(to_type_name(_model.__name__), (SQLAlchemyObjectType,), dict(
         Meta=Meta,
         resolve_primary_key=resolve_primary_key))
 
