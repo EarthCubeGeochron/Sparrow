@@ -18,6 +18,7 @@ traitlets==4.3.2
 werkzeug==0.15.6
 xlrd==1.2.0
 requests==2.21.0
+toposort==1.5
 
 # For GraphQL API
 graphene==2.1.5
