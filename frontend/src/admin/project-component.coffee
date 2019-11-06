@@ -1,5 +1,5 @@
 import {Component, createElement} from 'react'
-import h from 'react-hyperscript'
+import {hyperStyled} from '@macrostrat/hyper'
 import {Card, Colors, Callout} from '@blueprintjs/core'
 import styled from '@emotion/styled'
 import T from 'prop-types'
@@ -11,7 +11,16 @@ import WebMercatorViewport from 'viewport-mercator-project'
 
 import {SampleCard} from './sample/detail-card'
 import './main.styl'
+import styles from './module.styl'
+h = hyperStyled(styles)
 
+pluralize = (term, arrayOrNumber)->
+  count = arrayOrNumber
+  if Array.isArray(arrayOrNumber)
+    count = arrayOrNumber.length
+  if count > 1
+    term += "s"
+  return term
 
 ProjectMap = (props)->
   {width, height, samples, padding, minExtent} = props
@@ -82,9 +91,10 @@ ProjectPublications = ({data})->
   if data?
     content = data.map (d)->
       h Publication, d
-  h 'div.publications', [
+  h.if(data?) 'div.publications', [
     h 'h4', 'Publications'
-    content...
+    data.map (d)->
+      h Publication, d
   ]
 
 ProjectResearchers = ({data})->
@@ -114,15 +124,28 @@ ProjectSamples = ({data})->
   ]
 
 ProjectCard = (props)->
-  {id, name, description, samples} = props
-  h 'div.project', [
+  {id, name, description, samples, publications} = props
+  publications ?= []
+  h 'div.project-card', [
     h 'h3', name
     h 'p.description', description
-
-    h ProjectPublications, {data: props.publications}
-    h 'div.samples', [
-      h 'span.sample-count', props.samples.length
-      ' sample'+if props.samples.length > 1 then "s" else ""
+    h.if(samples.length) 'div.content-area', [
+      h 'h5', [
+        h 'span.count', samples.length
+        " "
+        pluralize('sample', samples)
+      ]
+      h 'ul.samples', samples.map (d)->
+        h 'li', d.name
+    ]
+    h.if(publications.length) 'div.content-area', [
+      h 'h5', [
+        h 'span.count', publications.length
+        " "
+        pluralize('publication', publications)
+      ]
+      h 'ul.publications', publications.map (d)->
+        h 'li', d.title
     ]
   ]
 

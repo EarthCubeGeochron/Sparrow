@@ -1,4 +1,5 @@
 @require '~app/shared/mixins'
+@require '~app/shared/colors'
 
 .minimal-navbar
   display: flex
@@ -25,3 +26,32 @@
     position absolute
     top 0.5em
     right 0.5em
+
+.content-area
+  display flex
+  flex-direction row
+  h5:first-child
+    margin-right 1em
+    min-width 8em
+  ul
+    flex-grow 1
+    margin-bottom 0.25em
+
+.project-card
+  h3
+    margin-top 0
+  h5
+    margin-bottom 0.2em
+    margin-top 0.5em
+  .samples,.publications
+    margin-top 0.2em
+    list-style-type none
+    padding-left 0
+    li
+      display inline-block
+      padding 0 0.5em 0.2em
+      border-radius 3px
+      border 1px solid $light-gray3
+      background-color: $light-gray5
+      margin-right 0.25em
+      margin-bottom 0.25em
