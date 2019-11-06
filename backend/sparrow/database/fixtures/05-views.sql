@@ -276,6 +276,41 @@ FROM sample s
 LEFT JOIN b
   ON s.id = b.id;
 
+/*
+View to link projects with all member samples and sessions
+*/
+CREATE VIEW core_view.project_sample_session AS
+SELECT
+  p.id project_id,
+  s.id sample_id,
+  ss.id session_id
+FROM session ss
+LEFT JOIN sample s
+  ON ss.sample_id = s.id
+JOIN project p
+  ON p.id = ss.project_id
+UNION ALL
+SELECT
+  p.id,
+  s.id sample_id,
+  NULL
+FROM sample s
+JOIN project_sample ps
+  ON ps.sample_id = s.id
+JOIN project p
+  ON p.id = ps.project_id;
+
+CREATE VIEW core_view.project_extent AS
+SELECT
+  project_id,
+  ST_Extent(location) extent,
+  count(*) n
+FROM core_view.project_sample_session p
+JOIN sample s
+  ON s.id = p.sample_id
+WHERE location IS NOT null
+GROUP BY p.project_id;
+
 CREATE VIEW core_view.project AS
 SELECT
 	p.id,
