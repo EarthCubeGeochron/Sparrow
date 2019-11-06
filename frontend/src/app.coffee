@@ -1,7 +1,7 @@
 import h from 'react-hyperscript'
 import {Component} from 'react'
 import {join} from 'path'
-import { BrowserRouter as Router, Route, Switch} from "react-router-dom"
+import { BrowserRouter as Router, Route, Switch, useLocation} from "react-router-dom"
 import {HomePage} from './homepage'
 
 import siteContent from 'site-content'
@@ -26,11 +26,33 @@ Expander = styled.div"""
 flex-grow: 1;
 """
 
+GlobalUI = (props)->
+  ###
+  Defines a hideable global UI component
+  ###
+  location = useLocation()
+  hidePaths = ['/map']
+  return null if hidePaths.includes(location.pathname)
+  h [
+    props.children
+  ]
+
 MainNavbar = (props)->
   h AppNavbar, {fullTitle: true}, [
     h CatalogNavLinks, {base: '/catalog'}
     h AppNavbar.Divider
     h NavButton, {to: '/api-explorer/v1'}, "API"
+  ]
+
+MapNavbar = (props)->
+  h AppNavbar, {vertical: true}, [
+    h CatalogNavLinks, {base: '/catalog'}
+    h AppNavbar.Divider
+  ]
+
+Map = (props)->
+  h 'div', [
+    h MapNavbar
   ]
 
 class AppMain extends Component
@@ -39,7 +61,9 @@ class AppMain extends Component
     h Router, {basename: baseURL}, (
       h AppHolder, [
         h Expander, [
-          h MainNavbar
+          h GlobalUI, null, (
+            h MainNavbar
+          )
           h Switch, [
             h Route, {
               path: '/',
@@ -50,10 +74,16 @@ class AppMain extends Component
               path: '/catalog',
               render: -> h Catalog, {base: '/catalog'}
             }
+            h Route, {
+              path: '/map'
+              component: Map
+            }
             h Route, {path: '/api-explorer', component: APIExplorer}
           ]
         ]
-        h PageFooter
+        h GlobalUI, null, (
+          h PageFooter
+        )
       ]
     )
   componentDidMount: ->

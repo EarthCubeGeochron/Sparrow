@@ -1,4 +1,4 @@
-import h from 'react-hyperscript'
+import h from '@macrostrat/hyper'
 import {Navbar, Button, ButtonGroup, Icon} from '@blueprintjs/core'
 import {NavLink, Route, Switch} from 'react-router-dom'
 import {AuthStatus} from 'app/auth'
@@ -47,4 +47,7 @@ AppNavbar = styled(Nav)"""
 
 AppNavbar.Divider = Navbar.Divider
 
-export {AppNavbar, NavButton}
+MapNavbar = ->
+  h 'div'
+
+export {AppNavbar, MapNavbar, NavButton}

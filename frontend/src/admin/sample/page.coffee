@@ -13,6 +13,7 @@ Parameter = ({name, value, rest...})->
   ]
 
 ProjectLink = ({project_name, project_id})->
+  return h('em', 'None') unless project_name? and project_id?
   h LinkCard, {
     to: "/catalog/project/#{project_id}"
   }, project_name
@@ -22,7 +23,7 @@ ProjectInfo = ({sample: d})->
   h 'div.parameter', [
     h 'h4.subtitle', 'Project'
     h 'p.value', [
-      h(ProjectLink, d) or h('em','None')
+      h ProjectLink, d
     ]
   ]
 
