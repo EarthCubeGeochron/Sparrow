@@ -1,9 +1,9 @@
 import hyper from '@macrostrat/hyper'
-import styles from './module.styl'
-import {UnderConstruction} from 'app/components'
-import {GeoDeepDiveCard} from './gdd-card'
 import {APIResultView} from '@macrostrat/ui-components'
 
+import {SampleContextMap} from 'app/components'
+import {GeoDeepDiveCard} from './gdd-card'
+import styles from './module.styl'
 h = hyper.styled(styles)
 
 Parameter = ({key, value, rest...})->
@@ -22,6 +22,16 @@ ProjectInfo = ({sample: d})->
     value: d.project_name
   }
 
+LocationBlock = (props)->
+  {sample} = props
+  {geometry} = sample
+  return null unless geometry?
+  h SampleContextMap, {
+    center: geometry.coordinates
+    zoom: 8
+  }
+
+
 SamplePage = (props)->
   {match} = props
   {id} = match.params
@@ -33,8 +43,9 @@ SamplePage = (props)->
       h 'div.basic-info', [
         h ProjectInfo, {sample: d}
       ]
-      h 'h3', "Metadata helpers"
-      h GeoDeepDiveCard, {sample_name: d.name}
+      h LocationBlock, {sample: d}
+      #h 'h3', "Metadata helpers"
+      #h GeoDeepDiveCard, {sample_name: d.name}
     ]
 
 export {SamplePage}
