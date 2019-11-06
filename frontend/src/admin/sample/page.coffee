@@ -1,26 +1,30 @@
 import hyper from '@macrostrat/hyper'
-import {APIResultView} from '@macrostrat/ui-components'
+import {APIResultView, LinkCard} from '@macrostrat/ui-components'
 
 import {SampleContextMap} from 'app/components'
 import {GeoDeepDiveCard} from './gdd-card'
 import styles from './module.styl'
 h = hyper.styled(styles)
 
-Parameter = ({key, value, rest...})->
+Parameter = ({name, value, rest...})->
   h 'div.parameter', rest, [
-    h 'span.key', key
-    h 'span.value', value
+    h 'h4.subtitle', name
+    h 'p.value', null, value
   ]
+
+ProjectLink = ({project_name, project_id})->
+  h LinkCard, {
+    to: "/catalog/project/#{project_id}"
+  }, project_name
 
 
 ProjectInfo = ({sample: d})->
-  if not d.project_name
-    return h 'em', "No project"
-  h Parameter, {
-    className: 'project'
-    key: 'Project'
-    value: d.project_name
-  }
+  h 'div.parameter', [
+    h 'h4.subtitle', 'Project'
+    h 'p.value', [
+      h(ProjectLink, d) or h('em','None')
+    ]
+  ]
 
 LocationBlock = (props)->
   {sample} = props
@@ -31,21 +35,30 @@ LocationBlock = (props)->
     zoom: 8
   }
 
+Material = (props)->
+  {material} = props
+  h Parameter, {
+    name: 'Material',
+    value: material or h('em', 'None')
+  }
 
 SamplePage = (props)->
   {match} = props
   {id} = match.params
   h APIResultView, {route: "/sample", params: {id}}, (data)=>
     d = data[0]
+    {material} = d
     return null unless d?
     h 'div.sample', [
-      h 'h2', "Sample #{d.name}"
+      h 'h3.page-type', 'Sample'
+      h 'h2', d.name
       h 'div.basic-info', [
         h ProjectInfo, {sample: d}
+        h Material, {material}
       ]
       h LocationBlock, {sample: d}
-      #h 'h3', "Metadata helpers"
-      #h GeoDeepDiveCard, {sample_name: d.name}
+      h 'h3', "Metadata helpers"
+      h GeoDeepDiveCard, {sample_name: d.name}
     ]
 
 export {SamplePage}
