@@ -1,5 +1,6 @@
 from flask import Blueprint, make_response, Response, render_template, current_app, abort
 from os.path import join
+from .plugins import SparrowCorePlugin
 
 web = Blueprint('frontend', __name__)
 
@@ -62,3 +63,9 @@ def index(path='/'):
             id='index',
             base_url=base_url,
             asset_dir=join(base_url, 'assets'))
+
+
+class WebPlugin(SparrowCorePlugin):
+    name = "web"
+    def on_finalize_routes(self):
+        self.app.register_blueprint(web, url_prefix='/')
