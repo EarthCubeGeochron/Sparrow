@@ -123,30 +123,33 @@ ProjectSamples = ({data})->
     h SampleContainer, content
   ]
 
+ContentArea = ({data, title, className})->
+  h 'div.content-area', [
+    h 'h5', [
+      h 'span.count', data.length
+      " "
+      pluralize(title, data)
+    ]
+    h 'ul', {className}, data.map (d)->
+      h 'li', d
+  ]
+
 ProjectCard = (props)->
   {id, name, description, samples, publications} = props
   publications ?= []
   h 'div.project-card', [
     h 'h3', name
     h 'p.description', description
-    h.if(samples.length) 'div.content-area', [
-      h 'h5', [
-        h 'span.count', samples.length
-        " "
-        pluralize('sample', samples)
-      ]
-      h 'ul.samples', samples.map (d)->
-        h 'li', d.name
-    ]
-    h.if(publications.length) 'div.content-area', [
-      h 'h5', [
-        h 'span.count', publications.length
-        " "
-        pluralize('publication', publications)
-      ]
-      h 'ul.publications', publications.map (d)->
-        h 'li', d.title
-    ]
+    h.if(samples.length) ContentArea, {
+      className: 'samples'
+      data: samples.map (d)->d.name
+      title: 'sample'
+    }
+    h.if(publications.length) ContentArea, {
+      className: 'publications'
+      data: publications.map (d)->d.title
+      title: 'publication'
+    }
   ]
 
 ProjectInfoLink = (props)->
