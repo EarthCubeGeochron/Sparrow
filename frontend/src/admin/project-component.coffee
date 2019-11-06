@@ -134,10 +134,13 @@ ContentArea = ({data, title, className})->
       h 'li', d
   ]
 
-ProjectCard = (props)->
+ProjectInfoLink = (props)->
   {id, name, description, samples, publications} = props
-  publications ?= []
-  h 'div.project-card', [
+  h LinkCard, {
+    to: "/catalog/project/#{id}"
+    key: id,
+    className: 'project-card'
+  }, [
     h 'h3', name
     h 'p.description', description
     h.if(samples.length) ContentArea, {
@@ -150,16 +153,6 @@ ProjectCard = (props)->
       data: publications.map (d)->d.title
       title: 'publication'
     }
-  ]
-
-ProjectInfoLink = (props)->
-  {id} = props
-  h LinkCard, {
-    to: "/catalog/project/#{id}"
-    key: id,
-    className: 'project-info-card'
-  }, [
-    h ProjectCard, props
   ]
 
 ProjectListComponent = ->
