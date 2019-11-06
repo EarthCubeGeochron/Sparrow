@@ -108,7 +108,7 @@ ProjectSamples = ({data})->
   if data?
     content = data.map (d)->
       h SampleCard, d
-  h 'div.samples', [
+  h 'div.sample-area', [
     h 'h4', 'Samples'
     h SampleContainer, content
   ]
@@ -118,9 +118,12 @@ ProjectCard = (props)->
   h 'div.project', [
     h 'h3', name
     h 'p.description', description
+
     h ProjectPublications, {data: props.publications}
-    h ProjectResearchers, {data: props.researchers}
-    h ProjectSamples, {data: props.samples}
+    h 'div.samples', [
+      h 'span.sample-count', props.samples.length
+      ' sample'+if props.samples.length > 1 then "s" else ""
+    ]
   ]
 
 ProjectInfoLink = (props)->
@@ -157,7 +160,11 @@ ProjectPage = (props)->
   {project} = props
   {samples} = project
   h 'div', [
-    h ProjectCard, project
+    h 'h3', project.name
+    h 'p.description', project.description
+    h ProjectPublications, {data: project.publications}
+    h ProjectResearchers, {data: project.researchers}
+    h ProjectSamples, {data: project.samples}
     h ProjectMap, {samples}
   ]
 

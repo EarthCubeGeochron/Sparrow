@@ -1,35 +1,21 @@
 import {Component, createElement} from 'react'
-import styled from '@emotion/styled'
-import h from 'react-hyperscript'
+import {hyperStyled} from '@macrostrat/hyper'
 import {Card, Colors} from '@blueprintjs/core'
+import {LinkCard} from '@macrostrat/ui-components'
+import styles from './module.styl'
 
-GreyCard = styled.div"""
-  background-color: #{Colors.LIGHT_GRAY4};
-  border-radius: 5px;
-  margin: 5px;
-  padding: 5px 10px;
-  flex-grow: 1;
-  max-width: 15em;
-  .location-name {
-    color: #{Colors.RED1};
-  }
-  h4 {
-    margin-top: 0em;
-    margin-bottom: 0em;
-  }
-"""
-
-Material = styled.div"""font-style: italic"""
+h = hyperStyled(styles)
 
 SampleCard = (props)->
-  {material, sample_id, name, location_name} = props
-  if material?
-    material = h Material, material
-
-  h GreyCard, {className: 'sample'}, [
+  {material, id, name, location_name, link} = props
+  console.log props
+  link ?= true
+  component = if link? then LinkCard else Card
+  to = "/catalog/sample/#{id}"
+  h component, {className: 'sample-card', to}, [
     h 'h4.name', name
     h 'div.location-name', location_name
-    material
+    h.if(material?) 'div.material', material
   ]
 
 export {SampleCard}
