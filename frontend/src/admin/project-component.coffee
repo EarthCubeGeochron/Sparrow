@@ -163,12 +163,6 @@ ProjectInfoLink = (props)->
   ]
 
 ProjectListComponent = ->
-  route = '/project'
-  filterFields = {
-    'name': "Name"
-    'description': "Description"
-  }
-
   h 'div.data-view.projects', [
       h Callout, {
         icon: 'info-sign',
@@ -176,8 +170,11 @@ ProjectListComponent = ->
       }, "This page lists projects of related samples, measurements, and publications.
           Projects can be imported into Sparrow or defined using the managment interface."
     h FilterListComponent, {
-      route,
-      filterFields,
+      route: '/project',
+      filterFields: {
+        'name': "Name"
+        'description': "Description"
+      }
       itemComponent: ProjectInfoLink
     }
   ]
@@ -194,11 +191,9 @@ ProjectPage = (props)->
     h ProjectMap, {samples}
   ]
 
-
 ProjectComponent = (props)->
   {id} = props
   return null unless id?
-
   h 'div.data-view.project', [
     h APIResultView, {
       route: "/project"
