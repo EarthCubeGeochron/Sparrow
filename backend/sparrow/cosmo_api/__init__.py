@@ -7,6 +7,14 @@ cosmo = Blueprint('cosmo_api', __name__)
 def index():
     return "Hello from COSMO API"
 
+# @cosmo.route('/', type="POST")
+# def index():
+#     GET DATA FROM FORM
+#     connect to database
+#     importer = COSMOWebImporter(self.db)
+#     importer.import_data(data_from_form)
+
+
 class CosmoPlugin(SparrowPlugin):
     name = "cosmo-api"
     def on_api_initialized(self, api):
