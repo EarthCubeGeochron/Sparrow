@@ -13,7 +13,8 @@ import {PageFooter} from './shared/footer'
 import {AuthProvider} from './auth'
 import {AppToaster} from './toaster'
 import {Catalog, CatalogNavLinks} from './admin'
-import {AppNavbar, NavButton} from './shared/navbar'
+import {AppNavbar, NavButton} from './components/navbar'
+import {MapPage} from './map'
 import styled from '@emotion/styled'
 
 AppHolder = styled.div"""
@@ -40,19 +41,9 @@ GlobalUI = (props)->
 MainNavbar = (props)->
   h AppNavbar, {fullTitle: true}, [
     h CatalogNavLinks, {base: '/catalog'}
+    h NavButton, {to: '/map'}, "Map"
     h AppNavbar.Divider
     h NavButton, {to: '/api-explorer/v1'}, "API"
-  ]
-
-MapNavbar = (props)->
-  h AppNavbar, {vertical: true}, [
-    h CatalogNavLinks, {base: '/catalog'}
-    h AppNavbar.Divider
-  ]
-
-Map = (props)->
-  h 'div', [
-    h MapNavbar
   ]
 
 class AppMain extends Component
@@ -76,7 +67,7 @@ class AppMain extends Component
             }
             h Route, {
               path: '/map'
-              component: Map
+              component: MapPage
             }
             h Route, {path: '/api-explorer', component: APIExplorer}
           ]

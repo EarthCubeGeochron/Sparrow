@@ -9,16 +9,19 @@ class AuthStatus extends Component
   @contextType: AuthContext
   render: ->
     {requestLoginForm, username} = @context
+    {className, large, rest...} = @props
+    large ?= true
 
     text = 'Not logged in'
     icon = 'blocked-person'
     if username?
       text = username
       icon = 'person'
-    h 'div.auth-status', [
+    h 'div.auth-status', {className}, [
       h LoginForm
       h Button, {
-        minimal: true, large: true,
+        minimal: true,
+        large
         icon,
         onClick: requestLoginForm}, text
     ]
