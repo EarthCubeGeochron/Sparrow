@@ -1,5 +1,5 @@
 import h from 'react-hyperscript'
-import {AppNavbar, NavButton} from 'app/shared/navbar'
+import {AppNavbar, NavButton} from 'app/components/navbar'
 import {SampleMap} from '../plugins/globe'
 import {Frame} from './frame'
 import {InsetText} from 'app/layout'

@@ -1,13 +1,64 @@
 import {Component, createElement} from 'react'
-import h from 'react-hyperscript'
+import {hyperStyled} from '@macrostrat/hyper'
 import {Card, Colors, Callout} from '@blueprintjs/core'
 import styled from '@emotion/styled'
 import T from 'prop-types'
 import {FilterListComponent} from '../components/filter-list'
 import {LinkCard, APIResultView} from '@macrostrat/ui-components'
+import {ContextMap, StaticMarker} from 'app/components'
+import bbox from '@turf/bbox'
+import WebMercatorViewport from 'viewport-mercator-project'
 
 import {SampleCard} from './sample/detail-card'
 import './main.styl'
+import styles from './module.styl'
+h = hyperStyled(styles)
+
+pluralize = (term, arrayOrNumber)->
+  count = arrayOrNumber
+  if Array.isArray(arrayOrNumber)
+    count = arrayOrNumber.length
+  if count > 1
+    term += "s"
+  return term
+
+ProjectMap = (props)->
+  {width, height, samples, padding, minExtent} = props
+  return null unless samples?
+  locatedSamples = samples.filter (d)->d.geometry?
+  return null unless locatedSamples.length > 0
+  padding ?= 50
+  minExtent ?= 0.2 # In degrees
+  width ?= 400
+  height ?= 300
+  vp = new WebMercatorViewport {width, height}
+  {samples} = props
+  coordinates = locatedSamples
+    .map (d)-> d.geometry.coordinates
+  return null unless coordinates.length
+  feature = {
+    type: 'Feature'
+    geometry: {
+      type: 'MultiPoint',
+      coordinates
+    }}
+  box = bbox(feature)
+  bounds = [box.slice(0,2), box.slice(2,4)]
+  console.log(bounds)
+  res = vp.fitBounds(bounds, {padding, minExtent})
+  {latitude, longitude, zoom} = res
+  center = [longitude, latitude]
+
+  h ContextMap, {
+    className: 'project-context-map'
+    center
+    zoom
+    width
+    height
+  }, locatedSamples.map (d)->
+    [longitude, latitude] = d.geometry.coordinates
+    console.log longitude, latitude
+    h StaticMarker, {latitude, longitude}
 
 class Publication extends Component
   renderMain: ->
@@ -40,9 +91,10 @@ ProjectPublications = ({data})->
   if data?
     content = data.map (d)->
       h Publication, d
-  h 'div.publications', [
+  h.if(data?) 'div.publications', [
     h 'h4', 'Publications'
-    content...
+    data.map (d)->
+      h Publication, d
   ]
 
 ProjectResearchers = ({data})->
@@ -66,38 +118,44 @@ ProjectSamples = ({data})->
   if data?
     content = data.map (d)->
       h SampleCard, d
-  h 'div.samples', [
+  h 'div.sample-area', [
     h 'h4', 'Samples'
     h SampleContainer, content
   ]
 
-ProjectCard = (props)->
-  {id, name, description} = props
-  h 'div.project', [
-    h 'h3', name
-    h 'p.description', description
-    h ProjectPublications, {data: props.publications}
-    h ProjectResearchers, {data: props.researchers}
-    h ProjectSamples, {data: props.samples}
+ContentArea = ({data, title, className})->
+  h 'div.content-area', [
+    h 'h5', [
+      h 'span.count', data.length
+      " "
+      pluralize(title, data)
+    ]
+    h 'ul', {className}, data.map (d)->
+      h 'li', d
   ]
 
 ProjectInfoLink = (props)->
-  {id} = props
+  {id, name, description, samples, publications} = props
   h LinkCard, {
     to: "/catalog/project/#{id}"
     key: id,
-    className: 'project-info-card'
+    className: 'project-card'
   }, [
-    h ProjectCard, props
+    h 'h3', name
+    h 'p.description', description
+    h.if(samples.length) ContentArea, {
+      className: 'samples'
+      data: samples.map (d)->d.name
+      title: 'sample'
+    }
+    h.if(publications.length) ContentArea, {
+      className: 'publications'
+      data: publications.map (d)->d.title
+      title: 'publication'
+    }
   ]
 
 ProjectListComponent = ->
-  route = '/project'
-  filterFields = {
-    'name': "Name"
-    'description': "Description"
-  }
-
   h 'div.data-view.projects', [
       h Callout, {
         icon: 'info-sign',
@@ -105,25 +163,37 @@ ProjectListComponent = ->
       }, "This page lists projects of related samples, measurements, and publications.
           Projects can be imported into Sparrow or defined using the managment interface."
     h FilterListComponent, {
-      route,
-      filterFields,
+      route: '/project',
+      filterFields: {
+        'name': "Name"
+        'description': "Description"
+      }
       itemComponent: ProjectInfoLink
     }
   ]
 
+ProjectPage = (props)->
+  {project} = props
+  {samples} = project
+  h 'div', [
+    h 'h3', project.name
+    h 'p.description', project.description
+    h ProjectPublications, {data: project.publications}
+    h ProjectResearchers, {data: project.researchers}
+    h ProjectSamples, {data: project.samples}
+    h ProjectMap, {samples}
+  ]
 
 ProjectComponent = (props)->
   {id} = props
   return null unless id?
-
   h 'div.data-view.project', [
     h APIResultView, {
       route: "/project"
       params: {id}
     }, (data)=>
-      res = data[0]
-      {sample_name, id, rest...} = res
-      h(ProjectCard, res)
+      project = data[0]
+      h(ProjectPage, {project})
   ]
 
 ProjectComponent.propTypes = {
