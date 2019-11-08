@@ -22,7 +22,6 @@ services:
       - SPARROW_BASE_URL
       - SPARROW_LAB_NAME
       - SPARROW_INIT_SQL=/init-sql
-      - SPARROW_PLUGINS=/sparrow-plugins
     volumes:
       # Volume for scripts to make things like
       # migrations work...
@@ -37,10 +36,11 @@ services:
       # and frontend
       - $SPARROW_INIT_SQL:/init-sql/
       - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
-      - ${SPARROW_PLUGINS:-placeholder}:/sparrow-plugins
+      # Link `SPARROW_PLUGIN_DIR` directly into site-packages as a folder
+      - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.7/site-packages/sparrow_plugins:ro
       # Save ipython configuration to anonymous volume so
-      # we keep
-      - ipython_config:/app/.ipython/profile_default/history.sqlite
+      # we keep command history between app runs
+      - ipython_config:/root/.ipython/profile_default
   db:
     image: mdillon/postgis:11
     expose:
