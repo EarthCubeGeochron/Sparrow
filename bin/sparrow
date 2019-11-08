@@ -28,6 +28,7 @@ fi
 # If we haven't yet sourced the config file in a higher-level script
 if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
   export SPARROW_CONFIG="$SPARROW_CONFIG"
+  export SPARROW_CONFIG_DIR="${SPARROW_CONFIG:h}"
   source "$SPARROW_CONFIG"
   export _SPARROW_CONFIG_SOURCED=1
   _SPARROW_CONFIG_SOURCED_HERE=1

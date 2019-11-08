@@ -10,7 +10,6 @@ from .plugins import SparrowPluginManager
 from .auth import AuthPlugin
 from .graph import GraphQLPlugin
 from .web import WebPlugin
-from .cosmo_api import CosmoPlugin
 
 class App(Flask):
     def __init__(self, *args, **kwargs):
@@ -68,7 +67,6 @@ def construct_app(config=None, minimal=False):
     app.register_plugin(AuthPlugin)
     app.register_plugin(GraphQLPlugin)
     app.register_plugin(WebPlugin)
-    app.register_plugin(CosmoPlugin)
 
     from .database import Database
 
