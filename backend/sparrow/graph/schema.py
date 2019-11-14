@@ -8,6 +8,7 @@ from sqlalchemy.types import INTEGER
 
 # https://github.com/alexisrolland/flask-graphene-sqlalchemy/wiki/Flask-Graphene-SQLAlchemy-Tutorial
 # https://github.com/flavors/django-graphql-jwt/issues/6
+# https://github.com/graphql-python/graphene-sqlalchemy/blob/master/examples/flask_sqlalchemy/schema.py
 
 connection_fields = dict()
 

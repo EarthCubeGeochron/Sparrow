@@ -14,7 +14,7 @@ import {SessionListComponent} from './session-list-component'
 import {SessionComponent} from './session-component'
 import {SampleMain} from './sample'
 
-import {AppNavbar, NavButton} from 'app/shared/navbar'
+import {AppNavbar, NavButton} from 'app/components/navbar'
 import {InsetText} from 'app/layout'
 import styled from '@emotion/styled'
 import styles from './module.styl'
@@ -30,6 +30,7 @@ HomeButton = (props)->
   }
 
 CatalogNavLinks = ({base, rest...})->
+  base ?= '/catalog'
   h [
     h NavButton, {to: base+'/project'}, "Projects"
     h NavButton, {to: base+'/sample'}, "Samples"

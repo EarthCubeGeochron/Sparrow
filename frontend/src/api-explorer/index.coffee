@@ -5,7 +5,6 @@ import {render} from 'react-dom'
 import { Route, Link, Redirect } from "react-router-dom"
 import h from 'react-hyperscript'
 
-import {AppNavbar} from 'app/shared/navbar'
 import {RouteComponent} from './route-component'
 
 import './main.styl'

@@ -5,11 +5,11 @@ from sqlalchemy.engine.url import make_url
 
 from .encoders import JSONEncoder
 from .api import APIv1
-from .web import web
 from .util import relative_path
-from .plugins import SparrowPluginManager
+from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .auth import AuthPlugin
 from .graph import GraphQLPlugin
+from .web import WebPlugin
 
 class App(Flask):
     def __init__(self, *args, **kwargs):
@@ -59,6 +59,17 @@ class App(Flask):
             except AttributeError:
                 continue
 
+    def register_external_plugins(self):
+        import sparrow_plugins
+        for name, obj in sparrow_plugins.__dict__.items():
+            try:
+                assert issubclass(obj, SparrowPlugin)
+                assert obj is not SparrowPlugin
+                assert obj is not SparrowCorePlugin
+            except (TypeError, AssertionError) as err:
+                continue
+            self.register_plugin(obj)
+
 
 def construct_app(config=None, minimal=False):
     app = App(__name__, config=config,
@@ -66,6 +77,8 @@ def construct_app(config=None, minimal=False):
 
     app.register_plugin(AuthPlugin)
     app.register_plugin(GraphQLPlugin)
+    app.register_plugin(WebPlugin)
+    app.register_external_plugins()
 
     from .database import Database
 
@@ -96,9 +109,7 @@ def construct_app(config=None, minimal=False):
     app.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
 
     app.run_hook("api-initialized", api)
-
-
-    app.register_blueprint(web, url_prefix='/')
+    app.run_hook("finalize-routes")
 
     # If we want to just serve assets without a file server...
     assets = app.config.get("ASSETS_DIRECTORY", None)

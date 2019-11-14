@@ -29,6 +29,8 @@ class MarkerOverlay extends Component
     route = "/sample"
     params = {geometry: "%"}
     h APIResultView, {route, params}, (data)=>
+      return null unless data?
+      return null unless Array.isArray(data)
       markers = data.map (d)->
         {geometry, rest...} = d
         coordinates = JSON.parse(d.geometry).coordinates
