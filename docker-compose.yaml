@@ -67,7 +67,8 @@ services:
       - $SPARROW_SITE_CONTENT:/app/site-content
   api-tests:
     build: api-tests
-    command: bin/true
+    # A placeholder command
+    command: echo
     depends_on:
       - backend
 volumes:
