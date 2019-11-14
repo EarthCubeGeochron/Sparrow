@@ -7,6 +7,6 @@ if [ ! -f frontend/bundled-deps/ui-components/.git ]; then
   git submodule update --init --recursive
 fi
 
-sparrow compose up --force-recreate --build -d $@
+sparrow compose up --build -d $@
 # Follow logs for running container(s)
 sparrow compose logs -f $@
