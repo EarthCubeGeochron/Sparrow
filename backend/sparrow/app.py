@@ -84,7 +84,6 @@ def construct_app(config=None, minimal=False):
 
     app.load()
 
-
     from .database import Database
 
     db = Database(app)

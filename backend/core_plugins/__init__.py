@@ -1,1 +1,2 @@
 from .earthchem_vocabulary import EarthChemVocabularyPlugin
+from .location_names import LocationNamesPlugin

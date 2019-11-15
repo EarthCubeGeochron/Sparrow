@@ -1,8 +1,8 @@
 from sparrow.plugins import SparrowPlugin
-from .cli import import_earthchem
 
+# Basic shim plugin that loads an external CLI
 class EarthChemVocabularyPlugin(SparrowPlugin):
     name = "earthchem-vocabulary"
     def on_setup_cli(self, cli):
-        wrapper = cli.command(name="import-earthchem-vocabulary")
-        wrapper(import_earthchem)
+        from .cli import import_earthchem
+        cli.add_command(import_earthchem)
