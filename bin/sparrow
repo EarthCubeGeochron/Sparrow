@@ -107,7 +107,8 @@ if [ $subcommand = '--help' ] || [ $subcommand = 'help' ]; then
   echo "" >&2
   echo "Config: $(tput setaf 6)$SPARROW_CONFIG$(tput sgr0)" >&2
   echo "Lab name: $(tput setaf 6)$(tput bold)$SPARROW_LAB_NAME$(tput sgr0)" >&2
-  sparrow compose run --no-deps -T backend cat /cache/sparrow-help.txt | (read; cat)
+  sparrow compose run --no-deps -T backend sparrow
+  #sparrow compose run --no-deps -T backend cat /cache/sparrow-help.txt | (read; cat)
   labname=${SPARROW_LAB_NAME:-"Lab-specific"}
   [ ! -z $SPARROW_COMMANDS ] && \
     echo-help "$labname commands" "$SPARROW_COMMANDS"

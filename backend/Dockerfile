@@ -22,6 +22,8 @@ WORKDIR /app
 ## Copy app core
 COPY ./setup.py /app
 COPY ./sparrow /app/sparrow
+COPY ./core_plugins /app/core_plugins
+# This installation doesn't seem to actually work.
 RUN pip3 install -e .
-RUN mkdir /cache && python3 sparrow --help > /cache/sparrow-help.txt
+## RUN mkdir /cache && python3 sparrow --help > /cache/sparrow-help.txt
 CMD ["/bin/run"]

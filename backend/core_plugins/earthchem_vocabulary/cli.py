@@ -12,7 +12,7 @@ import pandas as P
 from sparrow import App
 from sparrow.util import run_sql
 from os.path import join, realpath, dirname
-from click import command, option
+from click import option
 
 __here = dirname(realpath(__file__))
 __fixtures = join(__here,"fixtures")
@@ -47,9 +47,8 @@ def copy_table(conn, category, tbl, download=False):
     write_table(conn, df, tbl)
     return df
 
-@command(name="import-earthchem-vocabulary")
 @option('--download', is_flag=True, default=False)
-def cli(download=False):
+def import_earthchem(download=False):
     """
     Import EarthChem vocabulary files
     """
@@ -66,7 +65,3 @@ def cli(download=False):
     db.exec_sql(_)
 
     run_sql(db.session, "DROP SCHEMA earthchem_vocabulary CASCADE")
-
-
-cli()
-
