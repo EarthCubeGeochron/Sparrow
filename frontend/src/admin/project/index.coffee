@@ -1,10 +1,13 @@
-import {Component, createElement} from 'react'
+import {Component, createElement, useContext} from 'react'
 import {hyperStyled} from '@macrostrat/hyper'
-import {Card, Colors, Callout} from '@blueprintjs/core'
+import {Card, Colors, Callout, EditableText, Intent, Switch} from '@blueprintjs/core'
 import styled from '@emotion/styled'
 import T from 'prop-types'
 import {FilterListComponent} from '../../components/filter-list'
-import {LinkCard, APIResultView} from '@macrostrat/ui-components'
+import {
+  LinkCard, APIResultView,
+  ModelEditor, ModelEditorContext, ModelEditButton
+} from '@macrostrat/ui-components'
 import {ProjectMap} from './map'
 
 import {SampleCard} from '../sample/detail-card'
@@ -132,12 +135,51 @@ ProjectListComponent = ->
     }
   ]
 
+ModelEditableText = (props)->
+  el = props.is or 'div'
+  {multiline, field, placeholder, rest...} = props
+  placeholder ?= "Add a "+field
+  delete rest.is
+  {data, actions, isEditing} = useContext(ModelEditorContext)
+
+  # Show text with primary intent if changes have been made
+  intent = if actions.hasChanges(field) then Intent.SUCCESS else null
+
+  h el, rest, [
+    h.if(isEditing) EditableText, {
+      multiline
+      placeholder
+      intent
+      onChange: actions.onChange(field)
+      value: data[field]
+    }
+    h.if(not isEditing) 'span', data[field]
+  ]
+
+EmbargoEditor = (props)->
+  {data, actions} = useContext(ModelEditorContext)
+  h Switch, {
+    checked: not data.embargo_date?
+    large: true
+    label: "Public"
+    onChange: (evt)->
+      {checked} = evt.target
+      val = if checked then null else "indefinite"
+      actions.updateState {data: {embargo_date: {$set: val}}}
+  }
+
+EditableProjectDetails = (props)->
+  {project} = props
+  h ModelEditor, {data: project, isEditing: true}, [
+    h ModelEditableText, {is: 'h3', field: 'name', multiline: true}
+    h ModelEditableText, {is: 'p', field: 'description', multiline: true}
+  ]
+
 ProjectPage = (props)->
   {project} = props
   {samples} = project
   h 'div', [
-    h 'h3', project.name
-    h 'p.description', project.description
+    h EditableProjectDetails, {project}
     h ProjectPublications, {data: project.publications}
     h ProjectResearchers, {data: project.researchers}
     h ProjectSamples, {data: project.samples}
