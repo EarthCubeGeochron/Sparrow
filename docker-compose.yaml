@@ -36,6 +36,11 @@ services:
       # and frontend
       - $SPARROW_INIT_SQL:/init-sql/
       - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
+      # Link `SPARROW_PLUGIN_DIR` directly into site-packages as a folder
+      - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.7/site-packages/sparrow_plugins:ro
+      # Save ipython configuration to anonymous volume so
+      # we keep command history between app runs
+      - ipython_config:/root/.ipython/profile_default
   db:
     image: mdillon/postgis:11
     expose:
@@ -73,6 +78,8 @@ services:
       - backend
 volumes:
   frontend_build:
+  # Anonymous volume to preserve `sparrow shell` history
+  ipython_config:
   db_cluster:
   # Placeholder volumes in case we don't have these volumes to mount
   placeholder:

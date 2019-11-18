@@ -29,12 +29,15 @@ ProjectInfo = ({sample: d})->
 
 LocationBlock = (props)->
   {sample} = props
-  {geometry} = sample
+  {geometry, location_name} = sample
   return null unless geometry?
-  h SampleContextMap, {
-    center: geometry.coordinates
-    zoom: 8
-  }
+  h 'div.location', [
+    h SampleContextMap, {
+      center: geometry.coordinates
+      zoom: 8
+    }
+    h.if(location_name) 'h5.location-name', location_name
+  ]
 
 Material = (props)->
   {material} = props
@@ -52,12 +55,12 @@ SamplePage = (props)->
     return null unless d?
     h 'div.sample', [
       h 'h3.page-type', 'Sample'
+      h LocationBlock, {sample: d}
       h 'h2', d.name
       h 'div.basic-info', [
         h ProjectInfo, {sample: d}
         h Material, {material}
       ]
-      h LocationBlock, {sample: d}
       h 'h3', "Metadata helpers"
       h GeoDeepDiveCard, {sample_name: d.name}
     ]

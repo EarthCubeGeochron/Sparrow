@@ -1,5 +1,5 @@
 import click
-from os import path
+from os import path, environ
 from click import echo, style, secho
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
@@ -14,7 +14,17 @@ from .app import App, construct_app
 from .database import Database
 from .auth.create_user import create_user
 
-@click.group()
+# https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
+class SparrowCLI(click.Group):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # This only pulls in configuration from environment variable for now,
+        # but I don't see another option to support lazily loading plugins
+        app = App(__name__, config=environ.get("SPARROW_BACKEND_CONFIG"))
+        app.load()
+        app.run_hook("setup-cli", self)
+
+@click.group(cls=SparrowCLI)
 def cli():
     pass
 
@@ -117,12 +127,11 @@ def _create_user(db):
     """
     create_user(db)
 
+
 # Support arbitrary subcommand loading
-# https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
 # Right now we just program in each subcommand which is ugly and non-extensible
 # Ideally, we'd drag in anything we can find.
 name='import-earthchem'
-@cli.command(name=name)
 @click.argument('args', nargs=-1, type=click.UNPROCESSED)
 def sparrow_earthchem_vocabulary(args):
     """
