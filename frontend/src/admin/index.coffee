@@ -2,7 +2,8 @@ import {hyperStyled, classed} from '@macrostrat/hyper'
 import {Component, useContext} from 'react'
 import {NonIdealState, Intent,
         Button, ButtonGroup, Icon, Callout} from '@blueprintjs/core'
-import {Route, Switch} from 'react-router-dom'
+import {Switch} from 'react-router-dom'
+import {ErrorBoundaryRoute as Route} from 'app/util/route'
 import classNames from 'classnames'
 import T from 'prop-types'
 

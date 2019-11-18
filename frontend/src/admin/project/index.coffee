@@ -3,6 +3,7 @@ import {hyperStyled} from '@macrostrat/hyper'
 import {Card, Colors, Callout, EditableText, Intent, Switch} from '@blueprintjs/core'
 import styled from '@emotion/styled'
 import T from 'prop-types'
+import {useAuth} from '../../auth'
 import {FilterListComponent} from '../../components/filter-list'
 import {
   LinkCard, APIResultView,
@@ -157,7 +158,8 @@ ModelEditableText = (props)->
   ]
 
 EmbargoEditor = (props)->
-  {data, actions} = useContext(ModelEditorContext)
+  {data, actions, isEditing} = useContext(ModelEditorContext)
+  return null unless isEditing
   h Switch, {
     checked: not data.embargo_date?
     large: true
@@ -170,9 +172,12 @@ EmbargoEditor = (props)->
 
 EditableProjectDetails = (props)->
   {project} = props
-  h ModelEditor, {data: project, isEditing: true}, [
+  {login} = useAuth()
+
+  h ModelEditor, {data: project, isEditing: login}, [
     h ModelEditableText, {is: 'h3', field: 'name', multiline: true}
     h ModelEditableText, {is: 'p', field: 'description', multiline: true}
+    h EmbargoEditor
   ]
 
 ProjectPage = (props)->
