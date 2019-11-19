@@ -172,6 +172,8 @@ EmbargoEditor = (props)->
   {login} = useAuth()
   {model, actions, isEditing} = useContext(ModelEditorContext)
   [isOpen, setOpen] = useState(false)
+  text = if model.embargo_date? then "Embargoed" else "Public"
+  icon = if model.embargo_date? then "lock" else "unlock"
   return null unless login
   h 'div.embargo-editor', [
     h Popover, {
@@ -182,19 +184,19 @@ EmbargoEditor = (props)->
         setOpen(false)
     }, [
       h Button, {
-        text: "Public", minimal: true, interactive: false,
-        rightIcon: 'lock', intent: Intent.SUCCESS
+        text, minimal: true, interactive: false,
+        rightIcon: icon, intent: Intent.SUCCESS
         onClick: -> setOpen(not isOpen)
       }
       h 'div.embargo-control-panel', [
         h Switch, {
-          checked: not model.embargo_date?
+          checked: model.embargo_date?
           label: "Embargoed"
           alignIndicator: Alignment.RIGHT
           onChange: (evt)->
             {checked} = evt.target
-            val = if checked then null else "indefinite"
-            actions.updateState {model: {embargo_date: {$set: val}}}
+            val = if checked then "+Infinity" else null
+            actions.persistChanges {embargo_date: {$set: val}}
         }
       ]
     ]
@@ -203,12 +205,12 @@ EmbargoEditor = (props)->
 EditStatusButtons = ->
   {isEditing, hasChanges, actions} = useModelEditor()
   changed = hasChanges()
-  h [
-    h.if(not isEditing) ModelEditButton, "Edit"
-    h.if(isEditing) ButtonGroup, [
+  h 'div.edit-status-controls', [
+    h.if(not isEditing) ModelEditButton, {minimal: true}, "Edit"
+    h.if(isEditing) ButtonGroup, {minimal: true}, [
       h SaveButton, {
         disabled: not changed
-        onClick: actions.persistChanges
+        onClick: -> actions.persistChanges()
       }, "Save"
       h CancelButton, {
         intent: if changed then "warning" else "none"

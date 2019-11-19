@@ -6,13 +6,19 @@ from flask import jsonify
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from textwrap import dedent
 from datetime import datetime
+from ..logs import get_logger
 
 from .base import API, APIResourceCollection
 
+log = get_logger(__name__)
 # eventually should use **Marshmallow** or similar
 # for parsing incoming API requests
 
 def date(date_string):
+    if date_string == '-Infinity':
+        return datetime.min
+    if date_string == '+Infinity':
+        return datetime.max
     return datetime.strptime(date_string, "%Y-%m-%d").date()
 
 def infer_primary_key(table):
@@ -78,9 +84,15 @@ class ModelEditParser(reqparse.RequestParser):
                 continue
             try:
                 type = infer_type(column)
+                if type == datetime:
+                    type = date
+
                 self.add_argument(str(name),
-                    type=type, help=None, store_missing=False)
+                                  type=type,
+                                  help=None,
+                                  store_missing=False)
             except err:
+                log.info(f"Could not map column {name} for {model.__table__.name}")
                 continue
 
 class APIv1(API):

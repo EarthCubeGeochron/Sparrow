@@ -10,9 +10,6 @@ log = get_logger(__name__)
 
 ProjectEditAPI = APIResourceCollection()
 
-parser = reqparse.RequestParser()
-parser.add_argument("title", )
-
 @ProjectEditAPI.resource('/<int:id>')
 class ProjectEditResource(Resource):
     @jwt_required
@@ -35,7 +32,8 @@ class ProjectEditResource(Resource):
         db.session.add(m)
         db.session.commit()
 
-        res = dict(id=m.id, name=m.name, description=m.description)
+
+        res = m.to_dict()
         log.debug(res)
 
         # We need to replace this hacky solution with marshaling with
