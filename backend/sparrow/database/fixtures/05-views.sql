@@ -347,7 +347,8 @@ SELECT
       ON ss.sample_id = s.id
 		WHERE ss.project_id = p.id
 	) AS a)) AS samples
-FROM project p;
+FROM project p
+ORDER BY p.id;
 
 COMMENT ON COLUMN core_view.project.samples IS
 'Array of objects representing samples in the project

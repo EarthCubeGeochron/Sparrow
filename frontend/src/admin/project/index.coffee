@@ -213,7 +213,7 @@ EditStatusButtons = ->
       h CancelButton, {
         intent: if changed then "warning" else "none"
         onClick: actions.toggleEditing
-      }, "Cancel"
+      }, "Done"
     ]
   ]
 
@@ -228,9 +228,10 @@ EditableProjectDetails = (props)->
     canEdit: login
     persistChanges: (updatedModel, changeset)=>
       {id} = updatedModel
-      d = await put(buildURL("/edit/project/#{id}"), changeset)
-      console.log d
-      return null
+      response = await put(buildURL("/edit/project/#{id}"), changeset)
+      {data} = response
+      {id, rest...} = data
+      return rest
   }, [
     h 'div.project-editor', [
       h.if(login) MinimalNavbar, {className: 'project-editor-navbar'}, [

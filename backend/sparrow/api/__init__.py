@@ -7,7 +7,7 @@ from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from textwrap import dedent
 from datetime import datetime
 
-from .base import API
+from .base import API, APIResourceCollection
 
 # eventually should use **Marshmallow** or similar
 # for parsing incoming API requests
@@ -68,6 +68,20 @@ errors = dict(
 class CatchAll(Resource):
     def get(self, content):
         return dict(error="Requested API endpoint does not exist"), 404
+
+class ModelEditParser(reqparse.RequestParser):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+        for name, column in model.__table__.c.items():
+            if column in model.__mapper__.primary_key:
+                continue
+            try:
+                type = infer_type(column)
+                self.add_argument(str(name),
+                    type=type, help=None, store_missing=False)
+            except err:
+                continue
 
 class APIv1(API):
     """
