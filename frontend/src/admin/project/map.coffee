@@ -3,6 +3,7 @@ import T from 'prop-types'
 import {ContextMap, StaticMarker} from 'app/components'
 import bbox from '@turf/bbox'
 import WebMercatorViewport from 'viewport-mercator-project'
+import {Link} from 'react-router-dom'
 
 ProjectMap = (props)->
   {width, height, samples, padding, minExtent} = props
@@ -31,15 +32,17 @@ ProjectMap = (props)->
   {latitude, longitude, zoom} = res
   center = [longitude, latitude]
 
-  h ContextMap, {
-    className: 'project-context-map'
-    center
-    zoom
-    width
-    height
-  }, locatedSamples.map (d)->
-    [longitude, latitude] = d.geometry.coordinates
-    console.log longitude, latitude
-    h StaticMarker, {latitude, longitude}
+  h Link, {to: "/map##{zoom}/#{latitude}/#{longitude}"}, [
+    h ContextMap, {
+      className: 'project-context-map'
+      center
+      zoom
+      width
+      height
+    }, locatedSamples.map (d)->
+      [longitude, latitude] = d.geometry.coordinates
+      console.log longitude, latitude
+      h StaticMarker, {latitude, longitude}
+  ]
 
 export {ProjectMap}

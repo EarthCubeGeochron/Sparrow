@@ -1,6 +1,6 @@
 import hyper from '@macrostrat/hyper'
 import {APIResultView, LinkCard} from '@macrostrat/ui-components'
-
+import {Link} from 'react-router-dom'
 import {SampleContextMap} from 'app/components'
 import {GeoDeepDiveCard} from './gdd-card'
 import styles from './module.styl'
@@ -32,10 +32,12 @@ LocationBlock = (props)->
   {geometry, location_name} = sample
   return null unless geometry?
   h 'div.location', [
-    h SampleContextMap, {
-      center: geometry.coordinates
-      zoom: 8
-    }
+    h Link, {to: '/map'}, [
+      h SampleContextMap, {
+        center: geometry.coordinates
+        zoom: 8
+      }
+    ]
     h.if(location_name) 'h5.location-name', location_name
   ]
 
@@ -56,7 +58,7 @@ SamplePage = (props)->
     h 'div.sample', [
       h 'h3.page-type', 'Sample'
       h 'div.flex-row', [
-        h 'div', [
+        h 'div.info-block', [
           h 'h2', d.name
           h 'div.basic-info', [
             h ProjectInfo, {sample: d}
