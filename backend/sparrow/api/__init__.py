@@ -64,6 +64,11 @@ def build_description(argument):
 errors = dict(
     TypeError=dict(message="Could not serialize JSON data"))
 
+
+class CatchAll(Resource):
+    def get(self, content):
+        return dict(error="Requested API endpoint does not exist"), 404
+
 class APIv1(API):
     """
     Version 1 API for Sparrow
@@ -79,6 +84,7 @@ class APIv1(API):
         self.blueprint = Blueprint('api', __name__)
         super().__init__(self.blueprint, errors=errors)
         self.route_descriptions = []
+        self.add_resource(CatchAll, '/<path:content>', '/<path:content>/')
         self.create_description_model()
 
     def create_description_model(self):

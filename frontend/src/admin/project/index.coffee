@@ -1,16 +1,26 @@
-import {Component, createElement, useContext} from 'react'
+import {Component, createElement, useContext, useState} from 'react'
 import {hyperStyled} from '@macrostrat/hyper'
-import {Card, Colors, Callout, EditableText, Intent, Switch} from '@blueprintjs/core'
+import {
+  Card, Colors, Callout,
+  EditableText, Intent, Switch
+  Alignment, Button, Popover, ButtonGroup
+  Menu, MenuItem
+} from '@blueprintjs/core'
 import styled from '@emotion/styled'
+import {put} from 'axios'
 import T from 'prop-types'
 import {useAuth} from '../../auth'
 import {FilterListComponent} from '../../components/filter-list'
 import {
   LinkCard, APIResultView,
-  ModelEditor, ModelEditorContext, ModelEditButton
+  ModelEditor, ModelEditorContext, ModelEditButton,
+  CancelButton, SaveButton, useModelEditor,
+  APIContext
 } from '@macrostrat/ui-components'
 import {ProjectMap} from './map'
+import {MinimalNavbar} from 'app/components/navbar'
 
+import classNames from 'classnames'
 import {SampleCard} from '../sample/detail-card'
 import '../main.styl'
 import styles from '../module.styl'
@@ -141,54 +151,114 @@ ModelEditableText = (props)->
   {multiline, field, placeholder, rest...} = props
   placeholder ?= "Add a "+field
   delete rest.is
-  {data, actions, isEditing} = useContext(ModelEditorContext)
+  {model, actions, isEditing} = useContext(ModelEditorContext)
 
   # Show text with primary intent if changes have been made
   intent = if actions.hasChanges(field) then Intent.SUCCESS else null
 
   h el, rest, [
     h.if(isEditing) EditableText, {
+      className: "model-edit-text field-#{field}"
       multiline
       placeholder
       intent
       onChange: actions.onChange(field)
-      value: data[field]
+      value: model[field]
     }
-    h.if(not isEditing) 'span', data[field]
+    h.if(not isEditing) 'span', model[field]
   ]
 
 EmbargoEditor = (props)->
-  {data, actions, isEditing} = useContext(ModelEditorContext)
-  return null unless isEditing
-  h Switch, {
-    checked: not data.embargo_date?
-    large: true
-    label: "Public"
-    onChange: (evt)->
-      {checked} = evt.target
-      val = if checked then null else "indefinite"
-      actions.updateState {data: {embargo_date: {$set: val}}}
-  }
+  {login} = useAuth()
+  {model, actions, isEditing} = useContext(ModelEditorContext)
+  [isOpen, setOpen] = useState(false)
+  return null unless login
+  h 'div.embargo-editor', [
+    h Popover, {
+      position: 'bottom',
+      isOpen,
+      onClose: (evt)=>
+        console.log evt
+        setOpen(false)
+    }, [
+      h Button, {
+        text: "Public", minimal: true, interactive: false,
+        rightIcon: 'lock', intent: Intent.SUCCESS
+        onClick: -> setOpen(not isOpen)
+      }
+      h 'div.embargo-control-panel', [
+        h Switch, {
+          checked: not model.embargo_date?
+          label: "Embargoed"
+          alignIndicator: Alignment.RIGHT
+          onChange: (evt)->
+            {checked} = evt.target
+            val = if checked then null else "indefinite"
+            actions.updateState {model: {embargo_date: {$set: val}}}
+        }
+      ]
+    ]
+  ]
+
+EditStatusButtons = ->
+  {isEditing, hasChanges, actions} = useModelEditor()
+  changed = hasChanges()
+  h [
+    h.if(not isEditing) ModelEditButton, "Edit"
+    h.if(isEditing) ButtonGroup, [
+      h SaveButton, {
+        disabled: not changed
+        onClick: actions.persistChanges
+      }, "Save"
+      h CancelButton, {
+        intent: if changed then "warning" else "none"
+        onClick: actions.toggleEditing
+      }, "Cancel"
+    ]
+  ]
+
 
 EditableProjectDetails = (props)->
   {project} = props
   {login} = useAuth()
+  {helpers: {buildURL}} = useContext(APIContext)
 
-  h ModelEditor, {data: project, isEditing: login}, [
-    h ModelEditableText, {is: 'h3', field: 'name', multiline: true}
-    h ModelEditableText, {is: 'p', field: 'description', multiline: true}
-    h EmbargoEditor
+  h ModelEditor, {
+    model: project
+    canEdit: login
+    persistChanges: (updatedModel, changeset)=>
+      {id} = updatedModel
+      d = await put(buildURL("/edit/project/#{id}"), changeset)
+      console.log d
+      return null
+  }, [
+    h 'div.project-editor', [
+      h.if(login) MinimalNavbar, {className: 'project-editor-navbar'}, [
+        h 'h4', "Manage project"
+        h EditStatusButtons
+        h EmbargoEditor
+      ]
+      h 'div.project-editor-content', [
+        h ModelEditableText, {is: 'h3', field: 'name', multiline: true}
+        h ModelEditableText, {is: 'p', field: 'description', multiline: true}
+      ]
+    ]
   ]
 
 ProjectPage = (props)->
   {project} = props
   {samples} = project
-  h 'div', [
+  h 'div.project-page', [
     h EditableProjectDetails, {project}
     h ProjectPublications, {data: project.publications}
     h ProjectResearchers, {data: project.researchers}
-    h ProjectSamples, {data: project.samples}
-    h ProjectMap, {samples}
+    h 'div.flex-row', [
+      h ProjectSamples, {data: project.samples}
+      h 'div', [
+        h 'h4', 'Location'
+        h ProjectMap, {samples}
+      ]
+    ]
   ]
 
 ProjectComponent = (props)->
