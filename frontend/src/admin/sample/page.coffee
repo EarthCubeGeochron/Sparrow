@@ -55,11 +55,15 @@ SamplePage = (props)->
     return null unless d?
     h 'div.sample', [
       h 'h3.page-type', 'Sample'
-      h LocationBlock, {sample: d}
-      h 'h2', d.name
-      h 'div.basic-info', [
-        h ProjectInfo, {sample: d}
-        h Material, {material}
+      h 'div.flex-row', [
+        h 'div', [
+          h 'h2', d.name
+          h 'div.basic-info', [
+            h ProjectInfo, {sample: d}
+            h Material, {material}
+          ]
+        ]
+        h LocationBlock, {sample: d}
       ]
       h 'h3', "Metadata helpers"
       h GeoDeepDiveCard, {sample_name: d.name}
