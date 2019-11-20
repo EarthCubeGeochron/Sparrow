@@ -13,6 +13,7 @@ import {
   APIContext
 } from '@macrostrat/ui-components'
 import {MinimalNavbar} from 'app/components/navbar'
+import {put} from 'axios'
 
 import classNames from 'classnames'
 import '../main.styl'
