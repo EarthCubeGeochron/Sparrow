@@ -11,7 +11,7 @@ ErrorTolerantAPI = compose(ErrorBoundary, APIResultView)
 SampleOverlay = (props)->
   route = "/sample"
   params = {geometry: "%", all: true}
-  h ErrorTolerantAPI, {route, params}, (data)=>
+  h ErrorTolerantAPI, {route, params}, (data)->
     markerData = data.filter (d)->d.geometry?
     h markerData.map (d)->
       [longitude, latitude] = d.geometry.coordinates
@@ -20,6 +20,7 @@ SampleOverlay = (props)->
 class MapPanel extends Component
   constructor: (props)->
     super props
+    @firstWindowHash = window.location.hash
     @state = {
       viewport: {
         latitude: 43.6150
@@ -46,18 +47,22 @@ class MapPanel extends Component
       h SampleOverlay
     ]
 
-  setLocationFromHash: ->
-    {hash} = window.location
+  setLocationFromHash: (hash)->
+    hash ?= window.location.hash
     s = hash.slice(1)
     v = s.split("/")
     return {} unless v.length == 3
     [zoom, latitude, longitude] = v.map (d)->parseFloat(d)
     @setState {viewport: {zoom, latitude, longitude}}
 
+  componentDidMount: ->
+    # We would do this in componentDidMount,
+    # but there is a flash of a bad hash from the
+    # main map component.
+    @setLocationFromHash(@firstWindowHash)
+    delete @firstWindowHash
+
   onViewportChange: (viewport)=>
     @setState {viewport}
-
-  componentDidMount: ->
-    @setLocationFromHash()
 
 export {MapPanel}
