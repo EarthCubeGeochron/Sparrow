@@ -4,6 +4,8 @@ import {Link} from 'react-router-dom'
 import {SampleContextMap} from 'app/components'
 import {GeoDeepDiveCard} from './gdd-card'
 import styles from './module.styl'
+import {MapLink} from 'app/map'
+
 h = hyper.styled(styles)
 
 Parameter = ({name, value, rest...})->
@@ -31,11 +33,13 @@ LocationBlock = (props)->
   {sample} = props
   {geometry, location_name} = sample
   return null unless geometry?
+  zoom = 8
+  [longitude, latitude] = geometry.coordinates
   h 'div.location', [
-    h Link, {to: '/map'}, [
+    h MapLink, {zoom, latitude, longitude}, [
       h SampleContextMap, {
         center: geometry.coordinates
-        zoom: 8
+        zoom
       }
     ]
     h.if(location_name) 'h5.location-name', location_name

@@ -4,6 +4,7 @@ import {ContextMap, StaticMarker} from 'app/components'
 import bbox from '@turf/bbox'
 import WebMercatorViewport from 'viewport-mercator-project'
 import {Link} from 'react-router-dom'
+import {MapLink} from 'app/map'
 
 ProjectMap = (props)->
   {width, height, samples, padding, minExtent} = props
@@ -32,7 +33,7 @@ ProjectMap = (props)->
   {latitude, longitude, zoom} = res
   center = [longitude, latitude]
 
-  h Link, {to: "/map##{zoom}/#{latitude}/#{longitude}"}, [
+  h MapLink, {zoom, latitude, longitude}, [
     h ContextMap, {
       className: 'project-context-map'
       center
