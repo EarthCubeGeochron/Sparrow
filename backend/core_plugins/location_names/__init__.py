@@ -5,9 +5,10 @@ from json import loads
 from requests import get
 # TODO: add geoalchemy to base docker image
 # ..tricky because we are using Alpine
-#from geoalchemy2.shape import to_shape
+# from geoalchemy2.shape import to_shape
 
 # Could also extend this to support the Mapbox places or Google Places API.
+
 
 def get_location_name(coords):
     [lng, lat] = coords
@@ -19,17 +20,18 @@ def get_location_name(coords):
     name = name.replace(", , ", ", ")
     return name
 
+
 class LocationNamesPlugin(SparrowPlugin):
     name = "location-names"
     def on_setup_cli(self, cli):
 
         @click.command(name='update-location-names')
         @click.option("--overwrite", is_flag=True, default=False)
-        def cmd(*args,**kwargs):
+        def cmd(*args, **kwargs):
             """
             Update location names
             """
-            self.update_location_names(*args,**kwargs)
+            self.update_location_names(*args, **kwargs)
 
         cli.add_command(cmd)
 
@@ -38,7 +40,8 @@ class LocationNamesPlugin(SparrowPlugin):
         s = db.model.sample
         # Get unnamed locations
         q = (db.session.query(s)
-                .with_entities(s, func.ST_AsGeoJSON(func.ST_Centroid(s.location)))
+                .with_entities(s,
+                    func.ST_AsGeoJSON(func.ST_Centroid(s.location)))
                 .filter(s.location != None))
 
         if not overwrite:

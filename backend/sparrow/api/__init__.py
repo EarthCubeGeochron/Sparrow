@@ -6,13 +6,19 @@ from flask import jsonify
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from textwrap import dedent
 from datetime import datetime
+from ..logs import get_logger
 
-from .base import API
+from .base import API, APIResourceCollection
 
+log = get_logger(__name__)
 # eventually should use **Marshmallow** or similar
 # for parsing incoming API requests
 
 def date(date_string):
+    if date_string == '-Infinity':
+        return datetime.min
+    if date_string == '+Infinity':
+        return datetime.max
     return datetime.strptime(date_string, "%Y-%m-%d").date()
 
 def infer_primary_key(table):
@@ -64,6 +70,31 @@ def build_description(argument):
 errors = dict(
     TypeError=dict(message="Could not serialize JSON data"))
 
+
+class CatchAll(Resource):
+    def get(self, content):
+        return dict(error="Requested API endpoint does not exist"), 404
+
+class ModelEditParser(reqparse.RequestParser):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+        for name, column in model.__table__.c.items():
+            if column in model.__mapper__.primary_key:
+                continue
+            try:
+                type = infer_type(column)
+                if type == datetime:
+                    type = date
+
+                self.add_argument(str(name),
+                                  type=type,
+                                  help=None,
+                                  store_missing=False)
+            except err:
+                log.info(f"Could not map column {name} for {model.__table__.name}")
+                continue
+
 class APIv1(API):
     """
     Version 1 API for Sparrow
@@ -79,6 +110,7 @@ class APIv1(API):
         self.blueprint = Blueprint('api', __name__)
         super().__init__(self.blueprint, errors=errors)
         self.route_descriptions = []
+        self.add_resource(CatchAll, '/<path:content>', '/<path:content>/')
         self.create_description_model()
 
     def create_description_model(self):

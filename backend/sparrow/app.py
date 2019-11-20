@@ -2,6 +2,7 @@ from click import echo, style, secho
 from os import environ
 from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
+import logging
 
 from .encoders import JSONEncoder
 from .api import APIv1
