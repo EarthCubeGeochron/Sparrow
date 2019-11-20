@@ -8,6 +8,24 @@ import h, {compose} from '@macrostrat/hyper'
 
 ErrorTolerantAPI = compose(ErrorBoundary, APIResultView)
 
+# mapStyle = {
+#   version: 8,
+#   sources: {
+#     dem: {
+#       type: "raster-dem",
+#       url: "mapbox://mapbox.terrain-rgb"
+#     }
+#   },
+#   layers: [
+#     {
+#       id: "hillshading",
+#       source: "dem",
+#       type: "hillshade"
+#     }
+#   ]
+# }
+# #-> waterway-river-canal-shadow
+
 SampleOverlay = (props)->
   route = "/sample"
   params = {geometry: "%", all: true}
@@ -32,6 +50,7 @@ class MapPanel extends Component
   render: ->
     {accessToken, rest...} = @props
     {viewport} = @state
+
     h InteractiveMap, {
       rest...
       mapStyle: "mapbox://styles/mapbox/outdoors-v9"
