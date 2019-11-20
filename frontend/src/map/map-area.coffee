@@ -8,23 +8,8 @@ import h, {compose} from '@macrostrat/hyper'
 
 ErrorTolerantAPI = compose(ErrorBoundary, APIResultView)
 
-# mapStyle = {
-#   version: 8,
-#   sources: {
-#     dem: {
-#       type: "raster-dem",
-#       url: "mapbox://mapbox.terrain-rgb"
-#     }
-#   },
-#   layers: [
-#     {
-#       id: "hillshading",
-#       source: "dem",
-#       type: "hillshade"
-#     }
-#   ]
-# }
-# #-> waterway-river-canal-shadow
+# Should add raster hillshading styles to map...
+# https://docs.mapbox.com/mapbox-gl-js/example/hillshade/
 
 SampleOverlay = (props)->
   route = "/sample"
