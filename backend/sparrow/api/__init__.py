@@ -241,7 +241,6 @@ class APIv1(API):
                     return self.describe()
 
                 # Begin querying after filters are assembled
-
                 try:
                     q = db.session.query(table)
                     for filter in filters:
@@ -249,6 +248,10 @@ class APIv1(API):
 
                     count = q.count()
 
+                    # We should integrate keyset-based or cursor-based pagination
+                    # so that we don't have to do costly offsets e.g.
+                    # https://github.com/djrobstep/sqlakeyset
+                    # http://www.postgresqltutorial.com/plpgsql-cursor/
                     if offset is not None:
                         q = q.offset(offset)
                     if limit is not None:
