@@ -1,4 +1,5 @@
 #!/bin/sh
 
+(cd bundled-deps/ui-components && npm install)
 npm install
 webpack --watch --mode=development
