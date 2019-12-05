@@ -1,25 +1,55 @@
 import hyper from '@macrostrat/hyper'
-import styles from './module.styl'
-import {UnderConstruction} from 'app/components'
+import {APIResultView, LinkCard} from '@macrostrat/ui-components'
+import {Link} from 'react-router-dom'
+import {SampleContextMap} from 'app/components'
 import {GeoDeepDiveCard} from './gdd-card'
-import {APIResultView} from '@macrostrat/ui-components'
+import styles from './module.styl'
+import {MapLink} from 'app/map'
 
 h = hyper.styled(styles)
 
-Parameter = ({key, value, rest...})->
+Parameter = ({name, value, rest...})->
   h 'div.parameter', rest, [
-    h 'span.key', key
-    h 'span.value', value
+    h 'h4.subtitle', name
+    h 'p.value', null, value
   ]
+
+ProjectLink = ({project_name, project_id})->
+  return h('em', 'None') unless project_name? and project_id?
+  h LinkCard, {
+    to: "/catalog/project/#{project_id}"
+  }, project_name
 
 
 ProjectInfo = ({sample: d})->
-  if not d.project_name
-    return h 'em', "No project"
+  h 'div.parameter', [
+    h 'h4.subtitle', 'Project'
+    h 'p.value', [
+      h ProjectLink, d
+    ]
+  ]
+
+LocationBlock = (props)->
+  {sample} = props
+  {geometry, location_name} = sample
+  return null unless geometry?
+  zoom = 8
+  [longitude, latitude] = geometry.coordinates
+  h 'div.location', [
+    h MapLink, {zoom, latitude, longitude}, [
+      h SampleContextMap, {
+        center: geometry.coordinates
+        zoom
+      }
+    ]
+    h.if(location_name) 'h5.location-name', location_name
+  ]
+
+Material = (props)->
+  {material} = props
   h Parameter, {
-    className: 'project'
-    key: 'Project'
-    value: d.project_name
+    name: 'Material',
+    value: material or h('em', 'None')
   }
 
 SamplePage = (props)->
@@ -27,11 +57,19 @@ SamplePage = (props)->
   {id} = match.params
   h APIResultView, {route: "/sample", params: {id}}, (data)=>
     d = data[0]
+    {material} = d
     return null unless d?
     h 'div.sample', [
-      h 'h2', "Sample #{d.name}"
-      h 'div.basic-info', [
-        h ProjectInfo, {sample: d}
+      h 'h3.page-type', 'Sample'
+      h 'div.flex-row', [
+        h 'div.info-block', [
+          h 'h2', d.name
+          h 'div.basic-info', [
+            h ProjectInfo, {sample: d}
+            h Material, {material}
+          ]
+        ]
+        h LocationBlock, {sample: d}
       ]
       h 'h3', "Metadata helpers"
       h GeoDeepDiveCard, {sample_name: d.name}

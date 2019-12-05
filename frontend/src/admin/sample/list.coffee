@@ -31,7 +31,7 @@ SampleList = ->
     'project_name': "Project"
   }
 
-  h 'div.data-view#sample-list', [
+  h 'div.data-view.sample-list', [
     h Callout, {
       icon: 'info-sign',
       title: "Samples"

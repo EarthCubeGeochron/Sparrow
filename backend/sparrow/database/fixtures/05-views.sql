@@ -204,8 +204,9 @@ SELECT DISTINCT ON (s.id)
   s.name,
   s.material,
   ST_AsGeoJSON(s.location)::jsonb geometry,
-  location_name,
-  location_precision,
+  s.location_name,
+  s.location_precision,
+  s.location_name_autoset,
   p.id project_id,
   p.name project_name,
   is_public(s)
@@ -276,12 +277,50 @@ FROM sample s
 LEFT JOIN b
   ON s.id = b.id;
 
+/*
+View to link projects with all member samples and sessions
+*/
+CREATE VIEW core_view.project_sample_session AS
+SELECT
+  p.id project_id,
+  s.id sample_id,
+  ss.id session_id
+FROM session ss
+LEFT JOIN sample s
+  ON ss.sample_id = s.id
+JOIN project p
+  ON p.id = ss.project_id
+UNION ALL
+SELECT
+  p.id,
+  s.id sample_id,
+  NULL
+FROM sample s
+JOIN project_sample ps
+  ON ps.sample_id = s.id
+JOIN project p
+  ON p.id = ps.project_id;
+
+CREATE VIEW core_view.project_extent AS
+SELECT
+  project_id,
+  ST_Extent(location) extent,
+  count(*) n
+FROM core_view.project_sample_session p
+JOIN sample s
+  ON s.id = p.sample_id
+WHERE location IS NOT null
+GROUP BY p.project_id;
+
 CREATE VIEW core_view.project AS
 SELECT
 	p.id,
 	p.description,
 	p.name,
   p.embargo_date,
+  p.location_name,
+  p.location_name_autoset,
+  ST_AsGeoJSON(p.location)::jsonb geometry,
   NOT embargoed(p.embargo_date) AS is_public,
 	-- Get data from researchers table in standard format
 	to_jsonb((SELECT array_agg(a) FROM (
@@ -308,7 +347,8 @@ SELECT
       ON ss.sample_id = s.id
 		WHERE ss.project_id = p.id
 	) AS a)) AS samples
-FROM project p;
+FROM project p
+ORDER BY p.id;
 
 COMMENT ON COLUMN core_view.project.samples IS
 'Array of objects representing samples in the project

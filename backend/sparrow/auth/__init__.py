@@ -9,13 +9,15 @@
 
 from flask import current_app, jsonify
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import (create_access_token, create_refresh_token,
+from flask_jwt_extended import (JWTManager, create_access_token,
+                                create_refresh_token,
                                 jwt_required, jwt_refresh_token_required,
                                 set_access_cookies, set_refresh_cookies,
                                 unset_jwt_cookies, jwt_optional,
-                                get_jwt_identity, get_raw_jwt)
+                                get_jwt_identity)
 from ..api.base import APIResourceCollection
 from ..models import User
+from ..plugins import SparrowCorePlugin
 
 parser = reqparse.RequestParser()
 parser.add_argument('username',
@@ -95,3 +97,12 @@ class SecretResource(Resource):
     @jwt_required
     def get(self):
         return {'answer': 42}
+
+class AuthPlugin(SparrowCorePlugin):
+    name = "auth"
+    def on_database_ready(self):
+        # Manage JSON Web tokens
+        JWTManager(self.app)
+
+    def on_api_initialized(self, api):
+        api.add_resource(AuthAPI, "/auth")

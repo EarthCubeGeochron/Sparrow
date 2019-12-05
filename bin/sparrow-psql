@@ -5,4 +5,3 @@ if [ -t 0 ]; then
 else
   sparrow compose exec -T db psql -Upostgres sparrow $@
 fi
-

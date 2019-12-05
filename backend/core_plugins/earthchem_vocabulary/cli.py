@@ -47,9 +47,9 @@ def copy_table(conn, category, tbl, download=False):
     write_table(conn, df, tbl)
     return df
 
-@command(name="import-earthchem-vocabulary")
+@command(name="import-earthchem")
 @option('--download', is_flag=True, default=False)
-def cli(download=False):
+def import_earthchem(download=False):
     """
     Import EarthChem vocabulary files
     """
@@ -66,7 +66,3 @@ def cli(download=False):
     db.exec_sql(_)
 
     run_sql(db.session, "DROP SCHEMA earthchem_vocabulary CASCADE")
-
-
-cli()
-

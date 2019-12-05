@@ -33,7 +33,7 @@ def test_basic_route_exists(route):
 
 def test_api_sustained_load():
     """
-    API currently fails on large numbers of requests
+    Make sure API does not fail on large numbers of requests
     """
     for i in range(200):
         res = get("/sample", params=dict(geometry="%"))

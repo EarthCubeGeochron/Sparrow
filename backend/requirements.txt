@@ -18,10 +18,9 @@ traitlets==4.3.2
 werkzeug==0.15.6
 xlrd==1.2.0
 requests==2.21.0
+toposort==1.5
+#geoalchemy2==0.6.2
 
 # For GraphQL API
 graphene==2.1.5
 graphene_sqlalchemy==2.2.0
-
-# For testing
-tavern==0.30.3

@@ -25,6 +25,12 @@ class BaseClass(object):
         defaults = kwargs.pop('defaults', None)
         return get_or_create(cls.db.session, cls, defaults, **kwargs)
 
+    def to_dict(self):
+        res = {}
+        for k,v in self.__table__.c.items():
+            res[k] = getattr(self, k)
+        return res
+
 Base = automap_base(cls=BaseClass)
 
 class User(Base):

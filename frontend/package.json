@@ -14,9 +14,10 @@
     "@emotion/core": "^10.0.7",
     "@emotion/styled": "^10.0.7",
     "@loadable/component": "^5.10.2",
-    "@macrostrat/hyper": "^1.1.0",
+    "@macrostrat/hyper": "^1.1.5",
     "@macrostrat/ui-components": "file:./bundled-deps/ui-components",
     "@mongodb-js/react-mapbox-gl-leaflet": "^1.0.0",
+    "@turf/bbox": "^6.0.1",
     "@vx/axis": "0.0.183",
     "@vx/gradient": "0.0.183",
     "@vx/scale": "0.0.182",
@@ -40,8 +41,10 @@
     "react-markdown": "^4.0.6",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
+    "react-router-hash-link": "^1.2.2",
     "react-simple-maps": "^0.12.1",
-    "store": "^2.0.12"
+    "store": "^2.0.12",
+    "viewport-mercator-project": "^6.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
