@@ -5,6 +5,9 @@ from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 from graphene_sqlalchemy.utils import to_type_name
 from .filterable_query import FilterableConnectionField
 from sqlalchemy.types import INTEGER
+from sparrow import get_logger
+
+log = get_logger(__name__)
 
 # https://github.com/alexisrolland/flask-graphene-sqlalchemy/wiki/Flask-Graphene-SQLAlchemy-Tutorial
 # https://github.com/flavors/django-graphql-jwt/issues/6
@@ -80,6 +83,7 @@ def build_schema(db):
     fields = dict(
         node = relay.Node.Field())
     for model in db.automap_base.classes:
+        log.debug(f"Building GraphQL schema for {model.__name__}")
         obj = graphql_object_factory(model)
         types.append(obj)
         fields[model.__name__] = connection(obj)

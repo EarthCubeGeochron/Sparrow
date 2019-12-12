@@ -16,3 +16,4 @@ class VersioningPlugin(SparrowCorePlugin):
         for fn in files:
             fp = relative_path(__file__, 'pg-memento', fn)
             db.exec_sql(fp)
+        db.exec_sql(relative_path(__file__,'start-logging.sql'))
