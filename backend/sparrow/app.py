@@ -9,7 +9,7 @@ from .api import APIv1
 from .util import relative_path
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .auth import AuthPlugin
-from .graph import GraphQLPlugin
+#from .graph import GraphQLPlugin
 from .web import WebPlugin
 
 class App(Flask):
@@ -73,7 +73,8 @@ class App(Flask):
     def load(self):
         import sparrow_plugins, core_plugins
         self.register_plugin(AuthPlugin)
-        self.register_plugin(GraphQLPlugin)
+        # GraphQL is disabled for now
+        #self.register_plugin(GraphQLPlugin)
         self.register_plugin(WebPlugin)
         self.register_module_plugins(core_plugins)
         self.register_module_plugins(sparrow_plugins)
