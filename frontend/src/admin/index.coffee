@@ -2,19 +2,23 @@ import {hyperStyled, classed} from '@macrostrat/hyper'
 import {Component, useContext} from 'react'
 import {NonIdealState, Intent,
         Button, ButtonGroup, Icon, Callout} from '@blueprintjs/core'
-import {Route, Switch} from 'react-router-dom'
+import {Switch} from 'react-router-dom'
+import {ErrorBoundaryRoute as Route} from 'app/util/route'
 import classNames from 'classnames'
 import T from 'prop-types'
 
-import {LinkButton, LinkCard} from '@macrostrat/ui-components'
+import {
+  LinkButton,
+  LinkCard
+} from '@macrostrat/ui-components'
 import {Frame} from 'app/frame'
 import {AuthContext} from 'app/auth/context'
-import {ProjectListComponent, ProjectComponent} from './project-component'
+import {ProjectListComponent, ProjectComponent} from './project'
 import {SessionListComponent} from './session-list-component'
 import {SessionComponent} from './session-component'
 import {SampleMain} from './sample'
 
-import {AppNavbar, NavButton} from 'app/components/navbar'
+import {NavButton, MinimalNavbar} from 'app/components/navbar'
 import {InsetText} from 'app/layout'
 import styled from '@emotion/styled'
 import styles from './module.styl'

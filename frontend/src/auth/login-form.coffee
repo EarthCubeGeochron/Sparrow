@@ -1,10 +1,12 @@
-import h from 'react-hyperscript'
+import {hyperStyled} from '@macrostrat/hyper'
 import {Component} from 'react'
 import {StatefulComponent} from '@macrostrat/ui-components'
 import {AuthContext} from './context'
 import {Button, Dialog, Callout, Intent, Classes} from '@blueprintjs/core'
 import classNames from 'classnames'
-import './main.styl'
+import styles from './module.styl'
+
+h = hyperStyled(styles)
 
 class LoginFormInner extends Component
   render: ->

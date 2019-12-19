@@ -1,10 +1,12 @@
-import {Menu, MenuItem} from '@blueprintjs/core'
+import {useEffect, useState} from 'react'
+import {Menu, MenuItem, Popover} from '@blueprintjs/core'
 import {hyperStyled, classed} from '@macrostrat/hyper'
 import styles from './module.styl'
 import {SiteTitle} from 'app/components/navbar'
 import {CatalogNavLinks} from '../admin'
 import {AuthStatus} from 'app/auth'
 import {MapPanel} from './map-area'
+import {HashLink} from 'react-router-hash-link'
 
 h = hyperStyled(styles)
 
@@ -27,7 +29,14 @@ MapPage = (props)->
       h Menu.Divider
       h AuthStatus, {large: false}
     ]
-    h MapPanel, {className: 'main-map', accessToken: process.env.MAPBOX_API_TOKEN}
+    h MapPanel, {
+      className: 'main-map',
+      accessToken: process.env.MAPBOX_API_TOKEN
+    }
   ]
 
-export {MapPage}
+MapLink = (props)->
+  {zoom, latitude, longitude, children, rest...} = props
+  h HashLink, {to: "/map##{zoom}/#{latitude}/#{longitude}", rest...}, children
+
+export {MapPage, MapLink}

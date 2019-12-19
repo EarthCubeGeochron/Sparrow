@@ -36,7 +36,7 @@ SessionInfoComponent = (props)->
   date = parse(props.date)
   console.log props
 
-  h 'div', [
+  h [
     h 'div.top', [
       h 'h4.date', format(date, 'MMMM D, YYYY')
       h 'div.expander'

@@ -19,7 +19,9 @@ class DataTable__ extends Component
 
     columns = []
     cellRenderer = (column)->(rowIndex)->
-      a = data[rowIndex][column]
+      dv = data[rowIndex]
+      return null unless dv?
+      a = dv[column]
       # Special case for JSON rows
       if typeof a is "object"
         a = JSON.stringify a

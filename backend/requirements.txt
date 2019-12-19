@@ -24,6 +24,3 @@ marshmallow==3.3.0
 # For GraphQL API
 graphene==2.1.5
 graphene_sqlalchemy==2.2.0
-
-# For testing
-tavern==0.30.3

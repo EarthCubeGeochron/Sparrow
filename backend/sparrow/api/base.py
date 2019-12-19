@@ -26,6 +26,7 @@ class API(Api):
                 raise IndexError("A single endpoint must be specified for "
                                  "API resource collections.")
             endpoint, = endpoints
+            print(endpoint)
 
             for (args,kwargs) in resource.resource_arguments:
                 (r, e) = args

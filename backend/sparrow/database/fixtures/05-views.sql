@@ -204,8 +204,9 @@ SELECT DISTINCT ON (s.id)
   s.name,
   s.material,
   ST_AsGeoJSON(s.location)::jsonb geometry,
-  location_name,
-  location_precision,
+  s.location_name,
+  s.location_precision,
+  s.location_name_autoset,
   p.id project_id,
   p.name project_name,
   is_public(s)
@@ -317,6 +318,9 @@ SELECT
 	p.description,
 	p.name,
   p.embargo_date,
+  p.location_name,
+  p.location_name_autoset,
+  ST_AsGeoJSON(p.location)::jsonb geometry,
   NOT embargoed(p.embargo_date) AS is_public,
 	-- Get data from researchers table in standard format
 	to_jsonb((SELECT array_agg(a) FROM (
@@ -343,7 +347,8 @@ SELECT
       ON ss.sample_id = s.id
 		WHERE ss.project_id = p.id
 	) AS a)) AS samples
-FROM project p;
+FROM project p
+ORDER BY p.id;
 
 COMMENT ON COLUMN core_view.project.samples IS
 'Array of objects representing samples in the project

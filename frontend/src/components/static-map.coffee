@@ -11,7 +11,6 @@ StaticMarker = (props)->
   {size, rest...} = props
   size ?= 10
   offsetLeft = offsetTop = -size/2
-  console.log props
   h Marker, {offsetLeft, offsetTop, rest...}, (
     h 'span.map-marker.static', {style: {width: size, height: size}}
   )

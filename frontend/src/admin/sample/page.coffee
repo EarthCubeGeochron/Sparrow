@@ -1,9 +1,11 @@
 import hyper from '@macrostrat/hyper'
 import {APIResultView, LinkCard} from '@macrostrat/ui-components'
-
+import {Link} from 'react-router-dom'
 import {SampleContextMap} from 'app/components'
 import {GeoDeepDiveCard} from './gdd-card'
 import styles from './module.styl'
+import {MapLink} from 'app/map'
+
 h = hyper.styled(styles)
 
 Parameter = ({name, value, rest...})->
@@ -29,12 +31,19 @@ ProjectInfo = ({sample: d})->
 
 LocationBlock = (props)->
   {sample} = props
-  {geometry} = sample
+  {geometry, location_name} = sample
   return null unless geometry?
-  h SampleContextMap, {
-    center: geometry.coordinates
-    zoom: 8
-  }
+  zoom = 8
+  [longitude, latitude] = geometry.coordinates
+  h 'div.location', [
+    h MapLink, {zoom, latitude, longitude}, [
+      h SampleContextMap, {
+        center: geometry.coordinates
+        zoom
+      }
+    ]
+    h.if(location_name) 'h5.location-name', location_name
+  ]
 
 Material = (props)->
   {material} = props
@@ -52,12 +61,16 @@ SamplePage = (props)->
     return null unless d?
     h 'div.sample', [
       h 'h3.page-type', 'Sample'
-      h 'h2', d.name
-      h 'div.basic-info', [
-        h ProjectInfo, {sample: d}
-        h Material, {material}
+      h 'div.flex-row', [
+        h 'div.info-block', [
+          h 'h2', d.name
+          h 'div.basic-info', [
+            h ProjectInfo, {sample: d}
+            h Material, {material}
+          ]
+        ]
+        h LocationBlock, {sample: d}
       ]
-      h LocationBlock, {sample: d}
       h 'h3', "Metadata helpers"
       h GeoDeepDiveCard, {sample_name: d.name}
     ]

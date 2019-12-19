@@ -105,7 +105,20 @@ CREATE TABLE IF NOT EXISTS project (
   id serial PRIMARY KEY,
   name text NOT NULL,
   description text,
-  embargo_date timestamp
+  embargo_date timestamp,
+  /*
+  The position model incorporated Project is
+  shared with Sample.
+
+  A representative named location */
+  location_name text,
+  location_name_autoset boolean,
+  /*
+  Order-of-magnitude precision (in meters)
+  with which this position
+  is known */
+  location geometry,
+  location_precision integer
 );
 
 /*
@@ -170,6 +183,7 @@ CREATE TABLE IF NOT EXISTS sample (
   location_precision integer DEFAULT 0,
   /* A representative named location */
   location_name text,
+  location_name_autoset boolean,
   location geometry,
   /* The elevation column could potentially be recast as a *datum* tied directly
      to the sample. */
@@ -263,6 +277,16 @@ CREATE TABLE IF NOT EXISTS analysis (
   /* Not really sure that "material" is the best parameterization
      of this concept... */
   is_standard boolean,
+  /*
+  If set, this means that this is an "accepted" value
+  among several related measurements.
+
+  #### Examples:
+
+  - Accepted system for U-Pb single-zircon age
+  - Heating steps accepted in the final age analysis
+  */
+  is_accepted boolean,
   is_bad boolean,
   /* Some analytical results can be interpreted from other data, so we
   should explicitly state that this is the case.
@@ -296,7 +320,6 @@ CREATE TABLE IF NOT EXISTS datum (
   #### Examples:
 
   - Accepted system for U-Pb single-zircon age
-  - Heating steps accepted in the final age analysis
   */
   is_accepted boolean,
   UNIQUE (analysis, type)

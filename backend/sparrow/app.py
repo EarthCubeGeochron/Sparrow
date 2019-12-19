@@ -2,13 +2,14 @@ from click import echo, style, secho
 from os import environ
 from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
+import logging
 
 from .encoders import JSONEncoder
 from .api import APIv1
 from .util import relative_path
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .auth import AuthPlugin
-from .graph import GraphQLPlugin
+#from .graph import GraphQLPlugin
 from .web import WebPlugin
 
 class App(Flask):
@@ -45,40 +46,45 @@ class App(Flask):
         self.plugins.add(plugin)
 
     def loaded(self):
-        echo("Initializing plugins")
+        echo("Initializing plugins", err=True)
         self.plugins.finalize(self)
 
     def run_hook(self, hook_name, *args, **kwargs):
-        echo("Running hook "+hook_name)
+        echo("Running hook "+hook_name, err=True)
         method_name = "on_"+hook_name.replace("-","_")
         for plugin in self.plugins:
             try:
                 method = getattr(plugin, method_name)
-                echo("  plugin: "+plugin.name)
+                echo("  plugin: "+plugin.name, err=True)
                 method(*args, **kwargs)
             except AttributeError:
                 continue
 
-    def register_external_plugins(self):
-        import sparrow_plugins
-        for name, obj in sparrow_plugins.__dict__.items():
+    def register_module_plugins(self, module):
+        for name, obj in module.__dict__.items():
             try:
                 assert issubclass(obj, SparrowPlugin)
                 assert obj is not SparrowPlugin
                 assert obj is not SparrowCorePlugin
-            except (TypeError, AssertionError) as err:
+            except (TypeError, AssertionError):
                 continue
             self.register_plugin(obj)
 
+    def load(self):
+        import sparrow_plugins, core_plugins
+        self.register_plugin(AuthPlugin)
+        # GraphQL is disabled for now
+        #self.register_plugin(GraphQLPlugin)
+        self.register_plugin(WebPlugin)
+        self.register_module_plugins(core_plugins)
+        self.register_module_plugins(sparrow_plugins)
+        self.loaded()
 
 def construct_app(config=None, minimal=False):
     app = App(__name__, config=config,
               template_folder=relative_path(__file__, "templates"))
 
-    app.register_plugin(AuthPlugin)
-    app.register_plugin(GraphQLPlugin)
-    app.register_plugin(WebPlugin)
-    app.register_external_plugins()
+    app.load()
 
     from .database import Database
 
@@ -88,7 +94,6 @@ def construct_app(config=None, minimal=False):
     if minimal:
         return app, db
 
-    app.loaded()
 
     app.run_hook("database-ready")
 
