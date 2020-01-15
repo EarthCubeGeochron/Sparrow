@@ -10,7 +10,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import ClauseElement
 from sqlalchemy.types import Integer
 
-from ..app import App
 from ..util import run_sql_file, run_query, relative_path
 from ..models import Base, User, Project, Session
 from .helpers import (
@@ -36,6 +35,7 @@ class Database:
         """
         self.config = None
         if cfg is None:
+            from ..app import App
             # Set config from environment variable
             cfg = App(__name__)
         if hasattr(cfg,'config'):
@@ -151,7 +151,6 @@ class Database:
     def register_models(self, *models):
         # Could allow overriding name functions etc.
         self.__models__.register(*models)
-
 
     def automap_view(db, table_name, *column_args, **kwargs):
         """

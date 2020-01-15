@@ -23,6 +23,7 @@ toposort==1.5
 marshmallow==3.3.0
 marshmallow-sqlalchemy==0.21.0
 marshmallow-jsonschema==0.8.0
+stringcase==1.2.0 
 
 # For GraphQL API
 Flask-GraphQL==2.0.0

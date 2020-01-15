@@ -8,9 +8,11 @@ from .encoders import JSONEncoder
 from .api import APIv1
 from .util import relative_path
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
+from .interface import InterfacePlugin
 from .auth import AuthPlugin
 #from .graph import GraphQLPlugin
 from .web import WebPlugin
+
 
 class App(Flask):
     def __init__(self, *args, **kwargs):
@@ -55,9 +57,9 @@ class App(Flask):
         for plugin in self.plugins:
             try:
                 method = getattr(plugin, method_name)
-                echo("  plugin: "+plugin.name, err=True)
                 method(*args, **kwargs)
-            except AttributeError:
+                echo("  plugin: "+plugin.name, err=True)
+            except AttributeError as err:
                 continue
 
     def register_module_plugins(self, module):
@@ -71,14 +73,17 @@ class App(Flask):
             self.register_plugin(obj)
 
     def load(self):
-        import sparrow_plugins, core_plugins
+        import sparrow_plugins
+        import core_plugins
         self.register_plugin(AuthPlugin)
         # GraphQL is disabled for now
-        #self.register_plugin(GraphQLPlugin)
+        # self.register_plugin(GraphQLPlugin)
         self.register_plugin(WebPlugin)
+        self.register_plugin(InterfacePlugin)
         self.register_module_plugins(core_plugins)
         self.register_module_plugins(sparrow_plugins)
         self.loaded()
+
 
 def construct_app(config=None, minimal=False):
     app = App(__name__, config=config,
