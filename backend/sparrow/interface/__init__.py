@@ -6,20 +6,26 @@ from stringcase import pascalcase
 from ..database.helpers import ModelCollection, classname_for_table
 from click import echo, secho
 
+
 def _jsonschema_type_mapping(self):
     return {
         'type': 'integer',
     }
 
+
 Related._jsonschema_type_mapping = _jsonschema_type_mapping
+
 
 def to_schema_name(name):
     return pascalcase(name+"_schema")
 
+
 json_schema = JSONSchema()
+
 
 def to_json_schema(model):
     return json_schema.dump(model)
+
 
 def model_interface(model):
     """
@@ -38,6 +44,7 @@ def model_interface(model):
     except exceptions.ModelConversionError as err:
         secho(schema_name+": "+str(err), fg='red')
         return None
+
 
 class InterfaceCollection(ModelCollection):
     def register(self, *classes):
