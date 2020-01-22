@@ -8,9 +8,7 @@ from click import echo, secho
 
 
 def _jsonschema_type_mapping(self):
-    return {
-        'type': 'integer',
-    }
+    return {'type': 'integer'}
 
 
 Related._jsonschema_type_mapping = _jsonschema_type_mapping
@@ -42,7 +40,7 @@ def model_interface(model):
                 as_jsonschema=to_json_schema
             ))
     except exceptions.ModelConversionError as err:
-        secho(schema_name+": "+str(err), fg='red')
+        secho(type(err).__name__+": "+schema_name+" - "+str(err), fg='red')
         return None
 
 
@@ -53,7 +51,7 @@ class InterfaceCollection(ModelCollection):
             try:
                 self.add(k, model_interface(cls))
             except Exception as err:
-                secho(str(err))
+                secho(str(err), fg='red')
 
 
 class InterfacePlugin(SparrowCorePlugin):
@@ -62,3 +60,6 @@ class InterfacePlugin(SparrowCorePlugin):
     def on_database_ready(self):
         iface = InterfaceCollection(self.app.database.model)
         self.app.interface = iface
+
+def load_data(mapping):
+    print(mapping)

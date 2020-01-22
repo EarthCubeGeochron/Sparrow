@@ -13,6 +13,8 @@ services:
       - $SPARROW_DATA_DIR:/data:ro
   backend:
     build: backend
+    # Make sure we get colorized terminal output
+    tty: true
     expose:
       - 5000
     depends_on:
