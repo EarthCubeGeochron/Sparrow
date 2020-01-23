@@ -1,11 +1,16 @@
 from sparrow.plugins import SparrowCorePlugin
-from marshmallow_sqlalchemy import ModelSchema, exceptions
+from marshmallow_sqlalchemy import ModelConverter, ModelSchema, exceptions
 from marshmallow_sqlalchemy.fields import Related
 from marshmallow_jsonschema import JSONSchema
 from stringcase import pascalcase
+from .geometry import GeometryField
 from ..database.helpers import ModelCollection, classname_for_table
 from click import echo, secho
+from geoalchemy2 import Geography, Geometry
 
+# Modify geoalchemy converter
+ModelConverter.SQLA_TYPE_MAPPING[Geometry] = GeometryField
+ModelConverter.SQLA_TYPE_MAPPING[Geography] = GeometryField
 
 def _jsonschema_type_mapping(self):
     return {'type': 'integer'}
@@ -40,6 +45,7 @@ def model_interface(model):
                 as_jsonschema=to_json_schema
             ))
     except exceptions.ModelConversionError as err:
+        import IPython; IPython.embed(); raise
         secho(type(err).__name__+": "+schema_name+" - "+str(err), fg='red')
         return None
 
@@ -61,5 +67,14 @@ class InterfacePlugin(SparrowCorePlugin):
         iface = InterfaceCollection(self.app.database.model)
         self.app.interface = iface
 
+
 def load_data(mapping):
+    from ..app import construct_app
+    app, db = construct_app()
+    #import IPython; IPython.embed(); raise
     print(mapping)
+
+
+# transient load
+# https://marshmallow-sqlalchemy.readthedocs.io/en/latest/recipes.html#smart-nested-field
+# schema().load({}, transient=True)

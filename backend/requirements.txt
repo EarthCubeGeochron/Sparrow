@@ -1,3 +1,10 @@
+###
+# Main requirements file for the
+# Sparrow backend. Dependencies can be
+# updated using `pip-compile --upgrade`
+# command in the `pip-tools` package.
+###
+
 beautifulsoup4==4.7.1
 Click==7.0
 click-plugins==1.0.4
@@ -18,6 +25,10 @@ werkzeug==0.15.6
 xlrd==1.2.0
 requests==2.21.0
 toposort==1.5
+
+# (De)serialization of geographic data
+GeoAlchemy2==0.6.3
+shapely==1.6
 
 # For serialization/deserialization
 marshmallow==3.3.0
