@@ -39,7 +39,8 @@ services:
       - $SPARROW_INIT_SQL:/init-sql/
       - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
       # Link `SPARROW_PLUGIN_DIR` directly into site-packages as a folder
-      - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.7/site-packages/sparrow_plugins:ro
+      # ...we could probably do this in a more elegant way
+      - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.8/site-packages/sparrow_plugins:ro
       # Save ipython configuration to anonymous volume so
       # we keep command history between app runs
       - ipython_config:/root/.ipython/profile_default
