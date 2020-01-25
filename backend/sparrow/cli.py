@@ -1,5 +1,5 @@
 import click
-from os import path, environ
+from os import path, environ, devnull
 from click import echo, style, secho
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
@@ -7,11 +7,13 @@ from sys import exit
 from json import dumps
 from click_plugins import with_plugins
 from pkg_resources import iter_entry_points
+from contextlib import redirect_stdout
 from subprocess import run
 
 from .util import working_directory
 from .app import App, construct_app
 from .database import Database
+from .interface import pretty_print
 from .auth.create_user import create_user
 
 # https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
@@ -127,6 +129,20 @@ def _create_user(db):
     """
     create_user(db)
 
+@cli.command(name='show-interface')
+@click.argument('model', type=click.STRING)
+@with_config
+def show_interface(cfg, model):
+    """
+    Get a Python shell within the application
+    """
+    #with redirect_stdout(open(devnull, 'w')):
+    app, db = construct_app(cfg)
+    with app.app_context():
+        # `using` is related to this issue:
+        # https://github.com/ipython/ipython/issues/11523
+        m = getattr(app.interface, model)
+        m().pretty_print()
 
 # Support arbitrary subcommand loading
 # Right now we just program in each subcommand which is ugly and non-extensible
