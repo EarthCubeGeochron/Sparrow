@@ -23,7 +23,7 @@ def to_json_schema(model):
     return json_schema.dump(model)
 
 def pretty_print(model, prefix="", key=None):
-    new_prefix = prefix[0:len(prefix)-3]
+    new_prefix = prefix[0:len(prefix)-4]
     if key is not None:
         new_prefix += styled_key(key)
     print(new_prefix+model.__class__.__name__)
@@ -32,7 +32,7 @@ def pretty_print(model, prefix="", key=None):
         if isinstance(v, Nested):
             if len(prefix) < 6:
                 try:
-                    pretty_print(v.schema, prefix=prefix+"   ", key=k)
+                    pretty_print(v.schema, prefix=prefix+"    ", key=k)
                 except ValueError as err:
                     echo(v.schema.exclude)
                     echo(prefix+styled_key(k)+style(str(err), fg="red"))
@@ -89,6 +89,12 @@ class InterfacePlugin(SparrowCorePlugin):
         iface = InterfaceCollection(self.app.database.model)
         self.app.interface = iface
 
+    def on_setup_cli(self, cli):
+        from .cli import show_interface
+        cli.add_command(show_interface)
+
+    # load_datafile(schema, fileobj):
+    # load a data file for a specific schema
 
 def load_data(mapping):
     from ..app import construct_app

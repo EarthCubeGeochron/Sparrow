@@ -2,7 +2,6 @@ import click
 from os import path, environ, devnull
 from click import echo, style, secho
 from sqlalchemy import create_engine
-from sqlalchemy.exc import OperationalError
 from sys import exit
 from json import dumps
 from click_plugins import with_plugins
@@ -10,11 +9,11 @@ from pkg_resources import iter_entry_points
 from contextlib import redirect_stdout
 from subprocess import run
 
-from .util import working_directory
-from .app import App, construct_app
-from .database import Database
-from .interface import pretty_print
-from .auth.create_user import create_user
+from .util import with_config, with_database
+from ..util import working_directory
+from ..app import App, construct_app
+from ..auth.create_user import create_user
+
 
 # https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
 class SparrowCLI(click.Group):
@@ -26,6 +25,7 @@ class SparrowCLI(click.Group):
         app.load()
         app.run_hook("setup-cli", self)
 
+
 @click.group(cls=SparrowCLI)
 def cli():
     pass
@@ -36,23 +36,6 @@ def abort(message, status=1):
     echo(style(prefix, fg='red', bold=True)+msg)
     exit(status)
 
-
-def get_database(ctx, param, value):
-    try:
-        app = App(__name__, config=value)
-        return Database(app)
-    except ValueError:
-        raise click.BadParameter('Invalid database specified')
-    except OperationalError as err:
-        dbname = click.style(app.dbname, fg='cyan', bold=True)
-        cmd = style(f"createdb {app.dbname}", dim=True)
-        abort(f"Database {dbname} does not exist.\n"
-               "Please create it before continuing.\n"
-              f"Command: `{cmd}`")
-
-kw = dict(type=str, envvar="SPARROW_BACKEND_CONFIG", required=True)
-with_config = click.option('--config', 'cfg', **kw)
-with_database = click.option('--config', 'db', callback=get_database, **kw)
 
 @cli.command(name='init')
 @with_database
@@ -128,21 +111,6 @@ def _create_user(db):
     Create an authorized user for the web frontend
     """
     create_user(db)
-
-@cli.command(name='show-interface')
-@click.argument('model', type=click.STRING)
-@with_config
-def show_interface(cfg, model):
-    """
-    Get a Python shell within the application
-    """
-    #with redirect_stdout(open(devnull, 'w')):
-    app, db = construct_app(cfg)
-    with app.app_context():
-        # `using` is related to this issue:
-        # https://github.com/ipython/ipython/issues/11523
-        m = getattr(app.interface, model)
-        m().pretty_print()
 
 # Support arbitrary subcommand loading
 # Right now we just program in each subcommand which is ugly and non-extensible

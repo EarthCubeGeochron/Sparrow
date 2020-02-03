@@ -36,6 +36,25 @@ class SparrowConverter(ModelConverter):
             if prop.target.name == 'data_file_link':
                 return None
 
+            # if prop.backref:
+            #     return None
+
+            if prop.target.name == 'session':
+                if prop.parent.mapped_table.name not in ["project", "sample"]:
+                    return None
+
+            if prop.target.name == 'analysis':
+                if prop.parent.mapped_table.name != 'session':
+                    return None
+
+            # Projects cannot be nested by anything...
+            if prop.target.name == 'project':
+                return None
+
+            # if prop.entity.name == 'analysis':
+            #     if prop.parent.name not in ["session"]:
+            #         return None
+
             # Exclude foreign key columns from nesting
             #exclude = [c.name for c in prop.remote_side]
             exclude = []
