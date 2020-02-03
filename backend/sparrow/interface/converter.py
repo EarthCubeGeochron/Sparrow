@@ -23,8 +23,6 @@ class SparrowConverter(ModelConverter):
         ))
 
     def fields_for_model(self, model, **kwargs):
-        #print(" ")
-        #print(model)
         return super().fields_for_model(model, **kwargs)
 
     def property2field(self, prop, **kwargs):
@@ -33,6 +31,11 @@ class SparrowConverter(ModelConverter):
             # Get the class for this relationship
             cls = prop.mapper.class_
             name = to_schema_name(cls.__name__)
+
+            # Exclude field based on table name
+            if prop.target.name == 'data_file_link':
+                return None
+
             # Exclude foreign key columns from nesting
             #exclude = [c.name for c in prop.remote_side]
             exclude = []

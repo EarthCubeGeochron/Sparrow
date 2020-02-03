@@ -28,8 +28,9 @@ def pretty_print(model, prefix="", key=None):
         new_prefix += styled_key(key)
     print(new_prefix+model.__class__.__name__)
     for k,v in model._declared_fields.items():
+
         if isinstance(v, Nested):
-            if len(prefix) < 10:
+            if len(prefix) < 6:
                 try:
                     pretty_print(v.schema, prefix=prefix+"   ", key=k)
                 except ValueError as err:
@@ -37,6 +38,8 @@ def pretty_print(model, prefix="", key=None):
                     echo(prefix+styled_key(k)+style(str(err), fg="red"))
                 except RegistryError as err:
                     pass
+                except AttributeError as err:
+                    echo(prefix+styled_key(k)+style(str(err), fg="red"))
         else:
             classname = v.__class__.__name__
             nfill = 32-len(k)-len(classname)
@@ -68,11 +71,15 @@ def model_interface(model):
 class InterfaceCollection(ModelCollection):
     def register(self, *classes):
         for cls in classes:
-            k = classname_for_table(cls.__table__)
-            try:
-                self.add(k, model_interface(cls))
-            except Exception as err:
-                secho(str(err), fg='red')
+            self._register_table(cls)
+
+    def _register_table(self, cls):
+        k = classname_for_table(cls.__table__)
+        # Bail if we have a view
+        if not hasattr(cls, '__mapper__'):
+            return
+        self.add(k, model_interface(cls))
+
 
 
 class InterfacePlugin(SparrowCorePlugin):
