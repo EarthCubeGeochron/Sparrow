@@ -23,17 +23,18 @@ class SparrowConverter(ModelConverter):
         ))
 
     def fields_for_model(self, model, **kwargs):
-        print(" ")
-        print(model)
+        #print(" ")
+        #print(model)
         return super().fields_for_model(model, **kwargs)
 
     def property2field(self, prop, **kwargs):
-        print("  ",prop)
+        #print("  ",prop)
         if isinstance(prop, RelationshipProperty):
             # Get the class for this relationship
             cls = prop.mapper.class_
             name = to_schema_name(cls.__name__)
             # Exclude foreign key columns from nesting
-            exclude = [c.name for c in prop.remote_side]
+            #exclude = [c.name for c in prop.remote_side]
+            exclude = []
             return Nested(name, many=prop.uselist, exclude=exclude)
         return super().property2field(prop, **kwargs)

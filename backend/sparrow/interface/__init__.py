@@ -2,10 +2,11 @@ from sparrow.plugins import SparrowCorePlugin
 from marshmallow_sqlalchemy import ModelSchema, exceptions
 from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
+from marshmallow.exceptions import RegistryError
 from marshmallow_jsonschema import JSONSchema
 from .converter import SparrowConverter, to_schema_name
 from ..database.helpers import ModelCollection, classname_for_table
-from click import secho
+from click import echo, secho, style
 from textwrap import indent
 
 def _jsonschema_type_mapping(self):
@@ -14,25 +15,32 @@ def _jsonschema_type_mapping(self):
 Related._jsonschema_type_mapping = _jsonschema_type_mapping
 Nested._jsonschema_type_mapping = _jsonschema_type_mapping
 
-
 json_schema = JSONSchema()
 
+styled_key = lambda k: style("• ", dim=True)+k+style(": ", dim=True)
 
 def to_json_schema(model):
     return json_schema.dump(model)
 
-def pretty_print(model, prefix=""):
-    print(prefix+model.__class__.__name__)
-    for k,v in model.dump_fields.items():
+def pretty_print(model, prefix="", key=None):
+    new_prefix = prefix[0:len(prefix)-3]
+    if key is not None:
+        new_prefix += styled_key(key)
+    print(new_prefix+model.__class__.__name__)
+    for k,v in model._declared_fields.items():
         if isinstance(v, Nested):
-            print(f"{prefix}- {k}:")
             if len(prefix) < 10:
                 try:
-                    pretty_print(v.schema, prefix=prefix+"  ")
-                except Exception as err:
-                    secho(prefix+"  "+str(err), fg="red")
+                    pretty_print(v.schema, prefix=prefix+"   ", key=k)
+                except ValueError as err:
+                    echo(v.schema.exclude)
+                    echo(prefix+styled_key(k)+style(str(err), fg="red"))
+                except RegistryError as err:
+                    pass
         else:
-            print(f"{prefix}- {k}: {v.__class__.__name__}")
+            classname = v.__class__.__name__
+            nfill = 32-len(k)-len(classname)
+            echo(prefix+styled_key(k)+style("."*nfill,dim=True)+style(classname, fg="cyan", dim=True))
 
 def model_interface(model):
     """
