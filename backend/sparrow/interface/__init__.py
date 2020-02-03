@@ -24,12 +24,15 @@ def to_json_schema(model):
 def pretty_print(model, prefix=""):
     print(prefix+model.__class__.__name__)
     for k,v in model.dump_fields.items():
-        print(k, isinstance(v, Nested))
         if isinstance(v, Nested):
-            print(f"{prefix}{k}:")
-            pretty_print(v.schema, prefix=prefix+"  ")
-            continue
-        print(f"{prefix}  {k}: {v.__class__.__name__}")
+            print(f"{prefix}- {k}:")
+            if len(prefix) < 10:
+                try:
+                    pretty_print(v.schema, prefix=prefix+"  ")
+                except Exception as err:
+                    secho(prefix+"  "+str(err), fg="red")
+        else:
+            print(f"{prefix}- {k}: {v.__class__.__name__}")
 
 def model_interface(model):
     """

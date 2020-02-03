@@ -6,6 +6,7 @@ from stringcase import pascalcase
 
 from .geometry import GeometryField
 
+
 def to_schema_name(name):
     return pascalcase(name+"_schema")
 
@@ -32,7 +33,7 @@ class SparrowConverter(ModelConverter):
             # Get the class for this relationship
             cls = prop.mapper.class_
             name = to_schema_name(cls.__name__)
-            # Exclude primary key columns from nesting
+            # Exclude foreign key columns from nesting
             exclude = [c.name for c in prop.remote_side]
             return Nested(name, many=prop.uselist, exclude=exclude)
         return super().property2field(prop, **kwargs)
