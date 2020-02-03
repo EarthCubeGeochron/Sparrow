@@ -30,6 +30,7 @@ class SparrowCLI(click.Group):
 def cli():
     pass
 
+
 def abort(message, status=1):
     prefix = "ABORTING: "
     msg = message.replace("\n","\n"+" "*len(prefix))
@@ -111,16 +112,3 @@ def _create_user(db):
     Create an authorized user for the web frontend
     """
     create_user(db)
-
-# Support arbitrary subcommand loading
-# Right now we just program in each subcommand which is ugly and non-extensible
-# Ideally, we'd drag in anything we can find.
-name='import-earthchem'
-@click.argument('args', nargs=-1, type=click.UNPROCESSED)
-def sparrow_earthchem_vocabulary(args):
-    """
-    Import EarthChem vocabularies
-    """
-    __dirname = path.dirname(__file__)
-    cmd = path.abspath(path.join(__dirname,"..","bin","sparrow-"+name))
-    run([cmd, *args])
