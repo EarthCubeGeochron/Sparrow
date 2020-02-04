@@ -1,8 +1,17 @@
 import click
 from sqlalchemy.exc import OperationalError
+from os import devnull
+from click import style
+from contextlib import redirect_stderr
 
-from ..app import App
+from ..app import App, construct_app as base_construct_app
 from ..database import Database
+
+
+def construct_app(cfg):
+    with open(devnull, 'w') as f:
+        with redirect_stderr(f):
+            return base_construct_app(cfg)
 
 
 def get_database(ctx, param, value):

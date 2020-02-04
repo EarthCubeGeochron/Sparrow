@@ -21,7 +21,7 @@ class SparrowCLI(click.Group):
         super().__init__(*args, **kwargs)
         # This only pulls in configuration from environment variable for now,
         # but I don't see another option to support lazily loading plugins
-        app = App(__name__, config=environ.get("SPARROW_BACKEND_CONFIG"))
+        app = App(__name__, config=environ.get("SPARROW_BACKEND_CONFIG"), verbose=False)
         app.load()
         app.run_hook("setup-cli", self)
 
