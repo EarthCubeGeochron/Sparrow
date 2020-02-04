@@ -9,9 +9,9 @@ from ..database import Database
 
 
 def construct_app(cfg):
-    with open(devnull, 'w') as f:
-        with redirect_stderr(f):
-            return base_construct_app(cfg)
+    #with open(devnull, 'w') as f:
+    #    with redirect_stderr(f):
+    return base_construct_app(cfg)
 
 
 def get_database(ctx, param, value):

@@ -1,13 +1,11 @@
-from marshmallow_sqlalchemy import ModelSchema, exceptions
-from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
 from marshmallow.exceptions import RegistryError
 from click import echo, secho, style
 from textwrap import indent
 
 
-def styled_key(k):
-    return style("• ", dim=True)+k
+def styled_key(k, **kwargs):
+    return style("• ", dim=True)+style(k, **kwargs)
 
 
 sep = "…"
@@ -21,18 +19,17 @@ class ModelPrinter(object):
         prefix = level*indent*" "
         if level < self.nest_level:
             try:
-                self.print_model(field.schema, level=level+1, key=k)
+                self.print_model(field.schema, level=level+1, key=k, exclude=field.exclude)
             except ValueError as err:
-                echo(field.schema.exclude)
                 echo(prefix+styled_key(k)+style(str(err), fg="red"))
             except RegistryError:
-                # Ignore nested fields that aren't
+                # Ignore nested fields that don't have a table associated
+                # (e.g. views)
                 pass
             except AttributeError as err:
                 echo(prefix+styled_key(k)+style(str(err), fg="red"))
         else:
             self.print_field(k, field.schema, bold=True, level=level)
-            #echo(prefix+styled_key(k)+style(": ", dim=True)+style(field.schema.__class__.__name__, bold=True))
 
 
     def print_field(self, key, field, level=0, **kwargs):
@@ -40,9 +37,11 @@ class ModelPrinter(object):
         classname = field.__class__.__name__
         nfill = 60-level*indent-len(key)-len(classname)
 
+        dim = field.dump_only
+
         row = "".join([
             prefix,
-            styled_key(key),
+            styled_key(key, dim=dim),
             " ",
             style(sep*nfill, dim=True),
             " ",
@@ -53,13 +52,12 @@ class ModelPrinter(object):
     def __sort_fields(self, a):
         return isinstance(a[1],Nested)
 
-    def print_model(self, model, key=None, level=0):
+    def print_model(self, model, key=None, level=0, exclude=[]):
         prefix = level*indent*" "
 
         new_prefix = prefix[0:len(prefix)-indent]
         if key is not None:
             self.print_field(key, model, level=level-1, bold=True)
-            #new_prefix += styled_key(key)+style(": ", dim=True)
         else:
             echo(new_prefix+style(model.__class__.__name__, bold=True))
 
@@ -67,6 +65,8 @@ class ModelPrinter(object):
         fields.sort(key=self.__sort_fields)
 
         for k, v in fields:
+            if k in exclude:
+                continue
             if isinstance(v, Nested):
                 self.print_nested(k, v, level=level)
             else:

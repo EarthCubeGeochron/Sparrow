@@ -3,6 +3,8 @@ from marshmallow.fields import Nested
 
 from geoalchemy2 import Geography, Geometry
 from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy.types import Integer
+from sqlalchemy.dialects.postgresql import UUID
 from stringcase import pascalcase
 
 from .geometry import GeometryField
@@ -10,6 +12,14 @@ from .geometry import GeometryField
 
 def to_schema_name(name):
     return pascalcase(name+"_schema")
+
+# Control how relationships can be resolved
+allowed_collections = {
+    'sample': ['session'],
+    'session': ['analysis', 'attribute'],
+    'analysis': ['datum', 'attribute'],
+    'project': ['researcher', 'publication', 'session'],
+}
 
 
 class SmartNested(Nested):
@@ -32,48 +42,90 @@ class SparrowConverter(ModelConverter):
             }.items()
         ))
 
-    def fields_for_model(self, model, **kwargs):
-        return super().fields_for_model(model, **kwargs)
+    def _key_for_field(self, prop):
+        if not isinstance(prop, RelationshipProperty):
+            return prop.key
+
+        tbl = prop.parent.mapped_table
+        if prop.target == tbl:
+            return list(prop.local_columns)[0].name
+        return prop.target.name
+
+    def fields_for_model(
+        self,
+        model,
+        *,
+        include_fk=False,
+        fields=None,
+        exclude=None,
+        base_fields=None,
+        dict_cls=dict,
+    ):
+        result = dict()
+        base_fields = base_fields or {}
+        for prop in model.__mapper__.iterate_properties:
+            key = self._key_for_field(prop)
+            if self._should_exclude_field(prop, fields=fields, exclude=exclude):
+                # Allow marshmallow to validate and exclude the field key.
+                result[key] = None
+                continue
+            if hasattr(prop, "columns"):
+                if not include_fk:
+                    # Only skip a column if there is no overriden column
+                    # which does not have a Foreign Key.
+                    for column in prop.columns:
+                        if not column.foreign_keys:
+                            break
+                    else:
+                        continue
+            field = base_fields.get(prop.key) or self.property2field(prop)
+            if field:
+                result[key] = field
+        return result
+
+    def _get_field_kwargs_for_property(self, prop):
+        kwargs = super()._get_field_kwargs_for_property(prop)
+
+        for col in prop.columns:
+            if isinstance(col.type, Integer) and col.primary_key:
+                # Integer primary keys should be dump-only, probably
+                kwargs['dump_only'] = True
+            if isinstance(col.type, UUID):
+                kwargs['dump_only'] = True
+        return kwargs
 
     def property2field(self, prop, **kwargs):
-        #print("  ",prop)
-        if isinstance(prop, RelationshipProperty):
-            # Get the class for this relationship
-            cls = prop.mapper.class_
-            name = to_schema_name(cls.__name__)
+        if not isinstance(prop, RelationshipProperty):
+            return super().property2field(prop, **kwargs)
 
-            this_table = prop.parent.mapped_table.name
+        # Get the class for this relationship
+        cls = prop.mapper.class_
+        name = to_schema_name(cls.__name__)
+        # Exclude field based on table name
+        if prop.target.name == 'data_file_link':
+            return None
 
-            # Exclude field based on table name
-            if prop.target.name == 'data_file_link':
-                return None
+        this_table = prop.parent.mapped_table
 
-            # if prop.backref:
-            #     return None
+        if prop.target == this_table and prop.uselist:
+            # Don't allow self-referential collections
+            return None
 
-            if prop.target.name == 'session':
-                if this_table not in ["project", "sample"]:
-                    return None
+        coll = allowed_collections.get(this_table.name, [])
+        if prop.uselist and prop.target.name not in coll:
+            # Only certain collections are allowed
+            return None
 
-            if prop.target.name == 'analysis':
-                if this_table != 'session':
-                    return None
+        # Exclude foreign key columns from nesting
+        exclude = []
+        # Exclude all back-references to models already defined
+        if prop.backref is not None:
+            pass
 
-            # Projects cannot be nested by anything...
-            if prop.target.name == 'project':
-                return None
+        #prop.key = prop.target.name
 
-            # Materials have a self-referential relationship which is given
-            # a collection, but this shouldn't be serializable
-            if this_table == 'material' and prop.target.name == 'material' and prop.uselist:
-                return None
+        #col = list(prop.local_columns)[0]
+        #if not col.primary_key:
+        #    name = col.name
 
-            # if prop.entity.name == 'analysis':
-            #     if prop.parent.name not in ["session"]:
-            #         return None
-
-            # Exclude foreign key columns from nesting
-            #exclude = [c.name for c in prop.remote_side]
-            exclude = []
-            return SmartNested(name, many=prop.uselist, exclude=exclude)
-        return super().property2field(prop, **kwargs)
+        return Nested(name, many=prop.uselist, exclude=exclude)
