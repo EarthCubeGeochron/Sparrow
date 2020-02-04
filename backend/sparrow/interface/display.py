@@ -7,39 +7,75 @@ from textwrap import indent
 
 
 def styled_key(k):
-    return style("• ", dim=True)+k+style(": ", dim=True)
+    return style("• ", dim=True)+k
 
 
-def to_json_schema(model):
-    return json_schema.dump(model)
+sep = "…"
+indent = 3
 
+class ModelPrinter(object):
+    def __init__(self, nest_level=0):
+        self.nest_level = nest_level
 
-def pretty_print(model, prefix="", key=None):
-    new_prefix = prefix[0:len(prefix)-4]
-    if key is not None:
-        new_prefix += styled_key(key)
-    print(new_prefix+model.__class__.__name__)
-    for k, v in model._declared_fields.items():
-        if isinstance(v, Nested):
-            if len(prefix) < 6:
-                try:
-                    pretty_print(v.schema, prefix=prefix+"    ", key=k)
-                except ValueError as err:
-                    echo(v.schema.exclude)
-                    echo(prefix+styled_key(k)+style(str(err), fg="red"))
-                except RegistryError:
-                    # Ignore nested fields that aren't
-                    pass
-                except AttributeError as err:
-                    echo(prefix+styled_key(k)+style(str(err), fg="red"))
+    def print_nested(self, k, field, level=0):
+        prefix = level*indent*" "
+        if level < self.nest_level:
+            try:
+                self.print_model(field.schema, level=level+1, key=k)
+            except ValueError as err:
+                echo(field.schema.exclude)
+                echo(prefix+styled_key(k)+style(str(err), fg="red"))
+            except RegistryError:
+                # Ignore nested fields that aren't
+                pass
+            except AttributeError as err:
+                echo(prefix+styled_key(k)+style(str(err), fg="red"))
         else:
-            classname = v.__class__.__name__
-            nfill = 32-len(k)-len(classname)
+            self.print_field(k, field.schema, bold=True, level=level)
+            #echo(prefix+styled_key(k)+style(": ", dim=True)+style(field.schema.__class__.__name__, bold=True))
 
-            row = "".join([
-                prefix,
-                styled_key(k),
-                style("."*nfill,dim=True),
-                style(classname, fg="cyan", dim=True)
-            ])
-            echo(row)
+
+    def print_field(self, key, field, level=0, **kwargs):
+        prefix = level*indent*" "
+        classname = field.__class__.__name__
+        nfill = 60-level*indent-len(key)-len(classname)
+
+        row = "".join([
+            prefix,
+            styled_key(key),
+            " ",
+            style(sep*nfill, dim=True),
+            " ",
+            style(classname, fg="cyan", dim=True, **kwargs)
+        ])
+        echo(row)
+
+    def __sort_fields(self, a):
+        return isinstance(a[1],Nested)
+
+    def print_model(self, model, key=None, level=0):
+        prefix = level*indent*" "
+
+        new_prefix = prefix[0:len(prefix)-indent]
+        if key is not None:
+            self.print_field(key, model, level=level-1, bold=True)
+            #new_prefix += styled_key(key)+style(": ", dim=True)
+        else:
+            echo(new_prefix+style(model.__class__.__name__, bold=True))
+
+        fields = list(model._declared_fields.items())
+        fields.sort(key=self.__sort_fields)
+
+        for k, v in fields:
+            if isinstance(v, Nested):
+                self.print_nested(k, v, level=level)
+            else:
+                self.print_field(k, v, level=level)
+
+    def __call__(self, model):
+        self.print_model(model)
+
+
+def pretty_print(model, nested=0):
+    printer = ModelPrinter(nest_level=nested)
+    printer(model)
