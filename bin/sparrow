@@ -144,9 +144,9 @@ if [ $found_command = 0 ]; then
   # backend containers when containers are already running.
   # TODO: We need a better understanding of best practices here.
   if docker-compose exec backend true > /dev/null 2>&1 ; then
-    sparrow compose exec backend sparrow $@
+    sparrow compose --log-level ERROR exec backend sparrow $@
   else
-    sparrow compose run --rm backend sparrow $@
+    sparrow compose --log-level ERROR run --rm backend sparrow $@
   fi
 else
   shift

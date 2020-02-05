@@ -18,7 +18,9 @@ class App(Flask):
     def __init__(self, *args, **kwargs):
         # Setup config as suggested in http://flask.pocoo.org/docs/1.0/config/
         cfg = kwargs.pop("config", None)
+        verbose = kwargs.pop("verbose", True)
         super().__init__(*args, **kwargs)
+        self.verbose = verbose
 
         self.config.from_object('sparrow.default_config')
         if cfg is None:
@@ -36,6 +38,11 @@ class App(Flask):
 
         self.plugins = SparrowPluginManager()
 
+    def echo(self, msg):
+        if not self.verbose:
+            return
+        echo(msg, err=True)
+
     @property
     def database(self):
         from .database import Database
@@ -48,17 +55,17 @@ class App(Flask):
         self.plugins.add(plugin)
 
     def loaded(self):
-        echo("Initializing plugins", err=True)
+        self.echo("Initializing plugins")
         self.plugins.finalize(self)
 
     def run_hook(self, hook_name, *args, **kwargs):
-        echo("Running hook "+hook_name, err=True)
+        self.echo("Running hook "+hook_name)
         method_name = "on_"+hook_name.replace("-","_")
         for plugin in self.plugins:
             try:
                 method = getattr(plugin, method_name)
                 method(*args, **kwargs)
-                echo("  plugin: "+plugin.name, err=True)
+                self.echo("  plugin: "+plugin.name)
             except AttributeError as err:
                 continue
 
@@ -85,9 +92,10 @@ class App(Flask):
         self.loaded()
 
 
-def construct_app(config=None, minimal=False):
+def construct_app(config=None, minimal=False, **kwargs):
     app = App(__name__, config=config,
-              template_folder=relative_path(__file__, "templates"))
+              template_folder=relative_path(__file__, "templates"),
+              **kwargs)
 
     app.load()
 

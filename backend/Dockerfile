@@ -1,10 +1,7 @@
-FROM sparrowdata/backend-base:1.0
+FROM sparrowdata/backend-base:1.1
 
 COPY ./requirements.txt /install/requirements.txt
-RUN pip3 install --upgrade pip
-RUN pip3 install --no-cache-dir -r /install/requirements.txt
-
-RUN apk add --no-cache bash
+RUN pip install --no-cache -r /install/requirements.txt
 
 COPY ./docker.cfg /config/docker.cfg
 # These values should not change between installations
@@ -23,7 +20,7 @@ WORKDIR /app
 COPY ./setup.py /app
 COPY ./sparrow /app/sparrow
 COPY ./core_plugins /app/core_plugins
-# This installation doesn't seem to actually work.
-RUN pip3 install -e .
-## RUN mkdir /cache && python3 sparrow --help > /cache/sparrow-help.txt
+
+RUN pip install -e .
+
 CMD ["/bin/run"]
