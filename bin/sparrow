@@ -15,7 +15,7 @@ while [ -z $SPARROW_CONFIG ] && \
     export SPARROW_CONFIG="$cfg"
     break
   fi
-  [ __dirname = "/" ] && break
+  [ $__dirname = "/" ] && break
   __dirname="${__dirname:h}"
 done
 
