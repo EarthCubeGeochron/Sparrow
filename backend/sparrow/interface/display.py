@@ -1,6 +1,6 @@
 from marshmallow.fields import Nested
 from marshmallow.exceptions import RegistryError
-from click import echo, secho, style
+from click import echo, secho, style, get_terminal_size
 from textwrap import indent
 
 
@@ -14,6 +14,7 @@ indent = 3
 class ModelPrinter(object):
     def __init__(self, nest_level=0):
         self.nest_level = nest_level
+        self.width, _ = get_terminal_size()
 
     def print_nested(self, k, field, level=0):
         prefix = level*indent*" "
@@ -35,7 +36,7 @@ class ModelPrinter(object):
     def print_field(self, key, field, level=0, **kwargs):
         prefix = level*indent*" "
         classname = field.__class__.__name__
-        nfill = 60-level*indent-len(key)-len(classname)
+        nfill = self.width-4-level*indent-len(key)-len(classname)
 
         dim = field.dump_only
 
@@ -50,7 +51,7 @@ class ModelPrinter(object):
         echo(row)
 
     def __sort_fields(self, a):
-        return isinstance(a[1],Nested)
+        return isinstance(a[1], Nested)
 
     def print_model(self, model, key=None, level=0, exclude=[]):
         prefix = level*indent*" "
