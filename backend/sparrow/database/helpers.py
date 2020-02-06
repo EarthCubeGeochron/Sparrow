@@ -1,14 +1,16 @@
 from sqlalchemy.sql import ClauseElement
-from itertools import chain
+
 
 def classname_for_table(table):
     if table.schema is not None:
         return f"{table.schema}_{table.name}"
     return table.name
 
+
 def _classname_for_table(cls, table_name, table):
     # We have to be fancy for SQLAlchemy
     return classname_for_table(table)
+
 
 def get_or_create(session, model, defaults=None, **kwargs):
     """
@@ -30,6 +32,7 @@ def get_or_create(session, model, defaults=None, **kwargs):
         instance._created = True
         return instance
 
+
 class ModelCollection(object):
     def __init__(self, models=None):
         self.__models = {}
@@ -40,7 +43,10 @@ class ModelCollection(object):
     def register(self, *classes):
         for cls in classes:
             k = classname_for_table(cls.__table__)
-            self.__models[k] = cls
+            self.add(k, cls)
+
+    def add(self, key, value):
+        self.__models[key] = value
 
     def __getattr__(self, name):
         try:
@@ -52,19 +58,23 @@ class ModelCollection(object):
         return len(self.__models)
 
     def __iter__(self):
-        yield from self.__models
+        yield from self.__models.values()
 
     def keys(self):
         return [k for k in self.__models.keys()]
+
 
 class TableCollection(object):
     """
     Table collection object that returns automapped tables
     """
+
     def __init__(self, models):
         self.models = models
+
     def __getattr__(self, name):
         return getattr(self.models, name).__table__
+
     def __iter__(self):
         for model in self.models:
             yield model.__table__

@@ -8,15 +8,19 @@ from .encoders import JSONEncoder
 from .api import APIv1
 from .util import relative_path
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
+from .interface import InterfacePlugin
 from .auth import AuthPlugin
 #from .graph import GraphQLPlugin
 from .web import WebPlugin
+
 
 class App(Flask):
     def __init__(self, *args, **kwargs):
         # Setup config as suggested in http://flask.pocoo.org/docs/1.0/config/
         cfg = kwargs.pop("config", None)
+        verbose = kwargs.pop("verbose", True)
         super().__init__(*args, **kwargs)
+        self.verbose = verbose
 
         self.config.from_object('sparrow.default_config')
         if cfg is None:
@@ -34,6 +38,11 @@ class App(Flask):
 
         self.plugins = SparrowPluginManager()
 
+    def echo(self, msg):
+        if not self.verbose:
+            return
+        echo(msg, err=True)
+
     @property
     def database(self):
         from .database import Database
@@ -46,18 +55,18 @@ class App(Flask):
         self.plugins.add(plugin)
 
     def loaded(self):
-        echo("Initializing plugins", err=True)
+        self.echo("Initializing plugins")
         self.plugins.finalize(self)
 
     def run_hook(self, hook_name, *args, **kwargs):
-        echo("Running hook "+hook_name, err=True)
+        self.echo("Running hook "+hook_name)
         method_name = "on_"+hook_name.replace("-","_")
         for plugin in self.plugins:
             try:
                 method = getattr(plugin, method_name)
-                echo("  plugin: "+plugin.name, err=True)
                 method(*args, **kwargs)
-            except AttributeError:
+                self.echo("  plugin: "+plugin.name)
+            except AttributeError as err:
                 continue
 
     def register_module_plugins(self, module):
@@ -71,18 +80,22 @@ class App(Flask):
             self.register_plugin(obj)
 
     def load(self):
-        import sparrow_plugins, core_plugins
+        import sparrow_plugins
+        import core_plugins
         self.register_plugin(AuthPlugin)
         # GraphQL is disabled for now
-        #self.register_plugin(GraphQLPlugin)
+        # self.register_plugin(GraphQLPlugin)
         self.register_plugin(WebPlugin)
+        self.register_plugin(InterfacePlugin)
         self.register_module_plugins(core_plugins)
         self.register_module_plugins(sparrow_plugins)
         self.loaded()
 
-def construct_app(config=None, minimal=False):
+
+def construct_app(config=None, minimal=False, **kwargs):
     app = App(__name__, config=config,
-              template_folder=relative_path(__file__, "templates"))
+              template_folder=relative_path(__file__, "templates"),
+              **kwargs)
 
     app.load()
 
