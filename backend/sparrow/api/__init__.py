@@ -295,12 +295,16 @@ class APIv1(API):
                         q = q.limit(limit)
                     # Save the count of the query
                     response = q.all()
+                    # # Fix stupid serialization
+                    if len(response) > 0:
+                        keys = [str(k) for k in response[0].keys()]
+                        response = [{k: v for k, v in zip(keys, r)} for r in response]
 
                     status = 200
                     headers = {'x-total-count': count}
                     return response, status, headers
 
-                except Exception as err:
+                except AttributeError as err:
                     db.session.rollback()
                     return abort(500,
                         error_message='Query Error',

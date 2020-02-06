@@ -4,9 +4,8 @@ to GeoJSON
 
 Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
-from geoalchemy2 import Geometry, Geography
 from geoalchemy2.shape import from_shape, to_shape
-from shapely import geometry
+from shapely.geometry import mapping, shape
 from marshmallow.fields import Field
 
 class GeometryField(Field):
@@ -19,9 +18,9 @@ class GeometryField(Field):
     def _serialize(self, value, attr, obj):
         if value is None:
             return None
-        return geometry.mapping(to_shape(value))
+        return mapping(to_shape(value))
 
     def _deserialize(self, value, attr, data):
         if value is None:
             return None
-        return from_shape(geometry.shape(value))
+        return from_shape(shape(value))
