@@ -1,5 +1,7 @@
 from sqlalchemy.schema import ForeignKeyConstraint
 from sqlalchemy.ext import automap
+# Drag in geographic types for database reflection
+from geoalchemy2 import Geometry, Geography
 
 def _is_many_to_many(automap_base, table):
     """

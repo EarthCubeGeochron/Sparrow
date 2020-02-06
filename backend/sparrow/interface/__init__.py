@@ -9,7 +9,7 @@ from textwrap import indent
 
 from .converter import SparrowConverter, to_schema_name
 from .display import pretty_print
-from ..database.helpers import ModelCollection, classname_for_table
+from ..database.mapper.util import ModelCollection, classname_for_table
 
 
 def _jsonschema_type_mapping(self):

@@ -10,42 +10,26 @@ TODO: this module bundles convenience methods with core functionality
 in the API should be separately handled than things only used in import
 scripts.
 """
-from sqlalchemy.ext.automap import automap_base
 from werkzeug.security import generate_password_hash, check_password_hash
 from os import environ
-from sqlalchemy.schema import Column
-from sqlalchemy.types import Integer
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declared_attr
+from .mapper import BaseModel
 
-class BaseClass(object):
-    @classmethod
-    def get_or_create(cls, **kwargs):
-        from .database.helpers import get_or_create
-        defaults = kwargs.pop('defaults', None)
-        return get_or_create(cls.db.session, cls, defaults, **kwargs)
-
-    def to_dict(self):
-        res = {}
-        for k,v in self.__table__.c.items():
-            res[k] = getattr(self, k)
-        return res
-
-Base = automap_base(cls=BaseClass)
-
-class User(Base):
+class User(BaseModel):
     __tablename__ = "user"
     # Columns are automagically mapped from database
     # *NEVER* directly set the password column.
+
     def set_password(self, plaintext):
         # 'salt' the passwords to prevent brute forcing
         salt = environ.get("SPARROW_SECRET_KEY")
         self.password = generate_password_hash(salt+str(plaintext))
+
     def is_correct_password(self, plaintext):
         salt = environ.get("SPARROW_SECRET_KEY")
         return check_password_hash(self.password, salt+str(plaintext))
 
-class Project(Base):
+
+class Project(BaseModel):
     __tablename__ = "project"
 
     def add_researcher(self, researcher):
@@ -54,7 +38,8 @@ class Project(Base):
     def add_session(self, session):
         self.session_collection.append(session)
 
-class Session(Base):
+
+class Session(BaseModel):
     __tablename__ = "session"
 
     def get_attribute(self, type):

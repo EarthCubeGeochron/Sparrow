@@ -1,4 +1,3 @@
-from sqlalchemy.sql import ClauseElement
 
 
 def classname_for_table(table):
@@ -12,28 +11,18 @@ def _classname_for_table(cls, table_name, table):
     return classname_for_table(table)
 
 
-def get_or_create(session, model, defaults=None, **kwargs):
-    """
-    Get an instance of a model, or create it if it doesn't
-    exist.
-
-    https://stackoverflow.com/questions/2546207
-    """
-    instance = session.query(model).filter_by(**kwargs).first()
-    if instance:
-        instance._created = False
-        return instance
-    else:
-        params = dict((k, v) for k, v in kwargs.items()
-            if not isinstance(v, ClauseElement))
-        params.update(defaults or {})
-        instance = model(**params)
-        session.add(instance)
-        instance._created = True
-        return instance
+# For automapping
+def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
+    return "_"+referred_cls.__table__.name.lower()
 
 
-class ModelCollection(object):
+class BaseCollection(object):
+    def __repr__(self):
+        keys = ",\n  ".join(self.keys())
+        return f"{self.__class__.__name__}: [\n  {keys}\n]"
+
+
+class ModelCollection(BaseCollection):
     def __init__(self, models=None):
         self.__models = {}
         if models is None:
@@ -64,7 +53,7 @@ class ModelCollection(object):
         return [k for k in self.__models.keys()]
 
 
-class TableCollection(object):
+class TableCollection(BaseCollection):
     """
     Table collection object that returns automapped tables
     """
@@ -78,3 +67,6 @@ class TableCollection(object):
     def __iter__(self):
         for model in self.models:
             yield model.__table__
+
+    def keys(self):
+        return self.models.keys()

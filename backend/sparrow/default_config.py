@@ -1,10 +1,9 @@
 from os import environ
 from datetime import timedelta
-from pathlib import Path
 
-LAB_NAME= environ.get("SPARROW_LAB_NAME", "Test lab")
-DATABASE="postgresql:///earthcube_labdata_test"
-BASE_URL= environ.get("SPARROW_BASE_URL", "/")
+LAB_NAME = environ.get("SPARROW_LAB_NAME", "Test lab")
+DATABASE = "postgresql:///earthcube_labdata_test"
+BASE_URL = environ.get("SPARROW_BASE_URL", "/")
 
 # We want to check most of our config into version control,
 # but we should under no circumstances check in secret keys.

@@ -3,7 +3,7 @@ from sparrow.plugins import SparrowCorePlugin
 from sparrow.util import relative_path
 from sparrow import App
 import click
-from sparrow.util import run_sql
+from sparrow.database.util import run_sql
 
 exclude_tables = ['spatial_ref_sys']
 audit_schemas = ['public', 'vocabulary']
