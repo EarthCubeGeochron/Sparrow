@@ -38,6 +38,7 @@ def abort(message, status=1):
 def get_database(ctx, param, value):
     try:
         app = App(__name__, config=value)
+        app.load()
         return Database(app)
     except ValueError:
         raise click.BadParameter('Invalid database specified')

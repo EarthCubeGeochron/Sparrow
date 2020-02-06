@@ -35,10 +35,12 @@ class Database:
         the SPARROW_BACKEND_CONFIG file, if available.
         """
         self.config = None
+        self.app = None
         if cfg is None:
             # Set config from environment variable
             cfg = App(__name__)
         if hasattr(cfg,'config'):
+            self.app = cfg
             cfg = cfg.config
         self.config = cfg
         db_conn = self.config.get("DATABASE")
@@ -85,8 +87,9 @@ class Database:
         finally:
             session.close()
 
-    def exec_sql(self, *args):
-        run_sql_file(self.session, *args)
+    def exec_sql(self, fn):
+        secho(Path(fn).name, fg='cyan', bold=True)
+        run_sql_file(self.session, str(fn))
 
     def exec_query(self, *args):
         run_query(self.session, *args)
@@ -227,12 +230,9 @@ class Database:
         pretty_print = lambda x: secho(x, fg='cyan', bold=True)
 
         for fn in filenames:
-            pretty_print(fn.name)
-            self.exec_sql(str(fn))
+            self.exec_sql(fn)
 
-        init_sql = self.config.get("INIT_SQL", None)
-        if init_sql is not None:
-            secho("\nCreating schema extensions...", bold=True)
-            for s in init_sql:
-                pretty_print(Path(s).name)
-                self.exec_sql(s)
+        try:
+            self.app.run_hook('core-tables-initialized', self)
+        except AttributeError as err:
+            secho("Could not load plugins", fg='red', dim=True)

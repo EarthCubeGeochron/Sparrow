@@ -34,14 +34,14 @@ def pretty_print(sql, **kwargs):
             secho(start, **kwargs)
             return
 
-def run_sql(session, sql):
+def run_sql(session, sql, params=None):
     queries = split(sql)
     for q in queries:
         sql = format(q, strip_comments=True).strip()
         if sql == '':
             continue
         try:
-            session.execute(sql)
+            session.execute(sql, params=params)
             session.commit()
             pretty_print(sql, dim=True)
         except (ProgrammingError,IntegrityError) as err:
