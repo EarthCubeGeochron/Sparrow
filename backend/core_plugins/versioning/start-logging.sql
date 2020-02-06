@@ -8,3 +8,10 @@ SELECT pgmemento.create_schema_audit(
   -- Tables to ignore
   ARRAY['spatial_ref_sys']
 );
+
+SELECT pgmemento.create_schema_audit(
+  'vocabulary',
+  TRUE,
+  -- Tables to ignore
+  null
+);

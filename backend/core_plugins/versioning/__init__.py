@@ -1,19 +1,13 @@
+from sqlalchemy import inspect, sql
 from sparrow.plugins import SparrowCorePlugin
 from sparrow.util import relative_path
 from sparrow import App
 import click
-from sqlalchemy import inspect, sql
 from sparrow.util import run_sql
 
 exclude_tables = ['spatial_ref_sys']
 
-@click.command(name="remove-audit-trail")
-def drop_audit_trail():
-    """
-    Remove PGMemento audit trail
-    """
-    db = App(__name__).database
-    db.exec_sql(relative_path(__file__, 'drop-audit.sql'))
+def drop_audit_columns(db, schema):
     insp = inspect(db.engine)
     for table in insp.get_table_names(schema='public'):
         if table in exclude_tables:
@@ -24,6 +18,16 @@ def drop_audit_trail():
             continue
         q = f"ALTER TABLE {table} DROP COLUMN audit_id CASCADE"
         run_sql(db.session, q)
+
+@click.command(name="remove-audit-trail")
+def drop_audit_trail():
+    """
+    Remove PGMemento audit trail
+    """
+    db = App(__name__).database
+    db.exec_sql(relative_path(__file__, 'drop-audit.sql'))
+    drop_audit_columns(db, 'public')
+    drop_audit_columns(db, 'vocabulary')
 
 class VersioningPlugin(SparrowCorePlugin):
     name = "versioning"
