@@ -5,11 +5,8 @@ from os import environ
 
 from sqlalchemy import create_engine, inspect, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy.event import listens_for
 from sqlalchemy.schema import Table, ForeignKey, Column
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql import ClauseElement
-from sqlalchemy.types import Integer, NullType
+from sqlalchemy.types import Integer
 
 # Drag in geographic types for database reflection
 from geoalchemy2 import Geometry, Geography
@@ -20,6 +17,7 @@ from ..models import Base, User, Project, Session
 from .helpers import (
     ModelCollection, TableCollection, get_or_create,
     classname_for_table, _classname_for_table)
+from .fixes import _is_many_to_many
 
 metadata = MetaData()
 

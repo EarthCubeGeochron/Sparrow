@@ -15,7 +15,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from os import environ
 from sqlalchemy.schema import Column
 from sqlalchemy.types import Integer
-
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
 
 class BaseClass(object):
@@ -47,6 +47,7 @@ class User(Base):
 
 class Project(Base):
     __tablename__ = "project"
+
     def add_researcher(self, researcher):
         self.researcher_collection.append(researcher)
 
@@ -55,6 +56,7 @@ class Project(Base):
 
 class Session(Base):
     __tablename__ = "session"
+
     def get_attribute(self, type):
         # There has got to be a better way to get self!
         att = self.db.model.attribute
