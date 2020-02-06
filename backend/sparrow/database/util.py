@@ -1,6 +1,7 @@
 from click import secho
 from sqlalchemy.exc import ProgrammingError, IntegrityError
 from sqlparse import split, format
+from sqlalchemy.sql import ClauseElement
 
 
 def run_query(db, filename_or_query, **kwargs):

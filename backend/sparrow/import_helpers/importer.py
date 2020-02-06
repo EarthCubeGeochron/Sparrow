@@ -7,7 +7,7 @@ from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 
 from .util import md5hash, SparrowImportError, ensure_sequence, is_number, coalesce_nan
-from ..util import relative_path, pretty_print
+from ..util import relative_path
 
 class BaseImporter(object):
     """

@@ -13,6 +13,13 @@ from .auth import AuthPlugin
 #from .graph import GraphQLPlugin
 from .web import WebPlugin
 
+def echo_error(message, obj=None, err=None):
+    if obj is not None:
+        message += " "+style(str(obj), bold=True)
+    secho(message, fg='red', err=True)
+    if err is not None:
+        secho("  "+str(err), fg='red', err=True)
+
 
 class App(Flask):
     def __init__(self, *args, **kwargs):
@@ -52,7 +59,12 @@ class App(Flask):
         return self.db
 
     def register_plugin(self, plugin):
-        self.plugins.add(plugin)
+        try:
+            self.plugins.add(plugin)
+        except Exception as err:
+            name = plugin.__class__.__name__
+            echo_error("Could not register plugin", name, err)
+
 
     def loaded(self):
         self.echo("Initializing plugins")
@@ -73,10 +85,12 @@ class App(Flask):
         for name, obj in module.__dict__.items():
             try:
                 assert issubclass(obj, SparrowPlugin)
-                assert obj is not SparrowPlugin
-                assert obj is not SparrowCorePlugin
             except (TypeError, AssertionError):
                 continue
+
+            if obj in [SparrowPlugin, SparrowCorePlugin]:
+                continue
+
             self.register_plugin(obj)
 
     def load(self):
