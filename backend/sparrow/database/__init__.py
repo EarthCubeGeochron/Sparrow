@@ -32,11 +32,9 @@ class Database(MappedDatabaseMixin):
             from ..app import App
             # Set config from environment variable
             app = App(__name__)
-            app.load()
+            app.setup_database(self)
             # Load plugins
         self.app = app
-        self.app.db = self
-
 
         self.config = app.config
         db_conn = self.config.get("DATABASE")
@@ -56,7 +54,6 @@ class Database(MappedDatabaseMixin):
         # Use the self.session_scope function to more explicitly manage sessions.
 
         self.lazy_automap()
-        self.app.run_hook('database-ready')
 
     def automap(self):
         super().automap()
