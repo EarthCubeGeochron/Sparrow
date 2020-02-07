@@ -20,7 +20,7 @@ log = get_logger(__name__)
 
 
 class Database(MappedDatabaseMixin):
-    def __init__(self, cfg=None):
+    def __init__(self, app=None):
         """
         We can pass a connection string, a **Flask** application object
         with the appropriate configuration, or nothing, in which
@@ -28,15 +28,17 @@ class Database(MappedDatabaseMixin):
         the SPARROW_BACKEND_CONFIG file, if available.
         """
         self.config = None
-        self.app = None
-        if cfg is None:
+        if app is None:
             from ..app import App
             # Set config from environment variable
-            cfg = App(__name__)
-        if hasattr(cfg,'config'):
-            self.app = cfg
-            cfg = cfg.config
-        self.config = cfg
+            app = App(__name__)
+            app.load()
+            # Load plugins
+        self.app = app
+        self.app.db = self
+
+
+        self.config = app.config
         db_conn = self.config.get("DATABASE")
         # Override with environment variable
         envvar = environ.get("SPARROW_DATABASE", None)
@@ -54,6 +56,7 @@ class Database(MappedDatabaseMixin):
         # Use the self.session_scope function to more explicitly manage sessions.
 
         self.lazy_automap()
+        self.app.run_hook('database-ready')
 
     def automap(self):
         super().automap()

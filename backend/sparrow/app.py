@@ -27,6 +27,7 @@ class App(Flask):
         cfg = kwargs.pop("config", None)
         verbose = kwargs.pop("verbose", True)
         super().__init__(*args, **kwargs)
+        self.is_loaded = False
         self.verbose = verbose
 
         self.config.from_object('sparrow.default_config')
@@ -50,12 +51,18 @@ class App(Flask):
             return
         echo(msg, err=True)
 
+    def setup_database(self, db=None):
+        from .database import Database
+        self.load()
+        if not db:
+            db = Database(self)
+        self.db = db
+        self.run_hook('database-ready')
+
     @property
     def database(self):
-        from .database import Database
-        if self.db is not None:
-            return self.db
-        self.db = Database(self)
+        if self.db is None:
+            self.setup_database()
         return self.db
 
     def register_plugin(self, plugin):
@@ -66,8 +73,9 @@ class App(Flask):
             echo_error("Could not register plugin", name, err)
 
 
-    def loaded(self):
+    def __loaded(self):
         self.echo("Initializing plugins")
+        self.is_loaded = True
         self.plugins.finalize(self)
 
     def run_hook(self, hook_name, *args, **kwargs):
@@ -94,6 +102,8 @@ class App(Flask):
             self.register_plugin(obj)
 
     def load(self):
+        if self.is_loaded:
+            return
         import sparrow_plugins
         import core_plugins
         self.register_plugin(AuthPlugin)
@@ -103,7 +113,7 @@ class App(Flask):
         self.register_plugin(InterfacePlugin)
         self.register_module_plugins(core_plugins)
         self.register_module_plugins(sparrow_plugins)
-        self.loaded()
+        self.__loaded()
 
 
 def construct_app(config=None, minimal=False, **kwargs):
@@ -116,13 +126,9 @@ def construct_app(config=None, minimal=False, **kwargs):
     from .database import Database
 
     db = Database(app)
-    if db.automap_error is not None:
-        return app, db
+
     if minimal:
         return app, db
-
-
-    app.run_hook("database-ready")
 
     # Setup API
     api = APIv1(db)

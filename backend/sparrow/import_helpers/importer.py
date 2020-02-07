@@ -324,7 +324,7 @@ class BaseImporter(object):
         except (SparrowImportError, NotImplementedError, IntegrityError) as err:
             self.db.session.rollback()
             self.__track_model(rec, None, error=str(err))
-            secho(str(err)+"\n", fg='red')
+            secho(str(err), fg='red')
 
 
 
