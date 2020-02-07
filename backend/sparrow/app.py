@@ -54,10 +54,13 @@ class App(Flask):
     def setup_database(self, db=None):
         from .database import Database
         self.load()
-        if not db:
+        if self.db is not None:
+            return self.db
+        if db is None:
             db = Database(self)
         self.db = db
         self.run_hook('database-ready')
+        return db
 
     @property
     def database(self):
@@ -124,8 +127,7 @@ def construct_app(config=None, minimal=False, **kwargs):
     app.load()
 
     from .database import Database
-
-    db = Database(app)
+    db = app.setup_database(Database(app))
 
     if minimal:
         return app, db

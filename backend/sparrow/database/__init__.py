@@ -32,7 +32,6 @@ class Database(MappedDatabaseMixin):
             from ..app import App
             # Set config from environment variable
             app = App(__name__)
-            app.setup_database(self)
             # Load plugins
         self.app = app
 

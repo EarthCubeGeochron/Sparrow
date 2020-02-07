@@ -68,7 +68,7 @@ class InterfacePlugin(SparrowCorePlugin):
 
     def on_database_ready(self):
         iface = InterfaceCollection(self.app.database.model)
-        self.db.interface = iface
+        self.app.interface = iface
 
     def on_setup_cli(self, cli):
         from .cli import show_interface
