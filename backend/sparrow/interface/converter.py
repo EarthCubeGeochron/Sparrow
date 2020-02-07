@@ -16,17 +16,23 @@ def to_schema_name(name):
 # Control how relationships can be resolved
 allowed_collections = {
     'sample': ['session'],
-    'session': ['analysis', 'attribute'],
+    'session': ['analysis', 'attribute', 'constant'],
     'analysis': ['datum', 'attribute'],
     'project': ['researcher', 'publication', 'session'],
     'datum': ['datum_type'],
-    'datum_type': []
+    'datum_type': [
+        'vocabulary.parameter',
+        'vocabulary.unit',
+        'vocabulary.error_unit',
+        'vocabulary.error_metric'
+    ]
 }
 
 
 class SmartNested(Nested):
     def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)
+
     def serialize(self, attr, obj, accessor=None):
         #if attr not in obj.__dict__:
         #    return {"id": int(getattr(obj, attr + "_id"))}
@@ -44,63 +50,59 @@ class SparrowConverter(ModelConverter):
             }.items()
         ))
 
-    def _key_for_field(self, prop):
+    def _key_for_property(self, prop):
         if not isinstance(prop, RelationshipProperty):
             return prop.key
 
-        if len(prop.local_columns) == 1:
-            current_col = list(prop.local_columns)[0].name
-            # Self-referential foreign keys should have
-            # the relationship named after the column
-            if prop.target == prop.parent.mapped_table:
-                return current_col
-            # One-to-many models should have the field
-            # named after the local column
-            if prop.secondary is None and not prop.uselist:
-                return current_col
+        def normalize(k):
+            if k.endswith('_id'):
+                return k[:-3]
+            return k
+
+        # Normal column
+        if hasattr(prop, 'columns') and len(prop.columns) == 1:
+            return normalize(prop.columns[0].name)
+
+        # Relationship with local columns
+        if hasattr(prop, 'local_columns') and len(prop.local_columns) == 1:
+            return normalize(list(prop.local_columns)[0].name)
+
+        if prop.key.endswith('_id'):
+            return prop.target.name
+        # Self-referential foreign keys should have
+        # the relationship named after the column
+        if prop.key == prop.parent.mapped_table:
+            return prop.key
+        # One-to-many models should have the field
+        # named after the local column
+        if prop.secondary is None and not prop.uselist:
+            return prop.key
         # Otherwise, we go with the name of the remote model.
         return prop.target.name
 
-    def fields_for_model(
-        self,
-        model,
-        *,
-        include_fk=False,
-        fields=None,
-        exclude=None,
-        base_fields=None,
-        dict_cls=dict
-    ):
-        result = dict()
-        base_fields = base_fields or {}
-        for prop in model.__mapper__.iterate_properties:
-            key = self._key_for_field(prop)
-            if self._should_exclude_field(prop, fields=fields, exclude=exclude):
-                # Allow marshmallow to validate and exclude the field key.
-                result[key] = None
-                continue
-            if hasattr(prop, "columns"):
-                if not include_fk:
-                    # Only skip a column if there is no overriden column
-                    # which does not have a Foreign Key.
-                    for column in prop.columns:
-                        if not column.foreign_keys:
-                            break
-                    else:
-                        continue
-            field = base_fields.get(prop.key) or self.property2field(prop)
-            if field:
-                result[key] = field
-        return result
+    def fields_for_model(self, model, **kwargs):
+        # Precompute new keys so we can use properties
+        new_keys = {prop.key: self._key_for_property(prop)
+                    for prop in model.__mapper__.iterate_properties}
+        # Convert fields to models using library code.
+        fields = super().fields_for_model(model, **kwargs)
+        return {new_keys[k]: v for k, v in fields.items() if v is not None}
 
-    def _should_exclude_field(prop, **kwargs):
-        pass
+    def _should_exclude_field(self, prop, fields=None, exclude=None):
+        if fields and prop.key not in fields:
+            return True
+        if exclude and prop.key in fields:
+            return True
+
+        if isinstance(prop, RelationshipProperty):
+            if prop.target.name == 'data_file_link':
+                return True
+        return False
+
 
     def _get_field_kwargs_for_property(self, prop):
         kwargs = super()._get_field_kwargs_for_property(prop)
-        print(prop.columns[0].name)
         if hasattr(prop, "direction"): # Relationship property
-            print(prop, kwargs)
             return kwargs
 
         for col in prop.columns:
@@ -132,31 +134,33 @@ class SparrowConverter(ModelConverter):
         if not isinstance(prop, RelationshipProperty):
             return super().property2field(prop, **kwargs)
 
-        # Exclude field based on table name
+        # # Exclude field based on table name
         this_table = prop.parent.mapped_table
-        other_table = prop.target.name
+        other_table = prop.target
 
         if prop.target == this_table and prop.uselist:
-            # Don't allow self-referential collections
-            return None
+             # Don't allow self-referential collections
+             return None
 
-        # Don't allow the 'many' side of some 'one-to-many'
-        # relationships nest their parents...
-        r = prop.mapper.relationships
-        many_to_one = not prop.uselist and r[prop.backref[0]].uselist
-        remotes = allowed_collections.get(this_table.name, [])
+        #
+        # # Don't allow the 'many' side of some 'one-to-many'
+        # # relationships nest their parents...
+        # r = prop.mapper.relationships
+        # many_to_one = not prop.uselist and r[prop.backref[0]].uselist
+        # allowed_remotes = allowed_collections.get(this_table.name, [])
+        # if other_table.name not in allowed_remotes:
+        #     return None
+        #
+        # # Exclude foreign key columns from nesting
+        # exclude = []
+        # # Get the class for this relationship
+        # #name = self._name_for_relationship_property(prop)
+        #
+        # #print(len(prop.local_columns))
+        # #print(name, prop)
+        # #    name = col.name
 
-        if many_to_one and other_table not in remotes:
-            return None
-
-        # Exclude foreign key columns from nesting
-        exclude = []
-        # Get the class for this relationship
-        #name = self._name_for_relationship_property(prop)
-
-        #print(len(prop.local_columns))
-        #print(name, prop)
-        #    name = col.name
+        exclude=[]
 
         # The "name" is actually the name of the related model, NOT the name
         # of field

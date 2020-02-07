@@ -9,7 +9,7 @@ from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
 
 from .util import run_sql_file, run_query, get_or_create
-from .models import User, Project, Session
+from .models import User, Project, Session, DatumType
 from .mapper import MappedDatabaseMixin
 from ..logs import get_logger
 from ..util import relative_path
@@ -60,7 +60,7 @@ class Database(MappedDatabaseMixin):
         # (we need to add these to the automapped classes since they are not
         #  included by default)
         # TODO: there is probably a way to do this without having to manually register the models
-        self.register_models(User, Project, Session)
+        self.register_models(User, Project, Session, DatumType)
         # Register a new class
         # Automap the core_view.datum relationship
         cls = self.automap_view("datum",

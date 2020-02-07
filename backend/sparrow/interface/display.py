@@ -1,7 +1,6 @@
 from marshmallow.fields import Nested
 from marshmallow.exceptions import RegistryError
 from click import echo, secho, style, get_terminal_size
-from textwrap import indent
 
 
 def styled_key(k, **kwargs):
@@ -34,7 +33,7 @@ class ModelPrinter(object):
 
         modifier = ""
         if getattr(field, 'many', False):
-            modifier = "list of "
+            modifier = "..."
 
         nfill = self.width-4-level*indent-len(key)-len(classname)-len(modifier)
 
@@ -46,10 +45,10 @@ class ModelPrinter(object):
         row = "".join([
             prefix,
             styled_key(key, dim=dim, underline=required),
+            style(modifier, dim=dim, bold=True),
             " ",
             style(sep*nfill, dim=True),
             " ",
-            style(modifier, fg='cyan', dim=True),
             style(classname, fg="cyan", dim=True, **kwargs)
         ])
         echo(row)

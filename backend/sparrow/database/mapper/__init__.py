@@ -11,7 +11,8 @@ from .util import (
     ModelCollection, TableCollection,
     classname_for_table,
     _classname_for_table,
-    name_for_scalar_relationship)
+    name_for_scalar_relationship,
+    name_for_collection_relationship)
 from .base import BaseModel
 
 
@@ -70,6 +71,7 @@ class MappedDatabaseMixin(object):
         # This stuff should be placed outside of core (one likely extension point).
         reflection_kwargs = dict(
             name_for_scalar_relationship=name_for_scalar_relationship,
+            name_for_collection_relationship=name_for_collection_relationship,
             classname_for_table=_classname_for_table)
 
         BaseModel.prepare(self.engine, reflect=True, **reflection_kwargs)
