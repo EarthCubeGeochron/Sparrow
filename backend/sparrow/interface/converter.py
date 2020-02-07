@@ -19,6 +19,8 @@ allowed_collections = {
     'session': ['analysis', 'attribute'],
     'analysis': ['datum', 'attribute'],
     'project': ['researcher', 'publication', 'session'],
+    'datum': ['datum_type'],
+    'datum_type': []
 }
 
 
@@ -46,9 +48,17 @@ class SparrowConverter(ModelConverter):
         if not isinstance(prop, RelationshipProperty):
             return prop.key
 
-        tbl = prop.parent.mapped_table
-        if prop.target == tbl:
-            return list(prop.local_columns)[0].name
+        if len(prop.local_columns) == 1:
+            current_col = list(prop.local_columns)[0].name
+            # Self-referential foreign keys should have
+            # the relationship named after the column
+            if prop.target == prop.parent.mapped_table:
+                return current_col
+            # One-to-many models should have the field
+            # named after the local column
+            if prop.secondary is None and not prop.uselist:
+                return current_col
+        # Otherwise, we go with the name of the remote model.
         return prop.target.name
 
     def fields_for_model(
@@ -59,7 +69,7 @@ class SparrowConverter(ModelConverter):
         fields=None,
         exclude=None,
         base_fields=None,
-        dict_cls=dict,
+        dict_cls=dict
     ):
         result = dict()
         base_fields = base_fields or {}
@@ -83,49 +93,74 @@ class SparrowConverter(ModelConverter):
                 result[key] = field
         return result
 
+    def _should_exclude_field(prop, **kwargs):
+        pass
+
     def _get_field_kwargs_for_property(self, prop):
         kwargs = super()._get_field_kwargs_for_property(prop)
+        print(prop.columns[0].name)
+        if hasattr(prop, "direction"): # Relationship property
+            print(prop, kwargs)
+            return kwargs
 
         for col in prop.columns:
-            if isinstance(col.type, Integer) and col.primary_key:
-                # Integer primary keys should be dump-only, probably
+            is_integer = isinstance(col.type, Integer)
+            if col.name == 'audit_id' and is_integer:
                 kwargs['dump_only'] = True
+                return kwargs
+
+            if is_integer and col.primary_key:
+                # Integer primary keys should be dump-only, probably
+                # We could probably check for a default sequence
+                # if we wanted to be general...
+                kwargs['dump_only'] = True
+            elif not col.nullable:
+                kwargs['required'] = True
+
             if isinstance(col.type, UUID):
                 kwargs['dump_only'] = True
+                kwargs['required'] = False
+
+            dump_only = kwargs.get('dump_only', False)
+            if not dump_only and not col.nullable:
+                kwargs['required'] = True
+            if dump_only:
+                kwargs['required'] = False
         return kwargs
 
     def property2field(self, prop, **kwargs):
         if not isinstance(prop, RelationshipProperty):
             return super().property2field(prop, **kwargs)
 
-        # Get the class for this relationship
-        cls = prop.mapper.class_
-        name = to_schema_name(cls.__name__)
         # Exclude field based on table name
-        if prop.target.name == 'data_file_link':
-            return None
-
         this_table = prop.parent.mapped_table
+        other_table = prop.target.name
 
         if prop.target == this_table and prop.uselist:
             # Don't allow self-referential collections
             return None
 
-        coll = allowed_collections.get(this_table.name, [])
-        if prop.uselist and prop.target.name not in coll:
-            # Only certain collections are allowed
+        # Don't allow the 'many' side of some 'one-to-many'
+        # relationships nest their parents...
+        r = prop.mapper.relationships
+        many_to_one = not prop.uselist and r[prop.backref[0]].uselist
+        remotes = allowed_collections.get(this_table.name, [])
+
+        if many_to_one and other_table not in remotes:
             return None
 
         # Exclude foreign key columns from nesting
         exclude = []
-        # Exclude all back-references to models already defined
-        if prop.backref is not None:
-            pass
+        # Get the class for this relationship
+        #name = self._name_for_relationship_property(prop)
 
-        #prop.key = prop.target.name
-
-        #col = list(prop.local_columns)[0]
-        #if not col.primary_key:
+        #print(len(prop.local_columns))
+        #print(name, prop)
         #    name = col.name
 
-        return Nested(name, many=prop.uselist, exclude=exclude)
+        # The "name" is actually the name of the related model, NOT the name
+        # of field
+        cls = prop.mapper.class_
+        name = to_schema_name(cls.__name__)
+
+        return Nested(name, many=prop.uselist, exclude=exclude, **kwargs)

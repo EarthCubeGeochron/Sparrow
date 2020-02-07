@@ -20,32 +20,36 @@ class ModelPrinter(object):
         prefix = level*indent*" "
         if level < self.nest_level:
             try:
-                self.print_model(field.schema, level=level+1, key=k, exclude=field.exclude)
-            except ValueError as err:
-                echo(prefix+styled_key(k)+style(str(err), fg="red"))
-            except RegistryError:
-                # Ignore nested fields that don't have a table associated
-                # (e.g. views)
-                pass
-            except AttributeError as err:
-                echo(prefix+styled_key(k)+style(str(err), fg="red"))
+                self.print_model(field.schema, level=level+1, key=k,
+                                 exclude=field.exclude)
+            except (ValueError, RegistryError, AttributeError) as err:
+                echo(prefix+styled_key(k)+"  "+style(str(err), fg="red"))
         else:
-            self.print_field(k, field.schema, bold=True, level=level)
+            self.print_field(k, field.schema, bold=True, level=level, required=field.required)
 
 
     def print_field(self, key, field, level=0, **kwargs):
         prefix = level*indent*" "
         classname = field.__class__.__name__
-        nfill = self.width-4-level*indent-len(key)-len(classname)
+
+        modifier = ""
+        if getattr(field, 'many', False):
+            modifier = "list of "
+
+        nfill = self.width-4-level*indent-len(key)-len(classname)-len(modifier)
+
+        required = getattr(field, 'required', kwargs.pop('required', False))
 
         dim = field.dump_only
 
+
         row = "".join([
             prefix,
-            styled_key(key, dim=dim),
+            styled_key(key, dim=dim, underline=required),
             " ",
             style(sep*nfill, dim=True),
             " ",
+            style(modifier, fg='cyan', dim=True),
             style(classname, fg="cyan", dim=True, **kwargs)
         ])
         echo(row)
@@ -62,12 +66,10 @@ class ModelPrinter(object):
         else:
             echo(new_prefix+style(model.__class__.__name__, bold=True))
 
-        fields = list(model._declared_fields.items())
+        fields = list(model.declared_fields.items())
         fields.sort(key=self.__sort_fields)
 
         for k, v in fields:
-            if k in exclude:
-                continue
             if isinstance(v, Nested):
                 self.print_nested(k, v, level=level)
             else:

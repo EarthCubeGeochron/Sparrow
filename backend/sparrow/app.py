@@ -85,12 +85,11 @@ class App(Flask):
         self.echo("Running hook "+hook_name)
         method_name = "on_"+hook_name.replace("-","_")
         for plugin in self.plugins:
-            try:
-                method = getattr(plugin, method_name)
-                method(*args, **kwargs)
-                self.echo("  plugin: "+plugin.name)
-            except AttributeError as err:
+            method = getattr(plugin, method_name, None)
+            if method is None:
                 continue
+            method(*args, **kwargs)
+            self.echo("  plugin: "+plugin.name)
 
     def register_module_plugins(self, module):
         for name, obj in module.__dict__.items():
