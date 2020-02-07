@@ -5,8 +5,12 @@ from pathlib import Path
 from os import environ
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import inspect
 
-from .util import md5hash, SparrowImportError, ensure_sequence, is_number, coalesce_nan
+from .util import (
+    md5hash, SparrowImportError,
+    ensure_sequence, coalesce_nan
+)
 from ..util import relative_path
 
 class BaseImporter(object):
@@ -19,6 +23,7 @@ class BaseImporter(object):
         self.db = db
         self.m = self.db.model
         print_sql = kwargs.pop("print_sql", False)
+        self.verbose = kwargs.pop("verbose", False)
         # We shouldn't have to do this,
         #self.db.automap()
 
@@ -171,7 +176,8 @@ class BaseImporter(object):
         return self.analysis(session_id=session.id, type=type, **kwargs)
 
     def attribute(self, analysis, parameter, value):
-        if value is None: return None
+        if value is None:
+            return None
         self.db.session.flush()
         param = self.parameter(parameter)
         attr = self.db.get_or_create(self.m.attribute,
@@ -182,7 +188,8 @@ class BaseImporter(object):
 
     def datum(self, analysis, parameter, value, error=None, **kwargs):
         value = coalesce_nan(value)
-        if value is None: return None
+        if value is None:
+            return None
         type = self.datum_type(parameter, **kwargs)
         self.db.session.flush()
         datum = self.db.get_or_create(self.m.datum,
@@ -195,13 +202,15 @@ class BaseImporter(object):
     def constant(self, analysis, parameter, value, error=None, **kwargs):
         args = dict()
         value = coalesce_nan(value)
-        if value is None: return None
+        if value is None:
+            return None
         type = self.datum_type(parameter, **kwargs)
         self.db.session.flush()
         const = self.db.get_or_create(self.m.constant,
             value=value,
             error=error,
-            type=type.id)
+            type=type.id
+        )
         analysis.constant_collection.append(const)
         self.db.session.flush()
         return const
@@ -254,6 +263,7 @@ class BaseImporter(object):
         # Get data file record if it exists
         rec = (self.db.session.query(self.m.data_file)
                 .filter_by(file_path=file_path)).first()
+
         added = rec is None
         if added:
             rec = self.m.data_file(
@@ -302,8 +312,6 @@ class BaseImporter(object):
 
         # Create a "data_file_import" object to track model-datafile links
 
-
-
         try:
             # import_datafile needs to return the top-level model(s)
             # created or modified during import.
@@ -318,18 +326,56 @@ class BaseImporter(object):
             self.__track_model(rec, None, error=str(err))
             secho(str(err)+"\n", fg='red')
 
-        if redo:
-            dirty = set(i for i in set(self.__dirty) if self.db.session.is_modified(i))
-            dirty = list(dirty | self.__new)
-            if len(dirty) == 0:
-                secho("No modifications", fg='green')
-            else:
-                secho(f"{len(dirty)} records modified")
 
+
+
+        if redo:
+            self.__track_changes()
         # File records and trackers are added at the end,
         # outside of the try/except block, so they occur
         # regardness of error status
         self.db.session.commit()
+
+    def __track_changes(self):
+        new_changed = set(i for i in self.__new if self.__has_changes(i))
+        modified = set(i for i in self.__dirty if self.__has_changes(i))
+
+        def _echo(v, n, **kwargs):
+            i = len(v)
+            if i > 0:
+                secho(f"{i} {n}", **kwargs)
+
+        has_new_models = len(self.__new) > 0
+        has_dirty_models = len(self.__dirty) > 0
+        has_modified_models = len(modified) > 0
+
+        if self.verbose:
+            problems = (self.__new & new_changed) | (self.__dirty & modified)
+            _echo(problems, "update attempted for unchanged model", fg='yellow')
+            self.__print_changes(modified)
+
+        if not has_modified_models:
+            secho("No modifications", fg='green')
+        else:
+            _echo(self.__new, "records added", fg='green')
+            _echo(modified, "records modified", fg='yellow')
+        secho("")
+
+    def __print_changes(self, dirty_records):
+        pass
+
+    def __has_changes(self, obj):
+        for v in self.__object_changes(obj).values():
+            if v.added is not None and  len(v.added) > 0:
+                return True
+            if v.deleted is not None and len(v.deleted) > 0:
+                return True
+        return False
+
+    def __object_changes(self, obj):
+        if not self.db.session.is_modified(obj):
+            return {}
+        return {k: v.history for k, v in inspect(obj).attrs.items()}
 
     def __track_model(self, rec, model=None, **kw):
         """
