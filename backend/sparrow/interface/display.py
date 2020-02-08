@@ -75,6 +75,9 @@ class ModelPrinter(object):
                 self.print_nested(k, v, level=level)
             else:
                 self.print_field(k, v, level=level)
+        if len(exclude):
+            secho(prefix+"  excluded: "+" ".join(exclude), dim=True)
+
 
     def __call__(self, model):
         self.print_model(model)

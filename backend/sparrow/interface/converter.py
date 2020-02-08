@@ -17,18 +17,23 @@ def to_schema_name(name):
 # Control how relationships can be resolved
 allowed_collections = {
     'sample': ['session'],
-    'session': ['analysis', 'attribute', 'constant'],
-    'analysis': ['datum', 'attribute'],
+    'session': 'all',
+    'analysis': ['datum', 'attribute', 'constant', 'analysis_type'],
     'project': ['researcher', 'publication', 'session'],
     'datum': ['datum_type'],
     'datum_type': [
-        'vocabulary.parameter',
-        'vocabulary.unit',
-        'vocabulary.error_unit',
-        'vocabulary.error_metric'
+        'parameter',
+        'unit',
+        'error_unit',
+        'error_metric'
     ]
 }
 
+def allow_nest(outer, inner):
+    coll = allowed_collections.get(outer, [])
+    if coll == 'all':
+        return True
+    return inner in coll
 
 class SmartNested(Nested):
     def __init__(self, name, **kwargs):
@@ -38,6 +43,8 @@ class SmartNested(Nested):
         #if attr not in obj.__dict__:
         #    return {"id": int(getattr(obj, attr + "_id"))}
         return super().serialize(attr, obj, accessor)
+
+
 
 
 class SparrowConverter(ModelConverter):
@@ -102,19 +109,17 @@ class SparrowConverter(ModelConverter):
             return True
 
         # # Exclude field based on table name
-        this_table = prop.parent.mapped_table
-        try:
-            other_table = prop.target
-        except Exception:
-            import IPython; IPython.embed(); raise
+        this_table = prop.parent.tables[0]
+        other_table = prop.target
+        #import IPython; IPython.embed(); raise
+
 
         if prop.target == this_table and prop.uselist:
              # Don't allow self-referential collections
              return True
 
         #if prop.direction == ONETOMANY:
-        #    if this_table.name not in ['session', 'sample', 'datum']:
-        #        return True
+        #   #if this_table.name not in ['session', 'sample', 'datum']:
 
         return False
 
@@ -156,12 +161,12 @@ class SparrowConverter(ModelConverter):
         #
         # # TODO: remove parent fields
         exclude = []
-        # r = prop.mapper.relationships
-        # if prop.backref is not None:
-        #     remote_prop = r[prop.backref[0]]
-        #     remote_field = self._key_for_property(remote_prop)
-        #     if not self._should_exclude_field(remote_prop):
-        #         exclude.append(remote_field)
+        r = prop.mapper.relationships
+        if prop.backref is not None:
+            remote_prop = r[prop.backref[0]]
+            remote_field = self._key_for_property(remote_prop)
+            if not self._should_exclude_field(remote_prop):
+                exclude.append(remote_field)
 
         # allowed_remotes = allowed_collections.get(this_table.name, [])
         # if other_table.name not in allowed_remotes:
@@ -182,6 +187,11 @@ class SparrowConverter(ModelConverter):
         # of field
         cls = prop.mapper.class_
         name = to_schema_name(cls.__name__)
+
+        this_table = prop.parent.tables[0]
+        other_table = prop.target
+        if not allow_nest(this_table.name, prop.target.name):
+            return super().property2field(prop, exclude=exclude, **kwargs)
 
         #kwargs['required'] = True
         return Nested(name, many=prop.uselist, exclude=exclude, **kwargs)
