@@ -69,6 +69,8 @@ class ModelPrinter(object):
         fields.sort(key=self.__sort_fields)
 
         for k, v in fields:
+            if k in exclude:
+                continue
             if isinstance(v, Nested):
                 self.print_nested(k, v, level=level)
             else:

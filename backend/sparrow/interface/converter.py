@@ -7,8 +7,9 @@ from sqlalchemy.types import Integer
 from sqlalchemy.dialects.postgresql import UUID
 from stringcase import pascalcase
 
+from ..database.mapper.util import trim_postfix
 from .geometry import GeometryField
-
+from sqlalchemy.orm.interfaces import MANYTOONE, ONETOMANY
 
 def to_schema_name(name):
     return pascalcase(name+"_schema")
@@ -54,21 +55,19 @@ class SparrowConverter(ModelConverter):
         if not isinstance(prop, RelationshipProperty):
             return prop.key
 
-        def normalize(k):
-            if k.endswith('_id'):
-                return k[:-3]
-            return k
-
-        # Normal column
-        if hasattr(prop, 'columns') and len(prop.columns) == 1:
-            return normalize(prop.columns[0].name)
+        # # Normal column
+        # if hasattr(prop, 'columns') and len(prop.columns) == 1:
+        #     return trim_postfix(prop.columns[0].name, "_id")
 
         # Relationship with local columns
         if hasattr(prop, 'local_columns') and len(prop.local_columns) == 1:
-            return normalize(list(prop.local_columns)[0].name)
+            col_name = list(prop.local_columns)[0].name
+            if col_name != 'id':
+                return trim_postfix(col_name, "_id")
 
-        if prop.key.endswith('_id'):
-            return prop.target.name
+        #if prop.key.endswith('_id'):
+        #    return prop.target.name
+
         # Self-referential foreign keys should have
         # the relationship named after the column
         if prop.key == prop.parent.mapped_table:
@@ -94,9 +93,29 @@ class SparrowConverter(ModelConverter):
         if exclude and prop.key in fields:
             return True
 
-        if isinstance(prop, RelationshipProperty):
-            if prop.target.name == 'data_file_link':
-                return True
+        if not isinstance(prop, RelationshipProperty):
+            return False
+
+        ## Deal with relationships here ##
+
+        if prop.target.name == 'data_file_link':
+            return True
+
+        # # Exclude field based on table name
+        this_table = prop.parent.mapped_table
+        try:
+            other_table = prop.target
+        except Exception:
+            import IPython; IPython.embed(); raise
+
+        if prop.target == this_table and prop.uselist:
+             # Don't allow self-referential collections
+             return True
+
+        #if prop.direction == ONETOMANY:
+        #    if this_table.name not in ['session', 'sample', 'datum']:
+        #        return True
+
         return False
 
 
@@ -134,19 +153,16 @@ class SparrowConverter(ModelConverter):
         if not isinstance(prop, RelationshipProperty):
             return super().property2field(prop, **kwargs)
 
-        # # Exclude field based on table name
-        this_table = prop.parent.mapped_table
-        other_table = prop.target
-
-        if prop.target == this_table and prop.uselist:
-             # Don't allow self-referential collections
-             return None
-
         #
-        # # Don't allow the 'many' side of some 'one-to-many'
-        # # relationships nest their parents...
+        # # TODO: remove parent fields
+        exclude = []
         # r = prop.mapper.relationships
-        # many_to_one = not prop.uselist and r[prop.backref[0]].uselist
+        # if prop.backref is not None:
+        #     remote_prop = r[prop.backref[0]]
+        #     remote_field = self._key_for_property(remote_prop)
+        #     if not self._should_exclude_field(remote_prop):
+        #         exclude.append(remote_field)
+
         # allowed_remotes = allowed_collections.get(this_table.name, [])
         # if other_table.name not in allowed_remotes:
         #     return None
@@ -160,11 +176,12 @@ class SparrowConverter(ModelConverter):
         # #print(name, prop)
         # #    name = col.name
 
-        exclude=[]
+        #exclude=['session']
 
         # The "name" is actually the name of the related model, NOT the name
         # of field
         cls = prop.mapper.class_
         name = to_schema_name(cls.__name__)
 
+        #kwargs['required'] = True
         return Nested(name, many=prop.uselist, exclude=exclude, **kwargs)
