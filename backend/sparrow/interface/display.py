@@ -10,6 +10,7 @@ def styled_key(k, **kwargs):
 sep = "…"
 indent = 3
 
+
 class ModelPrinter(object):
     def __init__(self, nest_level=0):
         self.nest_level = nest_level
@@ -24,8 +25,8 @@ class ModelPrinter(object):
             except (ValueError, RegistryError, AttributeError) as err:
                 echo(prefix+styled_key(k)+"  "+style(str(err), fg="red"))
         else:
-            self.print_field(k, field.schema, bold=True, level=level, required=field.required)
-
+            self.print_field(k, field.schema, bold=True,
+                             level=level, required=field.required)
 
     def print_field(self, key, field, level=0, **kwargs):
         prefix = level*indent*" "
@@ -40,7 +41,6 @@ class ModelPrinter(object):
         required = getattr(field, 'required', kwargs.pop('required', False))
 
         dim = field.dump_only
-
 
         row = "".join([
             prefix,
@@ -77,7 +77,6 @@ class ModelPrinter(object):
                 self.print_field(k, v, level=level)
         if len(exclude):
             secho(prefix+"  excluded: "+" ".join(exclude), dim=True)
-
 
     def __call__(self, model):
         self.print_model(model)

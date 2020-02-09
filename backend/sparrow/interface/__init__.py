@@ -2,10 +2,8 @@ from sparrow.plugins import SparrowCorePlugin
 from marshmallow_sqlalchemy import ModelSchema, exceptions
 from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
-from marshmallow.exceptions import RegistryError
 from marshmallow_jsonschema import JSONSchema
-from click import echo, secho, style
-from textwrap import indent
+from click import secho
 
 from .converter import SparrowConverter, to_schema_name
 from .display import pretty_print
@@ -74,8 +72,6 @@ class InterfacePlugin(SparrowCorePlugin):
         from .cli import show_interface
         cli.add_command(show_interface)
 
-    # load_datafile(schema, fileobj):
-    # load a data file for a specific schema
 
 def load_data(mapping):
     from ..app import construct_app

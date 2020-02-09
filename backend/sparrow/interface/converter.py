@@ -9,11 +9,12 @@ from sqlalchemy.dialects.postgresql import UUID
 from stringcase import pascalcase
 
 from ..database.mapper.util import trim_postfix
-from .geometry import GeometryField
-from sqlalchemy.orm.interfaces import MANYTOONE, ONETOMANY
+from .fields import GeometryField, EnumField
+
 
 def to_schema_name(name):
     return pascalcase(name+"_schema")
+
 
 # Control how relationships can be resolved
 allowed_collections = {
@@ -31,6 +32,7 @@ allowed_collections = {
     ]
 }
 
+
 def allow_nest(outer, inner):
     if outer == inner:
         # Tables can always nest themselves
@@ -39,17 +41,6 @@ def allow_nest(outer, inner):
     if coll == 'all':
         return True
     return inner in coll
-
-class SmartNested(Nested):
-    def __init__(self, name, **kwargs):
-        super().__init__(name, **kwargs)
-
-    def serialize(self, attr, obj, accessor=None):
-        #if attr not in obj.__dict__:
-        #    return {"id": int(getattr(obj, attr + "_id"))}
-        return super().serialize(attr, obj, accessor)
-
-
 
 
 class SparrowConverter(ModelConverter):
@@ -92,6 +83,7 @@ class SparrowConverter(ModelConverter):
         return prop.target.name
 
     def fields_for_model(self, model, **kwargs):
+        # Shim fields_for_model so we can control the generated property names
         # Precompute new keys so we can use properties
         new_keys = {prop.key: self._key_for_property(prop)
                     for prop in model.__mapper__.iterate_properties}
@@ -108,9 +100,11 @@ class SparrowConverter(ModelConverter):
         if not isinstance(prop, RelationshipProperty):
             return False
 
-        ## Deal with relationships here ##
+        # ## Deal with relationships here #
 
         if prop.target.name == 'data_file_link':
+            # Data files are currently exclusively dealt with internally...
+            # (this may change)
             return True
 
         # # Exclude field based on table name
@@ -130,8 +124,9 @@ class SparrowConverter(ModelConverter):
 
     def _get_field_kwargs_for_property(self, prop):
         kwargs = super()._get_field_kwargs_for_property(prop)
+
         if isinstance(prop, RelationshipProperty): # Relationship property
-            cols = list(getattr(prop,'local_columns', []))
+            cols = list(getattr(prop, 'local_columns', []))
             kwargs['required'] = False
             for col in cols:
                 if not col.nullable:
@@ -170,51 +165,30 @@ class SparrowConverter(ModelConverter):
         if not isinstance(prop, RelationshipProperty):
             return super().property2field(prop, **kwargs)
 
-
-        # allowed_remotes = allowed_collections.get(this_table.name, [])
-        # if other_table.name not in allowed_remotes:
-        #     return None
-        #
-        # # Exclude foreign key columns from nesting
-        # exclude = []
-        # # Get the class for this relationship
-        # #name = self._name_for_relationship_property(prop)
-        #
-        # #print(len(prop.local_columns))
-        # #print(name, prop)
-        # #    name = col.name
-
-        #exclude=['session']
-
         # The "name" is actually the name of the related model, NOT the name
         # of field
         cls = prop.mapper.class_
         name = to_schema_name(cls.__name__)
 
-        this_table = prop.parent.tables[0]
-        other_table = prop.target
-        if not allow_nest(this_table.name, prop.target.name):
-            # Disallow related list field
-            return super().property2field(prop, **kwargs)
+        field_kwargs = self._get_field_kwargs_for_property(prop)
+        field_kwargs.update(**kwargs)
 
-        #
+        this_table = prop.parent.tables[0]
+        if not allow_nest(this_table.name, prop.target.name):
+            # Fields that are not allowed to be nested
+            return Related(name, **field_kwargs)
+        if prop.target.schema == 'enum':
+            # special carve-out for enums represented as foreign keys
+            # (these should be stored in the 'enum' schema):
+            return EnumField(name, **field_kwargs)
+
         # # TODO: remove parent fields
         exclude = []
         r = prop.mapper.relationships
         if prop.backref is not None:
-            # remote_class = prop.mapper.class_
-            # for v in remote_class.__mapper__.iterate_properties:
-            #     if hasattr(v,'mapper') and v.mapper.class_ == prop.parent._class:
-            #         exclude.append(self._key_for_property(v))
-
-            # import IPython; IPython.embed(); raiser
             remote_prop = r[prop.backref[0]]
             remote_field = self._key_for_property(remote_prop)
             if not self._should_exclude_field(remote_prop):
                 exclude.append(remote_field)
 
-        field_kwargs = self._get_field_kwargs_for_property(prop)
-        field_kwargs.update(**kwargs)
-
-        #kwargs['required'] = True
         return Nested(name, many=prop.uselist, exclude=exclude, **field_kwargs)
