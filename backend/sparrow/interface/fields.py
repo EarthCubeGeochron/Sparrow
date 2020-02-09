@@ -5,20 +5,15 @@ data from the Sparrow database.
 Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
 from marshmallow_sqlalchemy.fields import Related, Nested
-from marshmallow.fields import Field
+from marshmallow.fields import Field, Raw
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
 
 
-class EnumField(Related):
-    """
-    Enums are represented by a `Related` field, but we want to potentially
-    be able to revise/extend this later without breaking external APIs.
-    """
+class JSON(Raw):
     pass
 
-
-class GeometryField(Field):
+class Geometry(Field):
     """
     Field for for parsing and serializing a PostGIS geometry
     type to GeoJSON
@@ -37,6 +32,14 @@ class GeometryField(Field):
         if value is None:
             return None
         return from_shape(shape(value))
+
+
+class Enum(Related):
+    """
+    Enums are represented by a `Related` field, but we want to potentially
+    be able to revise/extend this later without breaking external APIs.
+    """
+    pass
 
 
 class SmartNested(Nested):

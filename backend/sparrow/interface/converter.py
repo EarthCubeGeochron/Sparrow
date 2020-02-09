@@ -2,14 +2,14 @@ from marshmallow_sqlalchemy import ModelConverter
 from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
 
-from geoalchemy2 import Geography, Geometry
+import geoalchemy2 as geo
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.types import Integer
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects import postgresql
 from stringcase import pascalcase
 
 from ..database.mapper.util import trim_postfix
-from .fields import GeometryField, EnumField
+from .fields import Geometry, Enum, JSON
 
 
 def to_schema_name(name):
@@ -49,8 +49,10 @@ class SparrowConverter(ModelConverter):
     SQLA_TYPE_MAPPING = dict(
         list(ModelConverter.SQLA_TYPE_MAPPING.items())
         + list({
-            Geometry: GeometryField,
-            Geography: GeometryField
+            geo.Geometry: Geometry,
+            geo.Geography: Geometry,
+            postgresql.JSON: JSON,
+            postgresql.JSONB: JSON
             }.items()
         ))
 
@@ -58,28 +60,18 @@ class SparrowConverter(ModelConverter):
         if not isinstance(prop, RelationshipProperty):
             return prop.key
 
-        # # Normal column
-        # if hasattr(prop, 'columns') and len(prop.columns) == 1:
-        #     return trim_postfix(prop.columns[0].name, "_id")
-
-        # Relationship with local columns
+        # Relationship with a single local column should be named for its
+        # column (less '_id' postfix)
         if hasattr(prop, 'local_columns') and len(prop.local_columns) == 1:
             col_name = list(prop.local_columns)[0].name
             if col_name != 'id':
                 return trim_postfix(col_name, "_id")
 
-        #if prop.key.endswith('_id'):
-        #    return prop.target.name
-
-        # Self-referential foreign keys should have
-        # the relationship named after the column
-        if prop.key == prop.parent.mapped_table:
-            return prop.key
         # One-to-many models should have the field
         # named after the local column
         if prop.secondary is None and not prop.uselist:
             return prop.key
-        # Otherwise, we go with the name of the remote model.
+        # Otherwise, we go with the name of the target model.
         return prop.target.name
 
     def fields_for_model(self, model, **kwargs):
@@ -123,6 +115,7 @@ class SparrowConverter(ModelConverter):
         return False
 
     def _get_field_kwargs_for_property(self, prop):
+        # Somewhat ugly method, mostly to decide if field is dump_only or required
         kwargs = super()._get_field_kwargs_for_property(prop)
 
         if isinstance(prop, RelationshipProperty): # Relationship property
@@ -150,7 +143,7 @@ class SparrowConverter(ModelConverter):
             elif not col.nullable:
                 kwargs['required'] = True
 
-            if isinstance(col.type, UUID):
+            if isinstance(col.type, postgresql.UUID):
                 kwargs['dump_only'] = True
                 kwargs['required'] = False
 
@@ -180,7 +173,7 @@ class SparrowConverter(ModelConverter):
         if prop.target.schema == 'enum':
             # special carve-out for enums represented as foreign keys
             # (these should be stored in the 'enum' schema):
-            return EnumField(name, **field_kwargs)
+            return Enum(name, **field_kwargs)
 
         # # TODO: remove parent fields
         exclude = []
