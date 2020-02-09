@@ -136,6 +136,9 @@ class SparrowConverter(ModelConverter):
             for col in cols:
                 if not col.nullable:
                     kwargs['required'] = True
+            if prop.uselist:
+                kwargs['required'] = False
+
             return kwargs
 
         for col in prop.columns:
