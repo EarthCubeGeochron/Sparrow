@@ -1,4 +1,5 @@
 from marshmallow_sqlalchemy import ModelConverter
+from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
 
 from geoalchemy2 import Geography, Geometry
@@ -19,6 +20,7 @@ allowed_collections = {
     'sample': ['session'],
     'session': 'all',
     'analysis': ['datum', 'attribute', 'constant', 'analysis_type'],
+    'attribute': ['parameter', 'unit'],
     'project': ['researcher', 'publication', 'session'],
     'datum': ['datum_type'],
     'datum_type': [
@@ -30,6 +32,9 @@ allowed_collections = {
 }
 
 def allow_nest(outer, inner):
+    if outer == inner:
+        # Tables can always nest themselves
+        return True
     coll = allowed_collections.get(outer, [])
     if coll == 'all':
         return True
@@ -111,22 +116,26 @@ class SparrowConverter(ModelConverter):
         # # Exclude field based on table name
         this_table = prop.parent.tables[0]
         other_table = prop.target
-        #import IPython; IPython.embed(); raise
-
 
         if prop.target == this_table and prop.uselist:
-             # Don't allow self-referential collections
-             return True
+            # Don't allow self-referential collections
+            return True
 
-        #if prop.direction == ONETOMANY:
-        #   #if this_table.name not in ['session', 'sample', 'datum']:
+        if prop.uselist and not allow_nest(this_table.name, prop.target.name):
+            # Disallow list fields that aren't related (these usually don't have
+            # corresponding local columns)
+            return True
 
         return False
 
-
     def _get_field_kwargs_for_property(self, prop):
         kwargs = super()._get_field_kwargs_for_property(prop)
-        if hasattr(prop, "direction"): # Relationship property
+        if isinstance(prop, RelationshipProperty): # Relationship property
+            cols = list(getattr(prop,'local_columns', []))
+            kwargs['required'] = False
+            for col in cols:
+                if not col.nullable:
+                    kwargs['required'] = True
             return kwargs
 
         for col in prop.columns:
@@ -158,15 +167,6 @@ class SparrowConverter(ModelConverter):
         if not isinstance(prop, RelationshipProperty):
             return super().property2field(prop, **kwargs)
 
-        #
-        # # TODO: remove parent fields
-        exclude = []
-        r = prop.mapper.relationships
-        if prop.backref is not None:
-            remote_prop = r[prop.backref[0]]
-            remote_field = self._key_for_property(remote_prop)
-            if not self._should_exclude_field(remote_prop):
-                exclude.append(remote_field)
 
         # allowed_remotes = allowed_collections.get(this_table.name, [])
         # if other_table.name not in allowed_remotes:
@@ -191,7 +191,27 @@ class SparrowConverter(ModelConverter):
         this_table = prop.parent.tables[0]
         other_table = prop.target
         if not allow_nest(this_table.name, prop.target.name):
-            return super().property2field(prop, exclude=exclude, **kwargs)
+            # Disallow related list field
+            return super().property2field(prop, **kwargs)
+
+        #
+        # # TODO: remove parent fields
+        exclude = []
+        r = prop.mapper.relationships
+        if prop.backref is not None:
+            # remote_class = prop.mapper.class_
+            # for v in remote_class.__mapper__.iterate_properties:
+            #     if hasattr(v,'mapper') and v.mapper.class_ == prop.parent._class:
+            #         exclude.append(self._key_for_property(v))
+
+            # import IPython; IPython.embed(); raiser
+            remote_prop = r[prop.backref[0]]
+            remote_field = self._key_for_property(remote_prop)
+            if not self._should_exclude_field(remote_prop):
+                exclude.append(remote_field)
+
+        field_kwargs = self._get_field_kwargs_for_property(prop)
+        field_kwargs.update(**kwargs)
 
         #kwargs['required'] = True
-        return Nested(name, many=prop.uselist, exclude=exclude, **kwargs)
+        return Nested(name, many=prop.uselist, exclude=exclude, **field_kwargs)

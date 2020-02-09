@@ -52,6 +52,7 @@ class Session(BaseModel):
                 .join(an.attribute_collection)
                 .filter(an.session_id==self.id)).all()
 
+
 class DatumType(BaseModel):
     __tablename__ = 'datum_type'
     _error_unit = relationship('vocabulary_unit', foreign_keys="[DatumType.error_unit]")
