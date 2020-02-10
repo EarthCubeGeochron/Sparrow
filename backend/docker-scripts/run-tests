@@ -15,6 +15,9 @@ export SPARROW_DATABASE="postgresql://postgres@db:5432/sparrow_test"
 
 sparrow init
 
+echo "Running tests"
+pytest /app/tests -v
+
 echo "Tearing down database..."
 dropdb -h db -p 5432 -U postgres sparrow_test
 echo "Done!"
