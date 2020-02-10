@@ -8,4 +8,13 @@ while ! pg_isready -h db -p 5432 -U postgres ; do
   sleep 1
 done
 
+createdb -h db -p 5432 -U postgres sparrow_test
 echo "Database is ready..."
+
+export SPARROW_DATABASE="postgresql://postgres@db:5432/sparrow_test"
+
+sparrow init
+
+echo "Tearing down database..."
+dropdb -h db -p 5432 -U postgres sparrow_test
+echo "Done!"
