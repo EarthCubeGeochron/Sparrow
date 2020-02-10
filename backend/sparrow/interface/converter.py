@@ -42,7 +42,6 @@ def allow_nest(outer, inner):
         return True
     return inner in coll
 
-
 class SparrowConverter(ModelConverter):
     # Make sure that we can properly convert geometries
     # and geographies
@@ -56,7 +55,8 @@ class SparrowConverter(ModelConverter):
             }.items()
         ))
 
-    def _key_for_property(self, prop):
+    def _get_field_name(self, prop):
+        # Only change columns for relationship properties
         if not isinstance(prop, RelationshipProperty):
             return prop.key
 
@@ -75,13 +75,8 @@ class SparrowConverter(ModelConverter):
         return prop.target.name
 
     def fields_for_model(self, model, **kwargs):
-        # Shim fields_for_model so we can control the generated property names
-        # Precompute new keys so we can use properties
-        new_keys = {prop.key: self._key_for_property(prop)
-                    for prop in model.__mapper__.iterate_properties}
-        # Convert fields to models using library code.
         fields = super().fields_for_model(model, **kwargs)
-        return {new_keys[k]: v for k, v in fields.items() if v is not None}
+        return {k: v for k, v in fields.items() if v is not None}
 
     def _should_exclude_field(self, prop, fields=None, exclude=None):
         if fields and prop.key not in fields:
@@ -180,7 +175,7 @@ class SparrowConverter(ModelConverter):
         r = prop.mapper.relationships
         if prop.backref is not None:
             remote_prop = r[prop.backref[0]]
-            remote_field = self._key_for_property(remote_prop)
+            remote_field = self._get_field_name(remote_prop)
             if not self._should_exclude_field(remote_prop):
                 exclude.append(remote_field)
 

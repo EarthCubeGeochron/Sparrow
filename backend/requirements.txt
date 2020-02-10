@@ -45,7 +45,7 @@ werkzeug==0.16.0
 
 # Serialization/deserialization
 marshmallow==3.3.0
-marshmallow-sqlalchemy==0.21.0
+marshmallow-sqlalchemy==0.22.2
 marshmallow-jsonschema==0.8.0
 stringcase==1.2.0
 
