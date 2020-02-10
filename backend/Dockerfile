@@ -12,7 +12,7 @@ ENV SPARROW_BACKEND_CONFIG=/config/docker.cfg
 # with useless bytecode
 ENV PYTHONDONTWRITEBYTECODE=1
 
-COPY ./docker-scripts/run /bin
+COPY ./docker-scripts/* /bin
 RUN mkdir /app
 WORKDIR /app
 
@@ -24,12 +24,3 @@ COPY ./core_plugins /app/core_plugins
 RUN pip install -e .
 
 CMD ["/bin/run"]
-
-# Create a extension to the base image with testing frameworks defined
-FROM main AS testing
-
-COPY ./test-requirements.txt /install/test-requirements.txt
-RUN pip install --no-cache -r /install/test-requirements.txt
-
-COPY ./docker-scripts/run-tests /bin
-CMD ["/bin/run-tests"]

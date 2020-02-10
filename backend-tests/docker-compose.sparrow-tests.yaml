@@ -1,9 +1,7 @@
 version: "3.6"
 services:
   backend:
-    build:
-      context: ../backend
-      target: testing
+    build: ../backend
     command: /bin/run-tests
     # Make sure we get colorized terminal output
     tty: true

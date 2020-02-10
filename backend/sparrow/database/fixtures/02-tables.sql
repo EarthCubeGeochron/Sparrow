@@ -121,27 +121,6 @@ CREATE TABLE IF NOT EXISTS project (
   location_precision integer
 );
 
-/*
-If researchers on a project have application user accounts,
-they can see data even if embargoed (not yet implemented).
-*/
-CREATE TABLE IF NOT EXISTS project_researcher (
-  project_id integer REFERENCES project(id) ON DELETE CASCADE,
-  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
-  PRIMARY KEY (project_id, researcher_id)
-);
-
-CREATE TABLE IF NOT EXISTS project_publication (
-  project_id integer REFERENCES project(id) ON DELETE CASCADE,
-  publication_id integer REFERENCES publication(id) ON DELETE CASCADE,
-  PRIMARY KEY (project_id, publication_id)
-);
-
-CREATE TABLE IF NOT EXISTS project_sample (
-  project_id integer REFERENCES project(id) ON DELETE CASCADE,
-  sample_id integer REFERENCES sample(id) ON DELETE CASCADE,
-  PRIMARY KEY (project_id, sample_id)
-);
 
 /*
 ### Descriptors for types of measurements/techniques
@@ -303,6 +282,32 @@ CREATE TABLE IF NOT EXISTS analysis (
   data jsonb,
   UNIQUE (session_id, session_index, analysis_name)
 );
+
+
+/*
+## Link projects, samples, and researchers
+
+If researchers on a project have application user accounts,
+they can see data even if embargoed (not yet implemented).
+*/
+CREATE TABLE IF NOT EXISTS project_researcher (
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, researcher_id)
+);
+
+CREATE TABLE IF NOT EXISTS project_publication (
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  publication_id integer REFERENCES publication(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, publication_id)
+);
+
+CREATE TABLE IF NOT EXISTS project_sample (
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  sample_id integer REFERENCES sample(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, sample_id)
+);
+
 
 
 CREATE TABLE IF NOT EXISTS datum (
