@@ -1,0 +1,11 @@
+#!/bin/sh
+# Command to run tests
+
+cd /app
+
+while ! pg_isready -h db -p 5432 -U postgres ; do
+  echo "Waiting for database..."
+  sleep 1
+done
+
+echo "Database is ready..."

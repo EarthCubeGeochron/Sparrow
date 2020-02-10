@@ -1,0 +1,17 @@
+version: "3.6"
+services:
+  backend:
+    build:
+      context: ../backend
+      target: testing
+    command: /bin/run-tests
+    # Make sure we get colorized terminal output
+    tty: true
+    depends_on:
+      - db
+    environment:
+      - SPARROW_SECRET_KEY=test_secret
+  db:
+    image: mdillon/postgis:11
+    expose:
+      - 5432
