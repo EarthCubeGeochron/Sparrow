@@ -17,7 +17,7 @@ if '--psql' in args:
 
 os.chdir("/app")
 
-dbargs = split("-h db -p 5432 -U postgres")
+dbargs = split("-U postgres -h db -p 5432")
 
 
 def db_ready():
@@ -41,8 +41,9 @@ print("Running tests")
 run(["pytest", "/app/tests", *args])
 
 if psql:
-    # This currently doesn't work
-    run(["psql", *split("-h db -p 5432"), "sparrow_test", "postgres"], shell=True)
+    echo("Initializing psql shell. "
+         "The database is also available on localhost port 54322")
+    run(["psql", *dbargs, "sparrow_test"])
 
 print("Tearing down database...")
 run(["dropdb", *dbargs, "sparrow_test"])
