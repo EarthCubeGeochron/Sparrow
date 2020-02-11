@@ -11,4 +11,7 @@ function compose {
 }
 
 compose build --quiet
-compose run backend /bin/run-tests $@
+# Need to bring up database separately to ensure ports are mapped...
+compose up -d db
+compose run --service-ports backend /bin/run-tests $@
+compose down

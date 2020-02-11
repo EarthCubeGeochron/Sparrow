@@ -14,6 +14,9 @@ services:
   db:
     image: mdillon/postgis:11
     ports:
+      # We could change this to port 54321 if we were cool with
+      # it conflicting with our default for Sparrow itself. This
+      # might make it harder to run tests, though.
       - '54322:5432'
     expose:
       - 5432
