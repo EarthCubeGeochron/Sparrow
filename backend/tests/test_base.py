@@ -27,6 +27,7 @@ class TestImperativeImport:
             db.model.sample,
             name="A-0")
         db.session.add(sample)
+        db.session.flush()
 
         # Import a single session
         session = db.get_or_create(
@@ -97,6 +98,15 @@ class TestImperativeImport:
         item = db.session.query(db.model.datum).first()
         assert item.value == 121
         assert item.error == 22
+
+    def test_foreign_keys(self):
+        item = db.session.query(db.model.session).first()
+        assert item.sample_id is not None
+        item = db.session.query(db.model.analysis).first()
+        assert item.session_id is not None
+        item = db.session.query(db.model.datum).first()
+        assert item.analysis is not None
+        assert item.type is not None
 
     def test_operation_log(self):
         """
