@@ -13,6 +13,8 @@ services:
       - SPARROW_SECRET_KEY=test_secret
   db:
     image: mdillon/postgis:11
+    ports:
+      - '54322:5432'
     expose:
       - 5432
     environment:
