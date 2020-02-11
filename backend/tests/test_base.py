@@ -4,13 +4,10 @@ from datetime import datetime
 app, db = construct_app()
 
 
-def test_true():
-    assert True
-
-
 session = dict(
     sample_id="A-0",
     date=datetime.now())
+
 
 class TestImperativeImport:
     def test_imperative_import(self):
@@ -82,6 +79,7 @@ class TestImperativeImport:
             parameter=param.id,
             unit=unit.id)
         db.session.add(type)
+        # not sure why we need to flush here...
         db.session.flush()
 
         # Parameter
@@ -100,5 +98,18 @@ class TestImperativeImport:
         assert item.value == 121
         assert item.error == 22
 
-    def test_api(self):
-        pass
+    def test_operation_log(self):
+        """
+        Test whether our PGMemento audit trail is working
+        """
+        res = db.session.execute("SELECT count(*) "
+                                 "FROM pgmemento.table_event_log")
+        total_ops = res.scalar()
+        assert total_ops > 0
+
+        res = db.session.execute("SELECT table_operation, table_name "
+                                 "FROM pgmemento.table_event_log "
+                                 "ORDER BY id DESC LIMIT 1")
+        (op, tbl) = res.first()
+        assert op == "INSERT"
+        assert tbl == "datum"

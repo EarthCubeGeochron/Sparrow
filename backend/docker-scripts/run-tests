@@ -8,6 +8,13 @@ from subprocess import run
 from shlex import split
 from time import sleep
 
+args = argv[1:]
+
+psql = False
+if '--psql' in args:
+    psql = True
+    args.remove('--psql')
+
 os.chdir("/app")
 
 dbargs = split("-h db -p 5432 -U postgres")
@@ -31,7 +38,11 @@ os.environ["SPARROW_DATABASE"] = "postgresql://postgres@db:5432/sparrow_test"
 run(["sparrow", "init"])
 
 print("Running tests")
-run(["pytest", "/app/tests", *argv[1:]])
+run(["pytest", "/app/tests", *args])
+
+if psql:
+    # This currently doesn't work
+    run(["psql", *split("-h db -p 5432"), "sparrow_test", "postgres"], shell=True)
 
 print("Tearing down database...")
 run(["dropdb", *dbargs, "sparrow_test"])
