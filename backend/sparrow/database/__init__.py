@@ -83,6 +83,11 @@ class Database(MappedDatabaseMixin):
         finally:
             session.close()
 
+    def load_data(self, model_name, data):
+        iface = getattr(self.interface, model_name)
+        res = iface().load(data, session=self.session)
+        self.session.add(res)
+
     def exec_sql(self, fn):
         secho(Path(fn).name, fg='cyan', bold=True)
         run_sql_file(self.session, str(fn))

@@ -51,9 +51,9 @@ def model_interface(model, session=None):
 class InterfaceCollection(ModelCollection):
     def register(self, *classes):
         for cls in classes:
-            self._register_table(cls)
+            self._register_model(cls)
 
-    def _register_table(self, cls):
+    def _register_model(self, cls):
         k = classname_for_table(cls.__table__)
         # Bail if we have a view
         if not hasattr(cls, '__mapper__'):
@@ -61,13 +61,13 @@ class InterfaceCollection(ModelCollection):
         self.add(k, model_interface(cls))
 
 
-
 class InterfacePlugin(SparrowCorePlugin):
     name = "schema-interface"
 
     def on_database_ready(self):
         iface = InterfaceCollection(self.app.database.model)
-        self.app.interface = iface
+        db = self.app.database
+        db.interface = iface
 
     def on_setup_cli(self, cli):
         from .cli import show_interface

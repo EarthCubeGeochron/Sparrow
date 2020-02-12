@@ -129,7 +129,7 @@ class TestImperativeImport:
 class TestDeclarativeImporter:
     def test_import_interface(self):
         for model in ['datum', 'session', 'datum_type']:
-            assert hasattr(app.interface, 'session')
+            assert hasattr(db.interface, model)
 
     def test_basic_import(self):
 
@@ -160,7 +160,5 @@ class TestDeclarativeImporter:
             }]
         }
 
-        iface = app.interface.session(session=db.session)
-        res = iface.load(data, session=db.session)
-        db.session.add(res)
+        db.load_data("session", data)
         db.session.commit()
