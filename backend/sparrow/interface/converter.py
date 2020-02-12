@@ -1,6 +1,9 @@
 from marshmallow_sqlalchemy import ModelConverter
-from marshmallow_sqlalchemy.fields import Related
-from marshmallow.fields import Nested
+# We need to use marshmallow_sqlalchemy's own implementation
+# of the 'Nested' field in order to pass along the SQLAlchemy session
+# to nested schemas.
+# See https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/67
+from marshmallow_sqlalchemy.fields import Nested, Related
 
 import geoalchemy2 as geo
 from sqlalchemy.orm import RelationshipProperty
@@ -18,9 +21,9 @@ def to_schema_name(name):
 
 # Control how relationships can be resolved
 allowed_collections = {
-    'sample': ['session'],
+    'sample': ['session', 'material'],
     'session': 'all',
-    'analysis': ['datum', 'attribute', 'constant', 'analysis_type'],
+    'analysis': ['datum', 'attribute', 'constant', 'analysis_type', 'material'],
     'attribute': ['parameter', 'unit'],
     'project': ['researcher', 'publication', 'session'],
     'datum': ['datum_type'],
@@ -55,7 +58,7 @@ class SparrowConverter(ModelConverter):
             }.items()
         ))
 
-    def _get_field_name(self, prop):
+    def _get_key(self, prop):
         # Only change columns for relationship properties
         if not isinstance(prop, RelationshipProperty):
             return prop.key
@@ -112,6 +115,7 @@ class SparrowConverter(ModelConverter):
     def _get_field_kwargs_for_property(self, prop):
         # Somewhat ugly method, mostly to decide if field is dump_only or required
         kwargs = super()._get_field_kwargs_for_property(prop)
+        kwargs['data_key'] = self._get_key(prop)
 
         if isinstance(prop, RelationshipProperty): # Relationship property
             cols = list(getattr(prop, 'local_columns', []))
@@ -149,13 +153,19 @@ class SparrowConverter(ModelConverter):
                 kwargs['required'] = False
         return kwargs
 
+    def _related_entity(self, prop):
+        # If this is a relationship, return related entity
+        if isinstance(prop, RelationshipProperty):
+            return prop.mapper.entity
+        return None
+
     def property2field(self, prop, **kwargs):
         if not isinstance(prop, RelationshipProperty):
             return super().property2field(prop, **kwargs)
 
         # The "name" is actually the name of the related model, NOT the name
         # of field
-        cls = prop.mapper.class_
+        cls = self._related_entity(prop)
         name = to_schema_name(cls.__name__)
 
         field_kwargs = self._get_field_kwargs_for_property(prop)
@@ -170,13 +180,13 @@ class SparrowConverter(ModelConverter):
             # (these should be stored in the 'enum' schema):
             return Enum(name, **field_kwargs)
 
-        # # TODO: remove parent fields
+        # Ignore fields that reference parent models in a nesting relationship
         exclude = []
-        r = prop.mapper.relationships
-        if prop.backref is not None:
-            remote_prop = r[prop.backref[0]]
-            remote_field = self._get_field_name(remote_prop)
-            if not self._should_exclude_field(remote_prop):
-                exclude.append(remote_field)
+        for p in cls.__mapper__.relationships:
+            if self._should_exclude_field(p):
+                continue
+            id_ = self._get_field_name(p)
+            if p.mapper.entity == prop.parent.entity:
+                exclude.append(id_)
 
         return Nested(name, many=prop.uselist, exclude=exclude, **field_kwargs)

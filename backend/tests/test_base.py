@@ -1,4 +1,5 @@
 from sparrow.app import construct_app
+from sparrow.interface import model_interface
 from datetime import datetime
 
 app, db = construct_app()
@@ -33,6 +34,7 @@ class TestImperativeImport:
         session = db.get_or_create(
             db.model.session,
             sample_id=sample.id,
+            name="Imperative import test",
             date=datetime.now())
         db.session.add(session)
 
@@ -123,3 +125,42 @@ class TestImperativeImport:
         (op, tbl) = res.first()
         assert op == "INSERT"
         assert tbl == "datum"
+
+class TestDeclarativeImporter:
+    def test_import_interface(self):
+        for model in ['datum', 'session', 'datum_type']:
+            assert hasattr(app.interface, 'session')
+
+    def test_basic_import(self):
+
+        data = {
+            "date": str(datetime.now()),
+            "name": "Declarative import test",
+            "sample": {
+                "name": "Soil 001"
+            },
+            "analysis": [{
+                "analysis_type": {
+                    "id": "Soil aliquot pyrolysis",
+                    "description": "I guess this could be an actual technique?"
+                },
+                "session_index": 0,
+                "datum": [{
+                    "value": 2.25,
+                    "error": 0.2,
+                    "type": {
+                        "parameter": {
+                            "id": "soil water content"
+                        },
+                        "unit": {
+                            "id": "weight %"
+                        }
+                    }
+                }]
+            }]
+        }
+
+        iface = app.interface.session(session=db.session)
+        res = iface.load(data, session=db.session)
+        db.session.add(res)
+        db.session.commit()

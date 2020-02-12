@@ -24,14 +24,15 @@ def to_json_schema(model):
     return json_schema.dump(model)
 
 
-def model_interface(model):
+def model_interface(model, session=None):
     """
     Create a Marshmallow interface to a SQLAlchemy model
     """
     # Create a meta class
     metacls = type("Meta", (), dict(
         model=model,
-        model_converter=SparrowConverter
+        model_converter=SparrowConverter,
+        sqla_session=session
     ))
 
     schema_name = to_schema_name(model.__name__)
