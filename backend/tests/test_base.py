@@ -1,6 +1,7 @@
 from sparrow.app import construct_app
 from sparrow.interface import model_interface
 from datetime import datetime
+from pytest import mark
 
 app, db = construct_app()
 
@@ -195,14 +196,59 @@ class TestDeclarativeImporter:
         db.load_data("session", data)
         db.session.commit()
 
+    @mark.xfail
     def test_datum_type_merging(self):
+        """Datum types should successfully find values already in the database.
+        """
         res = db.session.execute("SELECT count(*) FROM datum_type "
                                  "WHERE parameter = 'soil water content'"
                                  "  AND unit = 'weight %'")
         assert res.scalar() == 1
 
-    def test_primary_key_loading(self):
+    @mark.xfail
+    def test_session_merging(self):
+        data = {
+            "date": str(datetime.now()),
+            "name": "Session merging test",
+            "sample": {
+                "name": "Soil 003"
+            },
+            "analysis": [{
+                "analysis_type": {
+                    "id": "Soil aliquot pyrolysis"
+                },
+                "session_index": 0,
+                "datum": [{
+                    "value": 0.252,
+                    "error": 0.02,
+                    "type": {
+                        "parameter": {
+                            "id": "soil water content"
+                        },
+                        "unit": {
+                            "id": "weight %"
+                        }
+                    }
+                }]
+            }]
+        }
 
+        db.load_data("session", data)
+        db.session.commit()
+        db.load_data("session", data)
+        db.session.commit()
+        res = db.session.execute("SELECT count(*) FROM session "
+                                 "WHERE name = 'Session merging test'")
+        assert res.scalar() == 1
+        res = db.session.execute("SELECT count(*) FROM datum "
+                                 "WHERE value = 0.252")
+        assert res.scalar() == 1
+
+    @mark.xfail
+    def test_primary_key_loading(self):
+        """We should be able to load already-existing values with their
+        primary keys.
+        """
         session = {
             "date": str(datetime.now()),
             "name": "Declarative import test",

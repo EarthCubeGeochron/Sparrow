@@ -9,6 +9,7 @@ from marshmallow.fields import Field, Raw
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
 
+from ..database.util import get_or_create
 
 class JSON(Raw):
     pass
@@ -41,6 +42,7 @@ class Enum(Related):
     """
     pass
 
+from marshmallow import missing
 
 class SmartNested(Nested):
     def __init__(self, name, **kwargs):
@@ -52,25 +54,10 @@ class SmartNested(Nested):
         return super().serialize(attr, obj, accessor)
 
     def deserialize(
-            self,
-            attr: str,
-            obj: typing.Any,
-            accessor: typing.Callable[[typing.Any, str, typing.Any], typing.Any] = None,
-            **kwargs
-        ):
-
-    def deserialize(
         self,
-        value: typing.Any,
-        attr: str = None,
-        data: typing.Mapping[str, typing.Any] = None,
+        value,
+        attr=None,
+        data=None,
         **kwargs
     ):
-        """Deserialize ``value``.
-        :param value: The value to deserialize.
-        :param attr: The attribute/key in `data` to deserialize.
-        :param data: The raw input data passed to `Schema.load`.
-        :param kwargs: Field-specific keyword arguments.
-        :raise ValidationError: If an invalid value is passed or if a required value
-            is missing.
-        """
+        return super().deserialize(value, attr, data, **kwargs)

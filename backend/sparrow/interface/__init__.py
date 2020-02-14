@@ -1,5 +1,5 @@
 from sparrow.plugins import SparrowCorePlugin
-from marshmallow_sqlalchemy import ModelSchema, exceptions
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, ModelSchema, exceptions
 from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
@@ -32,13 +32,17 @@ def model_interface(model, session=None):
     metacls = type("Meta", (), dict(
         model=model,
         model_converter=SparrowConverter,
-        sqla_session=session
+        sqla_session=session,
+        # Needed for SQLAlchemyAutoSchema
+        include_relationships=True,
+        load_instance=True
     ))
 
     schema_name = to_schema_name(model.__name__)
     try:
+        # All conversion logic comes from ModelSchema
         return type(
-            schema_name, (ModelSchema,), dict(
+            schema_name, (SQLAlchemyAutoSchema,), dict(
                 Meta=metacls,
                 as_jsonschema=to_json_schema,
                 pretty_print=pretty_print
