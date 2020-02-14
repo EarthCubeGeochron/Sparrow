@@ -50,3 +50,27 @@ class SmartNested(Nested):
         #if attr not in obj.__dict__:
         #    return {"id": int(getattr(obj, attr + "_id"))}
         return super().serialize(attr, obj, accessor)
+
+    def deserialize(
+            self,
+            attr: str,
+            obj: typing.Any,
+            accessor: typing.Callable[[typing.Any, str, typing.Any], typing.Any] = None,
+            **kwargs
+        ):
+
+    def deserialize(
+        self,
+        value: typing.Any,
+        attr: str = None,
+        data: typing.Mapping[str, typing.Any] = None,
+        **kwargs
+    ):
+        """Deserialize ``value``.
+        :param value: The value to deserialize.
+        :param attr: The attribute/key in `data` to deserialize.
+        :param data: The raw input data passed to `Schema.load`.
+        :param kwargs: Field-specific keyword arguments.
+        :raise ValidationError: If an invalid value is passed or if a required value
+            is missing.
+        """

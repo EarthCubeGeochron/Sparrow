@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 from stringcase import pascalcase
 
 from ..database.mapper.util import trim_postfix
-from .fields import Geometry, Enum, JSON
+from .fields import Geometry, Enum, JSON, SmartNested
 
 
 def to_schema_name(name):
@@ -189,4 +189,4 @@ class SparrowConverter(ModelConverter):
             if p.mapper.entity == prop.parent.entity:
                 exclude.append(id_)
 
-        return Nested(name, many=prop.uselist, exclude=exclude, **field_kwargs)
+        return SmartNested(name, many=prop.uselist, exclude=exclude, **field_kwargs)

@@ -126,6 +126,7 @@ class TestImperativeImport:
         assert op == "INSERT"
         assert tbl == "datum"
 
+
 class TestDeclarativeImporter:
     def test_import_interface(self):
         for model in ['datum', 'session', 'datum_type']:
@@ -161,4 +162,64 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
+        db.session.commit()
+
+    def test_duplicate_parameter(self):
+
+        data = {
+            "date": str(datetime.now()),
+            "name": "Declarative import test",
+            "sample": {
+                "name": "Soil 002"
+            },
+            "analysis": [{
+                "analysis_type": {
+                    "id": "Soil aliquot pyrolysis"
+                },
+                "session_index": 0,
+                "datum": [{
+                    "value": 1.18,
+                    "error": 0.15,
+                    "type": {
+                        "parameter": {
+                            "id": "soil water content"
+                        },
+                        "unit": {
+                            "id": "weight %"
+                        }
+                    }
+                }]
+            }]
+        }
+
+        db.load_data("session", data)
+        db.session.commit()
+
+    def test_datum_type_merging(self):
+        res = db.session.execute("SELECT count(*) FROM datum_type "
+                                 "WHERE parameter = 'soil water content'"
+                                 "  AND unit = 'weight %'")
+        assert res.scalar() == 1
+
+    def test_primary_key_loading(self):
+
+        session = {
+            "date": str(datetime.now()),
+            "name": "Declarative import test",
+            "sample": {
+                "name": "Soil 003"
+            },
+            "analysis": [{
+                "analysis_type": "Soil aliquot pyrolysis",
+                "session_index": 0,
+                "datum": [{
+                    "value": 1.18,
+                    "error": 0.15,
+                    "type": "soil water content",
+                    "unit": "weight %"
+                }]
+            }]
+        }
+
+        db.load_data("session", session)
         db.session.commit()
