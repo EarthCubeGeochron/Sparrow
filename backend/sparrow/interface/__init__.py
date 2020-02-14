@@ -6,7 +6,6 @@ from marshmallow_jsonschema import JSONSchema
 from click import secho
 
 from .converter import SparrowConverter, to_schema_name
-from .display import pretty_print
 from ..database.mapper.util import ModelCollection, classname_for_table
 
 
@@ -20,8 +19,20 @@ Nested._jsonschema_type_mapping = _jsonschema_type_mapping
 json_schema = JSONSchema()
 
 
-def to_json_schema(model):
-    return json_schema.dump(model)
+class BaseMeta:
+    model_converter = SparrowConverter
+    # Needed for SQLAlchemyAutoSchema
+    include_relationships = True
+    load_instance = True
+
+class BaseSchema(SQLAlchemyAutoSchema):
+    def get_instance(self, data):
+        return super().get_instance(data)
+
+    def to_json_schema(model):
+        return json_schema.dump(model)
+
+    from .display import pretty_print
 
 
 def model_interface(model, session=None):
@@ -29,24 +40,15 @@ def model_interface(model, session=None):
     Create a Marshmallow interface to a SQLAlchemy model
     """
     # Create a meta class
-    metacls = type("Meta", (), dict(
+    metacls = type("Meta", (BaseMeta,), dict(
         model=model,
-        model_converter=SparrowConverter,
         sqla_session=session,
-        # Needed for SQLAlchemyAutoSchema
-        include_relationships=True,
-        load_instance=True
     ))
 
     schema_name = to_schema_name(model.__name__)
     try:
         # All conversion logic comes from ModelSchema
-        return type(
-            schema_name, (SQLAlchemyAutoSchema,), dict(
-                Meta=metacls,
-                as_jsonschema=to_json_schema,
-                pretty_print=pretty_print
-            ))
+        return type(schema_name, (BaseSchema,), {'Meta': metacls})
     except exceptions.ModelConversionError as err:
         secho(type(err).__name__+": "+schema_name+" - "+str(err), fg='red')
         return None
