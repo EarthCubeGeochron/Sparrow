@@ -4,10 +4,15 @@ data from the Sparrow database.
 
 Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
-from marshmallow_sqlalchemy.fields import Related, Nested
+from marshmallow_sqlalchemy.fields import (
+    Related, Nested, get_primary_keys, ensure_list
+)
 from marshmallow.fields import Field, Raw
+from marshmallow.decorators import pre_load
+from marshmallow.exceptions import ValidationError
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
+from collections import Mapping
 
 from ..database.util import get_or_create
 
@@ -53,11 +58,42 @@ class SmartNested(Nested):
         #    return {"id": int(getattr(obj, attr + "_id"))}
         return super().serialize(attr, obj, accessor)
 
-    def deserialize(
-        self,
-        value,
-        attr=None,
-        data=None,
-        **kwargs
-    ):
-        return super().deserialize(value, attr, data, **kwargs)
+    @pre_load
+    def expand_primary_keys(self, value, **kwargs):
+        print(value)
+        try:
+            # Typically, we are deserializing from a mapping of values
+            return dict(**value)
+        except TypeError:
+            pass
+        import pdb; pdb.set_trace()
+        print(value)
+        val_list = ensure_list(value)
+        model = self.schema.opts.model
+        pk = get_primary_keys(model)
+        assert len(pk) == len(val_list)
+        res = {}
+        for col, val in zip(pk, val_list):
+            res[col.key] = val
+        print(value, res)
+        assert False
+        return res
+
+    # def deserialize_as_primary_key(self, value, attr=None, data=None, **kwargs):
+    #     # Try to serialize as a primary key
+    #     val_list = ensure_list(value)
+    #     model = self.schema.opts.model
+    #     pk = get_primary_keys(model)
+    #     assert len(pk) == len(val_list)
+    #     res = {}
+    #     for col, val in zip(pk, val_list):
+    #         res[col.key] = val
+    #     print(res)
+    #     return super()._deserialize(res, attr, data, **kwargs)
+
+    # def _deserialize(self, value, attr=None, data=None, **kwargs):
+    #     # Typically, we are deserializing from a mapping of values,
+    #     # and this is what the Nested field is set up to accept.
+    #     if isinstance(value, str) or isinstance(value, int):
+    #         return self.deserialize_as_primary_key(value, attr, data, **kwargs)
+    #     return super()._deserialize(value, attr, data, **kwargs)

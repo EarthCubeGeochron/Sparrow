@@ -169,7 +169,7 @@ class TestDeclarativeImporter:
 
         data = {
             "date": str(datetime.now()),
-            "name": "Declarative import test",
+            "name": "Declarative import test 2",
             "sample": {
                 "name": "Soil 002"
             },
@@ -196,16 +196,6 @@ class TestDeclarativeImporter:
         db.load_data("session", data)
         db.session.commit()
 
-    @mark.xfail
-    def test_datum_type_merging(self):
-        """Datum types should successfully find values already in the database.
-        """
-        res = db.session.execute("SELECT count(*) FROM datum_type "
-                                 "WHERE parameter = 'soil water content'"
-                                 "  AND unit = 'weight %'")
-        assert res.scalar() == 1
-
-    @mark.xfail
     def test_session_merging(self):
         data = {
             "date": str(datetime.now()),
@@ -244,14 +234,13 @@ class TestDeclarativeImporter:
                                  "WHERE value = 0.252")
         assert res.scalar() == 1
 
-    @mark.xfail
     def test_primary_key_loading(self):
         """We should be able to load already-existing values with their
         primary keys.
         """
-        session = {
+        data = {
             "date": str(datetime.now()),
-            "name": "Declarative import test",
+            "name": "Session merging test",
             "sample": {
                 "name": "Soil 003"
             },
@@ -259,13 +248,23 @@ class TestDeclarativeImporter:
                 "analysis_type": "Soil aliquot pyrolysis",
                 "session_index": 0,
                 "datum": [{
-                    "value": 1.18,
-                    "error": 0.15,
-                    "type": "soil water content",
-                    "unit": "weight %"
+                    "value": 0.252,
+                    "error": 0.02,
+                    "type": {
+                        "parameter": "soil water content",
+                        "unit": "weight %"
+                    }
                 }]
             }]
         }
 
-        db.load_data("session", session)
+        db.load_data("session", data)
         db.session.commit()
+
+    def test_datum_type_merging(self):
+        """Datum types should successfully find values already in the database.
+        """
+        res = db.session.execute("SELECT count(*) FROM datum_type "
+                                 "WHERE parameter = 'soil water content'"
+                                 "  AND unit = 'weight %'")
+        assert res.scalar() == 1
