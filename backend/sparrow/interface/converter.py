@@ -151,6 +151,9 @@ class SparrowConverter(ModelConverter):
                 kwargs['required'] = True
             if dump_only:
                 kwargs['required'] = False
+            if col.default is not None:
+                kwargs['required'] = False
+
         return kwargs
 
     def _related_entity(self, prop):

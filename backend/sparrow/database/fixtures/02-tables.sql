@@ -138,8 +138,8 @@ CREATE TABLE IF NOT EXISTS datum_type (
   unit text REFERENCES vocabulary.unit(id) NOT NULL,
   error_unit text REFERENCES vocabulary.unit(id),
   error_metric text REFERENCES vocabulary.error_metric(id),
-  is_computed boolean, -- Can be rebuilt from data IN THE DATABASE
-  is_interpreted boolean, -- Results from a data-reduction process
+  is_computed boolean DEFAULT false, -- Can be rebuilt from data IN THE DATABASE
+  is_interpreted boolean DEFAULT false, -- Results from a data-reduction process
   description text,
   UNIQUE (parameter, unit, error_unit,
           error_metric, is_computed, is_interpreted)
@@ -313,7 +313,7 @@ CREATE TABLE IF NOT EXISTS project_sample (
 CREATE TABLE IF NOT EXISTS datum (
   id serial PRIMARY KEY,
   analysis integer REFERENCES analysis(id)
-    ON DELETE CASCADE,
+    ON DELETE CASCADE NOT NULL,
   type integer REFERENCES datum_type(id) NOT NULL,
   value numeric NOT NULL,
   error numeric,
@@ -327,6 +327,9 @@ CREATE TABLE IF NOT EXISTS datum (
   - Accepted system for U-Pb single-zircon age
   */
   is_accepted boolean,
+  /*
+  There should not be more than one datum of a single type per analysis
+  */
   UNIQUE (analysis, type)
 );
 
