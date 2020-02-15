@@ -163,7 +163,6 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
-        db.session.commit()
 
     def test_duplicate_parameter(self):
 
@@ -194,7 +193,6 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
-        db.session.commit()
 
     def test_session_merging(self):
         data = {
@@ -224,9 +222,7 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
-        db.session.commit()
         db.load_data("session", data)
-        db.session.commit()
         res = db.session.execute("SELECT count(*) FROM session "
                                  "WHERE name = 'Session merging test'")
         assert res.scalar() == 1
@@ -259,7 +255,6 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
-        db.session.commit()
 
     def test_datum_type_merging(self):
         """Datum types should successfully find values already in the database.
