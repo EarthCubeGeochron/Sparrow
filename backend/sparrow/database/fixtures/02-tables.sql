@@ -141,9 +141,11 @@ CREATE TABLE IF NOT EXISTS datum_type (
   is_computed boolean DEFAULT false, -- Can be rebuilt from data IN THE DATABASE
   is_interpreted boolean DEFAULT false, -- Results from a data-reduction process
   description text,
-  UNIQUE (parameter, unit, error_unit,
-          error_metric, is_computed, is_interpreted)
+  UNIQUE (parameter, unit, error_unit, error_metric)
 );
+
+CREATE UNIQUE INDEX datum_type_unique ON datum_type
+(parameter, unit, coalesce(error_unit, 'NO ERROR'), coalesce(error_metric, 'NO ERROR'));
 
 /*
 

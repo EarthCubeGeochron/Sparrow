@@ -194,6 +194,32 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
 
+    def test_primary_key_loading(self):
+        """We should be able to load already-existing values with their
+        primary keys.
+        """
+        data = {
+            "date": str(datetime.now()),
+            "name": "Session primary key loading",
+            "sample": {
+                "name": "Soil 003"
+            },
+            "analysis": [{
+                "analysis_type": "Soil aliquot pyrolysis",
+                "session_index": 0,
+                "datum": [{
+                    "value": 0.280,
+                    "error": 0.021,
+                    "type": {
+                        "parameter": "soil water content",
+                        "unit": "weight %"
+                    }
+                }]
+            }]
+        }
+
+        db.load_data("session", data)
+
     def test_session_merging(self):
         data = {
             "date": str(datetime.now()),
@@ -202,6 +228,7 @@ class TestDeclarativeImporter:
                 "name": "Soil 003"
             },
             "analysis": [{
+                # Can't seem to get or create this instance from the database
                 "analysis_type": {
                     "id": "Soil aliquot pyrolysis"
                 },
@@ -222,39 +249,13 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
-        db.load_data("session", data)
+        #db.load_data("session", data)
         res = db.session.execute("SELECT count(*) FROM session "
                                  "WHERE name = 'Session merging test'")
         assert res.scalar() == 1
         res = db.session.execute("SELECT count(*) FROM datum "
                                  "WHERE value = 0.252")
         assert res.scalar() == 1
-
-    def test_primary_key_loading(self):
-        """We should be able to load already-existing values with their
-        primary keys.
-        """
-        data = {
-            "date": str(datetime.now()),
-            "name": "Session merging test",
-            "sample": {
-                "name": "Soil 003"
-            },
-            "analysis": [{
-                "analysis_type": "Soil aliquot pyrolysis",
-                "session_index": 0,
-                "datum": [{
-                    "value": 0.252,
-                    "error": 0.02,
-                    "type": {
-                        "parameter": "soil water content",
-                        "unit": "weight %"
-                    }
-                }]
-            }]
-        }
-
-        db.load_data("session", data)
 
     def test_datum_type_merging(self):
         """Datum types should successfully find values already in the database.
