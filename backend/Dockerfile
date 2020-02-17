@@ -1,4 +1,5 @@
-FROM sparrowdata/backend-base:1.1
+FROM sparrowdata/backend-base:1.1 AS main
+# Multi-stage build of Sparrow backend.
 
 COPY ./requirements.txt /install/requirements.txt
 RUN pip install --no-cache -r /install/requirements.txt
@@ -11,8 +12,7 @@ ENV SPARROW_BACKEND_CONFIG=/config/docker.cfg
 # with useless bytecode
 ENV PYTHONDONTWRITEBYTECODE=1
 
-COPY ./docker-scripts/run /bin
-EXPOSE 5000
+COPY ./docker-scripts/* /bin/
 RUN mkdir /app
 WORKDIR /app
 
@@ -24,3 +24,7 @@ COPY ./core_plugins /app/core_plugins
 RUN pip install -e .
 
 CMD ["/bin/run"]
+
+FROM main AS testing
+
+COPY ./tests /app/tests

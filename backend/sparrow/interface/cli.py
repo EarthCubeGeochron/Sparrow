@@ -14,5 +14,5 @@ def show_interface(cfg, model, depth=0):
     with app.app_context():
         # `using` is related to this issue:
         # https://github.com/ipython/ipython/issues/11523
-        m = getattr(app.interface, model)
+        m = getattr(db.interface, model)
         m().pretty_print(nested=depth)

@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+# Command to run tests
+# Runs inside Docker container so we can depend on library availabilty.
+import os
+from sys import argv
+from click import echo
+from subprocess import run
+from shlex import split
+from time import sleep
+
+args = argv[1:]
+
+psql = False
+if '--psql' in args:
+    psql = True
+    args.remove('--psql')
+
+os.chdir("/app")
+
+dbargs = split("-U postgres -h db -p 5432")
+
+
+def db_ready():
+    c = run(["pg_isready", *dbargs])
+    return c.returncode == 0
+
+
+while not db_ready():
+    echo("Waiting for database...")
+    sleep(1)
+
+# Create the database
+run(["createdb", *dbargs, "sparrow_test"])
+echo("Database is ready...")
+
+os.environ["SPARROW_DATABASE"] = "postgresql://postgres@db:5432/sparrow_test"
+
+run(["sparrow", "init"])
+
+print("Running tests")
+run(["pytest", "/app/tests", *args])
+
+if psql:
+    echo("Initializing psql shell. "
+         "The database is also available on localhost port 54322")
+    run(["psql", *dbargs, "sparrow_test"])
+
+print("Tearing down database...")
+run(["dropdb", *dbargs, "sparrow_test"])
+echo("Done!")

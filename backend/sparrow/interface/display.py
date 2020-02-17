@@ -1,7 +1,6 @@
 from marshmallow.fields import Nested
 from marshmallow.exceptions import RegistryError
 from click import echo, secho, style, get_terminal_size
-from textwrap import indent
 
 
 def styled_key(k, **kwargs):
@@ -10,6 +9,7 @@ def styled_key(k, **kwargs):
 
 sep = "…"
 indent = 3
+
 
 class ModelPrinter(object):
     def __init__(self, nest_level=0):
@@ -20,29 +20,32 @@ class ModelPrinter(object):
         prefix = level*indent*" "
         if level < self.nest_level:
             try:
-                self.print_model(field.schema, level=level+1, key=k, exclude=field.exclude)
-            except ValueError as err:
-                echo(prefix+styled_key(k)+style(str(err), fg="red"))
-            except RegistryError:
-                # Ignore nested fields that don't have a table associated
-                # (e.g. views)
-                pass
-            except AttributeError as err:
-                echo(prefix+styled_key(k)+style(str(err), fg="red"))
+                self.print_model(field.schema, level=level+1, key=k,
+                                 exclude=field.exclude)
+            except (ValueError, RegistryError, AttributeError) as err:
+                echo(prefix+styled_key(k)+"  "+style(str(err), fg="red"))
         else:
-            self.print_field(k, field.schema, bold=True, level=level)
-
+            self.print_field(k, field.schema, bold=True,
+                             level=level, required=field.required)
 
     def print_field(self, key, field, level=0, **kwargs):
         prefix = level*indent*" "
         classname = field.__class__.__name__
-        nfill = self.width-4-level*indent-len(key)-len(classname)
+
+        modifier = ""
+        if getattr(field, 'many', False):
+            modifier = "..."
+
+        nfill = self.width-4-level*indent-len(key)-len(classname)-len(modifier)
+
+        required = getattr(field, 'required', kwargs.pop('required', False))
 
         dim = field.dump_only
 
         row = "".join([
             prefix,
-            styled_key(key, dim=dim),
+            styled_key(key, dim=dim, underline=required),
+            style(modifier, dim=dim, bold=True),
             " ",
             style(sep*nfill, dim=True),
             " ",
@@ -62,16 +65,20 @@ class ModelPrinter(object):
         else:
             echo(new_prefix+style(model.__class__.__name__, bold=True))
 
-        fields = list(model._declared_fields.items())
+        fields = list(model.declared_fields.items())
         fields.sort(key=self.__sort_fields)
 
         for k, v in fields:
+            name = v.data_key or l
             if k in exclude:
                 continue
             if isinstance(v, Nested):
-                self.print_nested(k, v, level=level)
+                self.print_nested(name, v, level=level)
             else:
-                self.print_field(k, v, level=level)
+                self.print_field(name, v, level=level)
+        if len(exclude):
+            excluded_names = [model.declared_fields[k].data_key or k for k in exclude]
+            secho(prefix+"  excluded: "+" ".join(excluded_names), dim=True)
 
     def __call__(self, model):
         self.print_model(model)
