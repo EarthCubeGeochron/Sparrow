@@ -44,7 +44,7 @@ def run_sql(session, sql, params=None):
             session.execute(sql, params=params)
             session.commit()
             pretty_print(sql, dim=True)
-        except (ProgrammingError,IntegrityError) as err:
+        except (ProgrammingError, IntegrityError) as err:
             err = str(err.orig).strip()
             dim = "already exists" in err
             session.rollback()

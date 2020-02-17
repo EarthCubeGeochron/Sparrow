@@ -76,15 +76,17 @@ class VersioningPlugin(SparrowCorePlugin):
 
     def on_core_tables_initialized(self, db):
 
-        # Basic setup procedures
-        procedures = ["SETUP", "LOG_UTIL", "DDL_LOG",
-                      "RESTORE", "REVERT", "SCHEMA_MANAGEMENT"]
+        procedures = []
 
         if not has_audit_schema(db):
             # Create the schema to hold audited tables
             # NOTE: this drops all transaction history, so we don't run
             # it if pgMemento tables already exist.
-            procedures.insert("SCHEMA", 0)
+            procedures.append("SCHEMA")
+
+        # Basic setup procedures
+        procedures += ["SETUP", "LOG_UTIL", "DDL_LOG",
+                      "RESTORE", "REVERT", "SCHEMA_MANAGEMENT"]
 
         for id in procedures:
             fp = relative_path(__file__, 'pg-memento', 'src', id+'.sql')

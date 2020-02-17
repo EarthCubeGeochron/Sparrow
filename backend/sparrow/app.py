@@ -12,6 +12,10 @@ from .interface import InterfacePlugin
 from .auth import AuthPlugin
 #from .graph import GraphQLPlugin
 from .web import WebPlugin
+from .logs import get_logger
+
+log = get_logger(__name__)
+
 
 def echo_error(message, obj=None, err=None):
     if obj is not None:
@@ -106,7 +110,6 @@ class App(Flask):
     def load(self):
         if self.is_loaded:
             return
-        import sparrow_plugins
         import core_plugins
         self.register_plugin(AuthPlugin)
         # GraphQL is disabled for now
@@ -114,7 +117,14 @@ class App(Flask):
         self.register_plugin(WebPlugin)
         self.register_plugin(InterfacePlugin)
         self.register_module_plugins(core_plugins)
-        self.register_module_plugins(sparrow_plugins)
+
+        # Try to import external plugins, but they might not be defined.
+        try:
+            import sparrow_plugins
+            self.register_module_plugins(sparrow_plugins)
+        except ModuleNotFoundError:
+            log.debug("Could not find external Sparrow plugins.")
+
         self.__loaded()
 
 

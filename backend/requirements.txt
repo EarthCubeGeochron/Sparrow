@@ -57,3 +57,7 @@ shapely # Should already be installed
 Flask-GraphQL==2.0.1
 graphene==2.1.8
 graphene_sqlalchemy==2.2.2
+
+# Testing (we could split this into a separate file
+# if it becomes too weighty.)
+pytest==5.3.5

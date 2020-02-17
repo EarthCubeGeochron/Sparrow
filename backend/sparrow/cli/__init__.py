@@ -39,12 +39,16 @@ def abort(message, status=1):
 
 
 @cli.command(name='init')
-@with_database
+@with_config
 @click.option('--drop', is_flag=True, default=False)
-def init_database(db, drop=False):
+def init_database(cfg, drop=False):
     """
     Initialize database schema (non-destructive)
     """
+    from ..database import Database
+    app = App(__name__, config=cfg)
+    app.load()
+    db = Database(app)
     db.initialize(drop=drop)
 
 

@@ -13,6 +13,7 @@ from shapely.geometry import mapping, shape
 class JSON(Raw):
     pass
 
+
 class Geometry(Field):
     """
     Field for for parsing and serializing a PostGIS geometry
@@ -43,10 +44,7 @@ class Enum(Related):
 
 
 class SmartNested(Nested):
-    def __init__(self, name, **kwargs):
-        super().__init__(name, **kwargs)
-
-    def serialize(self, attr, obj, accessor=None):
-        #if attr not in obj.__dict__:
-        #    return {"id": int(getattr(obj, attr + "_id"))}
-        return super().serialize(attr, obj, accessor)
+    def _deserialize(self, value, attr=None, data=None, **kwargs):
+        if isinstance(value, self.schema.opts.model):
+            return value
+        return super()._deserialize(value, attr, data, **kwargs)

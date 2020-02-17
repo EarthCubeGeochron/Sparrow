@@ -7,6 +7,7 @@ from sqlalchemy import create_engine, inspect, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
+from sqlalchemy.exc import IntegrityError
 
 from .util import run_sql_file, run_query, get_or_create
 from .models import User, Project, Session, DatumType
@@ -82,6 +83,22 @@ class Database(MappedDatabaseMixin):
             raise
         finally:
             session.close()
+
+    def load_data(self, model_name, data):
+        iface = getattr(self.interface, model_name)
+        try:
+            with self.session.no_autoflush:
+                res = iface().load(data, session=self.session)
+            self.session.add(res)
+            self.session.commit()
+        except Exception as err:
+            self.session.rollback()
+            raise err
+
+    def get_instance(self, model_name, filter_params):
+        iface = getattr(self.interface, model_name)
+        res = iface().load(filter_params, session=self.session, partial=True)
+        return res
 
     def exec_sql(self, fn):
         secho(Path(fn).name, fg='cyan', bold=True)

@@ -69,14 +69,16 @@ class ModelPrinter(object):
         fields.sort(key=self.__sort_fields)
 
         for k, v in fields:
+            name = v.data_key or l
             if k in exclude:
                 continue
             if isinstance(v, Nested):
-                self.print_nested(k, v, level=level)
+                self.print_nested(name, v, level=level)
             else:
-                self.print_field(k, v, level=level)
+                self.print_field(name, v, level=level)
         if len(exclude):
-            secho(prefix+"  excluded: "+" ".join(exclude), dim=True)
+            excluded_names = [model.declared_fields[k].data_key or k for k in exclude]
+            secho(prefix+"  excluded: "+" ".join(excluded_names), dim=True)
 
     def __call__(self, model):
         self.print_model(model)
