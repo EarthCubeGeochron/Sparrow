@@ -2,7 +2,7 @@ from os import environ
 from datetime import timedelta
 
 LAB_NAME = environ.get("SPARROW_LAB_NAME", "Test lab")
-DATABASE = "postgresql:///earthcube_labdata_test"
+DATABASE = environ.get("SPARROW_DATABASE", "postgresql:///sparrow")
 BASE_URL = environ.get("SPARROW_BASE_URL", "/")
 
 # We want to check most of our config into version control,

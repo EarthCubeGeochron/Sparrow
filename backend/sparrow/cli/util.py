@@ -1,17 +1,20 @@
 import click
 from sqlalchemy.exc import OperationalError
 from os import devnull
-from click import style
+from click import style, echo
 from contextlib import redirect_stderr
+import sys
 
 from ..app import App, construct_app as base_construct_app
 from ..database import Database
 
+def abort(err):
+    echo(err, fg='red', err=True)
 
 def construct_app(cfg):
-    #with open(devnull, 'w') as f:
-    #    with redirect_stderr(f):
-    return base_construct_app(cfg)
+    with open(devnull, 'w') as f:
+       with redirect_stderr(f):
+           return base_construct_app(cfg)
 
 
 def get_database(ctx, param, value):
@@ -23,9 +26,10 @@ def get_database(ctx, param, value):
     except OperationalError:
         dbname = click.style(app.dbname, fg='cyan', bold=True)
         cmd = style(f"createdb {app.dbname}", dim=True)
-        abort(f"Database {dbname} does not exist.\n"
+        echo(f"Database {dbname} does not exist.\n"
                "Please create it before continuing.\n"
               f"Command: `{cmd}`")
+        sys.exit(0)
 
 
 kw = dict(type=str, envvar="SPARROW_BACKEND_CONFIG", required=True)

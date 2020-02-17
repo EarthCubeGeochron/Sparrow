@@ -45,7 +45,7 @@ werkzeug==0.16.0
 
 # Serialization/deserialization
 marshmallow==3.3.0
-marshmallow-sqlalchemy==0.21.0
+marshmallow-sqlalchemy==0.22.2
 marshmallow-jsonschema==0.8.0
 stringcase==1.2.0
 
@@ -57,3 +57,7 @@ shapely # Should already be installed
 Flask-GraphQL==2.0.1
 graphene==2.1.8
 graphene_sqlalchemy==2.2.2
+
+# Testing (we could split this into a separate file
+# if it becomes too weighty.)
+pytest==5.3.5

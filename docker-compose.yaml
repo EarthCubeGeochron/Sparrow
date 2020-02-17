@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.6"
 services:
   gateway:
     image: nginx:1.15
@@ -12,7 +12,10 @@ services:
       - frontend_build:/frontend
       - $SPARROW_DATA_DIR:/data:ro
   backend:
-    build: backend
+    build:
+      context: backend
+      target: main
+    command: /bin/run
     # Make sure we get colorized terminal output
     tty: true
     expose:

@@ -1,7 +1,17 @@
-#!/usr/bin/env bash
-# Description: Run tests for Sparrow
+#!/usr/bin/env zsh
 
-# This should be run in a separate container eventually
-sparrow compose build backend
-sparrow compose build api-tests
-sparrow compose run api-tests pytest /tests $@
+cd "$SPARROW_PATH/backend-tests"
+
+# Set a different compose project name so we don't step on running
+# applications.
+export COMPOSE_PROJECT_NAME="sparrow_test"
+
+function compose {
+  docker-compose -f docker-compose.sparrow-tests.yaml $@
+}
+
+compose build --quiet
+# Need to bring up database separately to ensure ports are mapped...
+compose up -d db
+compose run --service-ports backend /bin/run-tests $@
+compose down
