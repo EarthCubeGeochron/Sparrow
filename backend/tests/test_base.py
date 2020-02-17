@@ -1,5 +1,6 @@
 from sparrow.app import construct_app
-from sparrow.interface import model_interface
+from sparrow.database.mapper import BaseModel
+from marshmallow.exceptions import ValidationError
 from datetime import datetime
 from pytest import mark
 
@@ -264,3 +265,60 @@ class TestDeclarativeImporter:
                                  "WHERE parameter = 'soil water content'"
                                  "  AND unit = 'weight %'")
         assert res.scalar() == 1
+
+    def test_load_existing_instance(self):
+        # Get an instance
+        type = db.session.query(db.model.datum_type).filter_by(
+            parameter='soil water content',
+            unit='weight %',
+            error_unit=None).first()
+
+        assert isinstance(type, BaseModel)
+
+        data = {
+            "date": str(datetime.now()),
+            "name": "Session with existing instances",
+            "sample": {
+                "name": "Soil 003"
+            },
+            "analysis": [{
+                # Can't seem to get or create this instance from the database
+                "analysis_type": "Soil aliquot pyrolysis",
+                "session_index": 0,
+                "datum": [{
+                    "value": 0.1,
+                    "error": 0.025,
+                    "type": type
+                }]
+            }]
+        }
+
+        db.load_data("session", data)
+
+    def test_incomplete_import_excluded(self):
+        # Get an instance
+        type = db.session.query(db.model.datum_type).filter_by(
+            parameter='soil water content',
+            unit='weight %',
+            error_unit=None).first()
+
+        assert isinstance(type, BaseModel)
+
+        data = {
+            # Can't seem to get or create this instance from the database
+            "analysis_type": "Soil aliquot pyrolysis",
+            "session_index": 0,
+            "datum": [{
+                "value": 0.1,
+                "error": 0.025,
+                "type": {
+                    'parameter': 'soil water content',
+                    'unit': 'weight %'
+                }
+            }]
+        }
+
+        try:
+            db.load_data("analysis", data)
+        except Exception as err:
+            assert isinstance(err, ValidationError)

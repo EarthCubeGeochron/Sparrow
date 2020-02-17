@@ -1,4 +1,5 @@
 from sparrow.plugins import SparrowCorePlugin
+from sparrow.database.mapper import BaseModel
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, exceptions
 from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
@@ -60,6 +61,8 @@ class BaseSchema(SQLAlchemyAutoSchema):
                 # Required column is unset
                 cols = columns_for_prop(prop)
                 if hasattr(prop, 'direction'):
+                    # This is unsatisfying, as we can't filter on pre-existing
+                    # related fields
                     filters[prop.key] = None
                 is_required = any([column_is_required(i) for i in cols])
                 if is_required:

@@ -44,4 +44,7 @@ class Enum(Related):
 
 
 class SmartNested(Nested):
-    pass
+    def _deserialize(self, value, attr=None, data=None, **kwargs):
+        if isinstance(value, self.schema.opts.model):
+            return value
+        return super()._deserialize(value, attr, data, **kwargs)
