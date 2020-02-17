@@ -322,3 +322,23 @@ class TestDeclarativeImporter:
             db.load_data("analysis", data)
         except Exception as err:
             assert isinstance(err, ValidationError)
+
+    def test_get_instance(self):
+        q = {
+            'parameter': 'soil water content',
+            'unit': 'weight %'
+        }
+        type = db.session.query(db.model.datum_type).filter_by(
+            parameter=q['parameter'],
+            unit=q['unit'],
+            error_unit=None).first()
+
+        res = db.get_instance('datum_type', q)
+
+        assert isinstance(res, db.model.datum_type)
+        assert res == type
+
+    def test_get_number(self):
+        res = db.get_instance('datum', dict(value=0.1, error=0.025))
+        assert isinstance(res, db.model.datum)
+        assert float(res.value) == 0.1

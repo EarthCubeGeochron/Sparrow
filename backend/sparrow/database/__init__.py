@@ -95,6 +95,11 @@ class Database(MappedDatabaseMixin):
             self.session.rollback()
             raise err
 
+    def get_instance(self, model_name, filter_params):
+        iface = getattr(self.interface, model_name)
+        res = iface().load(filter_params, session=self.session, partial=True)
+        return res
+
     def exec_sql(self, fn):
         secho(Path(fn).name, fg='cyan', bold=True)
         run_sql_file(self.session, str(fn))
