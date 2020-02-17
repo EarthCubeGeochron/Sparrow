@@ -15,6 +15,7 @@ from os import environ
 from sqlalchemy.orm import relationship
 from .mapper import BaseModel
 
+
 class User(BaseModel):
     __tablename__ = "user"
     # Columns are automagically mapped from database
@@ -50,10 +51,10 @@ class Session(BaseModel):
         return (self.db.session.query(att)
                 .filter(att.parameter == type)
                 .join(an.attribute_collection)
-                .filter(an.session_id==self.id)).all()
+                .filter(an.session_id == self.id)).all()
 
 
 class DatumType(BaseModel):
     __tablename__ = 'datum_type'
-    _error_unit = relationship('vocabulary_unit', foreign_keys="[DatumType.error_unit]")
-    _unit = relationship('vocabulary_unit', foreign_keys="[DatumType.unit]")
+    _error_unit = relationship('vocabulary_unit', foreign_keys="DatumType.error_unit")
+    _unit = relationship('vocabulary_unit', foreign_keys="DatumType.unit")
