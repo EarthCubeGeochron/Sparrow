@@ -87,10 +87,11 @@ class Database(MappedDatabaseMixin):
     def load_data(self, model_name, data):
         iface = getattr(self.interface, model_name)
         try:
-            res = iface().load(data, session=self.session)
+            with self.session.no_autoflush:
+                res = iface().load(data, session=self.session)
             self.session.add(res)
             self.session.commit()
-        except IntegrityError as err:
+        except Exception as err:
             self.session.rollback()
             raise err
 

@@ -58,26 +58,21 @@ class SmartNested(Nested):
         #    return {"id": int(getattr(obj, attr + "_id"))}
         return super().serialize(attr, obj, accessor)
 
-    @pre_load
-    def expand_primary_keys(self, value, **kwargs):
-        print(value)
-        try:
-            # Typically, we are deserializing from a mapping of values
-            return dict(**value)
-        except TypeError:
-            pass
-        import pdb; pdb.set_trace()
-        print(value)
-        val_list = ensure_list(value)
-        model = self.schema.opts.model
-        pk = get_primary_keys(model)
-        assert len(pk) == len(val_list)
-        res = {}
-        for col, val in zip(pk, val_list):
-            res[col.key] = val
-        print(value, res)
-        assert False
-        return res
+    # @pre_load
+    # def expand_primary_keys(self, value, **kwargs):
+    #     try:
+    #         # Typically, we are deserializing from a mapping of values
+    #         return dict(**value)
+    #     except TypeError:
+    #         pass
+    #     val_list = ensure_list(value)
+    #     model = self.schema.opts.model
+    #     pk = get_primary_keys(model)
+    #     assert len(pk) == len(val_list)
+    #     res = {}
+    #     for col, val in zip(pk, val_list):
+    #         res[col.key] = val
+    #     return res
 
     # def deserialize_as_primary_key(self, value, attr=None, data=None, **kwargs):
     #     # Try to serialize as a primary key
@@ -91,9 +86,11 @@ class SmartNested(Nested):
     #     print(res)
     #     return super()._deserialize(res, attr, data, **kwargs)
 
-    # def _deserialize(self, value, attr=None, data=None, **kwargs):
-    #     # Typically, we are deserializing from a mapping of values,
-    #     # and this is what the Nested field is set up to accept.
-    #     if isinstance(value, str) or isinstance(value, int):
-    #         return self.deserialize_as_primary_key(value, attr, data, **kwargs)
-    #     return super()._deserialize(value, attr, data, **kwargs)
+    def _deserialize(self, value, attr=None, data=None, **kwargs):
+        # Typically, we are deserializing from a mapping of values,
+        # and this is what the Nested field is set up to accept.
+        kwargs['parent'] = self.parent
+        val = super()._deserialize(value, attr, data, **kwargs)
+        print("Deserializing as: ", val)
+        # if isinstance(val, list):
+        return val
