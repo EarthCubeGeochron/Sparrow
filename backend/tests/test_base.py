@@ -342,3 +342,8 @@ class TestDeclarativeImporter:
         res = db.get_instance('datum', dict(value=0.1, error=0.025))
         assert isinstance(res, db.model.datum)
         assert float(res.value) == 0.1
+
+    @mark.xfail
+    def test_get_session(self):
+        res = db.get_instance('datum', dict(id=2))
+        assert isinstance(res, db.model.session)
