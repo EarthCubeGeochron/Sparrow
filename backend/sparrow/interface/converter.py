@@ -117,6 +117,8 @@ class SparrowConverter(ModelConverter):
         kwargs = super()._get_field_kwargs_for_property(prop)
         kwargs['data_key'] = self._get_key(prop)
 
+        kwargs['allow_nan'] = True
+
         if isinstance(prop, RelationshipProperty): # Relationship property
             cols = list(getattr(prop, 'local_columns', []))
             kwargs['required'] = False
