@@ -2,10 +2,10 @@ from sparrow.app import construct_app
 from sparrow.database.mapper import BaseModel
 from marshmallow.exceptions import ValidationError
 from datetime import datetime
-from pytest import mark
+from pytest import mark, fixture
+import requests
 
 app, db = construct_app()
-
 
 session = dict(
     sample_id="A-0",
@@ -128,6 +128,33 @@ class TestImperativeImport:
         assert op == "INSERT"
         assert tbl == "datum"
 
+basic_data = {
+    "date": str(datetime.now()),
+    "name": "Declarative import test",
+    "sample": {
+        "name": "Soil 001"
+    },
+    "analysis": [{
+        "analysis_type": {
+            "id": "Soil aliquot pyrolysis",
+            "description": "I guess this could be an actual technique?"
+        },
+        "session_index": 0,
+        "datum": [{
+            "value": 2.25,
+            "error": 0.2,
+            "type": {
+                "parameter": {
+                    "id": "soil water content"
+                },
+                "unit": {
+                    "id": "weight %"
+                }
+            }
+        }]
+    }]
+}
+
 
 class TestDeclarativeImporter:
     def test_import_interface(self):
@@ -135,35 +162,7 @@ class TestDeclarativeImporter:
             assert hasattr(db.interface, model)
 
     def test_basic_import(self):
-
-        data = {
-            "date": str(datetime.now()),
-            "name": "Declarative import test",
-            "sample": {
-                "name": "Soil 001"
-            },
-            "analysis": [{
-                "analysis_type": {
-                    "id": "Soil aliquot pyrolysis",
-                    "description": "I guess this could be an actual technique?"
-                },
-                "session_index": 0,
-                "datum": [{
-                    "value": 2.25,
-                    "error": 0.2,
-                    "type": {
-                        "parameter": {
-                            "id": "soil water content"
-                        },
-                        "unit": {
-                            "id": "weight %"
-                        }
-                    }
-                }]
-            }]
-        }
-
-        db.load_data("session", data)
+        db.load_data("session", basic_data)
 
     def test_duplicate_parameter(self):
 
@@ -347,3 +346,13 @@ class TestDeclarativeImporter:
     def test_get_session(self):
         res = db.get_instance('datum', dict(id=2))
         assert isinstance(res, db.model.session)
+
+@fixture
+def client():
+    with app.test_client() as client:
+        yield client
+
+class TestAPIImporter:
+    def test_api_import(self, client):
+        res = client.put("/api/v1/import-data/session", json={'filename': None, 'data': basic_data})
+        assert res.status_code == 201
