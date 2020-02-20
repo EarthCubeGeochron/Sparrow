@@ -89,8 +89,8 @@ class Database(MappedDatabaseMixin):
         try:
             with self.session.no_autoflush:
                 res = iface().load(data, session=self.session)
-                self.session.merge(res)
-                self.session.commit()
+            self.session.merge(res)
+            self.session.commit()
             return res
         except Exception as err:
             self.session.rollback()

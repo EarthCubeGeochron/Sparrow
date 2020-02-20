@@ -81,11 +81,9 @@ class BaseSchema(SQLAlchemyAutoSchema):
             assert query.count() <= 1
             instance = query.first()
         except StatementError:
-            instance = None
+            pass
         if instance is None:
-            instance = super().get_instance(data)
-        if instance is not None:
-            self.session.merge(instance)
+            return super().get_instance(data)
         return instance
 
     @pre_load
