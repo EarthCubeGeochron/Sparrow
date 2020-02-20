@@ -49,6 +49,7 @@ def columns_for_prop(prop):
 
 class BaseSchema(SQLAlchemyAutoSchema):
     def get_instance(self, data):
+        self.__has_existing = False
         """Gets pre-existing instances if they are available."""
         if self.transient:
             return None
@@ -77,13 +78,18 @@ class BaseSchema(SQLAlchemyAutoSchema):
         # Need to get relationship columns for primary keys!
         instance = None
         try:
+            #log.debug(filters)
             query = self.session.query(self.opts.model).filter_by(**filters)
             assert query.count() <= 1
             instance = query.first()
         except StatementError:
             pass
         if instance is None:
-            return super().get_instance(data)
+            instance = super().get_instance(data)
+        #if instance is not None:
+        #    #log.debug(f"Found instance {instance}")
+        #    #self.__has_existing = True
+
         return instance
 
     @pre_load
@@ -106,6 +112,13 @@ class BaseSchema(SQLAlchemyAutoSchema):
     def make_instance(self, data, **kwargs):
         inst = super().make_instance(data, **kwargs)
         log.debug(inst)
+        # if not self.__has_existing:
+        #     with self.session.begin_nested():
+        #         try:
+        #             self.session.add(inst)
+        #             self.session.commit()
+        #         except:
+        #             self.session.rollback()
         # if inst is not None:
         #     self.session.merge(inst)
         #     # try:

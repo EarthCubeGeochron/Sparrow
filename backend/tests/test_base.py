@@ -1,9 +1,11 @@
 from sparrow.app import construct_app
+from sparrow.util import relative_path
 from sparrow.database.mapper import BaseModel
 from marshmallow.exceptions import ValidationError
 from datetime import datetime
 from pytest import mark, fixture
 import requests
+from json import load
 
 app, db = construct_app()
 
@@ -384,4 +386,12 @@ class TestAPIImporter:
 
     def test_basic_import(self, client):
         res = client.put("/api/v1/import-data/session", json=data0)
+        assert res.status_code == 201
+
+    def test_complex_import(self, client):
+        fn = relative_path(__file__, 'large-test.json')
+        with open(fn) as fp:
+            complex_data = load(fp)
+
+        res = client.put("/api/v1/import-data/session", json=complex_data)
         assert res.status_code == 201

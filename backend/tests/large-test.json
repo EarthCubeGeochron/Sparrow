@@ -8,7 +8,7 @@
     "date": "2020-01-01T00:00:00",
     "analysis": [
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.414,
@@ -104,7 +104,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.409,
@@ -207,7 +207,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.213,
@@ -310,7 +310,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.253,
@@ -413,11 +413,11 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": []
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 17.502,
@@ -520,7 +520,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 17.703,
@@ -623,7 +623,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 17.945,
@@ -726,7 +726,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 17.624,
@@ -829,7 +829,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 17.761,
@@ -932,7 +932,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 17.789,
@@ -1035,11 +1035,11 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": []
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.227,
@@ -1142,7 +1142,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.189,
@@ -1245,7 +1245,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.356,
@@ -1348,7 +1348,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.376,
@@ -1451,7 +1451,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 0.9869,
@@ -1477,19 +1477,19 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": []
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": []
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": []
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.029,
@@ -1592,7 +1592,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.173,
@@ -1695,7 +1695,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.434,
@@ -1798,7 +1798,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.327,
@@ -1901,7 +1901,7 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 9.218,
@@ -2004,11 +2004,11 @@
         ]
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": []
       },
       {
-        "name": "d18O measurement",
+        "analysis_name": "d18O measurement",
         "datum": [
           {
             "value": 0.0217,
@@ -2161,4 +2161,4 @@
       }
     ]
   }
-}
+} 
