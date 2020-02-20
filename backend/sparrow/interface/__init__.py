@@ -5,12 +5,16 @@ from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
-from marshmallow.decorators import pre_load
+from marshmallow.decorators import pre_load, post_load
 from sqlalchemy.exc import StatementError
 from click import secho
 
 from .converter import SparrowConverter, to_schema_name
 from ..database.mapper.util import ModelCollection, classname_for_table
+
+from sparrow import get_logger
+
+log = get_logger(__name__)
 
 
 def _jsonschema_type_mapping(self):
@@ -73,14 +77,15 @@ class BaseSchema(SQLAlchemyAutoSchema):
         # Need to get relationship columns for primary keys!
         instance = None
         try:
-            q = self.session.query(self.opts.model).filter_by(**filters)
-            assert q.count() <= 1
-            instance = q.first()
+            query = self.session.query(self.opts.model).filter_by(**filters)
+            assert query.count() <= 1
+            instance = query.first()
         except StatementError:
-            pass
+            instance = None
         if instance is None:
-            return super().get_instance(data)
-
+            instance = super().get_instance(data)
+        if instance is not None:
+            self.session.merge(instance)
         return instance
 
     @pre_load
@@ -98,6 +103,18 @@ class BaseSchema(SQLAlchemyAutoSchema):
         for col, val in zip(pk, val_list):
             res[col.key] = val
         return res
+
+    @post_load
+    def make_instance(self, data, **kwargs):
+        inst = super().make_instance(data, **kwargs)
+        log.debug(inst)
+        # if inst is not None:
+        #     self.session.merge(inst)
+        #     # try:
+        #     #     self.session.flush()
+        #     # except FlushError:
+        #     #     return None
+        return inst
 
     def to_json_schema(model):
         return json_schema.dump(model)

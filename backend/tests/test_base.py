@@ -352,7 +352,36 @@ def client():
     with app.test_client() as client:
         yield client
 
+data0 = {
+  "filename": None,
+  "data": {
+    "name": "Test session",
+    "sample": {
+      "name": "Test sample"
+    },
+    "date": "2020-01-01T00:00:00",
+    "analysis": [
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.414,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+
 class TestAPIImporter:
     def test_api_import(self, client):
         res = client.put("/api/v1/import-data/session", json={'filename': None, 'data': basic_data})
+        assert res.status_code == 201
+
+    def test_basic_import(self, client):
+        res = client.put("/api/v1/import-data/session", json=data0)
         assert res.status_code == 201
