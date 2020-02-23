@@ -144,8 +144,8 @@ CREATE TABLE IF NOT EXISTS datum_type (
   UNIQUE (parameter, unit, error_unit, error_metric)
 );
 
-CREATE UNIQUE INDEX datum_type_unique ON datum_type
-(parameter, unit, coalesce(error_unit, 'NO ERROR'), coalesce(error_metric, 'NO ERROR'));
+-- CREATE UNIQUE INDEX datum_type_unique ON datum_type
+-- (parameter, unit, coalesce(error_unit, 'NO ERROR'), coalesce(error_metric, 'NO ERROR'));
 
 /*
 

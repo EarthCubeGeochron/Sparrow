@@ -6,7 +6,7 @@ from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load
-from sqlalchemy.exc import StatementError
+from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
 from click import secho
 
 from .converter import SparrowConverter, to_schema_name
@@ -37,7 +37,7 @@ class BaseMeta:
 
 def column_is_required(col):
     has_default = (col.server_default is not None) or (col.default is not None)
-    return not (col.nullable or has_default)
+    return not col.nullable and not has_default
 
 
 def columns_for_prop(prop):
@@ -46,16 +46,51 @@ def columns_for_prop(prop):
     except AttributeError:
         return list(getattr(prop, 'local_columns'))
 
+def pk_values(instance):
+    props = get_primary_keys(instance.__class__)
+    keys = {prop.key: getattr(instance, prop.key) for prop in props}
+    return keys.values()
+
+def pk_data(model, data):
+    props = get_primary_keys(model)
+    keys = {prop.key: data.get(prop.key) for prop in props}
+    return keys.values()
 
 class BaseSchema(SQLAlchemyAutoSchema):
+    value_index = {}
+    def _ready_for_flush(self, instance):
+        if instance is None:
+            return False
+        # for prop in self.opts.model.__mapper__.iterate_properties:
+        #     cols = columns_for_prop(prop)
+        #     is_required = any([column_is_required(i) for i in cols])
+        #     if not is_required:
+        #         continue
+        #     if getattr(instance, prop.key, None) is None:
+        #         return False
+        if any([p is None for p in pk_values(instance)]):
+            return False
+
+        return True
+
     def get_instance(self, data):
         self.__has_existing = False
         """Gets pre-existing instances if they are available."""
         if self.transient:
             return None
 
+        pk = tuple(pk_data(self.opts.model, data))
+        pk_is_defined = all([k is not None for k in pk])
+        # pk_hash = hash(pk)
+        # if pk_is_defined:
+        #     inst = self.value_index.get(pk_hash, None)
+        #     if inst is not None:
+        #         #log.debug(f"In-session instance retrieved for {inst} with key {pk}")
+        #         return inst
+
         # Filter on properties that actually have a local column
         filters = {}
+        instance = None
         for prop in self.opts.model.__mapper__.iterate_properties:
             val = data.get(prop.key, None)
             if getattr(prop, 'uselist', False):
@@ -73,22 +108,31 @@ class BaseSchema(SQLAlchemyAutoSchema):
                 if is_required:
                     if len(cols[0].foreign_keys) > 0:
                         continue
-                    return super().get_instance(data)
+                    instance = super().get_instance(data)
 
         # Need to get relationship columns for primary keys!
-        instance = None
-        try:
-            #log.debug(filters)
-            query = self.session.query(self.opts.model).filter_by(**filters)
-            assert query.count() <= 1
-            instance = query.first()
-        except StatementError:
-            pass
+        if instance is None:
+            try:
+                #log.debug(filters)
+                query = self.session.query(self.opts.model).filter_by(**filters)
+                assert query.count() <= 1
+                instance = query.first()
+            except (StatementError, AssertionError):
+                pass
         if instance is None:
             instance = super().get_instance(data)
         #if instance is not None:
         #    #log.debug(f"Found instance {instance}")
         #    #self.__has_existing = True
+        # if pk_is_defined and instance is not None:
+        #     # try:
+        #     #     with self.session.begin_nested():
+        #     self.session.merge(instance)
+        #     self.session.flush()
+        # except Exception:
+        #     pass
+        #     log.debug(f"PK defined for {instance} with key {pk}")
+        #     self.__class__.value_index[pk_hash] = instance
 
         return instance
 
@@ -110,22 +154,25 @@ class BaseSchema(SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        inst = super().make_instance(data, **kwargs)
-        log.debug(inst)
-        # if not self.__has_existing:
-        #     with self.session.begin_nested():
-        #         try:
-        #             self.session.add(inst)
-        #             self.session.commit()
-        #         except:
-        #             self.session.rollback()
-        # if inst is not None:
-        #     self.session.merge(inst)
-        #     # try:
-        #     #     self.session.flush()
-        #     # except FlushError:
-        #     #     return None
-        return inst
+        instance = super().make_instance(data, **kwargs)
+        # if instance is not None:
+        #         self.session.merge(res)
+        #         self.session.flush()
+        # #
+        if self._ready_for_flush(instance):
+            try:
+                self.session.flush(objects=[instance])
+            except IntegrityError:
+                pass
+            # except InvalidRequestError:
+            #     self.session.rollback()
+
+        #
+        # if pk_hash not in self.value_index:
+        #     #log.debug(f"PK defined for {instance} with key {pk}")
+        #     self.value_index[pk_hash] = instance
+
+        return instance
 
     def to_json_schema(model):
         return json_schema.dump(model)

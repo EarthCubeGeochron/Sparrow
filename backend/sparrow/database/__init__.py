@@ -86,10 +86,19 @@ class Database(MappedDatabaseMixin):
 
     def load_data(self, model_name, data):
         iface = getattr(self.interface, model_name)
+        self.session.rollback()
         try:
             with self.session.no_autoflush:
-                res = iface().load(data, session=self.session)
-            self.session.merge(res)
+                res = iface().load(data, session=self.session, transient=True)
+                self.session.flush()
+                self.session.merge(res)
+                #sess = self.session()
+                #sess.transaction._rollback_exception = None
+                #    import pdb; pdb.set_trace()
+            # insp = inspect(res)
+            # import pdb; pdb.set_trace()
+            # print(insp)
+            #self.session.merge(res)
             self.session.commit()
             return res
         except Exception as err:
