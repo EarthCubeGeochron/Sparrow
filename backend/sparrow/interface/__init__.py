@@ -73,20 +73,14 @@ class BaseSchema(SQLAlchemyAutoSchema):
 
         return True
 
-    def get_instance(self, data):
-        self.__has_existing = False
-        """Gets pre-existing instances if they are available."""
-        if self.transient:
-            return None
+    @property
+    def _table(self):
+        return self.opts.model.__table__
 
+    def get_instance(self, data):
+        """Gets pre-existing instances if they are available."""
         pk = tuple(pk_data(self.opts.model, data))
         pk_is_defined = all([k is not None for k in pk])
-        # pk_hash = hash(pk)
-        # if pk_is_defined:
-        #     inst = self.value_index.get(pk_hash, None)
-        #     if inst is not None:
-        #         #log.debug(f"In-session instance retrieved for {inst} with key {pk}")
-        #         return inst
 
         # Filter on properties that actually have a local column
         filters = {}
@@ -113,7 +107,6 @@ class BaseSchema(SQLAlchemyAutoSchema):
         # Need to get relationship columns for primary keys!
         if instance is None:
             try:
-                #log.debug(filters)
                 query = self.session.query(self.opts.model).filter_by(**filters)
                 assert query.count() <= 1
                 instance = query.first()
@@ -121,7 +114,13 @@ class BaseSchema(SQLAlchemyAutoSchema):
                 pass
         if instance is None:
             instance = super().get_instance(data)
-        #if instance is not None:
+
+        if self._ready_for_flush(instance):
+            try:
+                self.session.flush(objects=[instance])
+            except IntegrityError:
+                pass
+
         #    #log.debug(f"Found instance {instance}")
         #    #self.__has_existing = True
         # if pk_is_defined and instance is not None:
@@ -166,7 +165,12 @@ class BaseSchema(SQLAlchemyAutoSchema):
                 pass
             # except InvalidRequestError:
             #     self.session.rollback()
-
+        #if instance is not None:
+        # if self._table.name == "datum":
+        #     print(data)
+        #     from decimal import Decimal
+        #     if data['value'] == Decimal('0.383'):
+        #         import pdb; pdb.set_trace()
         #
         # if pk_hash not in self.value_index:
         #     #log.debug(f"PK defined for {instance} with key {pk}")
