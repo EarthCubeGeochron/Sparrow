@@ -268,7 +268,6 @@ class TestDeclarativeImporter:
                                  "  AND unit = 'weight %'")
         assert res.scalar() == 1
 
-    @mark.skip
     def test_load_existing_instance(self):
         # Get an instance
         type = db.session.query(db.model.datum_type).filter_by(
@@ -298,7 +297,6 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
 
-    @mark.skip
     def test_incomplete_import_excluded(self):
         # Get an instance
         type = db.session.query(db.model.datum_type).filter_by(

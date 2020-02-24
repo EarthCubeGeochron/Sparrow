@@ -46,6 +46,10 @@ def columns_for_prop(prop):
     except AttributeError:
         return list(getattr(prop, 'local_columns'))
 
+def prop_is_required(prop):
+    cols = [column_is_required(c) for c in columns_for_prop(prop)]
+    return any(cols)
+
 def pk_values(instance):
     props = get_primary_keys(instance.__class__)
     keys = {prop.key: getattr(instance, prop.key) for prop in props}
@@ -61,15 +65,14 @@ class BaseSchema(SQLAlchemyAutoSchema):
     def _ready_for_flush(self, instance):
         if instance is None:
             return False
-        # for prop in self.opts.model.__mapper__.iterate_properties:
-        #     cols = columns_for_prop(prop)
-        #     is_required = any([column_is_required(i) for i in cols])
-        #     if not is_required:
-        #         continue
-        #     if getattr(instance, prop.key, None) is None:
-        #         return False
         if any([p is None for p in pk_values(instance)]):
             return False
+        for prop in self.opts.model.__mapper__.iterate_properties:
+            is_required = prop_is_required(prop)
+            if not is_required:
+                continue
+            if getattr(instance, prop.key, None) is None:
+                return False
 
         return True
 
@@ -115,11 +118,14 @@ class BaseSchema(SQLAlchemyAutoSchema):
         if instance is None:
             instance = super().get_instance(data)
 
-        if self._ready_for_flush(instance):
-            try:
-                self.session.flush(objects=[instance])
-            except IntegrityError:
-                pass
+        # if self._ready_for_flush(instance):
+        #     try:
+        #         self.session.merge(instance)
+        #         self.session.flush(objects=[instance])
+        #         self.session.commit()
+        #     except IntegrityError as err:
+        #         log.debug(f"Adding {instance} failed with {err}")
+        #         self.session.rollback()
 
         #    #log.debug(f"Found instance {instance}")
         #    #self.__has_existing = True
@@ -160,9 +166,12 @@ class BaseSchema(SQLAlchemyAutoSchema):
         # #
         if self._ready_for_flush(instance):
             try:
+                self.session.merge(instance)
                 self.session.flush(objects=[instance])
-            except IntegrityError:
-                pass
+                self.session.commit()
+            except IntegrityError as err:
+                log.debug(f"Adding {instance} failed with {err}")
+                self.session.rollback()
             # except InvalidRequestError:
             #     self.session.rollback()
         #if instance is not None:
