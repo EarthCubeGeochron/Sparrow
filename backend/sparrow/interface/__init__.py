@@ -7,6 +7,7 @@ from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load
 from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
+from sqlalchemy.orm.exc import FlushError
 from click import secho
 
 from .converter import SparrowConverter, to_schema_name
@@ -108,6 +109,7 @@ class BaseSchema(SQLAlchemyAutoSchema):
                     instance = super().get_instance(data)
 
         # Need to get relationship columns for primary keys!
+        print(filters)
         if instance is None:
             try:
                 query = self.session.query(self.opts.model).filter_by(**filters)
@@ -117,6 +119,18 @@ class BaseSchema(SQLAlchemyAutoSchema):
                 pass
         if instance is None:
             instance = super().get_instance(data)
+        # if instance is None:
+        #     print(f"Did not find instance of {self.opts.model}")
+
+        if self._ready_for_flush(instance):
+            try:
+                self.session.merge(instance)
+                self.session.flush(objects=[instance])
+                self.session.commit()
+                #print(f"Added {instance}")
+            except (IntegrityError, FlushError) as err:
+                #log.debug(f"Adding {instance} failed with {err}")
+                self.session.rollback()
 
         # if self._ready_for_flush(instance):
         #     try:
@@ -159,7 +173,10 @@ class BaseSchema(SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        instance = super().make_instance(data, **kwargs)
+        instance = self.get_instance(data)
+        if instance is None:
+            instance = self.opts.model(**data)
+        #instance = super().make_instance(data, **kwargs)
         # if instance is not None:
         #         self.session.merge(res)
         #         self.session.flush()
@@ -169,11 +186,14 @@ class BaseSchema(SQLAlchemyAutoSchema):
                 self.session.merge(instance)
                 self.session.flush(objects=[instance])
                 self.session.commit()
-            except IntegrityError as err:
-                log.debug(f"Adding {instance} failed with {err}")
+                #print(f"Added {instance}")
+            except (IntegrityError, FlushError) as err:
+                #log.debug(f"Adding {instance} failed with {err}")
                 self.session.rollback()
-            # except InvalidRequestError:
-            #     self.session.rollback()
+        #else:
+        #    print(f"{instance} not yet ready for flush")
+        #    # except InvalidRequestError:
+        #    #     self.session.rollback()
         #if instance is not None:
         # if self._table.name == "datum":
         #     print(data)

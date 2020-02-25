@@ -101,7 +101,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 0
       },
       {
         "analysis_name": "d18O measurement",
@@ -204,7 +205,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 1
       },
       {
         "analysis_name": "d18O measurement",
@@ -307,7 +309,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 2
       },
       {
         "analysis_name": "d18O measurement",
@@ -410,11 +413,13 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 3
       },
       {
         "analysis_name": "d18O measurement",
-        "datum": []
+        "datum": [],
+        "session_index": 4
       },
       {
         "analysis_name": "d18O measurement",
@@ -517,7 +522,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 5
       },
       {
         "analysis_name": "d18O measurement",
@@ -620,7 +626,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 6
       },
       {
         "analysis_name": "d18O measurement",
@@ -723,7 +730,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 7
       },
       {
         "analysis_name": "d18O measurement",
@@ -826,7 +834,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 8
       },
       {
         "analysis_name": "d18O measurement",
@@ -929,7 +938,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 9
       },
       {
         "analysis_name": "d18O measurement",
@@ -1032,11 +1042,13 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 10
       },
       {
         "analysis_name": "d18O measurement",
-        "datum": []
+        "datum": [],
+        "session_index": 11
       },
       {
         "analysis_name": "d18O measurement",
@@ -1139,7 +1151,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 12
       },
       {
         "analysis_name": "d18O measurement",
@@ -1242,7 +1255,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 13
       },
       {
         "analysis_name": "d18O measurement",
@@ -1345,7 +1359,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 14
       },
       {
         "analysis_name": "d18O measurement",
@@ -1448,7 +1463,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 15
       },
       {
         "analysis_name": "d18O measurement",
@@ -1474,19 +1490,23 @@
               "unit": "permille"
             }
           }
-        ]
+        ],
+        "session_index": 16
       },
       {
         "analysis_name": "d18O measurement",
-        "datum": []
+        "datum": [],
+        "session_index": 17
       },
       {
         "analysis_name": "d18O measurement",
-        "datum": []
+        "datum": [],
+        "session_index": 18
       },
       {
         "analysis_name": "d18O measurement",
-        "datum": []
+        "datum": [],
+        "session_index": 19
       },
       {
         "analysis_name": "d18O measurement",
@@ -1589,7 +1609,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 20
       },
       {
         "analysis_name": "d18O measurement",
@@ -1692,7 +1713,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 21
       },
       {
         "analysis_name": "d18O measurement",
@@ -1795,7 +1817,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 22
       },
       {
         "analysis_name": "d18O measurement",
@@ -1898,7 +1921,8 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 23
       },
       {
         "analysis_name": "d18O measurement",
@@ -2001,11 +2025,13 @@
               "unit": "bits"
             }
           }
-        ]
+        ],
+        "session_index": 24
       },
       {
         "analysis_name": "d18O measurement",
-        "datum": []
+        "datum": [],
+        "session_index": 25
       },
       {
         "analysis_name": "d18O measurement",
@@ -2157,8 +2183,9 @@
               "unit": "permille"
             }
           }
-        ]
+        ],
+        "session_index": 26
       }
     ]
   }
-} 
+}

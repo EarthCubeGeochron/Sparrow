@@ -90,14 +90,7 @@ class Database(MappedDatabaseMixin):
             with self.session.no_autoflush:
                 res = iface().load(data, session=self.session)
                 self.session.merge(res)
-                #sess = self.session()
-                #sess.transaction._rollback_exception = None
-                #    import pdb; pdb.set_trace()
 
-            # insp = inspect(res)
-            #import pdb; pdb.set_trace()
-            # print(insp)
-            #self.session.merge(res)
             self.session.commit()
             return res
         except Exception as err:

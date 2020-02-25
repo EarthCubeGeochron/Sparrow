@@ -358,14 +358,14 @@ def client():
 data0 = {
   "filename": None,
   "data": {
-    "name": "Test session",
+    "name": "Test session 1",
     "sample": {
       "name": "Test sample"
     },
     "date": "2020-01-01T00:00:00",
     "analysis": [
       {
-        "analysis_name": "d18O measurement",
+        "analysis_type": "d18O measurement",
         "datum": [
           {
             "value": 9.414,
@@ -393,6 +393,7 @@ class TestAPIImporter:
         fn = relative_path(__file__, 'large-test.json')
         with open(fn) as fp:
             complex_data = load(fp)
+            complex_data['data']['analysis'] = complex_data['data']['analysis'][:1]
 
         db.load_data("session", complex_data['data'])
         #
