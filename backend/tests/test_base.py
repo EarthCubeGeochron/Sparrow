@@ -157,19 +157,41 @@ basic_data = {
     }]
 }
 
+def ensure_single(model_name, **filter_params):
+    model = getattr(db.model, model_name)
+    n = db.session.query(model).filter_by(**filter_params).count()
+    assert n == 1
 
 class TestDeclarativeImporter:
     def test_import_interface(self):
         for model in ['datum', 'session', 'datum_type']:
             assert hasattr(db.interface, model)
 
+    def test_standalone_sample(self):
+        sample = {'name': 'test sample 1'}
+        db.load_data("sample", sample)
+        db.load_data("sample", sample)
+        ensure_single('sample', **sample)
+
+    def test_standalone_datum_type(self):
+        data = {
+            "parameter": "Oxygen fugacity",
+            "unit": "dimensionless"
+        }
+
+        db.load_data("datum_type", data)
+        # We should be able to import this idempotently
+        db.load_data("datum_type", data)
+
+    #@mark.skip
     def test_basic_import(self):
         db.load_data("session", basic_data)
+        ensure_single('sample', name="Soil 001")
 
     def test_duplicate_parameter(self):
 
         data = {
-            "date": str(datetime.now()),
+            "date": "2020-02-02T10:20:02",
             "name": "Declarative import test 2",
             "sample": {
                 "name": "Soil 002"
@@ -195,6 +217,9 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
+
+        ensure_single('sample', name="Soil 002")
+        ensure_single('session', name="Declarative import test 2")
 
     def test_primary_key_loading(self):
         """We should be able to load already-existing values with their
@@ -259,7 +284,6 @@ class TestDeclarativeImporter:
                                  "WHERE value = 0.252")
         assert res.scalar() == 1
 
-    @mark.xfail
     def test_datum_type_merging(self):
         """Datum types should successfully find values already in the database.
         """

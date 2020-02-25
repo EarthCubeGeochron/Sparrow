@@ -61,6 +61,10 @@ def pk_data(model, data):
     keys = {prop.key: data.get(prop.key) for prop in props}
     return keys.values()
 
+def is_pk_defined(instance):
+    vals = pk_values(instance)
+    return all([v is not None for v in vals])
+
 class BaseSchema(SQLAlchemyAutoSchema):
     value_index = {}
     def _ready_for_flush(self, instance):
@@ -88,13 +92,21 @@ class BaseSchema(SQLAlchemyAutoSchema):
 
         # Filter on properties that actually have a local column
         filters = {}
+        related_models = {}
         instance = None
         for prop in self.opts.model.__mapper__.iterate_properties:
             val = data.get(prop.key, None)
             if getattr(prop, 'uselist', False):
                 continue
             if val is not None:
-                filters[prop.key] = val
+                if hasattr(prop, 'direction'):
+                    # For relationships
+                    if is_pk_defined(val):
+                        filters[prop.key] = val
+                    else:
+                        related_models[prop.key] = val
+                else:
+                    filters[prop.key] = val
             else:
                 # Required column is unset
                 cols = columns_for_prop(prop)
@@ -109,49 +121,24 @@ class BaseSchema(SQLAlchemyAutoSchema):
                     instance = super().get_instance(data)
 
         # Need to get relationship columns for primary keys!
-        print(filters)
         if instance is None:
+            log.debug(f"Finding instance of {self.opts.model.__name__}")
+            log.debug(f"..filters: {filters}")
             try:
                 query = self.session.query(self.opts.model).filter_by(**filters)
-                assert query.count() <= 1
-                instance = query.first()
-            except (StatementError, AssertionError):
-                pass
+                instance = query.one_or_none()
+                if instance is None:
+                    log.debug("..none found")
+                else:
+                    log.debug("..success!")
+            except StatementError as err:
+                log.exception(f"..none found")
         if instance is None:
             instance = super().get_instance(data)
-        # if instance is None:
-        #     print(f"Did not find instance of {self.opts.model}")
 
-        if self._ready_for_flush(instance):
-            try:
-                self.session.merge(instance)
-                self.session.flush(objects=[instance])
-                self.session.commit()
-                #print(f"Added {instance}")
-            except (IntegrityError, FlushError) as err:
-                #log.debug(f"Adding {instance} failed with {err}")
-                self.session.rollback()
-
-        # if self._ready_for_flush(instance):
-        #     try:
-        #         self.session.merge(instance)
-        #         self.session.flush(objects=[instance])
-        #         self.session.commit()
-        #     except IntegrityError as err:
-        #         log.debug(f"Adding {instance} failed with {err}")
-        #         self.session.rollback()
-
-        #    #log.debug(f"Found instance {instance}")
-        #    #self.__has_existing = True
-        # if pk_is_defined and instance is not None:
-        #     # try:
-        #     #     with self.session.begin_nested():
-        #     self.session.merge(instance)
-        #     self.session.flush()
-        # except Exception:
-        #     pass
-        #     log.debug(f"PK defined for {instance} with key {pk}")
-        #     self.__class__.value_index[pk_hash] = instance
+        if instance is not None:
+            for k, v in related_models.items():
+                setattr(instance, k, v)
 
         return instance
 
@@ -181,15 +168,15 @@ class BaseSchema(SQLAlchemyAutoSchema):
         #         self.session.merge(res)
         #         self.session.flush()
         # #
-        if self._ready_for_flush(instance):
-            try:
-                self.session.merge(instance)
-                self.session.flush(objects=[instance])
-                self.session.commit()
-                #print(f"Added {instance}")
-            except (IntegrityError, FlushError) as err:
-                #log.debug(f"Adding {instance} failed with {err}")
-                self.session.rollback()
+        # if self._ready_for_flush(instance):
+        #     try:
+        #         #self.session.merge(instance)
+        #         self.session.flush(objects=[instance])
+        #         self.session.commit()
+        #         #print(f"Added {instance}")
+        #     except (IntegrityError, FlushError) as err:
+        #         #log.debug(f"Adding {instance} failed with {err}")
+        #         self.session.rollback()
         #else:
         #    print(f"{instance} not yet ready for flush")
         #    # except InvalidRequestError:
