@@ -1,9 +1,11 @@
 from sparrow.app import construct_app
+from sparrow.util import relative_path
 from sparrow.database.mapper import BaseModel
 from marshmallow.exceptions import ValidationError
 from datetime import datetime
 from pytest import mark, fixture
-import requests
+import logging
+from json import load
 
 app, db = construct_app()
 
@@ -155,19 +157,45 @@ basic_data = {
     }]
 }
 
+def ensure_single(model_name, **filter_params):
+    model = getattr(db.model, model_name)
+    n = db.session.query(model).filter_by(**filter_params).count()
+    assert n == 1
 
 class TestDeclarativeImporter:
     def test_import_interface(self):
         for model in ['datum', 'session', 'datum_type']:
             assert hasattr(db.interface, model)
 
+    def test_standalone_sample(self):
+        sample = {'name': 'test sample 1'}
+        db.load_data("sample", sample)
+        db.load_data("sample", sample)
+        ensure_single('sample', **sample)
+
+    def test_standalone_datum_type(self):
+        data = {
+            "parameter": "Oxygen fugacity",
+            "unit": "dimensionless"
+        }
+
+        db.load_data("datum_type", data)
+        # We should be able to import this idempotently
+        db.load_data("datum_type", data)
+
     def test_basic_import(self):
         db.load_data("session", basic_data)
+        ensure_single('sample', name="Soil 001")
+
+    def test_duplicate_import(self):
+        db.load_data("session", basic_data)
+        ensure_single('sample', name="Soil 001")
+        ensure_single('session', name="Declarative import test")
 
     def test_duplicate_parameter(self):
 
         data = {
-            "date": str(datetime.now()),
+            "date": "2020-02-02T10:20:02",
             "name": "Declarative import test 2",
             "sample": {
                 "name": "Soil 002"
@@ -193,6 +221,9 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
+
+        ensure_single('sample', name="Soil 002")
+        ensure_single('session', name="Declarative import test 2")
 
     def test_primary_key_loading(self):
         """We should be able to load already-existing values with their
@@ -249,21 +280,15 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
-        #db.load_data("session", data)
-        res = db.session.execute("SELECT count(*) FROM session "
-                                 "WHERE name = 'Session merging test'")
-        assert res.scalar() == 1
-        res = db.session.execute("SELECT count(*) FROM datum "
-                                 "WHERE value = 0.252")
-        assert res.scalar() == 1
+        db.load_data("session", data)
+        ensure_single("session", name="Session merging test")
+        ensure_single("datum", value=0.252)
 
+    #@mark.skip
     def test_datum_type_merging(self):
         """Datum types should successfully find values already in the database.
         """
-        res = db.session.execute("SELECT count(*) FROM datum_type "
-                                 "WHERE parameter = 'soil water content'"
-                                 "  AND unit = 'weight %'")
-        assert res.scalar() == 1
+        ensure_single("datum_type", parameter='soil water content', unit='weight %')
 
     def test_load_existing_instance(self):
         # Get an instance
@@ -322,6 +347,15 @@ class TestDeclarativeImporter:
         except Exception as err:
             assert isinstance(err, ValidationError)
 
+    def test_expand_id(self, caplog):
+        caplog.set_level(logging.INFO, 'sqlalchemy.engine')
+
+        data = {'parameter': 'test param', 'unit': 'test unit'}
+        val = db.load_data("datum_type", data)
+        assert val._parameter.id == data['parameter']
+        assert val._unit.id == data['unit']
+        assert val._error_unit is None
+
     def test_get_instance(self):
         q = {
             'parameter': 'soil water content',
@@ -335,24 +369,69 @@ class TestDeclarativeImporter:
         res = db.get_instance('datum_type', q)
 
         assert isinstance(res, db.model.datum_type)
-        assert res == type
+        assert res.id == type.id
 
     def test_get_number(self):
         res = db.get_instance('datum', dict(value=0.1, error=0.025))
         assert isinstance(res, db.model.datum)
         assert float(res.value) == 0.1
 
-    @mark.xfail
-    def test_get_session(self):
+    @mark.skip
+    def test_get_datum(self):
         res = db.get_instance('datum', dict(id=2))
-        assert isinstance(res, db.model.session)
+        assert isinstance(res, db.model.datum)
 
 @fixture
 def client():
     with app.test_client() as client:
         yield client
 
+data0 = {
+  "filename": None,
+  "data": {
+    "name": "Test session 1",
+    "sample": {
+      "name": "Test sample"
+    },
+    "date": "2020-01-01T00:00:00",
+    "analysis": [
+      {
+        "analysis_type": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.414,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+
 class TestAPIImporter:
     def test_api_import(self, client):
         res = client.put("/api/v1/import-data/session", json={'filename': None, 'data': basic_data})
         assert res.status_code == 201
+
+    def test_basic_import(self, client):
+        res = client.put("/api/v1/import-data/session", json=data0)
+        assert res.status_code == 201
+
+    #@mark.skip
+    def test_complex_import(self, client):
+        fn = relative_path(__file__, 'large-test.json')
+        with open(fn) as fp:
+            complex_data = load(fp)
+        complex_data['data']['analysis'] = complex_data['data']['analysis'][2:3]
+        for a in complex_data['data']['analysis']:
+            a['datum'] = a['datum'][:-1]
+            #d['type']['error_unit'] = d['type']['unit']
+
+        db.load_data("session", complex_data['data'])
+        #
+        #
+        # res = client.put("/api/v1/import-data/session", json=complex_data)
+        # assert res.status_code == 201

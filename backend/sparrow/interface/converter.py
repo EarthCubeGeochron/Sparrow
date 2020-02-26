@@ -9,14 +9,10 @@ import geoalchemy2 as geo
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.types import Integer
 from sqlalchemy.dialects import postgresql
-from stringcase import pascalcase
 
 from ..database.mapper.util import trim_postfix
 from .fields import Geometry, Enum, JSON, SmartNested
-
-
-def to_schema_name(name):
-    return pascalcase(name+"_schema")
+from .util import column_is_required, to_schema_name
 
 
 # Control how relationships can be resolved
@@ -132,6 +128,7 @@ class SparrowConverter(ModelConverter):
 
         for col in prop.columns:
             is_integer = isinstance(col.type, Integer)
+            # Special case for audit columns
             if col.name == 'audit_id' and is_integer:
                 kwargs['dump_only'] = True
                 return kwargs

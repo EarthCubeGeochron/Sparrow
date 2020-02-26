@@ -17,9 +17,9 @@ class ImportDataResource(Resource):
     def put(self, model_name):
         db = current_app.database
         req = request.get_json()
+        log.debug(req)
         data = req.get("data")
         res = db.load_data(model_name, data)
-
         return res.id, 201
 
 class ImportDataPlugin(SparrowCorePlugin):
