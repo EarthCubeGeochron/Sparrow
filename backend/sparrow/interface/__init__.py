@@ -86,7 +86,19 @@ class BaseSchema(SQLAlchemyAutoSchema):
     def _table(self):
         return self.opts.model.__table__
 
-    def get_instance(self, data):
+    def _get_session_instance(self, filters):
+        sess = self.session()
+        for inst in list(sess.new):
+            if not isinstance(inst, self.opts.model):
+                continue
+            for k, value in filters.items():
+                if value != getattr(inst, k):
+                    return None
+            log.debug(f"Found instance {inst} in session")
+            return inst
+        return None
+
+    def _get_instance(self, data):
         """Gets pre-existing instances if they are available."""
         pk = tuple(pk_data(self.opts.model, data))
         pk_is_defined = all([k is not None for k in pk])
@@ -110,21 +122,27 @@ class BaseSchema(SQLAlchemyAutoSchema):
                     filters[prop.key] = val
             else:
                 # Required column is unset
-                cols = columns_for_prop(prop)
+                # cols = columns_for_prop(prop)
                 if hasattr(prop, 'direction'):
                     # This is unsatisfying, as we can't filter on pre-existing
                     # related fields
                     filters[prop.key] = None
-                is_required = any([column_is_required(i) for i in cols])
-                if is_required:
-                    if len(cols[0].foreign_keys) > 0:
-                        continue
-                    instance = super().get_instance(data)
+                # is_required = any([column_is_required(i) for i in cols])
+                # if is_required:
+                #     if len(cols[0].foreign_keys) > 0:
+                #         continue
+                #     #instance = super().get_instance(data)
 
-        # Need to get relationship columns for primary keys!
+        # Try to get value from session
         if instance is None:
             log.debug(f"Finding instance of {self.opts.model.__name__}")
             log.debug(f"..filters: {filters}")
+            instance = self._get_session_instance(filters)
+
+        # Get rid of filters by value
+
+        # Need to get relationship columns for primary keys!
+        if instance is None:
             try:
                 query = self.session.query(self.opts.model).filter_by(**filters)
                 instance = query.one_or_none()
@@ -163,9 +181,20 @@ class BaseSchema(SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        instance = self.get_instance(data)
+        #data_key = hash(frozenset(data))
+        #instance = self.value_index.get(data_key, None)
+
+        #if instance is None:
+        instance = self._get_instance(data)
         if instance is None:
             instance = self.opts.model(**data)
+            self.session.add(instance)
+        #
+        # if self._ready_for_flush(instance):
+        #     try:
+        #         self.session.flush()
+        #     except Exception as err:
+        #         self.session.rollback()
 
         return instance
 

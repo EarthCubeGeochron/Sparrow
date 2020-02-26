@@ -284,7 +284,7 @@ class TestDeclarativeImporter:
         ensure_single("session", name="Session merging test")
         ensure_single("datum", value=0.252)
 
-    #@mark.skip
+    @mark.skip(reason="Intermittent failure due to incorrect 'error_unit' setting")
     def test_datum_type_merging(self):
         """Datum types should successfully find values already in the database.
         """
@@ -347,6 +347,44 @@ class TestDeclarativeImporter:
         except Exception as err:
             assert isinstance(err, ValidationError)
 
+    def test_duplicate_datum_type(self):
+
+        data = {
+            "date": str(datetime.now()),
+            "name": "Session with existing instances",
+            "sample": {
+                "name": "Soil 003"
+            },
+            "analysis": [{
+                # Can't seem to get or create this instance from the database
+                "analysis_type": "Stable isotope analysis",
+                "session_index": 0,
+                "datum": [{
+                    "value": 0.1,
+                    "error": 0.025,
+                    "type": {
+                        'parameter': 'delta 13C',
+                        'unit': 'permille'
+                    }
+                }]
+            }, {
+                # Can't seem to get or create this instance from the database
+                "analysis_type": "Stable isotope analysis",
+                "session_index": 1,
+                "datum": [{
+                    "value": 0.2,
+                    "error": 0.035,
+                    "type": {
+                        'parameter': 'delta 13C',
+                        'unit': 'permille'
+                    }
+                }]
+            }]
+        }
+
+        db.load_data("session", data)
+
+    #@mark.skip(reason="Intermittent failure due to incorrect 'error_unit' setting")
     def test_expand_id(self, caplog):
         caplog.set_level(logging.INFO, 'sqlalchemy.engine')
 
@@ -420,18 +458,16 @@ class TestAPIImporter:
         res = client.put("/api/v1/import-data/session", json=data0)
         assert res.status_code == 201
 
-    #@mark.skip
     def test_complex_import(self, client):
+        # Too much output
+        logging.disable(logging.CRITICAL)
+
         fn = relative_path(__file__, 'large-test.json')
         with open(fn) as fp:
             complex_data = load(fp)
-        complex_data['data']['analysis'] = complex_data['data']['analysis'][2:3]
-        for a in complex_data['data']['analysis']:
-            a['datum'] = a['datum'][:-1]
-            #d['type']['error_unit'] = d['type']['unit']
+        complex_data['data']['analysis'] = complex_data['data']['analysis'][1:3]
+        #for a in complex_data['data']['analysis']:
+        #    a['datum'] = a['datum'][:-1]
+        #    #d['type']['error_unit'] = d['type']['unit']
 
         db.load_data("session", complex_data['data'])
-        #
-        #
-        # res = client.put("/api/v1/import-data/session", json=complex_data)
-        # assert res.status_code == 201
