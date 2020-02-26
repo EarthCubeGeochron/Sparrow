@@ -92,8 +92,9 @@ class Database(MappedDatabaseMixin):
                     res = iface().load(data, session=self.session)
                 self.session.add(res)
                 self.session.commit()
-            except IntegrityError:
+            except IntegrityError as err:
                 # This is super-sketchy !!!
+                log.error(err)
                 log.debug("Add to session failed, attempting merge.")
                 self.session.rollback()
                 self.session.merge(res)

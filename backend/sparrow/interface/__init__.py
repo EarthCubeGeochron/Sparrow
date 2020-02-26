@@ -101,7 +101,6 @@ class BaseSchema(SQLAlchemyAutoSchema):
     def _get_instance(self, data):
         """Gets pre-existing instances if they are available."""
         pk = tuple(pk_data(self.opts.model, data))
-        pk_is_defined = all([k is not None for k in pk])
 
         # Filter on properties that actually have a local column
         filters = {}
@@ -120,18 +119,11 @@ class BaseSchema(SQLAlchemyAutoSchema):
                         related_models[prop.key] = val
                 else:
                     filters[prop.key] = val
-            else:
-                # Required column is unset
-                # cols = columns_for_prop(prop)
-                if hasattr(prop, 'direction'):
-                    # This is unsatisfying, as we can't filter on pre-existing
-                    # related fields
-                    filters[prop.key] = None
-                # is_required = any([column_is_required(i) for i in cols])
-                # if is_required:
-                #     if len(cols[0].foreign_keys) > 0:
-                #         continue
-                #     #instance = super().get_instance(data)
+            elif hasattr(prop, 'direction'):
+                # This is unsatisfying, as we can't filter on pre-existing
+                # related fields
+                filters[prop.key] = None
+
 
         # Try to get value from session
         if instance is None:
@@ -139,13 +131,11 @@ class BaseSchema(SQLAlchemyAutoSchema):
             log.debug(f"..filters: {filters}")
             instance = self._get_session_instance(filters)
 
-        # Get rid of filters by value
-
         # Need to get relationship columns for primary keys!
         if instance is None:
             try:
                 query = self.session.query(self.opts.model).filter_by(**filters)
-                instance = query.one_or_none()
+                instance = query.first()
                 if instance is None:
                     log.debug("..none found")
                 else:
@@ -158,6 +148,11 @@ class BaseSchema(SQLAlchemyAutoSchema):
         if instance is not None:
             for k, v in related_models.items():
                 setattr(instance, k, v)
+
+        # Get rid of filters by value
+        # if self.opts.model.__name__ == 'analysis':
+        #     print(filters)
+        #     import pdb; pdb.set_trace()
 
         return instance
 
@@ -189,6 +184,7 @@ class BaseSchema(SQLAlchemyAutoSchema):
         if instance is None:
             instance = self.opts.model(**data)
             self.session.add(instance)
+            log.info(f"Created instance {instance} with parameters {data}")
         #
         # if self._ready_for_flush(instance):
         #     try:

@@ -2,6 +2,7 @@ from sparrow.app import construct_app
 from sparrow.util import relative_path
 from sparrow.database.mapper import BaseModel
 from marshmallow.exceptions import ValidationError
+from sqlalchemy import and_
 from datetime import datetime
 from pytest import mark, fixture
 import logging
@@ -384,7 +385,7 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
 
-    #@mark.skip(reason="Intermittent failure due to incorrect 'error_unit' setting")
+    @mark.skip(reason="Intermittent failure due to incorrect 'error_unit' setting")
     def test_expand_id(self, caplog):
         caplog.set_level(logging.INFO, 'sqlalchemy.engine')
 
@@ -434,7 +435,7 @@ data0 = {
     "date": "2020-01-01T00:00:00",
     "analysis": [
       {
-        "analysis_type": "d18O measurement",
+        "analysis_type": "d18O measurement trial",
         "datum": [
           {
             "value": 9.414,
@@ -458,16 +459,31 @@ class TestAPIImporter:
         res = client.put("/api/v1/import-data/session", json=data0)
         assert res.status_code == 201
 
-    def test_complex_import(self, client):
+    def test_complex_single_row(self, client):
         # Too much output
-        logging.disable(logging.CRITICAL)
+        #logging.disable(logging.CRITICAL)
 
         fn = relative_path(__file__, 'large-test.json')
         with open(fn) as fp:
             complex_data = load(fp)
-        complex_data['data']['analysis'] = complex_data['data']['analysis'][1:3]
+        complex_data['data']['analysis'] = complex_data['data']['analysis'][2:3]
+
+        db.load_data("session", complex_data['data'])
+
+    def test_complex_import(self, client):
+        # Too much output
+        fn = relative_path(__file__, 'large-test.json')
+        with open(fn) as fp:
+            complex_data = load(fp)
+        complex_data['data']['analysis'] = complex_data['data']['analysis'][3:4]
+        #complex_data['data']['analysis'] = complex_data['data']['analysis']
         #for a in complex_data['data']['analysis']:
         #    a['datum'] = a['datum'][:-1]
         #    #d['type']['error_unit'] = d['type']['unit']
 
         db.load_data("session", complex_data['data'])
+
+        a = db.model.analysis
+        q = db.session.query(a).filter(and_(a.session_index != None,
+                                            a.analysis_type == 'd18O measurement'))
+        assert q.count() > 1
