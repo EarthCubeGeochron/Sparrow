@@ -4,7 +4,7 @@ from sparrow.database.mapper import BaseModel
 from marshmallow.exceptions import ValidationError
 from datetime import datetime
 from pytest import mark, fixture
-import requests
+import logging
 from json import load
 
 app, db = construct_app()
@@ -183,10 +183,14 @@ class TestDeclarativeImporter:
         # We should be able to import this idempotently
         db.load_data("datum_type", data)
 
-    #@mark.skip
     def test_basic_import(self):
         db.load_data("session", basic_data)
         ensure_single('sample', name="Soil 001")
+
+    def test_duplicate_import(self):
+        db.load_data("session", basic_data)
+        ensure_single('sample', name="Soil 001")
+        ensure_single('session', name="Declarative import test")
 
     def test_duplicate_parameter(self):
 
@@ -276,21 +280,15 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
-        #db.load_data("session", data)
-        res = db.session.execute("SELECT count(*) FROM session "
-                                 "WHERE name = 'Session merging test'")
-        assert res.scalar() == 1
-        res = db.session.execute("SELECT count(*) FROM datum "
-                                 "WHERE value = 0.252")
-        assert res.scalar() == 1
+        db.load_data("session", data)
+        ensure_single("session", name="Session merging test")
+        ensure_single("datum", value=0.252)
 
+    #@mark.skip
     def test_datum_type_merging(self):
         """Datum types should successfully find values already in the database.
         """
-        res = db.session.execute("SELECT count(*) FROM datum_type "
-                                 "WHERE parameter = 'soil water content'"
-                                 "  AND unit = 'weight %'")
-        assert res.scalar() == 1
+        ensure_single("datum_type", parameter='soil water content', unit='weight %')
 
     def test_load_existing_instance(self):
         # Get an instance
@@ -349,6 +347,15 @@ class TestDeclarativeImporter:
         except Exception as err:
             assert isinstance(err, ValidationError)
 
+    def test_expand_id(self, caplog):
+        caplog.set_level(logging.INFO, 'sqlalchemy.engine')
+
+        data = {'parameter': 'test param', 'unit': 'test unit'}
+        val = db.load_data("datum_type", data)
+        assert val._parameter.id == data['parameter']
+        assert val._unit.id == data['unit']
+        assert val._error_unit is None
+
     def test_get_instance(self):
         q = {
             'parameter': 'soil water content',
@@ -369,10 +376,10 @@ class TestDeclarativeImporter:
         assert isinstance(res, db.model.datum)
         assert float(res.value) == 0.1
 
-    @mark.xfail
-    def test_get_session(self):
+    @mark.skip
+    def test_get_datum(self):
         res = db.get_instance('datum', dict(id=2))
-        assert isinstance(res, db.model.session)
+        assert isinstance(res, db.model.datum)
 
 @fixture
 def client():
@@ -413,11 +420,15 @@ class TestAPIImporter:
         res = client.put("/api/v1/import-data/session", json=data0)
         assert res.status_code == 201
 
+    #@mark.skip
     def test_complex_import(self, client):
         fn = relative_path(__file__, 'large-test.json')
         with open(fn) as fp:
             complex_data = load(fp)
-            complex_data['data']['analysis'] = complex_data['data']['analysis'][:1]
+        complex_data['data']['analysis'] = complex_data['data']['analysis'][2:3]
+        for a in complex_data['data']['analysis']:
+            a['datum'] = a['datum'][:-1]
+            #d['type']['error_unit'] = d['type']['unit']
 
         db.load_data("session", complex_data['data'])
         #

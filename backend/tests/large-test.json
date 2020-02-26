@@ -1,105 +1,99 @@
 {
-  "filename": null,
   "data": {
-    "name": "Test session",
-    "sample": {
-      "name": "Test sample"
-    },
-    "date": "2020-01-01T00:00:00",
     "analysis": [
       {
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.414,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.414
           },
           {
-            "value": 0.383,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.383
           },
           {
-            "value": 1.9469,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 1.9469
           },
           {
-            "value": 1.174,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.174
           },
           {
-            "value": 1.6583,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6583
           },
           {
-            "value": 24,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": 24
           },
           {
-            "value": -271,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -271
           },
           {
-            "value": -19,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -19
           },
           {
-            "value": -27,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -27
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0015,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0015
           },
           {
-            "value": 1,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 1
           },
           {
-            "value": -19,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -19
           }
         ],
         "session_index": 0
@@ -108,102 +102,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.409,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.409
           },
           {
-            "value": 0.343,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.343
           },
           {
-            "value": 2.0258,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0258
           },
           {
-            "value": 1.2037,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2037
           },
           {
-            "value": 1.6829,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6829
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": 25,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": 25
           },
           {
-            "value": -292,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -292
           },
           {
-            "value": -17,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -17
           },
           {
-            "value": -27,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -27
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0015,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0015
           },
           {
-            "value": 1,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 1
           },
           {
-            "value": -17,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -17
           }
         ],
         "session_index": 1
@@ -212,102 +206,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.213,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.213
           },
           {
-            "value": 0.364,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.364
           },
           {
-            "value": 2.0624,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0624
           },
           {
-            "value": 1.2376,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2376
           },
           {
-            "value": 1.6664,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6664
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": 55,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": 55
           },
           {
-            "value": -282,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -282
           },
           {
-            "value": -16,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -16
           },
           {
-            "value": -27,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -27
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0014,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0014
           },
           {
-            "value": 1,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 1
           },
           {
-            "value": -16,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -16
           }
         ],
         "session_index": 2
@@ -316,102 +310,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.253,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.253
           },
           {
-            "value": 0.246,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.246
           },
           {
-            "value": 2.0736,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0736
           },
           {
-            "value": 1.2431,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2431
           },
           {
-            "value": 1.6681,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6681
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": 47,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": 47
           },
           {
-            "value": -328,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -328
           },
           {
-            "value": -15,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -15
           },
           {
-            "value": -28,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -28
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0014,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0014
           },
           {
-            "value": 1,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 1
           },
           {
-            "value": -15,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -15
           }
         ],
         "session_index": 3
@@ -425,102 +419,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 17.502,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 17.502
           },
           {
-            "value": 0.304,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.304
           },
           {
-            "value": 1.9881,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 1.9881
           },
           {
-            "value": 1.2452,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2452
           },
           {
-            "value": 1.5965,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.5965
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -2967,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -2967
           },
           {
-            "value": -1007,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -1007
           },
           {
-            "value": -8,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -8
           },
           {
-            "value": -28,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -28
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0014,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0014
           },
           {
-            "value": 2,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 2
           },
           {
-            "value": -8,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -8
           }
         ],
         "session_index": 5
@@ -529,102 +523,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 17.703,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 17.703
           },
           {
-            "value": 0.376,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.376
           },
           {
-            "value": 1.9863,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 1.9863
           },
           {
-            "value": 1.2445,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2445
           },
           {
-            "value": 1.596,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.596
           },
           {
-            "value": 3,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 3
           },
           {
-            "value": -3023,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -3023
           },
           {
-            "value": -993,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -993
           },
           {
-            "value": -8,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -8
           },
           {
-            "value": -29,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -29
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0014,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0014
           },
           {
-            "value": 2,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 2
           },
           {
-            "value": -8,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -8
           }
         ],
         "session_index": 6
@@ -633,102 +627,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 17.945,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 17.945
           },
           {
-            "value": 0.329,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.329
           },
           {
-            "value": 1.9812,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 1.9812
           },
           {
-            "value": 1.2477,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2477
           },
           {
-            "value": 1.588,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.588
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -2986,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -2986
           },
           {
-            "value": -976,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -976
           },
           {
-            "value": -8,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -8
           },
           {
-            "value": -29,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -29
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0014,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0014
           },
           {
-            "value": 2,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 2
           },
           {
-            "value": -8,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -8
           }
         ],
         "session_index": 7
@@ -737,102 +731,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 17.624,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 17.624
           },
           {
-            "value": 0.261,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.261
           },
           {
-            "value": 1.9906,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 1.9906
           },
           {
-            "value": 1.2459,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2459
           },
           {
-            "value": 1.5977,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.5977
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -2001,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -2001
           },
           {
-            "value": -852,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -852
           },
           {
-            "value": -10,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -10
           },
           {
-            "value": -29,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -29
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0014,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0014
           },
           {
-            "value": 2,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 2
           },
           {
-            "value": -10,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -10
           }
         ],
         "session_index": 8
@@ -841,102 +835,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 17.761,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 17.761
           },
           {
-            "value": 0.356,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.356
           },
           {
-            "value": 1.9912,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 1.9912
           },
           {
-            "value": 1.2462,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2462
           },
           {
-            "value": 1.5977,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.5977
           },
           {
-            "value": 3,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 3
           },
           {
-            "value": -1927,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -1927
           },
           {
-            "value": -820,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -820
           },
           {
-            "value": -10,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -10
           },
           {
-            "value": -30,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -30
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0014,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0014
           },
           {
-            "value": 2,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 2
           },
           {
-            "value": -10,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -10
           }
         ],
         "session_index": 9
@@ -945,102 +939,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 17.789,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 17.789
           },
           {
-            "value": 0.432,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.432
           },
           {
-            "value": 1.9893,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 1.9893
           },
           {
-            "value": 1.2467,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2467
           },
           {
-            "value": 1.5957,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.5957
           },
           {
-            "value": 3,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 3
           },
           {
-            "value": -1906,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -1906
           },
           {
-            "value": -873,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -873
           },
           {
-            "value": -10,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -10
           },
           {
-            "value": -30,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -30
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0014,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0014
           },
           {
-            "value": 2,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 2
           },
           {
-            "value": -10,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -10
           }
         ],
         "session_index": 10
@@ -1054,102 +1048,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.227,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.227
           },
           {
-            "value": 0.46,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.46
           },
           {
-            "value": 2.0795,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0795
           },
           {
-            "value": 1.2486,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2486
           },
           {
-            "value": 1.6654,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6654
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -14,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -14
           },
           {
-            "value": -296,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -296
           },
           {
-            "value": -15,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -15
           },
           {
-            "value": -28,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -28
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0013,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0013
           },
           {
-            "value": 3,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 3
           },
           {
-            "value": -15,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -15
           }
         ],
         "session_index": 12
@@ -1158,102 +1152,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.189,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.189
           },
           {
-            "value": 0.392,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.392
           },
           {
-            "value": 2.0841,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0841
           },
           {
-            "value": 1.2484,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2484
           },
           {
-            "value": 1.6694,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6694
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -4,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -4
           },
           {
-            "value": -320,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -320
           },
           {
-            "value": -15,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -15
           },
           {
-            "value": -28,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -28
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0014,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0014
           },
           {
-            "value": 3,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 3
           },
           {
-            "value": -15,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -15
           }
         ],
         "session_index": 13
@@ -1262,102 +1256,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.356,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.356
           },
           {
-            "value": 0.292,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.292
           },
           {
-            "value": 2.0802,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0802
           },
           {
-            "value": 1.2464,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2464
           },
           {
-            "value": 1.6689,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6689
           },
           {
-            "value": 3,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 3
           },
           {
-            "value": 14,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": 14
           },
           {
-            "value": -347,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -347
           },
           {
-            "value": -15,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -15
           },
           {
-            "value": -28,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -28
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0013,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0013
           },
           {
-            "value": 3,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 3
           },
           {
-            "value": -15,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -15
           }
         ],
         "session_index": 14
@@ -1366,102 +1360,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.376,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.376
           },
           {
-            "value": 0.361,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.361
           },
           {
-            "value": 2.0737,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0737
           },
           {
-            "value": 1.2473,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2473
           },
           {
-            "value": 1.6625,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6625
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": 47,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": 47
           },
           {
-            "value": -359,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": -359
           },
           {
-            "value": -15,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -15
           },
           {
-            "value": -27,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -27
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0013,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0013
           },
           {
-            "value": 3,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 3
           },
           {
-            "value": -15,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -15
           }
         ],
         "session_index": 15
@@ -1470,25 +1464,25 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 0.9869,
             "type": {
               "parameter": "IMF",
               "unit": "permille"
-            }
+            },
+            "value": 0.9869
           },
           {
-            "value": 9.3046,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.3046
           },
           {
-            "value": 0.1868,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.1868
           }
         ],
         "session_index": 16
@@ -1512,102 +1506,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.029,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.029
           },
           {
-            "value": 0.446,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.446
           },
           {
-            "value": 2.0814,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0814
           },
           {
-            "value": 1.2445,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2445
           },
           {
-            "value": 1.6725,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6725
           },
           {
-            "value": 10,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 10
           },
           {
-            "value": -502,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -502
           },
           {
-            "value": 53,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": 53
           },
           {
-            "value": -7,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -7
           },
           {
-            "value": -10,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -10
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.002,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.002
           },
           {
-            "value": 4,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -7,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -7
           }
         ],
         "session_index": 20
@@ -1616,102 +1610,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.173,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.173
           },
           {
-            "value": 0.394,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.394
           },
           {
-            "value": 2.0718,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0718
           },
           {
-            "value": 1.2459,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2459
           },
           {
-            "value": 1.6629,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6629
           },
           {
-            "value": 3,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 3
           },
           {
-            "value": -478,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -478
           },
           {
-            "value": 30,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": 30
           },
           {
-            "value": -6,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -6
           },
           {
-            "value": -10,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -10
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.002,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.002
           },
           {
-            "value": 4,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -6,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -6
           }
         ],
         "session_index": 21
@@ -1720,102 +1714,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.434,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.434
           },
           {
-            "value": 0.299,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.299
           },
           {
-            "value": 2.0726,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0726
           },
           {
-            "value": 1.2486,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2486
           },
           {
-            "value": 1.6599,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6599
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -497,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -497
           },
           {
-            "value": 28,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": 28
           },
           {
-            "value": -5,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -5
           },
           {
-            "value": -10,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -10
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.002,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.002
           },
           {
-            "value": 4,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -5,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -5
           }
         ],
         "session_index": 22
@@ -1824,102 +1818,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.327,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.327
           },
           {
-            "value": 0.348,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.348
           },
           {
-            "value": 2.076,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.076
           },
           {
-            "value": 1.2495,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2495
           },
           {
-            "value": 1.6615,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6615
           },
           {
-            "value": 3,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 3
           },
           {
-            "value": -501,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -501
           },
           {
-            "value": 2,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": 2
           },
           {
-            "value": -5,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -5
           },
           {
-            "value": -10,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -10
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.002,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.002
           },
           {
-            "value": 4,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -5,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -5
           }
         ],
         "session_index": 23
@@ -1928,102 +1922,102 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 9.218,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 9.218
           },
           {
-            "value": 0.426,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.426
           },
           {
-            "value": 2.0728,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.0728
           },
           {
-            "value": 1.2492,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2492
           },
           {
-            "value": 1.6593,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6593
           },
           {
-            "value": 4,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -517,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": -517
           },
           {
-            "value": 19,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": 19
           },
           {
-            "value": -5,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -5
           },
           {
-            "value": -10,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -10
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.002,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.002
           },
           {
-            "value": 4,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 4
           },
           {
-            "value": -5,
             "type": {
-              "parameter": "DTFAX",
+              "parameter": "DTFAX_1",
               "unit": "bits"
-            }
+            },
+            "value": -5
           }
         ],
         "session_index": 24
@@ -2037,155 +2031,161 @@
         "analysis_name": "d18O measurement",
         "datum": [
           {
-            "value": 0.0217,
             "type": {
               "parameter": "d18OVSMOWxls",
               "unit": "permille"
-            }
+            },
+            "value": 0.0217
           },
           {
-            "value": 30.9324,
             "type": {
               "parameter": "SD2ext",
               "unit": "permille"
-            }
+            },
+            "value": 30.9324
           },
           {
-            "value": 27.599,
             "type": {
               "parameter": "d18Omeas",
               "unit": "permille"
-            }
+            },
+            "value": 27.599
           },
           {
-            "value": 0.365,
             "type": {
               "parameter": "SE2int",
               "unit": "permille"
-            }
+            },
+            "value": 0.365
           },
           {
-            "value": 2.003,
             "type": {
               "parameter": "O16cps",
               "unit": "Gcounts/sec"
-            }
+            },
+            "value": 2.003
           },
           {
-            "value": 1.2446,
             "type": {
               "parameter": "IP(nA)",
               "unit": "nA"
-            }
+            },
+            "value": 1.2446
           },
           {
-            "value": 1.6094,
             "type": {
               "parameter": "Yield",
               "unit": "Gcounts/sec/nA"
-            }
+            },
+            "value": 1.6094
           },
           {
-            "value": 9,
             "type": {
               "parameter": "AnalysisLength",
               "unit": "minutes"
-            }
+            },
+            "value": 9
           },
           {
-            "value": 1385,
             "type": {
               "parameter": "X",
               "unit": "micrometers"
-            }
+            },
+            "value": 1385
           },
           {
-            "value": 1642,
             "type": {
               "parameter": "Y",
               "unit": "micrometers"
-            }
+            },
+            "value": 1642
           },
           {
-            "value": -7,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -7
           },
           {
-            "value": -10,
             "type": {
               "parameter": "DTFAY",
               "unit": "bits"
-            }
+            },
+            "value": -10
           },
           {
-            "value": 898920,
             "type": {
               "parameter": "Mass",
               "unit": "???"
-            }
+            },
+            "value": 898920
           },
           {
-            "value": 0.0134,
             "type": {
               "parameter": "OHO",
               "unit": "Ratio"
-            }
+            },
+            "value": 0.0134
           },
           {
-            "value": 5,
             "type": {
               "parameter": "GROUPNUM",
               "unit": "GuessGroup"
-            }
+            },
+            "value": 5
           },
           {
-            "value": -7,
             "type": {
               "parameter": "DTFAX",
               "unit": "bits"
-            }
+            },
+            "value": -7
           },
           {
-            "value": 0.9747,
             "type": {
               "parameter": "REL_YIELD",
               "unit": "%"
-            }
+            },
+            "value": 0.9747
           },
           {
-            "value": 0.0113,
             "type": {
               "parameter": "REL_OHO",
               "unit": "ratio"
-            }
+            },
+            "value": 0.0113
           },
           {
-            "value": 0.2539,
             "type": {
               "parameter": "BRACKET2SD",
               "unit": "permille"
-            }
+            },
+            "value": 0.2539
           },
           {
-            "value": 30.9536,
             "type": {
               "parameter": "STDd18O",
               "unit": "permille"
-            }
+            },
+            "value": 30.9536
           },
           {
-            "value": 0.0423,
             "type": {
               "parameter": "STDd18O",
               "unit": "permille"
-            }
+            },
+            "value": 0.0423
           }
         ],
         "session_index": 26
       }
-    ]
-  }
+    ],
+    "date": "2020-01-01T00:00:00",
+    "name": "Test session",
+    "sample": {
+      "name": "Test sample"
+    }
+  },
+  "filename": null
 }

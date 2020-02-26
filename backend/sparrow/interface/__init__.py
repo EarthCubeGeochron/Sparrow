@@ -11,6 +11,7 @@ from sqlalchemy.orm.exc import FlushError
 from click import secho
 
 from .converter import SparrowConverter, to_schema_name
+from .util import column_is_required
 from ..database.mapper.util import ModelCollection, classname_for_table
 
 from sparrow import get_logger
@@ -36,34 +37,34 @@ class BaseMeta:
     load_instance = True
 
 
-def column_is_required(col):
-    has_default = (col.server_default is not None) or (col.default is not None)
-    return not col.nullable and not has_default
-
-
 def columns_for_prop(prop):
     try:
         return getattr(prop, 'columns')
     except AttributeError:
         return list(getattr(prop, 'local_columns'))
 
+
 def prop_is_required(prop):
     cols = [column_is_required(c) for c in columns_for_prop(prop)]
     return any(cols)
+
 
 def pk_values(instance):
     props = get_primary_keys(instance.__class__)
     keys = {prop.key: getattr(instance, prop.key) for prop in props}
     return keys.values()
 
+
 def pk_data(model, data):
     props = get_primary_keys(model)
     keys = {prop.key: data.get(prop.key) for prop in props}
     return keys.values()
 
+
 def is_pk_defined(instance):
     vals = pk_values(instance)
     return all([v is not None for v in vals])
+
 
 class BaseSchema(SQLAlchemyAutoSchema):
     value_index = {}
@@ -150,6 +151,8 @@ class BaseSchema(SQLAlchemyAutoSchema):
         except TypeError:
             pass
         val_list = ensure_list(value)
+        log.debug("Expanding keys "+str(val_list))
+
         model = self.opts.model
         pk = get_primary_keys(model)
         assert len(pk) == len(val_list)
@@ -163,34 +166,6 @@ class BaseSchema(SQLAlchemyAutoSchema):
         instance = self.get_instance(data)
         if instance is None:
             instance = self.opts.model(**data)
-        #instance = super().make_instance(data, **kwargs)
-        # if instance is not None:
-        #         self.session.merge(res)
-        #         self.session.flush()
-        # #
-        # if self._ready_for_flush(instance):
-        #     try:
-        #         #self.session.merge(instance)
-        #         self.session.flush(objects=[instance])
-        #         self.session.commit()
-        #         #print(f"Added {instance}")
-        #     except (IntegrityError, FlushError) as err:
-        #         #log.debug(f"Adding {instance} failed with {err}")
-        #         self.session.rollback()
-        #else:
-        #    print(f"{instance} not yet ready for flush")
-        #    # except InvalidRequestError:
-        #    #     self.session.rollback()
-        #if instance is not None:
-        # if self._table.name == "datum":
-        #     print(data)
-        #     from decimal import Decimal
-        #     if data['value'] == Decimal('0.383'):
-        #         import pdb; pdb.set_trace()
-        #
-        # if pk_hash not in self.value_index:
-        #     #log.debug(f"PK defined for {instance} with key {pk}")
-        #     self.value_index[pk_hash] = instance
 
         return instance
 
