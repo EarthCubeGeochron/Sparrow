@@ -3,7 +3,7 @@ from marshmallow_sqlalchemy import ModelConverter
 # of the 'Nested' field in order to pass along the SQLAlchemy session
 # to nested schemas.
 # See https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/67
-from marshmallow_sqlalchemy.fields import Nested, Related
+from marshmallow_sqlalchemy.fields import Related
 
 import geoalchemy2 as geo
 from sqlalchemy.orm import RelationshipProperty
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 from ..database.mapper.util import trim_postfix
 from .fields import Geometry, Enum, JSON, SmartNested
-from .util import column_is_required, to_schema_name
+from .util import to_schema_name
 
 
 # Control how relationships can be resolved

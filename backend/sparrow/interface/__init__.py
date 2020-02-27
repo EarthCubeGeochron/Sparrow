@@ -176,21 +176,20 @@ class BaseSchema(SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        #data_key = hash(frozenset(data))
-        #instance = self.value_index.get(data_key, None)
-
-        #if instance is None:
         instance = self._get_instance(data)
         if instance is None:
             instance = self.opts.model(**data)
             self.session.add(instance)
             log.info(f"Created instance {instance} with parameters {data}")
-        #
-        # if self._ready_for_flush(instance):
-        #     try:
-        #         self.session.flush()
-        #     except Exception as err:
-        #         self.session.rollback()
+
+            try:
+                self.session.flush(objects=[instance])
+                self.session.commit()
+                log.info("Successfully persisted to database")
+            except IntegrityError as err:
+                self.session.rollback()
+                log.info("Could not persist but will try again later")
+                log.error(err)
 
         return instance
 

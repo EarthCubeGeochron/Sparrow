@@ -459,9 +459,10 @@ class TestAPIImporter:
         res = client.put("/api/v1/import-data/session", json=data0)
         assert res.status_code == 201
 
+    @mark.skip
     def test_complex_single_row(self, client):
         # Too much output
-        #logging.disable(logging.CRITICAL)
+        logging.disable(logging.CRITICAL)
 
         fn = relative_path(__file__, 'large-test.json')
         with open(fn) as fp:
@@ -472,10 +473,12 @@ class TestAPIImporter:
 
     def test_complex_import(self, client):
         # Too much output
+        logging.disable(logging.CRITICAL)
+
         fn = relative_path(__file__, 'large-test.json')
         with open(fn) as fp:
             complex_data = load(fp)
-        complex_data['data']['analysis'] = complex_data['data']['analysis'][3:4]
+        complex_data['data']['analysis'] = complex_data['data']['analysis'][:30]
         #complex_data['data']['analysis'] = complex_data['data']['analysis']
         #for a in complex_data['data']['analysis']:
         #    a['datum'] = a['datum'][:-1]
