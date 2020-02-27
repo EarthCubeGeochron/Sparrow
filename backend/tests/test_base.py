@@ -14,6 +14,7 @@ session = dict(
     sample_id="A-0",
     date=datetime.now())
 
+logging.basicConfig(level=logging.CRITICAL)
 
 class TestImperativeImport:
     def test_imperative_import(self):
@@ -285,7 +286,7 @@ class TestDeclarativeImporter:
         ensure_single("session", name="Session merging test")
         ensure_single("datum", value=0.252)
 
-    @mark.skip(reason="Intermittent failure due to incorrect 'error_unit' setting")
+    #@mark.skip(reason="Intermittent failure due to incorrect 'error_unit' setting")
     def test_datum_type_merging(self):
         """Datum types should successfully find values already in the database.
         """
@@ -385,7 +386,7 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
 
-    @mark.skip(reason="Intermittent failure due to incorrect 'error_unit' setting")
+    #@mark.skip(reason="Intermittent failure due to incorrect 'error_unit' setting")
     def test_expand_id(self, caplog):
         caplog.set_level(logging.INFO, 'sqlalchemy.engine')
 
@@ -460,9 +461,10 @@ class TestAPIImporter:
         assert res.status_code == 201
 
     @mark.skip
-    def test_complex_single_row(self, client):
+    def test_complex_single_row_prior(self, client):
+        # This test fails if before the overall import
         # Too much output
-        logging.disable(logging.CRITICAL)
+        #logging.disable(logging.CRITICAL)
 
         fn = relative_path(__file__, 'large-test.json')
         with open(fn) as fp:
@@ -473,12 +475,12 @@ class TestAPIImporter:
 
     def test_complex_import(self, client):
         # Too much output
-        logging.disable(logging.CRITICAL)
+        logging.disable(logging.DEBUG)
 
         fn = relative_path(__file__, 'large-test.json')
         with open(fn) as fp:
             complex_data = load(fp)
-        complex_data['data']['analysis'] = complex_data['data']['analysis'][:30]
+        #complex_data['data']['analysis'] = complex_data['data']['analysis'][:100]
         #complex_data['data']['analysis'] = complex_data['data']['analysis']
         #for a in complex_data['data']['analysis']:
         #    a['datum'] = a['datum'][:-1]
@@ -490,3 +492,15 @@ class TestAPIImporter:
         q = db.session.query(a).filter(and_(a.session_index != None,
                                             a.analysis_type == 'd18O measurement'))
         assert q.count() > 1
+
+    def test_complex_single_row(self, client):
+        # This test fails if before the overall import
+        # Too much output
+        #logging.disable(logging.CRITICAL)
+
+        fn = relative_path(__file__, 'large-test.json')
+        with open(fn) as fp:
+            complex_data = load(fp)
+        complex_data['data']['analysis'] = complex_data['data']['analysis'][3:4]
+
+        db.load_data("session", complex_data['data'])
