@@ -480,11 +480,6 @@ class TestAPIImporter:
         fn = relative_path(__file__, 'large-test.json')
         with open(fn) as fp:
             complex_data = load(fp)
-        #complex_data['data']['analysis'] = complex_data['data']['analysis'][:100]
-        #complex_data['data']['analysis'] = complex_data['data']['analysis']
-        #for a in complex_data['data']['analysis']:
-        #    a['datum'] = a['datum'][:-1]
-        #    #d['type']['error_unit'] = d['type']['unit']
 
         db.load_data("session", complex_data['data'])
 
