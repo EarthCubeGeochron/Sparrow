@@ -87,13 +87,32 @@ class Database(MappedDatabaseMixin):
     def load_data(self, model_name, data):
         iface = getattr(self.interface, model_name)
         try:
+            #try:
             with self.session.no_autoflush:
                 res = iface().load(data, session=self.session)
-            self.session.merge(res)
-            self.session.commit()
+                log.info("Entering final commit phase of import")
+                log.info(f"Adding top-level object {res}")
+                self.session.add(res)
+                for object in self.session:
+                    try:
+                        self.session.flush(objects=[object])
+                        log.debug(f"Successfully flushed instance {object}")
+                    except IntegrityError as err:
+                        self.session.rollback()
+                        log.error(err)
+                log.info(f"Committing entire transaction")
+                self.session.commit()
+            # except IntegrityError as err:
+            #     # This is super-sketchy !!!
+            #     log.error(err)
+            #     log.debug("Add to session failed, attempting merge.")
+            #     self.session.rollback()
+            #     self.session.merge(res)
+            #     self.session.commit()
             return res
-        except Exception as err:
+        except IntegrityError as err:
             self.session.rollback()
+            log.error(err)
             raise err
 
     def get_instance(self, model_name, filter_params):
