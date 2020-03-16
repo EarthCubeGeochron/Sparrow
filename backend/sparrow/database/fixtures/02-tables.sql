@@ -6,7 +6,7 @@ for data in the **Sparrow** system.
 */
 
 CREATE TABLE IF NOT EXISTS researcher (
-  id integer PRIMARY KEY,
+  id serial PRIMARY KEY,
   name text NOT NULL,
   orcid text UNIQUE
 );
@@ -24,10 +24,38 @@ CREATE TABLE IF NOT EXISTS "user" ( -- Name must be quoted because it collides w
 );
 
 CREATE TABLE IF NOT EXISTS publication (
+  -- A basic model for tracked publications
   id serial PRIMARY KEY,
-  doi text NOT NULL,
-  title text
+  doi text,
+  title text,
+  year integer,
+  journal text,
+  author text,
+  link text,
+  -- Additional, unstructured data
+  data jsonb
 );
+
+/*
+# Enums
+*/
+CREATE TABLE IF NOT EXISTS enum.date_precision (
+  id text PRIMARY KEY
+);
+
+INSERT INTO enum.date_precision(id) VALUES
+  ('year'),
+  ('month'),
+  ('day')
+ON CONFLICT DO NOTHING;
+
+
+/*
+# Vocabularies
+
+Controlled vocabularies for terms defining data
+semantics.
+*/
 
 CREATE TABLE IF NOT EXISTS vocabulary.parameter (
   id text PRIMARY KEY,
@@ -61,6 +89,14 @@ CREATE TABLE IF NOT EXISTS vocabulary.error_metric (
   authority text
 );
 
+-- Conceptually, this could be combined with `method`...
+CREATE TABLE IF NOT EXISTS vocabulary.analysis_type (
+  id text PRIMARY KEY,
+  description text,
+  authority text,
+  type_of text REFERENCES vocabulary.analysis_type(id)
+);
+
 /*
 ## Projects
 */
@@ -69,24 +105,22 @@ CREATE TABLE IF NOT EXISTS project (
   id serial PRIMARY KEY,
   name text NOT NULL,
   description text,
-  embargo_date timestamp
+  embargo_date timestamp,
+  /*
+  The position model incorporated Project is
+  shared with Sample.
+
+  A representative named location */
+  location_name text,
+  location_name_autoset boolean,
+  /*
+  Order-of-magnitude precision (in meters)
+  with which this position
+  is known */
+  location geometry,
+  location_precision integer
 );
 
-/*
-If researchers on a project have application user accounts,
-they can see data even if embargoed (not yet implemented).
-*/
-CREATE TABLE IF NOT EXISTS project_researcher (
-  project_id integer REFERENCES project(id),
-  researcher_id integer REFERENCES researcher(id),
-  PRIMARY KEY (project_id, researcher_id)
-);
-
-CREATE TABLE IF NOT EXISTS project_publication (
-  project_id integer REFERENCES project(id),
-  publication_id integer REFERENCES publication(id),
-  PRIMARY KEY (project_id, publication_id)
-);
 
 /*
 ### Descriptors for types of measurements/techniques
@@ -104,12 +138,14 @@ CREATE TABLE IF NOT EXISTS datum_type (
   unit text REFERENCES vocabulary.unit(id) NOT NULL,
   error_unit text REFERENCES vocabulary.unit(id),
   error_metric text REFERENCES vocabulary.error_metric(id),
-  is_computed boolean, -- Can be rebuilt from data IN THE DATABASE
-  is_interpreted boolean, -- Results from a data-reduction process
+  is_computed boolean DEFAULT false, -- Can be rebuilt from data IN THE DATABASE
+  is_interpreted boolean DEFAULT false, -- Results from a data-reduction process
   description text,
-  UNIQUE (parameter, unit, error_unit,
-          error_metric, is_computed, is_interpreted)
+  UNIQUE (parameter, unit, error_unit, error_metric)
 );
+
+CREATE UNIQUE INDEX datum_type_unique ON datum_type
+(parameter, unit, coalesce(error_unit, 'NO ERROR'), coalesce(error_metric, 'NO ERROR'));
 
 /*
 
@@ -128,6 +164,7 @@ CREATE TABLE IF NOT EXISTS sample (
   location_precision integer DEFAULT 0,
   /* A representative named location */
   location_name text,
+  location_name_autoset boolean,
   location geometry,
   /* The elevation column could potentially be recast as a *datum* tied directly
      to the sample. */
@@ -170,12 +207,15 @@ CREATE TABLE IF NOT EXISTS session (
      for interoperability without affecting the internal organization
      of the *Sparrow* database. */
   uuid uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
-  sample_id integer REFERENCES sample(id)
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  project_id integer REFERENCES project(id),
-  publication_id integer REFERENCES publication(id),
+  sample_id integer REFERENCES sample(id),
+  project_id integer REFERENCES project(id)
+    ON DELETE SET NULL,
+  publication_id integer REFERENCES publication(id)
+    ON DELETE SET NULL,
   date timestamp NOT NULL,
   end_date timestamp,
+  date_precision text REFERENCES enum.date_precision(id),
+  name text, -- This column can store an (optional) internal lab id
   instrument integer REFERENCES instrument(id),
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
@@ -212,12 +252,22 @@ CREATE TABLE IF NOT EXISTS analysis (
     unique identification of a record within the session */
   analysis_name text,
   -- Should key this to a foreign key table
-  analysis_type text,
+  analysis_type text REFERENCES vocabulary.analysis_type(id),
   date timestamp,
   material text REFERENCES vocabulary.material(id),
   /* Not really sure that "material" is the best parameterization
      of this concept... */
   is_standard boolean,
+  /*
+  If set, this means that this is an "accepted" value
+  among several related measurements.
+
+  #### Examples:
+
+  - Accepted system for U-Pb single-zircon age
+  - Heating steps accepted in the final age analysis
+  */
+  is_accepted boolean,
   is_bad boolean,
   /* Some analytical results can be interpreted from other data, so we
   should explicitly state that this is the case.
@@ -235,11 +285,38 @@ CREATE TABLE IF NOT EXISTS analysis (
   UNIQUE (session_id, session_index, analysis_name)
 );
 
+
+/*
+## Link projects, samples, and researchers
+
+If researchers on a project have application user accounts,
+they can see data even if embargoed (not yet implemented).
+*/
+CREATE TABLE IF NOT EXISTS project_researcher (
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, researcher_id)
+);
+
+CREATE TABLE IF NOT EXISTS project_publication (
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  publication_id integer REFERENCES publication(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, publication_id)
+);
+
+CREATE TABLE IF NOT EXISTS project_sample (
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  sample_id integer REFERENCES sample(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, sample_id)
+);
+
+
+
 CREATE TABLE IF NOT EXISTS datum (
   id serial PRIMARY KEY,
   analysis integer REFERENCES analysis(id)
-    ON DELETE CASCADE,
-  type integer REFERENCES datum_type(id),
+    ON DELETE CASCADE NOT NULL,
+  type integer REFERENCES datum_type(id) NOT NULL,
   value numeric NOT NULL,
   error numeric,
   is_bad boolean,
@@ -250,19 +327,47 @@ CREATE TABLE IF NOT EXISTS datum (
   #### Examples:
 
   - Accepted system for U-Pb single-zircon age
-  - Heating steps accepted in the final age analysis
   */
   is_accepted boolean,
+  /*
+  There should not be more than one datum of a single type per analysis
+  */
   UNIQUE (analysis, type)
+);
+
+/*
+## Attributes
+
+Text attributes associated with analyses (e.g.
+standard names, calibration types). These should
+be numerical, unitless values.
+*/
+CREATE TABLE IF NOT EXISTS attribute (
+  id serial PRIMARY KEY,
+  parameter text REFERENCES vocabulary.parameter(id) NOT NULL,
+  value text NOT NULL,
+  UNIQUE (value, parameter)
+);
+
+CREATE TABLE IF NOT EXISTS __analysis_attribute (
+  analysis_id integer NOT NULL REFERENCES analysis(id),
+  attribute_id integer NOT NULL REFERENCES attribute(id),
+  PRIMARY KEY (analysis_id, attribute_id)
+);
+
+CREATE TABLE IF NOT EXISTS __session_attribute (
+  session_id integer NOT NULL REFERENCES session(id),
+  attribute_id integer NOT NULL REFERENCES attribute(id),
+  PRIMARY KEY (session_id, attribute_id)
 );
 
 /*
 ## Analytical constants
 
 Constants, etc. used in measurements, and their relationships
-to individual analytical sessions, etc.
+to individual analyses, etc.
 
-Right now, we support linking these parameters at the session
+Right now, we support linking these parameters at the analysis
 level. Some coarser (e.g. a table for analytical process) or finer
 (linked parameters for each datum) abstraction might be desired.
 
@@ -274,17 +379,16 @@ CREATE TABLE IF NOT EXISTS constant (
   that remain constant across many sessions
   (e.g. decay constants, assumed physical parameters). */
   id serial PRIMARY KEY,
-  text_value text UNIQUE,
-  value numeric,
+  value numeric NOT NULL,
   error numeric,
-  type integer REFERENCES datum_type(id),
-  CHECK ((text_value IS NULL) OR (value IS NULL AND error IS NULL))
+  type integer REFERENCES datum_type(id) NOT NULL,
+  description text
 );
 
-CREATE TABLE IF NOT EXISTS constant_link (
+CREATE TABLE IF NOT EXISTS __analysis_constant (
+  analysis_id integer NOT NULL REFERENCES analysis(id),
   constant_id integer NOT NULL REFERENCES constant(id),
-  session_id integer NOT NULL REFERENCES session(id),
-  PRIMARY KEY (constant_id, session_id)
+  PRIMARY KEY (analysis_id, constant_id)
 );
 
 /*

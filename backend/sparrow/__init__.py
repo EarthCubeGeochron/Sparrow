@@ -3,5 +3,6 @@ import warnings
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
-from .app import App
+from .logs import get_logger
+from .app import App, construct_app
 from .database import Database

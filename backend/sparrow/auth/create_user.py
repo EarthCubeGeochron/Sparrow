@@ -1,6 +1,6 @@
 import click
 from click import echo, secho, style, prompt
-from ..models import User
+from ..database.models import User
 
 def create_user(db):
     username = prompt("Enter the desired username")

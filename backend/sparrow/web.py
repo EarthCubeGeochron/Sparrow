@@ -1,15 +1,11 @@
 from flask import Blueprint, make_response, Response, render_template, current_app, abort
 from os.path import join
+from .plugins import SparrowCorePlugin
 
 web = Blueprint('frontend', __name__)
 
 @web.route('/data-file/<string:uuid>')
 def stream_data(uuid):
-    # def generate():
-    #     # create and return your data in small parts here
-    #     for i in xrange(10000):
-    #         yield str(i)
-    #Response(stream_with_context(generate()))
     # Send the user to the "protected" data dir to get the file with NGINX
     db = current_app.database
     m = db.model.data_file
@@ -58,8 +54,18 @@ def get_csv(uuid):
 def index(path='/'):
     v = current_app.config.get("LAB_NAME")
     base_url = current_app.config.get("BASE_URL")
+    # Hack to make browserSync work
+    if base_url == "/":
+        base_url = ""
+
     return render_template('page.html',
             title=v,
             id='index',
             base_url=base_url,
             asset_dir=join(base_url, 'assets'))
+
+
+class WebPlugin(SparrowCorePlugin):
+    name = "web"
+    def on_finalize_routes(self):
+        self.app.register_blueprint(web, url_prefix='/')

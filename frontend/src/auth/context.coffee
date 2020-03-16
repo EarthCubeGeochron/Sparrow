@@ -1,6 +1,6 @@
 import h from 'react-hyperscript'
 import {APIContext, StatefulComponent} from '@macrostrat/ui-components'
-import {createContext} from 'react'
+import {createContext, useContext} from 'react'
 
 AuthContext = createContext({})
 
@@ -64,4 +64,7 @@ class AuthProvider extends StatefulComponent
     value = {methods..., @state...}
     h AuthContext.Provider, {value}, @props.children
 
-export {AuthContext, AuthProvider}
+useAuth = ->
+  useContext(AuthContext)
+
+export {AuthContext, AuthProvider, useAuth}

@@ -7,6 +7,14 @@ if [ ! -f frontend/bundled-deps/ui-components/.git ]; then
   git submodule update --init --recursive
 fi
 
-sparrow compose up --force-recreate --build -d $@
+sparrow compose up --build -d $@
 # Follow logs for running container(s)
-sparrow compose logs -f $@
+exit_code=$?
+if (( $exit_code == 0 )); then
+  echo "$(tput bold)Containers built successfully! Following logs.$(tput sgr0)"
+  sparrow compose logs -f
+else
+  echo "$(tput bold)One or more containers did not build properly, aborting.$(tput sgr0)"
+  # Forward exit code to workers
+  exit $exit_code
+fi

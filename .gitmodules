@@ -4,3 +4,6 @@
 [submodule "deps/sadisplay"]
 	path = deps/sadisplay
 	url = git://github.com/davenquinn/sadisplay.git
+[submodule "backend/core_plugins/versioning/pg-memento"]
+	path = backend/core_plugins/versioning/pg-memento
+	url = https://github.com/pgMemento/pgMemento.git

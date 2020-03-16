@@ -1,0 +1,23 @@
+@require "../shared/mixins"
+
+.tab-panel
+  margin-top: 2em
+  :global(.bp3-tab-list)
+    minimal-navbar()
+    padding: 0em 1em
+  :global(.bp3-tab)
+    //font-size 1.2em
+    margin-right 2em
+    font-weight 600
+
+.map-marker
+  display: block
+  width: 10px
+  height: 10px
+  border-radius: 5px
+  &.static
+    background-color: #ad99ff
+    border: 1px solid #634dbf
+
+.context-map
+  border-radius: 10px
