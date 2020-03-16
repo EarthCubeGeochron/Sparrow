@@ -9,17 +9,26 @@ process.env['BASE_URL'] = process.env.SPARROW_BASE_URL;
 let assetsDir = path.resolve(__dirname, "_assets");
 let siteContent = process.env.SPARROW_SITE_CONTENT;
 
-let assetsRoute = path.join(process.env.SPARROW_BASE_URL,'/assets');
+console.log("Site content:", siteContent);
+
+let assetsRoute = path.join(process.env.SPARROW_BASE_URL,'/assets/');
 
 let bs_cfg = {
   open: false,
+  // Actual external port
   port: 3000,
+  //proxy: "http://backend:5000"
+  // socket: {
+  //   // Client-side port for socket IO
+  //   port: process.env.SPARROW_HTTP_PORT
+  // }
   socket: {
-    domain: "https://sparrow-data.org/labs/wiscar"
+    domain: "localhost:5002"
   }
 };
 
 if(!process.env.CONTAINERIZED) {
+  // Configuration for running locally
   // This configuration is probably wrong
   bs_cfg.proxy = "http://0.0.0.0:5000"
   bs_cfg.serveStatic = [
@@ -47,15 +56,63 @@ let stylusLoader = {
   loader: 'stylus-relative-loader'
 };
 
+const cssModuleLoader = {
+  loader: 'css-loader',
+  options: {
+    /* CSS Module support with local scope by default
+       This means that module support needs to be explicitly turned
+       off with a `:global` flag
+    */
+    modules: 'local'
+  }
+};
+
+// Remember that, counterintuitively, loaders load bottom-to-top
+const styleRules = [
+  {
+    test: /\.(styl|css)$/,
+    use: "style-loader"
+  },
+  // CSS compilation supporting local CSS modules
+  {
+    test: /\.(styl|css)$/,
+    oneOf: [
+      // Match css modules (.module.(css|styl) files)
+      {
+        test: /\.?module\.(css|styl)$/,
+        use: cssModuleLoader,
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(styl|css)$/,
+        use: "css-loader"
+      }
+    ]
+  },
+  // Fallback for raw CSS and stylus from node_modules
+  {test: /\.styl$/, use: stylusLoader}
+]
+
 module.exports = {
   module: {
     rules: [
+      ...styleRules,
       {test: /\.coffee$/, use: [ jsLoader, "coffee-loader" ]},
       {test: /\.(js|jsx)$/, use: [ jsLoader ], exclude: /node_modules/ },
-      {test: /\.styl$/, use: ["style-loader", "css-loader", stylusLoader]},
-      {test: /\.css$/, use: ["style-loader", 'css-loader' ]},
       {test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader]},
-      {test: /\.md$/, use: ["html-loader","markdown-loader"]}
+      {test: /\.md$/, use: ["html-loader","markdown-loader"]},
+      {test: /\.html$/, use: ["html-loader"]},
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              useRelativePath: true
+            }
+          },
+        ],
+      },
     ]
   },
   devtool: 'source-map',
@@ -76,6 +133,14 @@ module.exports = {
     publicPath: assetsRoute,
     filename: "[name].js"
   },
+  // Always split chunks
+  // We could turn this off in development if we wanted.
+  // https://medium.com/hackernoon/the-100-correct-way-to-split-your-chunks-with-webpack-f8a9df5b7758
+  //optimization: {
+    //splitChunks: {
+      //chunks: 'all',
+    //},
+  //},
   plugins: [
     browserSync,
     new EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'BASE_URL', 'SPARROW_LAB_NAME', 'MAPBOX_API_TOKEN'])

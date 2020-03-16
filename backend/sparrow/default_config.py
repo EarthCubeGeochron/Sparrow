@@ -1,10 +1,9 @@
 from os import environ
 from datetime import timedelta
-from pathlib import Path
 
-LAB_NAME= environ.get("SPARROW_LAB_NAME", "Test lab")
-DATABASE="postgresql:///earthcube_labdata_test"
-BASE_URL= environ.get("SPARROW_BASE_URL", "/")
+LAB_NAME = environ.get("SPARROW_LAB_NAME", "Test lab")
+DATABASE = environ.get("SPARROW_DATABASE", "postgresql:///sparrow")
+BASE_URL = environ.get("SPARROW_BASE_URL", "/")
 
 # We want to check most of our config into version control,
 # but we should under no circumstances check in secret keys.
@@ -13,16 +12,6 @@ SECRET_KEY = environ.get("SPARROW_SECRET_KEY")
 if SECRET_KEY is None:
     raise KeyError("Environment variable `SPARROW_SECRET_KEY` must be set")
 
-# Schema extensions
-sql = environ.get("SPARROW_INIT_SQL", None)
-if sql is not None:
-    p = Path(sql)
-    assert p.exists()
-    if p.is_dir():
-        files = p.glob('*.sql')
-    else:
-        files = [p]
-    INIT_SQL = [f for f in files if f.is_file()]
 
 JWT_SECRET_KEY = SECRET_KEY
 # We store JWT tokens in cookies because it's more secure.

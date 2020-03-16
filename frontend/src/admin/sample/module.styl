@@ -1,0 +1,50 @@
+@require "~app/shared/colors"
+
+.sample-list-card
+  h4
+    font-weight 500
+    .name
+      font-weight 600
+  margin 10px 1px
+  div.material
+    font-style italic
+
+.sample-card
+  background-color: $light-gray4
+  border-radius: 5px
+  margin: 5px
+  padding: 5px 10px
+  flex-grow: 1
+  max-width: 15em
+  .location-name
+    color: $indigo3
+  .material
+    font-style italic
+  h4
+    margin-top: 0em
+    margin-bottom: 0em
+
+.basic-info
+  h4
+    color $gray1
+    margin-bottom: 0.3em
+
+h3.page-type
+  font-size 1.2em
+  color $gray5
+
+.location
+  float right
+  .location-name
+    font-weight 400
+    margin-top 0
+    font-style italic
+
+.flex-row
+  display flex
+  flex-direction row
+  margin-right -1em
+  .info-block
+    flex-grow 1
+  &>*
+    margin-right 1em

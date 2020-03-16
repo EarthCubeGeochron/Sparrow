@@ -1,0 +1,21 @@
+analysis:
+  - type: Stable carbon isotopes
+    datum_type:
+      - id: 1
+        parameter: delta13C
+        unit: per mille VPDB
+      - id: 2
+        parameter: delta18O
+        unit: per mille VPDB
+      - id: 3
+        parameter: height
+        unit: meter
+    datum:
+      - value: -1.1
+        error: 0.1
+        type: 1
+      - value: 1.2
+        error: 0.1
+        type: 2
+      - value: 20
+        type: 3

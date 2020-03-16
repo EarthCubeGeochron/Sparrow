@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.6"
 services:
   gateway:
     image: nginx:1.15
@@ -12,7 +12,12 @@ services:
       - frontend_build:/frontend
       - $SPARROW_DATA_DIR:/data:ro
   backend:
-    build: backend
+    build:
+      context: backend
+      target: main
+    command: /bin/run
+    # Make sure we get colorized terminal output
+    tty: true
     expose:
       - 5000
     depends_on:
@@ -36,6 +41,12 @@ services:
       # and frontend
       - $SPARROW_INIT_SQL:/init-sql/
       - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
+      # Link `SPARROW_PLUGIN_DIR` directly into site-packages as a folder
+      # ...we could probably do this in a more elegant way
+      - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.8/site-packages/sparrow_plugins:ro
+      # Save ipython configuration to anonymous volume so
+      # we keep command history between app runs
+      - ipython_config:/root/.ipython/profile_default
   db:
     image: mdillon/postgis:11
     expose:
@@ -65,8 +76,16 @@ services:
       # Right now, we configure default site content
       # rather than allowing any customization
       - $SPARROW_SITE_CONTENT:/app/site-content
+  api-tests:
+    build: api-tests
+    # A placeholder command
+    command: echo
+    depends_on:
+      - backend
 volumes:
   frontend_build:
+  # Anonymous volume to preserve `sparrow shell` history
+  ipython_config:
   db_cluster:
   # Placeholder volumes in case we don't have these volumes to mount
   placeholder:

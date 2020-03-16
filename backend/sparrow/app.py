@@ -1,22 +1,38 @@
-
 from click import echo, style, secho
-from os import path, environ
+from os import environ
 from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
-from flask_jwt_extended import JWTManager
-from sqlalchemy.exc import NoSuchTableError
+import logging
 
 from .encoders import JSONEncoder
 from .api import APIv1
-from .auth import AuthAPI
-from .web import web
 from .util import relative_path
+from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
+from .interface import InterfacePlugin
+from .auth import AuthPlugin
+#from .graph import GraphQLPlugin
+from .web import WebPlugin
+from .logs import get_logger
+
+log = get_logger(__name__)
+
+
+def echo_error(message, obj=None, err=None):
+    if obj is not None:
+        message += " "+style(str(obj), bold=True)
+    secho(message, fg='red', err=True)
+    if err is not None:
+        secho("  "+str(err), fg='red', err=True)
+
 
 class App(Flask):
     def __init__(self, *args, **kwargs):
         # Setup config as suggested in http://flask.pocoo.org/docs/1.0/config/
         cfg = kwargs.pop("config", None)
+        verbose = kwargs.pop("verbose", True)
         super().__init__(*args, **kwargs)
+        self.is_loaded = False
+        self.verbose = verbose
 
         self.config.from_object('sparrow.default_config')
         if cfg is None:
@@ -32,55 +48,119 @@ class App(Flask):
         self.db_url = make_url(dburl)
         self.dbname = self.db_url.database
 
+        self.plugins = SparrowPluginManager()
+
+    def echo(self, msg):
+        if not self.verbose:
+            return
+        echo(msg, err=True)
+
+    def setup_database(self, db=None):
+        from .database import Database
+        self.load()
+        if self.db is not None:
+            return self.db
+        if db is None:
+            db = Database(self)
+        self.db = db
+        self.run_hook('database-ready')
+        return db
+
     @property
     def database(self):
-        from .database import Database
-        if self.db is not None: return self.db
-        self.db = Database(self)
+        if self.db is None:
+            self.setup_database()
         return self.db
 
-def construct_app(config=None, minimal=False):
-    # Should allow configuration of template path
+    def register_plugin(self, plugin):
+        try:
+            self.plugins.add(plugin)
+        except Exception as err:
+            name = plugin.__class__.__name__
+            echo_error("Could not register plugin", name, err)
+
+
+    def __loaded(self):
+        self.echo("Initializing plugins")
+        self.is_loaded = True
+        self.plugins.finalize(self)
+
+    def run_hook(self, hook_name, *args, **kwargs):
+        self.echo("Running hook "+hook_name)
+        method_name = "on_"+hook_name.replace("-","_")
+        for plugin in self.plugins:
+            method = getattr(plugin, method_name, None)
+            if method is None:
+                continue
+            method(*args, **kwargs)
+            self.echo("  plugin: "+plugin.name)
+
+    def register_module_plugins(self, module):
+        for name, obj in module.__dict__.items():
+            try:
+                assert issubclass(obj, SparrowPlugin)
+            except (TypeError, AssertionError):
+                continue
+
+            if obj in [SparrowPlugin, SparrowCorePlugin]:
+                continue
+
+            self.register_plugin(obj)
+
+    def load(self):
+        if self.is_loaded:
+            return
+        import core_plugins
+        self.register_plugin(AuthPlugin)
+        # GraphQL is disabled for now
+        # self.register_plugin(GraphQLPlugin)
+        self.register_plugin(WebPlugin)
+        self.register_plugin(InterfacePlugin)
+        self.register_module_plugins(core_plugins)
+
+        # Try to import external plugins, but they might not be defined.
+        try:
+            import sparrow_plugins
+            self.register_module_plugins(sparrow_plugins)
+        except ModuleNotFoundError:
+            log.debug("Could not find external Sparrow plugins.")
+
+        self.__loaded()
+
+
+def construct_app(config=None, minimal=False, **kwargs):
     app = App(__name__, config=config,
-            template_folder=relative_path(__file__, "templates"))
+              template_folder=relative_path(__file__, "templates"),
+              **kwargs)
+
+    app.load()
 
     from .database import Database
-
-    db = Database(app)
+    db = app.setup_database(Database(app))
 
     if minimal:
         return app, db
 
-    # Manage JSON Web tokens
-    jwt = JWTManager(app)
     # Setup API
     api = APIv1(db)
 
-    api.build_route("datum", schema='core_view')
-    api.build_route("analysis", schema='core_view')
-    api.build_route("session", schema='core_view')
-    api.build_route("age_datum", schema='core_view')
-    api.build_route("sample", schema='core_view')
-    api.build_route("sample_data", schema='core_view')
-    api.build_route("project", schema='core_view')
-    api.build_route("material", schema='core_view')
+    # Register all views in schema
+    for tbl in db.entity_names(schema='core_view'):
+        if tbl.endswith("_tree"):
+            continue
+        api.build_route(tbl, schema='core_view')
 
-    api.add_resource(AuthAPI, "/auth")
-
-    try:
-        api.build_route("aggregate_histogram", schema='lab_view')
-    except NoSuchTableError:
-        pass
-    #api.build_route("ar_age", schema='method_data')
+    for tbl in db.entity_names(schema='lab_view'):
+        api.build_route(tbl, schema='lab_view')
 
     app.api = api
     app.register_blueprint(api.blueprint, url_prefix='/api/v1')
     app.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
 
-    app.register_blueprint(web, url_prefix='/')
+    app.run_hook("api-initialized", api)
+    app.run_hook("finalize-routes")
 
-    # If we're serving on a low-key webserver and we
-    # want to just serve assets without a file server...
+    # If we want to just serve assets without a file server...
     assets = app.config.get("ASSETS_DIRECTORY", None)
     if assets is not None:
         @app.route('/assets/<path:filename>')

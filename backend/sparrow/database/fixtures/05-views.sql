@@ -29,6 +29,32 @@ SELECT DISTINCT ON (id)
 FROM __r
 ORDER BY id,n_levels DESC;
 
+/* Nested list of analysis type, ordered from
+   most specific to most general */
+CREATE VIEW core_view.analysis_type_tree AS
+WITH RECURSIVE __r (id, type_of, hierarchy, n_levels) AS (
+SELECT
+  id::text,
+  type_of,
+  ARRAY[id]::text[] hierarchy,
+  1 n_levels
+FROM vocabulary.analysis_type m -- non-recursive term
+UNION ALL
+SELECT
+  __r.id,
+  m2.type_of,
+  hierarchy || m2.id::text,
+  n_levels + 1
+FROM __r -- recursive term
+JOIN vocabulary.analysis_type m2
+  ON __r.type_of = m2.id
+)
+SELECT DISTINCT ON (id)
+	id,
+	hierarchy tree
+FROM __r
+ORDER BY id,n_levels DESC;
+
 /*
 A session view with some extra features
 */
@@ -87,6 +113,7 @@ SELECT
   a.is_standard,
   a.is_bad,
   s.technique,
+  a.analysis_type,
   ( SELECT
       name
     FROM instrument
@@ -116,6 +143,18 @@ JOIN session s
 JOIN sample sa
   ON s.sample_id = sa.id
 ORDER BY a.id;
+
+CREATE VIEW core_view.attribute AS
+SELECT
+	a0.id,
+	a0.parameter,
+	a0.value,
+	a1.id analysis_id
+FROM attribute a0
+JOIN __analysis_attribute aa
+  ON a0.id = aa.attribute_id
+JOIN analysis a1
+  ON a1.id = aa.analysis_id;
 
 CREATE VIEW core_view.datum AS
 SELECT
@@ -159,14 +198,15 @@ SELECT id, description, authority
 FROM vocabulary.material;
 
 CREATE VIEW core_view.sample AS
-SELECT
+SELECT DISTINCT ON (s.id)
   s.id,
   s.igsn,
   s.name,
   s.material,
-  ST_AsGeoJSON(s.location) geometry,
-  location_name,
-  location_precision,
+  ST_AsGeoJSON(s.location)::jsonb geometry,
+  s.location_name,
+  s.location_precision,
+  s.location_name_autoset,
   p.id project_id,
   p.name project_name,
   is_public(s)
@@ -175,6 +215,38 @@ LEFT JOIN session ss
   ON s.id = ss.sample_id
 LEFT JOIN project p
   ON ss.project_id = p.id;
+
+CREATE VIEW core_view.age_context AS
+SELECT
+	s.id sample_id,
+	ss.id session_id,
+	d.id datum_id,
+	s.name sample_name,
+	s.material,
+	ss.target,
+  'Feature' AS type,
+	ST_AsGeoJSON(s.location)::jsonb geometry,
+	s.location_name,
+	s.location_precision,
+	d.value,
+	d.error,
+	dt.parameter,
+	dt.unit,
+	dt.error_unit,
+	dt.error_metric
+FROM sample s
+JOIN session ss
+  ON ss.sample_id = s.id
+JOIN analysis a
+  ON a.session_id = ss.id
+JOIN datum d
+  ON d.analysis = a.id
+JOIN datum_type dt
+  ON dt.id = d.type
+WHERE location IS NOT NULL
+  AND dt.unit = 'Ma' -- Poor proxy for age right now
+  AND d.is_accepted
+  AND NOT coalesce(d.is_bad, false);
 
 CREATE VIEW core_view.sample_data AS
 WITH a AS (
@@ -205,12 +277,50 @@ FROM sample s
 LEFT JOIN b
   ON s.id = b.id;
 
+/*
+View to link projects with all member samples and sessions
+*/
+CREATE VIEW core_view.project_sample_session AS
+SELECT
+  p.id project_id,
+  s.id sample_id,
+  ss.id session_id
+FROM session ss
+LEFT JOIN sample s
+  ON ss.sample_id = s.id
+JOIN project p
+  ON p.id = ss.project_id
+UNION ALL
+SELECT
+  p.id,
+  s.id sample_id,
+  NULL
+FROM sample s
+JOIN project_sample ps
+  ON ps.sample_id = s.id
+JOIN project p
+  ON p.id = ps.project_id;
+
+CREATE VIEW core_view.project_extent AS
+SELECT
+  project_id,
+  ST_Extent(location) extent,
+  count(*) n
+FROM core_view.project_sample_session p
+JOIN sample s
+  ON s.id = p.sample_id
+WHERE location IS NOT null
+GROUP BY p.project_id;
+
 CREATE VIEW core_view.project AS
 SELECT
 	p.id,
 	p.description,
 	p.name,
   p.embargo_date,
+  p.location_name,
+  p.location_name_autoset,
+  ST_AsGeoJSON(p.location)::jsonb geometry,
   NOT embargoed(p.embargo_date) AS is_public,
 	-- Get data from researchers table in standard format
 	to_jsonb((SELECT array_agg(a) FROM (
@@ -230,13 +340,15 @@ SELECT
 	-- Note: we might convert this link to *analytical sessions*
 	-- to cover cases when samples are in use by multiple projects
 	to_jsonb((SELECT array_agg(a) FROM (
-		SELECT DISTINCT ON (s.id) *
+		SELECT DISTINCT ON (s.id)
+      s.*
 		FROM core_view.sample s
     JOIN session ss
       ON ss.sample_id = s.id
 		WHERE ss.project_id = p.id
 	) AS a)) AS samples
-FROM project p;
+FROM project p
+ORDER BY p.id;
 
 COMMENT ON COLUMN core_view.project.samples IS
 'Array of objects representing samples in the project

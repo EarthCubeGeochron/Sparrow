@@ -1,7 +1,12 @@
 from hashlib import md5
+from numpy import isnan
+from os import environ
+from pathlib import Path
+from click import echo, style
 
 class SparrowImportError(Exception):
     pass
+
 
 def md5hash(fname):
     """
@@ -13,8 +18,36 @@ def md5hash(fname):
             hash.update(chunk)
     return hash.hexdigest()
 
+
 def ensure_sequence(possible_iterator):
     try:
         return iter(possible_iterator)
     except TypeError:
         return [possible_iterator]
+
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+def coalesce_nan(value):
+    if isnan(value):
+        return None
+    return value
+
+
+def get_data_directory():
+    varname = "SPARROW_DATA_DIR"
+    env = environ.get(varname, None)
+    if env is None:
+        v = style(varname, fg='cyan', bold=True)
+        echo(f"Environment variable {v} is not set.")
+        secho("Aborting", fg='red', bold=True)
+        return
+    p = Path(env)
+    assert p.is_dir()
+    return p

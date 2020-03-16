@@ -4,8 +4,10 @@
 a.link-card
   text-decoration none
   color inherit
-  &:hover div.bp3-card
+  display block
+  &:hover
     background-color $light-gray5
+
 
 div.bp3-card
   padding 10px
@@ -19,6 +21,7 @@ div.pagination-controls
   flex-direction row
   align-items: center
   justify-content space-between
+  margin-bottom 1em
 
 .bp3-navbar
   margin-top 2em
@@ -46,6 +49,10 @@ a.publication
     &:after
       content: " "
 
+div.sample-area
+  flex-flow row wrap
+  align-items: stretch
+  margin-bottom 1em
 
 div.samples
   display: table
@@ -69,14 +76,14 @@ a.link-button
 
 accent=$red3
 
-div.session-info-card, div.snippet-result
+.session-info-card, div.snippet-result
   margin-bottom 1em
   h4.date
     color: accent
     font-weight 400
     font-style italic
 
-div.session-info-card.bp3-card
+.session-info-card.bp3-card
   position relative
   &:first-child
     margin-top 1em

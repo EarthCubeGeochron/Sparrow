@@ -1,0 +1,8 @@
+# Core
+psycopg2==2.8.4
+shapely==1.6.4.post2
+
+# Importing
+lxml==4.4.2
+numpy==1.18.1
+pandas==0.25.3

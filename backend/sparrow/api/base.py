@@ -1,10 +1,12 @@
 from flask_restful import Api
 
+
 class APIResourceCollection(object):
     """
     An extension to the `flask_restful` API that allows quick
     creation of nested API routes.
     """
+
     def __init__(self):
         self.resource_arguments = []
 
@@ -17,6 +19,7 @@ class APIResourceCollection(object):
             self.add_resource(cls, *endpoints, **kw)
         return func
 
+
 class API(Api):
     def add_resource(self, resource, *endpoints, **kw):
         try:
@@ -27,7 +30,7 @@ class API(Api):
                                  "API resource collections.")
             endpoint, = endpoints
 
-            for (args,kwargs) in resource.resource_arguments:
+            for (args, kwargs) in resource.resource_arguments:
                 (r, e) = args
                 e = endpoint + e
                 super().add_resource(r, e, **kwargs)

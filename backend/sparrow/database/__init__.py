@@ -1,55 +1,27 @@
-from click import echo, secho
+from contextlib import contextmanager
+from pathlib import Path
+from click import secho
 from os import environ
 
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.schema import Table
-from sqlalchemy.sql import ClauseElement
-from pathlib import Path
+from sqlalchemy import create_engine, inspect, MetaData
+from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.schema import ForeignKey, Column
+from sqlalchemy.types import Integer
+from sqlalchemy.exc import IntegrityError
 
-from ..app import App
-from ..models import Base, User
-from ..util import run_sql_file, run_query, relative_path
+from .util import run_sql_file, run_query, get_or_create
+from .models import User, Project, Session, DatumType
+from .mapper import MappedDatabaseMixin
+from ..logs import get_logger
+from ..util import relative_path
 
 metadata = MetaData()
 
-# For automapping
-def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
-    return "_"+referred_cls.__name__.lower()
+log = get_logger(__name__)
 
 
-def get_or_create(session, model, defaults=None, **kwargs):
-    """
-    Get an instance of a model, or create it if it doesn't
-    exist.
-
-    https://stackoverflow.com/questions/2546207
-    """
-    instance = session.query(model).filter_by(**kwargs).first()
-    if instance:
-        return instance
-    else:
-        params = dict((k, v) for k, v in kwargs.items()
-            if not isinstance(v, ClauseElement))
-        params.update(defaults or {})
-        instance = model(**params)
-        session.add(instance)
-        return instance
-
-class TableCollection(object):
-    """
-    Table collection object that returns automapped tables
-    """
-    def __init__(self, automap_base):
-        self.models = automap_base.classes
-    def __getattr__(self, name):
-        return getattr(self.models, name).__table__
-    def __iter__(self):
-            for model in self.models:
-                yield model.__table__
-class Database:
-    def __init__(self, cfg=None):
+class Database(MappedDatabaseMixin):
+    def __init__(self, app=None):
         """
         We can pass a connection string, a **Flask** application object
         with the appropriate configuration, or nothing, in which
@@ -57,12 +29,14 @@ class Database:
         the SPARROW_BACKEND_CONFIG file, if available.
         """
         self.config = None
-        if cfg is None:
+        if app is None:
+            from ..app import App
             # Set config from environment variable
-            cfg = App(__name__)
-        if hasattr(cfg,'config'):
-            cfg = cfg.config
-        self.config = cfg
+            app = App(__name__)
+            # Load plugins
+        self.app = app
+
+        self.config = app.config
         db_conn = self.config.get("DATABASE")
         # Override with environment variable
         envvar = environ.get("SPARROW_DATABASE", None)
@@ -71,80 +45,131 @@ class Database:
         self.engine = create_engine(db_conn)
         metadata.create_all(bind=self.engine)
         self.meta = metadata
-        self.session = sessionmaker(bind=self.engine)()
-        self.automap_base = None
-        # We're having trouble lazily automapping
-        try:
-            self.automap()
-        except Exception as err:
-            echo("Could not automap at database initialization", err=True)
-            secho(str(err), fg='red')
 
-    def exec_sql(self, *args):
-        run_sql_file(self.session, *args)
+        # Scoped session for database
+        # https://docs.sqlalchemy.org/en/13/orm/contextual.html#unitofwork-contextual
+        # https://docs.sqlalchemy.org/en/13/orm/session_basics.html#session-faq-whentocreate
+        self._session_factory = sessionmaker(bind=self.engine)
+        self.session = scoped_session(self._session_factory)
+        # Use the self.session_scope function to more explicitly manage sessions.
+
+        self.lazy_automap()
+
+    def automap(self):
+        super().automap()
+        # Database models we have extended with our own functions
+        # (we need to add these to the automapped classes since they are not
+        #  included by default)
+        # TODO: there is probably a way to do this without having to manually register the models
+        self.register_models(User, Project, Session, DatumType)
+        # Register a new class
+        # Automap the core_view.datum relationship
+        cls = self.automap_view("datum",
+            Column("datum_id", Integer, primary_key=True),
+            Column("analysis_id", Integer, ForeignKey(self.table.analysis.c.id)),
+            Column("session_id", Integer, ForeignKey(self.table.session.c.id)),
+            schema='core_view')
+        self.register_models(cls)
+
+    @contextmanager
+    def session_scope():
+        """Provide a transactional scope around a series of operations."""
+        session = self._session_factory()
+        try:
+            yield session
+            session.commit()
+        except:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+    def load_data(self, model_name, data):
+        iface = getattr(self.interface, model_name)
+        try:
+            #try:
+            with self.session.no_autoflush:
+                res = iface().load(data, session=self.session)
+                log.info("Entering final commit phase of import")
+                log.info(f"Adding top-level object {res}")
+                self.session.add(res)
+                for object in self.session:
+                    try:
+                        self.session.flush(objects=[object])
+                        log.debug(f"Successfully flushed instance {object}")
+                    except IntegrityError as err:
+                        self.session.rollback()
+                        log.error(err)
+                log.info(f"Committing entire transaction")
+                self.session.commit()
+            # except IntegrityError as err:
+            #     # This is super-sketchy !!!
+            #     log.error(err)
+            #     log.debug("Add to session failed, attempting merge.")
+            #     self.session.rollback()
+            #     self.session.merge(res)
+            #     self.session.commit()
+            return res
+        except IntegrityError as err:
+            self.session.rollback()
+            log.error(err)
+            raise err
+
+    def get_instance(self, model_name, filter_params):
+        iface = getattr(self.interface, model_name)
+        res = iface().load(filter_params, session=self.session, partial=True)
+        return res
+
+    def exec_sql(self, fn):
+        secho(Path(fn).name, fg='cyan', bold=True)
+        run_sql_file(self.session, str(fn))
 
     def exec_query(self, *args):
         run_query(self.session, *args)
 
-    def reflect_table(self, tablename, schema='public', **kwargs):
-        """
-        Use the automapped `table` object instead.
-        """
-        meta = MetaData(schema=schema)
-        return Table(tablename, meta,
-            autoload=True, autoload_with=self.engine, **kwargs)
-
-    def automap(self):
-        Base.prepare(self.engine, reflect=True,
-            name_for_scalar_relationship=name_for_scalar_relationship)
-
-        self.table = TableCollection(Base)
-        self.automap_base = Base
-
     @property
-    def model(self):
-        """
-        Map all tables in the database to SQLAlchemy models
+    def inspector(self):
+        if self.__inspector__ is None:
+            self.__inspector__ = inspect(self.engine)
+        return self.__inspector__
 
-        https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html
+    def entity_names(self, **kwargs):
         """
-        if self.automap_base is None:
-            self.automap()
-        return self.automap_base.classes
-
-    @property
-    def mapped_classes(self):
-        return self.model
+        Returns an iterator of names of *schema objects*
+        (both tables and views) from a the database.
+        """
+        yield from self.inspector.get_table_names(**kwargs)
+        yield from self.inspector.get_view_names(**kwargs)
 
     def get(self, model, *args, **kwargs):
         if isinstance(model, str):
             model = getattr(self.model, model)
         return self.session.query(model).get(*args,**kwargs)
 
-    def get_or_create(self, model, defaults=None, **kwargs):
+    def get_or_create(self, model, **kwargs):
         """
         Get an instance of a model, or create it if it doesn't
         exist.
         """
         if isinstance(model, str):
             model = getattr(self.model, model)
-        return get_or_create(self.session, model, defaults=None, **kwargs)
+        return get_or_create(self.session, model, **kwargs)
 
     def initialize(self, drop=False):
         secho("Creating core schema...", bold=True)
 
+        if drop:
+            fp = relative_path(__file__, "procedures", "drop-all-tables.sql")
+            self.exec_sql(fp)
+
         p = Path(relative_path(__file__, "fixtures"))
         filenames = list(p.glob("*.sql"))
         filenames.sort()
-        pretty_print = lambda x: secho(x, fg='cyan', bold=True)
 
         for fn in filenames:
-            pretty_print(fn.name)
-            self.exec_sql(str(fn))
+            self.exec_sql(fn)
 
-        init_sql = self.config.get("INIT_SQL", None)
-        if init_sql is not None:
-            secho("\nCreating schema extensions...", bold=True)
-            for s in init_sql:
-                pretty_print(Path(s).name)
-                self.exec_sql(s)
+        try:
+            self.app.run_hook('core-tables-initialized', self)
+        except AttributeError as err:
+            secho("Could not load plugins", fg='red', dim=True)
