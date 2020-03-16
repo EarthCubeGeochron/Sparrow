@@ -109,9 +109,9 @@ ProjectInfoLink = (props)->
       data: samples.map (d)->d.name
       title: 'sample'
     }
-    h.if(publications.length) ContentArea, {
+    h.if(publications? and publications.length) ContentArea, {
       className: 'publications'
-      data: publications.map (d)->d.title
+      data: (publications or []).map (d)->d.title
       title: 'publication'
     }
   ]
