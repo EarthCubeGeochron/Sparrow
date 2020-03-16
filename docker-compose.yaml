@@ -6,7 +6,7 @@ services:
       - backend
       - frontend
     ports:
-      - $SPARROW_HTTP_PORT:80
+      - ${SPARROW_HTTP_PORT:-80}
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - frontend_build:/frontend
@@ -37,7 +37,7 @@ services:
       # Nested volume to keep built files
       # separate from those on our local system
       - /app/sparrow.egg-info
-      # Share some configuration between backend
+      # Share some configuration between backend.
       # and frontend
       - $SPARROW_INIT_SQL:/init-sql/
       - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
@@ -52,7 +52,7 @@ services:
     expose:
       - 5432
     ports:
-      - $SPARROW_DB_PORT:5432
+      - ${SPARROW_DB_PORT:-5432}
     environment:
       - POSTGRES_DB=sparrow
     volumes:
@@ -70,9 +70,6 @@ services:
       # inside and outside of the container
       - SPARROW_SITE_CONTENT=/app/site-content
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - frontend_build:/app/_assets
       # Right now, we configure default site content
       # rather than allowing any customization
       - $SPARROW_SITE_CONTENT:/app/site-content
