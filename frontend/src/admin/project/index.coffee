@@ -52,7 +52,7 @@ ProjectPublications = ({data})->
   h [
     h.if(data?) 'div.publications', [
       h 'h4', 'Publications'
-      data.map (d, i)->
+      (data or []).map (d, i)->
         h Publication, {key: i, d...}
     ]
     h.if(not data?) "div.publications", "No publications"
@@ -97,6 +97,7 @@ ContentArea = ({data, title, className})->
 
 ProjectInfoLink = (props)->
   {id, name, description, samples, publications} = props
+  publications ?= []
   h LinkCard, {
     to: "/catalog/project/#{id}"
     key: id,
@@ -109,9 +110,9 @@ ProjectInfoLink = (props)->
       data: samples.map (d)->d.name
       title: 'sample'
     }
-    h.if(publications? and publications.length) ContentArea, {
+    h.if(publications.length) ContentArea, {
       className: 'publications'
-      data: (publications or []).map (d)->d.title
+      data: publications.map (d)->d.title
       title: 'publication'
     }
   ]

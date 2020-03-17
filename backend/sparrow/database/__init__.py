@@ -99,7 +99,7 @@ class Database(MappedDatabaseMixin):
                         log.debug(f"Successfully flushed instance {object}")
                     except IntegrityError as err:
                         self.session.rollback()
-                        log.error(err)
+                        log.debug(err)
                 log.info(f"Committing entire transaction")
                 self.session.commit()
             # except IntegrityError as err:
@@ -112,7 +112,7 @@ class Database(MappedDatabaseMixin):
             return res
         except IntegrityError as err:
             self.session.rollback()
-            log.error(err)
+            log.debug(err)
             raise err
 
     def get_instance(self, model_name, filter_params):
