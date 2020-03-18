@@ -6,7 +6,8 @@ services:
       - backend
       - frontend
     ports:
-      - $SPARROW_HTTP_PORT:80
+
+      - ${SPARROW_HTTP_PORT:-5002}:80
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - frontend_build:/frontend
@@ -40,7 +41,10 @@ services:
       # Share some configuration between backend
       # and frontend
       - $SPARROW_INIT_SQL:/init-sql/
-      - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
+      # The docker-compose volume for sparrow commands needs to be set
+      # even if a `SPARROW_COMMANDS` directory is not provided, so we can
+      # use a placeholder.
+      - ${SPARROW_COMMANDS_VOLUME:-placeholder}:/sparrow-commands/
       # Link `SPARROW_PLUGIN_DIR` directly into site-packages as a folder
       # ...we could probably do this in a more elegant way
       - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.8/site-packages/sparrow_plugins:ro

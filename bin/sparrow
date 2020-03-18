@@ -44,23 +44,12 @@ export SPARROW_PATH="${SPARROW_PATH:-"$this_install_root"}"
 # ENVIRONMENT VARIABLE DEFAULTS
 # Set variables that might not be created in the config file
 # to default values
-default="$SPARROW_PATH/frontend/default-content"
+# NOTE: much of this has been moved to `docker-compose.yaml`
 export SPARROW_BASE_URL="${SPARROW_BASE_URL:-"/"}"
 export SPARROW_LAB_NAME="${SPARROW_LAB_NAME:-"My Lab"}"
-export SPARROW_INIT_SQL="${SPARROW_INIT_SQL:-"placeholder"}"
-export SPARROW_SITE_CONTENT="${SPARROW_SITE_CONTENT:-"$default"}"
-export SPARROW_HTTP_PORT="${SPARROW_HTTP_PORT:-5002}"
 
-# A port range can be specified, but only with recent versions of Docker,
-# so we default to a single port.
-export SPARROW_DB_PORT="${SPARROW_DB_PORT:-54321}"
 # should be `development` or `production`
 export SPARROW_ENV="${SPARROW_ENV:-"development"}"
-
-# The docker-compose volume for sparrow commands needs to be set
-# even if a SPARROW_COMMANDS directory is not provided.
-export SPARROW_COMMANDS_VOLUME="${SPARROW_COMMANDS:-"placeholder"}"
-export SPARROW_DATA_DIR="${SPARROW_DATA_DIR:-"placeholder"}"
 
 # Make sure all commands can be referenced by name from
 # within these scripts (even if `sparrow` command itself isn't
