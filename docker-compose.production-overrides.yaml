@@ -1,0 +1,14 @@
+version: "3.4"
+services:
+  # Set restart policy to allow docker
+  # to bring these containers back up on system
+  # reboot.
+  gateway:
+    restart: unless-stopped
+  backend:
+    restart: unless-stopped
+  db:
+    restart: unless-stopped
+  frontend:
+    restart: unless-stopped
+
