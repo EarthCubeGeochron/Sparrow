@@ -15,6 +15,9 @@ let assetsRoute = path.join(process.env.SPARROW_BASE_URL,'/assets/');
 
 let bs_cfg = {
   open: false,
+  // These don't appear to work?
+  logLevel: "silent",
+  logSnippet: false,
   // Actual external port
   port: 3000,
   //proxy: "http://backend:5000"

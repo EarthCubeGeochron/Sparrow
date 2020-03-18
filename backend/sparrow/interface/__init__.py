@@ -189,7 +189,7 @@ class BaseSchema(SQLAlchemyAutoSchema):
             except IntegrityError as err:
                 self.session.rollback()
                 log.info("Could not persist but will try again later")
-                log.error(err)
+                log.debug(err)
 
         return instance
 
