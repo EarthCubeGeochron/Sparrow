@@ -1,0 +1,16 @@
+#!/usr/bin/env zsh
+# Description: Test round-trip data import export functionality
+
+# This script runs on the host system and kicks off the
+# import process within a docker container
+import_pipeline="${0:h:r}"
+
+# Run within container, mounting Sparrow data directory
+# and importer code.
+sparrow compose run \
+  -e "SPARROW_DATA_DIR=/Data" \
+  -e "PYTHONPATH=/import-pipeline" \
+  -v "$SPARROW_DATA_DIR:/Data:ro" \
+  -v "$import_pipeline:/import-pipeline" \
+  backend \
+  python -m test_importer

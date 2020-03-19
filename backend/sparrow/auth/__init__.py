@@ -16,7 +16,7 @@ from flask_jwt_extended import (JWTManager, create_access_token,
                                 unset_jwt_cookies, jwt_optional,
                                 get_jwt_identity)
 from ..api.base import APIResourceCollection
-from ..models import User
+from ..database.models import User
 from ..plugins import SparrowCorePlugin
 
 parser = reqparse.RequestParser()

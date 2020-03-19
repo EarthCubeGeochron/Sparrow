@@ -8,15 +8,31 @@ from .encoders import JSONEncoder
 from .api import APIv1
 from .util import relative_path
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
+from .interface import InterfacePlugin
 from .auth import AuthPlugin
-from .graph import GraphQLPlugin
+#from .graph import GraphQLPlugin
 from .web import WebPlugin
+from .logs import get_logger
+
+log = get_logger(__name__)
+
+
+def echo_error(message, obj=None, err=None):
+    if obj is not None:
+        message += " "+style(str(obj), bold=True)
+    secho(message, fg='red', err=True)
+    if err is not None:
+        secho("  "+str(err), fg='red', err=True)
+
 
 class App(Flask):
     def __init__(self, *args, **kwargs):
         # Setup config as suggested in http://flask.pocoo.org/docs/1.0/config/
         cfg = kwargs.pop("config", None)
+        verbose = kwargs.pop("verbose", True)
         super().__init__(*args, **kwargs)
+        self.is_loaded = False
+        self.verbose = verbose
 
         self.config.from_object('sparrow.default_config')
         if cfg is None:
@@ -34,67 +50,96 @@ class App(Flask):
 
         self.plugins = SparrowPluginManager()
 
-    @property
-    def database(self):
+    def echo(self, msg):
+        if not self.verbose:
+            return
+        echo(msg, err=True)
+
+    def setup_database(self, db=None):
         from .database import Database
+        self.load()
         if self.db is not None:
             return self.db
-        self.db = Database(self)
+        if db is None:
+            db = Database(self)
+        self.db = db
+        self.run_hook('database-ready')
+        return db
+
+    @property
+    def database(self):
+        if self.db is None:
+            self.setup_database()
         return self.db
 
     def register_plugin(self, plugin):
-        self.plugins.add(plugin)
+        try:
+            self.plugins.add(plugin)
+        except Exception as err:
+            name = plugin.__class__.__name__
+            echo_error("Could not register plugin", name, err)
 
-    def loaded(self):
-        echo("Initializing plugins", err=True)
+
+    def __loaded(self):
+        self.echo("Initializing plugins")
+        self.is_loaded = True
         self.plugins.finalize(self)
 
     def run_hook(self, hook_name, *args, **kwargs):
-        echo("Running hook "+hook_name, err=True)
+        self.echo("Running hook "+hook_name)
         method_name = "on_"+hook_name.replace("-","_")
         for plugin in self.plugins:
-            try:
-                method = getattr(plugin, method_name)
-                echo("  plugin: "+plugin.name, err=True)
-                method(*args, **kwargs)
-            except AttributeError:
+            method = getattr(plugin, method_name, None)
+            if method is None:
                 continue
+            method(*args, **kwargs)
+            self.echo("  plugin: "+plugin.name)
 
     def register_module_plugins(self, module):
         for name, obj in module.__dict__.items():
             try:
                 assert issubclass(obj, SparrowPlugin)
-                assert obj is not SparrowPlugin
-                assert obj is not SparrowCorePlugin
             except (TypeError, AssertionError):
                 continue
+
+            if obj in [SparrowPlugin, SparrowCorePlugin]:
+                continue
+
             self.register_plugin(obj)
 
     def load(self):
-        import sparrow_plugins, core_plugins
+        if self.is_loaded:
+            return
+        import core_plugins
         self.register_plugin(AuthPlugin)
-        self.register_plugin(GraphQLPlugin)
+        # GraphQL is disabled for now
+        # self.register_plugin(GraphQLPlugin)
         self.register_plugin(WebPlugin)
+        self.register_plugin(InterfacePlugin)
         self.register_module_plugins(core_plugins)
-        self.register_module_plugins(sparrow_plugins)
-        self.loaded()
 
-def construct_app(config=None, minimal=False):
+        # Try to import external plugins, but they might not be defined.
+        try:
+            import sparrow_plugins
+            self.register_module_plugins(sparrow_plugins)
+        except ModuleNotFoundError:
+            log.debug("Could not find external Sparrow plugins.")
+
+        self.__loaded()
+
+
+def construct_app(config=None, minimal=False, **kwargs):
     app = App(__name__, config=config,
-              template_folder=relative_path(__file__, "templates"))
+              template_folder=relative_path(__file__, "templates"),
+              **kwargs)
 
     app.load()
 
     from .database import Database
+    db = app.setup_database(Database(app))
 
-    db = Database(app)
-    if db.automap_error is not None:
-        return app, db
     if minimal:
         return app, db
-
-
-    app.run_hook("database-ready")
 
     # Setup API
     api = APIv1(db)

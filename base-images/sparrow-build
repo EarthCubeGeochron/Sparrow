@@ -1,22 +1,44 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env python
 # Description: Build docker base images
-cd "${0:A:h}"
+from __future__ import print_function
+from os import chdir, path, getcwd
+from textwrap import dedent
+from sys import argv, exit
+from subprocess import call
 
-image=$1
+b = lambda x: '\033[1m'+x+'\033[0m'
 
-if [ -z $1 ]; then
-  cat <<EOM
-Usage: sparrow-build <image>
+def cmd(*command):
+    c = " ".join(command)
+    print(c)
+    return call(c, shell=True)
 
-<image> should be one of
-- backend
-- database
-EOM
-  exit 0
-fi
+chdir(path.dirname(path.realpath(__file__)))
+argv.pop(0)
 
-if [ $image = 'backend' ]; then
-  docker build -t sparrowdata/backend-base:1.0 backend
-elif [ $image = 'db-mysql-fdw' ]; then
-  docker build -t sparrowdata/db-mysql-fdw:1.0 db-mysql-fdw
-fi
+if len(argv) == 0:
+    print(dedent("""
+        Usage: sparrow-build [--push] <image>
+        <image> should be one of
+        - backend
+        - db-mysql-fdw
+            """))
+    exit(0)
+
+push = False
+if '--push' in argv:
+    push = True
+
+IMAGES = {
+  "backend": "sparrowdata/backend-base:1.1",
+  "db-mysql-fdw": "sparrowdata/db-mysql-fdw:1.0"
+}
+
+for arg in argv:
+    if arg == '--push':
+        continue
+    im = IMAGES[arg]
+    print(arg+": building image "+b(im))
+    cmd("docker build -t "+im+" "+arg)
+    if push:
+        cmd("docker push "+im)

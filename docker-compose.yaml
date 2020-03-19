@@ -6,13 +6,19 @@ services:
       - backend
       - frontend
     ports:
-      - $SPARROW_HTTP_PORT:80
+
+      - ${SPARROW_HTTP_PORT:-5002}:80
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - frontend_build:/frontend
       - $SPARROW_DATA_DIR:/data:ro
   backend:
-    build: backend
+    build:
+      context: backend
+      target: main
+    command: /bin/run
+    # Make sure we get colorized terminal output
+    tty: true
     expose:
       - 5000
     depends_on:
@@ -34,10 +40,14 @@ services:
       - /app/sparrow.egg-info
       # Share some configuration between backend
       # and frontend
-      - $SPARROW_INIT_SQL:/init-sql/
-      - $SPARROW_COMMANDS_VOLUME:/sparrow-commands/
+      - ${SPARROW_INIT_SQL:-placeholder}:/init-sql/
+      # The docker-compose volume for sparrow commands needs to be set
+      # even if a `SPARROW_COMMANDS` directory is not provided, so we can
+      # use a placeholder.
+      - ${SPARROW_COMMANDS_VOLUME:-placeholder}:/sparrow-commands/
       # Link `SPARROW_PLUGIN_DIR` directly into site-packages as a folder
-      - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.7/site-packages/sparrow_plugins:ro
+      # ...we could probably do this in a more elegant way
+      - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.8/site-packages/sparrow_plugins:ro
       # Save ipython configuration to anonymous volume so
       # we keep command history between app runs
       - ipython_config:/root/.ipython/profile_default
@@ -46,7 +56,9 @@ services:
     expose:
       - 5432
     ports:
-      - $SPARROW_DB_PORT:5432
+      # A port range can be specified, but only with recent versions of Docker,
+      # so we default to a single port.
+      - ${SPARROW_DB_PORT:-54321}:5432
     environment:
       - POSTGRES_DB=sparrow
     volumes:
@@ -69,7 +81,7 @@ services:
       - frontend_build:/app/_assets
       # Right now, we configure default site content
       # rather than allowing any customization
-      - $SPARROW_SITE_CONTENT:/app/site-content
+      - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/app/site-content
   api-tests:
     build: api-tests
     # A placeholder command

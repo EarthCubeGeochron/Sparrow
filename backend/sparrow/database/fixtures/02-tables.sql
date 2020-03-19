@@ -121,27 +121,6 @@ CREATE TABLE IF NOT EXISTS project (
   location_precision integer
 );
 
-/*
-If researchers on a project have application user accounts,
-they can see data even if embargoed (not yet implemented).
-*/
-CREATE TABLE IF NOT EXISTS project_researcher (
-  project_id integer REFERENCES project(id) ON DELETE CASCADE,
-  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
-  PRIMARY KEY (project_id, researcher_id)
-);
-
-CREATE TABLE IF NOT EXISTS project_publication (
-  project_id integer REFERENCES project(id) ON DELETE CASCADE,
-  publication_id integer REFERENCES publication(id) ON DELETE CASCADE,
-  PRIMARY KEY (project_id, publication_id)
-);
-
-CREATE TABLE IF NOT EXISTS project_sample (
-  project_id integer REFERENCES project(id) ON DELETE CASCADE,
-  sample_id integer REFERENCES sample(id) ON DELETE CASCADE,
-  PRIMARY KEY (project_id, sample_id)
-);
 
 /*
 ### Descriptors for types of measurements/techniques
@@ -159,12 +138,14 @@ CREATE TABLE IF NOT EXISTS datum_type (
   unit text REFERENCES vocabulary.unit(id) NOT NULL,
   error_unit text REFERENCES vocabulary.unit(id),
   error_metric text REFERENCES vocabulary.error_metric(id),
-  is_computed boolean, -- Can be rebuilt from data IN THE DATABASE
-  is_interpreted boolean, -- Results from a data-reduction process
+  is_computed boolean DEFAULT false, -- Can be rebuilt from data IN THE DATABASE
+  is_interpreted boolean DEFAULT false, -- Results from a data-reduction process
   description text,
-  UNIQUE (parameter, unit, error_unit,
-          error_metric, is_computed, is_interpreted)
+  UNIQUE (parameter, unit, error_unit, error_metric)
 );
+
+CREATE UNIQUE INDEX datum_type_unique ON datum_type
+(parameter, unit, coalesce(error_unit, 'NO ERROR'), coalesce(error_metric, 'NO ERROR'));
 
 /*
 
@@ -305,10 +286,36 @@ CREATE TABLE IF NOT EXISTS analysis (
 );
 
 
+/*
+## Link projects, samples, and researchers
+
+If researchers on a project have application user accounts,
+they can see data even if embargoed (not yet implemented).
+*/
+CREATE TABLE IF NOT EXISTS project_researcher (
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, researcher_id)
+);
+
+CREATE TABLE IF NOT EXISTS project_publication (
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  publication_id integer REFERENCES publication(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, publication_id)
+);
+
+CREATE TABLE IF NOT EXISTS project_sample (
+  project_id integer REFERENCES project(id) ON DELETE CASCADE,
+  sample_id integer REFERENCES sample(id) ON DELETE CASCADE,
+  PRIMARY KEY (project_id, sample_id)
+);
+
+
+
 CREATE TABLE IF NOT EXISTS datum (
   id serial PRIMARY KEY,
   analysis integer REFERENCES analysis(id)
-    ON DELETE CASCADE,
+    ON DELETE CASCADE NOT NULL,
   type integer REFERENCES datum_type(id) NOT NULL,
   value numeric NOT NULL,
   error numeric,
@@ -322,6 +329,9 @@ CREATE TABLE IF NOT EXISTS datum (
   - Accepted system for U-Pb single-zircon age
   */
   is_accepted boolean,
+  /*
+  There should not be more than one datum of a single type per analysis
+  */
   UNIQUE (analysis, type)
 );
 

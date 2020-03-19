@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+# Description: Run a monitor
+
+cd $SPARROW_PATH
+lazydocker
+
+# docker run --rm -it \
+#   -v /var/run/docker.sock:/var/run/docker.sock \
+#   -v $SPARROW_PATH/monitor-cfg:/.config/jesseduffield/lazydocker \
+#   lazyteam/lazydocker

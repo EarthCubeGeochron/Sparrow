@@ -1,26 +1,63 @@
-beautifulsoup4==4.7.1
-Click==7.0
-click-plugins==1.0.4
-Flask==1.0.2
-Flask-GraphQL==2.0.0
-Flask-JWT-Extended==3.16.0
-Flask-RESTful==0.3.6
-html5lib==1.0.1
-ipython==7.5.0
-MarkupSafe==1.0
-migra==1.0.1554608452
-pexpect==4.6.0
-Pygments==2.2.0
-simplejson==3.16.0
-SQLAlchemy==1.3.3
-sqlparse==0.2.4
-traitlets==4.3.2
-werkzeug==0.15.6
-xlrd==1.2.0
-requests==2.21.0
-toposort==1.5
-#geoalchemy2==0.6.2
+###
+# Main requirements file for the
+# Sparrow backend.
+#
+# Last updated on 23 Jan 2019
+###
 
-# For GraphQL API
-graphene==2.1.5
-graphene_sqlalchemy==2.2.0
+# Preinstalled in 'sparrowdata/backend-base image'
+# due to long compile times.
+psycopg2
+shapely
+lxml
+numpy
+pandas
+
+# Core application
+Flask==1.1.1
+Flask-JWT-Extended==3.24.1
+Flask-RESTful==0.3.7
+MarkupSafe==1.1.1
+migra==1.0.1575954682
+Pygments==2.5.2
+SQLAlchemy==1.3.13
+sqlparse==0.3.0
+requests==2.22.0
+toposort==1.5
+
+# Command-line interface
+Click==7.0
+click-plugins==1.1.1
+ipython==7.11.1
+
+# Import file reading
+xlrd==1.2.0
+pyyaml==5.3
+beautifulsoup4==4.8.2
+html5lib==1.0.1
+
+# Not sure why these were added,
+# may be subdependencies of Click
+# and Flask
+pexpect==4.8.0
+traitlets==4.3.3
+werkzeug==0.16.0
+
+# Serialization/deserialization
+marshmallow==3.3.0
+marshmallow-sqlalchemy==0.22.2
+marshmallow-jsonschema==0.8.0
+stringcase==1.2.0
+
+# (De)serialization of geographic data
+GeoAlchemy2==0.6.3
+shapely # Should already be installed
+
+# Prototype GraphQL API
+Flask-GraphQL==2.0.1
+graphene==2.1.8
+graphene_sqlalchemy==2.2.2
+
+# Testing (we could split this into a separate file
+# if it becomes too weighty.)
+pytest==5.3.5
