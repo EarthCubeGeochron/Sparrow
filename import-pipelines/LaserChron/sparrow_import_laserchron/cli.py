@@ -37,19 +37,17 @@ def cli(basename=None, stop_on_error=False, verbose=False, extract=False, normal
     Import LaserChron files
     """
     varname = "SPARROW_DATA_DIR"
-    env = environ.get(varname, None)
-    if env is None:
-        v = style(varname, fg='cyan', bold=True)
-        echo(f"Environment variable {v} is not set.")
-        secho("Aborting", fg='red', bold=True)
-        return
-    path = Path(env)
-    assert path.is_dir()
+    for var in ["SPARROW_S3_ENDPOINT", "SPARROW_S3_BUCKET", "SPARROW_S3_KEY", "SPARROW_S3_SECRET"]:
+        env = environ.get(varname, None)
+        if env is None:
+            v = style(varname, fg='cyan', bold=True)
+            echo(f"Environment variable {v} is not set.")
+            secho("Aborting", fg='red', bold=True)
+            return
 
     db = Database()
     if extract:
-        with working_directory(path):
-            extract_data(db)
+        extract_data(db)
     importer = LaserchronImporter(db)
     if normalize and not basename:
         importer.import_all(redo=redo)
