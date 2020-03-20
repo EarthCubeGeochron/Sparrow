@@ -2,7 +2,7 @@
 # Main requirements file for the
 # Sparrow backend.
 #
-# Last updated on 23 Jan 2019
+# Last updated on 23 Jan 2020
 ###
 
 # Preinstalled in 'sparrowdata/backend-base image'
@@ -57,6 +57,9 @@ shapely # Should already be installed
 Flask-GraphQL==2.0.1
 graphene==2.1.8
 graphene_sqlalchemy==2.2.2
+
+# S3/AWS file access
+boto3==1.12.25
 
 # Testing (we could split this into a separate file
 # if it becomes too weighty.)

@@ -28,6 +28,14 @@ services:
       - SPARROW_BASE_URL
       - SPARROW_LAB_NAME
       - SPARROW_INIT_SQL=/init-sql
+      # For cloud data support
+      # NOTE: it may be useful to split this into a
+      # separate container, but it's centralized
+      # for now...
+      - SPARROW_S3_ENDPOINT
+      - SPARROW_S3_BUCKET
+      - SPARROW_S3_KEY
+      - SPARROW_S3_SECRET
     volumes:
       # Volume for scripts to make things like
       # migrations work...
