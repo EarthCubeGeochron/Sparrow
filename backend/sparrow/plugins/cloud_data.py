@@ -3,8 +3,8 @@ from boto3 import client
 from click import secho, command, option
 from os import environ
 
-
 class CloudDataPlugin(SparrowPlugin):
+    """A base plugin for cloud data. Should be subclassed by importers."""
     name = "cloud-data"
 
     def on_setup_cli(self, cli):
@@ -37,8 +37,12 @@ class CloudDataPlugin(SparrowPlugin):
             pages = paginator.paginate(Bucket=s3['bucket'])
             for page in pages:
                 for obj in page['Contents']:
+                    self.check_object(obj)
                     nkeys += 1
                     print(obj['Key'])
             print(nkeys)
 
         cli.add_command(cmd)
+
+    def check_object(self, obj):
+        pass
