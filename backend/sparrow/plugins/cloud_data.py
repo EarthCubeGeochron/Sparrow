@@ -6,6 +6,7 @@ from os import environ
 
 class CloudDataPlugin(SparrowPlugin):
     name = "cloud-data"
+
     def on_setup_cli(self, cli):
         # It might make sense to run cloud import operations
         # in a separate Docker container, but we do it in the
@@ -24,6 +25,7 @@ class CloudDataPlugin(SparrowPlugin):
             fully_defined = all([i is not None for i in s3.values()])
             if not fully_defined:
                 secho("Not all required environment variables are provided.")
+                return
 
             session = client('s3',
                              endpoint_url=s3['endpoint'],
@@ -31,7 +33,6 @@ class CloudDataPlugin(SparrowPlugin):
                              aws_secret_access_key=s3['secret_key'])
 
             nkeys = 0
-
             paginator = session.get_paginator('list_objects')
             pages = paginator.paginate(Bucket=s3['bucket'])
             for page in pages:
@@ -39,6 +40,5 @@ class CloudDataPlugin(SparrowPlugin):
                     nkeys += 1
                     print(obj['Key'])
             print(nkeys)
-
 
         cli.add_command(cmd)

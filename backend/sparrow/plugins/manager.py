@@ -1,22 +1,5 @@
-
 from toposort import toposort_flatten
-
-
-class SparrowPluginError(Exception):
-    pass
-
-
-class SparrowPlugin(object):
-    dependencies = []
-    name = None
-
-    def __init__(self, app):
-        self.app = app
-        self.db = self.app.db
-
-
-class SparrowCorePlugin(SparrowPlugin):
-    pass
+from .base import SparrowPlugin, SparrowPluginError
 
 
 class SparrowPluginManager(object):
