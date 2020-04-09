@@ -13,12 +13,14 @@ from .util import (
 )
 from ..util import relative_path
 
+
 class BaseImporter(object):
     """
     A basic Sparrow importer to be subclassed.
     """
     authority = None
     file_type = None
+
     def __init__(self, db, **kwargs):
         self.db = db
         self.m = self.db.model
@@ -244,6 +246,14 @@ class BaseImporter(object):
             secho(str(fn), dim=True)
             self.__import_datafile(fn, None, **kwargs)
 
+    def iter_records(self, seq, **kwargs):
+        """
+        This is kind of outmoded by the new version of iterfiles
+        """
+        for rec in seq:
+            secho(str(rec.file_path), dim=True)
+            self.__import_datafile(None, rec, **kwargs)
+
     def __set_file_info(self, infile, rec):
         _ = infile.stat().st_mtime
         mtime = datetime.utcfromtimestamp(_)
@@ -398,10 +408,10 @@ class BaseImporter(object):
             file_hash=rec.file_hash,
             **kw)
 
-    def iter_records(self, seq, **kwargs):
-        """
-        This is kind of outmoded by the new version of iterfiles
-        """
-        for rec in seq:
-            secho(str(rec.file_path), dim=True)
-            self.__import_datafile(None, rec, **kwargs)
+
+class CloudImporter(BaseImporter):
+    """
+    Importer to be subclassed that is geared towards S3 and compatible
+    cloud storage systems.
+    """
+    pass

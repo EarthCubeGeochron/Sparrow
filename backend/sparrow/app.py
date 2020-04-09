@@ -123,7 +123,7 @@ class App(Flask):
             import sparrow_plugins
             self.register_module_plugins(sparrow_plugins)
         except ModuleNotFoundError:
-            log.debug("Could not find external Sparrow plugins.")
+            log.error("Could not find external Sparrow plugins.")
 
         self.__loaded()
 
