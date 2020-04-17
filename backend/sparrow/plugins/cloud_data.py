@@ -1,4 +1,5 @@
 from sparrow.plugins import SparrowPlugin
+from sparrow.database.util import run_sql
 from boto3 import client
 from click import secho, command, option
 from os import environ
@@ -41,6 +42,11 @@ class CloudDataPlugin(SparrowPlugin):
         res = self.session.get_object(Bucket=self.auth['bucket'], Key=key)
         return res['Body']
 
+    def on_core_tables_initialized(self, db):
+        # We need a separate column to store S3 ETags, which are almost like our
+        # MD5 hashes, but not quite...
+        run_sql(db.session, "ALTER TABLE data_file ADD COLUMN file_etag text UNIQUE")
+
     def on_setup_cli(self, cli):
         # It might make sense to run cloud import operations
         # in a separate Docker container, but we do it in the
@@ -60,9 +66,11 @@ class CloudDataPlugin(SparrowPlugin):
 
     def check_object(self, obj):
         db = self.app.database
-        # ETag is basically always the MD5
-        id = obj["ETag"].replace('"','')
-        model = db.get(db.model.data_file, id)
+        # ETag is (almost) always the MD5. It could have a postfix
+        # Hash values are stored as uuids and must be 32 chars long
+        # https://docs.aws.amazon.com/AmazonS3/latest/API/RESTCommonResponseHeaders.html
+        id = obj["ETag"].replace('"', '')
+        model = db.session.query(db.model.data_file).filter_by(file_etag=id).first()
         return model is not None
 
     def import_object(self, meta, contents):

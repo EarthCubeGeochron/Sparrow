@@ -173,3 +173,4 @@ class Database(MappedDatabaseMixin):
             self.app.run_hook('core-tables-initialized', self)
         except AttributeError as err:
             secho("Could not load plugins", fg='red', dim=True)
+            secho(str(err))
