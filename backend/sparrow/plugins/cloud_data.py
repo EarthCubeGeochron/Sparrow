@@ -47,21 +47,23 @@ class CloudDataPlugin(SparrowPlugin):
         # MD5 hashes, but not quite...
         run_sql(db.session, "ALTER TABLE data_file ADD COLUMN file_etag text UNIQUE")
 
+    def process_objects(self, only_untracked=True):
+        for obj in self.iterate_objects():
+            already_exists = self.check_object(obj)
+            if already_exists and only_untracked:
+                continue
+            body = self.get_object(obj['Key'])
+            yield self.import_object(obj, body)
+
     def on_setup_cli(self, cli):
         # It might make sense to run cloud import operations
         # in a separate Docker container, but we do it in the
         # main container for now
         @command(name='import-cloud-data')
-        @option("--overwrite", is_flag=True, default=False)
-        def cmd(overwrite=False):
+        @option("--redo", is_flag=True, default=False)
+        def cmd(redo=False):
             """Import cloud data"""
-            for obj in self.iterate_objects():
-                already_exists = self.check_object(obj)
-                if already_exists and not overwrite:
-                    continue
-                body = self.get_object(obj['Key'])
-                self.import_object(obj, body)
-
+            list(self.process_objects(only_untracked=not redo))
         cli.add_command(cmd)
 
     def check_object(self, obj):
