@@ -38,7 +38,7 @@ class CloudDataPlugin(SparrowPlugin):
                 yield obj
                 nkeys += 1
 
-    def get_object(self, key):
+    def get_body(self, key):
         res = self.session.get_object(Bucket=self.auth['bucket'], Key=key)
         return res['Body']
 
@@ -49,11 +49,10 @@ class CloudDataPlugin(SparrowPlugin):
 
     def process_objects(self, only_untracked=True):
         for obj in self.iterate_objects():
-            already_exists = self.check_object(obj)
-            if already_exists and only_untracked:
+            if only_untracked and self._already_tracked(obj):
+                # Object already exists
                 continue
-            body = self.get_object(obj['Key'])
-            yield self.import_object(obj, body)
+            yield self.import_object(obj)
 
     def on_setup_cli(self, cli):
         # It might make sense to run cloud import operations
@@ -66,14 +65,16 @@ class CloudDataPlugin(SparrowPlugin):
             list(self.process_objects(only_untracked=not redo))
         cli.add_command(cmd)
 
-    def check_object(self, obj):
+    def _instance_for_meta(self, meta):
         db = self.app.database
         # ETag is (almost) always the MD5. It could have a postfix
         # Hash values are stored as uuids and must be 32 chars long
         # https://docs.aws.amazon.com/AmazonS3/latest/API/RESTCommonResponseHeaders.html
-        id = obj["ETag"].replace('"', '')
-        model = db.session.query(db.model.data_file).filter_by(file_etag=id).first()
-        return model is not None
+        id = meta["ETag"].replace('"', '')
+        return db.session.query(db.model.data_file).filter_by(file_etag=id).first()
+
+    def _already_tracked(self, meta):
+        return self._instance_for_meta(meta) is not None
 
     def import_object(self, meta, contents):
         raise Exception("Need to subclass and override this function")

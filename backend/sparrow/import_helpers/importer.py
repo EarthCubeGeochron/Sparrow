@@ -390,15 +390,13 @@ class BaseImporter(object):
         """
         Track the import of a given model from a data file
         """
-        if model is None:
-            return
-        elif isinstance(model, self.m.session):
+        if isinstance(model, self.m.session):
             kw['session_id'] = model.id
         elif isinstance(model, self.m.analysis):
             kw['analysis_id'] = model.id
         elif isinstance(model, self.m.sample):
             kw['sample_id'] = model.id
-        else:
+        elif 'error' not in kw:
             raise NotImplementedError(
                 "Only sessions, samples, and analyses "
                 "can be tracked independently on import.")
