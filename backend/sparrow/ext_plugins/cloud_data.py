@@ -1,9 +1,8 @@
-from sparrow.plugins import SparrowPlugin
-from sparrow.database.util import run_sql
 from boto3 import client
 from click import secho, command, option
 from os import environ
-
+from ..plugins import SparrowPlugin
+from ..database.util import run_sql
 
 class CloudDataPlugin(SparrowPlugin):
     """A base plugin for cloud data. Should be subclassed by importers."""
