@@ -325,7 +325,8 @@ class BaseImporter(object):
         except (SparrowImportError, NotImplementedError, IntegrityError) as err:
             self.db.session.rollback()
             df_link = self.__track_model(rec, None, error=str(err))
-            self.db.session.add(df_link)
+            if df_link is not None:
+                self.db.session.add(df_link)
             secho(str(err), fg='red')
 
         if redo:
