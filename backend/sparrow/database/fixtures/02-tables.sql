@@ -230,18 +230,18 @@ CREATE TABLE IF NOT EXISTS sample (
 
 Should the `session` table contain the link to project rather than
 the `sample` table? This might be more correct, and samples could still
-be linked to projects through a table relationship
+be linked to projects through a table relationship.
 */
 
 CREATE TABLE IF NOT EXISTS sample_geo_entity (
-  -- deleting analytical data should cascade
+  -- deletion of analytical data should cascade
   sample_id integer REFERENCES sample(id) ON DELETE CASCADE,
-  entity_id integer REFERENCES geo_entity(id),
-  ref_datum text REFERENCES vocabulary.entity_reference(id) NOT NULL,
-  ref_unit text REFERENCES vocabulary.unit(id) NOT NULL,
-  ref_distance numeric NOT NULL,
+  geo_entity_id integer REFERENCES geo_entity(id),
+  ref_datum text REFERENCES vocabulary.entity_reference(id),
+  ref_unit text REFERENCES vocabulary.unit(id),
+  ref_distance numeric,
   -- We could add some sort of *basis* or *confidence* field here...
-  PRIMARY KEY (sample_id, entity_id),
+  PRIMARY KEY (sample_id, geo_entity_id),
   CHECK (
       (ref_datum IS NOT NULL)::int
     + (ref_unit IS NOT NULL)::int
