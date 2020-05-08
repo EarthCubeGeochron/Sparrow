@@ -11,6 +11,14 @@ SELECT pgmemento.create_schema_audit(
 );
 
 SELECT pgmemento.create_schema_audit(
+  'geo_context',
+  -- Log existing data as imported
+  FALSE,
+  -- Tables to ignore
+  null
+);
+
+SELECT pgmemento.create_schema_audit(
   'vocabulary',
   -- Log existing data as imported
   FALSE,

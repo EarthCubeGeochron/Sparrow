@@ -79,6 +79,7 @@ class MappedDatabaseMixin(object):
             # Reflect tables in schemas we care about
             # Note: this will not reflect views because they don't have
             # primary keys.
+            print("Reflecting schema "+schema)
             BaseModel.metadata.reflect(
                     bind=self.engine,
                     schema=schema,

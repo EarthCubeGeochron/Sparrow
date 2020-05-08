@@ -49,12 +49,19 @@ INSERT INTO enum.date_precision(id) VALUES
   ('day')
 ON CONFLICT DO NOTHING;
 
-
 /*
 # Vocabularies
 
 Controlled vocabularies for terms defining data
 semantics.
+
+NOTE: vocabulary term tables all currently use "natural"
+keys. This makes them vulnerable to duplicate values
+(e.g. from different authorities). However, it is
+significantly simpler to read analytical data tables
+without having to follow integer foreign keys.
+We may need to shift these tables to integer keys in
+the future...
 */
 
 CREATE TABLE IF NOT EXISTS vocabulary.parameter (
@@ -98,7 +105,28 @@ CREATE TABLE IF NOT EXISTS vocabulary.analysis_type (
 );
 
 /*
-## Projects
+### Geological entities
+*/
+
+CREATE TABLE IF NOT EXISTS vocabulary.entity_type (
+  -- e.g. formation, group, river, lake, glacier
+  id text PRIMARY KEY,
+  description text,
+  authority text,
+  type_of text REFERENCES vocabulary.entity_type(id)
+);
+
+CREATE TABLE IF NOT EXISTS vocabulary.entity_reference (
+  -- e.g. top, bottom
+  id text PRIMARY KEY,
+  description text,
+  authority text
+);
+
+-- We could add a model for e.g. *facies* here.
+
+/*
+##Projects
 */
 
 CREATE TABLE IF NOT EXISTS project (
@@ -148,6 +176,26 @@ CREATE UNIQUE INDEX datum_type_unique ON datum_type
 (parameter, unit, coalesce(error_unit, 'NO ERROR'), coalesce(error_metric, 'NO ERROR'));
 
 /*
+## Geological context
+*/
+
+CREATE TABLE IF NOT EXISTS geo_entity (
+  id serial PRIMARY KEY,
+  /*
+  Entity name could potentially be unique or
+  specifically referenced to an externally-maintained
+  lexicon, if desired.
+  */
+  name text NOT NULL,
+  authority text,
+  ref_url text,
+  description text,
+  part_of integer REFERENCES geo_entity(id),
+  type text REFERENCES vocabulary.entity_type(id),
+  material text REFERENCES vocabulary.material(id)
+);
+
+/*
 
 ## Sample
 
@@ -183,6 +231,27 @@ CREATE TABLE IF NOT EXISTS sample (
 Should the `session` table contain the link to project rather than
 the `sample` table? This might be more correct, and samples could still
 be linked to projects through a table relationship
+*/
+
+CREATE TABLE IF NOT EXISTS sample_geo_entity (
+  -- deleting analytical data should cascade
+  sample_id integer REFERENCES sample(id) ON DELETE CASCADE,
+  entity_id integer REFERENCES geo_entity(id),
+  ref_datum text REFERENCES vocabulary.entity_reference(id) NOT NULL,
+  ref_unit text REFERENCES vocabulary.unit(id) NOT NULL,
+  ref_distance numeric NOT NULL,
+  -- We could add some sort of *basis* or *confidence* field here...
+  PRIMARY KEY (sample_id, entity_id),
+  CHECK (
+      (ref_datum IS NOT NULL)::int
+    + (ref_unit IS NOT NULL)::int
+    + (ref_distance IS NOT NULL)::int IN (0,3)
+  )
+);
+
+
+/*
+# Analytical data
 
 ## Session
 
@@ -228,7 +297,8 @@ CREATE TABLE IF NOT EXISTS session (
 /*
 ## Single analyses
 
-These two tables will end up needing data-type specific columns
+The `analysis` and `datum` tables will be where data-type specific columns
+(e.g. for in-situ geochemical data) will be stored.
 
 ### Analysis
 
@@ -340,7 +410,7 @@ CREATE TABLE IF NOT EXISTS datum (
 
 Text attributes associated with analyses (e.g.
 standard names, calibration types). These should
-be numerical, unitless values.
+be non-numerical, unitless values.
 */
 CREATE TABLE IF NOT EXISTS attribute (
   id serial PRIMARY KEY,

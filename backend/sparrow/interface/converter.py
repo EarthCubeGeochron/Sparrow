@@ -17,7 +17,7 @@ from .util import to_schema_name
 
 # Control how relationships can be resolved
 allowed_collections = {
-    'sample': ['session', 'material'],
+    'sample': 'all', #['session', 'material', 'sample_entity'],
     'session': 'all',
     'analysis': ['datum', 'attribute', 'constant', 'analysis_type', 'material'],
     'attribute': ['parameter', 'unit'],
