@@ -210,18 +210,20 @@ CREATE TABLE IF NOT EXISTS sample (
   name text,
   igsn text UNIQUE,
   material text REFERENCES vocabulary.material(id),
-  /* Order-of-magnitude precision (in meters)
-     with which this position
-     is known */
+  /* #### Location fields
+  These might be best moved to an external model.
+
+  Order-of-magnitude precision (in meters)
+  with which this position is known */
   location_precision integer DEFAULT 0,
   /* A representative named location */
   location_name text,
   location_name_autoset boolean,
   location geometry,
   /* NOTE: Elevation and depth are not normalized in the current schema!
-     Potentially, these columns should be recast as *references* to a specific
-     reference datum (e.g. `vocabulary.entity_reference`); perhaps we want to move towards
-     this in the future.
+  Potentially, these columns should be recast as *references* to a specific
+  reference datum (e.g. `vocabulary.entity_reference`); perhaps we want to move towards
+  this in the future.
   */
   -- elevation above sea level in meters
   elevation numeric,
