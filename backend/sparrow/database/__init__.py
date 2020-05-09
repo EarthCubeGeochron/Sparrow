@@ -84,18 +84,19 @@ class Database(MappedDatabaseMixin):
         finally:
             session.close()
 
-    def create_instance(self, model_name, data):
+    def model_schema(self, model_name):
         """
         Create a SQLAlchemy instance from data conforming to an import schema
         """
         iface = getattr(self.interface, model_name)
-        return iface().load(data, session=self.session)
+        return iface()
 
     def load_data(self, model_name, data):
+        schema = self.model_schema(model_name)
         try:
             #try:
             with self.session.no_autoflush:
-                res = self.create_instance(model_name, data)
+                res = schema.load(data, session=self.session)
                 log.info("Entering final commit phase of import")
                 log.info(f"Adding top-level object {res}")
                 self.session.add(res)
@@ -122,8 +123,8 @@ class Database(MappedDatabaseMixin):
             raise err
 
     def get_instance(self, model_name, filter_params):
-        iface = getattr(self.interface, model_name)
-        res = iface().load(filter_params, session=self.session, partial=True)
+        schema = self.model_schema(model_name)
+        res = schema.load(filter_params, session=self.session, partial=True)
         return res
 
     def exec_sql(self, fn):

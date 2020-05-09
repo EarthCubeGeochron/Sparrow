@@ -123,9 +123,13 @@ CREATE TABLE IF NOT EXISTS vocabulary.entity_reference (
   authority text
 );
 
--- We could add a model for e.g. *facies* here.
-
 /*
+- We could add a model for "global reference" (e.g. sea level, surface) to
+  allow abstraction of elevation, depth, etc. But this may overcomplicate things
+  right now.
+- We could add a model for e.g. *facies*. Or facies could be considered
+  subtypes of geological entity (this is probably better).
+
 ##Projects
 */
 
@@ -214,9 +218,15 @@ CREATE TABLE IF NOT EXISTS sample (
   location_name text,
   location_name_autoset boolean,
   location geometry,
-  /* The elevation column could potentially be recast as a *datum* tied directly
-     to the sample. */
+  /* NOTE: Elevation and depth are not normalized in the current schema!
+     Potentially, these columns should be recast as *references* to a specific
+     reference datum (e.g. `vocabulary.entity_reference`); perhaps we want to move towards
+     this in the future.
+  */
+  -- elevation above sea level in meters
   elevation numeric,
+  -- borehole depth in meters
+  depth numeric,
   embargo_date timestamp,
   CHECK ((name IS NOT null) OR (igsn IS NOT null))
 );
@@ -242,6 +252,7 @@ CREATE TABLE IF NOT EXISTS sample_geo_entity (
   ref_distance numeric,
   -- We could add some sort of *basis* or *confidence* field here...
   PRIMARY KEY (sample_id, geo_entity_id),
+  -- Either all reference fields are defined, or none of them are.
   CHECK (
       (ref_datum IS NOT NULL)::int
     + (ref_unit IS NOT NULL)::int
