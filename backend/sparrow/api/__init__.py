@@ -11,6 +11,10 @@ from ..logs import get_logger
 from .base import API, APIResourceCollection
 
 log = get_logger(__name__)
+
+# Maybe switch to https://fastapi.tiangolo.com/history-design-future/
+# which is a batteries-included solution for APIs
+
 # eventually should use **Marshmallow** or similar
 # for parsing incoming API requests
 
