@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
+from marshmallow.exceptions import ValidationError
 
 from .util import run_sql_file, run_query, get_or_create
 from .models import User, Project, Session, DatumType
@@ -116,10 +117,14 @@ class Database(MappedDatabaseMixin):
                 log.info(f"Committing entire transaction")
                 self.session.commit()
             return res
-        except IntegrityError as err:
+        except (IntegrityError, ValidationError) as err:
             self.session.rollback()
             log.debug(err)
             raise err
+
+    def get_existing_instance(self, model_name, filter_params):
+        schema = self.model_schema(model_name)
+        return schema.load(filter_params, session=self.session)
 
     def get_instance(self, model_name, filter_params):
         schema = self.model_schema(model_name)
