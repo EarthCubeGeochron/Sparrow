@@ -178,11 +178,12 @@ class BaseSchema(SQLAlchemyAutoSchema):
     def make_instance(self, data, **kwargs):
         instance = self._get_instance(data)
         if instance is None:
-            instance = self.opts.model(**data)
-            self.session.add(instance)
-            log.info(f"Created instance {instance} with parameters {data}")
-
             try:
+                # Begin a nested subtransaction
+                self.session.begin_nested()
+                instance = self.opts.model(**data)
+                self.session.add(instance)
+                log.info(f"Created instance {instance} with parameters {data}")
                 self.session.flush(objects=[instance])
                 self.session.commit()
                 log.info("Successfully persisted to database")
