@@ -16,7 +16,52 @@ session = dict(
 
 logging.basicConfig(level=logging.CRITICAL)
 
-class TestImperativeImport:
+class TestDatabaseInitialization:
+    def test_db_automap(self):
+        """
+        Make sure that all core tables are automapped by the
+        SQLAlchemy mapper.
+        """
+        core_automapped_tables = [
+            'enum_date_precision',
+            'instrument',
+            'publication',
+            'sample',
+            'vocabulary_material',
+            'vocabulary_method',
+            'vocabulary_error_metric',
+            'vocabulary_unit',
+            'vocabulary_parameter',
+            'analysis',
+            'vocabulary_analysis_type',
+            'constant',
+            'researcher',
+            'data_file',
+            'data_file_type',
+            'attribute',
+            'data_file_link',
+            'datum',
+            'user',
+            'project',
+            'session',
+            'datum_type',
+            'vocabulary_entity_type',
+            'vocabulary_entity_reference',
+            'geo_entity',
+            'sample_geo_entity',
+            'core_view_datum'
+        ]
+        for t in core_automapped_tables:
+            assert t in db.model.keys()
+
+class TestGenericData(object):
+    @mark.xfail(reason="'get_instance' has a poorly written API.")
+    def test_get_instance(self):
+        sample = db.get_instance("sample", {'name': "Nonexistent sample"})
+        assert sample is None
+
+
+class TestImperativeImport(object):
     def test_imperative_import(self):
         """
         Test importing some data using imperative SQLAlchemy. This is no
@@ -499,3 +544,53 @@ class TestAPIImporter:
         complex_data['data']['analysis'] = complex_data['data']['analysis'][3:4]
 
         db.load_data("session", complex_data['data'])
+
+    def test_missing_field(self, client):
+        """Missing fields should produce a useful error message
+           and insert no data"""
+        new_name = "Test error vvv"
+        data = {
+            "date": str(datetime.now()),
+            "name": "Session with existing instances",
+            "sample": {
+                "name": new_name
+            },
+            "analysis": [{
+                # Can't seem to get or create this instance from the database
+                "analysis_type": "Stable isotope analysis",
+                "session_index": 0,
+                "datum": [{
+                    "value": 0.1,
+                    "error": 0.025,
+                    "type": {
+                        # Missing field "parameter" here!
+                        'unit': 'permille'
+                    }
+                }]
+            }, {
+                # Can't seem to get or create this instance from the database
+                "analysis_type": "Stable isotope analysis",
+                "session_index": 1,
+                "datum": [{
+                    "value": 0.2,
+                    "error": 0.035,
+                    "type": {
+                        'parameter': 'delta 13C',
+                        'unit': 'permille'
+                    }
+                }]
+            }]
+        }
+
+        res = client.put("/api/v1/import-data/session", json={'filename': None, 'data': data})
+        assert res.status_code == 400
+        err = res.json['error']
+
+        assert err['type'] == 'marshmallow.exceptions.ValidationError'
+        # It could be useful to have a function that "unnests" these errors
+        keypath = err['messages']['analysis']['0']['datum']['0']['type']['parameter']
+        assert keypath[0] == 'Missing data for required field.'
+
+        # Make sure we don't partially import data
+        res = db.session.query(db.model.sample).filter_by(name=new_name).first()
+        assert res == None
