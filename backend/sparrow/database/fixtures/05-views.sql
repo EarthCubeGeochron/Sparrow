@@ -224,7 +224,7 @@ SELECT
 	s.name sample_name,
 	s.material,
 	ss.target,
-  'Feature' AS type,
+    'Feature' AS type,
 	ST_AsGeoJSON(s.location)::jsonb geometry,
 	s.location_name,
 	s.location_precision,
@@ -233,7 +233,9 @@ SELECT
 	dt.parameter,
 	dt.unit,
 	dt.error_unit,
-	dt.error_metric
+	dt.error_metric,
+	g.name geo_entity_name,
+	g.type geo_entity_type
 FROM sample s
 JOIN session ss
   ON ss.sample_id = s.id
@@ -243,6 +245,21 @@ JOIN datum d
   ON d.analysis = a.id
 JOIN datum_type dt
   ON dt.id = d.type
+/*
+TODO: Because the sample_geo_entity link is many-to-one, there might be more
+than one geo_entity defined for a single sample. This query is constructed
+in a straightforward manner, but it will result in us returning multiple copies
+of an age if the sample is connected to more than one `geo_entity`. This is not
+ideal, and we should consider either
+1. Returning a list of `geo_entity` objects for each sample (this would be a more
+   complex query), or
+2. Limiting the data model so that only one `geo_entity` can be directly linked
+   to a sample
+*/
+LEFT JOIN sample_geo_entity sg
+  ON s.id = sg.sample_id
+LEFT JOIN geo_entity g
+  ON sg.geo_entity_id = g.id
 WHERE location IS NOT NULL
   AND dt.unit = 'Ma' -- Poor proxy for age right now
   AND d.is_accepted
