@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 # Description: Import database from binary `pg_dump` archive
 sparrow compose stop backend
 sparrow db-await
@@ -11,7 +11,7 @@ mkdir -p /tmp
 rm -f "$internal_name"
 EOF
 
-docker cp "$1" $container_id:$internal_name
+docker cp "${1:A}" $container_id:$internal_name
 
 sparrow compose exec -T db bash -s <<EOF
 dropdb --if-exists -Upostgres sparrow
