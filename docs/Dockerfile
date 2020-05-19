@@ -5,4 +5,4 @@ RUN npm install
 
 EXPOSE 8000
 COPY . /app/
-RUN node_modules/.bin/gatsby develop -H 0.0.0.0
+CMD node_modules/.bin/gatsby develop -H 0.0.0.0
