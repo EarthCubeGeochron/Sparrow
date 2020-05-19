@@ -1,0 +1,15 @@
+version: "3.4"
+services:
+  frontend:
+    build: .
+    expose:
+      - 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - /app/.cache
+      - /app/node_modules
+      - public:/app/public
+volumes:
+  public:
