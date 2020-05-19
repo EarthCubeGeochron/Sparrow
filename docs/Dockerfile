@@ -3,6 +3,6 @@ COPY ./package.json /app/package.json
 WORKDIR /app
 RUN npm install
 
-EXPOSE 8000
+EXPOSE 3000
 COPY . /app/
-RUN node_modules/.bin/gatsby develop -H 0.0.0.0
+CMD node_modules/.bin/docusaurus start --host 0.0.0.0 --port 3000

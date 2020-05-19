@@ -1,15 +1,15 @@
 version: "3.4"
 services:
-  frontend:
+  main:
     build: .
-    expose:
-      - 8000
     ports:
-      - "8000:8000"
+      - "3000:3000"
     volumes:
-      - .:/app
-      - /app/.cache
-      - /app/node_modules
       - public:/app/public
+  main1:
+    image: nginxdemos/hello
+    ports:
+      - "3001:80"
 volumes:
   public:
+  #node_modules:
