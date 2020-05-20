@@ -3,10 +3,6 @@
 npm install
 
 # Default NODE_ENV to development
-export NODE_ENV="${NODE_ENV:-"development"}"
+#export NODE_ENV="${NODE_ENV:-"development"}"
 
-if [ $NODE_ENV = "development" ]; then
-  webpack --watch --mode=development
-else
-  webpack --mode production
-fi
+webpack --mode production
