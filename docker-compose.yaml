@@ -75,7 +75,7 @@ services:
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container
       - SPARROW_SITE_CONTENT=/app/site-content
-      - NODE_ENV=${SPARROW_ENV:-development}
+      - SPARROW_ENV
     volumes:
       - ./frontend:/app
       - /app/node_modules
