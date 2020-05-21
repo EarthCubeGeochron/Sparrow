@@ -1,0 +1,17 @@
+name: Documentaton website continuous integration
+on:
+  push:
+    branches: [ master, docs ]
+  pull_request:
+    branches: [ master, docs ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the containers
+      run: cd docs && docker-compose up --build -d
+    - name: Build the Docker image
+      run: docs/test-docs
+    - name: Deploy the application
+      run: echo
