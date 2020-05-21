@@ -4,10 +4,11 @@ source docs/.ci/_defs.bash
 
 # Pull existing built images from GitHub Package Repository, to provide build
 # cache, if it exists.
-for img in ("$main_img" "$test_img"); do
-  docker pull $PKG_ROOT/$main_img || true
+for img in "$main_img" "$test_img" ; do
+  echo $PKG_ROOT$img
+  docker pull $PKG_ROOT$img || true
 done
 
 # Build images, using existing images as cache if possible
-docker build docs -t $main_img --cache-from=$PKG_ROOT/$main_img
-docker build docs/test -t $test_img --cache-from=$PKG_ROOT/$test_img
+docker build docs -t $main_img --cache-from=$PKG_ROOT$main_img
+docker build docs/test -t $test_img --cache-from=$PKG_ROOT$test_img

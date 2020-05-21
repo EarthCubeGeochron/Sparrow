@@ -1,7 +1,7 @@
 #!/bin/bash
 source docs/.ci/_defs.bash
 
-for img in ("$main_img" "$test_img"); do
-  docker tag $main_img $PKG_ROOT/$main_img
-  docker push $PKG_ROOT/$main_img || true
+for img in "$main_img" "$test_img"; do
+  docker tag $img $PKG_ROOT$img
+  docker push $PKG_ROOT$img || true
 done
