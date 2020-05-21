@@ -7,17 +7,17 @@ module.exports = {
     author: "Daven Quinn and the EarthCube Geochronology Frontiers team"
   },
   // for development server
-  developMiddleware: app => {
-    app.use(
-      "/python-api/",
-      proxy({
-        target: "http://127.0.0.1:8001",
-        pathRewrite: {
-          "/python-api/": "",
-        },
-      })
-    )
-  },
+  // developMiddleware: app => {
+  //   app.use(
+  //     "/python-api/",
+  //     proxy({
+  //       target: "http://127.0.0.1:8001",
+  //       pathRewrite: {
+  //         "/python-api/": "",
+  //       },
+  //     })
+  //   )
+  // },
   plugins: [
     // custom configuration
     `gatsby-mdx`,

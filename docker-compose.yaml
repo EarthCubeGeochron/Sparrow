@@ -6,7 +6,6 @@ services:
       - backend
       - frontend
     ports:
-
       - ${SPARROW_HTTP_PORT:-5002}:80
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd "$(git rev-parse --show-toplevel HEAD)/docs"
+
+# Set a different compose project name so we don't step on running
+# applications.
+export COMPOSE_PROJECT_NAME="sparrow_docs"
+export COMPOSE_FILE="docker-compose.yaml:docker-compose.test.yaml"
+
+docker-compose build --quiet
+# Need to bring up database separately to ensure ports are mapped...
+docker-compose run --rm --service-ports test /test/run-tests $@
