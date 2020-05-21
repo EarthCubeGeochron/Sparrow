@@ -23,8 +23,8 @@ jobs:
     # Passes a webhook to the specified URL used for deployment
     # A webhook receiver such as https://github.com/staticfloat/docker-webhook
     # should be integrated into the destination
-    # - name: Send webhook to kick off deployment
-    #   uses: distributhor/workflow-webhook@v1
-    #   env:
-    #     webhook_url: ${{ secrets.DOCUMENTATION_DEPLOYMENT_ENDPOINT }}
-    #     webhook_secret: ${{ secrets.DOCUMENTATION_DEPLOYMENT_SECRET }}
+    - name: Send webhook to kick off deployment
+      uses: distributhor/workflow-webhook@v1
+      env:
+        webhook_url: ${{ secrets.DOCUMENTATION_DEPLOYMENT_ENDPOINT }}
+        webhook_secret: ${{ secrets.DOCUMENTATION_DEPLOYMENT_SECRET }}
