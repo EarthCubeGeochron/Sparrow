@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      PKG_ROOT: docker.pkg.github.com/$GITHUB_REPOSITORY
+      PKG_ROOT: docker.pkg.github.com/earthcubegeochron/sparrow/
     steps:
     # https://dev.to/dtinth/caching-docker-builds-in-github-actions-which-approach-is-the-fastest-a-research-18ei
     - uses: actions/checkout@v2
@@ -23,8 +23,8 @@ jobs:
     # Passes a webhook to the specified URL used for deployment
     # A webhook receiver such as https://github.com/staticfloat/docker-webhook
     # should be integrated into the destination
-    - name: Send webhook to kick off deployment
-      uses: distributhor/workflow-webhook@v1
-      env:
-        webhook_url: ${{ secrets.DOCUMENTATION_DEPLOYMENT_ENDPOINT }}
-        webhook_secret: ${{ secrets.DOCUMENTATION_DEPLOYMENT_SECRET }}
+    # - name: Send webhook to kick off deployment
+    #   uses: distributhor/workflow-webhook@v1
+    #   env:
+    #     webhook_url: ${{ secrets.DOCUMENTATION_DEPLOYMENT_ENDPOINT }}
+    #     webhook_secret: ${{ secrets.DOCUMENTATION_DEPLOYMENT_SECRET }}
