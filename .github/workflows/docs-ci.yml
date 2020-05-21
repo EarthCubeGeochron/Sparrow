@@ -7,15 +7,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      PKG_ROOT: docker.pkg.github.com/$GITHUB_REPOSITORY
     steps:
-    - uses: actions/checkout@v2
-    - name: Test that documentation website builds properly
-      run: docs/test-docs
-    - name: Deploy the application
-      run: echo
     # https://dev.to/dtinth/caching-docker-builds-in-github-actions-which-approach-is-the-fastest-a-research-18ei
-    # - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
-    # - name: Pull existing built image from GitHub, if it exists
-    #   run: docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit: || true
-    # - run: docker build . -t thing --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit
-    # - run: docker tag thing docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
+    - uses: actions/checkout@v2
+    - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
+    - name: Build Docker images
+      run: docs/.ci/1-build-images
+    - name: Test that website loads properly
+      run: docs/.ci/2-run-tests
+    - name: Push new images to GitHub Packages
+      run: docs/.ci/3-push-images
+    # Deployment:
+    # Passes a webhook to the specified URL used for deployment
+    # A webhook receiver such as https://github.com/staticfloat/docker-webhook
+    # should be integrated into the destination
+    - name: Send webhook to kick off deployment
+      uses: distributhor/workflow-webhook@v1
+      env:
+        webhook_url: ${{ secrets.DOCUMENTATION_DEPLOYMENT_ENDPOINT }}
+        webhook_secret: ${{ secrets.DOCUMENTATION_DEPLOYMENT_SECRET }}
