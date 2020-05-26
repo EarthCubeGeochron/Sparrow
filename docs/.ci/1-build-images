@@ -10,5 +10,5 @@ for img in "$main_img" "$test_img" ; do
 done
 
 # Build images, using existing images as cache if possible
-docker build docs -t $main_img --cache-from=$PKG_ROOT$main_img
+docker build . -f docs/Dockerfile -t $main_img --cache-from=$PKG_ROOT$main_img
 docker build docs/test -t $test_img --cache-from=$PKG_ROOT$test_img
