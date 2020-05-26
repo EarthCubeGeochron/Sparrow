@@ -1,0 +1,6 @@
+version: "3.4"
+services:
+  frontend:
+    image: sparrow-documentation-site:latest
+  test:
+    image: sparrow-documentation-test:latest

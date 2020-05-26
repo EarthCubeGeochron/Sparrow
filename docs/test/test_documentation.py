@@ -10,7 +10,8 @@ routes = [
     '/',
     '/docs',
     '/motivation-and-design',
-    '/installation'
+    '/installation',
+    '/schema'
 ]
 
 @pytest.mark.parametrize("route", routes)
