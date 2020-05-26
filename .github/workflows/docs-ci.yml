@@ -18,12 +18,14 @@ jobs:
     - name: Test that website loads properly
       run: docs/.ci/2-run-tests
     - name: Push new images to GitHub Packages
+      if: ${{ github.event_name == 'push' }}
       run: docs/.ci/3-push-images
     # Deployment:
     # Passes a webhook to the specified URL used for deployment
     # A webhook receiver such as https://github.com/staticfloat/docker-webhook
     # should be integrated into the destination
     - name: Send webhook to kick off deployment
+      if: ${{ github.event_name == 'push' }}
       uses: distributhor/workflow-webhook@v1
       env:
         webhook_url: ${{ secrets.DOCUMENTATION_DEPLOYMENT_ENDPOINT }}
