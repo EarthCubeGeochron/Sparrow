@@ -1,8 +1,9 @@
 from boto3 import client
 from click import secho, command, option
 from os import environ
-from ..plugins import SparrowPlugin
-from ..database.util import run_sql
+from sparrow.plugins import SparrowPlugin
+from sparrow.database.util import run_sql
+
 
 class CloudDataPlugin(SparrowPlugin):
     """A base plugin for cloud data. Should be subclassed by importers."""
@@ -24,7 +25,7 @@ class CloudDataPlugin(SparrowPlugin):
                               aws_access_key_id=s3['access_key'],
                               aws_secret_access_key=s3['secret_key'])
 
-    def iterate_objects(self):
+    def iterate_objects(self, only_untracked=False):
         if not self.__fully_defined:
             secho("Not all required environment variables are provided.")
             return
@@ -34,6 +35,8 @@ class CloudDataPlugin(SparrowPlugin):
         pages = paginator.paginate(Bucket=self.auth['bucket'])
         for page in pages:
             for obj in page['Contents']:
+                if only_untracked and self._already_tracked(obj):
+                    continue
                 yield obj
                 nkeys += 1
 
@@ -46,26 +49,6 @@ class CloudDataPlugin(SparrowPlugin):
         # MD5 hashes, but not quite...
         run_sql(db.session, "ALTER TABLE data_file ADD COLUMN file_etag text UNIQUE")
 
-    def process_objects(self, only_untracked=True, verbose=False):
-        for obj in self.iterate_objects():
-            if only_untracked and self._already_tracked(obj):
-                # Object already exists
-                if verbose:
-                    print(obj)
-                continue
-            yield self.import_object(obj)
-
-    def on_setup_cli(self, cli):
-        # It might make sense to run cloud import operations
-        # in a separate Docker container, but we do it in the
-        # main container for now
-        @command(name='import-cloud-data')
-        @option("--redo", is_flag=True, default=False)
-        def cmd(redo=False):
-            """Import cloud data"""
-            list(self.process_objects(only_untracked=not redo))
-        cli.add_command(cmd)
-
     def _instance_for_meta(self, meta):
         db = self.app.database
         # ETag is (almost) always the MD5. It could have a postfix
@@ -76,6 +59,3 @@ class CloudDataPlugin(SparrowPlugin):
 
     def _already_tracked(self, meta):
         return self._instance_for_meta(meta) is not None
-
-    def import_object(self, meta, contents):
-        raise Exception("Need to subclass and override this function")
