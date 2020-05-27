@@ -51,3 +51,10 @@ class SparrowPluginManager(object):
             self.__store.append(self.__load_plugin(plugin, app))
 
         self.__init_store = None
+
+    def get(self, name: str)-> SparrowPlugin:
+        """Get a plugin object, given its name."""
+        for plugin in self.__store:
+            if plugin.name == name:
+                return plugin
+        raise AttributeError(f"Plugin {name} not found")
