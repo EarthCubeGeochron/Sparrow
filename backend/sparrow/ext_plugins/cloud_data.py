@@ -46,10 +46,12 @@ class CloudDataPlugin(SparrowPlugin):
         # MD5 hashes, but not quite...
         run_sql(db.session, "ALTER TABLE data_file ADD COLUMN file_etag text UNIQUE")
 
-    def process_objects(self, only_untracked=True):
+    def process_objects(self, only_untracked=True, verbose=False):
         for obj in self.iterate_objects():
             if only_untracked and self._already_tracked(obj):
                 # Object already exists
+                if verbose:
+                    print(obj)
                 continue
             yield self.import_object(obj)
 
