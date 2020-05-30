@@ -71,6 +71,7 @@ class Database(MappedDatabaseMixin):
             Column("session_id", Integer, ForeignKey(self.table.session.c.id)),
             schema='core_view')
         self.register_models(cls)
+        self.app.run_hook('database-mapped')
 
     @contextmanager
     def session_scope():
