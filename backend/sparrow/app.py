@@ -63,7 +63,10 @@ class App(Flask):
         if db is None:
             db = Database(self)
         self.db = db
-        self.run_hook('database-ready')
+        self.run_hook('database-available')
+        # Database is only "ready" when it is mapped
+        if self.db.automap_base is not None:
+            self.run_hook('database-ready')
         return db
 
     @property
