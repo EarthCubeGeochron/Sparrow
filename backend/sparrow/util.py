@@ -23,3 +23,9 @@ def working_directory(pathname, *args):
         yield
     finally:
         os.chdir(prev_cwd)
+
+def get_qualified_name(obj):
+    module = obj.__class__.__module__
+    if module is None or module == str.__class__.__module__:
+        return obj.__class__.__name__
+    return module + '.' + obj.__class__.__name__

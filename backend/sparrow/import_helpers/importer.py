@@ -330,12 +330,14 @@ class BaseImporter(object):
             for created_model in items:
                 # Track the import of the resulting models
                 df_link = self.__track_model(rec, created_model)
-                self.db.session.add(df_link)
+                if df_link is not None:
+                    self.db.session.add(df_link)
                 self.db.session.commit()
         except (SparrowImportError, NotImplementedError, IntegrityError) as err:
             self.db.session.rollback()
             df_link = self.__track_model(rec, None, error=str(err))
-            self.db.session.add(df_link)
+            if df_link is not None:
+                self.db.session.add(df_link)
             secho(str(err), fg='red')
 
         if redo:

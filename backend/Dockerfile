@@ -12,6 +12,12 @@ ENV SPARROW_BACKEND_CONFIG=/config/docker.cfg
 # with useless bytecode
 ENV PYTHONDONTWRITEBYTECODE=1
 
+# This warning can get confused with an error,
+# but it's just pip being self-important
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+# Disable caching to slim down image
+ENV PIP_NO_CACHE_DIR=1
+
 COPY ./docker-scripts/* /bin/
 RUN mkdir /app
 WORKDIR /app

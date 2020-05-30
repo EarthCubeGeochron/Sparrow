@@ -2,4 +2,15 @@
 
 (cd bundled-deps/ui-components && npm install)
 npm install
-webpack --watch --mode=development
+
+# Default NODE_ENV to development
+export SPARROW_ENV="${SPARROW_ENV:-"development"}"
+
+echo $SPARROW_ENV
+if [ $SPARROW_ENV = "development" ]; then
+  echo "Bundling frontend for development"
+  webpack --watch --mode=development
+else
+  echo "Bundling frontend for production"
+  webpack --mode production
+fi
