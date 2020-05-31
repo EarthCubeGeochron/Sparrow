@@ -251,6 +251,8 @@ class BaseImporter(object):
         This is kind of outmoded by the new version of iterfiles
         """
         for rec in seq:
+            if rec is None:
+                continue
             secho(str(rec.file_path), dim=True)
             self.__import_datafile(None, rec, **kwargs)
 
