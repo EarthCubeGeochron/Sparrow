@@ -295,6 +295,8 @@ class BaseImporter(object):
         """
         A wrapper for data file import that tracks data files through
         the import process and builds links to data file types.
+
+        :param fix_errors  Fix errors that have previously been ignored
         """
         redo = kwargs.pop("redo", False)
         added = False
@@ -305,12 +307,10 @@ class BaseImporter(object):
         m = self.m.data_file_link
         if kwargs.pop("fix_errors", False):
             err_filter = m.error.is_(None)
-        prev_imports = (
-            self.db.session
-                .query(m)
-                .filter_by(file_hash=rec.file_hash)
-                .filter(err_filter)
-                .count())
+        prev_imports = (self.db.session.query(m)
+            .filter_by(file_hash=rec.file_hash)
+            .filter(err_filter)
+            .count())
         if prev_imports > 0 and not added and not redo:
             secho("Already imported", fg='green', dim=True)
             return
@@ -338,6 +338,7 @@ class BaseImporter(object):
             df_link = self.__track_model(rec, None, error=str(err))
             if df_link is not None:
                 self.db.session.add(df_link)
+            self.db.session.commit()
             secho(str(err), fg='red')
 
         if redo:
@@ -346,6 +347,7 @@ class BaseImporter(object):
         # outside of the try/except block, so they occur
         # regardness of error status
         self.db.session.commit()
+        secho("")
 
     def __track_changes(self):
         new_changed = set(i for i in self.__new if self.__has_changes(i))
@@ -388,25 +390,24 @@ class BaseImporter(object):
             return {}
         return {k: v.history for k, v in inspect(obj).attrs.items()}
 
-    def __track_model(self, rec, model=None, **kw):
+    def __track_model(self, rec, model=None, **defaults):
         """
         Track the import of a given model from a data file
         """
+        params = dict(_data_file=rec, defaults=defaults)
+
         if isinstance(model, self.m.session):
-            kw['session_id'] = model.id
+            params['_session'] = model
         elif isinstance(model, self.m.analysis):
-            kw['analysis_id'] = model.id
+            params['_analysis'] = model
         elif isinstance(model, self.m.sample):
-            kw['sample_id'] = model.id
-        elif 'error' not in kw:
+            params['_sample'] = model
+        elif 'error' not in defaults:
             raise NotImplementedError(
                 "Only sessions, samples, and analyses "
                 "can be tracked independently on import.")
 
-        return self.db.get_or_create(
-            self.m.data_file_link,
-            file_hash=rec.file_hash,
-            **kw)
+        return self.m.data_file_link.get_or_create(**params)
 
 
 class CloudImporter(BaseImporter):
