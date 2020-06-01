@@ -3,6 +3,7 @@ from sqlalchemy.exc import OperationalError
 from os import devnull
 from click import style, echo
 from contextlib import redirect_stderr
+from functools import update_wrapper
 import sys
 
 from ..app import App, construct_app as base_construct_app
@@ -32,6 +33,11 @@ def get_database(ctx, param, value):
         sys.exit(0)
 
 
-kw = dict(type=str, envvar="SPARROW_BACKEND_CONFIG", required=True)
-with_config = click.option('--config', 'cfg', **kw)
-with_database = click.option('--config', 'db', callback=get_database, **kw)
+with_app = click.make_pass_decorator(App)
+
+def with_database(cmd):
+    @click.pass_context
+    def new_cmd(ctx, *args, **kwargs):
+        app = ctx.find_object(App)
+        return ctx.invoke(cmd, app.database, *args, **kwargs)
+    return update_wrapper(new_cmd, cmd)
