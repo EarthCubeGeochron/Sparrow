@@ -13,12 +13,14 @@ from .util import (
 )
 from ..util import relative_path
 
+
 class BaseImporter(object):
     """
     A basic Sparrow importer to be subclassed.
     """
     authority = None
     file_type = None
+
     def __init__(self, db, **kwargs):
         self.db = db
         self.m = self.db.model
@@ -244,6 +246,16 @@ class BaseImporter(object):
             secho(str(fn), dim=True)
             self.__import_datafile(fn, None, **kwargs)
 
+    def iter_records(self, seq, **kwargs):
+        """
+        This is kind of outmoded by the new version of iterfiles
+        """
+        for rec in seq:
+            if rec is None:
+                continue
+            secho(str(rec.file_path), dim=True)
+            self.__import_datafile(None, rec, **kwargs)
+
     def __set_file_info(self, infile, rec):
         _ = infile.stat().st_mtime
         mtime = datetime.utcfromtimestamp(_)
@@ -285,6 +297,8 @@ class BaseImporter(object):
         """
         A wrapper for data file import that tracks data files through
         the import process and builds links to data file types.
+
+        :param fix_errors  Fix errors that have previously been ignored
         """
         redo = kwargs.pop("redo", False)
         added = False
@@ -295,12 +309,10 @@ class BaseImporter(object):
         m = self.m.data_file_link
         if kwargs.pop("fix_errors", False):
             err_filter = m.error.is_(None)
-        prev_imports = (
-            self.db.session
-                .query(m)
-                .filter_by(file_hash=rec.file_hash)
-                .filter(err_filter)
-                .count())
+        prev_imports = (self.db.session.query(m)
+            .filter_by(file_hash=rec.file_hash)
+            .filter(err_filter)
+            .count())
         if prev_imports > 0 and not added and not redo:
             secho("Already imported", fg='green', dim=True)
             return
@@ -328,6 +340,7 @@ class BaseImporter(object):
             df_link = self.__track_model(rec, None, error=str(err))
             if df_link is not None:
                 self.db.session.add(df_link)
+            self.db.session.commit()
             secho(str(err), fg='red')
 
         if redo:
@@ -336,6 +349,7 @@ class BaseImporter(object):
         # outside of the try/except block, so they occur
         # regardness of error status
         self.db.session.commit()
+        secho("")
 
     def __track_changes(self):
         new_changed = set(i for i in self.__new if self.__has_changes(i))
@@ -378,32 +392,29 @@ class BaseImporter(object):
             return {}
         return {k: v.history for k, v in inspect(obj).attrs.items()}
 
-    def __track_model(self, rec, model=None, **kw):
+    def __track_model(self, rec, model=None, **defaults):
         """
         Track the import of a given model from a data file
         """
-        if model is None:
-            return
-        elif isinstance(model, self.m.session):
-            kw['session_id'] = model.id
+        params = dict(_data_file=rec, defaults=defaults)
+
+        if isinstance(model, self.m.session):
+            params['_session'] = model
         elif isinstance(model, self.m.analysis):
-            kw['analysis_id'] = model.id
+            params['_analysis'] = model
         elif isinstance(model, self.m.sample):
-            kw['sample_id'] = model.id
-        else:
+            params['_sample'] = model
+        elif 'error' not in defaults:
             raise NotImplementedError(
                 "Only sessions, samples, and analyses "
                 "can be tracked independently on import.")
 
-        return self.db.get_or_create(
-            self.m.data_file_link,
-            file_hash=rec.file_hash,
-            **kw)
+        return self.m.data_file_link.get_or_create(**params)
 
-    def iter_records(self, seq, **kwargs):
-        """
-        This is kind of outmoded by the new version of iterfiles
-        """
-        for rec in seq:
-            secho(str(rec.file_path), dim=True)
-            self.__import_datafile(None, rec, **kwargs)
+
+class CloudImporter(BaseImporter):
+    """
+    Importer to be subclassed that is geared towards S3 and compatible
+    cloud storage systems.
+    """
+    pass

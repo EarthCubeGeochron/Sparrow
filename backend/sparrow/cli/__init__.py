@@ -9,26 +9,44 @@ from pkg_resources import iter_entry_points
 from contextlib import redirect_stdout
 from subprocess import run
 
-from .util import with_config, with_database
+from .util import with_database, with_app
 from ..util import working_directory
 from ..app import App, construct_app
 from ..auth.create_user import create_user
 
+def init_app(config):
+    app = App(__name__, config=config, verbose=False)
+    app.load()
+    return app
 
-# https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
 class SparrowCLI(click.Group):
     def __init__(self, *args, **kwargs):
+        # https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
+        # https://click.palletsprojects.com/en/7.x/complex/#interleaved-commands
+
+        # This pulls in configuration from environment variable or a configuration
+        # object, if provided; I don't see another option to support lazily loading plugins
+        config = kwargs.pop("config", environ.get("SPARROW_BACKEND_CONFIG"))
+        app = init_app(config)
+
+        kwargs.setdefault('context_settings', {})
+        kwargs['context_settings']['obj'] = app
         super().__init__(*args, **kwargs)
-        # This only pulls in configuration from environment variable for now,
-        # but I don't see another option to support lazily loading plugins
-        app = App(__name__, config=environ.get("SPARROW_BACKEND_CONFIG"), verbose=False)
-        app.load()
+
         app.run_hook("setup-cli", self)
 
-
 @click.group(cls=SparrowCLI)
-def cli():
-    pass
+# Get configuration from environment variable or passed
+# using the `--config` flag
+@click.option('--config', 'cfg',
+    type=str,
+    envvar="SPARROW_BACKEND_CONFIG",
+    required=False)
+@click.pass_context
+def cli(ctx, cfg):
+    if cfg is not None:
+        ctx.obj = init_app(cfg)
+
 
 
 def abort(message, status=1):
@@ -39,16 +57,12 @@ def abort(message, status=1):
 
 
 @cli.command(name='init')
-@with_config
 @click.option('--drop', is_flag=True, default=False)
-def init_database(cfg, drop=False):
+@with_database
+def init_database(db, drop=False):
     """
     Initialize database schema (non-destructive)
     """
-    from ..database import Database
-    app = App(__name__, config=cfg)
-    app.load()
-    db = Database(app)
     db.initialize(drop=drop)
 
 
@@ -60,42 +74,40 @@ def create_views(db):
     """
     # Don't need to build the app just for this
     with working_directory(__file__):
-        db.exec_sql("database/fixtures/05-views.sql")
+        db.exec_sql("../database/fixtures/05-views.sql")
 
 
 @cli.command(name='serve')
-@with_config
-def dev_server(cfg):
+@with_app
+def dev_server(app):
     """
     Run a development WSGI server
     """
-    app, db = construct_app(cfg)
     app.run(debug=True, host='0.0.0.0')
 
 
 @cli.command(name='shell')
-@with_config
-def shell(cfg):
+@with_app
+def shell(app):
     """
     Get a Python shell within the application
     """
     from IPython import embed
-    app, db = construct_app(cfg)
     with app.app_context():
+        db = app.database
         # `using` is related to this issue:
         # https://github.com/ipython/ipython/issues/11523
         embed(using=False)
 
 
 @cli.command(name='config')
-@with_config
 @click.argument('key', required=False)
 @click.option('--json', is_flag=True, default=False)
-def config(cfg, key=None, json=False):
+@with_app
+def config(app, key=None, json=False):
     """
     Print configuration of backend
     """
-    app, db = construct_app(cfg, minimal=True)
     if key is not None:
         print(app.config.get(key.upper()))
         return
@@ -121,3 +133,13 @@ def _create_user(db):
     Create an authorized user for the web frontend
     """
     create_user(db)
+
+@cli.command(name="plugins")
+@with_app
+def shell(app):
+    """
+    Print a list of enabled plugins
+    """
+    with app.app_context():
+        for p in app.plugins.order_plugins():
+            print(p.name)
