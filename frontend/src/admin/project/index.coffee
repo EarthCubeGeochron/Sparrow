@@ -49,8 +49,9 @@ class Publication extends Component
     h 'a.publication', {href, target: "_blank"}, interior
 
 ProjectPublications = ({data})->
+  data ?= []
   h [
-    h.if(data?) 'div.publications', [
+    h.if(data.length) 'div.publications', [
       h 'h4', 'Publications'
       (data or []).map (d, i)->
         h Publication, {key: i, d...}

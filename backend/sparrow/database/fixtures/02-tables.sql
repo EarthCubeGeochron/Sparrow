@@ -513,25 +513,25 @@ CREATE TABLE IF NOT EXISTS data_file_link (
   date timestamp NOT NULL DEFAULT now(),
   error text,
   session_id integer
-    UNIQUE
     REFERENCES session(id)
     ON DELETE CASCADE,
   analysis_id integer
-    UNIQUE
     REFERENCES analysis(id)
     ON DELETE CASCADE,
   sample_id integer
-    UNIQUE
     REFERENCES sample(id)
     ON DELETE CASCADE,
   /* Only one of the linked data file columns should be
-     set at a time (a data file can only be packaged at
+     set at a time (a data file should only be packaged at
      one level, even if it encompasses information about
-     other entities)
+     other entities). We could loosen this restriction if it
+     becomes onerous.
   */
   CHECK (
       (session_id IS NOT NULL)::int
     + (analysis_id IS NOT NULL)::int
     + (sample_id IS NOT NULL)::int <= 1
-  )
+  ),
+  -- Only one link between a data file and its model
+  UNIQUE (file_hash, session_id, analysis_id, sample_id)
 );

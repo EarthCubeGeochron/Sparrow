@@ -121,3 +121,11 @@ def _create_user(db):
     Create an authorized user for the web frontend
     """
     create_user(db)
+
+@cli.command(name="plugins")
+@with_config
+def shell(cfg):
+    app, db = construct_app(cfg)
+    with app.app_context():
+        for p in app.plugins.order_plugins():
+            print(p.name)

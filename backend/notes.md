@@ -13,3 +13,5 @@ in isolation:
 - [Marshmallow-JSONSchema](https://github.com/fuhrysteve/marshmallow-jsonschema)
 
 These all appear to be pretty good options.
+
+Sparrow printenv

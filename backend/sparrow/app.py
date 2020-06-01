@@ -63,7 +63,10 @@ class App(Flask):
         if db is None:
             db = Database(self)
         self.db = db
-        self.run_hook('database-ready')
+        self.run_hook('database-available')
+        # Database is only "ready" when it is mapped
+        if self.db.automap_base is not None:
+            self.run_hook('database-ready')
         return db
 
     @property
@@ -122,8 +125,9 @@ class App(Flask):
         try:
             import sparrow_plugins
             self.register_module_plugins(sparrow_plugins)
-        except ModuleNotFoundError:
-            log.debug("Could not find external Sparrow plugins.")
+        except ModuleNotFoundError as err:
+            log.error("Could not find external Sparrow plugins.")
+            log.error(err)
 
         self.__loaded()
 
