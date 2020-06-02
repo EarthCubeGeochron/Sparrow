@@ -43,6 +43,13 @@ if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
     export SPARROW_COMPOSE_OVERRIDES="-f $fp ${SPARROW_COMPOSE_OVERRIDES}"
   fi
 
+  # Special case for certbot HTTPS
+  if [ $SPARROW_ENV = 'production' ] && [ ! -z $SPARROW_DOMAIN ] && [ ! -z $CERTBOT_EMAIL ]; then
+    echo "Using certbot https for domain '$SPARROW_DOMAIN'"
+    fp="docker-compose.certbot.yaml"
+    export SPARROW_COMPOSE_OVERRIDES="-f $fp ${SPARROW_COMPOSE_OVERRIDES}"
+  fi
+
 fi
 
 # Get path to sparrow installation from location of current file
