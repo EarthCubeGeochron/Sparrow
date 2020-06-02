@@ -38,7 +38,7 @@ if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
   export SPARROW_ENV="${SPARROW_ENV:-"development"}"
 
   if [ $SPARROW_ENV = 'production' ]; then
-    echo "Running $(tput bold)sparrow$(tput sgr0) in production"
+    echo "Running $(tput bold)sparrow$(tput sgr0) in production" >&2
     fp="docker-compose.production-overrides.yaml"
     export SPARROW_COMPOSE_OVERRIDES="-f $fp ${SPARROW_COMPOSE_OVERRIDES}"
   fi
