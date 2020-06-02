@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Meant to be run from the repository root folder
+cd _cli
+
+mkdir -p build
+venv=build/venv
+
+if [ ! -f $venv/bin/activate ]; then
+  python -m venv $venv
+  source $venv/bin/activate
+fi
+
+pip install pyinstaller
+pip install -r requirements.txt
+
+pyinstaller --distpath dist sparrow.spec
