@@ -15,10 +15,10 @@ _cli/dist/windows/sparrow:
 	docker run -v "$(shell pwd)/_cli:/src" cdrx/pyinstaller-windows:latest
 
 # Build locally for the current platform
-_cli/dist/sparrow:
+_cli/dist/sparrow: _cli/main.py
 	_cli/_scripts/build-local
 
 build: _cli/dist/sparrow
 
 _generate_buildspec:
-	docker run -v "$(shell pwd)/_cli/:/src/" cdrx/pyinstaller-linux "pyinstaller --onefile main.py"
+	docker run -v "$(shell pwd)/_cli/:/src/" cdrx/pyinstaller-linux "pyinstaller main.py"
