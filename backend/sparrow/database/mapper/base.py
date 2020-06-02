@@ -7,7 +7,7 @@ class ModelHelperMixins(object):
     @classmethod
     def get_or_create(cls, **kwargs):
         defaults = kwargs.pop('defaults', None)
-        return cls.db.get_or_create(cls, defaults, **kwargs)
+        return cls.db.get_or_create(cls, defaults=defaults, **kwargs)
 
     def to_dict(self):
         res = {}

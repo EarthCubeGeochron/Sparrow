@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
+from marshmallow.exceptions import ValidationError
 
 from .util import run_sql_file, run_query, get_or_create
 from .models import User, Project, Session, DatumType
@@ -70,6 +71,7 @@ class Database(MappedDatabaseMixin):
             Column("session_id", Integer, ForeignKey(self.table.session.c.id)),
             schema='core_view')
         self.register_models(cls)
+        self.app.run_hook('database-mapped')
 
     @contextmanager
     def session_scope():
@@ -84,40 +86,50 @@ class Database(MappedDatabaseMixin):
         finally:
             session.close()
 
-    def load_data(self, model_name, data):
+    def model_schema(self, model_name):
+        """
+        Create a SQLAlchemy instance from data conforming to an import schema
+        """
         iface = getattr(self.interface, model_name)
+        return iface()
+
+    def _flush_nested_objects(self):
+        """
+        Flush objects remaining in a session (generally these are objects loaded
+        during schema-based importing).
+        """
+        for object in self.session:
+            try:
+                self.session.flush(objects=[object])
+                log.debug(f"Successfully flushed instance {object}")
+            except IntegrityError as err:
+                self.session.rollback()
+                log.debug(err)
+
+    def load_data(self, model_name, data):
+        schema = self.model_schema(model_name)
         try:
-            #try:
             with self.session.no_autoflush:
-                res = iface().load(data, session=self.session)
+                res = schema.load(data, session=self.session)
                 log.info("Entering final commit phase of import")
                 log.info(f"Adding top-level object {res}")
                 self.session.add(res)
-                for object in self.session:
-                    try:
-                        self.session.flush(objects=[object])
-                        log.debug(f"Successfully flushed instance {object}")
-                    except IntegrityError as err:
-                        self.session.rollback()
-                        log.debug(err)
+                self._flush_nested_objects()
                 log.info(f"Committing entire transaction")
                 self.session.commit()
-            # except IntegrityError as err:
-            #     # This is super-sketchy !!!
-            #     log.error(err)
-            #     log.debug("Add to session failed, attempting merge.")
-            #     self.session.rollback()
-            #     self.session.merge(res)
-            #     self.session.commit()
             return res
-        except IntegrityError as err:
+        except (IntegrityError, ValidationError) as err:
             self.session.rollback()
             log.debug(err)
             raise err
 
+    def get_existing_instance(self, model_name, filter_params):
+        schema = self.model_schema(model_name)
+        return schema.load(filter_params, session=self.session)
+
     def get_instance(self, model_name, filter_params):
-        iface = getattr(self.interface, model_name)
-        res = iface().load(filter_params, session=self.session, partial=True)
+        schema = self.model_schema(model_name)
+        res = schema.load(filter_params, session=self.session, partial=True)
         return res
 
     def exec_sql(self, fn):

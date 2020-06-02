@@ -8,7 +8,10 @@ if [ ! -f /.dockerenv ]; then
   exit 0
 fi
 
-indb_conn="$(sparrow config database)"
+#indb_conn="$(sparrow config database)"
+# HACK: hard-code sparrow db address because `sparrow config database`
+# mixes logging into output somehow
+indb_conn="postgresql://postgres@db:5432/sparrow"
 outdb='sparrow_test'
 outdb_conn="postgresql://postgres@db/$outdb"
 createdb -Upostgres -h db "$outdb" > /dev/null 2>&1
