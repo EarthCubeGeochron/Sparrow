@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+dist_dir=_cli/dist/sparrow
+
+if [ ! -d $dist_dir ]; then
+  # Build the local module
+  _cli/_scripts/build-local
+fi
+
+mkdir -p /usr/local/opt/sparrow
+# Copy all files and dependencies to a centralized location
+cp -r "$dist_dir" /usr/local/opt/sparrow
+
+symlink=/usr/local/bin/sparrow
+
+if [ -f "$symlink" ]; then
+  read -p "Sparrow executable already exists on path. Overwrite? yN " -n 1 -r
+  echo    # (optional) move to a new line
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    rm -f $symlink
+  fi
+fi
+
+# Link executable onto the path
+ln -s /usr/local/opt/sparrow/sparrow $symlink

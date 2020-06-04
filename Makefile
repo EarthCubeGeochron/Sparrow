@@ -22,3 +22,6 @@ build: _cli/dist/sparrow
 
 _generate_buildspec:
 	docker run -v "$(shell pwd)/_cli/:/src/" cdrx/pyinstaller-linux "pyinstaller main.py"
+
+install: _cli/dist/sparrow
+	_cli/_scripts/install

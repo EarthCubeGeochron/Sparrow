@@ -1,0 +1,151 @@
+#!/usr/bin/env zsh
+
+# Drag in configuration in `sparrow-config.sh` from current
+# working directory or parents.
+# Alternately, the location of this file can be specified using
+# the SPARROW_CONFIG environment variable.
+
+# Search for configuration file if it isn't found.
+export SPARROW_WORKDIR="$(pwd)"
+__dirname="$(pwd)"
+while [ -z $SPARROW_CONFIG ] && \
+      [ -z $_SPARROW_CONFIG_UNSET ]; do
+  cfg="${__dirname}/sparrow-config.sh"
+  if [ -f "$cfg" ] ; then
+    export SPARROW_CONFIG="$cfg"
+    break
+  fi
+  [ $__dirname = "/" ] && break
+  __dirname="${__dirname:h}"
+done
+
+# We might want to bail here if no config file is found.
+if [ -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_UNSET ]; then
+  echo "No configuration file found. Running using default values." >&2
+  export _SPARROW_CONFIG_UNSET=1
+fi
+
+# If we haven't yet sourced the config file in a higher-level script
+if [ ! -z $SPARROW_CONFIG ] && [ -z $_SPARROW_CONFIG_SOURCED ] ; then
+  export SPARROW_CONFIG="$SPARROW_CONFIG"
+  export SPARROW_CONFIG_DIR="${SPARROW_CONFIG:h}"
+  source "$SPARROW_CONFIG"
+  export _SPARROW_CONFIG_SOURCED=1
+  _SPARROW_CONFIG_SOURCED_HERE=1
+
+  # Set up environment (only needs to happen once)
+  # should be `development` or `production`
+  export SPARROW_ENV="${SPARROW_ENV:-"development"}"
+
+  if [ $SPARROW_ENV = 'production' ]; then
+    echo "Running $(tput bold)sparrow$(tput sgr0) in production" >&2
+    fp="docker-compose.production-overrides.yaml"
+    export SPARROW_COMPOSE_OVERRIDES="-f $fp ${SPARROW_COMPOSE_OVERRIDES}"
+  fi
+
+fi
+
+# Get path to sparrow installation from location of current file
+# (even if symlinked)
+# Note: if SPARROW_PATH is set in the config, we use that version
+# of sparrow (except for this wrapper script).
+this_install_root="${0:A:h:h}"
+export SPARROW_PATH="${SPARROW_PATH:-"$this_install_root"}"
+
+# ENVIRONMENT VARIABLE DEFAULTS
+# Set variables that might not be created in the config file
+# to default values
+# NOTE: much of this has been moved to `docker-compose.yaml`
+export SPARROW_BASE_URL="${SPARROW_BASE_URL:-"/"}"
+export SPARROW_LAB_NAME="${SPARROW_LAB_NAME:-"My Lab"}"
+
+# Make sure all commands can be referenced by name from
+# within these scripts (even if `sparrow` command itself isn't
+# on the PATH)
+export PATH="$SPARROW_PATH:$PATH"
+[ ! -z $SPARROW_COMMANDS ] && export PATH="$SPARROW_COMMANDS:$PATH"
+
+[ -z $SPARROW_SECRET_KEY ] && echo \
+  "You $(tput bold)must$(tput sgr0) set SPARROW_SECRET_KEY. Exiting..." && \
+  exit 1
+
+dir="$SPARROW_PATH/bin"
+
+# HELP SUBCOMMAND
+# Default to help if nothing is provided
+subcommand=$1
+[ -z $subcommand ] && subcommand='--help'
+
+prettify() {
+  perl -pe "s|\`(.+?)\`|$(tput setaf 6)\1$(tput sgr0)|g"
+}
+
+# Echo the description of a subcommand. $1 is the script file.
+echo-description() {
+  local descline=$(grep -E "#\s+Description" "$1")
+  echo "${descline##*Description: }" \
+  | prettify
+}
+
+echo-help() {
+  echo -e "\n$1:"
+  for c in $(ls "$2" \
+    | grep sparrow- \
+    | sed 's/sparrow-//g') ; do
+    printf "  %-18s" $c
+    echo-description "$2/sparrow-$c"
+  done
+}
+
+if [ $subcommand = '--help' ] || [ $subcommand = 'help' ]; then
+  # Get help from within sparrow container
+  # and append docker wrapper commands
+  echo "Usage: $(tput bold)sparrow$(tput sgr0) [options] <command> [args]..." >&2
+  echo "" >&2
+  echo "Config: $(tput setaf 6)$SPARROW_CONFIG$(tput sgr0)" >&2
+  echo "Lab name: $(tput setaf 6)$(tput bold)$SPARROW_LAB_NAME$(tput sgr0)" >&2
+  sparrow compose run --no-deps -T backend sparrow #2>/dev/null | (read; cat)
+  labname=${SPARROW_LAB_NAME:-"Lab-specific"}
+  [ ! -z $SPARROW_COMMANDS ] && \
+    echo-help "$labname commands" "$SPARROW_COMMANDS"
+  echo-help "Container-management commands" "$dir"
+  exit 0
+fi
+
+full_command="sparrow-$subcommand"
+found_command=0
+for f in $(ls "$dir" | grep sparrow-); do
+  [ $found_command = 1 ] && break
+  [ $f != $full_command ] && continue
+  cmd="$dir/$full_command"
+  found_command=1
+done
+
+# Search through user-provided subcommands
+# (only one directory allowed for now; should replace
+#  with a more flexible PATH representation).
+if [ ! -z $SPARROW_COMMANDS ]; then
+  for f in $(ls "$SPARROW_COMMANDS" | grep sparrow-); do
+    [ $found_command = 1 ] && break
+    # We don't want to return this file...
+    [ $f != $full_command ] && continue
+    cmd="$SPARROW_COMMANDS/$full_command"
+    found_command=1
+  done
+fi
+
+if [ $found_command = 0 ]; then
+  # Run a command against sparrow within a docker container
+  # This exec/run switch is added because there are apparently
+  # database/locking issues caused by spinning up arbitrary
+  # backend containers when containers are already running.
+  # TODO: We need a better understanding of best practices here.
+  if docker-compose exec backend true > /dev/null 2>&1 ; then
+    sparrow compose --log-level ERROR exec backend sparrow $@
+  else
+    sparrow compose --log-level ERROR run --rm backend sparrow $@
+  fi
+else
+  shift
+  "$cmd" $@
+fi
