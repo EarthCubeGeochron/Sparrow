@@ -19,7 +19,6 @@ if [ -d $dist_dir ]; then
   [[ $REPLY =~ ^[Yy]$ ]] && rm -rf $dist_dir
 fi
 
-
 [ -L $symlink ] && rm -f $symlink
 
 if [ -e $symlink ]; then
@@ -33,4 +32,5 @@ mkdir -p "$dist_dir"
 cp -r "$build_dir"/* "$dist_dir"
 
 # Link executable onto the path
+echo "Linking $symlink -> $dist_dir/sparrow"
 ln -s "$dist_dir/sparrow" "$symlink"
