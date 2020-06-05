@@ -25,3 +25,7 @@ _generate_buildspec:
 
 install: _cli/dist/sparrow
 	_cli/_scripts/install
+
+install-dev:
+	-rm /usr/local/bin/sparrow
+	ln -s $(shell pwd)/_cli/dist/sparrow/sparrow /usr/local/bin/sparrow
