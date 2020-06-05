@@ -16,7 +16,7 @@ _cli/dist/windows/sparrow:
 
 # Build locally for the current platform
 _cli/dist/sparrow: _cli/main.py
-	_cli/_scripts/build-local
+	_cli/_scripts/build-dist
 
 build: _cli/dist/sparrow
 
@@ -27,5 +27,6 @@ install: _cli/dist/sparrow
 	_cli/_scripts/install
 
 install-dev:
+	_cli/_scripts/build-local
 	-rm /usr/local/bin/sparrow
-	ln -s $(shell pwd)/_cli/dist/sparrow/sparrow /usr/local/bin/sparrow
+	ln -s $(shell pwd)/_cli/main.py /usr/local/bin/sparrow
