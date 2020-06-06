@@ -88,12 +88,29 @@ const styleRules = [
   {test: /\.styl$/, use: stylusLoader}
 ]
 
+const babelLoader = {
+  loader: "babel-loader"
+  // options: {
+  //   presets: [
+  //     "@babel/preset-env",
+  //     "@babel/preset-react",
+  //     "@babel/preset-typescript"
+  //   ],
+  //   plugins: [
+  //     "emotion",
+  //     "@babel/plugin-proposal-nullish-coalescing-operator",
+  //     "@babel/plugin-proposal-optional-chaining",
+  //     "@babel/plugin-proposal-class-properties"
+  //   ]
+  // }
+}
+
 module.exports = {
   module: {
     rules: [
       ...styleRules,
-      {test: /\.coffee$/, use: [ "babel-loader", "coffee-loader" ]},
-      {test: /\.(js|jsx|ts|tsx)$/, use: "babel-loader", exclude: /node_modules/ },
+      {test: /\.coffee$/, use: [ babelLoader , "coffee-loader" ]},
+      {test: /\.(js|jsx|ts|tsx)$/, use: babelLoader, exclude: /node_modules/ },
       {test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader]},
       {test: /\.md$/, use: ["html-loader","markdown-loader"]},
       {test: /\.html$/, use: ["html-loader"]},
