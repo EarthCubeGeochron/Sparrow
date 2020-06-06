@@ -5,6 +5,7 @@
     "declaration": true,
     "sourceMap": true,
     "declarationDir": "dist/types",
+    "jsx": "react",
     "typeRoots": [
       "node_modules/@types"
     ],
