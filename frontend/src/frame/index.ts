@@ -22,15 +22,8 @@ class FrameProvider extends StatefulComponent {
     this.defaultProps = {overrides: {}};
   }
   constructor(props){
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/return (?:_assertThisInitialized\()*(\w+)\)*;/)[1];
-      eval(`${thisName} = this;`);
-    }
-    this.getElement = this.getElement.bind(this);
     super(props);
+    this.getElement = this.getElement.bind(this);
     this.state = {registry: {}};
   }
   render() {

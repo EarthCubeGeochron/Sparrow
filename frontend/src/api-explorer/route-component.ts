@@ -86,30 +86,23 @@ class RouteComponent extends StatefulComponent {
     this.defaultProps = {
       parent: null
     };
-  
+
     this.prototype.renderSubRoutes = nullIfError(function() {
       const {response} = this.state;
       const {routes} = response;
       const {path: parent} = this.props.match;
       // Use a render function instead of a component match
       const render = props => h(RouteComponent, {...props, parent});
-  
+
       return routes.map(function(r){
         const path = join(parent, r.route);
         return h(Route, {path, key: r.route, render});});});
   }
   constructor(props){
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/return (?:_assertThisInitialized\()*(\w+)\)*;/)[1];
-      eval(`${thisName} = this;`);
-    }
+    super(props);
     this.updateParams = this.updateParams.bind(this);
     this.expandParameter = this.expandParameter.bind(this);
     this.renderMatch = this.renderMatch.bind(this);
-    super(props);
     this.state = {
       response: null,
       expandedParameter: null,

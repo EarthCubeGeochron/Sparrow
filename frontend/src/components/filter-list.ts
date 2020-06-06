@@ -24,15 +24,8 @@ class FilterListComponent extends StatefulComponent {
     };
   }
   constructor(props){
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/return (?:_assertThisInitialized\()*(\w+)\)*;/)[1];
-      eval(`${thisName} = this;`);
-    }
-    this.updateFilter = this.updateFilter.bind(this);
     super(props);
+    this.updateFilter = this.updateFilter.bind(this);
     this.state = {
       filter: '',
       field: Object.keys(this.props.filterFields)[0],

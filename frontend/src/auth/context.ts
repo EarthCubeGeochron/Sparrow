@@ -17,16 +17,9 @@ class AuthProvider extends StatefulComponent {
     this.contextType = APIContext;
   }
   constructor(props){
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/return (?:_assertThisInitialized\()*(\w+)\)*;/)[1];
-      eval(`${thisName} = this;`);
-    }
+    super(props);
     this.requestLoginForm = this.requestLoginForm.bind(this);
     this.render = this.render.bind(this);
-    super(props);
     this.state = {
       login: false,
       username: null,

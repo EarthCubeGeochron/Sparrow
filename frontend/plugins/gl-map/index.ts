@@ -59,15 +59,8 @@ class MarkerOverlay extends Component {
 
 class GLMap extends Component {
   constructor(props){
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/return (?:_assertThisInitialized\()*(\w+)\)*;/)[1];
-      eval(`${thisName} = this;`);
-    }
-    this.onViewportChange = this.onViewportChange.bind(this);
     super(props);
+    this.onViewportChange = this.onViewportChange.bind(this);
     this.state = {
       viewport: {
         latitude: 43.6150,

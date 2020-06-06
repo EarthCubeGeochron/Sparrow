@@ -31,15 +31,8 @@ const SampleOverlay = function(props){
 
 class MapPanel extends Component {
   constructor(props){
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/return (?:_assertThisInitialized\()*(\w+)\)*;/)[1];
-      eval(`${thisName} = this;`);
-    }
-    this.onViewportChange = this.onViewportChange.bind(this);
     super(props);
+    this.onViewportChange = this.onViewportChange.bind(this);
     this.firstWindowHash = window.location.hash;
     this.state = {
       viewport: {

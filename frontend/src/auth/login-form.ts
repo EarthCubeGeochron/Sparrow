@@ -53,16 +53,9 @@ class LoginForm extends StatefulComponent {
     this.contextType = AuthContext;
   }
   constructor() {
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/return (?:_assertThisInitialized\()*(\w+)\)*;/)[1];
-      eval(`${thisName} = this;`);
-    }
+    super(...arguments);
     this.resetState = this.resetState.bind(this);
     this.isValid = this.isValid.bind(this);
-    super(...arguments);
     this.resetState();
   }
 

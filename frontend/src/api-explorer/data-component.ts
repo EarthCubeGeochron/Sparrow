@@ -76,15 +76,8 @@ font-size: 1.2em;\
 
 class APIDataComponentInner extends JSONCollapsePanel {
   constructor(props){
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/return (?:_assertThisInitialized\()*(\w+)\)*;/)[1];
-      eval(`${thisName} = this;`);
-    }
-    this.renderDataInterior = this.renderDataInterior.bind(this);
     super(props);
+    this.renderDataInterior = this.renderDataInterior.bind(this);
     this.state = {showJSON: false};
   }
 

@@ -32,16 +32,9 @@ const errorExtent = function(arr){
 
 class StepHeatingChart extends Component {
   constructor(props){
-    {
-      // Hack: trick Babel/TypeScript into allowing this before super.
-      if (false) { super(); }
-      let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/return (?:_assertThisInitialized\()*(\w+)\)*;/)[1];
-      eval(`${thisName} = this;`);
-    }
+    super(props);
     this.findPlateauAge = this.findPlateauAge.bind(this);
     this.renderChart = this.renderChart.bind(this);
-    super(props);
   }
 
   findPlateauAge(data){
