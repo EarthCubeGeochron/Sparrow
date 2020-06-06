@@ -12,4 +12,4 @@ export SPARROW_SECRET_KEY="Freedom!!"
 
 bin/build-schema > build/schema.html
 (cd python-api && make html)
-gatsby build
+node_modules/.bin/gatsby build
