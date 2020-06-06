@@ -86,9 +86,9 @@ def dev_server(app):
     app.run(debug=True, host='0.0.0.0')
 
 
-@cli.command(name='shell')
-@with_app
-def shell(app):
+@cli.command(name='console')
+@with_full_app
+def console(app):
     """
     Get a Python shell within the application
     """
