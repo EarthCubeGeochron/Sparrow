@@ -11,7 +11,7 @@ from subprocess import run
 
 from .util import with_database, with_app, with_full_app
 from ..util import working_directory
-from ..app import App, construct_app
+from ..app import App
 from ..auth.create_user import create_user
 
 def _build_app_context(config):
