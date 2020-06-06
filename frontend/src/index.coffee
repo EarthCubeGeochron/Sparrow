@@ -7,5 +7,8 @@ import {App} from './app'
 import {createElement} from 'react'
 import {render} from 'react-dom'
 
-el = document.querySelector("#container")
+el = document.createElement("div")
+el.id = "container"
+document.body.appendChild(el)
+
 render(createElement(App), el)
