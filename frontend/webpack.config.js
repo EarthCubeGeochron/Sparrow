@@ -3,6 +3,7 @@ let BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 const { execSync } = require('child_process');
 const { readFileSync } = require('fs');
 const { EnvironmentPlugin } = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 process.env['BASE_URL'] = process.env.SPARROW_BASE_URL;
 
@@ -11,7 +12,7 @@ let siteContent = process.env.SPARROW_SITE_CONTENT;
 
 console.log("Site content:", siteContent);
 
-let assetsRoute = path.join(process.env.SPARROW_BASE_URL,'/assets/');
+let assetsRoute = process.env.SPARROW_BASE_URL;
 
 let bs_cfg = {
   open: false,
@@ -145,6 +146,7 @@ module.exports = {
     //},
   //},
   plugins: [
+    new HtmlWebpackPlugin({title: process.env.SPARROW_LAB_NAME}),
     browserSync,
     new EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'BASE_URL', 'SPARROW_LAB_NAME', 'MAPBOX_API_TOKEN'])
   ]

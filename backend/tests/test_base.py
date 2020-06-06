@@ -1,4 +1,4 @@
-from sparrow.app import construct_app
+from sparrow.app import App
 from sparrow.util import relative_path
 from sparrow.database.mapper import BaseModel
 from marshmallow.exceptions import ValidationError
@@ -8,7 +8,10 @@ from pytest import mark, fixture
 import logging
 from json import load
 
-app, db = construct_app()
+app = App(__name__)
+app.load()
+app.load_phase_2()
+db = app.database
 
 session = dict(
     sample_id="A-0",
