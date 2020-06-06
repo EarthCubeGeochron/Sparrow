@@ -42,14 +42,6 @@ if(!process.env.CONTAINERIZED) {
 
 let browserSync = new BrowserSyncPlugin(bs_cfg);
 
-let jsLoader = {
-  loader: 'babel-loader',
-  options: {
-    presets: ['@babel/preset-env', '@babel/preset-react'],
-    plugins: ["emotion"]
-  }
-};
-
 let fontLoader = {
   loader: 'file-loader',
   options: {name: "fonts/[name].[ext]"}
@@ -100,8 +92,8 @@ module.exports = {
   module: {
     rules: [
       ...styleRules,
-      {test: /\.coffee$/, use: [ jsLoader, "coffee-loader" ]},
-      {test: /\.(js|jsx)$/, use: [ jsLoader ], exclude: /node_modules/ },
+      {test: /\.coffee$/, use: [ "babel-loader", "coffee-loader" ]},
+      {test: /\.(js|jsx|ts|tsx)$/, use: "babel-loader", exclude: /node_modules/ },
       {test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader]},
       {test: /\.md$/, use: ["html-loader","markdown-loader"]},
       {test: /\.html$/, use: ["html-loader"]},
@@ -120,7 +112,17 @@ module.exports = {
   },
   devtool: 'source-map',
   resolve: {
-    extensions: [".coffee", ".js", ".styl",".css",".html",".md"],
+    extensions: [
+      ".ts",
+      ".tsx",
+      ".coffee",
+      ".js",
+      ".jsx",
+      ".styl",
+      ".css",
+      ".html",
+      ".md"
+    ],
     alias: {
       "app": path.resolve(__dirname, "src/"),
       "sparrow": path.resolve(__dirname, "src/"),
@@ -129,7 +131,7 @@ module.exports = {
     }
   },
   entry: {
-    index: './src/index.coffee'
+    index: './src/index.ts'
   },
   output: {
     path: assetsDir,
