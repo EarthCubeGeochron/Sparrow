@@ -53,6 +53,9 @@ def with_full_app(cmd):
     def new_cmd(ctx, *args, **kwargs):
         # We should ideally be able to pass a configuration from context...
         cfg = ctx.obj.get('config', None)
+        # By recreating the app, we actually run constructors (wastefully)
+        # twice on startup. We need to refactor the sparrow.app.construct_app
+        # to mitigate this.
         app, db = base_construct_app(config=cfg)
         return ctx.invoke(cmd, app, *args, **kwargs)
     return update_wrapper(new_cmd, cmd)

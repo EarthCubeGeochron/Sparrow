@@ -14,10 +14,10 @@ from ..util import working_directory
 from ..app import App, construct_app
 from ..auth.create_user import create_user
 
-def init_app(config):
+def _build_app_context(config):
     app = App(__name__, config=config, verbose=False)
     app.load()
-    return app
+    return {'app': app, 'config': config}
 
 class SparrowCLI(click.Group):
     def __init__(self, *args, **kwargs):
@@ -27,31 +27,25 @@ class SparrowCLI(click.Group):
         # This pulls in configuration from environment variable or a configuration
         # object, if provided; I don't see another option to support lazily loading plugins
         config = kwargs.pop("config", environ.get("SPARROW_BACKEND_CONFIG"))
-        app = init_app(config)
 
         kwargs.setdefault('context_settings', {})
         # Ideally we would add the Application _and_ config objects to settings
         # here...
-        kwargs['context_settings']['obj'] = {'app': app, 'config': config}
+        obj = _build_app_context(config)
+        kwargs['context_settings']['obj'] = obj
         super().__init__(*args, **kwargs)
+        obj['app'].run_hook("setup-cli", self)
 
-        app.run_hook("setup-cli", self)
 
 @click.group(cls=SparrowCLI)
 # Get configuration from environment variable or passed
 # using the `--config` flag
-@click.option('--config', 'cfg',
-    type=str,
-    envvar="SPARROW_BACKEND_CONFIG",
-    required=False)
+@click.option('--config', 'cfg', type=str, required=False)
 @click.pass_context
-def cli(ctx, cfg):
+def cli(ctx, cfg=None):
     # This signature might run things twice...
     if cfg is not None:
-        ctx.obj = {
-            'config': cfg,
-            'app': init_app(cfg)
-        }
+        ctx.obj = _build_app_context(config)
 
 
 

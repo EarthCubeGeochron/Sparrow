@@ -133,6 +133,7 @@ class App(Flask):
 
 
 def construct_app(config=None, minimal=False, **kwargs):
+    # TODO: refactor phase-2 setup into a method on the app itself
     app = App(__name__, config=config,
               template_folder=relative_path(__file__, "templates"),
               **kwargs)
