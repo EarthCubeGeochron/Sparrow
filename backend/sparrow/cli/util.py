@@ -41,3 +41,18 @@ def with_database(cmd):
         app = ctx.find_object(App)
         return ctx.invoke(cmd, app.database, *args, **kwargs)
     return update_wrapper(new_cmd, cmd)
+
+
+def with_full_app(cmd):
+    """This decorator gives us an instance of the application that has been
+    fully constructed (including API and database mapping). Ideally, this should
+    be refactored so that construction can occur from within methods (i.e. from
+    within the App object).
+    """
+    @click.pass_context
+    def new_cmd(ctx, *args, **kwargs):
+        # We should ideally be able to pass a configuration from context...
+        cfg = ctx.obj.get('config', None)
+        app, db = base_construct_app(config=cfg)
+        return ctx.invoke(cmd, app, *args, **kwargs)
+    return update_wrapper(new_cmd, cmd)

@@ -9,7 +9,7 @@ from pkg_resources import iter_entry_points
 from contextlib import redirect_stdout
 from subprocess import run
 
-from .util import with_database, with_app
+from .util import with_database, with_app, with_full_app
 from ..util import working_directory
 from ..app import App, construct_app
 from ..auth.create_user import create_user
@@ -30,7 +30,9 @@ class SparrowCLI(click.Group):
         app = init_app(config)
 
         kwargs.setdefault('context_settings', {})
-        kwargs['context_settings']['obj'] = app
+        # Ideally we would add the Application _and_ config objects to settings
+        # here...
+        kwargs['context_settings']['obj'] = {'app': app, 'config': config}
         super().__init__(*args, **kwargs)
 
         app.run_hook("setup-cli", self)
@@ -44,8 +46,12 @@ class SparrowCLI(click.Group):
     required=False)
 @click.pass_context
 def cli(ctx, cfg):
+    # This signature might run things twice...
     if cfg is not None:
-        ctx.obj = init_app(cfg)
+        ctx.obj = {
+            'config': cfg,
+            'app': init_app(cfg)
+        }
 
 
 
@@ -78,7 +84,7 @@ def create_views(db):
 
 
 @cli.command(name='serve')
-@with_app
+@with_full_app
 def dev_server(app):
     """
     Run a development WSGI server
@@ -136,7 +142,7 @@ def _create_user(db):
 
 @cli.command(name="plugins")
 @with_app
-def shell(app):
+def plugins(app):
     """
     Print a list of enabled plugins
     """
