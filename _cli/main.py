@@ -93,9 +93,8 @@ def find_subcommand(directories, name):
 
 
 def cli():
-    wd = getcwd()
-    environ['SPARROW_WORKDIR'] = wd
-    here = Path(wd)
+    environ['SPARROW_WORKDIR'] = getcwd()
+    here = Path(environ['SPARROW_WORKDIR'])
 
     sparrow_config = get_config()
 
@@ -106,18 +105,19 @@ def cli():
     if sparrow_config is None:
         echo("No configuration file found. Running using default values.", err=True)
         environ['_SPARROW_CONFIG_UNSET'] = '1'
-    environ['SPARROW_CONFIG'] = str(sparrow_config)
-    environ['SPARROW_CONFIG_DIR'] = str(sparrow_config.parent)
+    else:
+        environ['SPARROW_CONFIG'] = str(sparrow_config)
+        environ['SPARROW_CONFIG_DIR'] = str(sparrow_config.parent)
 
     _config_sourced = environ.get("_SPARROW_CONFIG_SOURCED", "0") == "1"
 
     if sparrow_config is not None and not _config_sourced:
-        chdir(str(sparrow_config.parent))
+        chdir(environ['SPARROW_CONFIG_DIR'])
         # This requires bash to be available on the platform, which
         # might be a problem for Windows/WSL.
-        load_envbash(str(sparrow_config))
+        load_envbash(environ['SPARROW_CONFIG'])
         # Change back to original working directory
-        chdir(wd)
+        chdir(environ['SPARROW_WORKDIR'])
         environ["_SPARROW_CONFIG_SOURCED"] = "1"
 
     # Check if this script is part of a source
