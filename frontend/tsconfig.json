@@ -1,0 +1,21 @@
+{
+  "emitDeclarationOnly": true,
+  "compilerOptions": {
+    "moduleResolution": "Node",
+    "declaration": true,
+    "sourceMap": true,
+    "declarationDir": "dist/types",
+    "jsx": "react",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "paths": {
+        "~/*": ["src/*"]
+    }
+  },
+  "include": [
+    "src",
+    "plugins",
+    "default-content"
+  ]
+}

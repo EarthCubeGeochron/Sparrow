@@ -1,0 +1,7 @@
+version: "3.4"
+services:
+  test:
+    build: test
+    command: /test/run-tests
+    depends_on:
+      - frontend

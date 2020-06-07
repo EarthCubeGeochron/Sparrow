@@ -4,5 +4,5 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
 from .logs import get_logger
-from .app import App, construct_app
+from .app import App
 from .database import Database
