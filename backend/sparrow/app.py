@@ -133,6 +133,8 @@ class App(Flask):
         self.__loaded()
 
     def load_phase_2(self):
+        if self.api_loaded:
+            return True
         # Database setup is likely redundant, but moves any database-mapping
         # errors forward.
         from .database import Database
