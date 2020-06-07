@@ -14,4 +14,4 @@ jobs:
     - name: Build command-line application
       run: _cli/_scripts/build-local
     - name: Run Sparrow core tests
-      run: bin/sparrow test
+      run: source _cli/build/venv/bin/activate && bin/sparrow test
