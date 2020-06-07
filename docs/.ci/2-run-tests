@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd docs
+# Run tests
+export COMPOSE_PROJECT_NAME="sparrow_docs"
+export COMPOSE_FILE="docker-compose.yaml:docker-compose.test.yaml:.ci/docker-compose.override.yaml"
+docker-compose run --rm --service-ports test /test/run-tests

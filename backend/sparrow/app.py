@@ -32,6 +32,7 @@ class App(Flask):
         verbose = kwargs.pop("verbose", True)
         super().__init__(*args, **kwargs)
         self.is_loaded = False
+        self.api_loaded = False
         self.verbose = verbose
 
         self.config.from_object('sparrow.default_config')
@@ -131,44 +132,38 @@ class App(Flask):
 
         self.__loaded()
 
+    def load_phase_2(self):
+        if self.api_loaded:
+            return True
+        # Database setup is likely redundant, but moves any database-mapping
+        # errors forward.
+        from .database import Database
+        db = self.setup_database(Database(self))
 
-def construct_app(config=None, minimal=False, **kwargs):
-    app = App(__name__, config=config,
-              template_folder=relative_path(__file__, "templates"),
-              **kwargs)
+        # Setup API
+        api = APIv1(db)
 
-    app.load()
+        # Register all views in schema
+        for tbl in db.entity_names(schema='core_view'):
+            if tbl.endswith("_tree"):
+                continue
+            api.build_route(tbl, schema='core_view')
 
-    from .database import Database
-    db = app.setup_database(Database(app))
+        for tbl in db.entity_names(schema='lab_view'):
+            api.build_route(tbl, schema='lab_view')
 
-    if minimal:
-        return app, db
+        self.api = api
+        self.register_blueprint(api.blueprint, url_prefix='/api/v1')
+        self.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
 
-    # Setup API
-    api = APIv1(db)
+        self.run_hook("api-initialized", api)
+        self.run_hook("finalize-routes")
 
-    # Register all views in schema
-    for tbl in db.entity_names(schema='core_view'):
-        if tbl.endswith("_tree"):
-            continue
-        api.build_route(tbl, schema='core_view')
+        # If we want to just serve assets without a file server...
+        assets = self.config.get("ASSETS_DIRECTORY", None)
+        if assets is not None:
+            @self.route('/assets/<path:filename>')
+            def assets_route(filename):
+                return send_from_directory(assets, filename)
 
-    for tbl in db.entity_names(schema='lab_view'):
-        api.build_route(tbl, schema='lab_view')
-
-    app.api = api
-    app.register_blueprint(api.blueprint, url_prefix='/api/v1')
-    app.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
-
-    app.run_hook("api-initialized", api)
-    app.run_hook("finalize-routes")
-
-    # If we want to just serve assets without a file server...
-    assets = app.config.get("ASSETS_DIRECTORY", None)
-    if assets is not None:
-        @app.route('/assets/<path:filename>')
-        def assets_route(filename):
-            return send_from_directory(assets, filename)
-
-    return app, db
+        self.api_loaded = True
