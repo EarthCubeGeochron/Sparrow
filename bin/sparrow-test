@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 cd "$SPARROW_PATH/backend-tests"
 
