@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Description: Run tests for Sparrow
 
 # This should be run in a separate container eventually

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Meant to be run from the repository root folder
+
+mkdir -p _cli/build
+venv=_cli/build/venv
+
+if [ ! -f $venv/bin/activate ]; then
+  python3 -m venv $venv
+  source $venv/bin/activate
+fi
+pip3 install -r _cli/requirements.txt
