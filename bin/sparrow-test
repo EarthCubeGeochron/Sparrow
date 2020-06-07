@@ -14,4 +14,8 @@ compose build --quiet
 # Need to bring up database separately to ensure ports are mapped...
 compose up -d db
 compose run --rm --service-ports backend /bin/run-tests $@
+status=$?
+
 compose down
+
+exit $status
