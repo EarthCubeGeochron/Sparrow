@@ -6,7 +6,7 @@ all: build
 
 _cli/dist/macos/sparrow:
 	# Due to the vagaries of PyInstaller, Mac distribution must be built on OS X
-	cd _cli && pyinstaller --distpath dist/macos sparrow.spec
+	pyinstaller --distpath _cli/dist/macos _cli/sparrow.spec
 
 _cli/dist/linux/sparrow:
 	docker run -v "$(shell pwd)/_cli:/src" cdrx/pyinstaller-linux:latest

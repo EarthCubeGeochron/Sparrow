@@ -4,23 +4,22 @@
 # the base system.
 
 import sys
+import re
 from click import echo, style, secho
-from os import environ, getcwd
+from os import environ, getcwd, chdir
 from pathlib import Path
 from typing import Optional
 from rich import print
-from rich.markdown import Markdown
 from rich.console import Console
-import sys
 from subprocess import run
 from shlex import split
 from envbash import load_envbash
-import re
 
 
 def cmd(*v, **kwargs):
     val = " ".join(v)
     return run(split(val), **kwargs)
+
 
 def find_config_file(dir: Path) -> Optional[Path]:
     for folder in (dir, *dir.parents):
@@ -108,11 +107,17 @@ def cli():
         echo("No configuration file found. Running using default values.", err=True)
         environ['_SPARROW_CONFIG_UNSET'] = '1'
     environ['SPARROW_CONFIG'] = str(sparrow_config)
+    environ['SPARROW_CONFIG_DIR'] = str(sparrow_config.parent)
 
     _config_sourced = environ.get("_SPARROW_CONFIG_SOURCED", "0") == "1"
 
     if sparrow_config is not None and not _config_sourced:
+        chdir(str(sparrow_config.parent))
+        # This requires bash to be available on the platform, which
+        # might be a problem for Windows/WSL.
         load_envbash(str(sparrow_config))
+        # Change back to original working directory
+        chdir(wd)
         environ["_SPARROW_CONFIG_SOURCED"] = "1"
 
     # Check if this script is part of a source
@@ -147,7 +152,7 @@ def cli():
     # within Sparrow (even if `sparrow` command itself isn't on the PATH)
     __cmd = environ.get("SPARROW_COMMANDS")
     if __cmd is not None:
-        bin_directories += Path(__cmd)
+        bin_directories.append(Path(__cmd))
 
     # Add location of Sparrow commands to path
     __added_path_dirs = [str(i) for i in bin_directories]
