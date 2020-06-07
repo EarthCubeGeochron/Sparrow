@@ -9,7 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get -y install zsh
+    #- name: Install CLI build dependencies
+    #  run: sudo apt-get update && sudo apt-get -y install python3
+    - name: Build command-line application
+      run: make install-dev
     - name: Run Sparrow core tests
-      run: bin/sparrow test
+      run: sparrow test
