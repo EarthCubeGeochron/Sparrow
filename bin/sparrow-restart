@@ -1,0 +1,2 @@
+#!/bin/bash
+sparrow up --force-recreate $@

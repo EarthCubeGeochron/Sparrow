@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 # Description: Like `sparrow down`, but for people in a hurry.
 
 # Note: this command should probably be hidden in production.

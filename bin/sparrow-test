@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 cd "$SPARROW_PATH/backend-tests"
 
@@ -13,5 +13,9 @@ function compose {
 compose build --quiet
 # Need to bring up database separately to ensure ports are mapped...
 compose up -d db
-compose run --service-ports backend /bin/run-tests $@
+compose run --rm --service-ports backend /bin/run-tests $@
+status=$?
+
 compose down
+
+exit $status

@@ -71,6 +71,7 @@ class Database(MappedDatabaseMixin):
             Column("session_id", Integer, ForeignKey(self.table.session.c.id)),
             schema='core_view')
         self.register_models(cls)
+        self.app.run_hook('database-mapped')
 
     @contextmanager
     def session_scope():
@@ -184,3 +185,4 @@ class Database(MappedDatabaseMixin):
             self.app.run_hook('core-tables-initialized', self)
         except AttributeError as err:
             secho("Could not load plugins", fg='red', dim=True)
+            secho(str(err))

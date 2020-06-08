@@ -1,7 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Description: Build docker base images
-from __future__ import print_function
-from os import chdir, path, getcwd
+from os import chdir, path
 from textwrap import dedent
 from sys import argv, exit
 from subprocess import call

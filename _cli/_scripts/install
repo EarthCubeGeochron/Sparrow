@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+build_dir=_cli/dist/sparrow
+dist_dir=${1:-/usr/local/opt/sparrow}
+symlink=${2:-/usr/local/bin/sparrow}
+
+# We build as a folder rather than a single zipped file due to MacOS Catalina issues
+# This is related to OSX 'phoning home' for security when unknown programs are run.
+# https://github.com/docker/compose/issues/6956
+
+if [ ! -d $build_dir ]; then
+  # Build the local module
+  _cli/_scripts/build-local
+fi
+
+if [ -d $dist_dir ]; then
+  read -p "$dist_dir already exists. Overwrite? yN " -n 1 -r
+  echo    # (optional) move to a new line
+  [[ $REPLY =~ ^[Yy]$ ]] && rm -rf $dist_dir
+fi
+
+[ -L $symlink ] && rm -f $symlink
+
+if [ -e $symlink ]; then
+  read -p "$symlink already exists. Overwrite? yN " -n 1 -r
+  echo    # (optional) move to a new line
+  [[ $REPLY =~ ^[Yy]$ ]] && rm -rf $symlink
+fi
+
+mkdir -p "$dist_dir"
+# Copy all files and dependencies to a centralized location
+cp -r "$build_dir"/* "$dist_dir"
+
+# Link executable onto the path
+echo "Linking $symlink -> $dist_dir/sparrow"
+ln -s "$dist_dir/sparrow" "$symlink"
