@@ -28,11 +28,9 @@ fi
 # Actually run database migration
 sparrow compose stop backend
 sparrow db-await
-sparrow compose exec -T db bash -s <<EOF
-dropdb --if-exists -Upostgres sparrow
-createdb -Upostgres sparrow
-pg_restore -v -Upostgres -d sparrow "$internal_name"
-rm -f "$internal_name"
-EOF
+sparrow compose exec db dropdb --if-exists -Upostgres sparrow
+sparrow compose exec db createdb -Upostgres sparrow
+sparrow compose exec db pg_restore -v -Upostgres -d sparrow "$internal_name"
+sparrow compose exec db rm -f "$internal_name"
 
 sparrow compose start backend
