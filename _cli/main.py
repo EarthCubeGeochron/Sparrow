@@ -6,7 +6,7 @@
 import sys
 import re
 from click import echo, style, secho
-from os import environ, getcwd, chdir
+from os import environ, getcwd, chdir, path
 from pathlib import Path
 from typing import Optional
 from rich import print
@@ -51,6 +51,13 @@ def get_description(script):
 def cmd_help(title, directory: Path):
     echo("", err=True)
     print(title+":", file=sys.stderr)
+
+    # Add sparrow compose help separately
+    # TODO: integrate into `click`
+    echo("  {0:24}".format('compose'), err=True, nl=False)
+    console.print("Alias to [cyan]docker-compose[/cyan] that respects [cyan]sparrow[/cyan] config", highlight=True)
+
+
     for f in directory.iterdir():
         if not f.is_file():
             continue
@@ -63,14 +70,19 @@ def cmd_help(title, directory: Path):
         desc = get_description(f)
         console.print(desc, highlight=True)
 
-
+def compose(*args, **kwargs):
+    base = environ['SPARROW_PATH']
+    main = path.join(base, "docker-compose.yaml")
+    overrides = environ.get("SPARROW_COMPOSE_OVERRIDES", "")
+    chdir(base)
+    return cmd("docker-compose", "-f", main, overrides, *args, **kwargs)
 
 def echo_help(core_commands=None, user_commands=None):
     echo("Usage: "+style("sparrow", bold=True)+" [options] <command> [args]...", err=True)
     echo("", err=True)
     echo("Config: "+style(environ['SPARROW_CONFIG'], fg='cyan'), err=True)
     echo("Lab: "+style(environ['SPARROW_LAB_NAME'], fg='cyan', bold=True), err=True)
-    out = run("sparrow compose run --no-deps -T backend sparrow", shell=True, stdout=PIPE)
+    out = compose("run --no-deps backend sparrow", shell=True, stdout=PIPE)
     if out.returncode != 0:
         echo(out.stderr, err=True)
     else:
@@ -175,6 +187,9 @@ def cli():
         echo_help(*bin_directories)
         sys.exit(0)
 
+    if subcommand == 'compose':
+        return compose(*args)
+
     _command = find_subcommand(bin_directories, subcommand)
 
     if _command is None:
@@ -184,9 +199,9 @@ def cli():
         # backend containers when containers are already running.
         # TODO: We need a better understanding of best practices here.
         if container_is_running("backend"):
-            cmd("sparrow compose --log-level ERROR exec backend sparrow", *args)
+            compose("--log-level ERROR exec backend sparrow", *args)
         else:
-            cmd("sparrow compose --log-level ERROR run --rm backend sparrow", *args)
+            compose("--log-level ERROR run --rm backend sparrow", *args)
     else:
         cmd(_command, *args)
 
