@@ -3,4 +3,5 @@
 # Meant to be run from the repository root folder
 _cli/scripts/build-local
 pip install pyinstaller
-pyinstaller --distpath _cli/dist _cli/sparrow.spec
+cd _cli
+pyinstaller --distpath --noconfirm dist sparrow.spec
