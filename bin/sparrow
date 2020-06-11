@@ -1,1 +1,8 @@
-../_cli/main.py
+#!/bin/bash
+# A development version of the Sparrow command that can be run directly
+# from the source folder.
+DIR="$(dirname "$(readlink -f "$0")")"
+
+cd $DIR/..
+source _cli/build/venv/bin/activate
+python3 _cli/main.py $@
