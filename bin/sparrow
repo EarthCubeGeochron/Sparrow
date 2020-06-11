@@ -3,6 +3,6 @@
 # from the source folder.
 DIR="$(dirname "$(readlink -f "$0")")"
 
-cd $DIR/..
-source _cli/build/venv/bin/activate
-python3 _cli/main.py $@
+cd $DIR/../_cli
+source build/venv/bin/activate
+python3 main.py $@
