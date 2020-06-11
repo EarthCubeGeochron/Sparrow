@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional
 from rich import print
 from rich.console import Console
-from subprocess import run
+from subprocess import run, PIPE
 from shlex import split
 from envbash import load_envbash
 
@@ -50,7 +50,7 @@ def get_description(script):
 
 def cmd_help(title, directory: Path):
     echo("", err=True)
-    echo(title+":", err=True)
+    print(title+":", file=sys.stderr)
     for f in directory.iterdir():
         if not f.is_file():
             continue
@@ -70,12 +70,15 @@ def echo_help(core_commands=None, user_commands=None):
     echo("", err=True)
     echo("Config: "+style(environ['SPARROW_CONFIG'], fg='cyan'), err=True)
     echo("Lab: "+style(environ['SPARROW_LAB_NAME'], fg='cyan', bold=True), err=True)
-    out = run("sparrow compose run --no-deps -T backend sparrow", shell=True, capture_output=True)
-    echo(b"\n".join(out.stdout.splitlines()[1:]), err=True)
+    out = run("sparrow compose run --no-deps -T backend sparrow", shell=True, stdout=PIPE)
+    if out.returncode != 0:
+        echo(out.stderr, err=True)
+    else:
+        echo(b"\n".join(out.stdout.splitlines()[1:]), err=True)
 
     if user_commands is not None:
-        lab_name = environ.get("SPARROW_CONFIG", "Lab-specific")
-        cmd_help(lab_name+" commands", user_commands)
+        lab_name = environ.get("SPARROW_LAB_NAME", "Lab-specific")
+        cmd_help("[underline]"+lab_name+"[/underline] commands", user_commands)
 
     cmd_help("Container management commands", core_commands)
 
