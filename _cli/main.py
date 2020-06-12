@@ -106,7 +106,10 @@ def find_subcommand(directories, name):
         if fn.is_file():
             return str(fn)
 
-@click.command("sparrow")
+@click.command("sparrow", context_settings=dict(
+    ignore_unknown_options=True,
+    help_option_names=[],
+))
 @click.argument('args', nargs=-1, type=click.UNPROCESSED)
 def cli(args):
     environ['SPARROW_WORKDIR'] = getcwd()
@@ -189,7 +192,7 @@ def cli(args):
         sys.exit(0)
 
     if subcommand == 'compose':
-        return compose(*args)
+        return compose(*rest)
 
     _command = find_subcommand(bin_directories, subcommand)
 
@@ -200,11 +203,11 @@ def cli(args):
         # backend containers when containers are already running.
         # TODO: We need a better understanding of best practices here.
         if container_is_running("backend"):
-            compose("--log-level ERROR exec backend sparrow", *rest)
+            return compose("--log-level ERROR exec backend sparrow", *args)
         else:
-            compose("--log-level ERROR run --rm backend sparrow", *rest)
+            return compose("--log-level ERROR run --rm backend sparrow", *args)
     else:
-        cmd(_command, *rest)
+        return cmd(_command, *rest)
 
 if __name__ == '__main__':
     cli()

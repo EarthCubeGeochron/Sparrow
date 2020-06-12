@@ -2,6 +2,8 @@
 
 cd "$SPARROW_PATH/backend-tests"
 
+echo "Running sparrow tests"
+
 # Set a different compose project name so we don't step on running
 # applications.
 export COMPOSE_PROJECT_NAME="sparrow_test"
@@ -11,7 +13,7 @@ function compose {
 }
 
 # First, test basic operation of command-line application
-$SPARROW_PATH/_cli/_scripts/test-cli
+$SPARROW_PATH/_cli/_scripts/test-cli $@
 status=$?
 [ $status -ne 0 ] && echo "CLI tests failed, exiting." && exit $status
 
