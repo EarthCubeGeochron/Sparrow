@@ -3,3 +3,4 @@ rich
 envbash
 pytest
 pyyaml
+docker-compose==1.26.0
