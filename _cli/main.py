@@ -5,6 +5,7 @@
 
 import sys
 import re
+import click
 from click import echo, style, secho
 from os import environ, getcwd, chdir, path
 from pathlib import Path
@@ -14,7 +15,6 @@ from rich.console import Console
 from subprocess import run, PIPE
 from shlex import split
 from envbash import load_envbash
-
 
 def cmd(*v, **kwargs):
     val = " ".join(v)
@@ -106,8 +106,12 @@ def find_subcommand(directories, name):
         if fn.is_file():
             return str(fn)
 
-
-def cli():
+@click.command("sparrow", context_settings=dict(
+    ignore_unknown_options=True,
+    help_option_names=[],
+))
+@click.argument('args', nargs=-1, type=click.UNPROCESSED)
+def cli(args):
     environ['SPARROW_WORKDIR'] = getcwd()
     here = Path(environ['SPARROW_WORKDIR'])
 
@@ -177,9 +181,9 @@ def cli():
         print("[red]You [underline]must[/underline] set [bold]SPARROW_SECRET_KEY[/bold]. Exiting...")
         sys.exit(1)
 
-    args = []
+    rest = []
     try:
-        (subcommand, *args) = sys.argv[1:]
+        (subcommand, *rest) = args
     except ValueError:
         subcommand = "--help"
 
@@ -188,7 +192,7 @@ def cli():
         sys.exit(0)
 
     if subcommand == 'compose':
-        return compose(*args)
+        return compose(*rest)
 
     _command = find_subcommand(bin_directories, subcommand)
 
@@ -199,11 +203,11 @@ def cli():
         # backend containers when containers are already running.
         # TODO: We need a better understanding of best practices here.
         if container_is_running("backend"):
-            compose("--log-level ERROR exec backend sparrow", *args)
+            return compose("--log-level ERROR exec backend sparrow", *args)
         else:
-            compose("--log-level ERROR run --rm backend sparrow", *args)
+            return compose("--log-level ERROR run --rm backend sparrow", *args)
     else:
-        cmd(_command, *args)
+        return cmd(_command, *rest)
 
 if __name__ == '__main__':
     cli()

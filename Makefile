@@ -15,6 +15,9 @@ install-dev:
 	mkdir -p $(SPARROW_INSTALL_PATH)/bin
 	ln -sf $(shell pwd)/bin/sparrow $(SPARROW_INSTALL_PATH)/bin/sparrow
 
+test:
+	_cli/_scripts/test-cli
+
 # Fallback Docker build instructions (for e.g. CI)
 # Some information on how to build can be found at https://github.com/docker/compose
 # Build the sparrow command-line application (for different platforms)
