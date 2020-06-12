@@ -5,16 +5,17 @@
 
 import sys
 import re
+import click
 from click import echo, style, secho
 from os import environ, getcwd, chdir, path
 from pathlib import Path
 from typing import Optional
 from rich import print
 from rich.console import Console
-from subprocess import run, PIPE
+from subprocess import run, PIPE, STDOUT
 from shlex import split
 from envbash import load_envbash
-
+from compose.cli.main import TopLevelCommand
 
 def cmd(*v, **kwargs):
     val = " ".join(v)
@@ -77,14 +78,17 @@ def compose(*args, **kwargs):
     chdir(base)
     return cmd("docker-compose", "-f", main, overrides, *args, **kwargs)
 
+
 def echo_help(core_commands=None, user_commands=None):
     echo("Usage: "+style("sparrow", bold=True)+" [options] <command> [args]...", err=True)
     echo("", err=True)
     echo("Config: "+style(environ['SPARROW_CONFIG'], fg='cyan'), err=True)
     echo("Lab: "+style(environ['SPARROW_LAB_NAME'], fg='cyan', bold=True), err=True)
-    out = compose("run --no-deps backend sparrow", shell=True, stdout=PIPE)
+    # Ideally we'd use a TTY here with -T, but this may have problems on Ubuntu.
+    # so we omit it for now.
+    out = compose("run --no-deps -T backend sparrow", stdout=PIPE, stderr=STDOUT)
     if out.returncode != 0:
-        echo(out.stderr, err=True)
+        secho("Help text for the Sparrow backend could not be accessed", err=True, fg='red')
     else:
         echo(b"\n".join(out.stdout.splitlines()[1:]), err=True)
 
@@ -106,8 +110,12 @@ def find_subcommand(directories, name):
         if fn.is_file():
             return str(fn)
 
-
-def cli():
+@click.command("sparrow", context_settings=dict(
+    ignore_unknown_options=True,
+    help_option_names=[],
+))
+@click.argument('args', nargs=-1, type=click.UNPROCESSED)
+def cli(args):
     environ['SPARROW_WORKDIR'] = getcwd()
     here = Path(environ['SPARROW_WORKDIR'])
 
@@ -177,9 +185,9 @@ def cli():
         print("[red]You [underline]must[/underline] set [bold]SPARROW_SECRET_KEY[/bold]. Exiting...")
         sys.exit(1)
 
-    args = []
+    rest = []
     try:
-        (subcommand, *args) = sys.argv[1:]
+        (subcommand, *rest) = args
     except ValueError:
         subcommand = "--help"
 
@@ -188,7 +196,7 @@ def cli():
         sys.exit(0)
 
     if subcommand == 'compose':
-        return compose(*args)
+        return compose(*rest)
 
     _command = find_subcommand(bin_directories, subcommand)
 
@@ -199,11 +207,11 @@ def cli():
         # backend containers when containers are already running.
         # TODO: We need a better understanding of best practices here.
         if container_is_running("backend"):
-            compose("--log-level ERROR exec backend sparrow", *args)
+            return compose("--log-level ERROR exec backend sparrow", *args)
         else:
-            compose("--log-level ERROR run --rm backend sparrow", *args)
+            return compose("--log-level ERROR run --rm backend sparrow", *args)
     else:
-        cmd(_command, *args)
+        return cmd(_command, *rest)
 
 if __name__ == '__main__':
     cli()
