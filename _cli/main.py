@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Optional
 from rich import print
 from rich.console import Console
-from subprocess import run, PIPE
+from subprocess import run, PIPE, STDOUT
 from shlex import split
 from envbash import load_envbash
 
@@ -77,14 +77,17 @@ def compose(*args, **kwargs):
     chdir(base)
     return cmd("docker-compose", "-f", main, overrides, *args, **kwargs)
 
+
 def echo_help(core_commands=None, user_commands=None):
     echo("Usage: "+style("sparrow", bold=True)+" [options] <command> [args]...", err=True)
     echo("", err=True)
     echo("Config: "+style(environ['SPARROW_CONFIG'], fg='cyan'), err=True)
     echo("Lab: "+style(environ['SPARROW_LAB_NAME'], fg='cyan', bold=True), err=True)
-    out = compose("run --no-deps backend sparrow", shell=True, stdout=PIPE)
+    # Ideally we'd use a TTY here with -T, but this may have problems on Ubuntu.
+    # so we omit it for now.
+    out = compose("run --no-deps backend sparrow", stdout=PIPE, stderr=STDOUT)
     if out.returncode != 0:
-        echo(out.stderr, err=True)
+        secho("Help text for the Sparrow backend could not be accessed", err=True, fg='red')
     else:
         echo(b"\n".join(out.stdout.splitlines()[1:]), err=True)
 
