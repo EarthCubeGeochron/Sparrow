@@ -6,8 +6,12 @@ The format is based on
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+We hope to arrive at full conformance for milestone `2.0.0`.
 
-## [Unreleased]
+## [Unreleased] - 2020-06-12
 
-- Updated command-line interface to be based on Python instead of shell scripts.
+### Changed
+
+- Command-line interface is now based on Python instead of shell scripts.
 - Added basic command-line tests to `sparrow test` command.
+- `SPARROW_PATH` is now explicitly required in `sparrow-config.sh` for source builds.
