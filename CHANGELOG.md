@@ -15,3 +15,5 @@ We hope to arrive at full conformance for milestone `2.0.0`.
 - Command-line interface is now based on Python instead of shell scripts.
 - Added basic command-line tests to `sparrow test` command.
 - `SPARROW_PATH` is now explicitly required in `sparrow-config.sh` for source builds.
+- Bundle `docker-compose` version `1.26.0` into the `sparrow` wrapper command
+  to solve version issues on Ubuntu and other platforms.  
