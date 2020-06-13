@@ -1,16 +1,16 @@
 INSTALL_PATH ?= /usr/local
 SPARROW_INSTALL_PATH ?= $(INSTALL_PATH)
 
-all: build
+all: install-hooks build
 
 build: _cli/dist/sparrow
 
 # Bundle with PyInstaller and install (requires local Python 3)
-install: _cli/dist/sparrow
+install: _cli/dist/sparrow install-hooks
 	_cli/_scripts/install
 
 # Install without building with PyInstaller
-install-dev:
+install-dev: install-hooks
 	_cli/_scripts/build-local
 	mkdir -p $(SPARROW_INSTALL_PATH)/bin
 	ln -sf $(shell pwd)/bin/sparrow $(SPARROW_INSTALL_PATH)/bin/sparrow
@@ -18,7 +18,7 @@ install-dev:
 test:
 	_cli/_scripts/test-cli
 
-# Fallback Docker build instructions (for e.g. CI)
+# Docker CLI build instructions (for e.g. CI)
 # Some information on how to build can be found at https://github.com/docker/compose
 # Build the sparrow command-line application (for different platforms)
 
@@ -38,3 +38,9 @@ _cli/dist/sparrow: _cli/main.py
 
 _generate_buildspec:
 	docker run -v "$(shell pwd)/_cli/:/src/" cdrx/pyinstaller-linux "pyinstaller main.py"
+
+# Link git hooks
+# (handles automatic submodule updating etc.)
+# For git > 2.9
+install-hooks:
+	git config core.hooksPath .githooks
