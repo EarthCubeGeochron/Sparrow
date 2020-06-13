@@ -1,10 +1,11 @@
 from flask_graphql import GraphQLView
-from ..plugins import SparrowCorePlugin
+from sparrow.plugins import SparrowCorePlugin
 from .schema import build_schema
 
 
 class GraphQLPlugin(SparrowCorePlugin):
     name = "graphql-api"
+    dependencies = ['schema-interface']
 
     def on_finalize_routes(self):
         db = self.app.database

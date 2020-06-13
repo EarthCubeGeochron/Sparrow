@@ -51,7 +51,7 @@ class DatabaseStringID(graphene.Interface):
 def primary_key_interface(model):
     v = model.__mapper__.primary_key
     if len(v) > 1:
-        return
+        return []
     # We only provide a primary key item if there is a *single*
     # primary key. We may implement multikey if we need it
     if is_integer(v[0].type):
@@ -69,12 +69,15 @@ def graphql_object_factory(_model, id_param=None):
     <model_name>:<primary_key> for single-key values.
     """
 
+    name_ = to_type_name(_model.__name__)
+
     class Meta:
         model = _model
         interfaces = (relay.Node, *primary_key_interface(model))
         connection_field_factory = connection_field_factory
+        name = name_
 
-    return type(to_type_name(_model.__name__), (SQLAlchemyObjectType,), dict(
+    return type(name_, (SQLAlchemyObjectType,), dict(
         Meta=Meta,
         resolve_primary_key=resolve_primary_key))
 
