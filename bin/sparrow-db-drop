@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 # Description: Drop the `Sparrow` database. `DANGEROUS`
 
 db_container=$(sparrow compose ps -q db)

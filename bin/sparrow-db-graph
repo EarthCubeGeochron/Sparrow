@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 # Description: Graph database schema to `dot` format.
 
 if ! type "sadisplay" > /dev/null; then

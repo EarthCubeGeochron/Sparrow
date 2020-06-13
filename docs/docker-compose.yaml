@@ -1,15 +1,18 @@
 version: "3.4"
 services:
-  main:
-    build: .
+  frontend:
+    build:
+      context: ..
+      dockerfile: docs/Dockerfile
+    expose:
+      - 8000
     ports:
       - "3000:3000"
     volumes:
-      - public:/app/public
-  main1:
-    image: nginxdemos/hello
-    ports:
-      - "3001:80"
+      - .:/docs
+      - /docs/.cache
+      - /docs/node_modules
+      - public:/docs/public
 volumes:
   public:
   #node_modules:

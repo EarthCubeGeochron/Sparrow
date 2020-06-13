@@ -1,4 +1,4 @@
 #!/bin/bash
 # Description: Simple wrapper for `docker-compose down`
 sparrow compose down
-
+sparrow compose rm

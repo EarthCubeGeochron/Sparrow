@@ -1,9 +1,13 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 # Description: Test round-trip data import export functionality
+
+# Switching from zsh to (less expressive) bash
+# https://stackoverflow.com/questions/59895
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # This script runs on the host system and kicks off the
 # import process within a docker container
-import_pipeline="${0:h:r}"
+import_pipeline="$DIR"
 
 # Run within container, mounting Sparrow data directory
 # and importer code.

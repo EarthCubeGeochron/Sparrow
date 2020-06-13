@@ -1,0 +1,3 @@
+- var: SPARROW_INSTALL_PATH
+  description: Base path for sparrow installation
+  defaults: $INSTALL_PATH, /usr/local

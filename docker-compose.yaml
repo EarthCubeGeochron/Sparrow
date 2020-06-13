@@ -10,7 +10,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - frontend_build:/frontend
-      - $SPARROW_DATA_DIR:/data:ro
+      - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend:
     build:
       context: backend
@@ -27,6 +27,14 @@ services:
       - SPARROW_BASE_URL
       - SPARROW_LAB_NAME
       - SPARROW_INIT_SQL=/init-sql
+      # For cloud data support
+      # NOTE: it may be useful to split this into a
+      # separate container, but it's centralized
+      # for now...
+      - SPARROW_S3_ENDPOINT
+      - SPARROW_S3_BUCKET
+      - SPARROW_S3_KEY
+      - SPARROW_S3_SECRET
     volumes:
       # Volume for scripts to make things like
       # migrations work...
@@ -39,11 +47,11 @@ services:
       - /app/sparrow.egg-info
       # Share some configuration between backend
       # and frontend
-      - ${SPARROW_INIT_SQL:-placeholder}:/init-sql/
+      - ${SPARROW_INIT_SQL:-placeholder}:/init-sql/:ro
       # The docker-compose volume for sparrow commands needs to be set
       # even if a `SPARROW_COMMANDS` directory is not provided, so we can
       # use a placeholder.
-      - ${SPARROW_COMMANDS_VOLUME:-placeholder}:/sparrow-commands/
+      - ${SPARROW_COMMANDS_VOLUME:-placeholder}:/sparrow-commands/:ro
       # Link `SPARROW_PLUGIN_DIR` directly into site-packages as a folder
       # ...we could probably do this in a more elegant way
       - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.8/site-packages/sparrow_plugins:ro
@@ -74,6 +82,7 @@ services:
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container
       - SPARROW_SITE_CONTENT=/app/site-content
+      - SPARROW_ENV
     volumes:
       - ./frontend:/app
       - /app/node_modules

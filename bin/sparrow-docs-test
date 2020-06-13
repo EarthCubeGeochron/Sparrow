@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+cd $SPARROW_PATH
+docs/test-docs
