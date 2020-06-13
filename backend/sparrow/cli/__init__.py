@@ -17,7 +17,7 @@ from ..auth.create_user import create_user
 def _build_app_context(config):
     app = App(__name__, config=config, verbose=False)
     app.load()
-    return {'app': app, 'config': config}
+    return app
 
 class SparrowCLI(click.Group):
     def __init__(self, *args, **kwargs):
@@ -34,7 +34,7 @@ class SparrowCLI(click.Group):
         obj = _build_app_context(config)
         kwargs['context_settings']['obj'] = obj
         super().__init__(*args, **kwargs)
-        obj['app'].run_hook("setup-cli", self)
+        obj.run_hook("setup-cli", self)
 
 
 @click.group(cls=SparrowCLI)
