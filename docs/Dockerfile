@@ -26,9 +26,9 @@ test -f /build/schema.html
 FROM node:11-alpine
 COPY docs/package.json /docs/package.json
 WORKDIR /docs
-RUN npm install
+RUN npm install -g docusaurus && npm install
 
 EXPOSE 3000
 COPY docs/ /docs/
 COPY --from=schema-builder /build/schema.html /docs/build/schema.html
-CMD node_modules/.bin/docusaurus start --host 0.0.0.0 --port 3000
+CMD docusaurus start --host 0.0.0.0 --port 3000

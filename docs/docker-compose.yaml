@@ -5,14 +5,14 @@ services:
       context: ..
       dockerfile: docs/Dockerfile
     expose:
-      - 8000
+      - 3000
     ports:
       - "3000:3000"
     volumes:
       - .:/docs
-      - /docs/.cache
+      #- /docs/.cache
       - /docs/node_modules
-      - public:/docs/public
+      #- public:/docs/public
 volumes:
   public:
   #node_modules:

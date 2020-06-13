@@ -17,6 +17,7 @@ from shlex import split
 from envbash import load_envbash
 from compose.cli.main import TopLevelCommand
 
+
 def cmd(*v, **kwargs):
     val = " ".join(v)
     return run(split(val), **kwargs)
@@ -49,6 +50,7 @@ def get_description(script):
                 return re.sub('`(.*?)`','[cyan]\\1[/cyan]',v)
     return ""
 
+
 def cmd_help(title, directory: Path):
     echo("", err=True)
     print(title+":", file=sys.stderr)
@@ -57,7 +59,6 @@ def cmd_help(title, directory: Path):
     # TODO: integrate into `click`
     echo("  {0:24}".format('compose'), err=True, nl=False)
     console.print("Alias to [cyan]docker-compose[/cyan] that respects [cyan]sparrow[/cyan] config", highlight=True)
-
 
     for f in directory.iterdir():
         if not f.is_file():
@@ -71,6 +72,7 @@ def cmd_help(title, directory: Path):
         desc = get_description(f)
         console.print(desc, highlight=True)
 
+
 def compose(*args, **kwargs):
     base = environ['SPARROW_PATH']
     main = path.join(base, "docker-compose.yaml")
@@ -82,13 +84,13 @@ def compose(*args, **kwargs):
 def echo_help(core_commands=None, user_commands=None):
     echo("Usage: "+style("sparrow", bold=True)+" [options] <command> [args]...", err=True)
     echo("", err=True)
-    echo("Config: "+style(environ['SPARROW_CONFIG'], fg='cyan'), err=True)
-    echo("Lab: "+style(environ['SPARROW_LAB_NAME'], fg='cyan', bold=True), err=True)
+    echo("Config: "+style(environ.get('SPARROW_CONFIG', "None"), fg='cyan'), err=True)
+    echo("Lab: "+style(environ.get('SPARROW_LAB_NAME', "None"), fg='cyan', bold=True), err=True)
     # Ideally we'd use a TTY here with -T, but this may have problems on Ubuntu.
     # so we omit it for now.
     out = compose("run --no-deps -T backend sparrow", stdout=PIPE, stderr=STDOUT)
     if out.returncode != 0:
-        secho("Help text for the Sparrow backend could not be accessed", err=True, fg='red')
+        secho("Could not access help text for the Sparrow backend", err=True, fg='red')
     else:
         echo(b"\n".join(out.stdout.splitlines()[1:]), err=True)
 
