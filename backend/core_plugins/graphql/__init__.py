@@ -2,8 +2,10 @@ from flask_graphql import GraphQLView
 from ..plugins import SparrowCorePlugin
 from .schema import build_schema
 
+
 class GraphQLPlugin(SparrowCorePlugin):
-    name = "graphql"
+    name = "graphql-api"
+
     def on_finalize_routes(self):
         db = self.app.database
         ctx = dict(session=db.session)

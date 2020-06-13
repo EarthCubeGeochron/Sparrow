@@ -2,6 +2,7 @@ from .earthchem_vocabulary import EarthChemVocabularyPlugin
 from .location_names import LocationNamesPlugin
 from .project_edit import ProjectEditPlugin
 from .destructive_operations import DestructiveOperationsPlugin
+from .graphql import GraphQLPlugin
 
 # These should only be run by labs that enable them
 from .versioning import VersioningPlugin
