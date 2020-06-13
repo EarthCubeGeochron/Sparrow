@@ -84,11 +84,10 @@ def echo_help(core_commands=None, user_commands=None):
     echo("", err=True)
     echo("Config: "+style(environ.get('SPARROW_CONFIG', "None"), fg='cyan'), err=True)
     echo("Lab: "+style(environ.get('SPARROW_LAB_NAME', "None"), fg='cyan', bold=True), err=True)
-    # Ideally we'd use a TTY here with -T, but this may have problems on Ubuntu.
-    # so we omit it for now.
+
     out = compose("run --no-deps -T backend sparrow", stdout=PIPE, stderr=STDOUT)
     if out.returncode != 0:
-        secho("Help text for the Sparrow backend could not be accessed", err=True, fg='red')
+        secho(out.stdout.decode('utf-8'), fg='red', err=True)
     else:
         echo(b"\n".join(out.stdout.splitlines()[1:]), err=True)
 
