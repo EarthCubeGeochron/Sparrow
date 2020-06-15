@@ -23,10 +23,12 @@ test -f /build/schema.html
 
 
 # Then build the overall documentation site:
-FROM node:11-alpine
+FROM node:12-slim
+# Deps for "gifsicle"
+# https://github.com/strapi/strapi/issues/3421
 COPY docs/package.json /docs/package.json
 WORKDIR /docs
-RUN npm install -g docusaurus && npm install
+RUN npm install -g docusaurus && npm --unsafe-perm=true --allow-root install
 
 EXPOSE 3000
 COPY docs/ /docs/
