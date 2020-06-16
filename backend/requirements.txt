@@ -12,6 +12,7 @@ shapely
 lxml
 numpy
 pandas
+uvloop
 
 # Core application
 Flask==1.1.1
@@ -65,3 +66,9 @@ boto3==1.12.25
 # Testing (we could split this into a separate file
 # if it becomes too weighty.)
 pytest==5.3.5
+
+# ASGI
+starlette==0.13.4
+uvicorn==0.11.5
+asgiref==3.2.8
+gunicorn==20.0.4
