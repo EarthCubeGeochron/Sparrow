@@ -21,14 +21,16 @@ def get_description(script):
     return ""
 
 
-def cmd_help(title, directory: Path):
+def cmd_help(title, directory: Path, extra_commands = {}):
     echo("", err=True)
     print(title+":", file=sys.stderr)
 
+
     # Add sparrow compose help separately
-    # TODO: integrate into `click`
-    echo("  {0:24}".format('compose'), err=True, nl=False)
-    console.print("Alias to [cyan]docker-compose[/cyan] that respects [cyan]sparrow[/cyan] config", highlight=True)
+    # TODO: integrate into `click` to provide better help commands
+    for cmd, help_text in extra_commands.items():
+        echo("  {0:24}".format(cmd), err=True, nl=False)
+        console.print(help_text, highlight=True)
 
     for f in directory.iterdir():
         if not f.is_file():
@@ -60,4 +62,7 @@ def echo_help(core_commands=None, user_commands=None):
         lab_name = environ.get("SPARROW_LAB_NAME", "Lab-specific")
         cmd_help("[underline]"+lab_name+"[/underline] commands", user_commands)
 
-    cmd_help("Container management commands", core_commands)
+    cmd_help("Container management commands", core_commands, extra_commands={
+        'compose': "Alias to [cyan]docker-compose[/cyan] that respects [cyan]sparrow[/cyan] config",
+        'test': "Run sparrow's testing suite."
+    })
