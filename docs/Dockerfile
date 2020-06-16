@@ -24,13 +24,11 @@ test -f /build/schema.html
 
 # Then build the overall documentation site:
 FROM node:12-slim
-# Deps for "gifsicle"
-# https://github.com/strapi/strapi/issues/3421
 COPY docs/package.json /docs/package.json
 WORKDIR /docs
-RUN npm install -g docusaurus && npm --unsafe-perm=true --allow-root install
+RUN npm --unsafe-perm=true --allow-root install
 
 EXPOSE 3000
 COPY docs/ /docs/
 COPY --from=schema-builder /build/schema.html /docs/build/schema.html
-CMD docusaurus start --host 0.0.0.0 --port 3000
+CMD node_modules/.bin/docusaurus start --host 0.0.0.0 --port 3000

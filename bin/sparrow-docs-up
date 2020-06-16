@@ -6,7 +6,7 @@ export COMPOSE_PROJECT_NAME="sparrow_docs"
 export COMPOSE_FILE="docker-compose.yaml"
 
 docker-compose build
-docker-compose up --build -d --remove-orphans $@
+docker-compose up --build -d -V --remove-orphans $@
 exit_code=$?
 if (( $exit_code == 0 )); then
   echo "$(tput bold)Containers built successfully! Following logs.$(tput sgr0)"
