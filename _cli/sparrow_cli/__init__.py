@@ -15,6 +15,7 @@ from rich.console import Console
 from envbash import load_envbash
 from .help import echo_help
 from .util import cmd, compose, container_is_running
+from .test import sparrow_test
 
 
 def find_config_file(dir: Path) -> Optional[Path]:
@@ -48,7 +49,8 @@ def find_subcommand(directories, name):
     help_option_names=[],
 ))
 @click.argument('args', nargs=-1, type=click.UNPROCESSED)
-def cli(args):
+@click.pass_context
+def cli(ctx, args):
     environ['SPARROW_WORKDIR'] = getcwd()
     here = Path(environ['SPARROW_WORKDIR'])
 
@@ -130,6 +132,9 @@ def cli(args):
 
     if subcommand == 'compose':
         return compose(*rest)
+
+    if subcommand == 'test':
+        return ctx.invoke(sparrow_test, *rest)
 
     _command = find_subcommand(bin_directories, subcommand)
 

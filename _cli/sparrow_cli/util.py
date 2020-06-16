@@ -12,6 +12,7 @@ def compose(*args, **kwargs):
     base = environ['SPARROW_PATH']
     main = path.join(base, "docker-compose.yaml")
     overrides = environ.get("SPARROW_COMPOSE_OVERRIDES", "")
+    # Overrides should be deprecated in favor of COMPOSE_FILE colon-separated list
     chdir(base)
     return cmd("docker-compose", "-f", main, overrides, *args, **kwargs)
 
