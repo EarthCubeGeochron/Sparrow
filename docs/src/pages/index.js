@@ -5,35 +5,58 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
+import Mdx from '../../docs/index-text.mdx'
 
 const features = [
   {
-    title: <>Easy to Use</>,
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    title: <>Manage your geochemical data</>,
+    imageUrl: null,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        <b>Sparrow</b> allows labs to organize
+        analytical data and track project- and sample-level metadata.
+        Its metadata management interface streamlines tasks such
+        as controlling embargo, identifying and linking geologic
+        and publication metadata, and generating aggregate summaries.
       </>
     ),
   },
   {
-    title: <>Focus on What Matters</>,
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    title: <>Link to community systems</>,
+    imageUrl: null,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        <b>Sparrow</b> straightforwardly implements FAIR (findable, accessible, interoperable, reusable)
+        data-management principles atop current data archives and lab analytical processes.
+        It provides a standard API access layer for geochemical data produced by
+        individual geochronology laboratories, which allows data to be extracted
+        by end users and centralized archives.
       </>
     ),
   },
   {
-    title: <>Powered by React</>,
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    title: <>Build a web presence</>,
+    imageUrl: null,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+      <b>Sparrow</b>'s web interface enables aggregate
+      summaries of geochemical data and metadata, driven by your
+      data archive to convey the scope and impact of your lab's work.
+      Useful summaries, such as a <a href="sparrow.boisestate.edu">map view of sample locations</a>, are bundled by default.
+      </>
+    ),
+  },
+  {
+    title: <>Extend and customize</>,
+    imageUrl: null,
+    description: (
+      <>
+      All parts of <b>Sparrow</b> can be customized.
+      Common metadata-management functionality
+      comes out of the box, but it can be augmented for lab-specific
+      needs. <b>Sparrow</b> is open-source
+      software that is built to be lightweight, flexible, and standards-compliant.
+      It's like <a href="https://wordpress.org">Wordpress</a> for geochemical data!
       </>
     ),
   },
@@ -80,6 +103,9 @@ function Home() {
           </section>
         )}
       </main>
+      <div className="container">
+        <Mdx />
+      </div>
     </Layout>
   );
 }

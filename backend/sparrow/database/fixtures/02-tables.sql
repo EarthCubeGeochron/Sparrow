@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS "user" ( -- Name must be quoted because it collides w
   researcher_id integer REFERENCES researcher(id)
 );
 
+
 CREATE TABLE IF NOT EXISTS publication (
   -- A basic model for tracked publications
   id serial PRIMARY KEY,
@@ -130,7 +131,7 @@ CREATE TABLE IF NOT EXISTS vocabulary.entity_reference (
 - We could add a model for e.g. *facies*. Or facies could be considered
   subtypes of geological entity (this is probably better).
 
-##Projects
+## Projects
 */
 
 CREATE TABLE IF NOT EXISTS project (
@@ -233,6 +234,7 @@ CREATE TABLE IF NOT EXISTS sample (
   CHECK ((name IS NOT null) OR (igsn IS NOT null))
 );
 /*
+
 #### Potential issues:
 
 - Samples potentially have several levels of abstraction

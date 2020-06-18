@@ -1,6 +1,7 @@
 ---
-path: "/motivation-and-design"
-date: 2019-01-01
+id: motivation-and-design
+title: Motivation and design
+sidebar_label: Motivation and design
 ---
 
 # Motivation and design: public interface for lab data

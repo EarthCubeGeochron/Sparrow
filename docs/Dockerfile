@@ -30,5 +30,5 @@ RUN npm --unsafe-perm=true --allow-root install
 
 EXPOSE 3000
 COPY docs/ /docs/
-COPY --from=schema-builder /build/schema.html /docs/build/schema.html
+COPY --from=schema-builder /build/schema.html /build/schema.html
 CMD node_modules/.bin/docusaurus start --host 0.0.0.0 --port 3000
