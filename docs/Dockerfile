@@ -23,7 +23,7 @@ test -f /build/schema.html
 
 
 # Then build the overall documentation site:
-FROM node:12-slim
+FROM node:12-slim AS docs-base
 COPY docs/package.json /docs/package.json
 WORKDIR /docs
 RUN npm --unsafe-perm=true --allow-root install
@@ -31,4 +31,14 @@ RUN npm --unsafe-perm=true --allow-root install
 EXPOSE 3000
 COPY docs/ /docs/
 COPY --from=schema-builder /build/schema.html /build/schema.html
-CMD node_modules/.bin/docusaurus start --host 0.0.0.0 --port 3000
+
+FROM docs-base AS docs-builder
+
+RUN npm run build
+
+FROM nginx:1.19 AS docs
+
+COPY --from=docs-builder /docs/build /usr/share/nginx/html
+COPY ./docs/docs-site.conf /etc/nginx/conf.d/docs-site.conf
+
+EXPOSE 80
