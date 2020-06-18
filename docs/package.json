@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "html-loader": "^1.1.0",
+    "stylus": "^0.54.7",
     "stylus-relative-loader": "^4.0.0"
   }
 }

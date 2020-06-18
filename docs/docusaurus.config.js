@@ -74,7 +74,7 @@ module.exports = {
             'https://github.com/EarthCubeGeochron/Sparrow/edit/master/docs/blog/',
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve('./src/css/custom.styl'),
         },
       },
     ],

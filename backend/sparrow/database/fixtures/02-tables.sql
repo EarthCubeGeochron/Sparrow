@@ -1,6 +1,4 @@
 /*
-# Database schema
-
 The set of table definitions here builds the fundamental structures
 for data in the **Sparrow** system.
 */
