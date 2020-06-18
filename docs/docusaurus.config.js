@@ -15,12 +15,28 @@ module.exports = {
       },
       links: [
         {
+          to: 'docs/motivation-and-design',
+          activeBasePath: 'Guides',
+          label: "Motivation and design",
+          position: 'left'
+        },
+        {
+          to: 'docs/getting-started',
+          activeBasePath: 'Guides',
+          label: "Getting started",
+          position: 'left'
+        },
+        {
           to: 'docs/index',
           activeBasePath: 'docs',
           label: 'Docs',
           position: 'left',
         },
-        {to: 'blog', label: 'Blog', position: 'left'},
+        {
+          to: 'blog',
+          label: 'Blog',
+          position: 'right'
+        },
         {
           href: 'https://github.com/EarthCubeGeochron/Sparrow',
           label: 'GitHub',

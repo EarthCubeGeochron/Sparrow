@@ -1,7 +1,7 @@
 ---
 id: index
 title: Documentation
-sidebar_label: Documentation
+sidebar_label: Index
 ---
 
 - [Database schema](/docs/schema): Data shape of core application

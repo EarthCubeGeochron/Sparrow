@@ -4,7 +4,7 @@ title: Motivation and design
 sidebar_label: Motivation and design
 ---
 
-# Motivation and design: public interface for lab data
+## Public interface for lab data
 
 **Sparrow** is software for managing the geochemica data
 created by an individual geochronology laboratory. This software has the goal of managing analytical data for indexing and public access.
