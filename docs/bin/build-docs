@@ -1,4 +1,6 @@
-#!/usr/bin/env zsh
+#!/bin/bash
+
+sparrow docs-build
 
 docs_dir="${0:h:h:A}"
 cd "$docs_dir"

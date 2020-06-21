@@ -3,4 +3,3 @@
 cd "$SPARROW_PATH"
 
 docker build -f docs/Dockerfile --tag sparrow_docs:latest .
-docker run -p 3000:80 sparrow_docs:latest
