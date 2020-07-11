@@ -1,0 +1,57 @@
+.mrker-btn {
+  background: transparent;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  width: 10px;
+  height: 10px;
+}
+
+.mrker-btn img {
+  width: 30px;
+  height: 30px;
+}
+
+.cluster-marker {
+  color: #fff;
+  background: #1978c8;
+  border-radius: 50%;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cluster-markerRed {
+  color: #fff;
+  background: #c82519;
+  border-radius: 50%;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cluster-markerGreen {
+  color: #fff;
+  background: #00a323;
+  border-radius: 50%;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cluster-markerYellow {
+  color: #fff;
+  background: #ff8800;
+  border-radius: 50%;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tooltip {
+  background: white;
+}

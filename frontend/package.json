@@ -16,7 +16,10 @@
     "@loadable/component": "^5.10.2",
     "@macrostrat/hyper": "^1.2.2",
     "@macrostrat/ui-components": "file:./bundled-deps/ui-components",
+    "@material-ui/core": "4.11.0",
+    "@material-ui/icons": "4.9.1",
     "@mongodb-js/react-mapbox-gl-leaflet": "^1.0.0",
+    "@tippy.js/react": "3.1.1",
     "@turf/bbox": "^6.0.1",
     "@vx/axis": "0.0.183",
     "@vx/gradient": "0.0.183",
@@ -44,6 +47,7 @@
     "react-router-hash-link": "^1.2.2",
     "react-simple-maps": "^0.12.1",
     "store": "^2.0.12",
+    "use-supercluster": "0.2.8",
     "viewport-mercator-project": "^6.2.2"
   },
   "devDependencies": {
