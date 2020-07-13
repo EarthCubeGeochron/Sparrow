@@ -60,6 +60,9 @@ const Material = function(props){
 };
 
 const SamplePage = function(props){
+  /*
+  Render sample page based on ID provided in URL through react router
+  */
   const {match} = props;
   const {id} = match.params;
   return h(APIResultView, {route: "/sample", params: {id}}, data=> {
