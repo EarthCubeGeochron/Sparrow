@@ -1,14 +1,21 @@
 #!/bin/sh
 
+# Install UI components dependencies
 (cd bundled-deps/ui-components && npm install)
+# Install core dependencies dependencies
 npm install
 
 # Default NODE_ENV to development
 export SPARROW_ENV="${SPARROW_ENV:-"development"}"
 
+# Build UI components
+(cd bundled-deps/ui-components && npm run build)
+
 echo $SPARROW_ENV
 if [ $SPARROW_ENV = "development" ]; then
   echo "Bundling frontend for development"
+  # Note: we don't currently watch UI components during development,
+  # but we could. Watching multiple packages at once can be slow.
   webpack --watch --mode=development
 else
   echo "Bundling frontend for production"
