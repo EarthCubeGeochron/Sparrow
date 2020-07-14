@@ -59,17 +59,6 @@ function MapPanel() {
     zoom: 1,
   });
 
-  // setLocationFromHash(hash){
-  //   if (hash == null) { ({
-  //     hash
-  //   } = window.location); }
-  //   const s = hash.slice(1);
-  //   const v = s.split("/");
-  //   if (v.length !== 3) { return {}; }
-  //   const [zoom, latitude, longitude] = v.map(d => parseFloat(d));
-  //   return setViewport({zoom, latitude, longitude});
-  // }
-
   const mapRef = useRef();
 
   const [selectedSample, setSelectedSample] = useState(null);
