@@ -1,3 +1,5 @@
+const {join} = require('path');
+
 module.exports = {
   title: 'Sparrow',
   tagline: 'An open-source laboratory information management system focused on geochronology.',
@@ -27,7 +29,7 @@ module.exports = {
           position: 'left'
         },
         {
-          to: 'docs/index',
+          to: 'docs/introduction',
           activeBasePath: 'docs',
           label: 'Docs',
           position: 'left',
@@ -51,8 +53,8 @@ module.exports = {
           title: 'Docs',
           items: [
             {
-              label: 'Index',
-              to: 'docs/index.md',
+              label: 'Introduction',
+              to: 'docs/introduction',
             },
           ],
         },
@@ -96,6 +98,19 @@ module.exports = {
     ],
   ],
   plugins: [
-    require.resolve('./plugins/webpack-extensions.js')
+    require.resolve('./plugins/webpack-extensions.js'),
+    // Client-side redirect as a fallback to server-side...
+    // This is a new docusaurus feature and doesn't appear to work properly [July 2020]
+    // [
+    //   '@docusaurus/plugin-client-redirects',
+    //   {
+    //     redirects: [
+    //       {
+    //         to: '/docs/introduction', // string
+    //         from: '/docs', // string | string[]
+    //       },
+    //     ],
+    //   },
+    // ],
   ]
 };

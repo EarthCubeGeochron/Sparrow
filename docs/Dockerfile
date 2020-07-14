@@ -29,10 +29,11 @@ WORKDIR /docs
 RUN npm --unsafe-perm=true --allow-root install
 
 EXPOSE 3000
-COPY docs/ /docs/
 COPY --from=schema-builder /build/schema.html /build/schema.html
 
 FROM docs-base AS docs-builder
+
+COPY docs/ /docs/
 
 RUN npm run build
 

@@ -15,7 +15,7 @@ services:
       - .:/docs
       #- /docs/.cache
       - /docs/node_modules
-      #- public:/docs/public
+      - cache:/docs/.docusaurus
 volumes:
-  public:
+  cache:
   #node_modules:
