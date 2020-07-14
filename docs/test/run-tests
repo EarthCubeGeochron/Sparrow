@@ -10,12 +10,14 @@ from requests.exceptions import ConnectionError
 
 args = argv[1:]
 
+
 def site_ready():
     try:
-        res = get("http://frontend:8000/")
+        res = get("http://sparrow_docs/")
         return res.status_code == 200
     except ConnectionError:
         return False
+
 
 counter = 0
 while not site_ready():

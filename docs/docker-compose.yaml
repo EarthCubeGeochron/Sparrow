@@ -4,14 +4,18 @@ services:
     build:
       context: ..
       dockerfile: docs/Dockerfile
+      # We build to docs-base for development, to allow for auto-reloading
+      target: docs-base
+    command: node_modules/.bin/docusaurus start --host 0.0.0.0 --port 3000
     expose:
-      - 8000
+      - 3000
     ports:
-      - "8000:8000"
+      - "3000:3000"
     volumes:
       - .:/docs
-      - /docs/.cache
+      #- /docs/.cache
       - /docs/node_modules
-      - public:/docs/public
+      #- public:/docs/public
 volumes:
   public:
+  #node_modules:

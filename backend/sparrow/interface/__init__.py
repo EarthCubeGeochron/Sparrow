@@ -242,9 +242,3 @@ class InterfacePlugin(SparrowCorePlugin):
     def on_setup_cli(self, cli):
         from .cli import show_interface
         cli.add_command(show_interface)
-
-
-def load_data(mapping):
-    from ..app import construct_app
-    app, db = construct_app()
-    print(mapping)

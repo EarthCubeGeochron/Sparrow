@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 # Description: Run a monitor
 
 cd $SPARROW_PATH

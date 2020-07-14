@@ -1,6 +1,4 @@
 /*
-# Database schema
-
 The set of table definitions here builds the fundamental structures
 for data in the **Sparrow** system.
 */
@@ -22,6 +20,7 @@ CREATE TABLE IF NOT EXISTS "user" ( -- Name must be quoted because it collides w
   password text,
   researcher_id integer REFERENCES researcher(id)
 );
+
 
 CREATE TABLE IF NOT EXISTS publication (
   -- A basic model for tracked publications
@@ -130,7 +129,7 @@ CREATE TABLE IF NOT EXISTS vocabulary.entity_reference (
 - We could add a model for e.g. *facies*. Or facies could be considered
   subtypes of geological entity (this is probably better).
 
-##Projects
+## Projects
 */
 
 CREATE TABLE IF NOT EXISTS project (
@@ -233,6 +232,7 @@ CREATE TABLE IF NOT EXISTS sample (
   CHECK ((name IS NOT null) OR (igsn IS NOT null))
 );
 /*
+
 #### Potential issues:
 
 - Samples potentially have several levels of abstraction
@@ -513,25 +513,25 @@ CREATE TABLE IF NOT EXISTS data_file_link (
   date timestamp NOT NULL DEFAULT now(),
   error text,
   session_id integer
-    UNIQUE
     REFERENCES session(id)
     ON DELETE CASCADE,
   analysis_id integer
-    UNIQUE
     REFERENCES analysis(id)
     ON DELETE CASCADE,
   sample_id integer
-    UNIQUE
     REFERENCES sample(id)
     ON DELETE CASCADE,
   /* Only one of the linked data file columns should be
-     set at a time (a data file can only be packaged at
+     set at a time (a data file should only be packaged at
      one level, even if it encompasses information about
-     other entities)
+     other entities). We could loosen this restriction if it
+     becomes onerous.
   */
   CHECK (
       (session_id IS NOT NULL)::int
     + (analysis_id IS NOT NULL)::int
     + (sample_id IS NOT NULL)::int <= 1
-  )
+  ),
+  -- Only one link between a data file and its model
+  UNIQUE (file_hash, session_id, analysis_id, sample_id)
 );

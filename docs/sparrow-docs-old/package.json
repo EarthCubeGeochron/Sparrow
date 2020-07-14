@@ -1,9 +1,0 @@
-{
-  "devDependencies": {
-    "cssnano": "^4.1.10",
-    "posthtml-expressions": "^1.1.0",
-    "posthtml-include": "^1.2.0",
-    "posthtml-md": "^1.1.0",
-    "stylus": "^0.54.5"
-  }
-}
