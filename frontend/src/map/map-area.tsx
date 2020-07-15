@@ -7,10 +7,7 @@
  */
 import React, { useState, useEffect, useRef } from "react";
 import LandscapeIcon from "@material-ui/icons/Landscape";
-import MapGl, {
-  Marker,
-  FlyToInterpolator,
-} from "react-map-gl";
+import MapGl, { Marker, FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Component } from "react";
 import { useAPIResult, APIResultView } from "@macrostrat/ui-components";
@@ -173,9 +170,9 @@ function MapPanel() {
               longitude={longitude}
             >
               <Popover content={cluster.properties.Sample_name}>
-                  <Tooltip content={cluster.properties.Sample_name}>
-                           <button className="mrker-btn">
-                      <LandscapeIcon></LandscapeIcon>
+                <Tooltip content={cluster.properties.Sample_name}>
+                  <button className="mrker-btn">
+                    <LandscapeIcon></LandscapeIcon>
                   </button>
                 </Tooltip>
               </Popover>
