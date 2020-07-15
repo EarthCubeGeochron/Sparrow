@@ -1,4 +1,4 @@
-import React, {useState, useRef} from "react";
+import React, { useState, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -27,51 +27,17 @@ function TableBottom({ data, columns, updateMyData, id }) {
     setRowState,
     useRowSelect,
     state: { pageIndex, pageSize, rowState, rowIndex },
-  } = useTable(
-    {
-      columns,
-      data,
-      updateMyData,
-      id,
-    },
-    (hooks) => {
-      hooks.allColumns.push((columns) => [
-        {
-          id: "selection",
-          Cell: ({ row }) => (
-            <div>
-              {/* <Button
-                onClick={() =>
-                  updateMyData(
-                    EditableCell.row,
-                    EditableCell.column,
-                    EditableCell.value
-                  )
-                }
-                {...row.getRowProps()}
-              >
-                Save
-              </Button> */}
-            </div>
-          ),
-        },
-        ...columns,
-      ]);
-    }
-  );
-
-  const buttonRef = useRef();
+  } = useTable({
+    columns,
+    data,
+    updateMyData,
+    id,
+  });
 
   const TableBottom = () => {
     return (
       <div>
-        <Button
-          onClick={() => {
-            console.log(buttonRef.current);
-          }}
-        >
-          Save Changes
-        </Button>
+        <Button>Save Changes</Button>
         <Table>
           <TableHead>
             {headerGroups.map((headerGroup) => (
@@ -89,7 +55,6 @@ function TableBottom({ data, columns, updateMyData, id }) {
               prepareRow(row);
               return (
                 <TableRow {...row.getRowProps()}>
-                  <Button>Save</Button> 
                   {row.cells.map((cell) => {
                     return (
                       <TableCell {...cell.getCellProps()}>

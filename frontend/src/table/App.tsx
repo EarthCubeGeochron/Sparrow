@@ -5,9 +5,6 @@ import {
   EditableNumCell,
 } from "./Components/EditableCell/EditableCell";
 
-import "./App.css";
-import { Tab } from "@material-ui/core";
-
 function Table() {
   const [data, setData] = useState([]);
   const skipPageResetRef = React.useRef();
@@ -122,7 +119,6 @@ function Table() {
   );
   return (
     <div>
-      <h1>WiscAr Samples</h1>
       <TableUI
         data={data}
         setData={setData}

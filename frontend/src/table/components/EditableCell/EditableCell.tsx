@@ -25,9 +25,7 @@ const EditableCell = ({
   return (
     <div>
       <input value={value} onChange={onChange} type="text" />
-      <button ref={buttonRef} onClick={onBlur}>
-        Save
-      </button>
+      <button onClick={onBlur}>Save</button>
     </div>
   );
 };
@@ -56,9 +54,7 @@ const EditableNumCell = ({
   return (
     <div>
       <input value={value} onChange={onChange} type="number" />
-      <button ref={buttonRef} onClick={onBlur}>
-        Save
-      </button>
+      <button onClick={onBlur}>Save</button>
     </div>
   );
 };
