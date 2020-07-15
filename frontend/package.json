@@ -46,6 +46,7 @@
     "react-router-dom": "^5.0.1",
     "react-router-hash-link": "^1.2.2",
     "react-simple-maps": "^0.12.1",
+    "react-table": "7.2.2",
     "store": "^2.0.12",
     "use-supercluster": "0.2.8",
     "viewport-mercator-project": "^6.2.2"
