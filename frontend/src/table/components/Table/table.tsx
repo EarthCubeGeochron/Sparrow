@@ -7,6 +7,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableFooter from "@material-ui/core/TableFooter";
+import { Tab } from "@material-ui/core";
 import TablePagination from "@material-ui/core/TablePagination";
 import {
   usePagination,
@@ -16,9 +17,10 @@ import {
   useGlobalFilter,
 } from "react-table";
 import Checkbox from "@material-ui/core/Checkbox";
-import TablePaginationActions from "./tablePagnation";
-import TableBottom from "./bottomTable";
-import TableToolBar from "./TableToolBar/TableToolBar";
+import Buttom from "@material-ui/core/Button";
+import TablePaginationActions from "./TablePaginationActions";
+import TableBottom from "./TableBottom";
+import TableToolBar from "../TableToolBar/TableToolBar";
 
 function TableUI({
   data,

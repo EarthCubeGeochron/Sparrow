@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
-import TableUI from "./components/topTable";
-import { EditableCell, EditableNumCell } from "./components/EditCells";
+import TableUI from "./Components/Table/table";
+import {
+  EditableCell,
+  EditableNumCell,
+} from "./Components/EditableCell/EditableCell";
+
+import "./App.css";
+import { Tab } from "@material-ui/core";
 
 function Table() {
   const [data, setData] = useState([]);

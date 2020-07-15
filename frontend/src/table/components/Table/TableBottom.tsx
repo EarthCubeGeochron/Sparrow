@@ -11,8 +11,8 @@ import { Tab, Button } from "@material-ui/core";
 import TablePagination from "@material-ui/core/TablePagination";
 import { usePagination, useTable, useRowSelect } from "react-table";
 import Checkbox from "@material-ui/core/Checkbox";
-import TablePaginationActions from "./tablePagnation";
-
+import TablePaginationActions from "./TablePaginationActions";
+import { EditableCell } from "../EditableCell/EditableCell";
 
 function TableBottom({ data, columns, updateMyData, id }) {
   const {

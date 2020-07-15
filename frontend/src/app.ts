@@ -26,7 +26,7 @@ import { AppToaster } from "./toaster";
 import { Catalog, CatalogNavLinks } from "./admin";
 import { AppNavbar, NavButton } from "./components/navbar";
 import { MapPage } from "./map";
-import { Table } from "./table";
+import Table from "./table/App";
 import styled from "@emotion/styled";
 
 const AppHolder = styled.div`\
