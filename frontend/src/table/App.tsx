@@ -1,38 +1,72 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import TableUI from "./Components/Table/table";
 import {
   EditableCell,
   EditableNumCell,
 } from "./Components/EditableCell/EditableCell";
+import {
+  APIContext,
+  APIActions,
+  QueryParams,
+  APIHookOpts,
+} from "@macrostrat/ui-components";
 
-function Table() {
+const useAPIResult = function <T>(
+  route: string | null,
+  params: QueryParams = {},
+  opts: APIHookOpts | (<T, U = any>(arg: U) => T) = {}
+): T {
+  /* React hook for API results, pulled out of @macrostrat/ui-components.
+  The fact that this works inline but the original hook doesn't suggests that we
+  have overlapping React versions between UI-components and the main codebase.
+  Frustrating. */
+  const deps = [route, ...Object.values(params ?? {})];
+
+  const [result, setResult] = useState<T | null>(null);
+
+  console.log("Your face");
+
+  if (typeof opts === "function") {
+    opts = { unwrapResponse: opts };
+  }
+
+  const { debounce: _debounce, ...rest } = opts ?? {};
+  let { get } = APIActions(useContext(APIContext));
+
+  useEffect(() => {
+    const getAPIData = async function () {
+      if (route == null) {
+        return setResult(null);
+      }
+      const res = await get(route, params, rest);
+      return setResult(res);
+    };
+    getAPIData();
+  }, deps);
+  return result;
+};
+
+const Table = function (props) {
   const [data, setData] = useState([]);
   const skipPageResetRef = React.useRef();
 
-  
+  const initialData = useAPIResult("/sample", { all: true });
 
   useEffect(() => {
-    getMarkers();
-  }, []);
-
-  async function getMarkers() {
-    const response = await fetch(
-      "https://sparrow-data.org/labs/wiscar/api/v1/sample?all=1"
-    );
-    const mrkers = await response.json();
-    const markers = mrkers.filter((d) => d.geometry != null);
-    const mutMarker = markers.map((sample) => {
+    // Set the data back to the initial data
+    if (initialData == null) return;
+    const markers = initialData.filter((d) => d.geometry != null);
+    const mutMarkers = markers.map((sample) => {
       const {
         geometry: {
           coordinates: [longitude, latitude],
         },
         ...rest
       } = sample;
-      const mutSample = { longitude, latitude, ...rest };
-      return mutSample;
+      return { longitude, latitude, ...rest };
     });
-    setData(mutMarker);
-  }
+    setData(mutMarkers);
+  }, [initialData]);
 
   const updateMyData = (rowIndex, columnId, value) => {
     skipPageResetRef.current = true;
@@ -131,6 +165,6 @@ function Table() {
       />
     </div>
   );
-}
+};
 
 export default Table;

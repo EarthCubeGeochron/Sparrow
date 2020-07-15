@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Install UI components dependencies
-(cd bundled-deps/ui-components && npm install)
-# Install core dependencies dependencies
+(cd bundled-deps/ui-components && npm install --production)
+# Install core dependencies
 npm install
 
 # Default NODE_ENV to development
