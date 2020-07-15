@@ -55,7 +55,7 @@ const GlobalFilter = ({
       <InputBase
         value={globalFilter || ""}
         onChange={(e) => {
-          setGlobalFilter(e.target.value || undefined); 
+          setGlobalFilter(e.target.value || undefined);
         }}
         placeholder={`${count} records...`}
         classes={{
