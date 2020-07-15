@@ -4,8 +4,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import React, {Component} from 'react';
-import h from 'react-hyperscript';
+import React, { Component } from "react";
+import h from "react-hyperscript";
 import {
   ComposableMap,
   ZoomableGlobe,
@@ -13,18 +13,21 @@ import {
   Geography,
   Graticule,
   Markers,
-  Marker,
 } from "react-simple-maps";
-import worldMap from './assets/land-110m.json';
-import {APIResultView} from '@macrostrat/ui-components';
-import {Colors} from '@blueprintjs/core';
+import worldMap from "./assets/land-110m.json";
+import { APIResultView } from "@macrostrat/ui-components";
+import { Colors, H1, Tooltip } from "@blueprintjs/core";
+import {Marker} from 'react-map-gl';
+//import { Tooltip } from "@material-ui/core";
 
 class MapComponent extends Component {
   render() {
-    let {markers} = this.props;
-    if (markers == null) { markers = []; }
+    let { markers } = this.props;
+    if (markers == null) {
+      markers = [];
+    }
     const style = {
-      fill: '#e9fcea',
+      fill: "#e9fcea",
       stroke: Colors.GRAY5,
       strokeWidth: 0.75,
       outline: "none",
@@ -42,56 +45,60 @@ class MapComponent extends Component {
           style={{
             width: "100%",
             height: "auto",
-            maxHeight: "500px"
-          }} >
+            maxHeight: "500px",
+          }}
+        >
           <ZoomableGlobe
-            center={[ -120, 35 ]}
+            center={[-120, 35]}
             fill="#afe6f0"
             stroke="#eceff1"
-            style={{cursor: "move"}} >
+            style={{ cursor: "move" }}
+          >
             <circle cx={410} cy={410} r={400} fill="#afe6f0" stroke="#888888" />
             <Geographies geography={worldMap} disableOptimization>
               {(geographies, projection) => {
-                  return geographies.map((geography, i) => {
-                    return <Geography
+                return geographies.map((geography, i) => {
+                  return (
+                    <Geography
                       key={i}
                       geography={geography}
                       projection={projection}
                       style={{
                         default: style,
                         hover: style,
-                        pressed: style
+                        pressed: style,
                       }}
-                    />;
-                  });
-                }
-              }
+                    />
+                  );
+                });
+              }}
             </Geographies>
-            <Markers>{
-              markers.map((marker, i) => {
-                return <Marker
-                  key={i}
-                  marker={marker}
-                  style={{
-                    default: { fill: "#ad99ff" },
-                    hover: { fill: "#634dbf" },
-                    pressed: { fill: "#FF5722" },
-                    hidden: { opacity: 0 }
-                  }}
-                  >
-                  <circle
-                    cx={0}
-                    cy={0}
-                    r={10}
+            <Markers>
+              {markers.map((marker, i) => {
+                return (
+                  <Marker
+                    key={i}
+                    marker={marker}
                     style={{
-                      stroke: "#634dbf",
-                      strokeWidth: 3,
-                      opacity: 0.9,
+                      default: { fill: "#ad99ff" },
+                      hover: { fill: "#634dbf" },
+                      pressed: { fill: "#FF5722" },
+                      hidden: { opacity: 0 },
                     }}
-                  />
-                </Marker>;
-              })
-              }
+                  >
+                    <circle
+                      cx={0}
+                      cy={0}
+                      r={10}
+                      style={{
+                        stroke: "#634dbf",
+                        strokeWidth: 3,
+                        opacity: 0.9,
+                      }}
+                    />
+                  </Marker>
+                );
+              })}
             </Markers>
           </ZoomableGlobe>
         </ComposableMap>
@@ -100,25 +107,27 @@ class MapComponent extends Component {
   }
 }
 
-
 class SampleMap extends Component {
   render() {
     const route = "/sample";
-    const params = {geometry: "%", all: true};
-    return h(APIResultView, {route, params}, data=> {
+    const params = { geometry: "%", all: true };
+    return h(APIResultView, { route, params }, (data) => {
       const markers = data
-        .filter(d => d.geometry != null)
-        .map(d => ({
-        coordinates: d.geometry.coordinates,
-        name: d.id
-      }));
+        .filter((d) => d.geometry != null)
+        .map((d) => ({
+          coordinates: d.geometry.coordinates,
+          name: d.id,
+        }));
 
-      return h('div', [
-        h('h4', `${markers.length} measurements have been linked to their geologic metadata`),
-        h(MapComponent, {markers})
+      return h("div", [
+        h(
+          "h4",
+          `${markers.length} measurements have been linked to their geologic metadata`
+        ),
+        h(MapComponent, { markers }),
       ]);
-  });
+    });
   }
 }
 
-export {MapComponent, SampleMap};
+export { MapComponent, SampleMap };

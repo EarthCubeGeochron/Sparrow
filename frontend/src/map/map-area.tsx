@@ -8,19 +8,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import LandscapeIcon from "@material-ui/icons/Landscape";
 import MapGl, {
-  InteractiveMap,
   Marker,
-  Popup,
   FlyToInterpolator,
 } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Component } from "react";
-import { APIResultView, useAPIResult } from "@macrostrat/ui-components";
+import { useAPIResult, APIResultView } from "@macrostrat/ui-components";
 //import { StaticMarker } from "app/components";
 //import { ErrorBoundary } from "app/util";
 import h, { compose } from "@macrostrat/hyper";
 import useSuperCluster from "use-supercluster";
-import Tippy from "@tippy.js/react";
+import { Tooltip, Popover, Button } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./cluster.css";
 //const ErrorTolerantAPI = compose(ErrorBoundary, APIResultView);
@@ -60,6 +58,9 @@ function MapPanel() {
   });
 
   const mapRef = useRef();
+
+  // const data = useAPIResult("/sample");
+  // console.log(data);
 
   const [selectedSample, setSelectedSample] = useState(null);
 
@@ -171,39 +172,16 @@ function MapPanel() {
               latitude={latitude}
               longitude={longitude}
             >
-              <Tippy
-                theme="light"
-                className="toolip"
-                content={cluster.properties.Sample_name}
-              >
-                <button
-                  className="mrker-btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setSelectedSample(cluster);
-                  }}
-                >
-                  <LandscapeIcon></LandscapeIcon>
-                </button>
-              </Tippy>
+              <Popover content={cluster.properties.Sample_name}>
+                  <Tooltip content={cluster.properties.Sample_name}>
+                           <button className="mrker-btn">
+                      <LandscapeIcon></LandscapeIcon>
+                  </button>
+                </Tooltip>
+              </Popover>
             </Marker>
           );
         })}
-
-        {selectedSample ? (
-          <Popup
-            latitude={selectedSample.geometry.coordinates[1]}
-            longitude={selectedSample.geometry.coordinates[0]}
-            onClose={() => {
-              setSelectedSample(null);
-            }}
-          >
-            <div>
-              <p> Sample Name: {selectedSample.properties.Sample_name}</p>
-              <p>{selectedSample.properties.project_name}</p>
-            </div>
-          </Popup>
-        ) : null}
       </MapGl>
     </div>
   );

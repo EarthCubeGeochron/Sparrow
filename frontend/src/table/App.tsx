@@ -9,6 +9,8 @@ function Table() {
   const [data, setData] = useState([]);
   const skipPageResetRef = React.useRef();
 
+  
+
   useEffect(() => {
     getMarkers();
   }, []);
