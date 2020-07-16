@@ -1,15 +1,7 @@
 #!/bin/sh
 
-# Install UI components dependencies
-(cd bundled-deps/ui-components && npm install)
-# Install core dependencies dependencies
-npm install
-
 # Default NODE_ENV to development
 export SPARROW_ENV="${SPARROW_ENV:-"development"}"
-
-# Build UI components
-(cd bundled-deps/ui-components && npm run build)
 
 echo $SPARROW_ENV
 if [ $SPARROW_ENV = "development" ]; then
