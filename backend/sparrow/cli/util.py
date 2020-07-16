@@ -9,25 +9,30 @@ import sys
 from ..app import App
 from ..database import Database
 
+
 def abort(err):
-    echo(err, fg='red', err=True)
+    echo(err, fg="red", err=True)
+
 
 def get_database(ctx, param, value):
     try:
         app = App(__name__, config=value)
         return Database(app)
     except ValueError:
-        raise click.BadParameter('Invalid database specified')
+        raise click.BadParameter("Invalid database specified")
     except OperationalError:
-        dbname = click.style(app.dbname, fg='cyan', bold=True)
+        dbname = click.style(app.dbname, fg="cyan", bold=True)
         cmd = style(f"createdb {app.dbname}", dim=True)
-        echo(f"Database {dbname} does not exist.\n"
-               "Please create it before continuing.\n"
-              f"Command: `{cmd}`")
+        echo(
+            f"Database {dbname} does not exist.\n"
+            "Please create it before continuing.\n"
+            f"Command: `{cmd}`"
+        )
         sys.exit(0)
 
 
 with_app = click.make_pass_decorator(App)
+
 
 def with_database(cmd):
     @click.pass_context
@@ -39,6 +44,7 @@ def with_database(cmd):
         if app is None:
             app = App(__name__)
         return ctx.invoke(cmd, app.database, *args, **kwargs)
+
     return update_wrapper(new_cmd, cmd)
 
 
@@ -48,6 +54,7 @@ def with_full_app(cmd):
     be refactored so that construction can occur from within methods (i.e. from
     within the App object).
     """
+
     @click.pass_context
     def new_cmd(ctx, *args, **kwargs):
         # We should ideally be able to pass a configuration from context...
@@ -57,4 +64,5 @@ def with_full_app(cmd):
         # to mitigate this.
         app.load_phase_2()
         return ctx.invoke(cmd, app, *args, **kwargs)
+
     return update_wrapper(new_cmd, cmd)

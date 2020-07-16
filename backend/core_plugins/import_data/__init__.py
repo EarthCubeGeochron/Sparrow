@@ -13,25 +13,34 @@ log = get_logger(__name__)
 ImportDataAPI = APIResourceCollection()
 
 
-def construct_error_response(err: ValidationError, code: int):
+def construct_error_response(err: Exception, code: int):
     """Constructs an error response for a Marshmallow validation error
     """
-    return {
-        "error": {
-            "type": get_qualified_name(err),
-            "code": code,
-            "messages": err.messages,
-            # Note: the original data *could* be packaged in the response, but
-            # for now we have chosen not to do that. It seems useless to send back
-            # (possibly large) datasets the client already has.
-        }
-    }, code
+    try:
+        # ValidationErrors have "messages" but most errors don't
+        msg = err.messages
+    except AttributeError:
+        msg = [str(err)]
+
+    return (
+        {
+            "error": {
+                "type": get_qualified_name(err),
+                "code": code,
+                "messages": msg
+                # Note: the original data *could* be packaged in the response, but
+                # for now we have chosen not to do that. It seems useless to send back
+                # (possibly large) datasets the client already has.
+            }
+        },
+        code,
+    )
 
 
-@ImportDataAPI.resource('/<string:model_name>')
+@ImportDataAPI.resource("/<string:model_name>")
 class ImportDataResource(Resource):
     # We should enable authentication but that is tricky with scripts
-    #@jwt_required
+    # @jwt_required
 
     # Raises a https://marshmallow.readthedocs.io/en/stable/api_reference.html#marshmallow.exceptions.ValidationError
     # when bad data is given
@@ -44,10 +53,12 @@ class ImportDataResource(Resource):
             data = req.get("data")
             res = db.load_data(model_name, data)
             return res.id, 201
-        except ValidationError as err:
+        except Exception as err:
             return construct_error_response(err, 400)
+
 
 class ImportDataPlugin(SparrowCorePlugin):
     name = "import-data"
+
     def on_api_initialized(self, api):
-        api.add_resource(ImportDataAPI, '/import-data')
+        api.add_resource(ImportDataAPI, "/import-data")

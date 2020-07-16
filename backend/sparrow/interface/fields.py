@@ -29,7 +29,7 @@ class Geometry(Field):
             return None
         return mapping(to_shape(value))
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         if value is None:
             return None
         return from_shape(shape(value))
@@ -40,6 +40,7 @@ class Enum(Related):
     Enums are represented by a `Related` field, but we want to potentially
     be able to revise/extend this later without breaking external APIs.
     """
+
     pass
 
 
