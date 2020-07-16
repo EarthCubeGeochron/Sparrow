@@ -4,7 +4,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Menu,
   MenuItem,
@@ -20,6 +20,7 @@ import { CatalogNavLinks } from "../admin";
 import { AuthStatus } from "app/auth";
 import { MapPanel } from "./map-area";
 import { HashLink } from "react-router-hash-link";
+import { Link } from "react-router-dom";
 
 const h = hyperStyled(styles);
 
@@ -34,13 +35,15 @@ const MapNavbar = function (props) {
   ]);
 };
 
-const MapHomePanel = () => {
+const MapHome = (props) => {
   return (
-    <div>
-      <Tooltip content={<h4>Go to Map</h4>}>
-        <Button icon="maximize"></Button>
+    <div className="map-home">
+      <Tooltip content="Go to Map">
+        <Link to="/map">
+          <Button icon="maximize"></Button>
+        </Link>
       </Tooltip>
-      <MapPanel />
+      <MapPanel></MapPanel>
     </div>
   );
 };
@@ -67,4 +70,4 @@ const MapLink = function (props) {
   );
 };
 
-export { MapPage, MapLink, MapHomePanel };
+export { MapPage, MapLink, MapHome };

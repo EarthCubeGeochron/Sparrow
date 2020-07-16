@@ -49,13 +49,12 @@ function HideNavbarSometimes(props) {
     return null;
   }
   return h([props.children]);
-};
+}
 
 const MainNavbar = (props) =>
   h(AppNavbar, { fullTitle: true }, [
     h(CatalogNavLinks, { base: "/catalog" }),
     h(NavButton, { to: "/map" }, "Map"),
-    h(NavButton, { to: "/table" }, "Table"),
     h(AppNavbar.Divider),
     h(NavButton, { to: "/api-explorer/v1" }, "API"), // NavButton, similar to React-Router 'Link' takes the 'to' arg
   ]);
@@ -64,7 +63,7 @@ function AppMain(props) {
   // Handles routing for the application between pages
   const { baseURL } = props;
 
-  // Tab Title becomes WiscAr-Sparrow 
+  // Tab Title becomes WiscAr-Sparrow
   useEffect(() => {
     const labname = process.env.SPARROW_LAB_NAME;
     document.title = labname != null ? `${labname} – Sparrow` : "Sparrow";
@@ -93,10 +92,6 @@ function AppMain(props) {
           h(Route, {
             path: "/map",
             component: MapPage,
-          }),
-          h(Route, {
-            path: "/table",
-            component: Table,
           }),
           h(Route, { path: "/api-explorer", component: APIExplorer }),
         ]),

@@ -21,6 +21,7 @@ import {
   QueryParams,
   APIHookOpts,
 } from "@macrostrat/ui-components";
+import { Link } from "react-router-dom";
 
 const useAPIResult = function <T>(
   route: string | null,
@@ -186,8 +187,18 @@ function MapPanel() {
               latitude={latitude}
               longitude={longitude}
             >
-              <Popover content={cluster.properties.Sample_name}>
-                <Tooltip content={cluster.properties.Sample_name}>
+              <Popover
+                content={
+                  <Link to={`/catalog/sample/${cluster.properties.id}`}>
+                    <Button>Go to Sample {cluster.properties.Sample_name}</Button>
+                  </Link>
+                }
+              >
+                <Tooltip
+                  content={
+                    cluster.properties.Sample_name + ": " + cluster.properties.project_name
+                  }
+                >
                   <button className="mrker-btn">
                     <LandscapeIcon></LandscapeIcon>
                   </button>
