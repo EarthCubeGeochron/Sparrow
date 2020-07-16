@@ -12,12 +12,13 @@ import {
   Geographies,
   Geography,
   Graticule,
+  Marker,
   Markers,
 } from "react-simple-maps";
 import worldMap from "./assets/land-110m.json";
 import { APIResultView } from "@macrostrat/ui-components";
 import { Colors, H1, Tooltip } from "@blueprintjs/core";
-import {Marker} from 'react-map-gl';
+//import { Marker } from "react-map-gl";
 //import { Tooltip } from "@material-ui/core";
 
 class MapComponent extends Component {

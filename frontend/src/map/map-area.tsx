@@ -5,46 +5,57 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import LandscapeIcon from "@material-ui/icons/Landscape";
 import MapGl, { Marker, FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Component } from "react";
-import { useAPIResult, APIResultView } from "@macrostrat/ui-components";
-//import { StaticMarker } from "app/components";
-//import { ErrorBoundary } from "app/util";
 import h, { compose } from "@macrostrat/hyper";
 import useSuperCluster from "use-supercluster";
 import { Tooltip, Popover, Button } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./cluster.css";
-//const ErrorTolerantAPI = compose(ErrorBoundary, APIResultView);
+import {
+  APIContext,
+  APIActions,
+  QueryParams,
+  APIHookOpts,
+} from "@macrostrat/ui-components";
 
-// Should add raster hillshading styles to map...
-// https://docs.mapbox.com/mapbox-gl-js/example/hillshade/
+const useAPIResult = function <T>(
+  route: string | null,
+  params: QueryParams = {},
+  opts: APIHookOpts | (<T, U = any>(arg: U) => T) = {}
+): T {
+  /* React hook for API results, pulled out of @macrostrat/ui-components.
+  The fact that this works inline but the original hook doesn't suggests that we
+  have overlapping React versions between UI-components and the main codebase.
+  Frustrating. */
+  const deps = [route, ...Object.values(params ?? {})];
 
-// function SampleOverlay(props) {
-//   const route = "/sample";
-//   const params = { geometry: "%", all: true };
-//   return (
-//     <div>
-//       <ErrorTolerantAPI route={route} params={params}>
-//         {({data})=> {
-//           const markerData = data.filter((d) => d.geometry != null);
-//           return
-//             markerData.map(({d})=> {
-//             const [longitude, latitude] = d.geometry.coordinates;
-//             return
-//               <StaticMarker latitude={latitude} longitude={longitude}/>
+  const [result, setResult] = useState<T | null>(null);
 
-//       </ErrorTolerantAPI>
+  if (typeof opts === "function") {
+    opts = { unwrapResponse: opts };
+  }
 
-//     </div>
+  const { debounce: _debounce, ...rest } = opts ?? {};
+  let { get } = APIActions(useContext(APIContext));
 
-// };
+  useEffect(() => {
+    const getAPIData = async function () {
+      if (route == null) {
+        return setResult(null);
+      }
+      const res = await get(route, params, rest);
+      return setResult(res);
+    };
+    getAPIData();
+  }, deps);
+  return result;
+};
 
 function MapPanel() {
-  let hash = window.location.hash;
   const [markers, setMarkers] = useState([]);
   const [viewport, setViewport] = useState({
     latitude: 0,
@@ -56,26 +67,32 @@ function MapPanel() {
 
   const mapRef = useRef();
 
-  // const data = useAPIResult("/sample");
-  // console.log(data);
-
-  const [selectedSample, setSelectedSample] = useState(null);
+  const initialData = useAPIResult("/sample", { all: true });
 
   useEffect(() => {
-    getMarkers();
-  }, []);
+    // Set the data back to the initial data
+    if (initialData == null) return;
+    const markers = initialData.filter((d) => d.geometry != null);
 
-  async function getMarkers() {
-    const response = await fetch(
-      "https://sparrow-data.org/labs/wiscar/api/v1/sample?all=1"
-    );
-    const markers = await response.json();
     setMarkers(markers);
-  }
+  }, [initialData]);
 
-  const mapMarkers = markers.filter((d) => d.geometry != null);
+  // function setLocationFromHash() {
+  //   let hash = window.location.hash;
+  //   const s = hash.slice(1);
+  //   const v = s.split("/");
+  //   if (v.length !== 3) {
+  //     return {};
+  //   }
+  //   const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
+  //   return setViewport({ zoom, latitude, longitude });
+  // }
 
-  const points = mapMarkers.map((markers) => ({
+  // useEffect(() => {
+  //   setLocationFromHash();
+  // }, []);
+
+  const points = markers.map((markers) => ({
     type: "Feature",
     properties: {
       cluster: false,

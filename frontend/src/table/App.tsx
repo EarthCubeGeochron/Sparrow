@@ -24,8 +24,6 @@ const useAPIResult = function <T>(
 
   const [result, setResult] = useState<T | null>(null);
 
-  console.log("Your face");
-
   if (typeof opts === "function") {
     opts = { unwrapResponse: opts };
   }

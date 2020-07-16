@@ -5,7 +5,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import h from "react-hyperscript";
-import { Component } from "react";
+import { Component, useEffect } from "react";
 import { join } from "path";
 import {
   BrowserRouter as Router,
@@ -39,7 +39,7 @@ const Expander = styled.div`\
 flex-grow: 1;\
 `;
 
-const HideNavbarSometimes = function (props) {
+function HideNavbarSometimes(props) {
   /*
   Defines a hideable global UI component
   */
@@ -60,50 +60,50 @@ const MainNavbar = (props) =>
     h(NavButton, { to: "/api-explorer/v1" }, "API"), // NavButton, similar to React-Router 'Link' takes the 'to' arg
   ]);
 
-class AppMain extends Component {
+function AppMain(props) {
   // Handles routing for the application between pages
-  render() {
-    const { baseURL } = this.props;
-    return h(
-      Router,
-      { basename: baseURL },
-      h(AppHolder, [
-        h(Expander, [
-          h(HideNavbarSometimes, null, h(MainNavbar)),
-          h(Switch, [
-            h(Route, {
-              path: "/",
-              exact: true,
-              render() {
-                return h(HomePage);
-              },
-            }),
-            h(Route, {
-              path: "/catalog",
-              render() {
-                return h(Catalog, { base: "/catalog" });
-              },
-            }),
-            h(Route, {
-              path: "/map",
-              component: MapPage,
-            }),
-            h(Route, {
-              path: "/table",
-              component: Table,
-            }),
-            h(Route, { path: "/api-explorer", component: APIExplorer }),
-          ]),
-        ]),
-        h(HideNavbarSometimes, null, h(PageFooter)),
-      ])
-    );
-  }
-  componentDidMount() {
+  const { baseURL } = props;
+
+  // Tab Title becomes WiscAr-Sparrow 
+  useEffect(() => {
     const labname = process.env.SPARROW_LAB_NAME;
-    return (document.title =
-      labname != null ? `${labname} – Sparrow` : "Sparrow");
-  }
+    document.title = labname != null ? `${labname} – Sparrow` : "Sparrow";
+  }, []);
+
+  return h(
+    Router,
+    { basename: baseURL },
+    h(AppHolder, [
+      h(Expander, [
+        h(HideNavbarSometimes, null, h(MainNavbar)),
+        h(Switch, [
+          h(Route, {
+            path: "/",
+            exact: true,
+            render() {
+              return h(HomePage);
+            },
+          }),
+          h(Route, {
+            path: "/catalog",
+            render() {
+              return h(Catalog, { base: "/catalog" });
+            },
+          }),
+          h(Route, {
+            path: "/map",
+            component: MapPage,
+          }),
+          h(Route, {
+            path: "/table",
+            component: Table,
+          }),
+          h(Route, { path: "/api-explorer", component: APIExplorer }),
+        ]),
+      ]),
+      h(HideNavbarSometimes, null, h(PageFooter)),
+    ])
+  );
 }
 
 const errorHandler = function (route, response) {
