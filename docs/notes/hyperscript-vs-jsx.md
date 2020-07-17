@@ -1,8 +1,8 @@
 # Hyperscript syntax
-h 'div', [
+h('div', [
   h 'h4', "#{data.length} measurements have been linked to their geologic metadata"
   h MapComponent, {markers}
-]
+])
 
 # JSX syntax
 <div>
