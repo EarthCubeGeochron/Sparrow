@@ -22,6 +22,7 @@ import {Catalog, CatalogNavLinks} from './admin';
 import {AppNavbar, NavButton} from './components/navbar';
 import {MapPage} from './map';
 import styled from '@emotion/styled';
+import GraphQLExplorer from './graphql'
 
 const AppHolder = styled.div`\
 display: flex;
@@ -29,9 +30,11 @@ flex-direction: column;
 min-height: 100vh;\
 `;
 
+
 const Expander = styled.div`\
 flex-grow: 1;\
 `;
+
 
 const HideNavbarSometimes = function(props){
   /*
@@ -76,7 +79,8 @@ class AppMain extends Component {
               path: '/map',
               component: MapPage
             }),
-            h(Route, {path: '/api-explorer', component: APIExplorer})
+            h(Route, {path: '/api-explorer', component: APIExplorer}),
+            h(Route, {path: '/graphql-explorer', component: GraphQLExplorer})
           ])
         ]),
         h(HideNavbarSometimes, null, (

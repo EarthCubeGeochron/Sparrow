@@ -15,22 +15,27 @@ log = get_logger(__name__)
 
 connection_fields = dict()
 
+
 def connection(model_type):
-    class_name = to_type_name(model_type.__name__+"_connection")
+    class_name = to_type_name(model_type.__name__ + "_connection")
     cls = connection_fields.get(class_name, None)
     if not cls:
+
         class Meta:
             node = model_type
+
         # Create a class dynamically
         cls = type(class_name, (relay.Connection,), {"Meta": Meta})
         connection_fields[class_name] = cls
     return FilterableConnectionField(cls)
+
 
 def connection_field_factory(relationship, registry, **field_kwargs):
     # https://github.com/graphql-python/graphene-sqlalchemy/blob/master/graphene_sqlalchemy/fields.py
     model = relationship.mapper.entity
     model_type = registry.get_type_for_model(model)
     return connection(model_type)
+
 
 def resolve_primary_key(self, info):
     """
@@ -39,14 +44,18 @@ def resolve_primary_key(self, info):
     keys = self.__mapper__.primary_key_from_instance(self)
     return tuple(keys) if len(keys) > 1 else keys[0]
 
+
 def is_integer(v):
     return issubclass(INTEGER, type(v))
+
 
 class DatabaseIntegerID(graphene.Interface):
     primary_key = graphene.Int()
 
+
 class DatabaseStringID(graphene.Interface):
     primary_key = graphene.String()
+
 
 def primary_key_interface(model):
     v = model.__mapper__.primary_key
@@ -59,6 +68,7 @@ def primary_key_interface(model):
     else:
         return (DatabaseStringID,)
 
+
 def graphql_object_factory(_model, id_param=None):
     """
     ID Resolution: [https://github.com/graphql-python/graphene-sqlalchemy/blob/89c37265012b0e296147a1631b44d8f5d943dc59/graphene_sqlalchemy/types.py#L312]
@@ -69,27 +79,36 @@ def graphql_object_factory(_model, id_param=None):
     <model_name>:<primary_key> for single-key values.
     """
 
-    name_ = to_type_name(_model.__name__)
+    name_ = _model.__name__
 
     class Meta:
         model = _model
-        interfaces = (relay.Node, *primary_key_interface(model))
-        connection_field_factory = connection_field_factory
-        name = name_
+        interfaces = (relay.Node,)  # , *primary_key_interface(model))
+        # connection_field_factory = connection_field_factory
+        # name = name_
 
-    return type(name_, (SQLAlchemyObjectType,), dict(
-        Meta=Meta,
-        resolve_primary_key=resolve_primary_key))
+    def resolve_name(self):
+        self.obj.__name__
+
+    cls = type(
+        name_,
+        (graphene.ObjectType,),
+        dict(Meta=Meta, obj=_model, name=Field(String), resolve_name=resolve_name),
+    )
+
+    print(cls)
+
+    return cls
+
 
 def build_schema(db):
     types = []
-    fields = dict(
-        node = relay.Node.Field())
-    for model in db.automap_base.classes:
-        log.debug(f"Building GraphQL schema for {model.__name__}")
-        obj = graphql_object_factory(model)
+    fields = dict(node=relay.Node.Field())
+    for iface in db.interface:
+        log.debug(f"Building GraphQL schema for {iface.__name__}")
+        obj = graphql_object_factory(iface)
         types.append(obj)
-        fields[model.__name__] = connection(obj)
+        # fields[model.__name__] = connection(obj)
 
     Query = type("Query", (graphene.ObjectType,), fields)
 
