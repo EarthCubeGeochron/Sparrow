@@ -16,6 +16,7 @@ from envbash import load_envbash
 from .help import echo_help
 from .util import cmd, compose, container_is_running
 from .test import sparrow_test
+from .env import prepare_docker_environment, setup_command_path
 
 
 def find_config_file(dir: Path) -> Optional[Path]:
@@ -88,42 +89,8 @@ def cli(ctx, args):
             pth = this_exe.parent.parent.parent
             environ["SPARROW_PATH"] = str(pth)
 
-    bin_directories = []
-
-    if "SPARROW_PATH" in environ:
-        bin = Path(environ["SPARROW_PATH"]) / "bin"
-        bin_directories.append(bin)
-    else:
-        secho(
-            "Sparrow could not automatically find a the source directory. "
-            "Running without a local installation is not yet supported. "
-            "Please set SPARROW_PATH to the location of the cloned Sparrow repository.",
-            fg="red",
-        )
-        sys.exit(1)
-
-    # ENVIRONMENT VARIABLE DEFAULTS
-    # Set variables that might not be created in the config file
-    # to default values
-    # NOTE: much of this has been moved to `docker-compose.yaml`
-    environ.setdefault("SPARROW_BASE_URL", "/")
-    environ.setdefault("SPARROW_LAB_NAME", "My Lab")
-
-    # Make sure all internal commands can be referenced by name from
-    # within Sparrow (even if `sparrow` command itself isn't on the PATH)
-    __cmd = environ.get("SPARROW_COMMANDS")
-    if __cmd is not None:
-        bin_directories.append(Path(__cmd))
-
-    # Add location of Sparrow commands to path
-    __added_path_dirs = [str(i) for i in bin_directories]
-    environ["PATH"] = ":".join([*__added_path_dirs, environ["PATH"]])
-
-    if environ.get("SPARROW_SECRET_KEY") is None:
-        print(
-            "[red]You [underline]must[/underline] set [bold]SPARROW_SECRET_KEY[/bold]. Exiting..."
-        )
-        sys.exit(1)
+    bin_directories = setup_command_path()
+    prepare_docker_environment()
 
     rest = []
     try:
