@@ -1,14 +1,13 @@
 version: "3.4"
 services:
   gateway:
-    image: nginx:1.15
     depends_on:
       - backend
       - frontend
     ports:
       - ${SPARROW_HTTP_PORT:-5002}:80
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-config/locations:/etc/nginx/locations:ro
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend:

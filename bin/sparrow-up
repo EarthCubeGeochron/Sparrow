@@ -2,10 +2,6 @@
 # Description: Build containers, start, detach, and follow logs.
 
 cd "$SPARROW_PATH"
-if [ ! -f frontend/bundled-deps/ui-components/.git ]; then
-  echo "Submodules not initialized – updating..."
-  git submodule update --init --recursive
-fi
 
 sparrow compose up --build -d $@
 # Follow logs for running container(s)

@@ -18,6 +18,6 @@ def test_compose():
     assert res.exit_code == 0
 
     # We need to rework using
-    #cfg = load(res.output)
-    #assert cfg is not None
-    #assert 'gateway' in cfg['services']
+    # cfg = load(res.output)
+    # assert cfg is not None
+    # assert 'gateway' in cfg['services']
