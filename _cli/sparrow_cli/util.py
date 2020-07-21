@@ -15,6 +15,8 @@ def compose(*args, **kwargs):
 
     compose_files = [main]
 
+    # All of this environment manipulation should be moved to a centralized
+    # place.
     env = environ.get("SPARROW_ENV", "production")
     if env == "production":
         compose_files.append(path.join(base, "docker-compose.production.yaml"))
