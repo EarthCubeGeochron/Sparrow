@@ -1,4 +1,6 @@
-#!/usr/bin/env zsh
+#!/bin/bash
+
+sparrow docs-build
 
 docs_dir="${0:h:h:A}"
 cd "$docs_dir"
@@ -12,4 +14,4 @@ export SPARROW_SECRET_KEY="Freedom!!"
 
 bin/build-schema > build/schema.html
 (cd python-api && make html)
-gatsby build
+node_modules/.bin/gatsby build

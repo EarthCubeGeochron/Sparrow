@@ -1,11 +1,11 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 # Description: Import database from binary `pg_dump` archive
 
 [ ! -f "$1" ] \
 && >&2 echo "File $1 not found" \
 && exit 1
 
-internal_name="/tmp/${1:t}"
+internal_name="/tmp/$(basename $1)"
 
 sparrow compose exec -T db bash -s <<EOF
 mkdir -p /tmp
@@ -14,9 +14,9 @@ EOF
 
 container_id=$(sparrow compose ps -q db)
 
-cd "${1:h}"
-tar -cf - "${1:t}" 2&>/dev/null \
-| docker cp - "$container_id":"${internal_name:h}"
+cd "$(dirname $1)"
+tar -cf - "$(basename $1)" \
+| docker cp - "$container_id":"$(dirname $internal_name)"
 
 if ! sparrow compose exec -T db ls "$internal_name" > /dev/null ; then
   >&2 echo "File $1 not properly copied into docker container"
@@ -28,11 +28,9 @@ fi
 # Actually run database migration
 sparrow compose stop backend
 sparrow db-await
-sparrow compose exec -T db bash -s <<EOF
-dropdb --if-exists -Upostgres sparrow
-createdb -Upostgres sparrow
-pg_restore -v -Upostgres -d sparrow "$internal_name"
-rm -f "$internal_name"
-EOF
+sparrow compose exec db dropdb --if-exists -Upostgres sparrow
+sparrow compose exec db createdb -Upostgres sparrow
+sparrow compose exec db pg_restore -v -Upostgres -d sparrow "$internal_name"
+sparrow compose exec db rm -f "$internal_name"
 
 sparrow compose start backend

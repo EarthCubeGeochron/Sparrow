@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+cd "$SPARROW_PATH/docs"
+
+export COMPOSE_PROJECT_NAME="sparrow_docs"
+export COMPOSE_FILE="docker-compose.yaml"
+
+docker-compose build
+docker-compose up --build -d -V --remove-orphans $@
+exit_code=$?
+if (( $exit_code == 0 )); then
+  echo "$(tput bold)Containers built successfully! Following logs.$(tput sgr0)"
+  docker-compose logs -f
+else
+  echo "$(tput bold)One or more containers did not build properly, aborting.$(tput sgr0)"
+  # Forward exit code to workers
+  exit $exit_code
+fi

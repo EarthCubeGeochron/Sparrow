@@ -1,0 +1,6 @@
+click==7.1.2
+rich
+envbash
+pytest
+pyyaml
+docker-compose==1.26.0

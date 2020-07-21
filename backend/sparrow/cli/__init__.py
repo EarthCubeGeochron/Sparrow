@@ -9,12 +9,12 @@ from pkg_resources import iter_entry_points
 from contextlib import redirect_stdout
 from subprocess import run
 
-from .util import with_database, with_app
+from .util import with_database, with_app, with_full_app
 from ..util import working_directory
-from ..app import App, construct_app
+from ..app import App
 from ..auth.create_user import create_user
 
-def init_app(config):
+def _build_app_context(config):
     app = App(__name__, config=config, verbose=False)
     app.load()
     return app
@@ -27,25 +27,25 @@ class SparrowCLI(click.Group):
         # This pulls in configuration from environment variable or a configuration
         # object, if provided; I don't see another option to support lazily loading plugins
         config = kwargs.pop("config", environ.get("SPARROW_BACKEND_CONFIG"))
-        app = init_app(config)
 
         kwargs.setdefault('context_settings', {})
-        kwargs['context_settings']['obj'] = app
+        # Ideally we would add the Application _and_ config objects to settings
+        # here...
+        obj = _build_app_context(config)
+        kwargs['context_settings']['obj'] = obj
         super().__init__(*args, **kwargs)
+        obj.run_hook("setup-cli", self)
 
-        app.run_hook("setup-cli", self)
 
 @click.group(cls=SparrowCLI)
 # Get configuration from environment variable or passed
 # using the `--config` flag
-@click.option('--config', 'cfg',
-    type=str,
-    envvar="SPARROW_BACKEND_CONFIG",
-    required=False)
+@click.option('--config', 'cfg', type=str, required=False)
 @click.pass_context
-def cli(ctx, cfg):
+def cli(ctx, cfg=None):
+    # This signature might run things twice...
     if cfg is not None:
-        ctx.obj = init_app(cfg)
+        ctx.obj = _build_app_context(config)
 
 
 
@@ -78,7 +78,7 @@ def create_views(db):
 
 
 @cli.command(name='serve')
-@with_app
+@with_full_app
 def dev_server(app):
     """
     Run a development WSGI server
@@ -86,9 +86,9 @@ def dev_server(app):
     app.run(debug=True, host='0.0.0.0')
 
 
-@cli.command(name='shell')
-@with_app
-def shell(app):
+@cli.command(name='console')
+@with_full_app
+def console(app):
     """
     Get a Python shell within the application
     """
@@ -136,7 +136,7 @@ def _create_user(db):
 
 @cli.command(name="plugins")
 @with_app
-def shell(app):
+def plugins(app):
     """
     Print a list of enabled plugins
     """
