@@ -1,73 +1,74 @@
-const {join} = require('path');
+const { join } = require("path");
 
 module.exports = {
-  title: 'Sparrow',
-  tagline: 'An open-source laboratory information management system focused on geochronology.',
-  url: 'https://sparrow-data.org',
-  baseUrl: '/',
-  favicon: 'img/favicon.png',
-  organizationName: 'EarthCubeGeochron', // Usually your GitHub org/user name.
-  projectName: 'Sparrow', // Usually your repo name.
+  title: "Sparrow",
+  tagline:
+    "An open-source laboratory information management system focused on geochronology.",
+  url: "https://sparrow-data.org",
+  baseUrl: "/",
+  favicon: "img/favicon.png",
+  organizationName: "EarthCubeGeochron", // Usually your GitHub org/user name.
+  projectName: "Sparrow", // Usually your repo name.
   themeConfig: {
     navbar: {
-      title: 'Sparrow',
+      title: "Sparrow",
       logo: {
-        alt: 'Sparrow logo',
-        src: 'img/sparrow-bird-flat.svg',
+        alt: "Sparrow logo",
+        src: "img/sparrow-bird-flat.svg",
       },
       links: [
         {
-          to: 'docs/motivation-and-design',
-          activeBasePath: 'Guides',
+          to: "docs/motivation-and-design",
+          activeBasePath: "Guides",
           label: "Motivation and design",
-          position: 'left'
+          position: "left",
         },
         {
-          to: 'docs/getting-started',
-          activeBasePath: 'Guides',
+          to: "docs/getting-started",
+          activeBasePath: "Guides",
           label: "Getting started",
-          position: 'left'
+          position: "left",
         },
         {
-          to: 'docs/introduction',
-          activeBasePath: 'docs',
-          label: 'Docs',
-          position: 'left',
+          to: "docs/introduction",
+          activeBasePath: "docs",
+          label: "Docs",
+          position: "left",
         },
         {
-          to: 'blog',
-          label: 'Blog',
-          position: 'right'
+          to: "blog",
+          label: "Blog",
+          position: "right",
         },
         {
-          href: 'https://github.com/EarthCubeGeochron/Sparrow',
-          label: 'GitHub',
-          position: 'right',
+          href: "https://github.com/EarthCubeGeochron/Sparrow",
+          label: "GitHub",
+          position: "right",
         },
       ],
     },
     footer: {
-      style: 'dark',
+      style: "dark",
       links: [
         {
-          title: 'Docs',
+          title: "Docs",
           items: [
             {
-              label: 'Introduction',
-              to: 'docs/introduction',
+              label: "Introduction",
+              to: "docs/introduction",
             },
           ],
         },
         {
-          title: 'More',
+          title: "More",
           items: [
             {
-              label: 'Blog',
-              to: 'blog',
+              label: "Blog",
+              to: "blog",
             },
             {
-              label: 'GitHub',
-              href: 'https://github.com/EarthCubeGeochron/Sparrow',
+              label: "GitHub",
+              href: "https://github.com/EarthCubeGeochron/Sparrow",
             },
           ],
         },
@@ -77,28 +78,28 @@ module.exports = {
   },
   presets: [
     [
-      '@docusaurus/preset-classic',
+      "@docusaurus/preset-classic",
       {
         docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
+          sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/EarthCubeGeochron/Sparrow/edit/master/docs/',
+            "https://github.com/EarthCubeGeochron/Sparrow/edit/master/docs/",
         },
         blog: {
           showReadingTime: false,
           // Please change this to your repo.
           editUrl:
-            'https://github.com/EarthCubeGeochron/Sparrow/edit/master/docs/blog/',
+            "https://github.com/EarthCubeGeochron/Sparrow/edit/master/docs/blog/",
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.styl'),
+          customCss: require.resolve("./src/css/custom.styl"),
         },
       },
     ],
   ],
   plugins: [
-    require.resolve('./plugins/webpack-extensions.js'),
+    require.resolve("./plugins/webpack-extensions.js"),
     // Client-side redirect as a fallback to server-side...
     // This is a new docusaurus feature and doesn't appear to work properly [July 2020]
     // [
@@ -112,5 +113,5 @@ module.exports = {
     //     ],
     //   },
     // ],
-  ]
+  ],
 };
