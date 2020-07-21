@@ -47,6 +47,8 @@ def prepare_docker_environment():
 
     prepare_compose_overrides()
 
+def is_defined(envvar):
+    return environ.get(envvar) is not None
 
 def prepare_compose_overrides():
     base = environ["SPARROW_PATH"]
@@ -54,13 +56,19 @@ def prepare_compose_overrides():
 
     compose_files = [main]
 
-    env = environ.get("SPARROW_ENV", "production")
-    if env == "production":
+    is_production = environ.get("SPARROW_ENV", "development") == "production"
+
+    # Use certbot for SSL  if certain conditions are met
+    use_certbot = is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
+
+    if use_certbot:
+        compose_files.append(path.join(base, "docker-compose.certbot.yaml"))
+    else:
+        compose_files.append(path.join(base, "docker-compose.base.yaml"))
+
+    if is_production:
         compose_files.append(path.join(base, "docker-compose.production.yaml"))
 
-        if environ.get("CERTBOT_EMAIL") is not None:
-            # We want to use certbot NGINX configuration
-            compose_files.append(path.join(base, "docker-compose.certbot.yaml"))
 
     # Overrides should now be formatted as a COMPOSE_FILE colon-separated list
     overrides = environ.get("SPARROW_COMPOSE_OVERRIDES", "")
