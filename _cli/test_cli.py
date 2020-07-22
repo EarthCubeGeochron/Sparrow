@@ -1,5 +1,5 @@
 from click.testing import CliRunner
-from main import cli
+from sparrow_cli import cli
 from yaml import load, Loader
 
 runner = CliRunner()
@@ -17,7 +17,7 @@ def test_compose():
     res = runner.invoke(cli, "compose config")
     assert res.exit_code == 0
 
-    # We need to rework using 
-    #cfg = load(res.output)
-    #assert cfg is not None
-    #assert 'gateway' in cfg['services']
+    # We need to rework using
+    # cfg = load(res.output)
+    # assert cfg is not None
+    # assert 'gateway' in cfg['services']

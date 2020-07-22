@@ -1,0 +1,84 @@
+{
+  "date": "2020-07-09T05:00:00.000Z",
+  "name": "dsad",
+  "sample": {
+    "name": "ddddd",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        10,
+        10
+      ]
+    }
+  },
+  "analysis": [
+    {
+      "datum": [
+        {
+          "value": 450,
+          "error": null,
+          "type": {
+            "parameter": "9Be carrier",
+            "unit": ""
+          }
+        },
+        {
+          "value": 1,
+          "error": null,
+          "type": {
+            "parameter": "10Be",
+            "unit": "atoms/g"
+          }
+        },
+        {
+          "value": 1,
+          "error": null,
+          "type": {
+            "parameter": "10Be/9Be",
+            "unit": "none"
+          }
+        },
+        {
+          "value": 10,
+          "error": 1.1,
+          "type": {
+            "parameter": "10Be Age",
+            "unit": "ka"
+          }
+        },
+        {
+          "value": 0.02,
+          "error": null,
+          "type": {
+            "parameter": "Sheilding",
+            "unit": "none"
+          }
+        },
+        {
+          "value": 100,
+          "error": null,
+          "type": {
+            "parameter": "Quartz",
+            "unit": "none"
+          }
+        },
+        {
+          "value": 1000,
+          "error": null,
+          "type": {
+            "parameter": "Elevation",
+            "unit": "m"
+          }
+        },
+        {
+          "value": 1,
+          "error": null,
+          "type": {
+            "parameter": "1 Sigma",
+            "unit": "none"
+          }
+        }
+      ]
+    }
+  ]
+}

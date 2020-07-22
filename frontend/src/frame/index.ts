@@ -7,7 +7,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import {StatefulComponent} from '@macrostrat/ui-components';
-import {Component, createContext} from 'react';
+import {Component, createContext, useContext} from 'react';
 import {ErrorBoundary} from '../util';
 import T from 'prop-types';
 import h from 'react-hyperscript';
@@ -15,12 +15,10 @@ import h from 'react-hyperscript';
 const FrameContext = createContext({});
 
 class FrameProvider extends StatefulComponent {
-  static initClass() {
-    this.propTypes = {
-      overrides: T.objectOf(T.node)
-    };
-    this.defaultProps = {overrides: {}};
+  static propTypes = {
+    overrides: T.objectOf(T.node)
   }
+  static defaultProps = {overrides: {}}
   constructor(props){
     super(props);
     this.getElement = this.getElement.bind(this);
@@ -36,37 +34,36 @@ class FrameProvider extends StatefulComponent {
     return overrides[id] || null;
   }
 }
-FrameProvider.initClass();
 
-class Frame extends Component {
-  static initClass() {
-    this.contextType = FrameContext;
-    this.propTypes = {
-      id: T.string.isRequired,
-      iface: T.object,
-      children: T.node,
-      rest: T.object
-    };
+const Frame = (props)=>{
+  /* Main component for overriding parts of the UI with
+     lab-specific components. Must be nested below a *FrameProvider*
+  */
+  const {getElement} = useContext(FrameContext);
+  const {id, iface, children, ...rest} = props;
+  const el = getElement(id);
+
+  // By default we just render the children
+  const defaultContent = children;
+  let child = defaultContent;
+  if (el != null) {
+    // We have an override
+    child = el;
   }
-  render() {
-    const {id, iface, children, ...rest} = this.props;
-    const el = this.context.getElement(id);
 
-    // By default we just render the children
-    const defaultContent = children;
-    let child = defaultContent;
-    if (el != null) {
-      // We have an override
-      child = el;
-    }
-
-    if (typeof child === 'function') {
-      child = child({...rest, defaultContent});
-    }
-
-    return h(ErrorBoundary, null, child);
+  // This is kinda sketchy for react component detection.
+  if (typeof child === 'function') {
+    child = child({...rest, defaultContent});
   }
+
+  return h(ErrorBoundary, null, child);
 }
-Frame.initClass();
+
+Frame.propTypes = {
+  id: T.string.isRequired,
+  iface: T.object,
+  children: T.node,
+  rest: T.object
+};
 
 export {FrameProvider, Frame};

@@ -33,7 +33,7 @@ const Expander = styled.div`\
 flex-grow: 1;\
 `;
 
-const GlobalUI = function(props){
+const HideNavbarSometimes = function(props){
   /*
   Defines a hideable global UI component
   */
@@ -53,12 +53,13 @@ const MainNavbar = props => h(AppNavbar, {fullTitle: true}, [
 ]);
 
 class AppMain extends Component {
+  // Handles routing for the application between pages
   render() {
     const {baseURL} = this.props;
     return h(Router, {basename: baseURL}, (
       h(AppHolder, [
         h(Expander, [
-          h(GlobalUI, null, (
+          h(HideNavbarSometimes, null, (
             h(MainNavbar)
           )),
           h(Switch, [
@@ -78,7 +79,7 @@ class AppMain extends Component {
             h(Route, {path: '/api-explorer', component: APIExplorer})
           ])
         ]),
-        h(GlobalUI, null, (
+        h(HideNavbarSometimes, null, (
           h(PageFooter)
         ))
       ])
@@ -105,6 +106,7 @@ const errorHandler = function(route, response){
 };
 
 const App = function() {
+  // Nest application in React context providers
   const baseURL = process.env.BASE_URL || "/";
   const apiBaseURL = join(baseURL,'/api/v1');
   console.log(apiBaseURL);
