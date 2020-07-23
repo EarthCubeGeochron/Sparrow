@@ -18,21 +18,22 @@ module.exports = {
       },
       links: [
         {
-          to: "docs/motivation-and-design",
+          to: "docs/guides",
           activeBasePath: "Guides",
-          label: "Motivation and design",
+          label: "Guides",
+          position: "left",
+        },
+
+        {
+          to: "docs/introduction",
+          activeBasePath: "docs",
+          label: "Docs",
           position: "left",
         },
         {
           to: "docs/getting-started",
           activeBasePath: "Guides",
           label: "Getting started",
-          position: "left",
-        },
-        {
-          to: "docs/introduction",
-          activeBasePath: "docs",
-          label: "Docs",
           position: "left",
         },
         {

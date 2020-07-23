@@ -1,6 +1,12 @@
 module.exports = {
   someSidebar: {
-    Guides: ["motivation-and-design", "getting-started", "sparrow-on-windows"],
+    Guides: [
+      'guides',
+      "motivation-and-design",
+      "getting-started",
+      "sparrow-on-windows",
+      "dataSci",
+    ],
     Documentation: ["introduction", "command-line-interface"],
   },
 };
