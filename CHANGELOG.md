@@ -8,6 +8,15 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## [Unreleased] - 2020-07-24
+
+### Changed
+
+- Bumped `sparrowdata/backend-base` Docker image to `v1.2` to include `uvloop`
+  (enables high-performance asynchronous code).
+- Switched Sparrow's backend to "ASGI" (a fast, asynchronous server interface)
+  and switched web server to `gunicorn` for robustness.
+
 ## [1.5.0] - 2020-07-22
 
 ### Changed
