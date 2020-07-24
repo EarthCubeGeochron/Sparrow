@@ -379,8 +379,11 @@ class TestDeclarativeImporter:
 
         try:
             db.load_data("analysis", data)
+            # We shouldn't succeed at importing this data
+            assert False
         except Exception as err:
             assert isinstance(err, ValidationError)
+            assert err.messages["session"][0] == "Missing data for required field."
 
     def test_duplicate_datum_type(self):
 
