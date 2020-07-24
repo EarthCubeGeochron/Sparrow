@@ -21,4 +21,5 @@ SELECT EXISTS (
 # Create tables if they don't exist
 [ ! $res = 't' ] && python3 sparrow init
 
-python3 sparrow serve
+#gunicorn -w 4 -k uvicorn.workers.UvicornWorker --log-level warning sparrow:app
+uvicorn --reload --port 5000 --host 0.0.0.0 sparrow.asgi:app

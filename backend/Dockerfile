@@ -1,4 +1,4 @@
-FROM sparrowdata/backend-base:1.1 AS main
+FROM sparrowdata/backend-base:1.2 AS main
 # Multi-stage build of Sparrow backend.
 
 COPY ./requirements.txt /install/requirements.txt
