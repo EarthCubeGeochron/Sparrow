@@ -6,7 +6,6 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import React, { useState, useEffect, useRef, useContext } from "react";
-import LandscapeIcon from "@material-ui/icons/Landscape";
 import MapGl, { Marker, FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Component } from "react";
@@ -190,18 +189,20 @@ function MapPanel() {
               <Popover
                 content={
                   <Link to={`/catalog/sample/${cluster.properties.id}`}>
-                    <Button>Go to Sample {cluster.properties.Sample_name}</Button>
+                    <Button>
+                      Go to Sample {cluster.properties.Sample_name}
+                    </Button>
                   </Link>
                 }
               >
                 <Tooltip
                   content={
-                    cluster.properties.Sample_name + ": " + cluster.properties.project_name
+                    cluster.properties.Sample_name +
+                    ": " +
+                    cluster.properties.project_name
                   }
                 >
-                  <button className="mrker-btn">
-                    <LandscapeIcon></LandscapeIcon>
-                  </button>
+                  <Button icon="circle" />
                 </Tooltip>
               </Popover>
             </Marker>
