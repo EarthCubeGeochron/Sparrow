@@ -17,6 +17,7 @@ class APIResourceCollection(object):
     def resource(self, *endpoints, **kw):
         def func(cls):
             self.add_resource(cls, *endpoints, **kw)
+
         return func
 
 
@@ -26,9 +27,11 @@ class API(Api):
             super().add_resource(resource, *endpoints, **kw)
         except AttributeError:
             if len(endpoints) != 1:
-                raise IndexError("A single endpoint must be specified for "
-                                 "API resource collections.")
-            endpoint, = endpoints
+                raise IndexError(
+                    "A single endpoint must be specified for "
+                    "API resource collections."
+                )
+            (endpoint,) = endpoints
 
             for (args, kwargs) in resource.resource_arguments:
                 (r, e) = args
