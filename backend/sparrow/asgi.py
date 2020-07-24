@@ -6,14 +6,15 @@ with new async server architecture available in Python 3.6+.
 from starlette.applications import Starlette
 from starlette.routing import Mount
 from asgiref.wsgi import WsgiToAsgi
+from .api import APIv2
 from .app import App
 
 flask = App(__name__)
 flask.load()
 flask.load_phase_2()
 
-# routes = [
-#     Mount("/", endpoint=WsgiToAsgi(flask)),
-# ]
+FlaskApp = WsgiToAsgi(flask)
 
-app = WsgiToAsgi(flask)#Starlette(routes=routes)
+routes = [Mount("/api/v2", app=APIv2), Mount("/", app=FlaskApp)]
+
+app = Starlette(routes=routes)
