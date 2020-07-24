@@ -5,7 +5,7 @@ from sqlalchemy.engine.url import make_url
 import logging
 
 from .encoders import JSONEncoder
-from .api import APIv1
+from .api.v1 import APIv1
 from .util import relative_path
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .interface import InterfacePlugin

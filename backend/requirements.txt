@@ -59,6 +59,9 @@ Flask-GraphQL==2.0.1
 graphene==2.1.8
 graphene_sqlalchemy==2.2.2
 
+# API version 2
+flama==0.15.0
+
 # S3/AWS file access
 boto3==1.12.25
 
