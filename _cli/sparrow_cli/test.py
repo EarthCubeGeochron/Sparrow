@@ -24,9 +24,10 @@ def sparrow_test(*args):
     pth = environ.get("SPARROW_PATH", None)
     if pth is None:
         print(
-            "SPARROW_PATH not found. For now, tests can only be run when a source directory is available."
+            "SPARROW_PATH not found. For now, tests can only "
+            "be run when a source directory is available."
         )
-        return
+        sys.exit(1)
 
     print("Running sparrow tests")
 
@@ -34,6 +35,7 @@ def sparrow_test(*args):
 
     # First, test basic operation of command-line application
     # We should probably just import pytest directly and run
+    chdir(pth)
     res = cmd(path.join(pth, "_cli/_scripts/test-cli"), *cli_args)
     if res.returncode != 0:
         print("CLI tests failed, exiting")
