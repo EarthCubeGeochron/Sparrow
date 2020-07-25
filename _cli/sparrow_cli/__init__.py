@@ -106,7 +106,7 @@ def cli(ctx, args):
         return compose(*rest)
 
     if subcommand == "test":
-        return ctx.invoke(sparrow_test, *rest)
+        return sparrow_test(*rest)
 
     _command = find_subcommand(bin_directories, subcommand)
 
