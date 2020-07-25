@@ -10,7 +10,8 @@ from .util import relative_path
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .interface import InterfacePlugin
 from .auth import AuthPlugin
-#from .graph import GraphQLPlugin
+
+# from .graph import GraphQLPlugin
 from .web import WebPlugin
 from .logs import get_logger
 
@@ -19,10 +20,10 @@ log = get_logger(__name__)
 
 def echo_error(message, obj=None, err=None):
     if obj is not None:
-        message += " "+style(str(obj), bold=True)
-    secho(message, fg='red', err=True)
+        message += " " + style(str(obj), bold=True)
+    secho(message, fg="red", err=True)
     if err is not None:
-        secho("  "+str(err), fg='red', err=True)
+        secho("  " + str(err), fg="red", err=True)
 
 
 class App(Flask):
@@ -35,7 +36,7 @@ class App(Flask):
         self.api_loaded = False
         self.verbose = verbose
 
-        self.config.from_object('sparrow.default_config')
+        self.config.from_object("sparrow.default_config")
         if cfg is None:
             cfg = environ.get("SPARROW_BACKEND_CONFIG", None)
         try:
@@ -58,16 +59,17 @@ class App(Flask):
 
     def setup_database(self, db=None):
         from .database import Database
+
         self.load()
         if self.db is not None:
             return self.db
         if db is None:
             db = Database(self)
         self.db = db
-        self.run_hook('database-available')
+        self.run_hook("database-available")
         # Database is only "ready" when it is mapped
         if self.db.automap_base is not None:
-            self.run_hook('database-ready')
+            self.run_hook("database-ready")
         return db
 
     @property
@@ -83,21 +85,20 @@ class App(Flask):
             name = plugin.__class__.__name__
             echo_error("Could not register plugin", name, err)
 
-
     def __loaded(self):
         self.echo("Initializing plugins")
         self.is_loaded = True
         self.plugins.finalize(self)
 
     def run_hook(self, hook_name, *args, **kwargs):
-        self.echo("Running hook "+hook_name)
-        method_name = "on_"+hook_name.replace("-","_")
+        self.echo("Running hook " + hook_name)
+        method_name = "on_" + hook_name.replace("-", "_")
         for plugin in self.plugins:
             method = getattr(plugin, method_name, None)
             if method is None:
                 continue
             method(*args, **kwargs)
-            self.echo("  plugin: "+plugin.name)
+            self.echo("  plugin: " + plugin.name)
 
     def register_module_plugins(self, module):
         for name, obj in module.__dict__.items():
@@ -115,6 +116,7 @@ class App(Flask):
         if self.is_loaded:
             return
         import core_plugins
+
         self.register_plugin(AuthPlugin)
         # GraphQL is disabled for now
         # self.register_plugin(GraphQLPlugin)
@@ -125,6 +127,7 @@ class App(Flask):
         # Try to import external plugins, but they might not be defined.
         try:
             import sparrow_plugins
+
             self.register_module_plugins(sparrow_plugins)
         except ModuleNotFoundError as err:
             log.error("Could not find external Sparrow plugins.")
@@ -138,23 +141,24 @@ class App(Flask):
         # Database setup is likely redundant, but moves any database-mapping
         # errors forward.
         from .database import Database
+
         db = self.setup_database(Database(self))
 
         # Setup API
         api = APIv1(db)
 
         # Register all views in schema
-        for tbl in db.entity_names(schema='core_view'):
+        for tbl in db.entity_names(schema="core_view"):
             if tbl.endswith("_tree"):
                 continue
-            api.build_route(tbl, schema='core_view')
+            api.build_route(tbl, schema="core_view")
 
-        for tbl in db.entity_names(schema='lab_view'):
-            api.build_route(tbl, schema='lab_view')
+        for tbl in db.entity_names(schema="lab_view"):
+            api.build_route(tbl, schema="lab_view")
 
         self.api = api
-        self.register_blueprint(api.blueprint, url_prefix='/api/v1')
-        self.config['RESTFUL_JSON'] = dict(cls=JSONEncoder)
+        self.register_blueprint(api.blueprint, url_prefix="/api/v1")
+        self.config["RESTFUL_JSON"] = dict(cls=JSONEncoder)
 
         self.run_hook("api-initialized", api)
         self.run_hook("finalize-routes")
@@ -162,7 +166,8 @@ class App(Flask):
         # If we want to just serve assets without a file server...
         assets = self.config.get("ASSETS_DIRECTORY", None)
         if assets is not None:
-            @self.route('/assets/<path:filename>')
+
+            @self.route("/assets/<path:filename>")
             def assets_route(filename):
                 return send_from_directory(assets, filename)
 

@@ -10,7 +10,7 @@ class SparrowImportError(Exception):
     pass
 
 
-def get_file_object(name_or_obj, mode='rb'):
+def get_file_object(name_or_obj, mode="rb"):
     """Get a reference to a data file if passed a file name, or pass through
         a file-like object unmodified.
     """
@@ -61,9 +61,9 @@ def get_data_directory():
     varname = "SPARROW_DATA_DIR"
     env = environ.get(varname, None)
     if env is None:
-        v = style(varname, fg='cyan', bold=True)
+        v = style(varname, fg="cyan", bold=True)
         echo(f"Environment variable {v} is not set.")
-        secho("Aborting", fg='red', bold=True)
+        secho("Aborting", fg="red", bold=True)
         return
     p = Path(env)
     assert p.is_dir()

@@ -25,11 +25,12 @@ class SparrowPluginManager(object):
         try:
             self.__init_store.append(plugin)
         except AttributeError:
-            raise SparrowPluginError("Cannot add plugins after "
-                                     "Sparrow is finished loading.")
+            raise SparrowPluginError(
+                "Cannot add plugins after " "Sparrow is finished loading."
+            )
 
     def order_plugins(self, store=None):
-        store = (store or self.__store)
+        store = store or self.__store
         struct = {p.name: set(p.dependencies) for p in store}
         map = {p.name: p for p in store}
         res = toposort_flatten(struct)
@@ -39,8 +40,9 @@ class SparrowPluginManager(object):
         try:
             assert issubclass(plugin_class, SparrowPlugin)
         except AssertionError:
-            raise SparrowPluginError("Sparrow plugins must be a "
-                                     "subclass of SparrowPlugin")
+            raise SparrowPluginError(
+                "Sparrow plugins must be a " "subclass of SparrowPlugin"
+            )
         return plugin_class(app)
 
     def finalize(self, app):
@@ -52,7 +54,7 @@ class SparrowPluginManager(object):
 
         self.__init_store = None
 
-    def get(self, name: str)-> SparrowPlugin:
+    def get(self, name: str) -> SparrowPlugin:
         """Get a plugin object, given its name."""
         for plugin in self.__store:
             if plugin.name == name:

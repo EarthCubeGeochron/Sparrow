@@ -10,7 +10,8 @@ log = get_logger(__name__)
 
 ProjectEditAPI = APIResourceCollection()
 
-@ProjectEditAPI.resource('/<int:id>')
+
+@ProjectEditAPI.resource("/<int:id>")
 class ProjectEditResource(Resource):
     @jwt_required
     def put(self, id):
@@ -26,12 +27,11 @@ class ProjectEditResource(Resource):
 
         m = db.session.query(model).get(id)
         # We don't do any error handling right now
-        for k,v in args.items():
+        for k, v in args.items():
             setattr(m, k, v)
 
         db.session.add(m)
         db.session.commit()
-
 
         res = m.to_dict()
         log.debug(res)
@@ -40,7 +40,9 @@ class ProjectEditResource(Resource):
         # marshmallow or similar
         return res, 201
 
+
 class ProjectEditPlugin(SparrowCorePlugin):
     name = "project-edit"
+
     def on_api_initialized(self, api):
-        api.add_resource(ProjectEditAPI, '/edit/project')
+        api.add_resource(ProjectEditAPI, "/edit/project")

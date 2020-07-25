@@ -32,6 +32,7 @@ class Database(MappedDatabaseMixin):
         self.config = None
         if app is None:
             from ..app import App
+
             # Set config from environment variable
             app = App(__name__)
             # Load plugins
@@ -65,13 +66,15 @@ class Database(MappedDatabaseMixin):
         self.register_models(User, Project, Session, DatumType)
         # Register a new class
         # Automap the core_view.datum relationship
-        cls = self.automap_view("datum",
+        cls = self.automap_view(
+            "datum",
             Column("datum_id", Integer, primary_key=True),
             Column("analysis_id", Integer, ForeignKey(self.table.analysis.c.id)),
             Column("session_id", Integer, ForeignKey(self.table.session.c.id)),
-            schema='core_view')
+            schema="core_view",
+        )
         self.register_models(cls)
-        self.app.run_hook('database-mapped')
+        self.app.run_hook("database-mapped")
 
     @contextmanager
     def session_scope():
@@ -133,7 +136,7 @@ class Database(MappedDatabaseMixin):
         return res
 
     def exec_sql(self, fn):
-        secho(Path(fn).name, fg='cyan', bold=True)
+        secho(Path(fn).name, fg="cyan", bold=True)
         run_sql_file(self.session, str(fn))
 
     def exec_query(self, *args):
@@ -156,7 +159,7 @@ class Database(MappedDatabaseMixin):
     def get(self, model, *args, **kwargs):
         if isinstance(model, str):
             model = getattr(self.model, model)
-        return self.session.query(model).get(*args,**kwargs)
+        return self.session.query(model).get(*args, **kwargs)
 
     def get_or_create(self, model, **kwargs):
         """
@@ -182,7 +185,7 @@ class Database(MappedDatabaseMixin):
             self.exec_sql(fn)
 
         try:
-            self.app.run_hook('core-tables-initialized', self)
+            self.app.run_hook("core-tables-initialized", self)
         except AttributeError as err:
-            secho("Could not load plugins", fg='red', dim=True)
+            secho("Could not load plugins", fg="red", dim=True)
             secho(str(err))
