@@ -9,38 +9,42 @@
 
 from flask import current_app, jsonify
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import (JWTManager, create_access_token,
-                                create_refresh_token,
-                                jwt_required, jwt_refresh_token_required,
-                                set_access_cookies, set_refresh_cookies,
-                                unset_jwt_cookies, jwt_optional,
-                                get_jwt_identity)
+from flask_jwt_extended import (
+    JWTManager,
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    jwt_refresh_token_required,
+    set_access_cookies,
+    set_refresh_cookies,
+    unset_jwt_cookies,
+    jwt_optional,
+    get_jwt_identity,
+)
 from ..api.base import APIResourceCollection
 from ..database.models import User
 from ..plugins import SparrowCorePlugin
 
 parser = reqparse.RequestParser()
-parser.add_argument('username',
-    help='This field cannot be blank',
-    required=True)
-parser.add_argument('password',
-    help='This field cannot be blank',
-    required=True)
+parser.add_argument("username", help="This field cannot be blank", required=True)
+parser.add_argument("password", help="This field cannot be blank", required=True)
 
 AuthAPI = APIResourceCollection()
 
-@AuthAPI.resource('/registration')
+
+@AuthAPI.resource("/registration")
 class UserRegistration(Resource):
     def post(self):
         # This route is a skeleton right now
         raise NotImplementedError()
 
+
 def user_login(self):
     db = current_app.database
     data = parser.parse_args()
     print(data)
-    username = data['username']
-    password = data['password']
+    username = data["username"]
+    password = data["password"]
 
     current_user = db.session.query(User).get(username)
     if current_user is None:
@@ -61,18 +65,21 @@ def user_login(self):
     set_refresh_cookies(resp, refresh_token)
     return resp
 
-@AuthAPI.resource('/login')
+
+@AuthAPI.resource("/login")
 class Login(Resource):
     post = user_login
 
-@AuthAPI.resource('/logout')
+
+@AuthAPI.resource("/logout")
 class Logout(Resource):
     def post(self):
-        resp = jsonify({'login': False})
+        resp = jsonify({"login": False})
         unset_jwt_cookies(resp)
         return resp
 
-@AuthAPI.resource('/status')
+
+@AuthAPI.resource("/status")
 class Status(Resource):
     @jwt_optional
     def get(self):
@@ -82,7 +89,8 @@ class Status(Resource):
             return resp
         return jsonify(login=False)
 
-@AuthAPI.resource('/refresh')
+
+@AuthAPI.resource("/refresh")
 class TokenRefresh(Resource):
     @jwt_refresh_token_required
     def post(self):
@@ -92,14 +100,17 @@ class TokenRefresh(Resource):
         set_access_cookies(resp, access_token)
         return resp
 
-@AuthAPI.resource('/secret')
+
+@AuthAPI.resource("/secret")
 class SecretResource(Resource):
     @jwt_required
     def get(self):
-        return {'answer': 42}
+        return {"answer": 42}
+
 
 class AuthPlugin(SparrowCorePlugin):
     name = "auth"
+
     def on_database_ready(self):
         # Manage JSON Web tokens
         JWTManager(self.app)

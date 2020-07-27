@@ -1,12 +1,13 @@
 ---
-path: "/docs/cli"
+id: command-line-interface
+title: Command-line interface
+sidebar_label: Command-line interface
 ---
 
-# Command-line interface
-
 **Sparrow** is administered using the `sparrow` command-line
-interface. This command wraps application management, database management,`docker-compose` orchestration subcommands in a single executable, simplifying
-basic management tasks.
+interface. This command wraps application management,
+database management,`docker-compose` orchestration subcommands in a
+single executable, simplifying basic management tasks.
 
 ```
 Usage: sparrow [OPTIONS] COMMAND [ARGS]...

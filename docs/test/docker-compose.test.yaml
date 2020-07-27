@@ -1,0 +1,11 @@
+version: "3.4"
+services:
+  sparrow_docs:
+    image: sparrow_docs:latest
+    expose:
+      - 80
+  test:
+    build: .
+    command: /test/run-tests
+    depends_on:
+      - sparrow_docs

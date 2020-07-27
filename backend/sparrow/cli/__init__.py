@@ -14,10 +14,12 @@ from ..util import working_directory
 from ..app import App
 from ..auth.create_user import create_user
 
+
 def _build_app_context(config):
     app = App(__name__, config=config, verbose=False)
     app.load()
     return app
+
 
 class SparrowCLI(click.Group):
     def __init__(self, *args, **kwargs):
@@ -28,11 +30,11 @@ class SparrowCLI(click.Group):
         # object, if provided; I don't see another option to support lazily loading plugins
         config = kwargs.pop("config", environ.get("SPARROW_BACKEND_CONFIG"))
 
-        kwargs.setdefault('context_settings', {})
+        kwargs.setdefault("context_settings", {})
         # Ideally we would add the Application _and_ config objects to settings
         # here...
         obj = _build_app_context(config)
-        kwargs['context_settings']['obj'] = obj
+        kwargs["context_settings"]["obj"] = obj
         super().__init__(*args, **kwargs)
         obj.run_hook("setup-cli", self)
 
@@ -40,7 +42,7 @@ class SparrowCLI(click.Group):
 @click.group(cls=SparrowCLI)
 # Get configuration from environment variable or passed
 # using the `--config` flag
-@click.option('--config', 'cfg', type=str, required=False)
+@click.option("--config", "cfg", type=str, required=False)
 @click.pass_context
 def cli(ctx, cfg=None):
     # This signature might run things twice...
@@ -48,16 +50,15 @@ def cli(ctx, cfg=None):
         ctx.obj = _build_app_context(config)
 
 
-
 def abort(message, status=1):
     prefix = "ABORTING: "
-    msg = message.replace("\n", "\n"+" "*len(prefix))
-    echo(style(prefix, fg='red', bold=True)+msg)
+    msg = message.replace("\n", "\n" + " " * len(prefix))
+    echo(style(prefix, fg="red", bold=True) + msg)
     exit(status)
 
 
-@cli.command(name='init')
-@click.option('--drop', is_flag=True, default=False)
+@cli.command(name="init")
+@click.option("--drop", is_flag=True, default=False)
 @with_database
 def init_database(db, drop=False):
     """
@@ -66,7 +67,7 @@ def init_database(db, drop=False):
     db.initialize(drop=drop)
 
 
-@cli.command(name='create-views')
+@cli.command(name="create-views")
 @with_database
 def create_views(db):
     """
@@ -77,22 +78,23 @@ def create_views(db):
         db.exec_sql("../database/fixtures/05-views.sql")
 
 
-@cli.command(name='serve')
+@cli.command(name="serve")
 @with_full_app
 def dev_server(app):
     """
     Run a development WSGI server
     """
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host="0.0.0.0")
 
 
-@cli.command(name='console')
+@cli.command(name="console")
 @with_full_app
 def console(app):
     """
     Get a Python shell within the application
     """
     from IPython import embed
+
     with app.app_context():
         db = app.database
         # `using` is related to this issue:
@@ -100,9 +102,9 @@ def console(app):
         embed(using=False)
 
 
-@cli.command(name='config')
-@click.argument('key', required=False)
-@click.option('--json', is_flag=True, default=False)
+@cli.command(name="config")
+@click.argument("key", required=False)
+@click.option("--json", is_flag=True, default=False)
 @with_app
 def config(app, key=None, json=False):
     """
@@ -126,13 +128,14 @@ def config(app, key=None, json=False):
         secho(f"{v}")
 
 
-@cli.command(name='create-user')
+@cli.command(name="create-user")
 @with_database
 def _create_user(db):
     """
     Create an authorized user for the web frontend
     """
     create_user(db)
+
 
 @cli.command(name="plugins")
 @with_app

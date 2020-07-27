@@ -3,6 +3,7 @@ from sparrow.plugins import SparrowPlugin
 from sqlalchemy import func
 from json import loads
 from requests import get
+
 # TODO: add geoalchemy to base docker image
 # ..tricky because we are using Alpine
 # from geoalchemy2.shape import to_shape
@@ -23,9 +24,9 @@ def get_location_name(coords):
 
 class LocationNamesPlugin(SparrowPlugin):
     name = "location-names"
-    def on_setup_cli(self, cli):
 
-        @click.command(name='update-location-names')
+    def on_setup_cli(self, cli):
+        @click.command(name="update-location-names")
         @click.option("--overwrite", is_flag=True, default=False)
         def cmd(*args, **kwargs):
             """
@@ -39,17 +40,18 @@ class LocationNamesPlugin(SparrowPlugin):
         db = self.app.database
         s = db.model.sample
         # Get unnamed locations
-        q = (db.session.query(s)
-                .with_entities(s,
-                    func.ST_AsGeoJSON(func.ST_Centroid(s.location)))
-                .filter(s.location != None))
+        q = (
+            db.session.query(s)
+            .with_entities(s, func.ST_AsGeoJSON(func.ST_Centroid(s.location)))
+            .filter(s.location != None)
+        )
 
         if not overwrite:
             q = q.filter(s.location_name == None)
 
         for (s, json_string) in q:
             # Get point coordinate
-            coord = loads(json_string)['coordinates']
+            coord = loads(json_string)["coordinates"]
 
             name = get_location_name(coord)
             s.location_name = name
