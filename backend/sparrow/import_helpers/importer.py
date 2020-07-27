@@ -7,10 +7,7 @@ from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import inspect
 
-from .util import (
-    md5hash, SparrowImportError,
-    ensure_sequence, coalesce_nan
-)
+from .util import md5hash, SparrowImportError, ensure_sequence, coalesce_nan
 from ..util import relative_path
 
 
@@ -18,6 +15,7 @@ class BaseImporter(object):
     """
     A basic Sparrow importer to be subclassed.
     """
+
     authority = None
     file_type = None
 
@@ -27,7 +25,7 @@ class BaseImporter(object):
         print_sql = kwargs.pop("print_sql", False)
         self.verbose = kwargs.pop("verbose", False)
         # We shouldn't have to do this,
-        #self.db.automap()
+        # self.db.automap()
 
         # This is kinda unsatisfying
         self.basedir = environ.get("SPARROW_DATA_DIR", None)
@@ -36,23 +34,26 @@ class BaseImporter(object):
         self.__dirty = set()
         self.__new = set()
         self.__deleted = set()
-        @event.listens_for(self.db.session, 'before_flush')
+
+        @event.listens_for(self.db.session, "before_flush")
         def on_before_flush(session, flush_context, instances):
             self.__dirty |= set(session.dirty)
             self.__new |= set(session.new)
             self.__deleted |= set(session.deleted)
 
-        @event.listens_for(self.db.session, 'after_commit')
+        @event.listens_for(self.db.session, "after_commit")
         def on_after_commit(session):
             self.__dirty = set()
             self.__new = set()
             self.__deleted = set()
 
         if print_sql:
-            @event.listens_for(self.db.engine, 'after_cursor_execute', named=True)
+
+            @event.listens_for(self.db.engine, "after_cursor_execute", named=True)
             def receive_after_cursor_execute(**kw):
-                statement = kw.pop('statement')
-                if statement.startswith("SELECT"): return
+                statement = kw.pop("statement")
+                if statement.startswith("SELECT"):
+                    return
                 secho(str(statement).strip())
 
         if self.file_type is not None:
@@ -70,7 +71,8 @@ class BaseImporter(object):
             dirty=self.__dirty,
             modified=set(i for i in set(self.__dirty) if changed(i)),
             new=self.__new,
-            deleted=self.__deleted)
+            deleted=self.__deleted,
+        )
 
     def add(self, *models):
         for model in models:
@@ -87,8 +89,8 @@ class BaseImporter(object):
 
     def publication(self, doi, title=None):
         return self.db.get_or_create(
-            self.m.publication,
-            doi=doi, defaults=dict(title=title))
+            self.m.publication, doi=doi, defaults=dict(title=title)
+        )
 
     def project(self, name):
         return self.db.get_or_create(self.m.project, name=name)
@@ -100,53 +102,58 @@ class BaseImporter(object):
 
     def unit(self, id, description=None):
         u = self.db.get_or_create(
-            self.m.vocabulary_unit,
-            id=id, defaults=dict(authority=self.authority))
+            self.m.vocabulary_unit, id=id, defaults=dict(authority=self.authority)
+        )
         if u is not None:
             u.description = description
         return u
 
     def error_metric(self, id, description=None):
-        if not id: return None
+        if not id:
+            return None
         em = self.db.get_or_create(
             self.m.vocabulary_error_metric,
-            id=id, defaults=dict(authority=self.authority))
+            id=id,
+            defaults=dict(authority=self.authority),
+        )
         if description is not None:
             em.description = description
         return em
 
     def parameter(self, id, description=None):
         p = self.db.get_or_create(
-            self.m.vocabulary_parameter,
-            id=id, defaults=dict(authority=self.authority))
+            self.m.vocabulary_parameter, id=id, defaults=dict(authority=self.authority)
+        )
         if description is not None:
             p.description = description
         return p
 
     def method(self, id):
         return self.db.get_or_create(
-            self.m.vocabulary_method,
-            id=id, defaults=dict(authority=self.authority))
+            self.m.vocabulary_method, id=id, defaults=dict(authority=self.authority)
+        )
 
     def material(self, id, type_of=None):
-        if id is None: return None
+        if id is None:
+            return None
         m = self.db.get_or_create(
-            self.m.vocabulary_material,
-            id=id, defaults=dict(authority=self.authority))
+            self.m.vocabulary_material, id=id, defaults=dict(authority=self.authority)
+        )
         if type_of is not None:
             m._material = self.material(type_of)
         return m
 
-    def analysis_type(self, id, type_of= None):
+    def analysis_type(self, id, type_of=None):
         m = self.db.get_or_create(
             self.m.vocabulary_analysis_type,
             id=id,
-            defaults=dict(authority=self.authority))
+            defaults=dict(authority=self.authority),
+        )
         if type_of is not None:
             m._analysis_type = self.analysis_type(type_of)
         return m
 
-    def datum_type(self, parameter, unit='unknown', error_metric=None, **kwargs):
+    def datum_type(self, parameter, unit="unknown", error_metric=None, **kwargs):
         error_metric = self.error_metric(error_metric)
         try:
             error_metric_id = error_metric.id
@@ -158,19 +165,19 @@ class BaseImporter(object):
         # Error values are *assumed* to be at the 1s level, apparently
         parameter = self.parameter(parameter)
 
-        dt =  self.db.get_or_create(
+        dt = self.db.get_or_create(
             self.m.datum_type,
             parameter=parameter.id,
             error_metric=error_metric_id,
             unit=unit.id,
-            **kwargs)
+            **kwargs,
+        )
         return dt
 
     def analysis(self, type=None, **kwargs):
         if type is not None:
             type = self.analysis_type(type).id
-        m = self.db.get_or_create(
-            self.m.analysis, analysis_type=type, **kwargs)
+        m = self.db.get_or_create(self.m.analysis, analysis_type=type, **kwargs)
         return m
 
     def add_analysis(self, session, type=None, **kwargs):
@@ -182,9 +189,7 @@ class BaseImporter(object):
             return None
         self.db.session.flush()
         param = self.parameter(parameter)
-        attr = self.db.get_or_create(self.m.attribute,
-            parameter=param.id,
-            value=value)
+        attr = self.db.get_or_create(self.m.attribute, parameter=param.id, value=value)
         analysis.attribute_collection.append(attr)
         return attr
 
@@ -194,9 +199,7 @@ class BaseImporter(object):
             return None
         type = self.datum_type(parameter, **kwargs)
         self.db.session.flush()
-        datum = self.db.get_or_create(self.m.datum,
-            analysis=analysis.id,
-            type=type.id)
+        datum = self.db.get_or_create(self.m.datum, analysis=analysis.id, type=type.id)
         datum.value = value
         datum.error = error
         return datum
@@ -208,10 +211,8 @@ class BaseImporter(object):
             return None
         type = self.datum_type(parameter, **kwargs)
         self.db.session.flush()
-        const = self.db.get_or_create(self.m.constant,
-            value=value,
-            error=error,
-            type=type.id
+        const = self.db.get_or_create(
+            self.m.constant, value=value, error=error, type=type.id
         )
         analysis.constant_collection.append(const)
         self.db.session.flush()
@@ -222,7 +223,7 @@ class BaseImporter(object):
     ###
 
     def warn(self, message):
-        secho(str(message), fg='yellow')
+        secho(str(message), fg="yellow")
 
     def import_datafile(self, fn, rec, **kwargs):
         raise NotImplementedError()
@@ -232,9 +233,9 @@ class BaseImporter(object):
         Delete session(s) and associated analysis and datum records,
         given a data file model
         """
-        fn = relative_path(__file__, 'sql', 'delete-session.sql')
+        fn = relative_path(__file__, "sql", "delete-session.sql")
         sql = text(open(fn).read())
-        self.db.session.execute(sql, {'file_hash': rec.file_hash})
+        self.db.session.execute(sql, {"file_hash": rec.file_hash})
 
     def iterfiles(self, file_sequence, **kwargs):
         """
@@ -273,14 +274,13 @@ class BaseImporter(object):
         # Get file hash
         hash = md5hash(str(fn))
         # Get data file record if it exists
-        rec = (self.db.session.query(self.m.data_file)
-                .filter_by(file_path=file_path)).first()
+        rec = (
+            self.db.session.query(self.m.data_file).filter_by(file_path=file_path)
+        ).first()
 
         added = rec is None
         if added:
-            rec = self.m.data_file(
-                file_path=file_path,
-                file_hash=hash)
+            rec = self.m.data_file(file_path=file_path, file_hash=hash)
 
         updated = rec.file_hash != hash
         if updated:
@@ -309,17 +309,19 @@ class BaseImporter(object):
         m = self.m.data_file_link
         if kwargs.pop("fix_errors", False):
             err_filter = m.error.is_(None)
-        prev_imports = (self.db.session.query(m)
+        prev_imports = (
+            self.db.session.query(m)
             .filter_by(file_hash=rec.file_hash)
             .filter(err_filter)
-            .count())
+            .count()
+        )
         if prev_imports > 0 and not added and not redo:
-            secho("Already imported", fg='green', dim=True)
+            secho("Already imported", fg="green", dim=True)
             return
         # It might get ugly here if we're trying to overwrite
         # old records but haven't deleted the appropriate
         # data_file_import models
-        #if prev_imports > 0 and rec is not None:
+        # if prev_imports > 0 and rec is not None:
         #    self.delete_session(rec)
 
         # Create a "data_file_import" object to track model-datafile links
@@ -341,7 +343,7 @@ class BaseImporter(object):
             if df_link is not None:
                 self.db.session.add(df_link)
             self.db.session.commit()
-            secho(str(err), fg='red')
+            secho(str(err), fg="red")
 
         if redo:
             self.__track_changes()
@@ -366,14 +368,14 @@ class BaseImporter(object):
 
         if self.verbose:
             problems = (self.__new & new_changed) | (self.__dirty & modified)
-            _echo(problems, "update attempted for unchanged model", fg='yellow')
+            _echo(problems, "update attempted for unchanged model", fg="yellow")
             self.__print_changes(modified)
 
         if not has_modified_models:
-            secho("No modifications", fg='green')
+            secho("No modifications", fg="green")
         else:
-            _echo(self.__new, "records added", fg='green')
-            _echo(modified, "records modified", fg='yellow')
+            _echo(self.__new, "records added", fg="green")
+            _echo(modified, "records modified", fg="yellow")
         secho("")
 
     def __print_changes(self, dirty_records):
@@ -381,7 +383,7 @@ class BaseImporter(object):
 
     def __has_changes(self, obj):
         for v in self.__object_changes(obj).values():
-            if v.added is not None and  len(v.added) > 0:
+            if v.added is not None and len(v.added) > 0:
                 return True
             if v.deleted is not None and len(v.deleted) > 0:
                 return True
@@ -399,15 +401,16 @@ class BaseImporter(object):
         params = dict(_data_file=rec, defaults=defaults)
 
         if isinstance(model, self.m.session):
-            params['_session'] = model
+            params["_session"] = model
         elif isinstance(model, self.m.analysis):
-            params['_analysis'] = model
+            params["_analysis"] = model
         elif isinstance(model, self.m.sample):
-            params['_sample'] = model
-        elif 'error' not in defaults:
+            params["_sample"] = model
+        elif "error" not in defaults:
             raise NotImplementedError(
                 "Only sessions, samples, and analyses "
-                "can be tracked independently on import.")
+                "can be tracked independently on import."
+            )
 
         return self.m.data_file_link.get_or_create(**params)
 
@@ -417,4 +420,5 @@ class CloudImporter(BaseImporter):
     Importer to be subclassed that is geared towards S3 and compatible
     cloud storage systems.
     """
+
     pass

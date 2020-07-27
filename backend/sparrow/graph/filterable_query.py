@@ -12,11 +12,12 @@ from flask_jwt_extended import jwt_optional
 
 from .filters import filter_class_for_module, Filter
 
+
 class FilterableConnectionField(SQLAlchemyConnectionField):
     def __init__(self, type, *args, **kwargs):
-        if 'filter' not in kwargs and issubclass(type, Connection):
+        if "filter" not in kwargs and issubclass(type, Connection):
             model = type.Edge.node._type._meta.model
-            kwargs.setdefault('filter', filter_class_for_module(model))
+            kwargs.setdefault("filter", filter_class_for_module(model))
         elif "filter" in kwargs and kwargs["filter"] is None:
             del kwargs["filter"]
         super(FilterableConnectionField, self).__init__(type, *args, **kwargs)

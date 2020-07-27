@@ -21,3 +21,8 @@ export SPARROW_BASE_URL="/" # This is the default
 
 # Needed for import script
 export LASERCHRON_DATA_DIR="$laserchron/test-data"
+
+# Needed for certbot: A 'fully-qualified domain name'
+# and contact email
+export SPARROW_DOMAIN="sparrow.test-lab.org"
+export CERTBOT_EMAIL="test@test-lab.org"

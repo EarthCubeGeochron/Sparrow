@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cd "$SPARROW_PATH"
+
+docker build -f docs/Dockerfile --tag sparrow_docs:latest .

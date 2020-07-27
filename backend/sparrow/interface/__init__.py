@@ -21,7 +21,7 @@ log = get_logger(__name__)
 
 def _jsonschema_type_mapping(self):
     """TODO: this is just a shim"""
-    return {'type': 'integer'}
+    return {"type": "integer"}
 
 
 Related._jsonschema_type_mapping = _jsonschema_type_mapping
@@ -39,9 +39,9 @@ class BaseMeta:
 
 def columns_for_prop(prop):
     try:
-        return getattr(prop, 'columns')
+        return getattr(prop, "columns")
     except AttributeError:
-        return list(getattr(prop, 'local_columns'))
+        return list(getattr(prop, "local_columns"))
 
 
 def prop_is_required(prop):
@@ -68,6 +68,7 @@ def is_pk_defined(instance):
 
 class BaseSchema(SQLAlchemyAutoSchema):
     value_index = {}
+
     def _ready_for_flush(self, instance):
         if instance is None:
             return False
@@ -108,10 +109,10 @@ class BaseSchema(SQLAlchemyAutoSchema):
         instance = None
         for prop in self.opts.model.__mapper__.iterate_properties:
             val = data.get(prop.key, None)
-            if getattr(prop, 'uselist', False):
+            if getattr(prop, "uselist", False):
                 continue
             if val is not None:
-                if hasattr(prop, 'direction'):
+                if hasattr(prop, "direction"):
                     # For relationships
                     if is_pk_defined(val):
                         filters[prop.key] = val
@@ -119,11 +120,10 @@ class BaseSchema(SQLAlchemyAutoSchema):
                         related_models[prop.key] = val
                 else:
                     filters[prop.key] = val
-            elif hasattr(prop, 'direction'):
+            elif hasattr(prop, "direction"):
                 # This is unsatisfying, as we can't filter on pre-existing
                 # related fields
                 filters[prop.key] = None
-
 
         # Try to get value from session
         if instance is None:
@@ -164,7 +164,7 @@ class BaseSchema(SQLAlchemyAutoSchema):
         except TypeError:
             pass
         val_list = ensure_list(value)
-        log.debug("Expanding keys "+str(val_list))
+        log.debug("Expanding keys " + str(val_list))
 
         model = self.opts.model
         pk = get_primary_keys(model)
@@ -205,16 +205,14 @@ def model_interface(model, session=None):
     Create a Marshmallow interface to a SQLAlchemy model
     """
     # Create a meta class
-    metacls = type("Meta", (BaseMeta,), dict(
-                    model=model,
-                    sqla_session=session))
+    metacls = type("Meta", (BaseMeta,), dict(model=model, sqla_session=session))
 
     schema_name = to_schema_name(model.__name__)
     try:
         # All conversion logic comes from ModelSchema
-        return type(schema_name, (BaseSchema,), {'Meta': metacls})
+        return type(schema_name, (BaseSchema,), {"Meta": metacls})
     except exceptions.ModelConversionError as err:
-        secho(type(err).__name__+": "+schema_name+" - "+str(err), fg='red')
+        secho(type(err).__name__ + ": " + schema_name + " - " + str(err), fg="red")
         return None
 
 
@@ -226,7 +224,7 @@ class InterfaceCollection(ModelCollection):
     def _register_model(self, cls):
         k = classname_for_table(cls.__table__)
         # Bail if we have a view
-        if not hasattr(cls, '__mapper__'):
+        if not hasattr(cls, "__mapper__"):
             return
         self.add(k, model_interface(cls))
 
@@ -241,4 +239,5 @@ class InterfacePlugin(SparrowCorePlugin):
 
     def on_setup_cli(self, cli):
         from .cli import show_interface
+
         cli.add_command(show_interface)
