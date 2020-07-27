@@ -57,16 +57,16 @@ function DataSheet() {
     );
   };
 
-  const sheetRenderer = ({virtualRowRenderer, data, className}) => (
+  const sheetRenderer = ({ virtualRowRenderer, data, className }) => (
     <List
       className={className}
-      height={ 600 }
-      rowHeight={ ({ index }) => 20 }
-      rowRenderer={ virtualRowRenderer }
-      rowCount={ data.length }
-      width={ 600 }
+      height={600}
+      rowHeight={({ index }) => 20}
+      rowRenderer={virtualRowRenderer}
+      rowCount={data.length}
+      width={600}
     />
-  )
+  );
 
   const rowRender = (props) => {
     return (
@@ -86,7 +86,7 @@ function DataSheet() {
   };
 
   return (
-    <VirDataSheet
+    <virDataSheet
       data={data}
       valueRenderer={(cell) => cell.value}
       SheetRenderer={sheetRender}
