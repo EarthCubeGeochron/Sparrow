@@ -57,17 +57,6 @@ function DataSheet() {
     );
   };
 
-  const sheetRenderer = ({ virtualRowRenderer, data, className }) => (
-    <List
-      className={className}
-      height={600}
-      rowHeight={({ index }) => 20}
-      rowRenderer={virtualRowRenderer}
-      rowCount={data.length}
-      width={600}
-    />
-  );
-
   const rowRender = (props) => {
     return (
       <tr>
@@ -86,11 +75,11 @@ function DataSheet() {
   };
 
   return (
-    <virDataSheet
-      data={data}
+    <ReactDataSheet
+      data={data.slice(0, 100)}
       valueRenderer={(cell) => cell.value}
-      SheetRenderer={sheetRender}
-      RowRenderer={rowRender}
+      sheetRenderer={sheetRender}
+      rowRenderer={rowRender}
       onCellsChanged={onCellsChanged}
     />
   );
