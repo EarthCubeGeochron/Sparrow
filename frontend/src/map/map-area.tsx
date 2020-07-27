@@ -195,13 +195,7 @@ function MapPanel() {
                   </Link>
                 }
               >
-                <Tooltip
-                  content={
-                    cluster.properties.Sample_name +
-                    ": " +
-                    cluster.properties.project_name
-                  }
-                >
+                <Tooltip content={cluster.properties.Sample_name}>
                   <Button icon="circle" />
                 </Tooltip>
               </Popover>
