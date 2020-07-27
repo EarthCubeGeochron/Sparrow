@@ -5,8 +5,10 @@ from geoalchemy2.elements import WKBElement
 from geoalchemy2.shape import to_shape
 from shapely.geometry import mapping
 
+
 def to_geojson(wkb):
     return mapping(to_shape(wkb))
+
 
 class JSONEncoder(BaseJSONEncoder):
     def default(self, obj):

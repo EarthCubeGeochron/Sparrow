@@ -19,23 +19,24 @@ def compose(*args, **kwargs):
 
 
 # Ideally this would be a subcommand, not its own separate command
-@click.command("sparrow-test", context_settings=dict(ignore_unknown_options=True,))
-@click.argument("args", nargs=-1, type=click.UNPROCESSED)
-@click.option("--psql", is_flag=True, default=False)
-def sparrow_test(args, psql=False):
+def sparrow_test(*args):
 
     pth = environ.get("SPARROW_PATH", None)
     if pth is None:
         print(
-            "SPARROW_PATH not found. For now, tests can only be run when a source directory is available."
+            "SPARROW_PATH not found. For now, tests can only "
+            "be run when a source directory is available."
         )
-        return
+        sys.exit(1)
 
     print("Running sparrow tests")
 
+    cli_args = [a for a in args if a != "--psql"]
+
     # First, test basic operation of command-line application
     # We should probably just import pytest directly and run
-    res = cmd(path.join(pth, "_cli/_scripts/test-cli"), *args)
+    chdir(pth)
+    res = cmd(path.join(pth, "_cli/_scripts/test-cli"), *cli_args)
     if res.returncode != 0:
         print("CLI tests failed, exiting")
         sys.exit(res.returncode)
@@ -44,10 +45,8 @@ def sparrow_test(args, psql=False):
     chdir(path.join(pth, "backend-tests"))
     compose("build --quiet")
 
-    flag = "--psql" if psql else ""
-
     # Need to bring up database separately to ensure ports are mapped...
     compose("up -d db")
-    res = compose("run --rm --service-ports backend", "/bin/run-tests", *args, flag)
+    res = compose("run --rm --service-ports backend", "/bin/run-tests", *args)
     compose("down")
     sys.exit(res.returncode)

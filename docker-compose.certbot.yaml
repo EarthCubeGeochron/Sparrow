@@ -1,0 +1,20 @@
+version: "3.4"
+services:
+  gateway:
+    image: staticfloat/nginx-certbot:latest
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - ${SPARROW_HTTP_PORT:-80}:80
+      - ${SPARROW_HTTPS_PORT:-443}:443
+    environment:
+      - CERTBOT_EMAIL
+      # Substitute in value for SPARROW_DOMAIN
+      - ENVSUBST_VARS=SPARROW_DOMAIN
+      - SPARROW_DOMAIN
+    volumes:
+      - ./nginx-config/certbot-ssl.conf:/etc/nginx/user.conf.d/site.conf:ro
+      - ./nginx-config/locations:/etc/nginx/locations:ro
+      - frontend_build:/frontend
+      - ${SPARROW_DATA_DIR:-placeholder}:/data:ro

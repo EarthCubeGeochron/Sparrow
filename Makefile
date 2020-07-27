@@ -43,4 +43,6 @@ _generate_buildspec:
 # (handles automatic submodule updating etc.)
 # For git > 2.9
 install-hooks:
-	git config core.hooksPath .githooks
+	git config --local core.hooksPath .githooks
+	# Always git prune on config
+	git config --local remote.origin.prune true

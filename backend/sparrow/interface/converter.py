@@ -1,4 +1,5 @@
 from marshmallow_sqlalchemy import ModelConverter
+
 # We need to use marshmallow_sqlalchemy's own implementation
 # of the 'Nested' field in order to pass along the SQLAlchemy session
 # to nested schemas.
@@ -17,20 +18,15 @@ from .util import to_schema_name
 
 # Control how relationships can be resolved
 allowed_collections = {
-    'sample': ['session', 'material', 'sample_geo_entity'],
-    'geo_entity': 'all',
-    'sample_geo_entity': 'all',
-    'session': 'all',
-    'analysis': ['datum', 'attribute', 'constant', 'analysis_type', 'material'],
-    'attribute': ['parameter', 'unit'],
-    'project': ['researcher', 'publication', 'session'],
-    'datum': ['datum_type'],
-    'datum_type': [
-        'parameter',
-        'unit',
-        'error_unit',
-        'error_metric'
-    ]
+    "sample": ["session", "material", "sample_geo_entity"],
+    "geo_entity": "all",
+    "sample_geo_entity": "all",
+    "session": "all",
+    "analysis": ["datum", "attribute", "constant", "analysis_type", "material"],
+    "attribute": ["parameter", "unit"],
+    "project": ["researcher", "publication", "session"],
+    "datum": ["datum_type"],
+    "datum_type": ["parameter", "unit", "error_unit", "error_metric"],
 }
 
 
@@ -39,22 +35,25 @@ def allow_nest(outer, inner):
         # Tables can always nest themselves
         return True
     coll = allowed_collections.get(outer, [])
-    if coll == 'all':
+    if coll == "all":
         return True
     return inner in coll
+
 
 class SparrowConverter(ModelConverter):
     # Make sure that we can properly convert geometries
     # and geographies
     SQLA_TYPE_MAPPING = dict(
         list(ModelConverter.SQLA_TYPE_MAPPING.items())
-        + list({
-            geo.Geometry: Geometry,
-            geo.Geography: Geometry,
-            postgresql.JSON: JSON,
-            postgresql.JSONB: JSON
+        + list(
+            {
+                geo.Geometry: Geometry,
+                geo.Geography: Geometry,
+                postgresql.JSON: JSON,
+                postgresql.JSONB: JSON,
             }.items()
-        ))
+        )
+    )
 
     def _get_key(self, prop):
         # Only change columns for relationship properties
@@ -63,9 +62,9 @@ class SparrowConverter(ModelConverter):
 
         # Relationship with a single local column should be named for its
         # column (less '_id' postfix)
-        if hasattr(prop, 'local_columns') and len(prop.local_columns) == 1:
+        if hasattr(prop, "local_columns") and len(prop.local_columns) == 1:
             col_name = list(prop.local_columns)[0].name
-            if col_name != 'id':
+            if col_name != "id":
                 return trim_postfix(col_name, "_id")
 
         # One-to-many models should have the field
@@ -90,7 +89,7 @@ class SparrowConverter(ModelConverter):
 
         # ## Deal with relationships here #
 
-        if prop.target.name == 'data_file_link':
+        if prop.target.name == "data_file_link":
             # Data files are currently exclusively dealt with internally...
             # (this may change)
             return True
@@ -113,47 +112,47 @@ class SparrowConverter(ModelConverter):
     def _get_field_kwargs_for_property(self, prop):
         # Somewhat ugly method, mostly to decide if field is dump_only or required
         kwargs = super()._get_field_kwargs_for_property(prop)
-        kwargs['data_key'] = self._get_key(prop)
+        kwargs["data_key"] = self._get_key(prop)
 
-        kwargs['allow_nan'] = True
+        kwargs["allow_nan"] = True
 
-        if isinstance(prop, RelationshipProperty): # Relationship property
-            cols = list(getattr(prop, 'local_columns', []))
-            kwargs['required'] = False
+        if isinstance(prop, RelationshipProperty):  # Relationship property
+            cols = list(getattr(prop, "local_columns", []))
+            kwargs["required"] = False
             for col in cols:
                 if not col.nullable:
-                    kwargs['required'] = True
+                    kwargs["required"] = True
             if prop.uselist:
-                kwargs['required'] = False
+                kwargs["required"] = False
 
             return kwargs
 
         for col in prop.columns:
             is_integer = isinstance(col.type, Integer)
             # Special case for audit columns
-            if col.name == 'audit_id' and is_integer:
-                kwargs['dump_only'] = True
+            if col.name == "audit_id" and is_integer:
+                kwargs["dump_only"] = True
                 return kwargs
 
             if is_integer and col.primary_key:
                 # Integer primary keys should be dump-only, probably
                 # We could probably check for a default sequence
                 # if we wanted to be general...
-                kwargs['dump_only'] = True
+                kwargs["dump_only"] = True
             elif not col.nullable:
-                kwargs['required'] = True
+                kwargs["required"] = True
 
             if isinstance(col.type, postgresql.UUID):
-                kwargs['dump_only'] = True
-                kwargs['required'] = False
+                kwargs["dump_only"] = True
+                kwargs["required"] = False
 
-            dump_only = kwargs.get('dump_only', False)
+            dump_only = kwargs.get("dump_only", False)
             if not dump_only and not col.nullable:
-                kwargs['required'] = True
+                kwargs["required"] = True
             if dump_only:
-                kwargs['required'] = False
+                kwargs["required"] = False
             if col.default is not None:
-                kwargs['required'] = False
+                kwargs["required"] = False
 
         return kwargs
 
@@ -179,7 +178,7 @@ class SparrowConverter(ModelConverter):
         if not allow_nest(this_table.name, prop.target.name):
             # Fields that are not allowed to be nested
             return Related(name, **field_kwargs)
-        if prop.target.schema == 'enum':
+        if prop.target.schema == "enum":
             # special carve-out for enums represented as foreign keys
             # (these should be stored in the 'enum' schema):
             return Enum(name, **field_kwargs)
