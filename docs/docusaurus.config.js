@@ -8,6 +8,8 @@ module.exports = {
   favicon: 'img/favicon.png',
   organizationName: 'EarthCubeGeochron', // Usually your GitHub org/user name.
   projectName: 'Sparrow', // Usually your repo name.
+  // We need to ignore broken links for now.
+  onBrokenLinks: 'ignore',
   themeConfig: {
     navbar: {
       title: 'Sparrow',
