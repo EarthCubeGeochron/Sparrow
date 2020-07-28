@@ -6,7 +6,8 @@ services:
       dockerfile: docs/Dockerfile
       # We build to docs-base for development, to allow for auto-reloading
       target: docs-base
-    command: node_modules/.bin/docusaurus start --host 0.0.0.0 --port 3000
+    # Run npm install
+    command: bin/run-docker
     expose:
       - 3000
     ports:
