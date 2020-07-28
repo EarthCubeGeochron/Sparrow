@@ -35,7 +35,7 @@ of analytical data:
 
 - Link literature references to laboratory archival data
 - Manage sample metadata (locations, sample names, etc.)
-- Manage data embargos and public access
+- Manage data embargo and public access
 - Visualize data (e.g. step-heating plots, age spectra)
 - Track measurement versions (e.g. new corrections)
 - Download data (for authors' own analysis and archival purposes)
@@ -70,6 +70,10 @@ such as [`PyChron`](https://github.com/NMGRL/PyChron)
 sit immediately prior to this system in a typical lab's data production pipeline.
 
 ![Chart](pathname:///images/Lab-Data-Interface.png)
+
+## Meta-goals
+
+- Emphasize the power of scientists taking control of their own software
 
 # Design
 
