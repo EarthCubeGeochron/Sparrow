@@ -17,6 +17,10 @@ services:
       #- /docs/.cache
       - node_modules:/docs/node_modules
       - cache:/docs/.docusaurus
+  # gateway:
+  #   image: nginx:1.19
+  #   volumes:
+  #     - docs_build:
 volumes:
   cache:
   node_modules:

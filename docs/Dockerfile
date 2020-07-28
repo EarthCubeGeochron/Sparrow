@@ -40,6 +40,7 @@ RUN npm run build
 
 FROM nginx:1.19 AS docs
 
+# Copy nginx config into docker container
 COPY --from=docs-builder /docs/build /usr/share/nginx/html
 COPY ./docs/docs-site.conf /etc/nginx/conf.d/docs-site.conf
 

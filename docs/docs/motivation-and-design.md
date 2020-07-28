@@ -6,13 +6,13 @@ sidebar_label: Motivation and design
 
 ## Public interface for lab data
 
-**Sparrow** is software for managing the geochemica data
+**Sparrow** is software for managing the geochemical data
 created by an individual geochronology laboratory. This software has the goal of managing analytical data for indexing and public access.
 It is designed for flexibility and extensibility, so that it can
 be tailored to the needs of individual analytical labs that manage a
 wide variety of data.
 
-![Chart](/images/simplified-chart.png)
+![Chart](pathname:///images/simplified-chart.png)
 
 ## Principles
 
@@ -69,7 +69,7 @@ to the server. Data collection, storage, and analysis tools
 such as [`PyChron`](https://github.com/NMGRL/PyChron)
 sit immediately prior to this system in a typical lab's data production pipeline.
 
-![Chart](/images/Lab-Data-Interface.png)
+![Chart](pathname:///images/Lab-Data-Interface.png)
 
 # Design
 
@@ -103,7 +103,7 @@ Code and issues for this project are tracked [on Github](https://github.com/Eart
 
 ### Hierarchical levels of analytical data
 
-![Chart](/images/model-levels.png)
+![Chart](pathname:///images/model-levels.png)
 
 - **`datum`**: an individual data point (any numerical parameter and its error)
 - **`analysis`**: an collection of data points measured at the same time
@@ -123,7 +123,7 @@ Code and issues for this project are tracked [on Github](https://github.com/Eart
 Data must be loaded into this standardized core in order to be
 exposed to the outside world.
 
-![Chart](/images/erd-core.png)
+![Chart](pathname:///images/erd-core.png)
 
 ### Schema → API
 
