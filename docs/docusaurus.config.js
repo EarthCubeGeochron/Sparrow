@@ -15,7 +15,7 @@ module.exports = {
         alt: 'Sparrow logo',
         src: 'img/sparrow-bird-flat.svg',
       },
-      links: [
+      items: [
         {
           to: 'docs/motivation-and-design',
           activeBasePath: 'Guides',
