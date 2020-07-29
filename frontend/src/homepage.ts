@@ -8,12 +8,13 @@ import { AppNavbar, NavButton } from "app/components/navbar";
 import { MapHome } from "./map/index";
 import { Frame } from "./frame";
 import { InsetText } from "app/layout";
+import "./styles.modules.css";
 
 const HomePage = () =>
   h("div.homepage", [
     h(InsetText, null, [
       h(Frame, { id: "landingText" }, "Landing page text goes here."),
-      h(Frame, { id: "landingGraphic" }, h(MapHome)),
+      h(Frame, { id: "landingGraphic" }, h(MapHome, { className: "map-home" })),
     ]),
   ]);
 

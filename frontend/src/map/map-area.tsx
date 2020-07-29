@@ -60,8 +60,7 @@ function MapPanel() {
   const [viewport, setViewport] = useState({
     latitude: 0,
     longitude: 0,
-    width: "100vw",
-    height: "100vh",
+
     zoom: 1,
   });
 
@@ -76,21 +75,6 @@ function MapPanel() {
 
     setMarkers(markers);
   }, [initialData]);
-
-  // function setLocationFromHash() {
-  //   let hash = window.location.hash;
-  //   const s = hash.slice(1);
-  //   const v = s.split("/");
-  //   if (v.length !== 3) {
-  //     return {};
-  //   }
-  //   const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
-  //   return setViewport({ zoom, latitude, longitude });
-  // }
-
-  // useEffect(() => {
-  //   setLocationFromHash();
-  // }, []);
 
   const points = markers.map((markers) => ({
     type: "Feature",
@@ -124,6 +108,8 @@ function MapPanel() {
       <MapGl
         mapStyle="mapbox://styles/mapbox/outdoors-v9"
         mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
+        width="50vw"
+        height="50vh"
         {...viewport}
         onViewportChange={(viewport) => {
           setViewport(viewport);

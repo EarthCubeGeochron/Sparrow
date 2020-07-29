@@ -3,6 +3,7 @@ import { List, Grid, AutoSizer } from "react-virtualized";
 import VirDataSheet from "./vDataSheet";
 import ReactDataSheet from "react-datasheet";
 import "react-datasheet/lib/react-datasheet.css";
+import "./datasheet.modules.css";
 
 function DataSheet() {
   const [geo, setGeo] = useState([]);
@@ -75,13 +76,18 @@ function DataSheet() {
   };
 
   return (
-    <ReactDataSheet
-      data={data.slice(0, 100)}
-      valueRenderer={(cell) => cell.value}
-      sheetRenderer={sheetRender}
-      rowRenderer={rowRender}
-      onCellsChanged={onCellsChanged}
-    />
+    <div className="data-sheet">
+      <h3>DataSheet for Editin</h3>
+      <div className="sheet">
+        <ReactDataSheet
+          data={data.slice(0, 100)}
+          valueRenderer={(cell) => cell.value}
+          sheetRenderer={sheetRender}
+          rowRenderer={rowRender}
+          onCellsChanged={onCellsChanged}
+        />
+      </div>
+    </div>
   );
 }
 export default DataSheet;
