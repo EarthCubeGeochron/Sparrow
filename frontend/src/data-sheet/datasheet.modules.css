@@ -193,3 +193,12 @@ span.data-grid-container:focus {
 .data-grid-container .data-grid .cell .data-editor {
   display: block;
 }
+
+.data-sheet{
+    position: absolute;
+}
+
+.sheet {
+    position: relative;
+    width: 300px;
+}
