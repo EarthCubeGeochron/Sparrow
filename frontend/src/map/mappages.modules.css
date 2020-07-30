@@ -1,15 +1,10 @@
-.map-home {
-  display: inline-block;
-  width: 50%;
-}
-
 .mapHome {
   position: absolute;
-  width: 80vw;
 }
+
 .map-butn {
-  position: absolute;
-  top: 0.01;
+  position: relative;
+  top: 0.02;
   left: 0.01;
-  margin: 20px 10px;
+  margin: 10px 5px;
 }

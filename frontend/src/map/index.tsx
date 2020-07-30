@@ -40,7 +40,7 @@ const MapHome = (props) => {
   return (
     <div className="map-home">
       <div className="mapHome">
-        <MapPanel></MapPanel>
+        <MapPanel width="68vw" height="500px"></MapPanel>
       </div>
       <div className="map-butn">
         <Tooltip content="Go to Map">
@@ -63,6 +63,8 @@ const MapPage = (props) =>
     h(MapPanel, {
       className: "main-map",
       accessToken: process.env.MAPBOX_API_TOKEN,
+      width: "100vw",
+      height: "100vh",
     }),
   ]);
 

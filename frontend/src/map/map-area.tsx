@@ -55,13 +55,14 @@ const useAPIResult = function <T>(
   return result;
 };
 
-function MapPanel() {
+function MapPanel({ width, height }) {
   const [markers, setMarkers] = useState([]);
   const [viewport, setViewport] = useState({
     latitude: 0,
     longitude: 0,
-
     zoom: 1,
+    width,
+    height,
   });
 
   const mapRef = useRef();
@@ -108,8 +109,6 @@ function MapPanel() {
       <MapGl
         mapStyle="mapbox://styles/mapbox/outdoors-v9"
         mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
-        width="50vw"
-        height="50vh"
         {...viewport}
         onViewportChange={(viewport) => {
           setViewport(viewport);
@@ -182,7 +181,7 @@ function MapPanel() {
                 }
               >
                 <Tooltip content={cluster.properties.Sample_name}>
-                  <Button icon="circle" />
+                  <Button className="mrker-btn" icon="circle" />
                 </Tooltip>
               </Popover>
             </Marker>

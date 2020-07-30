@@ -14,7 +14,7 @@ const HomePage = () =>
   h("div.homepage", [
     h(InsetText, null, [
       h(Frame, { id: "landingText" }, "Landing page text goes here."),
-      h(Frame, { id: "landingGraphic" }, h(MapHome, { className: "map-home" })),
+      h(Frame, { id: "landingGraphic" }, h(MapHome)),
     ]),
   ]);
 
