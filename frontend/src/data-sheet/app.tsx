@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { List, Grid, AutoSizer } from "react-virtualized";
 import VirDataSheet from "./vDataSheet";
 import ReactDataSheet from "react-datasheet";
 import "react-datasheet/lib/react-datasheet.css";
 import "./datasheet.modules.css";
+import useAPIResult from "./ui-components";
 
 const Row = ({ row, children, className }) => {
   return (
@@ -35,16 +36,11 @@ function DataSheet() {
   const [edited, setEdited] = useState(false);
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    getMarkers();
-  }, []);
+  const initialData = useAPIResult("/sample", { all: true });
 
-  async function getMarkers() {
-    const response = await fetch(
-      "https://sparrow-data.org/labs/wiscar/api/v1/sample?all=1"
-    );
-    const mrkers = await response.json();
-    const markers = mrkers.filter((d) => d.geometry != null);
+  useEffect(() => {
+    if (initialData == null) return;
+    const markers = initialData.filter((d) => d.geometry != null);
     const mutMarker = markers.map((sample) => {
       const {
         geometry: {
@@ -60,7 +56,8 @@ function DataSheet() {
       Object.values(obj).map((d) => ({ value: d }))
     );
     setData(geoVal);
-  }
+  }, [initialData]);
+
   if (geo.length === 0) {
     return null;
   }
@@ -71,7 +68,7 @@ function DataSheet() {
     const grid = data.map((row) => [...row]);
     changes.forEach(({ cell, row, col, value }) => {
       grid[row][col] = { ...grid[row][col], value };
-      cell.className = "edited";
+      grid[row][col].className = "edited";
     });
     setData(grid);
     setEdited(true);
