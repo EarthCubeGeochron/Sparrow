@@ -55,13 +55,13 @@ const useAPIResult = function <T>(
   return result;
 };
 
-function MapPanel() {
+function MapPanel({ width, height }) {
   const [markers, setMarkers] = useState([]);
   const [viewport, setViewport] = useState({
     latitude: 0,
     longitude: 0,
-    width: "100vw",
-    height: "100vh",
+    width,
+    height,
     zoom: 1,
   });
 

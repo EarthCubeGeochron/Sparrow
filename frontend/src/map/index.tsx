@@ -43,7 +43,7 @@ const MapHome = (props) => {
           <Button icon="maximize"></Button>
         </Link>
       </Tooltip>
-      <MapPanel></MapPanel>
+      <MapPanel width="68vw" height="500px"></MapPanel>
     </div>
   );
 };
@@ -58,6 +58,8 @@ const MapPage = (props) =>
     h(MapPanel, {
       className: "main-map",
       accessToken: process.env.MAPBOX_API_TOKEN,
+      width: "100vw",
+      height: "100vh",
     }),
   ]);
 
