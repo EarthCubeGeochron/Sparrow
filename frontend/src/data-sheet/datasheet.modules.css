@@ -194,11 +194,23 @@ span.data-grid-container:focus {
   display: block;
 }
 
-.data-sheet{
-    position: absolute;
+.data-sheet {
+  position: absolute;
+}
+
+.sheet-header {
+  display: flex;
+}
+
+.save-btn {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.sheet-title {
 }
 
 .sheet {
-    position: relative;
-    width: 300px;
+  position: absolute;
+  width: 300px;
 }

@@ -5,6 +5,8 @@ import ReactDataSheet from "react-datasheet";
 import "react-datasheet/lib/react-datasheet.css";
 import "./datasheet.modules.css";
 import useAPIResult from "./ui-components";
+import { Button } from "@blueprintjs/core";
+import { AppToaster } from "../toaster";
 
 const Row = ({ row, children, className }) => {
   return (
@@ -64,16 +66,6 @@ function DataSheet() {
   const geoCol = geo.map((obj) => Object.keys(obj).map((d) => ({ name: d })));
   const columns2 = geoCol[0];
 
-  const onCellsChanged = (changes) => {
-    const grid = data.map((row) => [...row]);
-    changes.forEach(({ cell, row, col, value }) => {
-      grid[row][col] = { ...grid[row][col], value };
-      grid[row][col].className = "edited";
-    });
-    setData(grid);
-    setEdited(true);
-  };
-
   const renderRow = (props) => {
     return (
       <Row
@@ -94,22 +86,38 @@ function DataSheet() {
     );
   };
 
-  // const Cell = (props) => {
-  //   return (
-  //     <td className={edited ? "edited" : props.className}>{props.cell}</td>
-  //   );
-  // };
+  const onClickHandle = (changes) => {
+    AppToaster.show({ message: "This works?" });
+    const grid = data.map((row)=> [...row]);
+    changes.forEach(({cell, row, col, value})=> {
+      grid[row][col]={...grid[row][col],value}
+    })
+  };
+
+  const onCellsChanged = (changes) => {
+    const grid = data.map((row) => [...row]);
+    changes.forEach(({ cell, row, col, value }) => {
+      grid[row][col] = { ...grid[row][col], value };
+      grid[row][col].className = "edited";
+    });
+    setData(grid);
+  };
 
   return (
     <div className="data-sheet">
-      <h3>DataSheet for Editing</h3>
+      <div className="sheet-header">
+        <h3 className="sheet-title">DataSheet for Editing</h3>
+        <Button onClick={onClickHandle} className="save-btn">
+          Submit Changes
+        </Button>
+      </div>
+
       <div className="sheet">
         <ReactDataSheet
           data={data.slice(0, 100)}
           valueRenderer={(cell) => cell.value}
           sheetRenderer={renderSheet}
           rowRenderer={renderRow}
-          //cellRenderer={Cell}
           onCellsChanged={onCellsChanged}
         />
       </div>

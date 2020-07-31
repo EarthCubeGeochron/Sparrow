@@ -83,6 +83,7 @@ const SamplePage = function(props){
       ]),
       h('h3', "Metadata helpers"),
       h(GeoDeepDiveCard, {sample_name: d.name})
+      // find a better place for this
     ]);
 });
 };
