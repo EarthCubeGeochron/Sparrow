@@ -8,6 +8,7 @@ import { AppNavbar, NavButton } from "app/components/navbar";
 import { MapHome } from "./map/index";
 import { Frame } from "./frame";
 import { InsetText } from "app/layout";
+import "./styles.modules.css";
 
 const HomePage = () =>
   h("div.homepage", [

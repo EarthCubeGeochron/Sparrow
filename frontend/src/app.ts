@@ -28,6 +28,7 @@ import { AppNavbar, NavButton } from "./components/navbar";
 import { MapPage } from "./map";
 import Table from "./table/App";
 import styled from "@emotion/styled";
+import DataSheet from "./data-sheet/app";
 
 const AppHolder = styled.div`\
 display: flex;
@@ -55,6 +56,7 @@ const MainNavbar = (props) =>
   h(AppNavbar, { fullTitle: true }, [
     h(CatalogNavLinks, { base: "/catalog" }),
     h(NavButton, { to: "/map" }, "Map"),
+    h(NavButton, { to: "/data-sheet" }, "Data Sheet"),
     h(AppNavbar.Divider),
     h(NavButton, { to: "/api-explorer/v1" }, "API"), // NavButton, similar to React-Router 'Link' takes the 'to' arg
   ]);
@@ -92,6 +94,10 @@ function AppMain(props) {
           h(Route, {
             path: "/map",
             component: MapPage,
+          }),
+          h(Route, {
+            path: "/data-sheet",
+            component: DataSheet,
           }),
           h(Route, { path: "/api-explorer", component: APIExplorer }),
         ]),

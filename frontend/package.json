@@ -34,6 +34,8 @@
     "mapbox-gl": "^0.54.0",
     "mapbox-gl-leaflet": "0.0.6",
     "react": "^16.8.6",
+    "react-dataset": "6.0.7",
+    "react-datasheet": "^1.4.8",
     "react-dom": "^16.8.6",
     "react-hyperscript": "^3.2.0",
     "react-json-view": "^1.19.1",
@@ -45,6 +47,7 @@
     "react-router-hash-link": "^1.2.2",
     "react-simple-maps": "^0.12.1",
     "react-table": "7.2.2",
+    "react-virtualized": "^9.21.2",
     "store": "^2.0.12",
     "use-supercluster": "0.2.8",
     "viewport-mercator-project": "^6.2.2"

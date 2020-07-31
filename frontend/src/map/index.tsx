@@ -21,6 +21,7 @@ import { AuthStatus } from "app/auth";
 import { MapPanel } from "./map-area";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
+import "./mappages.modules.css";
 
 const h = hyperStyled(styles);
 
@@ -38,12 +39,16 @@ const MapNavbar = function (props) {
 const MapHome = (props) => {
   return (
     <div className="map-home">
-      <Tooltip content="Go to Map">
-        <Link to="/map">
-          <Button icon="maximize"></Button>
-        </Link>
-      </Tooltip>
-      <MapPanel width="68vw" height="500px"></MapPanel>
+      <div className="mapHome">
+        <MapPanel width="68vw" height="500px"></MapPanel>
+      </div>
+      <div className="map-butn">
+        <Tooltip content="Go to Map">
+          <Link to="/map">
+            <Button icon="maximize"></Button>
+          </Link>
+        </Tooltip>
+      </div>
     </div>
   );
 };

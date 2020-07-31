@@ -60,9 +60,9 @@ function MapPanel({ width, height }) {
   const [viewport, setViewport] = useState({
     latitude: 0,
     longitude: 0,
+    zoom: 1,
     width,
     height,
-    zoom: 1,
   });
 
   const mapRef = useRef();
@@ -76,21 +76,6 @@ function MapPanel({ width, height }) {
 
     setMarkers(markers);
   }, [initialData]);
-
-  // function setLocationFromHash() {
-  //   let hash = window.location.hash;
-  //   const s = hash.slice(1);
-  //   const v = s.split("/");
-  //   if (v.length !== 3) {
-  //     return {};
-  //   }
-  //   const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
-  //   return setViewport({ zoom, latitude, longitude });
-  // }
-
-  // useEffect(() => {
-  //   setLocationFromHash();
-  // }, []);
 
   const points = markers.map((markers) => ({
     type: "Feature",
@@ -195,14 +180,8 @@ function MapPanel({ width, height }) {
                   </Link>
                 }
               >
-                <Tooltip
-                  content={
-                    cluster.properties.Sample_name +
-                    ": " +
-                    cluster.properties.project_name
-                  }
-                >
-                  <Button icon="circle" />
+                <Tooltip content={cluster.properties.Sample_name}>
+                  <Button className="mrker-btn" icon="circle" />
                 </Tooltip>
               </Popover>
             </Marker>
