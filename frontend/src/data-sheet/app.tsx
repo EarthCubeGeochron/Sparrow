@@ -38,8 +38,10 @@ function DataSheet() {
   const [edited, setEdited] = useState(false);
   const [data, setData] = useState([]);
   const [iData, setiData] = useState([]);
+  const [upData, setUpData] = useState([]);
   const initialData = useAPIResult("/sample", { all: true });
 
+  console.log(upData);
   useEffect(() => {
     if (initialData == null) return;
     const markers = initialData.filter((d) => d.geometry != null);
@@ -90,17 +92,17 @@ function DataSheet() {
   const onClickHandleUndo = () => {
     setData(iData);
   };
-  const onClickHandle = (className) => {
-    //AppToaster.show({ message: "This works?" });
-    const grid = data.map((row) => [...row]);
-    data.forEach(({ cell, row, col, value }) => {
-      grid[row][col] = { ...grid[row][col] };
-      grid[row][col].className = "cell read-only";
-    });
-    setData(grid);
+  const onClickHandle = (changes) => {
+    //push method for sending data back to api
+    setData(upData);
   };
 
   const onCellsChanged = (changes) => {
+    const grid1 = data.map((row) => [...row]);
+    changes.forEach(({ cell, row, col, value }) => {
+      grid1[row][col] = { ...grid1[row][col], value };
+    });
+    setUpData(grid1);
     const grid = data.map((row) => [...row]);
     changes.forEach(({ cell, row, col, value }) => {
       grid[row][col] = { ...grid[row][col], value };
