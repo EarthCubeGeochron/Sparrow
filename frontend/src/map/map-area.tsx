@@ -192,4 +192,9 @@ function MapPanel({ width, height }) {
   );
 }
 
+MapPanel.defaultProps = {
+  width: "50vw",
+  height: "500px",
+};
+
 export { MapPanel };
