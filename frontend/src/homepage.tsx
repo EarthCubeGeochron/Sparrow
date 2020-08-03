@@ -14,15 +14,8 @@ import { Tab, Tabs, Drawer, Button } from "@blueprintjs/core";
 import "./styles.modules.css";
 
 const HomePage = () => {
-  const [open, setOpen] = useState(false);
-
   return (
     <div className="homepage">
-      <Button onClick={() => setOpen(true)}> </Button>
-
-      <Drawer isOpen={open} title={"Test"} onClose={() => setOpen(false)}>
-        <p> Just Testing some stuff out</p>
-      </Drawer>
       <InsetText null>
         <Frame id="landingText"></Frame>
         <Frame id="landingGraphic">
