@@ -37,7 +37,7 @@ function DataSheet() {
   const [geo, setGeo] = useState([]);
   const [edited, setEdited] = useState(false);
   const [data, setData] = useState([]);
-
+  const [iData, setiData] = useState([]);
   const initialData = useAPIResult("/sample", { all: true });
 
   useEffect(() => {
@@ -58,6 +58,7 @@ function DataSheet() {
       Object.values(obj).map((d) => ({ value: d }))
     );
     setData(geoVal);
+    setiData(geoVal);
   }, [initialData]);
 
   if (geo.length === 0) {
@@ -86,12 +87,17 @@ function DataSheet() {
     );
   };
 
-  const onClickHandle = (changes) => {
-    AppToaster.show({ message: "This works?" });
-    const grid = data.map((row)=> [...row]);
-    changes.forEach(({cell, row, col, value})=> {
-      grid[row][col]={...grid[row][col],value}
-    })
+  const onClickHandleUndo = () => {
+    setData(iData);
+  };
+  const onClickHandle = (className) => {
+    //AppToaster.show({ message: "This works?" });
+    const grid = data.map((row) => [...row]);
+    data.forEach(({ cell, row, col, value }) => {
+      grid[row][col] = { ...grid[row][col] };
+      grid[row][col].className = "cell read-only";
+    });
+    setData(grid);
   };
 
   const onCellsChanged = (changes) => {
@@ -109,6 +115,9 @@ function DataSheet() {
         <h3 className="sheet-title">DataSheet for Editing</h3>
         <Button onClick={onClickHandle} className="save-btn">
           Submit Changes
+        </Button>
+        <Button onClick={onClickHandleUndo} className="save-btn">
+          Undo Changes
         </Button>
       </div>
 
