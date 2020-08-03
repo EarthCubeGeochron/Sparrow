@@ -4,8 +4,8 @@ import VirDataSheet from "./vDataSheet";
 import ReactDataSheet from "react-datasheet";
 import "react-datasheet/lib/react-datasheet.css";
 import "./datasheet.modules.css";
-import useAPIResult from "./ui-components";
-import { Button } from "@blueprintjs/core";
+import { useAPIResult, SubmitDialog } from "./ui-components";
+import { Button, Dialog } from "@blueprintjs/core";
 import { AppToaster } from "../toaster";
 
 const Row = ({ row, children, className }) => {
@@ -92,8 +92,11 @@ function DataSheet() {
   const onClickHandleUndo = () => {
     setData(iData);
   };
-  const onClickHandle = (changes) => {
+  const onClickHandle = () => {
     //push method for sending data back to api
+    if (upData.length === 0) {
+      return null;
+    }
     setData(upData);
   };
 
@@ -111,16 +114,20 @@ function DataSheet() {
     setData(grid);
   };
 
+  var constant =
+    "Are you sure you want to Submit? All changes will be final. If you do not want to submit, click Cancel.";
+
   return (
     <div className="data-sheet">
       <div className="sheet-header">
         <h3 className="sheet-title">DataSheet for Editing</h3>
-        <Button onClick={onClickHandle} className="save-btn">
-          Submit Changes
-        </Button>
-        <Button onClick={onClickHandleUndo} className="save-btn">
-          Undo Changes
-        </Button>
+        <SubmitDialog
+          className="save-btn"
+          divClass="sheet-header"
+          onClick={onClickHandle}
+          content={constant}
+        ></SubmitDialog>
+        <Button onClick={onClickHandleUndo}>Undo Changes</Button>
       </div>
 
       <div className="sheet">

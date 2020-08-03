@@ -5,8 +5,10 @@ import {
   QueryParams,
   APIHookOpts,
 } from "@macrostrat/ui-components";
+import { Dialog, Button, Classes } from "@blueprintjs/core";
+import "./datasheet.modules.css";
 
-const useAPIResult = function <T>(
+export const useAPIResult = function <T>(
   route: string | null,
   params: QueryParams = {},
   opts: APIHookOpts | (<T, U = any>(arg: U) => T) = {}
@@ -39,4 +41,45 @@ const useAPIResult = function <T>(
   return result;
 };
 
-export default useAPIResult;
+export const SubmitDialog = ({
+  onClick,
+  content,
+  divClass = null,
+  className = null,
+}) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={divClass}>
+      <Button className={className} onClick={() => setOpen(true)}>
+        Submit Changes
+      </Button>
+      <Dialog isOpen={open}>
+        <div className={Classes.DIALOG_HEADER}>
+          <h3>WARNING</h3>
+        </div>
+        <div className={Classes.DIALOG_BODY}>
+          <p>{content}</p>
+        </div>
+        <div className={Classes.DIALOG_FOOTER}>
+          <Button
+            className="save-btn"
+            onClick={() => {
+              onClick();
+              setOpen(false);
+            }}
+            intent="primary"
+          >
+            Submit
+          </Button>
+          <Button
+            className="save-btn"
+            onClick={() => setOpen(false)}
+            intent="danger"
+          >
+            Cancel
+          </Button>
+        </div>
+      </Dialog>
+    </div>
+  );
+};
