@@ -40,7 +40,7 @@ const MapHome = (props) => {
   return (
     <div className="map-home">
       <div className="mapHome">
-        <MapPanel></MapPanel>
+        <MapPanel width="750px"></MapPanel>
       </div>
       <div className="map-butn">
         <Tooltip content="Go to Map">

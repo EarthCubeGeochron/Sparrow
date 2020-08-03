@@ -55,12 +55,18 @@ const useAPIResult = function <T>(
   return result;
 };
 
-function MapPanel({ width, height }) {
+function MapPanel({
+  width = "50vw",
+  height = "500px",
+  latitude = 0,
+  longitude = 0,
+  zoom = 1,
+}) {
   const [markers, setMarkers] = useState([]);
   const [viewport, setViewport] = useState({
-    latitude: 0,
-    longitude: 0,
-    zoom: 1,
+    latitude,
+    longitude,
+    zoom,
     width,
     height,
   });
@@ -181,7 +187,7 @@ function MapPanel({ width, height }) {
                 }
               >
                 <Tooltip content={cluster.properties.Sample_name}>
-                  <Button className="mrker-btn" icon="circle" />
+                  <Button className="bp3-minimal" icon="map-marker" />
                 </Tooltip>
               </Popover>
             </Marker>
@@ -191,10 +197,5 @@ function MapPanel({ width, height }) {
     </div>
   );
 }
-
-MapPanel.defaultProps = {
-  width: "50vw",
-  height: "500px",
-};
 
 export { MapPanel };
