@@ -8,6 +8,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import MapGl, { Marker, FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { mapStyle } from "./MapStyle";
 import { Component } from "react";
 import h, { compose } from "@macrostrat/hyper";
 import useSuperCluster from "use-supercluster";
@@ -113,7 +114,8 @@ function MapPanel({
   return (
     <div>
       <MapGl
-        mapStyle="mapbox://styles/mapbox/outdoors-v9"
+        mapStyle={mapStyle}
+        //mapStyle="mapbox://styles/mapbox/outdoors-v9"
         mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
         {...viewport}
         onViewportChange={(viewport) => {
