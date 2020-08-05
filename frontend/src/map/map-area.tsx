@@ -12,7 +12,14 @@ import { mapStyle } from "./MapStyle";
 import { Component } from "react";
 import h, { compose } from "@macrostrat/hyper";
 import useSuperCluster from "use-supercluster";
-import { Tooltip, Popover, Button } from "@blueprintjs/core";
+import {
+  Tooltip,
+  Popover,
+  Button,
+  Menu,
+  Position,
+  MenuItem,
+} from "@blueprintjs/core";
 import classNames from "classnames";
 import "./cluster.css";
 import {
@@ -62,6 +69,7 @@ function MapPanel({
   latitude = 0,
   longitude = 0,
   zoom = 1,
+  mapstyle = "mapbox://styles/mapbox/outdoors-v9",
 }) {
   const [markers, setMarkers] = useState([]);
   const [viewport, setViewport] = useState({
@@ -71,6 +79,10 @@ function MapPanel({
     width,
     height,
   });
+  const [MapStyle, setMapStyle] = useState(mapstyle);
+  const [showMarkers, setShowMarkers] = useState(true);
+
+  const initialMapStyle = "mapbox://styles/mapbox/outdoors-v9";
 
   const mapRef = useRef();
 
@@ -111,91 +123,110 @@ function MapPanel({
     options: { radius: 75, maxZoom: 5 },
   });
 
+  const dropMenu = (
+    <Menu>
+      <MenuItem onClick={() => setMapStyle(mapStyle)} text="Bedrock Geology" />
+      <MenuItem
+        onClick={() => setMapStyle(initialMapStyle)}
+        text="Standard Satelite"
+      />
+      <MenuItem text="Topographic" />
+      <MenuItem onClick={() => setShowMarkers(!showMarkers)} text="Markers" />
+    </Menu>
+  );
+
   return (
-    <div>
-      <MapGl
-        mapStyle={mapStyle}
-        //mapStyle="mapbox://styles/mapbox/outdoors-v9"
-        mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
-        {...viewport}
-        onViewportChange={(viewport) => {
-          setViewport(viewport);
-        }}
-        ref={mapRef}
-      >
-        {clusters.map((cluster) => {
-          const [longitude, latitude] = cluster.geometry.coordinates;
-          const {
-            cluster: isCluster,
-            point_count: pointCount,
-          } = cluster.properties;
+    <div className="map-container">
+      <div className="layer-button">
+        <Popover content={dropMenu} position={Position.BOTTOM}>
+          <Button icon="layers"></Button>
+        </Popover>
+      </div>
+      <div>
+        <MapGl
+          mapStyle={MapStyle}
+          mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
+          {...viewport}
+          onViewportChange={(viewport) => {
+            setViewport(viewport);
+          }}
+          ref={mapRef}
+        >
+          {clusters.map((cluster) => {
+            const [longitude, latitude] = cluster.geometry.coordinates;
+            const {
+              cluster: isCluster,
+              point_count: pointCount,
+            } = cluster.properties;
 
-          const clusterClass = classNames({
-            "cluster-marker": pointCount < 50,
-            "cluster-markerGreen": pointCount >= 50 && pointCount < 100,
-            "cluster-markerYellow": pointCount >= 100 && pointCount < 200,
-            "cluster-markerRed": pointCount >= 200,
-          });
+            const clusterClass = classNames({
+              "cluster-marker": pointCount < 50,
+              "cluster-markerGreen": pointCount >= 50 && pointCount < 100,
+              "cluster-markerYellow": pointCount >= 100 && pointCount < 200,
+              "cluster-markerRed": pointCount >= 200,
+            });
+            if (showMarkers === true) {
+              if (isCluster) {
+                return (
+                  <Marker
+                    key={cluster.id}
+                    longitude={longitude}
+                    latitude={latitude}
+                  >
+                    <div
+                      className={clusterClass}
+                      style={{
+                        width: `${20 + (pointCount / points.length) * 250}px`,
+                        height: `${20 + (pointCount / points.length) * 250}px`,
+                      }}
+                      onClick={() => {
+                        const expansionZoom = Math.min(
+                          supercluster.getClusterExpansionZoom(cluster.id),
+                          5
+                        );
+                        setViewport({
+                          ...viewport,
+                          longitude,
+                          latitude,
+                          zoom: expansionZoom,
+                          transitionInterpolator: new FlyToInterpolator({
+                            speed: 1,
+                          }),
+                          transitionDuration: "auto",
+                        });
+                      }}
+                    >
+                      {pointCount}
+                    </div>
+                  </Marker>
+                );
+              }
 
-          if (isCluster) {
-            return (
-              <Marker
-                key={cluster.id}
-                longitude={longitude}
-                latitude={latitude}
-              >
-                <div
-                  className={clusterClass}
-                  style={{
-                    width: `${20 + (pointCount / points.length) * 250}px`,
-                    height: `${20 + (pointCount / points.length) * 250}px`,
-                  }}
-                  onClick={() => {
-                    const expansionZoom = Math.min(
-                      supercluster.getClusterExpansionZoom(cluster.id),
-                      5
-                    );
-                    setViewport({
-                      ...viewport,
-                      longitude,
-                      latitude,
-                      zoom: expansionZoom,
-                      transitionInterpolator: new FlyToInterpolator({
-                        speed: 1,
-                      }),
-                      transitionDuration: "auto",
-                    });
-                  }}
+              return (
+                <Marker
+                  key={cluster.properties.id}
+                  latitude={latitude}
+                  longitude={longitude}
                 >
-                  {pointCount}
-                </div>
-              </Marker>
-            );
-          }
-
-          return (
-            <Marker
-              key={cluster.properties.id}
-              latitude={latitude}
-              longitude={longitude}
-            >
-              <Popover
-                content={
-                  <Link to={`/catalog/sample/${cluster.properties.id}`}>
-                    <Button>
-                      Go to Sample {cluster.properties.Sample_name}
-                    </Button>
-                  </Link>
-                }
-              >
-                <Tooltip content={cluster.properties.Sample_name}>
-                  <Button className="bp3-minimal" icon="map-marker" />
-                </Tooltip>
-              </Popover>
-            </Marker>
-          );
-        })}
-      </MapGl>
+                  <Popover
+                    content={
+                      <Link to={`/catalog/sample/${cluster.properties.id}`}>
+                        <Button>
+                          Go to Sample {cluster.properties.Sample_name}
+                        </Button>
+                      </Link>
+                    }
+                  >
+                    <Tooltip content={cluster.properties.Sample_name}>
+                      <Button className="bp3-minimal" icon="map-marker" />
+                    </Tooltip>
+                  </Popover>
+                </Marker>
+              );
+            }
+          })}
+        </MapGl>
+      </div>
     </div>
   );
 }

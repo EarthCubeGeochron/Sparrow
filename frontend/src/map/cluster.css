@@ -1,3 +1,11 @@
+.map-container {
+  position: relative;
+}
+
+.layer-button {
+  position: absolute;
+}
+
 .mrker-btn {
   background: transparent;
   background-color: transparent;
