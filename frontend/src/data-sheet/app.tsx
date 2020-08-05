@@ -21,7 +21,7 @@ const SheetRender = ({ className, columns, children }) => {
   return (
     <table className={className}>
       <thead>
-        <tr className="cell read-only">
+        <tr className="cell header">
           <th>Index</th>
           {columns.map((col) => (
             <th key={col.name}>{col.name}</th>
@@ -72,7 +72,7 @@ function DataSheet() {
   const renderRow = (props) => {
     return (
       <Row
-        className="cell read-only"
+        className="cell header"
         row={props.row}
         children={props.children}
       ></Row>
