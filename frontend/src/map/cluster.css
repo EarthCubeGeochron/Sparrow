@@ -1,9 +1,11 @@
 .map-container {
   position: relative;
+  z-index: 1;
 }
 
 .layer-button {
   position: absolute;
+  z-index: 99;
 }
 
 .mrker-btn {

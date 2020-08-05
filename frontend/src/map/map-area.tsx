@@ -139,7 +139,9 @@ function MapPanel({
     <div className="map-container">
       <div className="layer-button">
         <Popover content={dropMenu} position={Position.BOTTOM}>
-          <Button icon="layers"></Button>
+          <Tooltip content="Change Map">
+            <Button icon="layers"></Button>
+          </Tooltip>
         </Popover>
       </div>
       <div>

@@ -4,7 +4,8 @@
 
 .map-butn {
   position: relative;
+  z-index: 2;
   top: 0.02;
-  left: 0.01;
-  margin: 10px 5px;
+  left: 1;
+  margin: 10px 30px;
 }
