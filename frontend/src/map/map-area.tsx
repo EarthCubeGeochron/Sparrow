@@ -19,6 +19,8 @@ import {
   Menu,
   Position,
   MenuItem,
+  Intent,
+  MenuDivider,
 } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./cluster.css";
@@ -29,6 +31,7 @@ import {
   APIHookOpts,
 } from "@macrostrat/ui-components";
 import { Link } from "react-router-dom";
+import { INTENT_DANGER } from "@blueprintjs/core/lib/esm/common/classes";
 
 const useAPIResult = function <T>(
   route: string | null,
@@ -125,13 +128,26 @@ function MapPanel({
 
   const dropMenu = (
     <Menu>
-      <MenuItem onClick={() => setMapStyle(mapStyle)} text="Bedrock Geology" />
       <MenuItem
+        intent={MapStyle == mapStyle ? "primary" : null}
+        icon={MapStyle == mapStyle ? "tick" : null}
+        onClick={() => setMapStyle(mapStyle)}
+        text="Bedrock Geology"
+      />
+      <MenuItem
+        intent={MapStyle == initialMapStyle ? "primary" : null}
+        icon={MapStyle == initialMapStyle ? "tick" : null}
         onClick={() => setMapStyle(initialMapStyle)}
         text="Standard Satelite"
       />
       <MenuItem text="Topographic" />
-      <MenuItem onClick={() => setShowMarkers(!showMarkers)} text="Markers" />
+      <MenuDivider />
+      <MenuItem
+        label={showMarkers ? "On" : "Off"}
+        intent={showMarkers ? "warning" : null}
+        onClick={() => setShowMarkers(!showMarkers)}
+        text="Markers"
+      />
     </Menu>
   );
 
