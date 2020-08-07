@@ -4,6 +4,15 @@ import VirDataSheet from "./vDataSheet";
 import ReactDataSheet from "react-datasheet";
 import "react-datasheet/lib/react-datasheet.css";
 
+const Row = (props) => {
+  return (
+    <tr>
+      <td className="cell read-only">{props.row}</td>
+      {props.children}
+    </tr>
+  );
+};
+
 function DataSheet() {
   const [geo, setGeo] = useState([]);
 
@@ -46,23 +55,14 @@ function DataSheet() {
       <table className={props.className}>
         <thead>
           <tr>
-            <th>Index</th>
+            <th className="cell read-only">Index</th>
             {columns2.map((col) => (
-              <th key={col.name}>{col.name}</th>
+              <th className="cell read-only" key={col.name}>{col.name}</th>
             ))}
           </tr>
         </thead>
         <tbody>{props.children}</tbody>
       </table>
-    );
-  };
-
-  const rowRender = (props) => {
-    return (
-      <tr>
-        <td>{props.row}</td>
-        {props.children}
-      </tr>
     );
   };
 
@@ -79,9 +79,10 @@ function DataSheet() {
       data={data.slice(0, 100)}
       valueRenderer={(cell) => cell.value}
       sheetRenderer={sheetRender}
-      rowRenderer={rowRender}
+      rowRenderer={Row}
       onCellsChanged={onCellsChanged}
     />
   );
 }
+
 export default DataSheet;
