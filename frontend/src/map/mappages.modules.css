@@ -1,0 +1,10 @@
+.mapHome {
+  position: absolute;
+}
+
+.map-butn {
+  position: relative;
+  top: 0.02;
+  left: 0.01;
+  margin: 10px 5px;
+}
