@@ -53,15 +53,15 @@ export function MapPanel({
 
   const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
 
-  const MacostratData = useAPIResult(MacURl, {
-    lng: clickPnt.lng,
-    lat: clickPnt.lat,
-  });
+  // const MacostratData = useAPIResult(MacURl, {
+  //   lng: clickPnt.lng,
+  //   lat: clickPnt.lat,
+  // });
 
-  useEffect(() => {
-    if (MacostratData == null) return;
-    console.log(MacostratData.success.data);
-  }, [MacostratData]);
+  // useEffect(() => {
+  //   if (MacostratData == null) return;
+  //   console.log(MacostratData.success.data);
+  // }, [MacostratData]);
 
   const bounds = mapRef.current
     ? mapRef.current.getMap().getBounds().toArray().flat()
@@ -69,7 +69,11 @@ export function MapPanel({
 
   return (
     <div className="map-container">
-      <MapDrawer drawOpen={drawOpen} setDrawOpen={setDrawOpen}></MapDrawer>
+      <MapDrawer
+        drawOpen={drawOpen}
+        setDrawOpen={setDrawOpen}
+        clickPnt={clickPnt}
+      ></MapDrawer>
       <div className="layer-button">
         <LayerMenu
           MapStyle={MapStyle}
