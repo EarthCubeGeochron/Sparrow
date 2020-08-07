@@ -21,6 +21,7 @@ import {
   MenuItem,
   Intent,
   MenuDivider,
+  Icon,
 } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./cluster.css";
@@ -84,12 +85,29 @@ function MapPanel({
   });
   const [MapStyle, setMapStyle] = useState(mapstyle);
   const [showMarkers, setShowMarkers] = useState(true);
+  const [clickPnt, setClickPnt] = useState({ lng: 0, lat: 0 });
 
   const initialMapStyle = "mapbox://styles/mapbox/outdoors-v9";
+
+  const topoMapStyle = "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub";
+
+  const satMapStyle = "mapbox://styles/jczaplewski/cjeycrpxy1yv22rqju6tdl9xb";
 
   const mapRef = useRef();
 
   const initialData = useAPIResult("/sample", { all: true });
+
+  const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
+
+  const MacostratData = useAPIResult(MacURl, {
+    lng: clickPnt.lng,
+    lat: clickPnt.lat,
+  });
+
+  useEffect(() => {
+    if (MacostratData == null) return;
+    console.log(MacostratData.success.data);
+  }, [MacostratData]);
 
   useEffect(() => {
     // Set the data back to the initial data
@@ -129,18 +147,36 @@ function MapPanel({
   const dropMenu = (
     <Menu>
       <MenuItem
+        intent={MapStyle == initialMapStyle ? "primary" : null}
+        labelElement={
+          MapStyle == initialMapStyle ? <Icon icon="tick"></Icon> : null
+        }
+        text="Standard Map"
+        onClick={() => setMapStyle(initialMapStyle)}
+      />
+      <MenuItem
+        intent={MapStyle == topoMapStyle ? "primary" : null}
+        labelElement={
+          MapStyle == topoMapStyle ? <Icon icon="tick"></Icon> : null
+        }
+        text="Topographic"
+        onClick={() => setMapStyle(topoMapStyle)}
+      />
+      <MenuItem
         intent={MapStyle == mapStyle ? "primary" : null}
-        icon={MapStyle == mapStyle ? "tick" : null}
+        labelElement={MapStyle == mapStyle ? <Icon icon="tick"></Icon> : null}
         onClick={() => setMapStyle(mapStyle)}
         text="Bedrock Geology"
       />
       <MenuItem
-        intent={MapStyle == initialMapStyle ? "primary" : null}
-        icon={MapStyle == initialMapStyle ? "tick" : null}
-        onClick={() => setMapStyle(initialMapStyle)}
-        text="Standard Satelite"
+        intent={MapStyle == satMapStyle ? "primary" : null}
+        labelElement={
+          MapStyle == satMapStyle ? <Icon icon="tick"></Icon> : null
+        }
+        onClick={() => setMapStyle(satMapStyle)}
+        text="Satelite"
       />
-      <MenuItem text="Topographic" />
+
       <MenuDivider />
       <MenuItem
         label={showMarkers ? "On" : "Off"}
@@ -162,6 +198,7 @@ function MapPanel({
       </div>
       <div>
         <MapGl
+          onClick={(e) => setClickPnt({ lng: e.lngLat[0], lat: e.lngLat[1] })}
           mapStyle={MapStyle}
           mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
           {...viewport}
