@@ -7,6 +7,7 @@ import "./datasheet.modules.css";
 import { useAPIResult, SubmitDialog } from "./ui-components";
 import { Button } from "@blueprintjs/core";
 import { DataSheetContext, DataSheetProvider } from "./provider";
+import update from "immutability-helper";
 
 const Row = ({ row, children, className }) => {
   return (
@@ -54,60 +55,80 @@ function unwrapSampleData(sampleData) {
   return { longitude, latitude, ...rest };
 }
 
-function DataSheet() {
-  const [geo, setGeo] = useState([]);
-  const [data, setData] = useState([]);
-  const [iData, setiData] = useState([]);
-  const [upData, setUpData] = useState([]);
-  const initialData = useAPIResult("/sample", { all: true });
+function unwrapResponse(apiResult) {
+  /** Flatten latitudes and longitudes for entire API response */
+  return apiResult.map(unwrapSampleData);
+}
 
-  console.log(upData);
+interface SampleData {
+  latitude: number;
+  longitude: number;
+  name: string;
+}
+
+function DataSheet() {
+  const [data, setData] = useState<SampleData[]>([]);
+  const initialData = useAPIResult<SampleData[]>(
+    "/sample",
+    { all: true },
+    unwrapResponse
+  );
+
   useEffect(() => {
+    // Set data to start with the value of the initial data
     if (initialData == null) return;
-    const mutMarker = initialData.map(unwrapSampleData);
-    setGeo(mutMarker);
-    const geoVal = mutMarker.map((obj) =>
-      Object.values(obj).map((d) => ({ value: d }))
-    );
-    setData(geoVal);
-    setiData(geoVal);
+    setData(initialData);
   }, [initialData]);
 
-  if (geo.length === 0) {
+  if (data.length === 0) {
     return null;
   }
 
-  const columns = Object.keys(geo[0]).map((d) => {
+  const columns = Object.keys(data[0]).map((d) => {
     return { name: d };
   });
 
   const onClickHandleUndo = () => {
-    setData(iData);
+    setData(initialData);
   };
   const onClickHandle = () => {
     //push method for sending data back to api
-    if (upData.length === 0) {
+    if (data.length === 0) {
       return null;
     }
-    setData(upData);
+    setData(data);
   };
 
   const onCellsChanged = (changes) => {
-    const grid1 = data.map((row) => [...row]);
+    /** Cell change function that uses immutability-helper */
+    const spec = {};
     changes.forEach(({ cell, row, col, value }) => {
-      grid1[row][col] = { ...grid1[row][col], value };
+      // Get the key that should be used to assign the value
+      const key: string = columns[col].name;
+      spec[row] = {
+        ...(spec[row] || {}),
+        [key]: { $set: value },
+      };
     });
-    setUpData(grid1);
-    const grid = data.map((row) => [...row]);
-    changes.forEach(({ cell, row, col, value }) => {
-      grid[row][col] = { ...grid[row][col], value };
-      grid[row][col].className = "edited";
-    });
-    setData(grid);
+    console.log(spec);
+    setData(update(data, spec));
   };
 
   var constant =
     "Are you sure you want to Submit? All changes will be final. If you do not want to submit, click Cancel.";
+
+  const buildCellProps = (value: any, row: number, key: string) => {
+    const isChanged = value != initialData[row][key];
+    const className = isChanged ? "edited" : null;
+    return { value, className };
+  };
+
+  /* Instead of storing the cell values in a pre-computed useEffect hook,
+     we just compute cell values on-demand. We get whether the cell was
+     edited by doing an == comparison on the data value */
+  const cellData = data.map((obj, row) =>
+    Object.entries(obj).map(([key, value]) => buildCellProps(value, row, key))
+  );
 
   return (
     <DataSheetProvider columns={columns}>
@@ -125,7 +146,7 @@ function DataSheet() {
 
         <div className="sheet">
           <ReactDataSheet
-            data={data.slice(0, 100)}
+            data={cellData.slice(0, 100)}
             valueRenderer={(cell) => cell.value}
             sheetRenderer={Sheet}
             rowRenderer={Row}
