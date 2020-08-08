@@ -4,8 +4,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import h from "react-hyperscript";
-import { Component, useEffect } from "react";
+import h, { C } from "@macrostrat/hyper";
+import { useEffect } from "react";
 import { join } from "path";
 import {
   BrowserRouter as Router,
@@ -40,18 +40,6 @@ const Expander = styled.div`\
 flex-grow: 1;\
 `;
 
-function HideNavbarSometimes(props) {
-  /*
-  Defines a hideable global UI component
-  */
-  const location = useLocation();
-  const hidePaths = ["/map"];
-  if (hidePaths.includes(location.pathname)) {
-    return null;
-  }
-  return h([props.children]);
-}
-
 const MainNavbar = (props) =>
   h(AppNavbar, { fullTitle: true }, [
     h(CatalogNavLinks, { base: "/catalog" }),
@@ -60,6 +48,29 @@ const MainNavbar = (props) =>
     h(AppNavbar.Divider),
     h(NavButton, { to: "/api-explorer/v1" }, "API"), // NavButton, similar to React-Router 'Link' takes the 'to' arg
   ]);
+
+function PageSkeleton(props) {
+  const { hideNavbar, children } = props;
+  return h(AppHolder, [
+    h(Expander, [
+      h.if(!hideNavbar)(MainNavbar),
+      // Render component if it exists, otherwise use render function
+      children,
+    ]),
+    h.if(!hideNavbar)(PageFooter),
+  ]);
+}
+
+PageSkeleton.defaultProps = { hideNavbar: false };
+
+function PageRoute(props) {
+  /** A custom route to manage page header, footer, and style associated
+      with a specific route */
+  const { render, component: base, hideNavbar, ...rest } = props;
+  const children = base != null ? h(base) : render();
+  const component = () => h(PageSkeleton, { hideNavbar, children });
+  return h(Route, { ...rest, component });
+}
 
 function AppMain(props) {
   // Handles routing for the application between pages
@@ -74,35 +85,28 @@ function AppMain(props) {
   return h(
     Router,
     { basename: baseURL },
-    h(AppHolder, [
-      h(Expander, [
-        h(HideNavbarSometimes, null, h(MainNavbar)),
-        h(Switch, [
-          h(Route, {
-            path: "/",
-            exact: true,
-            render() {
-              return h(HomePage);
-            },
-          }),
-          h(Route, {
-            path: "/catalog",
-            render() {
-              return h(Catalog, { base: "/catalog" });
-            },
-          }),
-          h(Route, {
-            path: "/map",
-            component: MapPage,
-          }),
-          h(Route, {
-            path: "/data-sheet",
-            component: DataSheet,
-          }),
-          h(Route, { path: "/api-explorer", component: APIExplorer }),
-        ]),
-      ]),
-      h(HideNavbarSometimes, null, h(PageFooter)),
+    h(Switch, [
+      h(PageRoute, {
+        path: "/",
+        exact: true,
+        component: HomePage,
+      }),
+      h(PageRoute, {
+        path: "/catalog",
+        render() {
+          return h(Catalog, { base: "/catalog" });
+        },
+      }),
+      h(PageRoute, {
+        path: "/map",
+        hideNavbar: true,
+        component: MapPage,
+      }),
+      h(PageRoute, {
+        path: "/data-sheet",
+        component: DataSheet,
+      }),
+      h(PageRoute, { path: "/api-explorer", component: APIExplorer }),
     ])
   );
 }
