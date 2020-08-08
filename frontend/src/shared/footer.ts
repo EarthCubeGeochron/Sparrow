@@ -8,7 +8,7 @@ const PageFooter = (props) =>
   h(
     Frame,
     { id: "pageFooter" },
-    h(InsetText, [h(Markdown, { src: footerText })])
+    h(InsetText, null, h(Markdown, { src: footerText }))
   );
 
 export { PageFooter };

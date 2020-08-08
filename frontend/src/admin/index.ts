@@ -5,7 +5,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import { hyperStyled, classed } from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import { Component, useContext } from "react";
 import {
   NonIdealState,
@@ -17,7 +17,6 @@ import {
 } from "@blueprintjs/core";
 import { Switch } from "react-router-dom";
 import { ErrorBoundaryRoute as Route } from "app/util/route";
-import classNames from "classnames";
 import T from "prop-types";
 
 import { LinkButton, LinkCard } from "@macrostrat/ui-components";
@@ -28,9 +27,8 @@ import { SessionListComponent } from "./session-list-component";
 import { SessionComponent } from "./session-component";
 import { SampleMain } from "./sample";
 
-import { NavButton, MinimalNavbar } from "app/components/navbar";
+import { NavButton } from "app/components";
 import { InsetText } from "app/components/layout";
-import styled from "@emotion/styled";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);

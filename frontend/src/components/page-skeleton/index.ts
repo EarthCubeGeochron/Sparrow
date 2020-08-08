@@ -1,7 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { PageFooter } from "app/shared/footer";
 import { CatalogNavLinks } from "app/admin";
-import { AppNavbar, NavButton } from "app/components/navbar";
+import { AppNavbar, NavButton } from "./navbar";
 import { PropsWithChildren } from "react";
 import styles from "./module.styl";
 
@@ -15,7 +15,7 @@ enum PageStyle {
 }
 
 const MainNavbar = (props) =>
-  h(AppNavbar, { fullTitle: true }, [
+  h(AppNavbar, { ...props, fullTitle: true }, [
     h(CatalogNavLinks, { base: "/catalog" }),
     h(NavButton, { to: "/map" }, "Map"),
     h(NavButton, { to: "/data-sheet" }, "Data Sheet"),
@@ -36,9 +36,9 @@ function PageSkeleton(props: PageSkeletonProps) {
 
   return h("div.page-skeleton", { className: style }, [
     h("div.expander", [
-      h.if(showNavbar)(MainNavbar),
+      h.if(showNavbar)(MainNavbar, { fixedToTop: style == PageStyle.WIDE }),
       // Render component if it exists, otherwise use render function
-      children,
+      h("div.page-content", null, children),
     ]),
     h.if(showFooter)(PageFooter),
   ]);
@@ -46,4 +46,5 @@ function PageSkeleton(props: PageSkeletonProps) {
 
 PageSkeleton.defaultProps = { style: PageStyle.BASIC };
 
+export * from "./navbar";
 export { PageSkeleton, PageStyle };
