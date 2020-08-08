@@ -193,25 +193,3 @@ span.data-grid-container:focus {
 .data-grid-container .data-grid .cell .data-editor {
   display: block;
 }
-
-.data-sheet {
-  position: absolute;
-}
-
-.sheet-header {
-  display: flex;
-}
-
-.save-btn {
-  margin-left: 2px;
-  margin-right: 2px;
-}
-
-.sheet-title {
-  margin-right: 10px;
-}
-
-.sheet {
-  position: absolute;
-  width: 300px;
-}

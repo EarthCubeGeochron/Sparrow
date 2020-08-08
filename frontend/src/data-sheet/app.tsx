@@ -2,12 +2,13 @@ import React, { useState, useEffect, useContext } from "react";
 import { List, Grid, AutoSizer } from "react-virtualized";
 import VirDataSheet from "./vDataSheet";
 import ReactDataSheet from "react-datasheet";
-import "react-datasheet/lib/react-datasheet.css";
-import "./datasheet.modules.css";
-import { useAPIResult, SubmitDialog } from "./ui-components";
-import { Button } from "@blueprintjs/core";
+import { useAPIResult } from "@macrostrat/ui-components";
+import { SheetHeader } from "./header";
 import { DataSheetContext, DataSheetProvider } from "./provider";
 import update from "immutability-helper";
+
+import "./datasheet.css";
+import styles from "./module.styl";
 
 const Row = ({ row, children, className }) => {
   return (
@@ -88,10 +89,11 @@ function DataSheet() {
 
   const columns = columnSpec;
 
-  const onClickHandleUndo = () => {
+  // Change management
+  const handleUndo = () => {
     setData(initialData);
   };
-  const onClickHandle = () => {
+  const handleSubmit = () => {
     //push method for sending data back to api
     if (data.length === 0) {
       return null;
@@ -114,9 +116,6 @@ function DataSheet() {
     setData(update(data, spec));
   };
 
-  var constant =
-    "Are you sure you want to Submit? All changes will be final. If you do not want to submit, click Cancel.";
-
   const buildCellProps = (value: any, row: number, key: string) => {
     // Check if values is the same as the initial data key
     const isChanged = value != initialData[row][key];
@@ -134,18 +133,12 @@ function DataSheet() {
 
   return (
     <DataSheetProvider columns={columns}>
-      <div className="data-sheet">
-        <div className="sheet-header">
-          <h3 className="sheet-title">Sample metadata</h3>
-          <SubmitDialog
-            className="save-btn"
-            divClass="sheet-header"
-            onClick={onClickHandle}
-            content={constant}
-          ></SubmitDialog>
-          <Button onClick={onClickHandleUndo}>Undo Changes</Button>
-        </div>
-
+      <div className={styles["data-sheet"]}>
+        <SheetHeader
+          onSubmit={handleSubmit}
+          onUndo={handleUndo}
+          hasChanges={initialData != data}
+        ></SheetHeader>
         <div className="sheet">
           <ReactDataSheet
             data={cellData.slice(0, 100)}
