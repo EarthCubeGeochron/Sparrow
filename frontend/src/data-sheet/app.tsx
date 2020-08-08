@@ -124,9 +124,10 @@ function DataSheet() {
     return { value, className };
   };
 
-  /* Instead of storing the cell values in a pre-computed useEffect hook,
-     we just compute cell values on-demand. We get whether the cell was
-     edited by doing an == comparison on the data value */
+  /** We now build cell properties in the render function, rather than storing
+      them using a precomputed useEffect hook. We decide what cells have changed using
+      a direct comparison with the equivalent value of initialData. (That's the
+      power of immutable data.) */
   const cellData = data.map((obj, row) =>
     columns.map(({ key }) => buildCellProps(obj[key], row, key))
   );
