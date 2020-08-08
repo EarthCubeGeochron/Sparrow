@@ -21,7 +21,6 @@ const Row = ({ row, children, className }) => {
 
 const Sheet = ({ className, children }) => {
   const { columns } = useContext(DataSheetContext);
-  console.log(columns);
   return (
     <table className={className}>
       <thead>
@@ -107,9 +106,12 @@ function DataSheet() {
     changes.forEach(({ cell, row, col, value }) => {
       // Get the key that should be used to assign the value
       const { key } = columns[col];
+      // Substitute empty strings for nulls
+      const $set = value == "" ? null : value;
+
       spec[row] = {
         ...(spec[row] || {}),
-        [key]: { $set: value },
+        [key]: { $set },
       };
     });
     console.log(spec);
