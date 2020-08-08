@@ -5,3 +5,7 @@
 .map-home {
   size: 10px 10px;
 }
+
+.inset-text {
+  margin: 2em 0.5em 1em;
+}

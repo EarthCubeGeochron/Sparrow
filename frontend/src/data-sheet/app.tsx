@@ -80,6 +80,7 @@ function DataSheet() {
   };
 
   const renderSheet = (props) => {
+    console.log(props);
     return (
       <SheetRender
         className={props.className}

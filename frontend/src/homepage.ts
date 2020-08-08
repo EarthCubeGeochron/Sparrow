@@ -1,7 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Frame } from "./frame";
-import { InsetText } from "app/layout";
-
+import { InsetText } from "app/components/layout";
 import styles from "./styles.module.css";
 
 const h = hyperStyled(styles);

@@ -18,16 +18,16 @@ import { APIExplorer } from "./api-explorer";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
 import { Catalog } from "./admin";
-import { PageSkeleton } from "./components/page-skeleton";
+import { PageSkeleton, PageStyle } from "./components/page-skeleton";
 import { MapPage } from "./map";
 import DataSheet from "./data-sheet/app";
 
 function PageRoute(props) {
   /** A custom route to manage page header, footer, and style associated
       with a specific route */
-  const { render, component: base, hideNavbar, ...rest } = props;
+  const { render, component: base, style, ...rest } = props;
   const children = base != null ? h(base) : render();
-  const component = () => h(PageSkeleton, { hideNavbar, children });
+  const component = () => h(PageSkeleton, { style, children });
   return h(Route, { ...rest, component });
 }
 
@@ -36,6 +36,7 @@ function AppMain(props) {
   const { baseURL } = props;
 
   // Tab Title becomes WiscAr-Sparrow
+  // TODO: We could use the 'react-helmet' library to manage this...
   useEffect(() => {
     const labname = process.env.SPARROW_LAB_NAME;
     document.title = labname != null ? `${labname} – Sparrow` : "Sparrow";
@@ -58,11 +59,12 @@ function AppMain(props) {
       }),
       h(PageRoute, {
         path: "/map",
-        hideNavbar: true,
+        style: PageStyle.FULLSCREEN,
         component: MapPage,
       }),
       h(PageRoute, {
         path: "/data-sheet",
+        style: PageStyle.WIDE,
         component: DataSheet,
       }),
       h(PageRoute, { path: "/api-explorer", component: APIExplorer }),

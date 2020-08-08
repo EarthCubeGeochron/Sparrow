@@ -19,6 +19,7 @@
     "@mongodb-js/react-mapbox-gl-leaflet": "^1.0.0",
     "@tippy.js/react": "3.1.1",
     "@turf/bbox": "^6.0.1",
+    "@types/react": "^16.9.44",
     "@vx/axis": "0.0.183",
     "@vx/gradient": "0.0.183",
     "@vx/scale": "0.0.182",
