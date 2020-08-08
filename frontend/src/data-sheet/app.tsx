@@ -36,13 +36,15 @@ const Sheet = ({ className, children }) => {
   );
 };
 
-const columnData = [
+const columnSpec = [
   { name: "Sample Name", key: "name" },
   { name: "IGSN", key: "igsn" },
   { name: "Public", key: "is_public" },
   { name: "Material", key: "material" },
   { name: "Latitude", key: "latitude" },
   { name: "Longitude", key: "longitude" },
+  { name: "Location name", key: "location_name" },
+  { name: "Project", key: "project_name" },
 ];
 
 function unwrapSampleData(sampleData) {
@@ -84,9 +86,7 @@ function DataSheet() {
     return null;
   }
 
-  const columns = Object.keys(data[0]).map((d) => {
-    return { name: d };
-  });
+  const columns = columnSpec;
 
   const onClickHandleUndo = () => {
     setData(initialData);
@@ -104,7 +104,7 @@ function DataSheet() {
     const spec = {};
     changes.forEach(({ cell, row, col, value }) => {
       // Get the key that should be used to assign the value
-      const key: string = columns[col].name;
+      const { key } = columns[col];
       spec[row] = {
         ...(spec[row] || {}),
         [key]: { $set: value },
@@ -118,6 +118,7 @@ function DataSheet() {
     "Are you sure you want to Submit? All changes will be final. If you do not want to submit, click Cancel.";
 
   const buildCellProps = (value: any, row: number, key: string) => {
+    // Check if values is the same as the initial data key
     const isChanged = value != initialData[row][key];
     const className = isChanged ? "edited" : null;
     return { value, className };
@@ -127,7 +128,7 @@ function DataSheet() {
      we just compute cell values on-demand. We get whether the cell was
      edited by doing an == comparison on the data value */
   const cellData = data.map((obj, row) =>
-    Object.entries(obj).map(([key, value]) => buildCellProps(value, row, key))
+    columns.map(({ key }) => buildCellProps(obj[key], row, key))
   );
 
   return (
