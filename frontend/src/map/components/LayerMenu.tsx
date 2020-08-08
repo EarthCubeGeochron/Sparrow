@@ -12,10 +12,10 @@ import {
 
 export const LayerMenu = ({
   MapStyle,
-  setMapStyle,
+  chooseMapStyle,
   mapstyles,
   showMarkers,
-  setShowMarkers,
+  toggleShowMarkers,
 }) => {
   const dropMenu = (
     <Menu>
@@ -27,7 +27,7 @@ export const LayerMenu = ({
           ) : null
         }
         text="Standard Map"
-        onClick={() => setMapStyle(mapstyles.initialMapStyle)}
+        onClick={() => chooseMapStyle(mapstyles.initialMapStyle)}
       />
       <MenuItem
         intent={MapStyle == mapstyles.topoMapStyle ? "primary" : null}
@@ -35,14 +35,14 @@ export const LayerMenu = ({
           MapStyle == mapstyles.topoMapStyle ? <Icon icon="tick"></Icon> : null
         }
         text="Topographic"
-        onClick={() => setMapStyle(mapstyles.topoMapStyle)}
+        onClick={() => chooseMapStyle(mapstyles.topoMapStyle)}
       />
       <MenuItem
         intent={MapStyle == mapstyles.mapStyle ? "primary" : null}
         labelElement={
           MapStyle == mapstyles.mapStyle ? <Icon icon="tick"></Icon> : null
         }
-        onClick={() => setMapStyle(mapstyles.mapStyle)}
+        onClick={() => chooseMapStyle(mapstyles.mapStyle)}
         text="Bedrock Geology"
       />
       <MenuItem
@@ -52,7 +52,7 @@ export const LayerMenu = ({
             <Icon icon="tick"></Icon>
           ) : null
         }
-        onClick={() => setMapStyle(mapstyles.sateliteMapStyle)}
+        onClick={() => chooseMapStyle(mapstyles.sateliteMapStyle)}
         text="Satelite"
       />
 
@@ -60,7 +60,7 @@ export const LayerMenu = ({
       <MenuItem
         label={showMarkers ? "On" : "Off"}
         intent={showMarkers ? "warning" : null}
-        onClick={() => setShowMarkers(!showMarkers)}
+        onClick={() => toggleShowMarkers()}
         text="Markers"
       />
     </Menu>

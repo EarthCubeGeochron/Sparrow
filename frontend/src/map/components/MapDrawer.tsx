@@ -6,8 +6,12 @@ import { useAPIResult } from "./APIResult";
 info box we decide on to display data from the MacroStrat 
 API based on a click on the map */
 
-export function MapDrawer({ drawOpen, setDrawOpen, clickPnt }) {
+// USE TOASTER it'll be way cooler
+
+export function MapDrawer({ drawOpen, closeToast, clickPnt }) {
   const [macrostratData, setMacrostratData] = useState([]);
+
+  // url to queary macrostrat
   const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
 
   const MacostratData = useAPIResult(MacURl, {
@@ -24,6 +28,8 @@ export function MapDrawer({ drawOpen, setDrawOpen, clickPnt }) {
   return (
     <div>
       <Drawer
+        hasBackdrop={false}
+        canOutsideClickClose={false}
         isOpen={drawOpen}
         autoFocus={false}
         enforceFocus={false}

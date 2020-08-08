@@ -28,6 +28,16 @@ export function MapPanel({
   zoom = 1,
   mapstyle = "mapbox://styles/mapbox/outdoors-v9",
 }) {
+  const initialState = {
+    viewport: { latitude, longitude, zoom, width, height },
+    MapStyle: mapstyle,
+    showMarkers: true,
+    clickPnt: { lng: 0, lat: 0 },
+    drawOpen: false,
+  };
+
+  const [state, setState] = useState(initialState);
+
   const [viewport, setViewport] = useState({
     latitude,
     longitude,
@@ -35,11 +45,6 @@ export function MapPanel({
     width,
     height,
   });
-  const [MapStyle, setMapStyle] = useState(mapstyle);
-  const [showMarkers, setShowMarkers] = useState(true);
-  const [clickPnt, setClickPnt] = useState({ lng: 0, lat: 0 });
-  const [drawOpen, setDrawOpen] = useState(false);
-
   const mapstyles = {
     initialMapStyle: "mapbox://styles/mapbox/outdoors-v9",
     topoMapStyle: "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub",
@@ -49,47 +54,68 @@ export function MapPanel({
 
   const mapRef = useRef();
 
-  const initialData = useAPIResult("/sample", { all: true });
-
-  const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
-
-  // const MacostratData = useAPIResult(MacURl, {
-  //   lng: clickPnt.lng,
-  //   lat: clickPnt.lat,
-  // });
-
-  // useEffect(() => {
-  //   if (MacostratData == null) return;
-  //   console.log(MacostratData.success.data);
-  // }, [MacostratData]);
-
   const bounds = mapRef.current
     ? mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
+  const closeToast = () => {
+    setState({ ...state, drawOpen: !state.drawOpen });
+  };
+
+  const toggleShowMarkers = () => {
+    setState({ ...state, showMarkers: !state.showMarkers });
+  };
+
+  const chooseMapStyle = (props) => {
+    setState({ ...state, MapStyle: props });
+  };
+
+  const changeViewport = ({ expansionZoom, longitude, latitude }) => {
+    setState({
+      ...state,
+      viewport: {
+        ...state.viewport,
+        longitude: longitude,
+        latitude: latitude,
+        zoom: expansionZoom,
+        transitionInterpolator: new FlyToInterpolator({
+          speed: 1,
+        }),
+        transitionDuration: "auto",
+      },
+    });
+  };
+
+  const mapClicked = (e) => {
+    setState({
+      ...state,
+      drawOpen: !state.drawOpen,
+      clickPnt: { lng: e.lngLat[0], lat: e.lngLat[1] },
+    });
+  };
+
   return (
     <div className="map-container">
       <MapDrawer
-        drawOpen={drawOpen}
-        setDrawOpen={setDrawOpen}
-        clickPnt={clickPnt}
+        drawOpen={state.drawOpen}
+        closeToast={closeToast}
+        clickPnt={state.clickPnt}
       ></MapDrawer>
       <div className="layer-button">
         <LayerMenu
-          MapStyle={MapStyle}
-          setMapStyle={setMapStyle}
+          MapStyle={state.MapStyle}
+          chooseMapStyle={chooseMapStyle}
           mapstyles={mapstyles}
-          showMarkers={showMarkers}
-          setShowMarkers={setShowMarkers}
+          showMarkers={state.showMarkers}
+          toggleShowMarkers={toggleShowMarkers}
         ></LayerMenu>
       </div>
       <div>
         <MapGl
           onClick={(e) => {
-            setClickPnt({ lng: e.lngLat[0], lat: e.lngLat[1] });
-            setDrawOpen(!drawOpen);
+            mapClicked(e);
           }}
-          mapStyle={MapStyle}
+          mapStyle={state.MapStyle}
           mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
           {...viewport}
           onViewportChange={(viewport) => {
@@ -97,7 +123,7 @@ export function MapPanel({
           }}
           ref={mapRef}
         >
-          {showMarkers ? (
+          {state.showMarkers ? (
             <MarkerCluster
               viewport={viewport}
               setViewport={setViewport}
