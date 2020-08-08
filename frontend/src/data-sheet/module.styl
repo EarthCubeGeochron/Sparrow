@@ -3,16 +3,21 @@
   //@import "./datasheet.css"
 
 .data-sheet
-  height 100vh
   position fixed
   top 50px
   left 0px
   right 0px
-  bottom 0px
+  bottom 1px
   display flex
   flex-direction column
   tbody
     overflow-y scroll
+    padding-bottom 2em
+  // https://css-tricks.com/position-sticky-and-table-headers/
+  th
+    position sticky
+    top 0
+    background-color: whitesmoke
 
 :global
   .sheet-header, .sheet-actions
