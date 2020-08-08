@@ -19,6 +19,7 @@ const Row = ({ row, children, className }) => {
 
 const Sheet = ({ className, children }) => {
   const { columns } = useContext(DataSheetContext);
+  console.log(columns);
   return (
     <table className={className}>
       <thead>
@@ -34,9 +35,27 @@ const Sheet = ({ className, children }) => {
   );
 };
 
+const columnData = [
+  { name: "Sample Name", key: "name" },
+  { name: "IGSN", key: "igsn" },
+  { name: "Public", key: "is_public" },
+  { name: "Material", key: "material" },
+  { name: "Latitude", key: "latitude" },
+  { name: "Longitude", key: "longitude" },
+];
+
+function unwrapSampleData(sampleData) {
+  /** Unwrap samples from API response to a flattened version */
+  const { geometry, ...rest } = sampleData;
+  let longitude: number, latitude: number;
+  if (geometry != null) {
+    [longitude, latitude] = geometry?.coordinates;
+  }
+  return { longitude, latitude, ...rest };
+}
+
 function DataSheet() {
   const [geo, setGeo] = useState([]);
-  const [edited, setEdited] = useState(false);
   const [data, setData] = useState([]);
   const [iData, setiData] = useState([]);
   const [upData, setUpData] = useState([]);
@@ -45,17 +64,7 @@ function DataSheet() {
   console.log(upData);
   useEffect(() => {
     if (initialData == null) return;
-    const markers = initialData.filter((d) => d.geometry != null);
-    const mutMarker = markers.map((sample) => {
-      const {
-        geometry: {
-          coordinates: [longitude, latitude],
-        },
-        ...rest
-      } = sample;
-      const mutSample = { longitude, latitude, ...rest };
-      return mutSample;
-    });
+    const mutMarker = initialData.map(unwrapSampleData);
     setGeo(mutMarker);
     const geoVal = mutMarker.map((obj) =>
       Object.values(obj).map((d) => ({ value: d }))
@@ -68,7 +77,9 @@ function DataSheet() {
     return null;
   }
 
-  const columns = Object.keys(geo[0]).map((d) => ({ name: d }));
+  const columns = Object.keys(geo[0]).map((d) => {
+    return { name: d };
+  });
 
   const onClickHandleUndo = () => {
     setData(iData);
@@ -102,7 +113,7 @@ function DataSheet() {
     <DataSheetProvider columns={columns}>
       <div className="data-sheet">
         <div className="sheet-header">
-          <h3 className="sheet-title">DataSheet for Editing</h3>
+          <h3 className="sheet-title">Sample metadata</h3>
           <SubmitDialog
             className="save-btn"
             divClass="sheet-header"
