@@ -5,19 +5,20 @@ import ReactDataSheet from "react-datasheet";
 import "react-datasheet/lib/react-datasheet.css";
 import "./datasheet.modules.css";
 import { useAPIResult, SubmitDialog } from "./ui-components";
-import { Button, Dialog } from "@blueprintjs/core";
-import { AppToaster } from "../toaster";
+import { Button } from "@blueprintjs/core";
+import { DataSheetContext, DataSheetProvider } from "./provider";
 
 const Row = ({ row, children, className }) => {
   return (
     <tr>
-      <td className={className}>{row}</td>
+      <td className="cell read-only">{row}</td>
       {children}
     </tr>
   );
 };
 
-const SheetRender = ({ className, columns, children }) => {
+const Sheet = ({ className, children }) => {
+  const { columns } = useContext(DataSheetContext);
   return (
     <table className={className}>
       <thead>
@@ -66,29 +67,8 @@ function DataSheet() {
   if (geo.length === 0) {
     return null;
   }
-  const geoCol = geo.map((obj) => Object.keys(obj).map((d) => ({ name: d })));
-  const columns2 = geoCol[0];
 
-  const renderRow = (props) => {
-    return (
-      <Row
-        className="cell read-only"
-        row={props.row}
-        children={props.children}
-      ></Row>
-    );
-  };
-
-  const renderSheet = (props) => {
-    console.log(props);
-    return (
-      <SheetRender
-        className={props.className}
-        columns={columns2}
-        children={props.children}
-      ></SheetRender>
-    );
-  };
+  const columns = Object.keys(geo[0]).map((d) => ({ name: d }));
 
   const onClickHandleUndo = () => {
     setData(iData);
@@ -119,28 +99,30 @@ function DataSheet() {
     "Are you sure you want to Submit? All changes will be final. If you do not want to submit, click Cancel.";
 
   return (
-    <div className="data-sheet">
-      <div className="sheet-header">
-        <h3 className="sheet-title">DataSheet for Editing</h3>
-        <SubmitDialog
-          className="save-btn"
-          divClass="sheet-header"
-          onClick={onClickHandle}
-          content={constant}
-        ></SubmitDialog>
-        <Button onClick={onClickHandleUndo}>Undo Changes</Button>
-      </div>
+    <DataSheetProvider columns={columns}>
+      <div className="data-sheet">
+        <div className="sheet-header">
+          <h3 className="sheet-title">DataSheet for Editing</h3>
+          <SubmitDialog
+            className="save-btn"
+            divClass="sheet-header"
+            onClick={onClickHandle}
+            content={constant}
+          ></SubmitDialog>
+          <Button onClick={onClickHandleUndo}>Undo Changes</Button>
+        </div>
 
-      <div className="sheet">
-        <ReactDataSheet
-          data={data.slice(0, 100)}
-          valueRenderer={(cell) => cell.value}
-          sheetRenderer={renderSheet}
-          rowRenderer={renderRow}
-          onCellsChanged={onCellsChanged}
-        />
+        <div className="sheet">
+          <ReactDataSheet
+            data={data.slice(0, 100)}
+            valueRenderer={(cell) => cell.value}
+            sheetRenderer={Sheet}
+            rowRenderer={Row}
+            onCellsChanged={onCellsChanged}
+          />
+        </div>
       </div>
-    </div>
+    </DataSheetProvider>
   );
 }
 
