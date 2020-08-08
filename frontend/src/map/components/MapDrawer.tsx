@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Drawer, Button, Card } from "@blueprintjs/core";
+import { Button, Card, Drawer, To } from "@blueprintjs/core";
 import { useAPIResult } from "./APIResult";
+import { AppToaster } from "../../toaster";
 
 /* This component will Handle the drawer or whatever 
 info box we decide on to display data from the MacroStrat 
@@ -33,7 +34,7 @@ export function MapDrawer({ drawOpen, closeToast, clickPnt }) {
         isOpen={drawOpen}
         autoFocus={false}
         enforceFocus={false}
-        onClose={() => setDrawOpen(false)}
+        onClose={() => closeToast()}
       >
         {macrostratData.map((object) => {
           return (

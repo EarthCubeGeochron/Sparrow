@@ -117,16 +117,16 @@ export function MapPanel({
           }}
           mapStyle={state.MapStyle}
           mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
-          {...viewport}
+          {...state.viewport}
           onViewportChange={(viewport) => {
-            setViewport(viewport);
+            setState({ ...state, viewport: viewport });
           }}
           ref={mapRef}
         >
           {state.showMarkers ? (
             <MarkerCluster
-              viewport={viewport}
-              setViewport={setViewport}
+              viewport={state.viewport}
+              changeViewport={changeViewport}
               bounds={bounds}
             ></MarkerCluster>
           ) : null}

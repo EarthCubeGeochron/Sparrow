@@ -9,7 +9,7 @@ import { Marker, FlyToInterpolator } from "react-map-gl";
 
 // This component controls the State and the UI for the markers and the markercluster
 
-export function MarkerCluster({ viewport, setViewport, bounds }) {
+export function MarkerCluster({ viewport, changeViewport, bounds }) {
   const [markers, setMarkers] = useState([]);
   const initialData = useAPIResult("/sample", { all: true });
   useEffect(() => {
@@ -73,16 +73,7 @@ export function MarkerCluster({ viewport, setViewport, bounds }) {
                     supercluster.getClusterExpansionZoom(cluster.id),
                     5
                   );
-                  setViewport({
-                    ...viewport,
-                    longitude,
-                    latitude,
-                    zoom: expansionZoom,
-                    transitionInterpolator: new FlyToInterpolator({
-                      speed: 1,
-                    }),
-                    transitionDuration: "auto",
-                  });
+                  changeViewport({ expansionZoom, longitude, latitude });
                 }}
               >
                 {pointCount}
