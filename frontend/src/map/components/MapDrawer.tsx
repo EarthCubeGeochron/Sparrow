@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, Drawer, To } from "@blueprintjs/core";
+import {
+  Button,
+  Card,
+  Drawer,
+  Toaster,
+  Toast,
+  Position,
+} from "@blueprintjs/core";
 import { useAPIResult } from "./APIResult";
 import { AppToaster } from "../../toaster";
 
@@ -28,23 +35,18 @@ export function MapDrawer({ drawOpen, closeToast, clickPnt }) {
 
   return (
     <div>
-      <Drawer
-        hasBackdrop={false}
-        canOutsideClickClose={false}
-        isOpen={drawOpen}
-        autoFocus={false}
-        enforceFocus={false}
-        onClose={() => closeToast()}
-      >
-        {macrostratData.map((object) => {
-          return (
-            <div>
-              <p key={object.name}>{"Name: " + object.name}</p>
-              <p key={object.lith}>{"Lithology: " + object.lith}</p>
-            </div>
-          );
-        })}
-      </Drawer>
+      <Toaster >
+        <Toast>
+          {macrostratData.map((object) => {
+            return (
+              <div>
+                <p key={object.name}>{"Name: " + object.name}</p>
+                <p key={object.lith}>{"Lithology: " + object.lith}</p>
+              </div>
+            );
+          })}
+        </Toast>
+      </Toaster>
     </div>
   );
 }
