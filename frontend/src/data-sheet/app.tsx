@@ -21,8 +21,11 @@ const Row = ({ row, children, className }) => {
 
 const Sheet = ({ className, children }) => {
   const { columns } = useContext(DataSheetContext);
+  const onScroll = (evt) => {
+    console.log(evt);
+  };
   return (
-    <table className={className}>
+    <table className={className} onScroll={onScroll}>
       <thead>
         <tr className="cell read-only">
           <th>Index</th>
