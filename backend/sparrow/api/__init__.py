@@ -37,5 +37,7 @@ class APIv2(Flama):
             log.info(name)
 
             def list_items() -> iface(many=True):
-                db.session.query(schema.opts.model).limit(100)
-                return [schema]
+                res = db.session.query(schema.opts.model).limit(100)
+                return [schema.dump(r) for r in res]
+
+            self.add_route("/" + name, list_items, methods=["GET"])
