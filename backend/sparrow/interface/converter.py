@@ -15,6 +15,10 @@ from ..database.mapper.util import trim_postfix
 from .fields import Geometry, Enum, JSON, SmartNested
 from .util import to_schema_name
 
+from ..logs import get_logger
+
+log = get_logger(__name__)
+
 
 # Control how relationships can be resolved
 allowed_collections = {
@@ -188,11 +192,11 @@ class SparrowConverter(ModelConverter):
         this_table = prop.parent.tables[0]
         if not allow_nest(this_table.name, prop.target.name):
             # Fields that are not allowed to be nested
-            return Related(name, **field_kwargs)
+            return Related(**field_kwargs)
         if prop.target.schema == "enum":
             # special carve-out for enums represented as foreign keys
             # (these should be stored in the 'enum' schema):
-            return Enum(name, **field_kwargs)
+            return Enum(**field_kwargs)
 
         # Ignore fields that reference parent models in a nesting relationship
         exclude = []

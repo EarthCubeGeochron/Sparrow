@@ -237,8 +237,30 @@ incomplete_analysis = {
 
 class TestSchema:
     def test_basic_import(self, db):
-        s = db.interface.sample()
-        inst = s.load({"name": "test sample"}, session=db.session, transient=True)
+        schema = db.interface.sample()
+        name = "test sample"
+        obj = {"name": name}
+        inst = schema.load(obj, session=db.session, transient=True)
+        assert inst.name == name
+        res = schema.dump(inst)
+        assert res["name"] == name
+
+    def test_more_complex_import(self, db):
+        schema = db.interface.session()
+        inst = schema.load(basic_data, session=db.session, transient=True)
+        res = schema.dump(inst)
+        assert res["name"] == basic_data["name"]
+        assert len(res["analysis"]) == 1
+
+    def test_schema_structure(self, db):
+        """
+        Make sure that schemas follow basic conformance to their underlying
+        SQLAlchemy models.
+        """
+        schema = db.interface.session()
+        model = db.model.session()
+        for k in schema.fields.keys():
+            assert hasattr(model, k)
 
 
 class TestDeclarativeImporter:
