@@ -109,7 +109,7 @@ def cli(ctx, args):
         # This is an ugly hack that results from poor ability to pass command-line
         # arguments to the sparrow-test command
         _args = [v for v in rest if v != "--psql"]
-        return ctx.invoke(sparrow_test, pytest_args=_args, psql="--psql" in rest)
+        return ctx.invoke(sparrow_test, args=_args, psql="--psql" in rest)
 
     _command = find_subcommand(bin_directories, subcommand)
 

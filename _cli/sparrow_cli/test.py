@@ -20,12 +20,12 @@ def compose(*args, **kwargs):
 
 # Ideally this would be a subcommand, not its own separate command
 @click.command("sparrow-test", context_settings=dict(ignore_unknown_options=True,))
-@click.argument("pytest_args", nargs=-1, type=click.UNPROCESSED)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.option("--psql", is_flag=True, default=False)
 @click.pass_context
-def sparrow_test(ctx, pytest_args, psql=False):
+def sparrow_test(ctx, args, psql=False):
 
-    if "--help" in pytest_args:
+    if "--help" in args:
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
         ctx.exit()
@@ -42,6 +42,7 @@ def sparrow_test(ctx, pytest_args, psql=False):
     # First, test basic operation of command-line application
     # We should probably just import pytest directly and run
     pass_conditions = {0: "Tests passed", 5: "No tests collected"}
+    pytest_args = [a for a in args if a not in ["--psql", "--keep-database"]]
 
     chdir(pth)
     res = cmd(path.join(pth, "_cli/_scripts/test-cli"), *pytest_args)
@@ -59,8 +60,6 @@ def sparrow_test(ctx, pytest_args, psql=False):
 
     # Need to bring up database separately to ensure ports are mapped...
     compose("up -d db")
-    res = compose(
-        "run --rm --service-ports backend", "/bin/run-tests", *pytest_args, flag
-    )
+    res = compose("run --rm --service-ports backend", "/bin/run-tests", *args, flag)
     compose("down")
     sys.exit(res.returncode)
