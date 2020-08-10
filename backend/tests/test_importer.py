@@ -18,7 +18,7 @@ def ensure_single(db, model_name, **filter_params):
 
 
 # This should be in the fixture function ideally but I can't figure out
-# how the setup can get cached.
+# how to cache it so it doesn't repeatedly regenerate.
 app = App(__name__)
 app.load()
 app.load_phase_2()
