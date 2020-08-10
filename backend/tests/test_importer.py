@@ -9,6 +9,7 @@ from pytest import mark, fixture, warns
 import logging
 from json import load
 from sqlalchemy.exc import SAWarning
+import warnings
 
 
 def ensure_single(db, model_name, **filter_params):
@@ -17,11 +18,11 @@ def ensure_single(db, model_name, **filter_params):
     assert n == 1
 
 
+# pytestmark = mark.filterwarnings("ignore", "*", SAWarning)
+
 # This should be in the fixture function ideally but I can't figure out
 # how to cache it so it doesn't repeatedly regenerate.
 app = App(__name__)
-app.load()
-app.load_phase_2()
 
 
 @fixture
@@ -232,6 +233,12 @@ incomplete_analysis = {
         }
     ],
 }
+
+
+class TestSchema:
+    def test_basic_import(self, db):
+        s = db.interface.sample()
+        inst = s.load({"name": "test sample"}, session=db.session, transient=True)
 
 
 class TestDeclarativeImporter:

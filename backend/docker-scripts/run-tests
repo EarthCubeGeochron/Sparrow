@@ -16,9 +16,9 @@ if "--psql" in args:
     psql = True
     args.remove("--psql")
 
-keep_database = True
+keep_database = False
 if "--keep-database" in args:
-    teardown = False
+    keep_database = True
     args.remove("--keep-database")
 
 os.chdir("/app")
@@ -52,6 +52,10 @@ else:
     echo("Database is ready...")
 
     run(["sparrow", "init"])
+
+# This prevents us from getting absolutely spammed by SAWarning
+# TODO: improve warning handling for database automapping
+args.append("--disable-warnings")
 
 print("Running tests")
 run(["pytest", "/app/tests", *args])

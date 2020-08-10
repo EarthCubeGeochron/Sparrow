@@ -1,4 +1,8 @@
 from flama import Flama
+from sparrow.logs import get_logger
+from ..database.mapper.util import classname_for_table
+
+log = get_logger(__name__)
 
 
 def hello_world():
@@ -14,6 +18,7 @@ def hello_world():
 
 class APIv2(Flama):
     def __init__(self, app):
+        self._app = app
         super().__init__(
             title="Sparrow API",
             version="2.0",
@@ -23,3 +28,14 @@ class APIv2(Flama):
 
     def _add_routes(self):
         self.add_route("/", hello_world, methods=["GET"])
+
+        db = self._app.database
+
+        for iface in db.interface:
+            schema = iface()
+            name = classname_for_table(schema.opts.model.__table__)
+            log.info(name)
+
+            def list_items() -> iface(many=True):
+                db.session.query(schema.opts.model).limit(100)
+                return [schema]

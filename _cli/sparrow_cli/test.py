@@ -2,7 +2,7 @@ import click
 import sys
 from os import environ, path, chdir
 from rich import print
-from .util import cmd
+from .util import cmd, container_is_running
 
 
 def compose(*args, **kwargs):
@@ -22,8 +22,9 @@ def compose(*args, **kwargs):
 @click.command("sparrow-test", context_settings=dict(ignore_unknown_options=True,))
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.option("--psql", is_flag=True, default=False)
+@click.option("--standalone", is_flag=True, default=False)
 @click.pass_context
-def sparrow_test(ctx, args, psql=False):
+def sparrow_test(ctx, args, psql=False, standalone=False):
 
     if "--help" in args:
         ctx = click.get_current_context()
@@ -42,7 +43,9 @@ def sparrow_test(ctx, args, psql=False):
     # First, test basic operation of command-line application
     # We should probably just import pytest directly and run
     pass_conditions = {0: "Tests passed", 5: "No tests collected"}
-    pytest_args = [a for a in args if a not in ["--psql", "--keep-database"]]
+    pytest_args = [
+        a for a in args if a not in ["--psql", "--keep-database", "--standalone"]
+    ]
 
     chdir(pth)
     res = cmd(path.join(pth, "_cli/_scripts/test-cli"), *pytest_args)
@@ -60,6 +63,11 @@ def sparrow_test(ctx, args, psql=False):
 
     # Need to bring up database separately to ensure ports are mapped...
     compose("up -d db")
+    # if container_is_running("backend") and not standalone:
+    #     res = compose("exec backend", "/bin/run-tests", *args, flag)
+    # else:
     res = compose("run --rm --service-ports backend", "/bin/run-tests", *args, flag)
-    compose("down")
+    # if "--keep-database" not in args:
+    if standalone:
+        compose("down")
     sys.exit(res.returncode)
