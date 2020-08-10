@@ -75,6 +75,7 @@ class MappedDatabaseMixin(object):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
         # TODO: add the process flow described below:
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
+
         BaseModel.query = self.session.query_property()
         BaseModel.db = self
 

@@ -5,9 +5,10 @@ from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from sqlalchemy import and_
 from datetime import datetime
-from pytest import mark, fixture
+from pytest import mark, fixture, warns
 import logging
 from json import load
+from sqlalchemy.exc import SAWarning
 
 
 def ensure_single(db, model_name, **filter_params):
@@ -16,11 +17,16 @@ def ensure_single(db, model_name, **filter_params):
     assert n == 1
 
 
+# This should be in the fixture function ideally but I can't figure out
+# how the setup can get cached.
+app = App(__name__)
+app.load()
+app.load_phase_2()
+
+
 @fixture
 def db():
-    app = App(__name__)
-    app.load()
-    app.load_phase_2()
+    # with warns(SAWarning) as record:
     return app.database
 
 
