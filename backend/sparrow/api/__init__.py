@@ -1,13 +1,6 @@
 from flama import Flama
 
-APIv2 = Flama(
-    title="Sparrow API",
-    version="2.0",
-    description="An API for accessing geochemical data",
-)
 
-
-@APIv2.route("/", methods=["GET"])
 def hello_world():
     """
     description:
@@ -17,3 +10,16 @@ def hello_world():
             description: It's alive!
     """
     return {"Hello": "world!"}
+
+
+class APIv2(Flama):
+    def __init__(self, app):
+        super().__init__(
+            title="Sparrow API",
+            version="2.0",
+            description="An API for accessing geochemical data",
+        )
+        self._add_routes()
+
+    def _add_routes(self):
+        self.add_route("/", hello_world, methods=["GET"])

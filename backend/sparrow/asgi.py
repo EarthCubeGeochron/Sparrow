@@ -15,14 +15,17 @@ flask.load_phase_2()
 
 FlaskApp = WsgiToAsgi(flask)
 
-
+# Shim redirect for root path.
+# TODO: clean this up
 async def redirect(*args):
     return RedirectResponse("/api/v2/")
 
 
+api_v2 = APIv2(flask)
+
 routes = [
     Route("/api/v2", endpoint=redirect),
-    Mount("/api/v2/", app=APIv2),
+    Mount("/api/v2/", app=api_v2),
     Mount("/", app=FlaskApp),
 ]
 
