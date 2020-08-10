@@ -36,7 +36,6 @@ while not db_ready():
 
 # Create the database
 c = run(["createdb", *dbargs, "sparrow_test"])
-echo(c.returncode)
 echo("Database is ready...")
 
 os.environ["SPARROW_DATABASE"] = "postgresql://postgres@db:5432/sparrow_test"

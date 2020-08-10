@@ -1,6 +1,7 @@
 from sparrow.app import App
 from sparrow.util import relative_path
 from sparrow.database.mapper import BaseModel
+from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from sqlalchemy import and_
 from datetime import datetime
@@ -8,10 +9,20 @@ from pytest import mark, fixture
 import logging
 from json import load
 
-app = App(__name__)
-app.load()
-app.load_phase_2()
-db = app.database
+
+def ensure_single(db, model_name, **filter_params):
+    model = getattr(db.model, model_name)
+    n = db.session.query(model).filter_by(**filter_params).count()
+    assert n == 1
+
+
+@fixture
+def db():
+    app = App(__name__)
+    app.load()
+    app.load_phase_2()
+    return app.database
+
 
 session = dict(sample_id="A-0", date=datetime.now())
 
@@ -19,7 +30,7 @@ logging.basicConfig(level=logging.CRITICAL)
 
 
 class TestDatabaseInitialization:
-    def test_db_automap(self):
+    def test_db_automap(self, db):
         """
         Make sure that all core tables are automapped by the
         SQLAlchemy mapper.
@@ -59,13 +70,13 @@ class TestDatabaseInitialization:
 
 class TestGenericData(object):
     @mark.xfail(reason="'get_instance' has a poorly written API.")
-    def test_get_instance(self):
+    def test_get_instance(self, db):
         sample = db.get_instance("sample", {"name": "Nonexistent sample"})
         assert sample is None
 
 
 class TestImperativeImport(object):
-    def test_imperative_import(self):
+    def test_imperative_import(self, db):
         """
         Test importing some data using imperative SQLAlchemy. This is no
         longer the recommended approach (use import schemas instead). Many
@@ -146,12 +157,12 @@ class TestImperativeImport(object):
         db.session.add(datum)
         db.session.commit()
 
-    def test_import_successful(self):
+    def test_import_successful(self, db):
         item = db.session.query(db.model.datum).first()
         assert item.value == 121
         assert item.error == 22
 
-    def test_foreign_keys(self):
+    def test_foreign_keys(self, db):
         item = db.session.query(db.model.session).first()
         assert item.sample_id is not None
         item = db.session.query(db.model.analysis).first()
@@ -160,7 +171,7 @@ class TestImperativeImport(object):
         assert item.analysis is not None
         assert item.type is not None
 
-    def test_operation_log(self):
+    def test_operation_log(self, db):
         """
         Test whether our PGMemento audit trail is working
         """
@@ -203,41 +214,49 @@ basic_data = {
     ],
 }
 
-
-def ensure_single(model_name, **filter_params):
-    model = getattr(db.model, model_name)
-    n = db.session.query(model).filter_by(**filter_params).count()
-    assert n == 1
+incomplete_analysis = {
+    # Can't seem to get or create this instance from the database
+    "analysis_type": "Soil aliquot pyrolysis",
+    "session_index": 0,
+    "datum": [
+        {
+            "value": 0.1,
+            "error": 0.025,
+            "type": {"parameter": "soil water content", "unit": "weight %"},
+        }
+    ],
+}
 
 
 class TestDeclarativeImporter:
-    def test_import_interface(self):
+    def test_import_interface(self, db):
         for model in ["datum", "session", "datum_type"]:
-            assert hasattr(db.interface, model)
+            iface = getattr(db.interface, model)
+            assert isinstance(iface(), Schema)
 
-    def test_standalone_sample(self):
+    def test_standalone_sample(self, db):
         sample = {"name": "test sample 1"}
         db.load_data("sample", sample)
         db.load_data("sample", sample)
-        ensure_single("sample", **sample)
+        ensure_single(db, "sample", **sample)
 
-    def test_standalone_datum_type(self):
+    def test_standalone_datum_type(self, db):
         data = {"parameter": "Oxygen fugacity", "unit": "dimensionless"}
 
         db.load_data("datum_type", data)
         # We should be able to import this idempotently
         db.load_data("datum_type", data)
 
-    def test_basic_import(self):
+    def test_basic_import(self, db):
         db.load_data("session", basic_data)
-        ensure_single("sample", name="Soil 001")
+        ensure_single(db, "sample", name="Soil 001")
 
-    def test_duplicate_import(self):
+    def test_duplicate_import(self, db):
         db.load_data("session", basic_data)
-        ensure_single("sample", name="Soil 001")
-        ensure_single("session", name="Declarative import test")
+        ensure_single(db, "sample", name="Soil 001")
+        ensure_single(db, "session", name="Declarative import test")
 
-    def test_duplicate_parameter(self):
+    def test_duplicate_parameter(self, db):
 
         data = {
             "date": "2020-02-02T10:20:02",
@@ -263,10 +282,10 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
 
-        ensure_single("sample", name="Soil 002")
-        ensure_single("session", name="Declarative import test 2")
+        ensure_single(db, "sample", name="Soil 002")
+        ensure_single(db, "session", name="Declarative import test 2")
 
-    def test_primary_key_loading(self):
+    def test_primary_key_loading(self, db):
         """We should be able to load already-existing values with their
         primary keys.
         """
@@ -294,7 +313,7 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
 
-    def test_session_merging(self):
+    def test_session_merging(self, db):
         data = {
             "date": str(datetime.now()),
             "name": "Session merging test",
@@ -320,15 +339,15 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
         db.load_data("session", data)
-        ensure_single("session", name="Session merging test")
-        ensure_single("datum", value=0.252)
+        ensure_single(db, "session", name="Session merging test")
+        ensure_single(db, "datum", value=0.252)
 
-    def test_datum_type_merging(self):
+    def test_datum_type_merging(self, db):
         """Datum types should successfully find values already in the database.
         """
-        ensure_single("datum_type", parameter="soil water content", unit="weight %")
+        ensure_single(db, "datum_type", parameter="soil water content", unit="weight %")
 
-    def test_load_existing_instance(self):
+    def test_load_existing_instance(self, db):
         # Get an instance
         type = (
             db.session.query(db.model.datum_type)
@@ -354,38 +373,16 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
 
-    def test_incomplete_import_excluded(self):
-        # Get an instance
-        type = (
-            db.session.query(db.model.datum_type)
-            .filter_by(parameter="soil water content", unit="weight %", error_unit=None)
-            .first()
-        )
-
-        assert isinstance(type, BaseModel)
-
-        data = {
-            # Can't seem to get or create this instance from the database
-            "analysis_type": "Soil aliquot pyrolysis",
-            "session_index": 0,
-            "datum": [
-                {
-                    "value": 0.1,
-                    "error": 0.025,
-                    "type": {"parameter": "soil water content", "unit": "weight %"},
-                }
-            ],
-        }
-
+    def test_incomplete_import_excluded(self, db):
         try:
-            db.load_data("analysis", data)
+            db.load_data("analysis", incomplete_analysis)
             # We shouldn't succeed at importing this data
             assert False
         except Exception as err:
             assert isinstance(err, ValidationError)
             assert err.messages["session"][0] == "Missing data for required field."
 
-    def test_duplicate_datum_type(self):
+    def test_duplicate_datum_type(self, db):
 
         data = {
             "date": str(datetime.now()),
@@ -421,7 +418,7 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
 
-    def test_expand_id(self, caplog):
+    def test_expand_id(self, caplog, db):
         caplog.set_level(logging.INFO, "sqlalchemy.engine")
 
         data = {"parameter": "test param", "unit": "test unit"}
@@ -430,7 +427,7 @@ class TestDeclarativeImporter:
         assert val._unit.id == data["unit"]
         assert val._error_unit is None
 
-    def test_get_instance(self):
+    def test_get_instance(self, db):
         q = {"parameter": "soil water content", "unit": "weight %"}
         type = (
             db.session.query(db.model.datum_type)
@@ -443,13 +440,13 @@ class TestDeclarativeImporter:
         assert isinstance(res, db.model.datum_type)
         assert res.id == type.id
 
-    def test_get_number(self):
+    def test_get_number(self, db):
         res = db.get_instance("datum", dict(value=0.1, error=0.025))
         assert isinstance(res, db.model.datum)
         assert float(res.value) == 0.1
 
     @mark.skip
-    def test_get_datum(self):
+    def test_get_datum(self, db):
         res = db.get_instance("datum", dict(id=2))
         assert isinstance(res, db.model.datum)
 
@@ -461,7 +458,7 @@ def load_relative(*pth):
 
 
 class TestImportDataTypes(object):
-    def test_simple_cosmo_import(self):
+    def test_simple_cosmo_import(self, db):
         # Test import of simple cosmogenic nuclides data types
         data = load_relative("simple-cosmo-test.json")
         db.load_data("session", data)
@@ -469,6 +466,9 @@ class TestImportDataTypes(object):
 
 @fixture
 def client():
+    app = App(__name__)
+    app.load()
+    app.load_phase_2()
     with app.test_client() as client:
         yield client
 
@@ -506,7 +506,7 @@ class TestAPIImporter:
         assert res.status_code == 201
 
     @mark.skip
-    def test_complex_single_row_prior(self, client):
+    def test_complex_single_row_prior(self, client, db):
         # This test fails if before the overall import
         # Too much output
         # logging.disable(logging.CRITICAL)
@@ -518,7 +518,7 @@ class TestAPIImporter:
 
         db.load_data("session", complex_data["data"])
 
-    def test_complex_import(self, client):
+    def test_complex_import(self, client, db):
         # Too much output
         logging.disable(logging.DEBUG)
 
@@ -534,7 +534,7 @@ class TestAPIImporter:
         )
         assert q.count() > 1
 
-    def test_complex_single_row(self, client):
+    def test_complex_single_row(self, client, db):
         # This test fails if before the overall import
         # Too much output
         # logging.disable(logging.CRITICAL)
@@ -546,7 +546,7 @@ class TestAPIImporter:
 
         db.load_data("session", complex_data["data"])
 
-    def test_missing_field(self, client):
+    def test_missing_field(self, client, db):
         """Missing fields should produce a useful error message
            and insert no data"""
         new_name = "Test error vvv"

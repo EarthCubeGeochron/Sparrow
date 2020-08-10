@@ -71,6 +71,17 @@ class SparrowConverter(ModelConverter):
         # named after the local column
         if prop.secondary is None and not prop.uselist:
             return prop.key
+
+        # For tables not in Sparrow's standard schemas, we make sure to append the
+        # schema name in front of keys, in order for views etc. to not trample
+        # on already-used names. This was added in order to solve problems
+        # with the automapping of `core_view.datum`.
+        #
+        # It may be desirable to improve this by adding a __prefix before views,
+        # OR by making _ALL_ non-public schema tables require a prefix.
+        if prop.target.schema not in [None, "vocabulary", "enum"]:
+            return f"{prop.target.schema}_{prop.target.name}"
+
         # Otherwise, we go with the name of the target model.
         return prop.target.name
 
