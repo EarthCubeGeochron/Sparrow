@@ -43,6 +43,7 @@ def sparrow_test(ctx, pytest_args, psql=False):
     # We should probably just import pytest directly and run
     pass_conditions = {0: "Tests passed", 5: "No tests collected"}
 
+    chdir(pth)
     res = cmd(path.join(pth, "_cli/_scripts/test-cli"), *pytest_args)
     if res.returncode not in pass_conditions.keys():
         print("CLI tests failed, exiting")
