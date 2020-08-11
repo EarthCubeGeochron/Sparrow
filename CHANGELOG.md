@@ -8,7 +8,14 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
-## [1.6.0] - 2020-07-24
+## [Unreleased] - 2020-07-31
+
+## Changed
+
+- Excel-like data sheet with drag copy and paste features.
+- Highlights on Select (blue), during editing (red), recently changed cells (green)
+
+## [Unreleased] - 2020-07-24
 
 ## Changed
 
@@ -43,13 +50,6 @@ We hope to arrive at full conformance for milestone `2.0.0`.
 - Bundle `docker-compose` version `1.26.0` into the `sparrow` wrapper command
   to solve version issues on Ubuntu and other platforms.
 
-## [Unreleased] - 2020-07-24
-
-## Changed
-
-- Map now has interactive markers with tooltips and popovers
-- Sample's popovers contain links to the respective sample page
-- Map has superclusters to increase loading performance
 ## [1.3.0] - 2020-06-07
 
 ### Changes

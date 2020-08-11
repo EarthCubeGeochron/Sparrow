@@ -1,21 +1,17 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import h from "react-hyperscript";
-import { AppNavbar, NavButton } from "app/components/navbar";
-import { MapHome } from "./map/index";
+import { hyperStyled } from "@macrostrat/hyper";
 import { Frame } from "./frame";
-import { InsetText } from "app/layout";
-import "./styles.modules.css";
+import { InsetText } from "app/components/layout";
+import styles from "./styles.module.css";
 
-const HomePage = () =>
-  h("div.homepage", [
-    h(InsetText, null, [
-      h(Frame, { id: "landingText" }, "Landing page text goes here."),
-      h(Frame, { id: "landingGraphic" }, h(MapHome)),
+const h = hyperStyled(styles);
+
+const HomePage = () => {
+  return h("div.homepage", [
+    h(InsetText, [
+      h(Frame, { id: "landingText" }),
+      h(Frame, { id: "landingGraphic" }),
     ]),
   ]);
+};
 
 export { HomePage };

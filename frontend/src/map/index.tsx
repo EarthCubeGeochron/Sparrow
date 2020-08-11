@@ -15,7 +15,7 @@ import {
 } from "@blueprintjs/core";
 import { hyperStyled, classed } from "@macrostrat/hyper";
 import styles from "./module.styl";
-import { SiteTitle } from "app/components/navbar";
+import { SiteTitle } from "app/components";
 import { CatalogNavLinks } from "../admin";
 import { AuthStatus } from "app/auth";
 import { MapPanel } from "./map-area";

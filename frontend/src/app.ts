@@ -4,15 +4,10 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import h from "react-hyperscript";
-import { Component, useEffect } from "react";
+import h from "@macrostrat/hyper";
+import { useEffect } from "react";
 import { join } from "path";
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { HomePage } from "./homepage";
 
 import siteContent from "site-content";
@@ -20,37 +15,30 @@ import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
 import { APIProvider } from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
-import { PageFooter } from "./shared/footer";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
-import { Catalog, CatalogNavLinks } from "./admin";
-import { AppNavbar, NavButton } from "./components/navbar";
+import { Catalog } from "./admin";
+import { PageSkeleton, PageStyle } from "./components/page-skeleton";
 import { MapPage } from "./map";
+<<<<<<< HEAD
 import Table from "./table/App";
 import styled from "@emotion/styled";
+=======
+import DataSheet from "./data-sheet/app";
+>>>>>>> 14ebec2ef96929777789924ea72573ccf9261782
 
-const AppHolder = styled.div`\
-display: flex;
-flex-direction: column;
-min-height: 100vh;\
-`;
-
-const Expander = styled.div`\
-flex-grow: 1;\
-`;
-
-function HideNavbarSometimes(props) {
-  /*
-  Defines a hideable global UI component
-  */
-  const location = useLocation();
-  const hidePaths = ["/map"];
-  if (hidePaths.includes(location.pathname)) {
-    return null;
-  }
-  return h([props.children]);
+function PageRoute(props) {
+  /** A custom route to manage page header, footer, and style associated
+      with a specific route */
+  const { render, component: base, style, ...rest } = props;
+  const component = (p) => {
+    const children = base != null ? h(base, p) : render(p);
+    return h(PageSkeleton, { style, children });
+  };
+  return h(Route, { ...rest, component });
 }
 
+<<<<<<< HEAD
 const MainNavbar = (props) =>
   h(AppNavbar, { fullTitle: true }, [
     h(CatalogNavLinks, { base: "/catalog" }),
@@ -59,11 +47,14 @@ const MainNavbar = (props) =>
     h(NavButton, { to: "/api-explorer/v1" }, "API"), // NavButton, similar to React-Router 'Link' takes the 'to' arg
   ]);
 
+=======
+>>>>>>> 14ebec2ef96929777789924ea72573ccf9261782
 function AppMain(props) {
   // Handles routing for the application between pages
   const { baseURL } = props;
 
   // Tab Title becomes WiscAr-Sparrow
+  // TODO: We could use the 'react-helmet' library to manage this...
   useEffect(() => {
     const labname = process.env.SPARROW_LAB_NAME;
     document.title = labname != null ? `${labname} – Sparrow` : "Sparrow";
@@ -72,31 +63,29 @@ function AppMain(props) {
   return h(
     Router,
     { basename: baseURL },
-    h(AppHolder, [
-      h(Expander, [
-        h(HideNavbarSometimes, null, h(MainNavbar)),
-        h(Switch, [
-          h(Route, {
-            path: "/",
-            exact: true,
-            render() {
-              return h(HomePage);
-            },
-          }),
-          h(Route, {
-            path: "/catalog",
-            render() {
-              return h(Catalog, { base: "/catalog" });
-            },
-          }),
-          h(Route, {
-            path: "/map",
-            component: MapPage,
-          }),
-          h(Route, { path: "/api-explorer", component: APIExplorer }),
-        ]),
-      ]),
-      h(HideNavbarSometimes, null, h(PageFooter)),
+    h(Switch, [
+      h(PageRoute, {
+        path: "/",
+        exact: true,
+        component: HomePage,
+      }),
+      h(PageRoute, {
+        path: "/catalog",
+        render() {
+          return h(Catalog, { base: "/catalog" });
+        },
+      }),
+      h(PageRoute, {
+        path: "/map",
+        style: PageStyle.FULLSCREEN,
+        component: MapPage,
+      }),
+      h(PageRoute, {
+        path: "/data-sheet",
+        style: PageStyle.WIDE,
+        component: DataSheet,
+      }),
+      h(PageRoute, { path: "/api-explorer", component: APIExplorer }),
     ])
   );
 }
