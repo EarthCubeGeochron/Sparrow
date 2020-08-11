@@ -18,7 +18,8 @@ import { Link } from "react-router-dom";
 import { useAPIResult } from "./components/APIResult";
 import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
-import { MapDrawer } from "./components/MapDrawer";
+import { MapToaster } from "./components/MapToast";
+import { AppToaster } from "../toaster";
 
 export function MapPanel({
   width = "50vw",
@@ -38,13 +39,13 @@ export function MapPanel({
 
   const [state, setState] = useState(initialState);
 
-  const [viewport, setViewport] = useState({
-    latitude,
-    longitude,
-    zoom,
-    width,
-    height,
-  });
+  // const [viewport, setViewport] = useState({
+  //   latitude,
+  //   longitude,
+  //   zoom,
+  //   width,
+  //   height,
+  // });
   const mapstyles = {
     initialMapStyle: "mapbox://styles/mapbox/outdoors-v9",
     topoMapStyle: "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub",
@@ -92,15 +93,16 @@ export function MapPanel({
       drawOpen: !state.drawOpen,
       clickPnt: { lng: e.lngLat[0], lat: e.lngLat[1] },
     });
+
+    return AppToaster.show({ message: "Workgin" });
   };
 
   return (
     <div className="map-container">
-      <MapDrawer
-        drawOpen={state.drawOpen}
-        closeToast={closeToast}
+      {/* <MapToaster
         clickPnt={state.clickPnt}
-      ></MapDrawer>
+        drawOpen={state.drawOpen}
+      ></MapToaster> */}
       <div className="layer-button">
         <LayerMenu
           MapStyle={state.MapStyle}
