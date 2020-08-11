@@ -11,15 +11,20 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyle } from "./MapStyle";
 import h, { compose } from "@macrostrat/hyper";
 import useSuperCluster from "use-supercluster";
-import { Tooltip, Popover, Button, Intent } from "@blueprintjs/core";
+import { Button, Intent, Toaster, Position } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./cluster.css";
 import { Link } from "react-router-dom";
 import { useAPIResult } from "./components/APIResult";
 import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
-import { MapToaster } from "./components/MapToast";
+//import { MapToaster } from "./components/MapToast";
 import { AppToaster } from "../toaster";
+
+const MapToaster = Toaster.create({
+  position: Position.TOP_RIGHT,
+  maxToasts: 3,
+});
 
 export function MapPanel({
   width = "50vw",
@@ -38,6 +43,29 @@ export function MapPanel({
   };
 
   const [state, setState] = useState(initialState);
+  const [macrostratData, setMacrostratData] = useState([]);
+
+  const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
+
+  const MacostratData = useAPIResult(MacURl, {
+    lng: state.clickPnt.lng,
+    lat: state.clickPnt.lat,
+  });
+
+  useEffect(() => {
+    if (MacostratData == null) return;
+    setMacrostratData(MacostratData.success.data);
+    console.log(macrostratData);
+  }, [MacostratData]);
+
+  let message = macrostratData.map((object) => {
+    return (
+      <div>
+        <p key={object.name}>{"Name: " + object.name}</p>
+        <p key={object.lith}>{"Lithology: " + object.lith}</p>
+      </div>
+    );
+  });
 
   // const [viewport, setViewport] = useState({
   //   latitude,
@@ -94,15 +122,14 @@ export function MapPanel({
       clickPnt: { lng: e.lngLat[0], lat: e.lngLat[1] },
     });
 
-    return AppToaster.show({ message: "Workgin" });
+    return MapToaster.show({
+      message: message,
+      timeout: 0,
+    });
   };
 
   return (
     <div className="map-container">
-      {/* <MapToaster
-        clickPnt={state.clickPnt}
-        drawOpen={state.drawOpen}
-      ></MapToaster> */}
       <div className="layer-button">
         <LayerMenu
           MapStyle={state.MapStyle}

@@ -8,6 +8,7 @@ import {
   Position,
   Intent,
 } from "@blueprintjs/core";
+
 import { useAPIResult } from "./APIResult";
 import { AppToaster } from "../../toaster";
 import { intentClass } from "@blueprintjs/core/lib/esm/common/classes";
@@ -18,15 +19,15 @@ API based on a click on the map */
 
 // USE TOASTER it'll be way cooler
 
-export function MapToaster({ clickPnt, drawOpen }) {
+export function MapToaster({ lng, lat, drawOp }) {
   const [macrostratData, setMacrostratData] = useState([]);
 
   // url to queary macrostrat
   const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
 
   const MacostratData = useAPIResult(MacURl, {
-    lng: clickPnt.lng,
-    lat: clickPnt.lat,
+    lng: lng,
+    lat: lat,
   });
 
   useEffect(() => {
@@ -36,16 +37,18 @@ export function MapToaster({ clickPnt, drawOpen }) {
   }, [MacostratData]);
 
   return (
-    <div>
-      {macrostratData.map((object) => {
-        return (
-          <div>
-            <p key={object.name}>{"Name: " + object.name}</p>
-            <p key={object.lith}>{"Lithology: " + object.lith}</p>
-          </div>
-        );
-      })}
-    </div>
+    <Toaster maxToasts={3} position={Position.TOP_RIGHT}>
+      <Toast
+        message={macrostratData.map((object) => {
+          return (
+            <div>
+              <p key={object.name}>{"Name: " + object.name}</p>
+              <p key={object.lith}>{"Lithology: " + object.lith}</p>
+            </div>
+          );
+        })}
+      ></Toast>
+    </Toaster>
   );
   // return (
   //   <div>
