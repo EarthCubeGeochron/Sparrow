@@ -38,7 +38,6 @@ function PageRoute(props) {
   return h(Route, { ...rest, component });
 }
 
-<<<<<<< HEAD
 const MainNavbar = (props) =>
   h(AppNavbar, { fullTitle: true }, [
     h(CatalogNavLinks, { base: "/catalog" }),
@@ -47,8 +46,6 @@ const MainNavbar = (props) =>
     h(NavButton, { to: "/api-explorer/v1" }, "API"), // NavButton, similar to React-Router 'Link' takes the 'to' arg
   ]);
 
-=======
->>>>>>> 14ebec2ef96929777789924ea72573ccf9261782
 function AppMain(props) {
   // Handles routing for the application between pages
   const { baseURL } = props;
@@ -79,11 +76,6 @@ function AppMain(props) {
         path: "/map",
         style: PageStyle.FULLSCREEN,
         component: MapPage,
-      }),
-      h(PageRoute, {
-        path: "/data-sheet",
-        style: PageStyle.WIDE,
-        component: DataSheet,
       }),
       h(PageRoute, { path: "/api-explorer", component: APIExplorer }),
     ])
