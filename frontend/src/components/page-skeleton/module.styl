@@ -1,0 +1,56 @@
+@require '~app/shared/mixins'
+@require '~app/shared/colors'
+
+.app-navbar
+  margin-top 0
+
+.page-skeleton
+  display: flex
+  flex-direction: column
+  min-height: 100vh
+
+  &.basic
+    max-width 60em
+    margin 0 auto
+    .app-navbar
+      border-radius: 5px
+      margin-top 2em
+  &.wide
+    padding-top: 50px
+    height: 100vh
+    overflow-y hidden
+    .app-navbar
+      padding-left 2rem
+      padding-right 2rem
+    .page-content
+      position fixed
+      top 50px
+      left 0
+      right 0
+      bottom 0
+      padding 2em
+      overflow-y scroll
+
+.expander
+  flex-grow 1
+
+
+.minimal-navbar
+  display: flex
+  flex-direction: row
+  align-items: baseline
+  minimal-navbar()
+  h4
+    margin: 0
+    padding: 0.1em 1em 0.1em 0.4em
+    color: #5c7080
+    min-width: 5em
+
+.auth-right
+  position absolute
+  right 0.2em
+
+.navbar-button
+  margin-right: 1em
+  &.active
+    background-color: #d8e1e8

@@ -2,22 +2,25 @@ import React, { useState, useEffect, useContext } from "react";
 import { List, Grid, AutoSizer } from "react-virtualized";
 import VirDataSheet from "./vDataSheet";
 import ReactDataSheet from "react-datasheet";
-import "react-datasheet/lib/react-datasheet.css";
-import "./datasheet.modules.css";
-import { useAPIResult, SubmitDialog } from "./ui-components";
-import { Button, Dialog } from "@blueprintjs/core";
-import { AppToaster } from "../toaster";
+import { useAPIResult } from "@macrostrat/ui-components";
+import { SheetHeader } from "./header";
+import { DataSheetContext, DataSheetProvider } from "./provider";
+import update from "immutability-helper";
+
+import "./datasheet.css";
+import styles from "./module.styl";
 
 const Row = ({ row, children, className }) => {
   return (
     <tr>
-      <td className={className}>{row}</td>
+      <td className="cell read-only">{row}</td>
       {children}
     </tr>
   );
 };
 
-const SheetRender = ({ className, columns, children }) => {
+const Sheet = ({ className, children }) => {
+  const { columns } = useContext(DataSheetContext);
   return (
     <table className={className}>
       <thead>
@@ -33,113 +36,123 @@ const SheetRender = ({ className, columns, children }) => {
   );
 };
 
-function DataSheet() {
-  const [geo, setGeo] = useState([]);
-  const [edited, setEdited] = useState(false);
-  const [data, setData] = useState([]);
-  const [iData, setiData] = useState([]);
-  const [upData, setUpData] = useState([]);
-  const initialData = useAPIResult("/sample", { all: true });
+const columnSpec = [
+  { name: "Sample Name", key: "name" },
+  { name: "IGSN", key: "igsn" },
+  { name: "Public", key: "is_public" },
+  { name: "Material", key: "material" },
+  { name: "Latitude", key: "latitude" },
+  { name: "Longitude", key: "longitude" },
+  { name: "Location name", key: "location_name" },
+  { name: "Project", key: "project_name" },
+];
 
-  console.log(upData);
+function unwrapSampleData(sampleData) {
+  /** Unwrap samples from API response to a flattened version */
+  const { geometry, ...rest } = sampleData;
+  let longitude: number, latitude: number;
+  if (geometry != null) {
+    [longitude, latitude] = geometry?.coordinates;
+  }
+  return { longitude, latitude, ...rest };
+}
+
+function unwrapResponse(apiResult) {
+  /** Flatten latitudes and longitudes for entire API response */
+  return apiResult.map(unwrapSampleData);
+}
+
+interface SampleData {
+  latitude: number;
+  longitude: number;
+  name: string;
+}
+
+function DataSheet() {
+  const [data, setData] = useState<SampleData[]>([]);
+  const initialData = useAPIResult<SampleData[]>(
+    "/sample",
+    { all: true },
+    unwrapResponse
+  );
+
   useEffect(() => {
+    // Set data to start with the value of the initial data
     if (initialData == null) return;
-    const markers = initialData.filter((d) => d.geometry != null);
-    const mutMarker = markers.map((sample) => {
-      const {
-        geometry: {
-          coordinates: [longitude, latitude],
-        },
-        ...rest
-      } = sample;
-      const mutSample = { longitude, latitude, ...rest };
-      return mutSample;
-    });
-    setGeo(mutMarker);
-    const geoVal = mutMarker.map((obj) =>
-      Object.values(obj).map((d) => ({ value: d }))
-    );
-    setData(geoVal);
-    setiData(geoVal);
+    setData(initialData);
   }, [initialData]);
 
-  if (geo.length === 0) {
+  if (data.length === 0) {
     return null;
   }
-  const geoCol = geo.map((obj) => Object.keys(obj).map((d) => ({ name: d })));
-  const columns2 = geoCol[0];
 
-  const renderRow = (props) => {
-    return (
-      <Row
-        className="cell header"
-        row={props.row}
-        children={props.children}
-      ></Row>
-    );
-  };
+  const columns = columnSpec;
 
-  const renderSheet = (props) => {
-    return (
-      <SheetRender
-        className={props.className}
-        columns={columns2}
-        children={props.children}
-      ></SheetRender>
-    );
+  // Change management
+  const handleUndo = () => {
+    setData(initialData);
   };
-
-  const onClickHandleUndo = () => {
-    setData(iData);
-  };
-  const onClickHandle = () => {
+  const handleSubmit = () => {
     //push method for sending data back to api
-    if (upData.length === 0) {
+    if (data.length === 0) {
       return null;
     }
-    setData(upData);
+    setData(data);
   };
 
   const onCellsChanged = (changes) => {
-    const grid1 = data.map((row) => [...row]);
+    /** Cell change function that uses immutability-helper */
+    const spec = {};
     changes.forEach(({ cell, row, col, value }) => {
-      grid1[row][col] = { ...grid1[row][col], value };
+      // Get the key that should be used to assign the value
+      const { key } = columns[col];
+      // Substitute empty strings for nulls
+      const $set = value == "" ? null : value;
+
+      spec[row] = {
+        ...(spec[row] || {}),
+        [key]: { $set },
+      };
     });
-    setUpData(grid1);
-    const grid = data.map((row) => [...row]);
-    changes.forEach(({ cell, row, col, value }) => {
-      grid[row][col] = { ...grid[row][col], value };
-      grid[row][col].className = "edited";
-    });
-    setData(grid);
+    console.log(spec);
+    setData(update(data, spec));
   };
 
-  var constant =
-    "Are you sure you want to Submit? All changes will be final. If you do not want to submit, click Cancel.";
+  const buildCellProps = (value: any, row: number, key: string) => {
+    // Check if values is the same as the initial data key
+    const isChanged = value != initialData[row][key];
+    const className = isChanged ? "edited" : null;
+    return { value, className };
+  };
+
+  /** We now build cell properties in the render function, rather than storing
+      them using a precomputed useEffect hook. We decide what cells have changed using
+      a direct comparison with the equivalent value of initialData. (That's the
+      power of immutable data.) */
+  const cellData = data.map((obj, row) =>
+    columns.map(({ key }) => buildCellProps(obj[key], row, key))
+  );
 
   return (
-    <div className="data-sheet">
-      <div className="sheet-header">
-        <h3 className="sheet-title">DataSheet for Editing</h3>
-        <SubmitDialog
-          className="save-btn"
-          divClass="sheet-header"
-          onClick={onClickHandle}
-          content={constant}
-        ></SubmitDialog>
-        <Button onClick={onClickHandleUndo}>Undo Changes</Button>
+    <DataSheetProvider columns={columns}>
+      <div className={styles["data-sheet"]}>
+        <SheetHeader
+          onSubmit={handleSubmit}
+          onUndo={handleUndo}
+          hasChanges={initialData != data}
+        ></SheetHeader>
+        <div className="sheet">
+          <ReactDataSheet
+            data={cellData.slice(0, 100)}
+            valueRenderer={(cell) => cell.value}
+            sheetRenderer={Sheet}
+            rowRenderer={Row}
+            onCellsChanged={onCellsChanged}
+          />
+        </div>
       </div>
-
-      <div className="sheet">
-        <ReactDataSheet
-          data={data.slice(0, 100)}
-          valueRenderer={(cell) => cell.value}
-          sheetRenderer={renderSheet}
-          rowRenderer={renderRow}
-          onCellsChanged={onCellsChanged}
-        />
-      </div>
-    </div>
+    </DataSheetProvider>
   );
 }
+
 export default DataSheet;

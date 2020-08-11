@@ -1,0 +1,54 @@
+@import "~app/shared/colors"
+
+  //@require "~react-datasheet/lib/react-datasheet.css";
+  //@import "./datasheet.css"
+
+.data-sheet
+  position fixed
+  top 50px
+  left 1em
+  right 0em
+  bottom 1px
+  display flex
+  flex-direction column
+  tbody
+    overflow-y scroll
+    padding-bottom 2em
+  // https://css-tricks.com/position-sticky-and-table-headers/
+  th
+    position sticky
+    top 0
+    background-color: whitesmoke
+
+:global
+  .sheet-header, .sheet-actions
+    display flex
+    flex-direction row
+    align-items: baseline;
+
+  .sheet-actions
+    &>*
+      display inline-block
+      margin-right 0.5em
+
+  .sheet-header
+    padding-top 1em
+    margin-bottom 0.5em
+    h3
+      padding 0
+      margin 0
+      margin-right 1em
+      color $gray1
+
+  .sheet
+    flex 1
+    position relative
+
+  table.data-grid
+    display block
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
+    overflow-y scroll
