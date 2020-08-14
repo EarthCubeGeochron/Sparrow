@@ -601,8 +601,11 @@ class TestAPIImporter:
         assert res == None
 
 
-def test_large_dataset():
+def test_large_dataset(client):
     fn = relative_path(__file__, "wiscsims-test2.json")
     with open(fn) as fp:
         data = load(fp)
-    db.load_data("session", data["data"])
+
+    logging.disable(logging.CRITICAL)
+    res = client.put("/api/v1/import-data/session", json=data)
+    assert res.status_code == 201  # Created
