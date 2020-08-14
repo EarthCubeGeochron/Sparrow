@@ -607,5 +607,10 @@ def test_large_dataset(client):
         data = load(fp)
 
     logging.disable(logging.CRITICAL)
-    res = client.put("/api/v1/import-data/session", json=data)
-    assert res.status_code == 201  # Created
+
+    for i in range(10):
+        data["data"]["name"] = f"Session {i}"
+        data["data"]["date"] = datetime.now().isoformat()
+        print(i)
+        res = client.put("/api/v1/import-data/session", json=data)
+        assert res.status_code == 201  # Created
