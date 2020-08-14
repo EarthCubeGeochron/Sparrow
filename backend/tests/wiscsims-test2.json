@@ -1,0 +1,4274 @@
+{
+  "filename": null,
+  "data": {
+    "name": "Test session 2",
+    "sample": {
+      "name": "J-125=85630"
+    },
+    "date": "2020-01-01T00:00:40",
+    "analysis": [
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 1
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.414,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 2
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.409,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 3
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.213,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 4
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.253,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 5
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 6
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 17.502,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 7
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 17.703,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 8
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 17.945,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 9
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 17.624,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 10
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 17.761,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 11
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 17.789,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 12
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 13
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.227,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 14
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.189,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 15
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.356,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 16
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.376,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 17
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.3046,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 18
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 19
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 20
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 21
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.029,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 22
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.173,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 23
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.434,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 24
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.327,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 25
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.218,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 26
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 27
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.0217,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.9324,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.599,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 28
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.5248,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.4511,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 28.116,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 29
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.628,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.5574,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 28.222,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 30
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.1048,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.802,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.469,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 31
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.1404,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0548,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.721,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 32
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.2008,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.117,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.783,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 33
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.0665,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.9785,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.645,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 34
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.2041,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.6996,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.367,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 35
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.6475,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.5775,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 28.242,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 36
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.0285,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.9394,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.606,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 37
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 38
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.234,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 39
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.113,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 40
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.165,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 41
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.066,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 42
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.2163,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 43
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 44
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.0023,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.9076,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.557,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 45
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.6604,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.5908,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 28.238,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 46
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.4918,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.403,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.054,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 47
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.3072,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2266,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.875,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 48
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.1271,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.041,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.69,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 49
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.2711,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.1895,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.838,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 50
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.3081,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2277,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.876,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 51
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.2631,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.6387,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.289,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 52
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.0802,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.8273,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.477,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 53
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.3023,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2216,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.87,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 54
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 55
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.308,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 56
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.204,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 57
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.272,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 58
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.232,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 59
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.1993,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 60
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 61
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.1371,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0514,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.802,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 62
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.1187,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0323,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.783,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 63
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.107,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0203,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.771,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 64
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.3114,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.5889,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.341,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 65
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.2891,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.612,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.364,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 66
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.5119,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.3823,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.135,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 67
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.8097,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.0753,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.829,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 68
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.2636,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.1818,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.932,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 69
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.2005,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.7033,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.455,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 70
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.6219,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.2689,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.022,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 71
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 72
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.914,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 73
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.43,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 74
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.399,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 75
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.307,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 76
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.626,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 77
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 9.2991,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 78
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 79
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.971,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 80
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.395,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 81
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.544,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 82
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.581,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 83
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 84
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.134,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.7719,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.741,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 85
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.3646,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2859,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.253,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 86
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.3714,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2929,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.26,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 87
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.5673,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.3251,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.296,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 88
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.4922,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.4174,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.384,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 89
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.0054,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.9044,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.873,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 90
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.0978,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0108,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.979,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 91
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.5487,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.4756,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.442,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 92
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.87,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.8069,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.772,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 93
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.7707,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.7045,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.67,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 94
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 95
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.322,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 96
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.47,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 97
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.502,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 98
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.46,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 99
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.5306,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 100
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 101
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.3106,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2302,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.112,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 102
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.1334,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0475,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.93,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 103
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.5258,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.4521,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.333,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 104
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.7343,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.667,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.547,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 105
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.4908,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.416,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.297,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 106
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.2064,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.1228,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.005,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 107
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.2658,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.184,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.066,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 108
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.0905,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0033,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.886,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 109
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 1.154,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 32.0997,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.978,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 110
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 1.4394,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 32.3939,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 28.271,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 111
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 112
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.439,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 113
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.503,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 114
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.484,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 115
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.393,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 116
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.4466,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 117
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 118
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.6905,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.6219,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.456,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 119
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.6487,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.5787,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.413,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 120
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.299,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2183,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.054,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 121
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.0964,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.8106,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.648,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 122
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.1597,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.7453,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.583,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 123
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.6087,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.2825,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.122,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 124
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.1539,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0686,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.905,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 125
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.2532,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.649,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.487,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 126
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.1003,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.8066,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.644,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 127
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.1208,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0345,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.871,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 128
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 129
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.208,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 130
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.205,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 131
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.553,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 132
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.426,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 133
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.4014,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 134
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 135
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.964,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.9038,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.713,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 136
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.9855,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.9259,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.735,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 137
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.7683,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.702,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.512,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 138
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.3134,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2331,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.045,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 139
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.0203,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.9309,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.744,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 140
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.1034,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.8034,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.617,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 141
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.2209,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.1377,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.95,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 142
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.1249,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.7813,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.595,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 143
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.591,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.5193,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.33,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 144
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.2375,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.1548,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.967,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 145
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 146
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.637,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 147
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.329,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 148
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.367,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 149
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.299,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 150
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.378,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 151
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 152
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.9438,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.8829,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.663,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 153
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.6311,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.5606,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.342,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 154
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.4675,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.3919,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.174,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 155
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.0166,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.8929,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.677,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 156
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.6749,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.6058,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.387,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 157
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.8493,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.7855,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.566,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 158
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.9749,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.9151,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.695,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 159
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.334,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2544,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.037,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 160
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.4938,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.419,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.201,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 161
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.6632,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.5938,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.375,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 162
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 163
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.224,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 164
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.276,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 165
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.259,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 166
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.404,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 167
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.3494,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 168
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 169
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.8354,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.7712,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.609,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 170
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.6017,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.5303,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.369,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 171
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.1717,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.733,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.575,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 172
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.177,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0925,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.933,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 173
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.776,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.71,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.548,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 174
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.4332,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.3566,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.196,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 175
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.3066,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.226,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.066,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 176
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.9036,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.8415,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.679,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 177
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.3723,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.5262,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.369,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 178
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.8325,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.7682,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.606,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 179
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 180
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.676,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 181
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.19,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 182
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.544,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 183
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.335,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 184
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.742,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 185
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.4056,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 186
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 187
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.4529,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.4431,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.385,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 188
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.7206,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.6529,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.59,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 189
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 1.0586,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 32.0013,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.937,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 190
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 1.1969,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 32.1438,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 28.079,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 191
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.8093,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.7443,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.681,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 192
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.1412,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.7644,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.705,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 193
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.0438,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.9552,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.895,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 194
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.5629,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.4903,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.428,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 195
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.7615,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.6951,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.632,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 196
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.3408,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2614,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.2,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 197
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.3408,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2614,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.2,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 198
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 199
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.534,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 200
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.59,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 201
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.591,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 202
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.321,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 203
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.51,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 204
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.5026,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 205
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 206
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.327,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2471,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.174,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 207
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.327,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2471,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.174,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 208
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.2393,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.1567,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.084,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 209
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": -0.7735,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 30.1126,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.044,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 210
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 1.108,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 32.0523,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.976,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 211
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.5773,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.5051,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.431,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 212
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 1.033,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.975,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.899,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 213
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.8723,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.8093,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.734,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 214
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.9181,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.8565,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.781,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 215
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 1.2297,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 32.1778,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 28.101,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 216
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.289,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.2079,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 27.135,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 217
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 0.141,
+            "type": {
+              "parameter": "d18OVSMOWxls",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 31.0553,
+            "type": {
+              "parameter": "SD2ext",
+              "unit": "permille"
+            }
+          },
+          {
+            "value": 26.983,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 218
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [],
+        "session_index": 219
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.583,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 220
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.313,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 221
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.344,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 222
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.633,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 223
+      },
+      {
+        "analysis_name": "d18O measurement",
+        "datum": [
+          {
+            "value": 8.491,
+            "type": {
+              "parameter": "d18Omeas",
+              "unit": "permille"
+            }
+          }
+        ],
+        "session_index": 224
+      }
+    ]
+  }
+}

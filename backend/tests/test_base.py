@@ -599,3 +599,10 @@ class TestAPIImporter:
         # Make sure we don't partially import data
         res = db.session.query(db.model.sample).filter_by(name=new_name).first()
         assert res == None
+
+
+def test_large_dataset():
+    fn = relative_path(__file__, "wiscsims-test2.json")
+    with open(fn) as fp:
+        data = load(fp)
+    db.load_data("session", data["data"])
