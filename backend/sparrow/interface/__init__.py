@@ -88,7 +88,7 @@ class BaseSchema(SQLAlchemyAutoSchema):
         return self.opts.model.__table__
 
     def _get_session_instance(self, filters):
-        sess = self.session()
+        sess = self.session
         for inst in list(sess.new):
             if not isinstance(inst, self.opts.model):
                 continue
