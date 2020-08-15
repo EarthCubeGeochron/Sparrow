@@ -4,13 +4,10 @@ from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from sqlalchemy import and_
-from sqlalchemy.orm import sessionmaker, scoped_session
 from datetime import datetime
-from pytest import mark, fixture, warns, yield_fixture
+from pytest import mark, fixture
 import logging
 from json import load
-from sqlalchemy.exc import SAWarning
-import warnings
 from sparrow.logs import get_logger
 
 log = get_logger(__name__)
@@ -27,24 +24,6 @@ def ensure_single(db, model_name, **filter_params):
 # This should be in the fixture function ideally but I can't figure out
 # how to cache it so it doesn't repeatedly regenerate.
 app = App(__name__)
-
-
-@fixture(scope="class")
-def db():
-    _db = app.database
-    connection = _db.session.connection()
-
-    transaction = connection.begin()
-
-    session_factory = sessionmaker(bind=connection)
-    _db.session = scoped_session(session_factory)
-
-    yield _db
-
-    _db.session.close()
-
-    transaction.rollback()
-
 
 session = dict(sample_id="A-0", date=datetime.now())
 
