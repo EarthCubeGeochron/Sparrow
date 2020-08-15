@@ -12,6 +12,8 @@ We hope to arrive at full conformance for milestone `2.0.0`.
 
 ### Changed
 
+- More robust testing framework, including transaction isolation between
+  test classes.
 - Bumped `sparrowdata/backend-base` Docker image to `v1.2` to include `uvloop`
   (enables high-performance asynchronous code).
 - Switched Sparrow's backend to "ASGI" (a fast, asynchronous server interface)
@@ -54,7 +56,6 @@ We hope to arrive at full conformance for milestone `2.0.0`.
 - Simplify application loading
 - "Decaffeinate" frontend application from Coffeescript to Typescript.
 - Command-line interface is now based on Python instead of shell scripts.
-
 
 ## [1.2.0] - 2020-06-02
 
