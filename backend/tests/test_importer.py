@@ -4,12 +4,16 @@ from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from sqlalchemy import and_
+from sqlalchemy.orm import sessionmaker, scoped_session
 from datetime import datetime
-from pytest import mark, fixture, warns
+from pytest import mark, fixture, warns, yield_fixture
 import logging
 from json import load
 from sqlalchemy.exc import SAWarning
 import warnings
+from sparrow.logs import get_logger
+
+log = get_logger(__name__)
 
 
 def ensure_single(db, model_name, **filter_params):
@@ -31,9 +35,39 @@ def db():
     return app.database
 
 
+@yield_fixture
+def db_trans(scope="class"):
+    _db = app.database
+    connection = _db.session.connection()
+
+    transaction = connection.begin()
+
+    session_factory = sessionmaker(bind=connection)
+    _db.session = scoped_session(session_factory)
+
+    yield _db
+
+    _db.session.close()
+
+    transaction.rollback()
+
+
 session = dict(sample_id="A-0", date=datetime.now())
 
 logging.basicConfig(level=logging.CRITICAL)
+
+
+class TestDB:
+    def test_standalone_datum_type(self, db_trans):
+        data = {"parameter": "Oxygen fugacity1", "unit": "dimensionless"}
+        db_trans.load_data("datum_type", data)
+
+
+class TestDBRollback:
+    def test_rollback(self, db_trans):
+        results = db_trans.session.query(db_trans.model.datum_type).all()
+        log.debug(results)
+        assert len(results) == 0
 
 
 class TestDatabaseInitialization:

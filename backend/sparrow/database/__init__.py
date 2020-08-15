@@ -77,9 +77,11 @@ class Database(MappedDatabaseMixin):
         self.app.run_hook("database-mapped")
 
     @contextmanager
-    def session_scope():
+    def session_scope(self):
         """Provide a transactional scope around a series of operations."""
+        self.__old_session = self.session
         session = self._session_factory()
+        self.session = session
         try:
             yield session
             session.commit()
@@ -88,6 +90,7 @@ class Database(MappedDatabaseMixin):
             raise
         finally:
             session.close()
+            self.session = self.__old_session
 
     def model_schema(self, model_name):
         """
