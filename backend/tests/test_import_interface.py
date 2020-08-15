@@ -1,22 +1,16 @@
 from sparrow.app import App
-from sparrow.util import relative_path
 from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
-from sqlalchemy import and_
 from datetime import datetime
-from pytest import mark, fixture
+from pytest import mark
 import logging
-from json import load
 from sparrow.logs import get_logger
 
+from .fixtures import basic_data, incomplete_analysis
+from .helpers import json_fixture, ensure_single
+
 log = get_logger(__name__)
-
-
-def ensure_single(db, model_name, **filter_params):
-    model = getattr(db.model, model_name)
-    n = db.session.query(model).filter_by(**filter_params).count()
-    assert n == 1
 
 
 # pytestmark = mark.filterwarnings("ignore", "*", SAWarning)
@@ -28,65 +22,6 @@ app = App(__name__)
 session = dict(sample_id="A-0", date=datetime.now())
 
 logging.basicConfig(level=logging.CRITICAL)
-
-
-class TestDB:
-    def test_standalone_datum_type(self, db):
-        data = {"parameter": "Oxygen fugacity1", "unit": "dimensionless"}
-        db.load_data("datum_type", data)
-
-
-class TestDBRollback:
-    def test_rollback(self, db):
-        results = db.session.query(db.model.datum_type).all()
-        log.debug(results)
-        assert len(results) == 0
-
-
-class TestDatabaseInitialization:
-    def test_db_automap(self, db):
-        """
-        Make sure that all core tables are automapped by the
-        SQLAlchemy mapper.
-        """
-        core_automapped_tables = [
-            "enum_date_precision",
-            "instrument",
-            "publication",
-            "sample",
-            "vocabulary_material",
-            "vocabulary_method",
-            "vocabulary_error_metric",
-            "vocabulary_unit",
-            "vocabulary_parameter",
-            "analysis",
-            "vocabulary_analysis_type",
-            "constant",
-            "researcher",
-            "data_file",
-            "data_file_type",
-            "attribute",
-            "data_file_link",
-            "datum",
-            "user",
-            "project",
-            "session",
-            "datum_type",
-            "vocabulary_entity_type",
-            "vocabulary_entity_reference",
-            "geo_entity",
-            "sample_geo_entity",
-            "core_view_datum",
-        ]
-        for t in core_automapped_tables:
-            assert t in db.model.keys()
-
-
-class TestGenericData(object):
-    @mark.xfail(reason="'get_instance' has a poorly written API.")
-    def test_get_instance(self, db):
-        sample = db.get_instance("sample", {"name": "Nonexistent sample"})
-        assert sample is None
 
 
 class TestImperativeImport(object):
@@ -202,45 +137,6 @@ class TestImperativeImport(object):
         (op, tbl) = res.first()
         assert op == "INSERT"
         assert tbl == "datum"
-
-
-basic_data = {
-    "date": str(datetime.now()),
-    "name": "Declarative import test",
-    "sample": {"name": "Soil 001"},
-    "analysis": [
-        {
-            "analysis_type": {
-                "id": "Soil aliquot pyrolysis",
-                "description": "I guess this could be an actual technique?",
-            },
-            "session_index": 0,
-            "datum": [
-                {
-                    "value": 2.25,
-                    "error": 0.2,
-                    "type": {
-                        "parameter": {"id": "soil water content"},
-                        "unit": {"id": "weight %"},
-                    },
-                }
-            ],
-        }
-    ],
-}
-
-incomplete_analysis = {
-    # Can't seem to get or create this instance from the database
-    "analysis_type": "Soil aliquot pyrolysis",
-    "session_index": 0,
-    "datum": [
-        {
-            "value": 0.1,
-            "error": 0.025,
-            "type": {"parameter": "soil water content", "unit": "weight %"},
-        }
-    ],
-}
 
 
 class TestSchema:
@@ -497,151 +393,8 @@ class TestDeclarativeImporter:
         assert isinstance(res, db.model.datum)
 
 
-def load_relative(*pth):
-    fn = relative_path(__file__, *pth)
-    with open(fn) as fp:
-        return load(fp)
-
-
 class TestImportDataTypes(object):
     def test_simple_cosmo_import(self, db):
         # Test import of simple cosmogenic nuclides data types
-        data = load_relative("simple-cosmo-test.json")
+        data = json_fixture("simple-cosmo-test.json")
         db.load_data("session", data)
-
-
-@fixture
-def client():
-    app = App(__name__)
-    app.load()
-    app.load_phase_2()
-    with app.test_client() as client:
-        yield client
-
-
-data0 = {
-    "filename": None,
-    "data": {
-        "name": "Test session 1",
-        "sample": {"name": "Test sample"},
-        "date": "2020-01-01T00:00:00",
-        "analysis": [
-            {
-                "analysis_type": "d18O measurement trial",
-                "datum": [
-                    {
-                        "value": 9.414,
-                        "type": {"parameter": "d18Omeas", "unit": "permille"},
-                    }
-                ],
-            }
-        ],
-    },
-}
-
-
-class TestAPIImporter:
-    def test_api_import(self, client):
-        res = client.put(
-            "/api/v1/import-data/session", json={"filename": None, "data": basic_data}
-        )
-        assert res.status_code == 201
-
-    def test_basic_import(self, client):
-        res = client.put("/api/v1/import-data/session", json=data0)
-        assert res.status_code == 201
-
-    @mark.skip
-    def test_complex_single_row_prior(self, client, db):
-        # This test fails if before the overall import
-        # Too much output
-        # logging.disable(logging.CRITICAL)
-
-        fn = relative_path(__file__, "large-test.json")
-        with open(fn) as fp:
-            complex_data = load(fp)
-        complex_data["data"]["analysis"] = complex_data["data"]["analysis"][2:3]
-
-        db.load_data("session", complex_data["data"])
-
-    def test_complex_import(self, client, db):
-        # Too much output
-        logging.disable(logging.DEBUG)
-
-        fn = relative_path(__file__, "large-test.json")
-        with open(fn) as fp:
-            complex_data = load(fp)
-
-        db.load_data("session", complex_data["data"])
-
-        a = db.model.analysis
-        q = db.session.query(a).filter(
-            and_(a.session_index != None, a.analysis_type == "d18O measurement")
-        )
-        assert q.count() > 1
-
-    def test_complex_single_row(self, client, db):
-        # This test fails if before the overall import
-        # Too much output
-        # logging.disable(logging.CRITICAL)
-
-        fn = relative_path(__file__, "large-test.json")
-        with open(fn) as fp:
-            complex_data = load(fp)
-        complex_data["data"]["analysis"] = complex_data["data"]["analysis"][3:4]
-
-        db.load_data("session", complex_data["data"])
-
-    def test_missing_field(self, client, db):
-        """Missing fields should produce a useful error message
-           and insert no data"""
-        new_name = "Test error vvv"
-        data = {
-            "date": str(datetime.now()),
-            "name": "Session with existing instances",
-            "sample": {"name": new_name},
-            "analysis": [
-                {
-                    # Can't seem to get or create this instance from the database
-                    "analysis_type": "Stable isotope analysis",
-                    "session_index": 0,
-                    "datum": [
-                        {
-                            "value": 0.1,
-                            "error": 0.025,
-                            "type": {
-                                # Missing field "parameter" here!
-                                "unit": "permille"
-                            },
-                        }
-                    ],
-                },
-                {
-                    # Can't seem to get or create this instance from the database
-                    "analysis_type": "Stable isotope analysis",
-                    "session_index": 1,
-                    "datum": [
-                        {
-                            "value": 0.2,
-                            "error": 0.035,
-                            "type": {"parameter": "delta 13C", "unit": "permille"},
-                        }
-                    ],
-                },
-            ],
-        }
-
-        res = client.put(
-            "/api/v1/import-data/session", json={"filename": None, "data": data}
-        )
-        assert res.status_code == 400
-        err = res.json["error"]
-
-        assert err["type"] == "marshmallow.exceptions.ValidationError"
-        # It could be useful to have a function that "unnests" these errors
-        keypath = err["messages"]["analysis"]["0"]["datum"]["0"]["type"]["parameter"]
-        assert keypath[0] == "Missing data for required field."
-
-        # Make sure we don't partially import data
-        res = db.session.query(db.model.sample).filter_by(name=new_name).first()
-        assert res == None
