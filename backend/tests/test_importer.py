@@ -29,14 +29,8 @@ def ensure_single(db, model_name, **filter_params):
 app = App(__name__)
 
 
-@fixture
+@fixture(scope="class")
 def db():
-    # with warns(SAWarning) as record:
-    return app.database
-
-
-@yield_fixture
-def db_trans(scope="class"):
     _db = app.database
     connection = _db.session.connection()
 
@@ -58,14 +52,14 @@ logging.basicConfig(level=logging.CRITICAL)
 
 
 class TestDB:
-    def test_standalone_datum_type(self, db_trans):
+    def test_standalone_datum_type(self, db):
         data = {"parameter": "Oxygen fugacity1", "unit": "dimensionless"}
-        db_trans.load_data("datum_type", data)
+        db.load_data("datum_type", data)
 
 
 class TestDBRollback:
-    def test_rollback(self, db_trans):
-        results = db_trans.session.query(db_trans.model.datum_type).all()
+    def test_rollback(self, db):
+        results = db.session.query(db.model.datum_type).all()
         log.debug(results)
         assert len(results) == 0
 
@@ -216,6 +210,7 @@ class TestImperativeImport(object):
         """
         Test whether our PGMemento audit trail is working
         """
+
         res = db.session.execute("SELECT count(*) " "FROM pgmemento.table_event_log")
         total_ops = res.scalar()
         assert total_ops > 0
@@ -424,6 +419,7 @@ class TestDeclarativeImporter:
             .first()
         )
 
+        assert type is not None
         assert isinstance(type, BaseModel)
 
         data = {
@@ -441,6 +437,21 @@ class TestDeclarativeImporter:
         }
 
         db.load_data("session", data)
+
+    def test_get_instance(self, db):
+        data = dict(parameter="soil water content", unit="weight %")
+        dt = (
+            db.session.query(db.model.datum_type)
+            .filter_by(**data, error_unit=None)
+            .first()
+        )
+
+        assert dt is not None
+
+        res = db.get_instance("datum_type", data)
+
+        assert isinstance(res, db.model.datum_type)
+        assert res.id == dt.id
 
     def test_incomplete_import_excluded(self, db):
         try:
@@ -495,19 +506,6 @@ class TestDeclarativeImporter:
         assert val._parameter.id == data["parameter"]
         assert val._unit.id == data["unit"]
         assert val._error_unit is None
-
-    def test_get_instance(self, db):
-        q = {"parameter": "soil water content", "unit": "weight %"}
-        type = (
-            db.session.query(db.model.datum_type)
-            .filter_by(parameter=q["parameter"], unit=q["unit"], error_unit=None)
-            .first()
-        )
-
-        res = db.get_instance("datum_type", q)
-
-        assert isinstance(res, db.model.datum_type)
-        assert res.id == type.id
 
     def test_get_number(self, db):
         res = db.get_instance("datum", dict(value=0.1, error=0.025))
