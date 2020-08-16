@@ -21,10 +21,20 @@ log = get_logger(__name__)
 
 # Control how relationships can be resolved
 allowed_collections = {
+    "data_file": ["data_file_link"],
+    "data_file_link": ["session", "sample", "analysis"],
     "sample": ["session", "material", "sample_geo_entity"],
     "geo_entity": "all",
     "sample_geo_entity": "all",
-    "session": "all",
+    "session": [
+        "analysis",
+        "attribute",
+        "project",
+        "publication",
+        "sample",
+        "instrument",
+        "target",
+    ],
     "analysis": ["datum", "attribute", "constant", "analysis_type", "material"],
     "attribute": ["parameter", "unit"],
     "project": ["researcher", "publication", "session"],
@@ -67,6 +77,9 @@ class SparrowConverter(ModelConverter):
         # column (less '_id' postfix)
         if hasattr(prop, "local_columns") and len(prop.local_columns) == 1:
             col_name = list(prop.local_columns)[0].name
+            # Special case for 'data_file_link'
+            if col_name == "file_hash":
+                return "data_file"
             if col_name != "id":
                 return trim_postfix(col_name, "_id")
 

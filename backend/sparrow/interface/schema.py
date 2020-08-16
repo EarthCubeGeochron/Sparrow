@@ -35,6 +35,10 @@ class BaseMeta:
 class ModelSchema(SQLAlchemyAutoSchema):
     value_index = {}
 
+    def __init__(self, *args, **kwargs):
+        self.allowed_nests = kwargs.pop("allowed_nests", [])
+        super().__init__(*args, **kwargs)
+
     def _ready_for_flush(self, instance):
         if instance is None:
             return False

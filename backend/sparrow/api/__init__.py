@@ -58,7 +58,7 @@ class APIv2(Flama):
 
     def _add_schema_route(self, iface):
         db = self._app.database
-        schema = iface(many=True)
+        schema = iface(many=True, allowed_nests=["session", "analysis", "datum"])
         name = classname_for_table(schema.opts.model.__table__)
         log.info(str(name))
 

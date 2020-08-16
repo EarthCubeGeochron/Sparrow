@@ -75,6 +75,8 @@ class SmartNested(Nested, Related):
         return key
 
     def _serialize_instance(self, value):
+        if value is None:
+            return None
         self._instances.add(value)
         return self._serialize_related_key(value)
 
@@ -82,11 +84,13 @@ class SmartNested(Nested, Related):
         # return ret if len(ret) > 1 else list(ret)[0]
         # return super(Nested, self)._serialize(value, attr, obj)
         # Don't allow nesting for now...
-        if value is None:
-            return None
+
+        # Pass through allowed_nests configuration to child schema
+        if hasattr(self.root, "allowed_nests"):
+            self.schema.allowed_nests = self.root.allowed_nests
 
         other_name = self.related_model.__table__.name
-        if other_name in ["session", "analysis"]:
+        if other_name in self.root.allowed_nests:
             # Serialize as nested
             return super(Nested, self)._serialize(value, attr, obj)
 
