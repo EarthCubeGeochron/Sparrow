@@ -1,10 +1,13 @@
-from flama import Flama
+from flama.responses import APIResponse
+from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 from sparrow.logs import get_logger
 from json import dumps
 from ..database.mapper.util import classname_for_table
 from ..encoders import JSONEncoder
-from typing import Any
+from typing import Any, List
+from webargs_starlette import parser
+from webargs.fields import DelimitedList, Str
 
 log = get_logger(__name__)
 
@@ -38,14 +41,15 @@ def hello_world():
     return {"Hello": "world!"}
 
 
-class APIv2(Flama):
+class APIv2(Starlette):
     def __init__(self, app):
         self._app = app
-        super().__init__(
+        api_args = dict(
             title="Sparrow API",
             version="2.0",
             description="An API for accessing geochemical data",
         )
+        super().__init__()
         self._add_routes()
 
     def _add_routes(self):
@@ -58,12 +62,18 @@ class APIv2(Flama):
 
     def _add_schema_route(self, iface):
         db = self._app.database
-        schema = iface(many=True, allowed_nests=["session", "analysis", "datum"])
+        schema = iface(many=True)
         name = classname_for_table(schema.opts.model.__table__)
         log.info(str(name))
 
+        args_schema = {"nest": DelimitedList(Str(), missing=[])}
+
         # Flama's API methods know to deserialize this with the proper model
-        def list_items() -> schema:
-            return db.session.query(schema.opts.model).limit(100).all()
+        async def list_items(request):
+            args = await parser.parse(args_schema, request, location="querystring")
+            log.info(args)
+            schema = iface(many=True, allowed_nests=args["nest"])
+            res = db.session.query(schema.opts.model).limit(100).all()
+            return APIResponse(schema, res)
 
         self.add_route("/" + name, list_items, methods=["GET"])
