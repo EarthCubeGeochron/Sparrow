@@ -79,13 +79,16 @@ class SmartNested(Nested, Related):
         return self._serialize_related_key(value)
 
     def _serialize(self, value, attr, obj):
-        # ret = [prop.key for prop in self.related_keys]
-        # ret = {prop.key: getattr(value, prop.key, None) for prop in self.related_keys}
         # return ret if len(ret) > 1 else list(ret)[0]
         # return super(Nested, self)._serialize(value, attr, obj)
         # Don't allow nesting for now...
         if value is None:
             return None
+
+        other_name = self.related_model.__table__.name
+        if other_name in ["session", "analysis"]:
+            # Serialize as nested
+            return super(Nested, self)._serialize(value, attr, obj)
 
         if isinstance(value, Iterable):
             return [self._serialize_instance(v) for v in value]
