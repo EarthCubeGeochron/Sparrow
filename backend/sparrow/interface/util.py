@@ -28,10 +28,13 @@ def prop_is_required(prop):
     return any(cols)
 
 
-def pk_values(instance):
+def primary_key(instance):
     props = get_primary_keys(instance.__class__)
-    keys = {prop.key: getattr(instance, prop.key) for prop in props}
-    return keys.values()
+    return {prop.key: getattr(instance, prop.key) for prop in props}
+
+
+def pk_values(instance):
+    return primary_key(instance).values()
 
 
 def pk_data(model, data):

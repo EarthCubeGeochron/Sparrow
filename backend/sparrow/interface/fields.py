@@ -8,6 +8,8 @@ from marshmallow_sqlalchemy.fields import Related, Nested
 from marshmallow.fields import Field, Raw
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
+from collections.abc import Iterable
+from .util import primary_key
 from ..logs import get_logger
 
 log = get_logger(__name__)
@@ -56,17 +58,35 @@ class SmartNested(Nested, Related):
             name, only=only, exclude=exclude, many=many, unknown=unknown, **field_kwargs
         )
         super(Related, self).__init__(**field_kwargs)
+        self._instances = set()
 
     def _deserialize(self, value, attr=None, data=None, **kwargs):
         if isinstance(value, self.schema.opts.model):
             return value
-        return super()._deserialize(value, attr, data, **kwargs)
+        return super(Nested, self)._deserialize(value, attr, data, **kwargs)
+
+    def _serialize_related_key(self, value):
+        """Serialize the primary key for a related model. In the (common) special
+        case of a 1-column primary key, return just the value of that column; otherwise,
+        return a map of {column_name: value}"""
+        key = primary_key(value)
+        if len(key.keys()) == 1:
+            return list(key.values())[0]
+        return key
+
+    def _serialize_instance(self, value):
+        self._instances.add(value)
+        return self._serialize_related_key(value)
 
     def _serialize(self, value, attr, obj):
         # ret = [prop.key for prop in self.related_keys]
         # ret = {prop.key: getattr(value, prop.key, None) for prop in self.related_keys}
         # return ret if len(ret) > 1 else list(ret)[0]
-        # log.debug(attr)
-        return super(Nested, self)._serialize(value, attr, obj)
+        # return super(Nested, self)._serialize(value, attr, obj)
+        # Don't allow nesting for now...
+        if value is None:
+            return None
 
-        # return str(super(Related, self)._serialize(value, attr, obj))
+        if isinstance(value, Iterable):
+            return [self._serialize_instance(v) for v in value]
+        return self._serialize_instance(value)
