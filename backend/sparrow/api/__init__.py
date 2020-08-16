@@ -1,11 +1,12 @@
-from flama.responses import APIResponse
+from flama.responses import APIResponse as BaseAPIResponse
+from flama.exceptions import SerializationError
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 from sparrow.logs import get_logger
 from json import dumps
 from ..database.mapper.util import classname_for_table
 from ..encoders import JSONEncoder
-from typing import Any, List
+from typing import Any
 from webargs_starlette import parser
 from webargs.fields import DelimitedList, Str
 
@@ -28,6 +29,28 @@ def render_json_response(self, content: Any) -> bytes:
 
 # Monkey-patch Starlette's API response
 JSONResponse.render = render_json_response
+
+
+class APIResponse(JSONResponse):
+    # copied from https://github.com/perdy/flama/blob/master/flama/responses.py
+    media_type = "application/json"
+
+    def __init__(self, schema=None, *args, **kwargs):
+        self.schema = schema
+        super().__init__(*args, **kwargs)
+
+    def render(self, content: Any):
+        # Use output schema to validate and format data
+        try:
+            if self.schema is not None:
+                content = self.schema.dump(content)
+        except Exception:
+            raise SerializationError(status_code=500)
+
+        if not content:
+            return b""
+
+        return super().render(dict(data=content))
 
 
 def hello_world():
