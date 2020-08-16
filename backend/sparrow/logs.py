@@ -1,6 +1,5 @@
 import logging
 from colorlog import StreamHandler, ColoredFormatter
-from uvicorn.logging import DefaultFormatter
 
 # disabled 'levelname'
 formatter = ColoredFormatter(
@@ -18,24 +17,26 @@ formatter = ColoredFormatter(
     style="%",
 )
 
-
-def console_handler():
-    console = StreamHandler()
-    # create console handler and set level to debug
-    console.setLevel(logging.DEBUG)
-    # create formatter
-    # add formatter to ch
-    console.setFormatter(formatter)
-    return console
+console_handler = StreamHandler()
+# create console handler and set level to debug
+console_handler.setLevel(logging.DEBUG)
+# create formatter
+# add formatter to ch
+console_handler.setFormatter(formatter)
 
 
 def get_logger(name, level=logging.DEBUG, handler=None):
     log = logging.getLogger(name)
     log.setLevel(level)
-    # add ch to logger
     if handler:
         log.addHandler(handler)
-    else:
-        # This is likely to be slow
-        log.addHandler(console_handler())
     return log
+
+
+# Customize Sparrow's root logger so we don't get overridden by uvicorn
+# We may want to customize this further eventually
+# https://github.com/encode/uvicorn/issues/410
+logger = logging.getLogger("sparrow")
+if logger.hasHandlers():
+    logger.handlers.clear()
+logger.addHandler(console_handler)

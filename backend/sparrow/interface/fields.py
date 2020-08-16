@@ -6,7 +6,6 @@ Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
 from marshmallow_sqlalchemy.fields import Related, Nested
 from marshmallow.fields import Field, Raw
-from geoalchemy2 import WKBElement
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
 from ..logs import get_logger
@@ -48,11 +47,26 @@ class Enum(Related):
     pass
 
 
-class SmartNested(Nested):
+class SmartNested(Nested, Related):
+    # https://github.com/marshmallow-code/marshmallow/blob/dev/src/marshmallow/fields.py
+    def __init__(
+        self, name, *, only=None, exclude=(), many=False, unknown=None, **field_kwargs
+    ):
+        super(Nested, self).__init__(
+            name, only=only, exclude=exclude, many=many, unknown=unknown, **field_kwargs
+        )
+        super(Related, self).__init__(**field_kwargs)
+
     def _deserialize(self, value, attr=None, data=None, **kwargs):
         if isinstance(value, self.schema.opts.model):
             return value
         return super()._deserialize(value, attr, data, **kwargs)
 
     def _serialize(self, value, attr, obj):
-        return str(value)
+        # ret = [prop.key for prop in self.related_keys]
+        # ret = {prop.key: getattr(value, prop.key, None) for prop in self.related_keys}
+        # return ret if len(ret) > 1 else list(ret)[0]
+        # log.debug(attr)
+        return super(Nested, self)._serialize(value, attr, obj)
+
+        # return str(super(Related, self)._serialize(value, attr, obj))

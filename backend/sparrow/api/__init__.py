@@ -1,5 +1,5 @@
 from flama import Flama
-from flama.responses import APIResponse
+from starlette.responses import JSONResponse
 from sparrow.logs import get_logger
 from json import dumps
 from ..database.mapper.util import classname_for_table
@@ -23,8 +23,8 @@ def render_json_response(self, content: Any) -> bytes:
     ).encode("utf-8")
 
 
-# Monkey-patch Flama's API response
-APIResponse.render = render_json_response
+# Monkey-patch Starlette's API response
+JSONResponse.render = render_json_response
 
 
 def hello_world():
@@ -58,13 +58,12 @@ class APIv2(Flama):
 
     def _add_schema_route(self, iface):
         db = self._app.database
-        schema = iface()
+        schema = iface(many=True)
         name = classname_for_table(schema.opts.model.__table__)
         log.info(str(name))
 
-        def list_items():
-            schema = iface()
-            res = db.session.query(schema.opts.model).limit(100).all()
-            return [schema.dump(r) for r in res]
+        # Flama's API methods know to deserialize this with the proper model
+        def list_items() -> schema:
+            return db.session.query(schema.opts.model).limit(100).all()
 
         self.add_route("/" + name, list_items, methods=["GET"])
