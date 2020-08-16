@@ -66,7 +66,7 @@ def is_pk_defined(instance):
     return all([v is not None for v in vals])
 
 
-class BaseSchema(SQLAlchemyAutoSchema):
+class ModelSchema(SQLAlchemyAutoSchema):
     value_index = {}
 
     def _ready_for_flush(self, instance):
@@ -200,7 +200,7 @@ class BaseSchema(SQLAlchemyAutoSchema):
     from .display import pretty_print
 
 
-def model_interface(model, session=None):
+def model_interface(model, session=None) -> ModelSchema:
     """
     Create a Marshmallow interface to a SQLAlchemy model
     """
@@ -210,7 +210,7 @@ def model_interface(model, session=None):
     schema_name = to_schema_name(model.__name__)
     try:
         # All conversion logic comes from ModelSchema
-        return type(schema_name, (BaseSchema,), {"Meta": metacls})
+        return type(schema_name, (ModelSchema,), {"Meta": metacls})
     except exceptions.ModelConversionError as err:
         secho(type(err).__name__ + ": " + schema_name + " - " + str(err), fg="red")
         return None

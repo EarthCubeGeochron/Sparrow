@@ -1,4 +1,6 @@
-#!/bin/sh
+#! /usr/bin/env sh
+
+set -e
 
 cd /app
 
@@ -24,6 +26,10 @@ SELECT EXISTS (
 HOST=0.0.0.0
 PORT=5000
 
-#gunicorn --worker-tmp-dir /dev/shm --reload --bind 0.0.0.0:5000 -w 4 -k uvicorn.workers.UvicornWorker --log-level warning --log-file - sparrow.asgi:app
+# exec gunicorn \
+#   --worker-tmp-dir /dev/shm \
+#   --reload --bind $HOST:$PORT \
+#   -w 1 -k uvicorn.workers.UvicornWorker \
+#   --log-level warning --log-file - "sparrow.asgi:app"
 #uvicorn --debug --port 5000 --host 0.0.0.0 --access-log sparrow.asgi:app
 exec uvicorn --reload --host $HOST --port $PORT --log-level warning "sparrow.asgi:app"

@@ -19,7 +19,6 @@ from ..logs import get_logger
 
 log = get_logger(__name__)
 
-
 # Control how relationships can be resolved
 allowed_collections = {
     "sample": ["session", "material", "sample_geo_entity"],
@@ -113,11 +112,11 @@ class SparrowConverter(ModelConverter):
         this_table = prop.parent.tables[0]
         other_table = prop.target
 
-        if prop.target == this_table and prop.uselist:
+        if other_table == this_table and prop.uselist:
             # Don't allow self-referential collections
             return True
 
-        if prop.uselist and not allow_nest(this_table.name, prop.target.name):
+        if prop.uselist and not allow_nest(this_table.name, other_table.name):
             # Disallow list fields that aren't related (these usually don't have
             # corresponding local columns)
             return True

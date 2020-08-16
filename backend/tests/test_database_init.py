@@ -2,6 +2,7 @@ from datetime import datetime
 from pytest import mark
 import logging
 from sparrow.logs import get_logger
+import numpy as N
 
 log = get_logger(__name__)
 
@@ -70,3 +71,21 @@ class TestGenericData(object):
     def test_get_instance(self, db):
         sample = db.get_instance("sample", {"name": "Nonexistent sample"})
         assert sample is None
+
+
+class TestGeoInstance(object):
+    obj = {
+        "name": "Test sample",
+        "location": {"type": "Point", "coordinates": [122, 35.225]},
+    }
+
+    def test_geo_object_creation(self, db):
+        inst = db.load_data("sample", self.obj)
+        assert inst is not None
+        schema = db.model_schema("sample")
+
+        out = schema.dump(inst)
+        assert out["location"] is not None
+        c0 = self.obj["location"]["coordinates"]
+        c1 = out["location"]["coordinates"]
+        assert N.allclose(c0, c1)
