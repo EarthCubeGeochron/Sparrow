@@ -66,9 +66,9 @@ flama==0.15.0
 # S3/AWS file access
 boto3==1.12.25
 
-# Testing (we could split this into a separate file
-# if it becomes too weighty.)
+# Testing and logging
 pytest==5.3.5
+colorlog==4.2.1
 
 # ASGI
 starlette==0.13.4
