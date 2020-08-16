@@ -6,8 +6,12 @@ Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
 from marshmallow_sqlalchemy.fields import Related, Nested
 from marshmallow.fields import Field, Raw
+from geoalchemy2 import WKBElement
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
+from ..logs import get_logger
+
+log = get_logger(__name__)
 
 
 class JSON(Raw):
@@ -49,3 +53,6 @@ class SmartNested(Nested):
         if isinstance(value, self.schema.opts.model):
             return value
         return super()._deserialize(value, attr, data, **kwargs)
+
+    def _serialize(self, value, attr, obj):
+        return str(value)
