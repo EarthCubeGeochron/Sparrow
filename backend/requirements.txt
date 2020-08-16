@@ -63,7 +63,7 @@ graphene_sqlalchemy==2.2.2
 # API version 2
 flama==0.15.0
 webargs-starlette==2.0.0
-sqlakeyset==git+git://github.com/djrobstep/sqlakeyset.git#fec6936
+sqlakeyset
 
 # S3/AWS file access
 boto3==1.12.25

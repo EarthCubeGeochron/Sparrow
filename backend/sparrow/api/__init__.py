@@ -9,6 +9,7 @@ from ..encoders import JSONEncoder
 from typing import Any
 from webargs_starlette import parser
 from webargs.fields import DelimitedList, Str
+from sqlakeyset import get_page
 
 log = get_logger(__name__)
 
@@ -95,8 +96,11 @@ class APIv2(Starlette):
         async def list_items(request):
             args = await parser.parse(args_schema, request, location="querystring")
             log.info(args)
+
             schema = iface(many=True, allowed_nests=args["nest"])
-            res = db.session.query(schema.opts.model).limit(100).all()
+            q = db.session.query(schema.opts.model)
+
+            res = get_page(q, per_page=20)
             return APIResponse(schema, res)
 
         self.add_route("/" + name, list_items, methods=["GET"])
