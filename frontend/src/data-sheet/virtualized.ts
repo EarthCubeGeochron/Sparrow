@@ -26,7 +26,6 @@ export function VirtualizedSheet(props) {
   }
 
   const lastRow = Math.min(rowOffset + rowsToDisplay, data.length - 1);
-  console.log(rowOffset, rowsToDisplay);
 
   return h("div.virtualized-sheet", { ref }, [
     h("div.ui", { style: { height } }, [
