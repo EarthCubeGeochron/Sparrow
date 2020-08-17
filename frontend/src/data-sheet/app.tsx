@@ -1,16 +1,7 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useLayoutEffect,
-  useRef,
-} from "react";
-import { useElementHeight, useScrollOffset } from "./util";
-import { List, Grid, AutoSizer } from "react-virtualized";
-import VirDataSheet from "./vDataSheet";
-import ReactDataSheet from "react-datasheet";
+import React, { useState, useEffect, useContext } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { SheetHeader } from "./header";
+import { VirtualizedSheet } from "./virtualized";
 import { DataSheetContext, DataSheetProvider } from "./provider";
 import update from "immutability-helper";
 
@@ -18,9 +9,10 @@ import "./datasheet.css";
 import styles from "./module.styl";
 
 const Row = ({ row, children, className }) => {
+  const { rowHeight } = useContext(DataSheetContext);
   return (
-    <tr>
-      <td className="cell read-only">{row}</td>
+    <tr style={{ height: rowHeight }}>
+      <td className="cell read-only">{row + 1}</td>
       {children}
     </tr>
   );
@@ -28,11 +20,8 @@ const Row = ({ row, children, className }) => {
 
 const Sheet = ({ className, children }) => {
   const { columns } = useContext(DataSheetContext);
-  const onScroll = (evt) => {
-    console.log(evt);
-  };
   return (
-    <table className={className} onScroll={onScroll}>
+    <table className={className}>
       <thead>
         <tr className="cell read-only">
           <th>Index</th>
@@ -76,37 +65,6 @@ interface SampleData {
   latitude: number;
   longitude: number;
   name: string;
-}
-
-function VirtualizedSheet(props) {
-  const { data, onCellsChanged } = props;
-  const { rowHeight } = useContext(DataSheetContext);
-
-  const ref = useRef<HTMLDivElement>();
-  const height = useElementHeight(ref) ?? 100;
-  const scrollOffset = useScrollOffset(ref);
-
-  const scrollerHeight = data.length * rowHeight;
-  const rowsToDisplay = Math.round((height / rowHeight) * 1.2);
-  const rowOffset = Math.round(scrollOffset / rowHeight);
-
-  return (
-    <div ref={ref} className={styles["virtualized-sheet"]}>
-      <div className={styles["ui"]} style={{ height: scrollerHeight }}>
-        <ReactDataSheet
-          data={data.slice(rowOffset, rowOffset + rowsToDisplay)}
-          valueRenderer={(cell) => cell.value}
-          sheetRenderer={Sheet}
-          rowRenderer={Row}
-          onCellsChanged={onCellsChanged}
-        />
-      </div>
-      <div
-        className={styles["scroll-panel"]}
-        style={{ height: scrollerHeight }}
-      />
-    </div>
-  );
 }
 
 function DataSheet() {
@@ -183,7 +141,13 @@ function DataSheet() {
           hasChanges={initialData != data}
         ></SheetHeader>
         <div className="sheet">
-          <VirtualizedSheet data={cellData} onCellsChanged={onCellsChanged} />
+          <VirtualizedSheet
+            data={cellData}
+            valueRenderer={(cell) => cell.value}
+            sheetRenderer={Sheet}
+            rowRenderer={Row}
+            onCellsChanged={onCellsChanged}
+          />
         </div>
       </div>
     </DataSheetProvider>
