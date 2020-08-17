@@ -1,5 +1,4 @@
-from flama.responses import APIResponse as BaseAPIResponse
-from flama.exceptions import SerializationError
+from flama.exceptions import SerializationError, ValidationError
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 from sparrow.logs import get_logger
@@ -8,8 +7,10 @@ from ..database.mapper.util import classname_for_table
 from ..encoders import JSONEncoder
 from typing import Any
 from webargs_starlette import parser
-from webargs.fields import DelimitedList, Str
+from webargs.fields import DelimitedList, Str, Int
 from sqlakeyset import get_page
+from marshmallow_sqlalchemy.fields import get_primary_keys
+from sqlalchemy import desc
 
 log = get_logger(__name__)
 
@@ -42,6 +43,11 @@ class APIResponse(JSONResponse):
 
     def render(self, content: Any):
         # Use output schema to validate and format data
+        paging = {}
+        if hasattr(content, "paging"):
+            paging["bookmark_next"] = content.paging.bookmark_next
+            paging["bookmark_previous"] = content.paging.bookmark_previous
+
         try:
             if self.schema is not None:
                 content = self.schema.dump(content)
@@ -51,10 +57,10 @@ class APIResponse(JSONResponse):
         if not content:
             return b""
 
-        return super().render(dict(data=content))
+        return super().render(dict(data=content, **paging))
 
 
-def hello_world():
+def hello_world(request):
     """
     description:
         A test API base route.
@@ -62,7 +68,7 @@ def hello_world():
         200:
             description: It's alive!
     """
-    return {"Hello": "world!"}
+    return JSONResponse({"Hello": "world!"})
 
 
 class APIv2(Starlette):
@@ -90,7 +96,11 @@ class APIv2(Starlette):
         name = classname_for_table(schema.opts.model.__table__)
         log.info(str(name))
 
-        args_schema = {"nest": DelimitedList(Str(), missing=[])}
+        args_schema = {
+            "nest": DelimitedList(Str(), missing=[]),
+            "page": Str(missing=None),
+            "per_page": Int(missing=20),
+        }
 
         # Flama's API methods know to deserialize this with the proper model
         async def list_items(request):
@@ -98,9 +108,17 @@ class APIv2(Starlette):
             log.info(args)
 
             schema = iface(many=True, allowed_nests=args["nest"])
-            q = db.session.query(schema.opts.model)
 
-            res = get_page(q, per_page=20)
+            # By default, we order by the "natural" order of Primary Keys. This
+            # is not really what we want in most cases, probably.
+            pk = [desc(p) for p in get_primary_keys(schema.opts.model)]
+            q = db.session.query(schema.opts.model).order_by(*pk)
+
+            try:
+                res = get_page(q, per_page=args["per_page"], page=args["page"])
+            except ValueError:
+                raise ValidationError("Invalid page token.")
+
             return APIResponse(schema, res)
 
         self.add_route("/" + name, list_items, methods=["GET"])
