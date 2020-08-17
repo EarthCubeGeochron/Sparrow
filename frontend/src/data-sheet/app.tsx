@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
-import { List, Grid, AutoSizer } from "react-virtualized";
-import VirDataSheet from "./vDataSheet";
-import ReactDataSheet from "react-datasheet";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { SheetHeader } from "./header";
+import { VirtualizedSheet } from "./virtualized";
 import { DataSheetContext, DataSheetProvider } from "./provider";
 import update from "immutability-helper";
 
@@ -11,9 +9,10 @@ import "./datasheet.css";
 import styles from "./module.styl";
 
 const Row = ({ row, children, className }) => {
+  const { rowHeight } = useContext(DataSheetContext);
   return (
-    <tr>
-      <td className="cell read-only">{row}</td>
+    <tr style={{ height: rowHeight }}>
+      <td className="cell read-only">{row + 1}</td>
       {children}
     </tr>
   );
@@ -142,8 +141,8 @@ function DataSheet() {
           hasChanges={initialData != data}
         ></SheetHeader>
         <div className="sheet">
-          <ReactDataSheet
-            data={cellData.slice(0, 100)}
+          <VirtualizedSheet
+            data={cellData}
             valueRenderer={(cell) => cell.value}
             sheetRenderer={Sheet}
             rowRenderer={Row}
