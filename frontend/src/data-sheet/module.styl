@@ -6,7 +6,7 @@
 .data-sheet
   position fixed
   top 50px
-  left 1em
+  left 0em
   right 0em
   bottom 1px
   display flex
@@ -19,6 +19,25 @@
     position sticky
     top 0
     background-color: whitesmoke
+
+.virtualized-sheet
+  position: absolute;
+  top: 0px
+  bottom: 0px
+  left 0em
+  right 0em
+  background green
+  overflow-y scroll
+
+  .scroll-panel
+    background: purple
+
+  .ui
+    position: sticky
+    top: 0px
+    bottom: 0px
+    left 0px
+    right 0px
 
 :global
   .sheet-header, .sheet-actions
