@@ -14,28 +14,30 @@ export function VirtualizedSheet(props) {
 
   const height = useElementHeight(ref) ?? 100;
   const scrollOffset = useScrollOffset(ref);
+  const buffer = 50;
 
   const scrollerHeight = data.length * rowHeight;
-  const percentOffset = scrollOffset / scrollerHeight;
-  const rowsToDisplay = Math.round((height / rowHeight) * 1.1);
-  const rowOffset = Math.round(data.length * percentOffset);
-
-  console.log(scrollOffset);
+  const percentage = scrollOffset / scrollerHeight;
+  const rowsToDisplay = Math.ceil((height + buffer) / rowHeight);
+  const rowOffset = Math.floor(percentage * (data.length - rowsToDisplay + 5));
 
   function virtualRowRenderer({ row, children, className }) {
     return rowRenderer({ row: row + rowOffset, children, className });
   }
 
+  const lastRow = Math.min(rowOffset + rowsToDisplay, data.length - 1);
+  console.log(rowOffset, rowsToDisplay);
+
   return h("div.virtualized-sheet", { ref }, [
     h("div.ui", { style: { height } }, [
       h(ReactDataSheet, {
-        data: data.slice(rowOffset, rowOffset + rowsToDisplay),
+        data: data.slice(rowOffset, lastRow),
         rowRenderer: virtualRowRenderer,
         ...rest,
       }),
-      h("div.scroll-panel", {
-        style: { height: scrollerHeight },
-      }),
     ]),
+    h("div.scroll-panel", {
+      style: { height: scrollerHeight },
+    }),
   ]);
 }
