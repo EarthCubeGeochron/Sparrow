@@ -43,10 +43,14 @@ class APIResponse(JSONResponse):
 
     def render(self, content: Any):
         # Use output schema to validate and format data
-        paging = {}
-        if hasattr(content, "paging"):
-            paging["bookmark_next"] = content.paging.bookmark_next
-            paging["bookmark_previous"] = content.paging.bookmark_previous
+
+        paging = getattr(content, "paging", None)
+        page = {}
+        if paging is not None:
+            page["next_page"] = paging.bookmark_next if paging.has_next else None
+            page["previous_page"] = (
+                paging.bookmark_previous if paging.has_previous else None
+            )
 
         try:
             if self.schema is not None:
@@ -57,7 +61,7 @@ class APIResponse(JSONResponse):
         if not content:
             return b""
 
-        return super().render(dict(data=content, **paging))
+        return super().render(dict(data=content, **page))
 
 
 def hello_world(request):
@@ -113,7 +117,7 @@ class APIv2(Starlette):
             # is not really what we want in most cases, probably.
             pk = [desc(p) for p in get_primary_keys(schema.opts.model)]
             q = db.session.query(schema.opts.model).order_by(*pk)
-
+            # https://github.com/djrobstep/sqlakeyset
             try:
                 res = get_page(q, per_page=args["per_page"], page=args["page"])
             except ValueError:
