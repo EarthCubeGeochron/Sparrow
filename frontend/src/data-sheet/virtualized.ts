@@ -7,7 +7,7 @@ import styles from "./module.styl";
 const h = hyperStyled(styles);
 
 export function VirtualizedSheet(props) {
-  const { data, rowRenderer, ...rest } = props;
+  const { data, rowRenderer, onCellsChanged, ...rest } = props;
   const { rowHeight } = useContext(DataSheetContext);
 
   const ref = useRef<HTMLDivElement>();
@@ -33,6 +33,10 @@ export function VirtualizedSheet(props) {
       h(ReactDataSheet, {
         data: data.slice(rowOffset, lastRow),
         rowRenderer: virtualRowRenderer,
+        onCellsChanged(changes) {
+          changes.forEach((d) => (d.row += rowOffset));
+          onCellsChanged(changes);
+        },
         ...rest,
       }),
     ]),
