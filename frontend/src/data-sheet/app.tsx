@@ -5,6 +5,7 @@ import React, {
   useLayoutEffect,
   useRef,
 } from "react";
+import { useElementHeight, useScrollOffset } from "./util";
 import { List, Grid, AutoSizer } from "react-virtualized";
 import VirDataSheet from "./vDataSheet";
 import ReactDataSheet from "react-datasheet";
@@ -77,27 +78,6 @@ interface SampleData {
   name: string;
 }
 
-// Should factor this into UI Components
-function useElementHeight(ref: React.Ref<HTMLElement>): number | null {
-  const [height, setHeight] = useState<number>(null);
-  useLayoutEffect(() => {
-    if (ref.current == null) return;
-    const { height } = ref.current.getBoundingClientRect();
-    setHeight(height);
-  }, [ref.current]);
-  return height;
-}
-
-function useScrollOffset(ref: React.Ref<HTMLElement>): number {
-  const [offset, setOffset] = useState(0);
-  useEffect(() => {
-    ref.current?.addEventListener("scroll", (evt) => {
-      setOffset(evt.target.scrollTop);
-    });
-  }, [ref.current]);
-  return offset;
-}
-
 function VirtualizedSheet(props) {
   const { data, onCellsChanged } = props;
   const { rowHeight } = useContext(DataSheetContext);
@@ -107,25 +87,26 @@ function VirtualizedSheet(props) {
   const scrollOffset = useScrollOffset(ref);
 
   const scrollerHeight = data.length * rowHeight;
-  const nRowsDisplayed = Math.round((height / rowHeight) * 1.2);
+  const rowsToDisplay = Math.round((height / rowHeight) * 1.2);
+  const rowOffset = Math.round(scrollOffset / rowHeight);
 
   return (
     <div ref={ref} className={styles["virtualized-sheet"]}>
-      <div className={styles["ui"]}>Scroll offset: {scrollOffset}</div>
+      <div className={styles["ui"]} style={{ height: scrollerHeight }}>
+        <ReactDataSheet
+          data={data.slice(rowOffset, rowOffset + rowsToDisplay)}
+          valueRenderer={(cell) => cell.value}
+          sheetRenderer={Sheet}
+          rowRenderer={Row}
+          onCellsChanged={onCellsChanged}
+        />
+      </div>
       <div
         className={styles["scroll-panel"]}
         style={{ height: scrollerHeight }}
       />
     </div>
   );
-
-  // <ReactDataSheet
-  //   data={cellData.slice(0, 100)}
-  //   valueRenderer={(cell) => cell.value}
-  //   sheetRenderer={Sheet}
-  //   rowRenderer={Row}
-  //   onCellsChanged={onCellsChanged}
-  // />
 }
 
 function DataSheet() {
@@ -202,7 +183,7 @@ function DataSheet() {
           hasChanges={initialData != data}
         ></SheetHeader>
         <div className="sheet">
-          <VirtualizedSheet rowHeight={40} data={data} />
+          <VirtualizedSheet data={cellData} onCellsChanged={onCellsChanged} />
         </div>
       </div>
     </DataSheetProvider>
