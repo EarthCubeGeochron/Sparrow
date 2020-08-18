@@ -44,6 +44,10 @@ export function MarkerCluster({ viewport, changeViewport, bounds }) {
     options: { radius: 75, maxZoom: 5 },
   });
 
+  const markerClicked = (e) => {
+    return console.log(e);
+  };
+
   return (
     <div>
       {clusters.map((cluster) => {
@@ -86,6 +90,11 @@ export function MarkerCluster({ viewport, changeViewport, bounds }) {
             key={cluster.properties.id}
             latitude={latitude}
             longitude={longitude}
+            offsetLeft={-15}
+            offsetTop={-20}
+            captureClick={(e) => {
+              markerClicked(e);
+            }}
           >
             <Popover
               content={
@@ -95,7 +104,11 @@ export function MarkerCluster({ viewport, changeViewport, bounds }) {
               }
             >
               <Tooltip content={cluster.properties.Sample_name}>
-                <Button className="bp3-minimal" icon="map-marker" />
+                <Button
+                  minimal={true}
+                  className="mrker-btn"
+                  icon="map-marker"
+                />
               </Tooltip>
             </Popover>
           </Marker>

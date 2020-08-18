@@ -5,7 +5,13 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  createElement,
+} from "react";
 import MapGl, { Marker, FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyle } from "./MapStyle";
@@ -15,15 +21,15 @@ import { Button, Intent, Toaster, Position } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./cluster.css";
 import { Link } from "react-router-dom";
-import { useAPIResult } from "./components/APIResult";
+import { useAPIResult, useToggle } from "./components/APIResult";
 import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
-//import { MapToaster } from "./components/MapToast";
-import { AppToaster } from "../toaster";
+import { FilterMenu } from "./components/filterMenu";
+import { MapToast } from "./components/MapToast";
 
 const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
-  maxToasts: 3,
+  maxToasts: 1,
 });
 
 export function MapPanel({
@@ -39,41 +45,11 @@ export function MapPanel({
     MapStyle: mapstyle,
     showMarkers: true,
     clickPnt: { lng: 0, lat: 0 },
-    drawOpen: false,
+    openInfo: false,
   };
 
   const [state, setState] = useState(initialState);
-  const [macrostratData, setMacrostratData] = useState([]);
 
-  const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
-
-  const MacostratData = useAPIResult(MacURl, {
-    lng: state.clickPnt.lng,
-    lat: state.clickPnt.lat,
-  });
-
-  useEffect(() => {
-    if (MacostratData == null) return;
-    setMacrostratData(MacostratData.success.data);
-    console.log(macrostratData);
-  }, [MacostratData]);
-
-  let message = macrostratData.map((object) => {
-    return (
-      <div>
-        <p key={object.name}>{"Name: " + object.name}</p>
-        <p key={object.lith}>{"Lithology: " + object.lith}</p>
-      </div>
-    );
-  });
-
-  // const [viewport, setViewport] = useState({
-  //   latitude,
-  //   longitude,
-  //   zoom,
-  //   width,
-  //   height,
-  // });
   const mapstyles = {
     initialMapStyle: "mapbox://styles/mapbox/outdoors-v9",
     topoMapStyle: "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub",
@@ -86,10 +62,6 @@ export function MapPanel({
   const bounds = mapRef.current
     ? mapRef.current.getMap().getBounds().toArray().flat()
     : null;
-
-  const closeToast = () => {
-    setState({ ...state, drawOpen: !state.drawOpen });
-  };
 
   const toggleShowMarkers = () => {
     setState({ ...state, showMarkers: !state.showMarkers });
@@ -115,15 +87,18 @@ export function MapPanel({
     });
   };
 
+  const toggleToasterInfo = () => {
+    setState({ ...state, openInfo: !state.openInfo });
+  };
+
   const mapClicked = (e) => {
     setState({
       ...state,
-      drawOpen: !state.drawOpen,
       clickPnt: { lng: e.lngLat[0], lat: e.lngLat[1] },
     });
 
     return MapToaster.show({
-      message: message,
+      message: <MapToast lng={e.lngLat[0]} lat={e.lngLat[1]} />,
       timeout: 0,
     });
   };
@@ -138,6 +113,7 @@ export function MapPanel({
           showMarkers={state.showMarkers}
           toggleShowMarkers={toggleShowMarkers}
         ></LayerMenu>
+        <FilterMenu></FilterMenu>
       </div>
       <div>
         <MapGl

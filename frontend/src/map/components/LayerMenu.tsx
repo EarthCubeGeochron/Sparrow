@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import {
   Menu,
   MenuItem,
@@ -8,7 +8,9 @@ import {
   Tooltip,
   Button,
   Position,
+  InputGroup,
 } from "@blueprintjs/core";
+import "../cluster.css";
 
 export const LayerMenu = ({
   MapStyle,
@@ -66,10 +68,12 @@ export const LayerMenu = ({
     </Menu>
   );
   return (
-    <Popover content={dropMenu} position={Position.BOTTOM}>
-      <Tooltip content="Change Map">
-        <Button icon="layers"></Button>
-      </Tooltip>
-    </Popover>
+    <div className="mappagemenu">
+      <Popover content={dropMenu} position={Position.BOTTOM}>
+        <Tooltip content="Change Map">
+          <Button icon="layers"></Button>
+        </Tooltip>
+      </Popover>
+    </div>
   );
 };
