@@ -3,29 +3,36 @@ import { useState } from "react";
 import { Card, MenuItem } from "@blueprintjs/core";
 import { MultiSelect } from "@blueprintjs/select";
 
-/** 
-This component is a search bar with a drop down menu. 
-It can set filters or fill forms 
+/**
+This component is a search bar with a drop down menu.
+It can set filters or fill forms
 */
 export function MultipleSelectFilter({ text }) {
   const [state, setState] = useState({
     items: ["car", "horse", "duck", "goose"],
-    selectedItem: [],
+    selectedItems: [],
     isItemSelected: false,
   });
 
-  const itemRenderer = (item) => {
-    return <MenuItem text={item}></MenuItem>;
+  const itemRenderer = (item, itemProps) => {
+    console.log(itemProps);
+    const isSelected = state.selectedItems.includes(item);
+    return (
+      <MenuItem
+        text={item}
+        onClick={itemProps.handleClick}
+        active={isSelected}
+      ></MenuItem>
+    );
   };
 
   const itemSelect = (item) => {
-    let list = state.selectedItem;
-    let newlist = list.concat(item);
-    setState({ ...state, selectedItem: newlist });
+    let newlist = [...state.selectedItems, item];
+    setState({ ...state, selectedItems: newlist });
     return item;
   };
 
-  const tagRenderer = () => state.selectedItem;
+  const tagRenderer = () => state.selectedItems;
 
   return (
     <Card>
@@ -39,7 +46,7 @@ export function MultipleSelectFilter({ text }) {
             itemRenderer={itemRenderer}
             onItemSelect={itemSelect}
             tagRenderer={tagRenderer}
-            selectedItems={state.selectedItem}
+            selectedItems={state.selectedItems}
           ></MultiSelect>
         </div>
       </div>
