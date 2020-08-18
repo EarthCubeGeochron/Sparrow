@@ -14,25 +14,18 @@ export function MultipleSelectFilter({ text }) {
     isItemSelected: false,
   });
 
-  const itemRenderer = (item, { modifiers }) => {
-    function ClickHandler(item) {
-      let List = state.selectedItem;
-      let newList = List.concat(item);
-      setState({ ...state, selectedItem: newList });
-    }
-    if (!modifiers.matchesPredicate) {
-      return null;
-    }
-    return (
-      <MenuItem
-        active={modifiers.active}
-        text={item}
-        onClick={(item) => ClickHandler(item)}
-      ></MenuItem>
-    );
+  const itemRenderer = (item) => {
+    return <MenuItem text={item}></MenuItem>;
   };
 
-  const tagRenderer = (item) => item;
+  const itemSelect = (item) => {
+    let list = state.selectedItem;
+    let newlist = list.concat(item);
+    setState({ ...state, selectedItem: newlist });
+    return item;
+  };
+
+  const tagRenderer = () => state.selectedItem;
 
   return (
     <Card>
@@ -44,7 +37,7 @@ export function MultipleSelectFilter({ text }) {
             fill={true}
             items={state.items}
             itemRenderer={itemRenderer}
-            onItemSelect={(item) => item}
+            onItemSelect={itemSelect}
             tagRenderer={tagRenderer}
             selectedItems={state.selectedItem}
           ></MultiSelect>
