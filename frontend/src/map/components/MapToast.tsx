@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { Button, Card, Collapse, Spinner } from "@blueprintjs/core";
+import { Button, Card, Collapse, Spinner, Divider } from "@blueprintjs/core";
 import { useAPIResult, useToggle } from "./APIResult";
 
 /* This component will Handle the drawer or whatever 
@@ -19,14 +19,26 @@ export function MapToast({ lng, lat }) {
     lng: lng,
     lat: lat,
   });
+  console.log(MacostratData); // if MacrostratData.success.data.length is 0... there is no associated data.
   return (
     <div>
       <h5>
-        Information Provided by{" "}
-        <a href="https://macrostrat.org/">MacroStrat API</a>
+        <b>Longitude: </b>
+        <i>{Number(lng).toFixed(3) + " "}</i>
+        <b>Latitude: </b>
+        <i>{Number(lat).toFixed(3)}</i>
       </h5>
+      <Divider />
+      <div>
+        <h5>
+          Information Provided by{" "}
+          <a href="https://macrostrat.org/">MacroStrat</a>
+        </h5>
+      </div>
       {MacostratData == null ? (
         <Spinner size={50} />
+      ) : MacostratData.success.data.length == 0 ? (
+        <h4>No Data at this point. Click Somewhere Else</h4>
       ) : (
         MacostratData.success.data.map((object) => {
           return (

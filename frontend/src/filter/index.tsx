@@ -15,9 +15,9 @@ const SampleFilter = () => {
       <Collapse isOpen={open}>
         <AgeSlideSelect />
         <DatePicker />
-        <MultipleSelectFilter text="Material :" />
-        <MultipleSelectFilter text="Geologic Formation :" />
-        <MultipleSelectFilter text="Geologic Time Period :" />
+        <MultipleSelectFilter text="Material :" items={items} />
+        <MultipleSelectFilter text="Geologic Formation :" items={items} />
+        <MultipleSelectFilter text="Geologic Time Period :" items={items} />
       </Collapse>
     </div>
   );

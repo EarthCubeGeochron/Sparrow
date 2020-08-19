@@ -19,35 +19,6 @@ export function FilterMenu() {
     return <Tag onRemove={onRemove}>{tag}</Tag>;
   });
 
-  const filterMenu = (
-    <Menu>
-      <MenuItem
-        intent={filterType == "Name" ? "primary" : null}
-        labelElement={filterType == "Name" ? <Icon icon="tick" /> : null}
-        onClick={() => setFilterType("Name")}
-        text="Name"
-      />
-      <MenuItem
-        intent={filterType == "Material" ? "primary" : null}
-        labelElement={filterType == "Material" ? <Icon icon="tick" /> : null}
-        onClick={() => setFilterType("Material")}
-        text="Material"
-      />
-      <MenuItem
-        intent={filterType == "Location" ? "primary" : null}
-        labelElement={filterType == "Location" ? <Icon icon="tick" /> : null}
-        onClick={() => setFilterType("Location")}
-        text="Location"
-      />
-      <MenuItem
-        intent={filterType == "Sparrow ID" ? "primary" : null}
-        labelElement={filterType == "Sparrow ID" ? <Icon icon="tick" /> : null}
-        onClick={() => setFilterType("Sparrow ID")}
-        text="Sparrow ID"
-      />
-    </Menu>
-  );
-
   return (
     <div style={{ display: "flex" }}>
       <InputGroup

@@ -9,6 +9,7 @@ export function AgeSlideSelect() {
   const handleRangeChange = (range) => {
     setRange(range);
   };
+  //console.log(range);
   return (
     <Card>
       <h5>Sample Age (Ma): </h5>
