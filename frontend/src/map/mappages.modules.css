@@ -9,3 +9,14 @@
   left: 1;
   margin: 10px 30px;
 }
+
+.map-page {
+  position: absolute;
+}
+
+.map-navbar {
+  position: relative;
+  top: 0.2;
+  left: 1;
+  margin: 30px 30px;
+}

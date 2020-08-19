@@ -9,6 +9,7 @@
   "dependencies": {
     "@blueprintjs/core": "^3.10.0",
     "@blueprintjs/datetime": "^3.9.1",
+    "@blueprintjs/select": "^3.13.7",
     "@blueprintjs/table": "^3.3.0",
     "@data-ui/histogram": "0.0.75",
     "@emotion/core": "^10.0.7",

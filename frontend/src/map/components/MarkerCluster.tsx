@@ -9,7 +9,7 @@ import { Marker, FlyToInterpolator } from "react-map-gl";
 
 // This component controls the State and the UI for the markers and the markercluster
 
-export function MarkerCluster({ viewport, setViewport, bounds }) {
+export function MarkerCluster({ viewport, changeViewport, bounds }) {
   const [markers, setMarkers] = useState([]);
   const initialData = useAPIResult("/sample", { all: true });
   useEffect(() => {
@@ -44,6 +44,10 @@ export function MarkerCluster({ viewport, setViewport, bounds }) {
     options: { radius: 75, maxZoom: 5 },
   });
 
+  const markerClicked = (e) => {
+    return console.log(e);
+  };
+
   return (
     <div>
       {clusters.map((cluster) => {
@@ -73,16 +77,7 @@ export function MarkerCluster({ viewport, setViewport, bounds }) {
                     supercluster.getClusterExpansionZoom(cluster.id),
                     5
                   );
-                  setViewport({
-                    ...viewport,
-                    longitude,
-                    latitude,
-                    zoom: expansionZoom,
-                    transitionInterpolator: new FlyToInterpolator({
-                      speed: 1,
-                    }),
-                    transitionDuration: "auto",
-                  });
+                  changeViewport({ expansionZoom, longitude, latitude });
                 }}
               >
                 {pointCount}
@@ -95,6 +90,11 @@ export function MarkerCluster({ viewport, setViewport, bounds }) {
             key={cluster.properties.id}
             latitude={latitude}
             longitude={longitude}
+            offsetLeft={-15}
+            offsetTop={-20}
+            captureClick={(e) => {
+              markerClicked(e);
+            }}
           >
             <Popover
               content={
@@ -104,7 +104,11 @@ export function MarkerCluster({ viewport, setViewport, bounds }) {
               }
             >
               <Tooltip content={cluster.properties.Sample_name}>
-                <Button className="bp3-minimal" icon="map-marker" />
+                <Button
+                  minimal={true}
+                  className="mrker-btn"
+                  icon="map-marker"
+                />
               </Tooltip>
             </Popover>
           </Marker>

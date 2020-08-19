@@ -5,20 +5,32 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  createElement,
+} from "react";
 import MapGl, { Marker, FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyle } from "./MapStyle";
 import h, { compose } from "@macrostrat/hyper";
 import useSuperCluster from "use-supercluster";
-import { Tooltip, Popover, Button, Intent } from "@blueprintjs/core";
+import { Button, Intent, Toaster, Position } from "@blueprintjs/core";
 import classNames from "classnames";
 import "./cluster.css";
 import { Link } from "react-router-dom";
-import { useAPIResult } from "./components/APIResult";
+import { useAPIResult, useToggle } from "./components/APIResult";
 import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
-import { MapDrawer } from "./components/MapDrawer";
+import { FilterMenu } from "./components/filterMenu";
+import { MapToast } from "./components/MapToast";
+
+const MapToaster = Toaster.create({
+  position: Position.TOP_RIGHT,
+  maxToasts: 1,
+});
 
 export function MapPanel({
   width = "50vw",
@@ -28,17 +40,15 @@ export function MapPanel({
   zoom = 1,
   mapstyle = "mapbox://styles/mapbox/outdoors-v9",
 }) {
-  const [viewport, setViewport] = useState({
-    latitude,
-    longitude,
-    zoom,
-    width,
-    height,
-  });
-  const [MapStyle, setMapStyle] = useState(mapstyle);
-  const [showMarkers, setShowMarkers] = useState(true);
-  const [clickPnt, setClickPnt] = useState({ lng: 0, lat: 0 });
-  const [drawOpen, setDrawOpen] = useState(false);
+  const initialState = {
+    viewport: { latitude, longitude, zoom, width, height },
+    MapStyle: mapstyle,
+    showMarkers: true,
+    clickPnt: { lng: 0, lat: 0 },
+    openInfo: false,
+  };
+
+  const [state, setState] = useState(initialState);
 
   const mapstyles = {
     initialMapStyle: "mapbox://styles/mapbox/outdoors-v9",
@@ -49,58 +59,79 @@ export function MapPanel({
 
   const mapRef = useRef();
 
-  const initialData = useAPIResult("/sample", { all: true });
-
-  const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
-
-  // const MacostratData = useAPIResult(MacURl, {
-  //   lng: clickPnt.lng,
-  //   lat: clickPnt.lat,
-  // });
-
-  // useEffect(() => {
-  //   if (MacostratData == null) return;
-  //   console.log(MacostratData.success.data);
-  // }, [MacostratData]);
-
   const bounds = mapRef.current
     ? mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
+  const toggleShowMarkers = () => {
+    setState({ ...state, showMarkers: !state.showMarkers });
+  };
+
+  const chooseMapStyle = (props) => {
+    setState({ ...state, MapStyle: props });
+  };
+
+  const changeViewport = ({ expansionZoom, longitude, latitude }) => {
+    setState({
+      ...state,
+      viewport: {
+        ...state.viewport,
+        longitude: longitude,
+        latitude: latitude,
+        zoom: expansionZoom,
+        transitionInterpolator: new FlyToInterpolator({
+          speed: 1,
+        }),
+        transitionDuration: "auto",
+      },
+    });
+  };
+
+  const toggleToasterInfo = () => {
+    setState({ ...state, openInfo: !state.openInfo });
+  };
+
+  const mapClicked = (e) => {
+    setState({
+      ...state,
+      clickPnt: { lng: e.lngLat[0], lat: e.lngLat[1] },
+    });
+
+    return MapToaster.show({
+      message: <MapToast lng={e.lngLat[0]} lat={e.lngLat[1]} />,
+      timeout: 0,
+    });
+  };
+
   return (
     <div className="map-container">
-      <MapDrawer
-        drawOpen={drawOpen}
-        setDrawOpen={setDrawOpen}
-        clickPnt={clickPnt}
-      ></MapDrawer>
       <div className="layer-button">
         <LayerMenu
-          MapStyle={MapStyle}
-          setMapStyle={setMapStyle}
+          MapStyle={state.MapStyle}
+          chooseMapStyle={chooseMapStyle}
           mapstyles={mapstyles}
-          showMarkers={showMarkers}
-          setShowMarkers={setShowMarkers}
+          showMarkers={state.showMarkers}
+          toggleShowMarkers={toggleShowMarkers}
         ></LayerMenu>
+        <FilterMenu></FilterMenu>
       </div>
       <div>
         <MapGl
           onClick={(e) => {
-            setClickPnt({ lng: e.lngLat[0], lat: e.lngLat[1] });
-            setDrawOpen(!drawOpen);
+            mapClicked(e);
           }}
-          mapStyle={MapStyle}
+          mapStyle={state.MapStyle}
           mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
-          {...viewport}
+          {...state.viewport}
           onViewportChange={(viewport) => {
-            setViewport(viewport);
+            setState({ ...state, viewport: viewport });
           }}
           ref={mapRef}
         >
-          {showMarkers ? (
+          {state.showMarkers ? (
             <MarkerCluster
-              viewport={viewport}
-              setViewport={setViewport}
+              viewport={state.viewport}
+              changeViewport={changeViewport}
               bounds={bounds}
             ></MarkerCluster>
           ) : null}

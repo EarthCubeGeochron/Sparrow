@@ -55,11 +55,11 @@ const MapHome = (props) => {
 
 const MapPage = (props) =>
   h("div.map-page", [
-    h(MapNavbar, [
-      h(CatalogNavLinks),
-      h(Menu.Divider),
-      h(AuthStatus, { large: false }),
-    ]),
+    // h(MapNavbar, [
+    //   h(CatalogNavLinks),
+    //   h(Menu.Divider),
+    //   h(AuthStatus, { large: false }),
+    // ]),
     h(MapPanel, {
       className: "main-map",
       accessToken: process.env.MAPBOX_API_TOKEN,
