@@ -20,12 +20,8 @@ import { AppToaster } from "./toaster";
 import { Catalog } from "./admin";
 import { PageSkeleton, PageStyle } from "./components/page-skeleton";
 import { MapPage } from "./map";
-<<<<<<< HEAD
-import Table from "./table/App";
-import styled from "@emotion/styled";
-=======
+
 import DataSheet from "./data-sheet/app";
->>>>>>> 14ebec2ef96929777789924ea72573ccf9261782
 
 function PageRoute(props) {
   /** A custom route to manage page header, footer, and style associated
@@ -42,6 +38,7 @@ const MainNavbar = (props) =>
   h(AppNavbar, { fullTitle: true }, [
     h(CatalogNavLinks, { base: "/catalog" }),
     h(NavButton, { to: "/map" }, "Map"),
+    h(NavButton, { to: "/data-sheet" }, "Data Sheet"),
     h(AppNavbar.Divider),
     h(NavButton, { to: "/api-explorer/v1" }, "API"), // NavButton, similar to React-Router 'Link' takes the 'to' arg
   ]);
@@ -76,6 +73,11 @@ function AppMain(props) {
         path: "/map",
         style: PageStyle.FULLSCREEN,
         component: MapPage,
+      }),
+      h(PageRoute, {
+        path: "/data-sheet",
+        style: PageStyle.WIDE,
+        component: DataSheet,
       }),
       h(PageRoute, { path: "/api-explorer", component: APIExplorer }),
     ])
