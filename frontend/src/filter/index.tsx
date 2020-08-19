@@ -1,55 +1,36 @@
 import * as React from "react";
 import { Button, Tooltip, Collapse, Card, MenuItem } from "@blueprintjs/core";
-import { AgeSlideSelect, DatePicker, MultipleSelectFilter } from "./components";
+import {
+  AgeSlideSelect,
+  DatePicker,
+  MultipleSelectFilter,
+  GeologicFormationSelector,
+} from "./components";
 import { useToggle, useAPIResult } from "../map/components/APIResult";
 
+/**
+ * This Functional Component is a filter template to be used on different
+ * pages. Some of the filters may be hidden depending on what page the user
+ * is on, (i.e. a location selector wouldn't be rendered on the MapPanel
+ */
 const SampleFilter = () => {
   const [open, toggleOpen] = useToggle(false);
-  const items = ["car", "horse", "duck", "goose"];
-  const [searchText, setSearchText] = React.useState("");
-  const [stratNames, setStratNames] = React.useState([]);
-  console.log(stratNames);
 
-  const MacGeoFormationUrl =
-    "https://macrostrat.org/api/v2/defs/strat_names?strat_name_like=" +
-    searchText;
-
-  const geologicFormations = useAPIResult(MacGeoFormationUrl);
-  console.log(geologicFormations);
-
-  React.useEffect(() => {
-    if (geologicFormations !== null) {
-      setStratNames(
-        geologicFormations.success.data
-          .map((item) => item.strat_name)
-          .slice(0, 10)
-      );
-    }
-  }, [geologicFormations]);
-
-  const searchBySelectQuery = (query) => {
-    setSearchText(query);
-  };
   return (
     <div>
-      {geologicFormations !== null ? (
-        <div>
-          <Tooltip content="Choose Multiple Filters">
-            <Button onClick={toggleOpen} icon="filter"></Button>
-          </Tooltip>
-          <Collapse isOpen={open}>
-            <AgeSlideSelect />
-            <DatePicker />
-            {/* <MultipleSelectFilter text="Material :" items={items} /> */}
-            <MultipleSelectFilter
-              text="Geologic Formation :"
-              items={stratNames}
-              sendQuery={searchBySelectQuery}
-            />
-            {/* <MultipleSelectFilter text="Geologic Time Period :" items={items} /> */}
-          </Collapse>
-        </div>
-      ) : null}
+      <Tooltip content="Choose Multiple Filters">
+        <Button onClick={toggleOpen} icon="filter"></Button>
+      </Tooltip>
+      <Collapse isOpen={open}>
+        <Card>
+          <AgeSlideSelect />
+          <DatePicker />
+          <GeologicFormationSelector />
+          {/* <MultipleSelectFilter text="Material :" items={items} /> */}
+
+          {/* <MultipleSelectFilter text="Geologic Time Period :" items={items} /> */}
+        </Card>
+      </Collapse>
     </div>
   );
 };

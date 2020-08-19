@@ -33,6 +33,7 @@ const MapToaster = Toaster.create({
 });
 
 export function MapPanel({
+  hide_filter = false,
   width = "50vw",
   height = "500px",
   latitude = 0,
@@ -113,7 +114,7 @@ export function MapPanel({
           showMarkers={state.showMarkers}
           toggleShowMarkers={toggleShowMarkers}
         ></LayerMenu>
-        <FilterMenu></FilterMenu>
+        <FilterMenu hide={hide_filter}></FilterMenu>
       </div>
       <div>
         <MapGl

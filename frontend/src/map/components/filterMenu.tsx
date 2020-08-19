@@ -4,8 +4,7 @@ import { Menu, MenuItem, Icon, InputGroup, Tag } from "@blueprintjs/core";
 import "../cluster.css";
 import { SampleFilter } from "../../filter";
 
-export function FilterMenu() {
-  const [filterType, setFilterType] = useState("Name");
+export function FilterMenu({ hide = true }) {
   const [tags, setTags] = useState([]);
 
   const inputChange = (e) => {
@@ -20,12 +19,16 @@ export function FilterMenu() {
   });
 
   return (
-    <div style={{ display: "flex" }}>
-      <InputGroup
-        placeholder={"Global Filter"}
-        onChange={(e) => inputChange(e)}
-      />
-      <SampleFilter />
+    <div>
+      {hide ? null : (
+        <div style={{ display: "flex" }}>
+          <InputGroup
+            placeholder={"Global Filter"}
+            onChange={(e) => inputChange(e)}
+          />
+          <SampleFilter />
+        </div>
+      )}
     </div>
   );
 }

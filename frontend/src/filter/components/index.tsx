@@ -1,3 +1,3 @@
 export { AgeSlideSelect } from "./AgeSlider";
 export { DatePicker } from "./DatePicker";
-export { MultipleSelectFilter } from "./MultiSelect";
+export { MultipleSelectFilter, GeologicFormationSelector } from "./MultiSelect";
