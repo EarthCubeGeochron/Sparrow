@@ -27,13 +27,6 @@ const SampleFilter = () => {
     }
   }, [geologicFormations]);
 
-  // if (geologicFormations !== null) {
-  //   const stratNames = geologicFormations.success.data
-  //     .map((item) => item.strat_name)
-  //     .slice(0, 10);
-  //   console.log(stratNames);
-  // }
-
   const searchBySelectQuery = (query) => {
     setSearchText(query);
   };

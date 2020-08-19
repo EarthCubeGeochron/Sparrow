@@ -14,7 +14,7 @@ It can set filters or fill forms
 
 export function MultipleSelectFilter({ text, items, sendQuery }) {
   const [state, setState] = useState({
-    items: items,
+    //items: items,
     selectedItems: [],
     isItemSelected: false,
   });
@@ -75,7 +75,7 @@ export function MultipleSelectFilter({ text, items, sendQuery }) {
           <MultiSelect
             noResults={<MenuItem disabled={true} text="No results." />}
             fill={true}
-            items={state.items}
+            items={items}
             itemRenderer={itemRenderer}
             itemPredicate={filterItem}
             onItemSelect={itemSelect}
