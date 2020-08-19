@@ -12,7 +12,7 @@ This component is a search bar with a drop down menu.
 It can set filters or fill forms
 */
 
-export function MultipleSelectFilter({ text, items }) {
+export function MultipleSelectFilter({ text, items, sendQuery }) {
   const [state, setState] = useState({
     items: items,
     selectedItems: [],
@@ -34,6 +34,7 @@ export function MultipleSelectFilter({ text, items }) {
   };
 
   const filterItem = (query, item) => {
+    sendQuery(query);
     return item.toLowerCase().indexOf(query.toLowerCase()) >= 0;
   };
 
