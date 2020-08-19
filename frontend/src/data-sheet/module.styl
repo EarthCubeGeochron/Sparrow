@@ -4,21 +4,35 @@
   //@import "./datasheet.css"
 
 .data-sheet
-  position fixed
-  top 50px
-  left 1em
+  position absolute
+  top 0px
+  left 0em
   right 0em
-  bottom 1px
+  bottom 0px
   display flex
   flex-direction column
   tbody
-    overflow-y scroll
     padding-bottom 2em
   // https://css-tricks.com/position-sticky-and-table-headers/
   th
     position sticky
     top 0
     background-color: whitesmoke
+
+.virtualized-sheet
+  position: absolute;
+  top: 0px
+  bottom: 0px
+  left 0em
+  right 0em
+  overflow-y scroll
+
+  .ui
+    position: sticky
+    top: 0px
+    bottom: 0px
+    left 0px
+    right 0px
 
 :global
   .sheet-header, .sheet-actions
@@ -51,4 +65,6 @@
     left 0
     right 0
     bottom 0
-    overflow-y scroll
+
+  input.data-editor
+    height 20px !important
