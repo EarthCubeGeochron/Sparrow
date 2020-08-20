@@ -159,7 +159,7 @@ class APIv2(Starlette):
 
             return JSONResponse(res)
 
-        self.add_route(endpoint + "/filter", filter_items, methods=["GET", "POST"])
+        # self.add_route(endpoint + "/filter", filter_items, methods=["GET", "POST"])
 
         tbl = schema.opts.model.__table__
         basic_info = dict(
