@@ -99,7 +99,7 @@ export function MapPanel({
     });
 
     return MapToaster.show({
-      message: <MapToast lng={e.lngLat[0]} lat={e.lngLat[1]} />,
+      message: <MapToast mapstyle={state.MapStyle} lng={e.lngLat[0]} lat={e.lngLat[1]} />,
       timeout: 0,
     });
   };
