@@ -1,6 +1,7 @@
 from flama.exceptions import SerializationError, ValidationError
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
+from starlette.exceptions import HTTPException
 from sparrow.logs import get_logger
 from json import dumps
 from ..database.mapper.util import classname_for_table
@@ -31,6 +32,16 @@ def render_json_response(self, content: Any) -> bytes:
 
 # Monkey-patch Starlette's API response
 JSONResponse.render = render_json_response
+
+
+async def http_exception(request, exc):
+    return JSONResponse(
+        {"error": {"detail": exc.detail, "status_code": exc.status_code}},
+        status_code=exc.status_code,
+    )
+
+
+exception_handlers = {HTTPException: http_exception}
 
 
 class APIResponse(JSONResponse):
@@ -83,7 +94,7 @@ class APIv2(Starlette):
             version="2.0",
             description="An API for accessing geochemical data",
         )
-        super().__init__()
+        super().__init__(exception_handlers=exception_handlers)
         self._add_routes()
 
     def _add_routes(self):
@@ -108,6 +119,7 @@ class APIv2(Starlette):
 
         # Flama's API methods know to deserialize this with the proper model
         async def list_items(request):
+            log.info(request)
             args = await parser.parse(args_schema, request, location="querystring")
             log.info(args)
 
