@@ -1,9 +1,0 @@
-#!/usr/bin/env zsh
-
-docs_dir="${0:h:h:A}"
-
-"$docs_dir/bin/build-docs"
-
-v="$docs_dir/public/"
-
-rsync -rltgoD -zv -L --delete "$v" birdnest:"/projects/sparrow-data.org/htdocs/"

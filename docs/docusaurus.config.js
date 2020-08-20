@@ -9,6 +9,8 @@ module.exports = {
   favicon: "img/favicon.png",
   organizationName: "EarthCubeGeochron", // Usually your GitHub org/user name.
   projectName: "Sparrow", // Usually your repo name.
+  // We need to ignore broken links for now.
+  onBrokenLinks: "ignore",
   themeConfig: {
     navbar: {
       title: "Sparrow",
@@ -16,7 +18,7 @@ module.exports = {
         alt: "Sparrow logo",
         src: "img/sparrow-bird-flat.svg",
       },
-      links: [
+      items: [
         {
           to: "docs/guides",
           activeBasePath: "Guides",

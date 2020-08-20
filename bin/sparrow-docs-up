@@ -5,8 +5,15 @@ cd "$SPARROW_PATH/docs"
 export COMPOSE_PROJECT_NAME="sparrow_docs"
 export COMPOSE_FILE="docker-compose.yaml"
 
+if [[ $1 -eq "--delete" ]]; then
+  echo "Removing documentation conter"
+  shift
+  echo $@
+  docker-compose rm frontend
+fi
+
 docker-compose build
-docker-compose up --build -d -V --remove-orphans $@
+docker-compose up --build -d -V --remove-orphans --force-recreate $@
 exit_code=$?
 if (( $exit_code == 0 )); then
   echo "$(tput bold)Containers built successfully! Following logs.$(tput sgr0)"

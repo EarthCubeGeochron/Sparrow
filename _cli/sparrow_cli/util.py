@@ -1,6 +1,7 @@
-from os import environ, chdir, path
+from os import environ, chdir
 from subprocess import run, PIPE, STDOUT
 from shlex import split
+from .env import validate_environment
 
 
 def cmd(*v, **kwargs):
@@ -9,11 +10,12 @@ def cmd(*v, **kwargs):
 
 
 def compose(*args, **kwargs):
-    base = environ['SPARROW_PATH']
-    main = path.join(base, "docker-compose.yaml")
-    overrides = environ.get("SPARROW_COMPOSE_OVERRIDES", "")
-    chdir(base)
-    return cmd("docker-compose", "-f", main, overrides, *args, **kwargs)
+
+    validate_environment()
+
+    chdir(environ["SPARROW_PATH"])
+    overrides = environ.get("_SPARROW_DEPRECATED_OVERRIDES", "")
+    return cmd("docker-compose", overrides, *args, **kwargs)
 
 
 def container_is_running(name):
