@@ -13,6 +13,7 @@ import {
 import "../cluster.css";
 
 export const LayerMenu = ({
+  hide,
   MapStyle,
   chooseMapStyle,
   mapstyles,
@@ -68,12 +69,16 @@ export const LayerMenu = ({
     </Menu>
   );
   return (
-    <div className="mappagemenu">
-      <Popover content={dropMenu} position={Position.BOTTOM}>
-        <Tooltip content="Change Map">
-          <Button icon="layers"></Button>
-        </Tooltip>
-      </Popover>
+    <div>
+      {hide ? null : (
+        <div className="mappagemenu">
+          <Popover content={dropMenu} position={Position.BOTTOM}>
+            <Tooltip content="Change Map">
+              <Button icon="layers"></Button>
+            </Tooltip>
+          </Popover>
+        </div>
+      )}
     </div>
   );
 };

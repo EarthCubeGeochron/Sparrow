@@ -12,6 +12,7 @@ import {
   Tooltip,
   Icon,
   Button,
+  Collapse,
 } from "@blueprintjs/core";
 import { hyperStyled, classed } from "@macrostrat/hyper";
 import styles from "./module.styl";
@@ -22,6 +23,7 @@ import { MapPanel } from "./map-area";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import "./mappages.modules.css";
+import { useToggle } from "./components/APIResult";
 
 const h = hyperStyled(styles);
 
@@ -53,13 +55,19 @@ const MapHome = (props) => {
   );
 };
 
-const MapPage = (props) =>
-  h("div.map-page", [
-    // h(MapNavbar, [
-    //   h(CatalogNavLinks),
-    //   h(Menu.Divider),
-    //   h(AuthStatus, { large: false }),
+const MapPage = (props) => {
+  const [open, toggleOpen] = useToggle(false);
+
+  return h("div.map-page", [
+    // h(Button, { icon: "menu", onClick: toggleOpen, className: "nav-btn" }),
+    // h(Collapse, { isOpen: true }, [
+    //   h(MapNavbar, [
+    //     h(CatalogNavLinks),
+    //     h(Menu.Divider),
+    //     h(AuthStatus, { large: false }),
+    //   ]),
     // ]),
+
     h(MapPanel, {
       hide_filter: false,
       className: "main-map",
@@ -68,6 +76,7 @@ const MapPage = (props) =>
       height: "100vh",
     }),
   ]);
+};
 
 const MapLink = function (props) {
   const { zoom, latitude, longitude, children, ...rest } = props;

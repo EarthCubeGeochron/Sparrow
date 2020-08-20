@@ -121,3 +121,32 @@ export function GeologicFormationSelector() {
     />
   );
 }
+
+export function NoLocalSampleSelector() {
+  const [markers, setMarkers] = useState([]);
+
+  interface Sample {
+    geometry: object;
+    name: string;
+  }
+
+  const initialData = useAPIResult<Sample[]>("/sample", { all: true });
+  React.useEffect(() => {
+    // Set the data back to the initial data
+    if (initialData !== null) {
+      const markers = initialData.filter((d) => d.geometry == null);
+      const names = markers.map((object) => {
+        return object.name;
+      });
+      setMarkers(names);
+    }
+  }, [initialData]);
+
+  return (
+    <MultipleSelectFilter
+      text="Connect Location to Existing Sample"
+      items={markers}
+      sendQuery={() => null}
+    />
+  );
+}
