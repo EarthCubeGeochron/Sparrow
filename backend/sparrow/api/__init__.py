@@ -1,6 +1,8 @@
 from flama.exceptions import SerializationError, ValidationError
 from starlette.applications import Starlette
+from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
+from starlette.exceptions import HTTPException
 from sparrow.logs import get_logger
 from json import dumps
 from ..database.mapper.util import classname_for_table
@@ -11,6 +13,8 @@ from webargs.fields import DelimitedList, Str, Int
 from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
+from json.decoder import JSONDecodeError
+from .schema import schema
 
 log = get_logger(__name__)
 
@@ -31,6 +35,16 @@ def render_json_response(self, content: Any) -> bytes:
 
 # Monkey-patch Starlette's API response
 JSONResponse.render = render_json_response
+
+
+async def http_exception(request, exc):
+    return JSONResponse(
+        {"error": {"detail": exc.detail, "status_code": exc.status_code}},
+        status_code=exc.status_code,
+    )
+
+
+exception_handlers = {HTTPException: http_exception}
 
 
 class APIResponse(JSONResponse):
@@ -64,35 +78,41 @@ class APIResponse(JSONResponse):
         return super().render(dict(data=content, **page))
 
 
-def hello_world(request):
-    """
-    description:
-        A test API base route.
-    responses:
-        200:
-            description: It's alive!
-    """
-    return JSONResponse({"Hello": "world!"})
+class APIEntry(HTTPEndpoint):
+    async def get(self, request):
+        """
+        description:
+            A test API base route.
+        responses:
+            200:
+                description: It's alive!
+        """
+        desc = {d["route"]: d["description"] for d in request.app.route_descriptions}
+        return JSONResponse({"routes": desc})
 
 
 class APIv2(Starlette):
     def __init__(self, app):
         self._app = app
+        self.route_descriptions = []
         api_args = dict(
             title="Sparrow API",
             version="2.0",
             description="An API for accessing geochemical data",
         )
-        super().__init__()
+        super().__init__(exception_handlers=exception_handlers)
         self._add_routes()
 
     def _add_routes(self):
-        self.add_route("/", hello_world, methods=["GET"])
+
+        self.add_route("/", APIEntry)
 
         db = self._app.database
 
         for iface in db.interface:
             self._add_schema_route(iface)
+
+        self.add_route("/schema", schema, methods=["GET"], include_in_schema=False)
 
     def _add_schema_route(self, iface):
         db = self._app.database
@@ -108,6 +128,7 @@ class APIv2(Starlette):
 
         # Flama's API methods know to deserialize this with the proper model
         async def list_items(request):
+            log.info(request)
             args = await parser.parse(args_schema, request, location="querystring")
             log.info(args)
 
@@ -125,4 +146,23 @@ class APIv2(Starlette):
 
             return APIResponse(schema, res)
 
-        self.add_route("/" + name, list_items, methods=["GET"])
+        endpoint = "/" + name
+        self.add_route(endpoint, list_items, methods=["GET"])
+
+        async def filter_items(request):
+            """Shim route to filter models. May not want to include this in the
+            final design, but it is valuable for testing."""
+            try:
+                res = await request.json()
+            except JSONDecodeError:
+                raise ValidationError("Expected a GET or POST body for filter.")
+
+            return JSONResponse(res)
+
+        # self.add_route(endpoint + "/filter", filter_items, methods=["GET", "POST"])
+
+        tbl = schema.opts.model.__table__
+        basic_info = dict(
+            route=endpoint, table=tbl.name, schema=tbl.schema, description="A route!",
+        )
+        self.route_descriptions.append(basic_info)

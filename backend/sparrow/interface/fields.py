@@ -80,20 +80,26 @@ class SmartNested(Nested, Related):
         self._instances.add(value)
         return self._serialize_related_key(value)
 
+    def _copy_config(self, key):
+        """Copy configuration from root model"""
+        if hasattr(self.root, key):
+            setattr(self.schema, key, getattr(self.root, key))
+
     def _serialize(self, value, attr, obj):
         # return ret if len(ret) > 1 else list(ret)[0]
         # return super(Nested, self)._serialize(value, attr, obj)
         # Don't allow nesting for now...
 
         # Pass through allowed_nests configuration to child schema
-        if hasattr(self.root, "allowed_nests"):
-            self.schema.allowed_nests = self.root.allowed_nests
+        self._copy_config("allowed_nests")
+        self._copy_config("_show_audit_id")
 
         other_name = self.related_model.__table__.name
         if other_name in self.root.allowed_nests:
             # Serialize as nested
             return super(Nested, self)._serialize(value, attr, obj)
 
+        # If we don't want to nest
         if isinstance(value, Iterable):
             return [self._serialize_instance(v) for v in value]
         return self._serialize_instance(value)

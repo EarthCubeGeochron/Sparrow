@@ -3,7 +3,7 @@ from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
-from marshmallow.decorators import pre_load, post_load
+from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError
 
 from .util import is_pk_defined, pk_values, prop_is_required
@@ -37,6 +37,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     def __init__(self, *args, **kwargs):
         self.allowed_nests = kwargs.pop("allowed_nests", [])
+        self._show_audit_id = kwargs.pop("audit_id", False)
+
         super().__init__(*args, **kwargs)
 
     def _ready_for_flush(self, instance):
@@ -164,6 +166,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 log.debug(err)
 
         return instance
+
+    @post_dump
+    def remove_internal_fields(self, data, many, **kwargs):
+        if not self._show_audit_id:
+            data.pop("audit_id")
+        return data
 
     def to_json_schema(model):
         return json_schema.dump(model)
