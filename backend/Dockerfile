@@ -1,7 +1,8 @@
-FROM sparrowdata/backend-base:1.1 AS main
+FROM sparrowdata/backend-base:1.2 AS main
 # Multi-stage build of Sparrow backend.
 
 COPY ./requirements.txt /install/requirements.txt
+RUN pip install --no-cache "https://github.com/djrobstep/sqlakeyset/zipball/fec6936"
 RUN pip install --no-cache -r /install/requirements.txt
 
 COPY ./docker.cfg /config/docker.cfg

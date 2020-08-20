@@ -15,13 +15,26 @@ from ..database.mapper.util import trim_postfix
 from .fields import Geometry, Enum, JSON, SmartNested
 from .util import to_schema_name
 
+from ..logs import get_logger
+
+log = get_logger(__name__)
 
 # Control how relationships can be resolved
 allowed_collections = {
+    "data_file": ["data_file_link"],
+    "data_file_link": ["session", "sample", "analysis"],
     "sample": ["session", "material", "sample_geo_entity"],
     "geo_entity": "all",
     "sample_geo_entity": "all",
-    "session": "all",
+    "session": [
+        "analysis",
+        "attribute",
+        "project",
+        "publication",
+        "sample",
+        "instrument",
+        "target",
+    ],
     "analysis": ["datum", "attribute", "constant", "analysis_type", "material"],
     "attribute": ["parameter", "unit"],
     "project": ["researcher", "publication", "session"],
@@ -64,6 +77,9 @@ class SparrowConverter(ModelConverter):
         # column (less '_id' postfix)
         if hasattr(prop, "local_columns") and len(prop.local_columns) == 1:
             col_name = list(prop.local_columns)[0].name
+            # Special case for 'data_file_link'
+            if col_name == "file_hash":
+                return "data_file"
             if col_name != "id":
                 return trim_postfix(col_name, "_id")
 
@@ -71,6 +87,17 @@ class SparrowConverter(ModelConverter):
         # named after the local column
         if prop.secondary is None and not prop.uselist:
             return prop.key
+
+        # For tables not in Sparrow's standard schemas, we make sure to append the
+        # schema name in front of keys, in order for views etc. to not trample
+        # on already-used names. This was added in order to solve problems
+        # with the automapping of `core_view.datum`.
+        #
+        # It may be desirable to improve this by adding a __prefix before views,
+        # OR by making _ALL_ non-public schema tables require a prefix.
+        if prop.target.schema not in [None, "vocabulary", "enum"]:
+            return f"{prop.target.schema}_{prop.target.name}"
+
         # Otherwise, we go with the name of the target model.
         return prop.target.name
 
@@ -98,11 +125,11 @@ class SparrowConverter(ModelConverter):
         this_table = prop.parent.tables[0]
         other_table = prop.target
 
-        if prop.target == this_table and prop.uselist:
+        if other_table == this_table and prop.uselist:
             # Don't allow self-referential collections
             return True
 
-        if prop.uselist and not allow_nest(this_table.name, prop.target.name):
+        if prop.uselist and not allow_nest(this_table.name, other_table.name):
             # Disallow list fields that aren't related (these usually don't have
             # corresponding local columns)
             return True
@@ -177,11 +204,11 @@ class SparrowConverter(ModelConverter):
         this_table = prop.parent.tables[0]
         if not allow_nest(this_table.name, prop.target.name):
             # Fields that are not allowed to be nested
-            return Related(name, **field_kwargs)
+            return Related(**field_kwargs)
         if prop.target.schema == "enum":
             # special carve-out for enums represented as foreign keys
             # (these should be stored in the 'enum' schema):
-            return Enum(name, **field_kwargs)
+            return Enum(**field_kwargs)
 
         # Ignore fields that reference parent models in a nesting relationship
         exclude = []

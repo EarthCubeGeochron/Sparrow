@@ -15,6 +15,7 @@ import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
 import { APIProvider } from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
+import { APIExplorerV2 } from "./api-v2";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
 import { Catalog } from "./admin";
@@ -33,15 +34,6 @@ function PageRoute(props) {
   };
   return h(Route, { ...rest, component });
 }
-
-const MainNavbar = (props) =>
-  h(AppNavbar, { fullTitle: true }, [
-    h(CatalogNavLinks, { base: "/catalog" }),
-    h(NavButton, { to: "/map" }, "Map"),
-    h(NavButton, { to: "/data-sheet" }, "Data Sheet"),
-    h(AppNavbar.Divider),
-    h(NavButton, { to: "/api-explorer/v1" }, "API"), // NavButton, similar to React-Router 'Link' takes the 'to' arg
-  ]);
 
 function AppMain(props) {
   // Handles routing for the application between pages
@@ -79,7 +71,12 @@ function AppMain(props) {
         style: PageStyle.WIDE,
         component: DataSheet,
       }),
-      h(PageRoute, { path: "/api-explorer", component: APIExplorer }),
+      h(PageRoute, {
+        path: "/api-explorer",
+        component: APIExplorerV2,
+        exact: true,
+      }),
+      h(PageRoute, { path: "/api-explorer-v1", component: APIExplorer }),
     ])
   );
 }

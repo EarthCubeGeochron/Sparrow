@@ -15,6 +15,7 @@ from .models import User, Project, Session, DatumType
 from .mapper import MappedDatabaseMixin
 from ..logs import get_logger
 from ..util import relative_path
+from ..interface import ModelSchema
 
 metadata = MetaData()
 
@@ -77,19 +78,22 @@ class Database(MappedDatabaseMixin):
         self.app.run_hook("database-mapped")
 
     @contextmanager
-    def session_scope():
+    def session_scope(self):
         """Provide a transactional scope around a series of operations."""
+        self.__old_session = self.session
         session = self._session_factory()
+        self.session = session
         try:
             yield session
             session.commit()
-        except:
+        except Exception:
             session.rollback()
             raise
         finally:
             session.close()
+            self.session = self.__old_session
 
-    def model_schema(self, model_name):
+    def model_schema(self, model_name) -> ModelSchema:
         """
         Create a SQLAlchemy instance from data conforming to an import schema
         """
@@ -118,7 +122,7 @@ class Database(MappedDatabaseMixin):
                 log.info(f"Adding top-level object {res}")
                 self.session.add(res)
                 self._flush_nested_objects()
-                log.info(f"Committing entire transaction")
+                log.info("Committing entire transaction")
                 self.session.commit()
             return res
         except (IntegrityError, ValidationError) as err:

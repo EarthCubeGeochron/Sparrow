@@ -5,7 +5,7 @@ from sqlalchemy.engine.url import make_url
 import logging
 
 from .encoders import JSONEncoder
-from .api import APIv1
+from .api.v1 import APIv1
 from .util import relative_path
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .interface import InterfacePlugin
@@ -13,7 +13,7 @@ from .auth import AuthPlugin
 
 # from .graph import GraphQLPlugin
 from .web import WebPlugin
-from .logs import get_logger
+from .logs import get_logger, console_handler
 
 log = get_logger(__name__)
 
@@ -21,9 +21,9 @@ log = get_logger(__name__)
 def echo_error(message, obj=None, err=None):
     if obj is not None:
         message += " " + style(str(obj), bold=True)
-    secho(message, fg="red", err=True)
+    log.error(message)
     if err is not None:
-        secho("  " + str(err), fg="red", err=True)
+        log.error("  " + str(err))
 
 
 class App(Flask):
@@ -42,8 +42,8 @@ class App(Flask):
         try:
             self.config.from_pyfile(cfg)
         except RuntimeError as err:
-            secho("No lab-specific configuration file found.", bold=True)
-            print(str(err))
+            log.info("No lab-specific configuration file found.")
+            log.exception(str(err))
 
         self.db = None
         dburl = self.config.get("DATABASE")
@@ -86,19 +86,19 @@ class App(Flask):
             echo_error("Could not register plugin", name, err)
 
     def __loaded(self):
-        self.echo("Initializing plugins")
+        log.info("Initializing plugins")
         self.is_loaded = True
         self.plugins.finalize(self)
 
     def run_hook(self, hook_name, *args, **kwargs):
-        self.echo("Running hook " + hook_name)
+        log.info("Running hook " + hook_name)
         method_name = "on_" + hook_name.replace("-", "_")
         for plugin in self.plugins:
             method = getattr(plugin, method_name, None)
             if method is None:
                 continue
             method(*args, **kwargs)
-            self.echo("  plugin: " + plugin.name)
+            log.info("  plugin: " + plugin.name)
 
     def register_module_plugins(self, module):
         for name, obj in module.__dict__.items():

@@ -1,17 +1,9 @@
 from sparrow.plugins import SparrowCorePlugin
-from sparrow.database.mapper import BaseModel
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, exceptions
-from marshmallow_sqlalchemy.fields import Related
-from marshmallow.fields import Nested
-from marshmallow_jsonschema import JSONSchema
-from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
-from marshmallow.decorators import pre_load, post_load
-from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
-from sqlalchemy.orm.exc import FlushError
+from marshmallow_sqlalchemy import exceptions
 from click import secho
 
-from .converter import SparrowConverter, to_schema_name
-from .util import column_is_required
+from .schema import ModelSchema, BaseMeta
+from .util import to_schema_name
 from ..database.mapper.util import ModelCollection, classname_for_table
 
 from sparrow import get_logger
@@ -19,188 +11,7 @@ from sparrow import get_logger
 log = get_logger(__name__)
 
 
-def _jsonschema_type_mapping(self):
-    """TODO: this is just a shim"""
-    return {"type": "integer"}
-
-
-Related._jsonschema_type_mapping = _jsonschema_type_mapping
-Nested._jsonschema_type_mapping = _jsonschema_type_mapping
-
-json_schema = JSONSchema()
-
-
-class BaseMeta:
-    model_converter = SparrowConverter
-    # Needed for SQLAlchemyAutoSchema
-    include_relationships = True
-    load_instance = True
-
-
-def columns_for_prop(prop):
-    try:
-        return getattr(prop, "columns")
-    except AttributeError:
-        return list(getattr(prop, "local_columns"))
-
-
-def prop_is_required(prop):
-    cols = [column_is_required(c) for c in columns_for_prop(prop)]
-    return any(cols)
-
-
-def pk_values(instance):
-    props = get_primary_keys(instance.__class__)
-    keys = {prop.key: getattr(instance, prop.key) for prop in props}
-    return keys.values()
-
-
-def pk_data(model, data):
-    props = get_primary_keys(model)
-    keys = {prop.key: data.get(prop.key) for prop in props}
-    return keys.values()
-
-
-def is_pk_defined(instance):
-    vals = pk_values(instance)
-    return all([v is not None for v in vals])
-
-
-class BaseSchema(SQLAlchemyAutoSchema):
-    value_index = {}
-
-    def _ready_for_flush(self, instance):
-        if instance is None:
-            return False
-        if any([p is None for p in pk_values(instance)]):
-            return False
-        for prop in self.opts.model.__mapper__.iterate_properties:
-            is_required = prop_is_required(prop)
-            if not is_required:
-                continue
-            if getattr(instance, prop.key, None) is None:
-                return False
-
-        return True
-
-    @property
-    def _table(self):
-        return self.opts.model.__table__
-
-    def _get_session_instance(self, filters):
-        sess = self.session()
-        for inst in list(sess.new):
-            if not isinstance(inst, self.opts.model):
-                continue
-            for k, value in filters.items():
-                if value != getattr(inst, k):
-                    return None
-            log.debug(f"Found instance {inst} in session")
-            return inst
-        return None
-
-    def _get_instance(self, data):
-        """Gets pre-existing instances if they are available."""
-        pk = tuple(pk_data(self.opts.model, data))
-
-        # Filter on properties that actually have a local column
-        filters = {}
-        related_models = {}
-        instance = None
-        for prop in self.opts.model.__mapper__.iterate_properties:
-            val = data.get(prop.key, None)
-            if getattr(prop, "uselist", False):
-                continue
-            if val is not None:
-                if hasattr(prop, "direction"):
-                    # For relationships
-                    if is_pk_defined(val):
-                        filters[prop.key] = val
-                    else:
-                        related_models[prop.key] = val
-                else:
-                    filters[prop.key] = val
-            elif hasattr(prop, "direction"):
-                # This is unsatisfying, as we can't filter on pre-existing
-                # related fields
-                filters[prop.key] = None
-
-        # Try to get value from session
-        if instance is None:
-            log.debug(f"Finding instance of {self.opts.model.__name__}")
-            log.debug(f"..filters: {filters}")
-            instance = self._get_session_instance(filters)
-
-        # Need to get relationship columns for primary keys!
-        if instance is None:
-            try:
-                query = self.session.query(self.opts.model).filter_by(**filters)
-                instance = query.first()
-                if instance is None:
-                    log.debug("..none found")
-                else:
-                    log.debug("..success!")
-            except StatementError as err:
-                log.exception(f"..none found")
-        if instance is None:
-            instance = super().get_instance(data)
-
-        if instance is not None:
-            for k, v in related_models.items():
-                setattr(instance, k, v)
-
-        # Get rid of filters by value
-        # if self.opts.model.__name__ == 'analysis':
-        #     print(filters)
-        #     import pdb; pdb.set_trace()
-
-        return instance
-
-    @pre_load
-    def expand_primary_keys(self, value, **kwargs):
-        try:
-            # Typically, we are deserializing from a mapping of values
-            return dict(**value)
-        except TypeError:
-            pass
-        val_list = ensure_list(value)
-        log.debug("Expanding keys " + str(val_list))
-
-        model = self.opts.model
-        pk = get_primary_keys(model)
-        assert len(pk) == len(val_list)
-        res = {}
-        for col, val in zip(pk, val_list):
-            res[col.key] = val
-        return res
-
-    @post_load
-    def make_instance(self, data, **kwargs):
-        instance = self._get_instance(data)
-        if instance is None:
-            try:
-                # Begin a nested subtransaction
-                self.session.begin_nested()
-                instance = self.opts.model(**data)
-                self.session.add(instance)
-                log.info(f"Created instance {instance} with parameters {data}")
-                self.session.flush(objects=[instance])
-                self.session.commit()
-                log.info("Successfully persisted to database")
-            except IntegrityError as err:
-                self.session.rollback()
-                log.info("Could not persist but will try again later")
-                log.debug(err)
-
-        return instance
-
-    def to_json_schema(model):
-        return json_schema.dump(model)
-
-    from .display import pretty_print
-
-
-def model_interface(model, session=None):
+def model_interface(model, session=None) -> ModelSchema:
     """
     Create a Marshmallow interface to a SQLAlchemy model
     """
@@ -210,7 +21,7 @@ def model_interface(model, session=None):
     schema_name = to_schema_name(model.__name__)
     try:
         # All conversion logic comes from ModelSchema
-        return type(schema_name, (BaseSchema,), {"Meta": metacls})
+        return type(schema_name, (ModelSchema,), {"Meta": metacls})
     except exceptions.ModelConversionError as err:
         secho(type(err).__name__ + ": " + schema_name + " - " + str(err), fg="red")
         return None

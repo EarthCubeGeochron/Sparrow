@@ -21,7 +21,7 @@ from flask_jwt_extended import (
     jwt_optional,
     get_jwt_identity,
 )
-from ..api.base import APIResourceCollection
+from ..api.v1.base import APIResourceCollection
 from ..database.models import User
 from ..plugins import SparrowCorePlugin
 

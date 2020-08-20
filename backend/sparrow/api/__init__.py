@@ -1,336 +1,168 @@
-from flask import Flask, Blueprint
-from flask_restful import Resource, reqparse, inputs, abort
-from sqlalchemy.schema import Table
-from sqlalchemy import MetaData
-from flask import jsonify
-from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
-from textwrap import dedent
-from datetime import datetime
-from ..logs import get_logger
-
-from .base import API, APIResourceCollection
+from flama.exceptions import SerializationError, ValidationError
+from starlette.applications import Starlette
+from starlette.endpoints import HTTPEndpoint
+from starlette.responses import JSONResponse
+from starlette.exceptions import HTTPException
+from sparrow.logs import get_logger
+from json import dumps
+from ..database.mapper.util import classname_for_table
+from ..encoders import JSONEncoder
+from typing import Any
+from webargs_starlette import parser
+from webargs.fields import DelimitedList, Str, Int
+from sqlakeyset import get_page
+from marshmallow_sqlalchemy.fields import get_primary_keys
+from sqlalchemy import desc
+from json.decoder import JSONDecodeError
+from .schema import schema
 
 log = get_logger(__name__)
 
-# Maybe switch to https://fastapi.tiangolo.com/history-design-future/
-# which is a batteries-included solution for APIs
 
-# eventually should use **Marshmallow** or similar
-# for parsing incoming API requests
-
-
-def date(date_string):
-    if date_string == "-Infinity":
-        return datetime.min
-    if date_string == "+Infinity":
-        return datetime.max
-    return datetime.strptime(date_string, "%Y-%m-%d").date()
-
-
-def infer_primary_key(table):
-    pk = table.primary_key
-    if len(pk) == 1:
-        return list(pk)[0]
-    # Check PK column a few possible ways
-    for i in ("id", table.name + "_id"):
-        pk = table.c.get(i, None)
-        if pk is not None:
-            return pk
-    return list(table.c)[0]
-
-
-def infer_type(t):
-    # Really hackish
-    try:
-        type = t.type.python_type
-        if type == bool:
-            type = inputs.boolean
-        return type
-    except NotImplementedError:
-        return None
-
-
-def build_description(argument):
+def render_json_response(self, content: Any) -> bytes:
+    """Shim for starlette's JSONResponse (subclassed by Flama)
+    that properly encodes Decimal and geometries.
     """
-    Build a description for a parser argument
-    """
-    type = argument.type
-    usage = None
-    typename = type.__name__
-    if typename == "Decimal":
-        typename = "numeric"
-    elif type == list:
-        typename = "array"
-        usage = "Match any of the array items"
-    elif type == str:
-        usage = dedent(
-            """
-        Use [*PostgreSQL* **LIKE** wildcards](https://www.postgresql.org/docs/current/functions-matching.html)
-        (e.g. %,_,*) for fuzzy matching
-        """
-        ).strip()
+    return dumps(
+        content,
+        ensure_ascii=False,
+        allow_nan=False,
+        indent=None,
+        separators=(",", ":"),
+        cls=JSONEncoder,
+    ).encode("utf-8")
 
-    return dict(
-        name=argument.name,
-        default=argument.default,
-        type=typename,
-        description=argument.help,
-        usage=usage,
+
+# Monkey-patch Starlette's API response
+JSONResponse.render = render_json_response
+
+
+async def http_exception(request, exc):
+    return JSONResponse(
+        {"error": {"detail": exc.detail, "status_code": exc.status_code}},
+        status_code=exc.status_code,
     )
 
 
-errors = dict(TypeError=dict(message="Could not serialize JSON data"))
+exception_handlers = {HTTPException: http_exception}
 
 
-class CatchAll(Resource):
-    def get(self, content):
-        return dict(error="Requested API endpoint does not exist"), 404
+class APIResponse(JSONResponse):
+    # copied from https://github.com/perdy/flama/blob/master/flama/responses.py
+    media_type = "application/json"
+
+    def __init__(self, schema=None, *args, **kwargs):
+        self.schema = schema
+        super().__init__(*args, **kwargs)
+
+    def render(self, content: Any):
+        # Use output schema to validate and format data
+
+        paging = getattr(content, "paging", None)
+        page = {}
+        if paging is not None:
+            page["next_page"] = paging.bookmark_next if paging.has_next else None
+            page["previous_page"] = (
+                paging.bookmark_previous if paging.has_previous else None
+            )
+
+        try:
+            if self.schema is not None:
+                content = self.schema.dump(content)
+        except Exception:
+            raise SerializationError(status_code=500)
+
+        if not content:
+            return b""
+
+        return super().render(dict(data=content, **page))
 
 
-class ModelEditParser(reqparse.RequestParser):
-    def __init__(self, model):
-        super().__init__()
-        self.model = model
-        for name, column in model.__table__.c.items():
-            if column in model.__mapper__.primary_key:
-                continue
-            try:
-                type = infer_type(column)
-                if type == datetime:
-                    type = date
-
-                self.add_argument(str(name), type=type, help=None, store_missing=False)
-            except err:
-                log.info(f"Could not map column {name} for {model.__table__.name}")
-                continue
+class APIEntry(HTTPEndpoint):
+    async def get(self, request):
+        """
+        description:
+            A test API base route.
+        responses:
+            200:
+                description: It's alive!
+        """
+        desc = {d["route"]: d["description"] for d in request.app.route_descriptions}
+        return JSONResponse({"routes": desc})
 
 
-class APIv1(API):
-    """
-    Version 1 API for Sparrow
-
-    Includes functionality for autogenerating routes
-    from database tables and views.
-
-    Each autogenerated endpoint has a `/describe` URL that
-    provides API usage data.
-    """
-
-    def __init__(self, database):
-        self.db = database
-        self.blueprint = Blueprint("api", __name__)
-        super().__init__(self.blueprint, errors=errors)
+class APIv2(Starlette):
+    def __init__(self, app):
+        self._app = app
         self.route_descriptions = []
-        self.add_resource(CatchAll, "/<path:content>", "/<path:content>/")
-        self.create_description_model()
-
-    def create_description_model(self):
-        route_descriptions = self.route_descriptions
-
-        class APIDescriptionModel(Resource):
-            def get(self):
-                return dict(
-                    route="/api/v1",
-                    description="Version 1 API for Sparrow",
-                    routes=route_descriptions,
-                )
-
-        self.add_resource(APIDescriptionModel, "/", "/describe")
-
-    def build_route(self, tablename, **kwargs):
-        schema = kwargs.pop("schema", None)
-        db = self.db
-        table = db.reflect_table(tablename, schema=schema)
-
-        schema_qualified_tablename = tablename
-        if schema is not None:
-            schema_qualified_tablename = schema + "." + schema_qualified_tablename
-        description = f"Autogenerated route for table `{schema_qualified_tablename}`"
-
-        primary_key = kwargs.pop("primary_key", None)
-        if primary_key is not None:
-            key = table.c[primary_key]
-        else:
-            key = infer_primary_key(table)
-
-        parser = reqparse.RequestParser()
-        parser.add_argument("offset", type=int, help="Query offset", default=None)
-        parser.add_argument("limit", type=int, help="Query limit", default=None)
-        parser.add_argument("all", type=bool, help="Return all rows", default=False)
-
-        # Manage row-level permissions
-        is_access_controlled = False
-        for name, column in table.c.items():
-            # We handle embargo at the application rather than database level
-            if name == "is_public":
-                parser.add_argument(
-                    "private", type=bool, help="Return private data", default=False
-                )
-                continue
-
-            try:
-                type = infer_type(column)
-                if type == dict:
-                    # We don't yet support dict types
-                    continue
-                if type == datetime:
-                    start = str(name) + "_start"
-                    end = str(name) + "_end"
-                    parser.add_argument(
-                        start, type=date, help=f"Beginning date (e.g. 2017-01-02)"
-                    )
-                    parser.add_argument(
-                        end, type=date, help=f"End date (e.g. 2017-01-02)"
-                    )
-                    continue
-                typename = type.__name__
-                parser.add_argument(str(name), type=type, help=None)
-            except:
-                continue
-
-        # Set up information about
-        # table descriptions
-
-        route = f"/{tablename}"
-        tname = infer_type(key).__name__
-        if tname != "int":
-            tname = "string"
-        get_route = f"/<{tname}:{key.name}>"
-
-        basicInfo = dict(
-            route=route,
-            table=table.name,
-            schema=table.schema,
-            description=description,
-            usage_info="Pass the parameter `?all=1` to return all rows instead of API description",
+        api_args = dict(
+            title="Sparrow API",
+            version="2.0",
+            description="An API for accessing geochemical data",
         )
-        self.route_descriptions.append(basicInfo)
+        super().__init__(exception_handlers=exception_handlers)
+        self._add_routes()
 
-        class TableModel(Resource):
-            def describe(self):
-                """
-                If no parameters are passed, return the API route's
-                description object. This conforms to the convention
-                of the Macrostrat API.
-                """
-                args = [build_description(a) for a in parser.args]
+    def _add_routes(self):
 
-                return dict(
-                    **basicInfo,
-                    arguments=args,
-                    record=dict(route=get_route, key=key.name, type=tname),
-                )
+        self.add_route("/", APIEntry)
 
-            @jwt_optional
-            def get(self):
+        db = self._app.database
 
-                args = parser.parse_args()
+        for iface in db.interface:
+            self._add_schema_route(iface)
 
-                # Check identity and abort if unauthorized
-                identity = get_jwt_identity()
-                # If we are logged in, always request private
-                # (this should probably be handled better in the long term)
-                # private = identity is not None
-                private = args.pop("private", False)
-                if identity:
-                    private = True
-                if private and not identity:
-                    # Should throw a better error
-                    return abort(401)
+        self.add_route("/schema", schema, methods=["GET"], include_in_schema=False)
 
-                should_describe = True
+    def _add_schema_route(self, iface):
+        db = self._app.database
+        schema = iface(many=True)
+        name = classname_for_table(schema.opts.model.__table__)
+        log.info(str(name))
 
-                # Get offset and limit at outset
-                offset = args.pop("offset", None)
-                limit = args.pop("limit", None)
-                if offset is not None and limit is not None:
-                    should_describe = False
+        args_schema = {
+            "nest": DelimitedList(Str(), missing=[]),
+            "page": Str(missing=None),
+            "per_page": Int(missing=20),
+        }
 
-                filters = []
+        # Flama's API methods know to deserialize this with the proper model
+        async def list_items(request):
+            log.info(request)
+            args = await parser.parse(args_schema, request, location="querystring")
+            log.info(args)
 
-                for k, col in table.c.items():
-                    if k == "is_public":
-                        # To return embargoed data, we must
-                        # have a valid JSON Web Token
-                        if not private:
-                            filters.append(col == True)
-                        continue
+            schema = iface(many=True, allowed_nests=args["nest"])
 
-                    # Should have a better way to do this
-                    if infer_type(col) == datetime:
-                        date_start = args.pop(str(k) + "_start", None)
-                        date_end = args.pop(str(k) + "_end", None)
-                        if date_start is not None:
-                            filters.append(col >= date_start)
-                            should_describe = False
-                        if date_end is not None:
-                            filters.append(col <= date_end)
-                            should_describe = False
-                        continue
+            # By default, we order by the "natural" order of Primary Keys. This
+            # is not really what we want in most cases, probably.
+            pk = [desc(p) for p in get_primary_keys(schema.opts.model)]
+            q = db.session.query(schema.opts.model).order_by(*pk)
+            # https://github.com/djrobstep/sqlakeyset
+            try:
+                res = get_page(q, per_page=args["per_page"], page=args["page"])
+            except ValueError:
+                raise ValidationError("Invalid page token.")
 
-                    val = args.pop(k, None)
-                    if val is None:
-                        continue
+            return APIResponse(schema, res)
 
-                    should_describe = False
-                    if infer_type(col) == str:
-                        filters.append(col.like(val))
-                    else:
-                        filters.append(col == val)
+        endpoint = "/" + name
+        self.add_route(endpoint, list_items, methods=["GET"])
 
-                if args.pop("all", False):
-                    should_describe = False
+        async def filter_items(request):
+            """Shim route to filter models. May not want to include this in the
+            final design, but it is valuable for testing."""
+            try:
+                res = await request.json()
+            except JSONDecodeError:
+                raise ValidationError("Expected a GET or POST body for filter.")
 
-                # Bail to describing query optionally
-                if should_describe:
-                    return self.describe()
+            return JSONResponse(res)
 
-                # Begin querying after filters are assembled
-                try:
-                    q = db.session.query(table)
-                    for filter in filters:
-                        q = q.filter(filter)
+        # self.add_route(endpoint + "/filter", filter_items, methods=["GET", "POST"])
 
-                    count = q.count()
-
-                    # We should integrate keyset-based or cursor-based pagination
-                    # so that we don't have to do costly offsets e.g.
-                    # https://github.com/djrobstep/sqlakeyset
-                    # http://www.postgresqltutorial.com/plpgsql-cursor/
-                    if offset is not None:
-                        q = q.offset(offset)
-                    if limit is not None:
-                        q = q.limit(limit)
-                    # Save the count of the query
-                    response = q.all()
-                    # # Fix stupid serialization
-                    if len(response) > 0:
-                        keys = [str(k) for k in response[0].keys()]
-                        response = [{k: v for k, v in zip(keys, r)} for r in response]
-
-                    status = 200
-                    headers = {"x-total-count": count}
-                    return response, status, headers
-
-                except AttributeError as err:
-                    db.session.rollback()
-                    return abort(
-                        500, error_message="Query Error", debug_message=str(err)
-                    )
-                finally:
-                    db.session.close()
-
-        class RecordModel(Resource):
-            @jwt_required
-            def get(self, id):
-                # Should fail if more than one record is returned
-                return db.session.query(table).filter(key == id).first()
-
-        # Dynamically change class name,
-        # this kind of metaprogrammy wizardry
-        # may cause problems later
-        TableModel.__name__ = tablename
-        RecordModel.__name__ = tablename + "_record"
-
-        self.add_resource(TableModel, route, route + "/")
-        self.add_resource(RecordModel, get_route)
+        tbl = schema.opts.model.__table__
+        basic_info = dict(
+            route=endpoint, table=tbl.name, schema=tbl.schema, description="A route!",
+        )
+        self.route_descriptions.append(basic_info)

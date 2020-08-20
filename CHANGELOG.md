@@ -12,16 +12,27 @@ We hope to arrive at full conformance for milestone `2.0.0`.
 
 ## Changed
 
-- Excel-like data sheet with drag copy and paste features.
+- Excel-like data sheet with drag copy and paste features (not yet wired up to backend).
 - Highlights on Select (blue), during editing (red), recently changed cells (green)
 
 ## [Unreleased] - 2020-07-24
 
 ## Changed
 
+### User interface fixes
+
 - Map now has interactive markers with tooltips and popovers
 - Sample's popovers contain links to the respective sample page
 - Map has superclusters to increase loading performance
+
+### Backend
+
+- More robust testing framework, including transaction isolation between
+  test classes.
+- Bumped `sparrowdata/backend-base` Docker image to `v1.2` to include `uvloop`
+  (enables high-performance asynchronous code).
+- Switched Sparrow's backend to "ASGI" (a fast, asynchronous server interface)
+  and switched web server to `gunicorn` for robustness.
 
 ## [1.5.0] - 2020-07-22
 

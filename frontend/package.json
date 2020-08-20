@@ -52,6 +52,7 @@
     "react-virtualized": "^9.21.2",
     "store": "^2.0.12",
     "use-supercluster": "0.2.8",
+    "swagger-ui-react": "^3.32.3",
     "viewport-mercator-project": "^6.2.2"
   },
   "devDependencies": {

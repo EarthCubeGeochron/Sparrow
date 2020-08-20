@@ -12,6 +12,7 @@ shapely
 lxml
 numpy
 pandas
+uvloop
 
 # Core application
 Flask==1.1.1
@@ -59,9 +60,22 @@ Flask-GraphQL==2.0.1
 graphene==2.1.8
 graphene_sqlalchemy==2.2.2
 
+# API version 2
+flama==0.15.0
+webargs-starlette==2.0.0
+sqlakeyset
+apispec==3.3.1
+starlette-apispec==1.0.3
+
 # S3/AWS file access
 boto3==1.12.25
 
-# Testing (we could split this into a separate file
-# if it becomes too weighty.)
+# Testing and logging
 pytest==5.3.5
+colorlog==4.2.1
+
+# ASGI
+starlette==0.13.4
+uvicorn[watchgodreload]==0.11.8
+asgiref==3.2.8
+gunicorn==20.0.4
