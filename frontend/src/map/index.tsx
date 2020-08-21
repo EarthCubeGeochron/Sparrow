@@ -15,6 +15,7 @@ import {
   Collapse,
 } from "@blueprintjs/core";
 import { hyperStyled, classed } from "@macrostrat/hyper";
+// @ts-ignore
 import styles from "./module.styl";
 import { SiteTitle } from "app/components";
 import { CatalogNavLinks } from "../admin";
@@ -39,20 +40,16 @@ const MapNavbar = function (props) {
 };
 
 const MapHome = (props) => {
-  return (
-    <div className="map-home">
-      <div className="mapHome">
-        <MapPanel width="750px" hide_filter={true}></MapPanel>
-      </div>
-      <div className="map-butn">
-        <Tooltip content="Go to Map">
-          <Link to="/map">
-            <Button icon="maximize"></Button>
-          </Link>
-        </Tooltip>
-      </div>
-    </div>
-  );
+  return h("div.map-home", [
+    h("div.mapHome", [h(MapPanel, { width: "750px", hide_filter: true })]),
+    h("div.map-butn", [
+      h(
+        Tooltip,
+        { content: "Go to Map" },
+        h(Link, { to: "/map" }, h(Button, { icon: "maximize" }))
+      ),
+    ]),
+  ]);
 };
 
 const MapPage = (props) => {

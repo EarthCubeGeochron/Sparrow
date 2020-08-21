@@ -34,6 +34,7 @@ function PageRoute(props) {
   return h(Route, { ...rest, component });
 }
 
+
 const MainNavbar = (props) =>
   h(AppNavbar, { fullTitle: true }, [
     h(CatalogNavLinks, { base: "/catalog" }),
