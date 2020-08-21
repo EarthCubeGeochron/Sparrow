@@ -8,9 +8,82 @@ import {
   Divider,
   Dialog,
   NumericInput,
+  InputGroup,
 } from "@blueprintjs/core";
 import { useAPIResult, useToggle } from "./APIResult";
 import { mapStyle } from "../MapStyle";
+import {
+  MultipleSelectFilter,
+  GeologicFormationSelector,
+  NoLocalSampleSelector,
+} from "../../filter/components";
+
+/**
+ * Button and Form that pops up from the Toaster component.
+ * Has the ability to suggest Geologic Formations from macrostrat
+ */
+function AddSampleAtLocalButton({ lng, lat, data }) {
+  const [open, toggleOpen] = useToggle(false);
+  const [state, setState] = useState("");
+
+  return (
+    <div>
+      <Button minimal={true} onClick={toggleOpen}>
+        Add Sample at Location
+      </Button>
+      <Dialog isOpen={open} title="Add Sample At Location" onClose={toggleOpen}>
+        <Card>
+          {/* <NoLocalSampleSelector /> */}
+          <MultipleSelectFilter
+            text="Connect to Sample without location: "
+            items={[
+              "84C207AB",
+              "90T112B",
+              "SMUB-13",
+              "86C471B",
+              "AT80-36",
+              "CH9-11",
+              "AT11",
+              "GR-11-103",
+              "NI-010813-7",
+            ]}
+            sendQuery={() => null}
+          />
+          <br></br>
+
+          <p>Longitude: </p>
+          <NumericInput defaultValue={Number(lng).toFixed(5)}></NumericInput>
+          <br></br>
+          <p>Latitude</p>
+          <NumericInput defaultValue={Number(lat).toFixed(5)}></NumericInput>
+          <br></br>
+
+          <p>Geologic Formation: </p>
+          <InputGroup
+            value={state}
+            onChange={(event) => setState(event.target.value)}
+          />
+          <h5>
+            <i>Nearby units suggested by MacroStrat: </i>
+          </h5>
+          {data !== null ? (
+            data.success.data.map((object) => {
+              return (
+                <div>
+                  <Button minimal={true} onClick={() => setState(object.name)}>
+                    {object.name}
+                  </Button>
+                </div>
+              );
+            })
+          ) : (
+            <Spinner size={50} />
+          )}
+        </Card>
+      </Dialog>
+    </div>
+  );
+}
 
 /**
  * This component will Handle the Toast or whatever
@@ -19,17 +92,20 @@ import { mapStyle } from "../MapStyle";
  * should be different based on which mapstyle is selected in
  * the MapPanel Component.
  *
- * Need to find an API that returns an elevation based on location
+ *
  */
 
 export function MapToast({ lng, lat, mapstyle }) {
-  const [open, toggleOpen] = useToggle(false);
-
   // url to queary macrostrat
   const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
 
   // url to queary Rockd, requires a lat and lng and returns a nearby town
   const RockdURL = "https://rockd.org/api/v2/nearby";
+
+  // url to query MacroStrat to return an elevation
+  const ElevationURl = `https://macrostrat.org/api/v2/mobile/map_query_v2?lng=${lng}&lat=${lat}&z=3`;
+
+  const elevationData = useAPIResult(ElevationURl);
 
   const rockdNearbyData = useAPIResult(RockdURL, {
     lat: lat,
@@ -40,26 +116,35 @@ export function MapToast({ lng, lat, mapstyle }) {
     lng: lng,
     lat: lat,
   });
-  //console.log(); // if MacrostratData.success.data.length is 0... there is no associated data.
+
   const NearByCity = () => {
-    const [open, toggleOpen] = useToggle(false);
     return (
       <div>
         <h5>
           Nearby: <i>{rockdNearbyData}</i>
         </h5>
-        <Button onClick={toggleOpen}>Add Sample at Location</Button>
-        <Dialog
-          isOpen={open}
-          title="Add Sample At Location"
-          onClose={toggleOpen}
-        >
-          <p>Longitude: </p>
-          <NumericInput defaultValue={lng}></NumericInput>
-          <p>Latitude</p>
-          <NumericInput defaultValue={lat}></NumericInput>
-          <p>Suggested Geologic Formations</p>
-        </Dialog>
+        <Divider />
+        <AddSampleAtLocalButton lng={lng} lat={lat} data={MacostratData} />
+      </div>
+    );
+  };
+
+  const ElevationToaster = () => {
+    return (
+      <div>
+        <h5>
+          Nearby: <i>{rockdNearbyData}</i>
+        </h5>
+        {elevationData == null ? (
+          <Spinner size={50} />
+        ) : (
+          <h5>
+            Elevation: <i>{elevationData.success.data.elevation} meters</i>
+          </h5>
+        )}
+
+        <Divider />
+        <AddSampleAtLocalButton lng={lng} lat={lat} data={MacostratData} />
       </div>
     );
   };
@@ -94,6 +179,7 @@ export function MapToast({ lng, lat, mapstyle }) {
             })}
           </div>
         )}
+        <AddSampleAtLocalButton lng={lng} lat={lat} data={MacostratData} />
       </div>
     );
   };
@@ -106,7 +192,14 @@ export function MapToast({ lng, lat, mapstyle }) {
         <i>{Number(lat).toFixed(3)}</i>
       </h5>
       <Divider />
-      {mapstyle == mapStyle ? <NearbyGeologicFormations /> : <NearByCity />}
+      {mapstyle == mapStyle ? (
+        <NearbyGeologicFormations />
+      ) : mapstyle ==
+        "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub" ? (
+        <ElevationToaster />
+      ) : (
+        <NearByCity />
+      )}
     </div>
   );
 }

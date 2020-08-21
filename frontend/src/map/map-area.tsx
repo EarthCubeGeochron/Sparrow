@@ -97,17 +97,28 @@ export function MapPanel({
       ...state,
       clickPnt: { lng: e.lngLat[0], lat: e.lngLat[1] },
     });
-
-    return MapToaster.show({
-      message: <MapToast mapstyle={state.MapStyle} lng={e.lngLat[0]} lat={e.lngLat[1]} />,
-      timeout: 0,
-    });
+    if (hide_filter == false) {
+      return MapToaster.show({
+        message: (
+          <MapToast
+            mapstyle={state.MapStyle}
+            lng={e.lngLat[0]}
+            lat={e.lngLat[1]}
+          />
+        ),
+        timeout: 0,
+      });
+    }
   };
 
   return (
     <div className="map-container">
       <div className="layer-button">
+        <Link to="/">
+          <Button icon="home"></Button>
+        </Link>
         <LayerMenu
+          hide={hide_filter}
           MapStyle={state.MapStyle}
           chooseMapStyle={chooseMapStyle}
           mapstyles={mapstyles}

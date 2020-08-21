@@ -1,6 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Frame } from "./frame";
 import { InsetText } from "app/components/layout";
+// @ts-ignore
 import styles from "./styles.module.css";
 import { MapHome } from "./map";
 

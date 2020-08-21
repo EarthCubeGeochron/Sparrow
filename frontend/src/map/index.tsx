@@ -12,8 +12,10 @@ import {
   Tooltip,
   Icon,
   Button,
+  Collapse,
 } from "@blueprintjs/core";
 import { hyperStyled, classed } from "@macrostrat/hyper";
+// @ts-ignore
 import styles from "./module.styl";
 import { SiteTitle } from "app/components";
 import { CatalogNavLinks } from "../admin";
@@ -22,6 +24,7 @@ import { MapPanel } from "./map-area";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import "./mappages.modules.css";
+import { useToggle } from "./components/APIResult";
 
 const h = hyperStyled(styles);
 
@@ -37,29 +40,31 @@ const MapNavbar = function (props) {
 };
 
 const MapHome = (props) => {
-  return (
-    <div className="map-home">
-      <div className="mapHome">
-        <MapPanel width="750px" hide_filter={true}></MapPanel>
-      </div>
-      <div className="map-butn">
-        <Tooltip content="Go to Map">
-          <Link to="/map">
-            <Button icon="maximize"></Button>
-          </Link>
-        </Tooltip>
-      </div>
-    </div>
-  );
+  return h("div.map-home", [
+    h("div.mapHome", [h(MapPanel, { width: "750px", hide_filter: true })]),
+    h("div.map-butn", [
+      h(
+        Tooltip,
+        { content: "Go to Map" },
+        h(Link, { to: "/map" }, h(Button, { icon: "maximize" }))
+      ),
+    ]),
+  ]);
 };
 
-const MapPage = (props) =>
-  h("div.map-page", [
-    // h(MapNavbar, [
-    //   h(CatalogNavLinks),
-    //   h(Menu.Divider),
-    //   h(AuthStatus, { large: false }),
+const MapPage = (props) => {
+  const [open, toggleOpen] = useToggle(false);
+
+  return h("div.map-page", [
+    // h(Button, { icon: "menu", onClick: toggleOpen, className: "nav-btn" }),
+    // h(Collapse, { isOpen: true }, [
+    //   h(MapNavbar, [
+    //     h(CatalogNavLinks),
+    //     h(Menu.Divider),
+    //     h(AuthStatus, { large: false }),
+    //   ]),
     // ]),
+
     h(MapPanel, {
       hide_filter: false,
       className: "main-map",
@@ -68,6 +73,7 @@ const MapPage = (props) =>
       height: "100vh",
     }),
   ]);
+};
 
 const MapLink = function (props) {
   const { zoom, latitude, longitude, children, ...rest } = props;

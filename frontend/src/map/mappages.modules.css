@@ -1,13 +1,22 @@
 .mapHome {
   position: absolute;
 }
+.main-map {
+  position: "absolute";
+  z-index: 1;
+}
+
+.nav-btn {
+  position: relative;
+  z-index: 99;
+}
 
 .map-butn {
   position: relative;
   z-index: 2;
   top: 0.02;
-  left: 1;
-  margin: 10px 30px;
+  left: 0;
+  margin-top: 10px;
 }
 
 .map-page {
