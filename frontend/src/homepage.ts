@@ -7,7 +7,6 @@ import { MapHome } from "./map";
 
 const h = hyperStyled(styles);
 
-
 const HomePage = () => {
   return h("div.homepage", [
     h(InsetText, [
