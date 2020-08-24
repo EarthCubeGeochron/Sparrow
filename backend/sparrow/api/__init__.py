@@ -5,7 +5,7 @@ from starlette.exceptions import HTTPException
 from sparrow.logs import get_logger
 from ..database.mapper.util import classname_for_table
 from .schema import schema
-from .endpoint import APIEndpoint
+from .endpoint import ModelAPIEndpoint
 
 log = get_logger(__name__)
 
@@ -62,9 +62,10 @@ class APIv2(Starlette):
             schema = iface
 
         name = classname_for_table(iface.opts.model.__table__)
-        cls = type(name + "_route", (APIEndpoint,), {"Meta": Meta})
+        cls = type(name + "_route", (ModelAPIEndpoint,), {"Meta": Meta})
         endpoint = "/" + name
         self.add_route(endpoint, cls)
+        self.add_route(endpoint + "/{id}", cls)
 
         tbl = iface.opts.model.__table__
         basic_info = dict(

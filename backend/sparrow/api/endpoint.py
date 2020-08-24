@@ -43,7 +43,7 @@ class APIResponse(JSONResponse):
         if not content:
             return b""
 
-        return self._encode(content)
+        return self._encode(dict(data=content, **page))
 
     def _encode(self, content: Any) -> bytes:
         """Shim for starlette's JSONResponse (subclassed by Flama)
@@ -59,7 +59,7 @@ class APIResponse(JSONResponse):
         ).encode("utf-8")
 
 
-class APIEndpoint(HTTPEndpoint):
+class ModelAPIEndpoint(HTTPEndpoint):
     class Meta:
         database = None
         schema = None
@@ -67,22 +67,45 @@ class APIEndpoint(HTTPEndpoint):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.meta = self.Meta()
-        db = self.meta.database
+        for k in ("database", "schema"):
+            if getattr(self.meta, k) is None:
+                raise ValueError(
+                    f"Meta value '{k}' must be provided for ModelAPIEndpoint"
+                )
+
         schema = self.meta.schema
         name = classname_for_table(schema.opts.model.__table__)
         log.info(str(name))
 
-        self.args_schema = {
-            "nest": DelimitedList(Str(), missing=[]),
-            "page": Str(missing=None),
-            "per_page": Int(missing=20),
-        }
+        self.instance_schema = dict(nest=DelimitedList(Str(), missing=[]),)
+
+        self.args_schema = dict(
+            **self.instance_schema, page=Str(missing=None), per_page=Int(missing=20),
+        )
+
+    def query(self, schema):
+        db = self.meta.database
+        return db.session.query(schema.opts.model)
+
+    async def get_single(self, request):
+        """Handler for single instance GET requests"""
+        args = await parser.parse(self.instance_schema, request, location="querystring")
+        id = request.path_params.get("id")
+        log.info(id, args)
+
+        schema = self.meta.schema(many=False, allowed_nests=args["nest"])
+        res = self.query(schema).get(id)
+        # https://github.com/djrobstep/sqlakeyset
+        return APIResponse(schema, res)
 
     async def get(self, request):
+        """Handler for all GET requests"""
 
-        db = self.meta.database
+        if request.path_params.get("id") is not None:
+            return await self.get_single(request)
 
         log.info(request)
+        log.info(request.path_params)
         args = await parser.parse(self.args_schema, request, location="querystring")
         log.info(args)
 
@@ -91,7 +114,7 @@ class APIEndpoint(HTTPEndpoint):
         # By default, we order by the "natural" order of Primary Keys. This
         # is not really what we want in most cases, probably.
         pk = [desc(p) for p in get_primary_keys(schema.opts.model)]
-        q = db.session.query(schema.opts.model).order_by(*pk)
+        q = self.query(schema).order_by(*pk)
         # https://github.com/djrobstep/sqlakeyset
         try:
             res = get_page(q, per_page=args["per_page"], page=args["page"])
