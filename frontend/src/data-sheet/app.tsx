@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
+import * as React from "react";
+import { useState, useEffect, useContext } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { SheetHeader } from "./header";
 import { VirtualizedSheet } from "./virtualized";

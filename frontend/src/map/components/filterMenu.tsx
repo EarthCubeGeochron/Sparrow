@@ -4,7 +4,7 @@ import { Menu, MenuItem, Icon, InputGroup, Tag } from "@blueprintjs/core";
 import "../cluster.css";
 import { SampleFilter } from "../../filter";
 
-export function FilterMenu({ hide = true }) {
+export function FilterMenu({ hide = true, on_map }) {
   const [tags, setTags] = useState([]);
 
   const inputChange = (e) => {
@@ -26,7 +26,7 @@ export function FilterMenu({ hide = true }) {
             placeholder={"Global Filter"}
             onChange={(e) => inputChange(e)}
           />
-          <SampleFilter />
+          <SampleFilter on_map={on_map} />
         </div>
       )}
     </div>

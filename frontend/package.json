@@ -43,6 +43,7 @@
     "react-json-view": "^1.19.1",
     "react-leaflet": "^2.3.0",
     "react-map-gl": "^4.1.2",
+    "react-map-gl-draw": "^0.19.3",
     "react-markdown": "^4.0.6",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
@@ -51,8 +52,8 @@
     "react-table": "7.2.2",
     "react-virtualized": "^9.21.2",
     "store": "^2.0.12",
-    "use-supercluster": "0.2.8",
     "swagger-ui-react": "^3.32.3",
+    "use-supercluster": "0.2.8",
     "viewport-mercator-project": "^6.2.2"
   },
   "devDependencies": {

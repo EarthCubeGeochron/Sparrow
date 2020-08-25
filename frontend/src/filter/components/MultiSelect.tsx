@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { Card, MenuItem, ITagProps, Icon } from "@blueprintjs/core";
+import h from "@macrostrat/hyper";
 import {
   MultiSelect,
   ItemPredicate,
@@ -23,15 +24,13 @@ export function MultipleSelectFilter({ text, items, sendQuery }) {
   const itemRenderer = (item, itemProps) => {
     //console.log(itemProps);
     const isSelected = state.selectedItems.includes(item);
-    return (
-      <MenuItem
-        labelElement={isSelected ? <Icon icon="tick" /> : null}
-        intent={isSelected ? "primary" : null}
-        text={item}
-        onClick={itemProps.handleClick}
-        active={isSelected ? "active" : itemProps.modifiers.active}
-      ></MenuItem>
-    );
+    return h(MenuItem, {
+      labelElement: h.if(isSelected)(Icon, { icon: "tick" }),
+      intent: isSelected ? "primary" : null,
+      text: item,
+      onClick: itemProps.handleClick,
+      active: isSelected ? "active" : itemProps.modifiers.active,
+    });
   };
 
   const filterItem = (query, item) => {
@@ -68,26 +67,24 @@ export function MultipleSelectFilter({ text, items, sendQuery }) {
 
   const tagRenderer = (item) => item;
 
-  return (
-    <Card>
-      <div style={{ display: "flex" }}>
-        <h5>{text}</h5>
-        <div style={{ marginTop: 10, marginLeft: 10 }}>
-          <MultiSelect
-            noResults={<MenuItem disabled={true} text="No results." />}
-            fill={true}
-            items={items}
-            itemRenderer={itemRenderer}
-            itemPredicate={filterItem}
-            onItemSelect={itemSelect}
-            tagRenderer={tagRenderer}
-            tagInputProps={{ onRemove: removeTag }}
-            selectedItems={state.selectedItems}
-          ></MultiSelect>
-        </div>
-      </div>
-    </Card>
-  );
+  return h(Card, [
+    h("div", { style: { display: "flex" } }, [
+      h("h5", [text]),
+      h("div", { style: { marginTop: 10, marginLeft: 10 } }, [
+        h(MultiSelect, {
+          noResults: h(MenuItem, { disabled: true, text: "No Results" }),
+          fill: true,
+          items: items,
+          itemRenderer: itemRenderer,
+          itemPredicate: filterItem,
+          onItemSelect: itemSelect,
+          tagRenderer: tagRenderer,
+          tagInputProps: { onRemove: removeTag },
+          selectedItems: state.selectedItems,
+        }),
+      ]),
+    ]),
+  ]);
 }
 
 export function GeologicFormationSelector() {
@@ -97,7 +94,7 @@ export function GeologicFormationSelector() {
     "https://macrostrat.org/api/v2/defs/strat_names?strat_name_like=" +
     searchText;
 
-  const geologicFormations = useAPIResult(MacGeoFormationUrl);
+  const geologicFormations: object = useAPIResult(MacGeoFormationUrl);
   //console.log(geologicFormations);
 
   React.useEffect(() => {
@@ -113,13 +110,11 @@ export function GeologicFormationSelector() {
   const searchBySelectQuery = (query) => {
     setSearchText(query);
   };
-  return (
-    <MultipleSelectFilter
-      text="Geologic Formation :"
-      items={stratNames}
-      sendQuery={searchBySelectQuery}
-    />
-  );
+  return h(MultipleSelectFilter, {
+    text: "Geologic Formation",
+    items: stratNames,
+    sendQuery: searchBySelectQuery,
+  });
 }
 
 export function NoLocalSampleSelector() {
@@ -142,11 +137,9 @@ export function NoLocalSampleSelector() {
     }
   }, [initialData]);
 
-  return (
-    <MultipleSelectFilter
-      text="Connect Location to Existing Sample"
-      items={markers}
-      sendQuery={() => null}
-    />
-  );
+  return h(MultipleSelectFilter, {
+    text: "Connect Location to Existing Sample",
+    items: markers,
+    sendQuery: () => null,
+  });
 }

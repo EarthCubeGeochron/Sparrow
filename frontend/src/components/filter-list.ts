@@ -2,6 +2,7 @@ import h from "react-hyperscript";
 import { InputGroup, Menu, Popover, Button, Position } from "@blueprintjs/core";
 import { PagedAPIView, StatefulComponent } from "@macrostrat/ui-components";
 import T from "prop-types";
+import { FilterMenu } from "../map/components/filterMenu";
 
 class FilterListComponent extends StatefulComponent {
   static propTypes = {

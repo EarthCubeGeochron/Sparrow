@@ -5,34 +5,36 @@ import {
   DatePicker,
   MultipleSelectFilter,
   GeologicFormationSelector,
+  MapSelector,
 } from "./components";
 import { useToggle, useAPIResult } from "../map/components/APIResult";
+import h from "@macrostrat/hyper";
 
 /**
  * This Functional Component is a filter template to be used on different
  * pages. Some of the filters may be hidden depending on what page the user
  * is on, (i.e. a location selector wouldn't be rendered on the MapPanel
  */
-const SampleFilter = () => {
+interface filter {
+  on_map?: boolean;
+}
+
+const SampleFilter = ({ on_map = false }) => {
   const [open, toggleOpen] = useToggle(false);
 
-  return (
-    <div>
-      <Tooltip content="Choose Multiple Filters">
-        <Button onClick={toggleOpen} icon="filter"></Button>
-      </Tooltip>
-      <Collapse isOpen={open}>
-        <Card>
-          <AgeSlideSelect />
-          <DatePicker />
-          <GeologicFormationSelector />
-          {/* <MultipleSelectFilter text="Material :" items={items} /> */}
-
-          {/* <MultipleSelectFilter text="Geologic Time Period :" items={items} /> */}
-        </Card>
-      </Collapse>
-    </div>
-  );
+  return h("div", [
+    h(Tooltip, { content: "Choose Multiple Filters" }, [
+      h(Button, { onClick: toggleOpen, icon: "filter" }),
+    ]),
+    h(Collapse, { isOpen: open }, [
+      h(Card, [
+        h(AgeSlideSelect),
+        h(DatePicker),
+        h(GeologicFormationSelector),
+        h.if(!on_map)(MapSelector),
+      ]),
+    ]),
+  ]);
 };
 
 export { SampleFilter };

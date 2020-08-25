@@ -26,13 +26,26 @@ import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
+import { Editor, DrawRectangleMode } from "react-map-gl-draw";
 
 const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
   maxToasts: 1,
 });
 
+interface MapProps {
+  on_map?: boolean;
+  hide_filter?: boolean;
+  width: any;
+  height: any;
+  latitude: number;
+  longitude: number;
+  zoom: number;
+  mapstyle: any;
+}
+
 export function MapPanel({
+  on_map,
   hide_filter = false,
   width = "50vw",
   height = "500px",
@@ -40,13 +53,12 @@ export function MapPanel({
   longitude = 0,
   zoom = 1,
   mapstyle = "mapbox://styles/mapbox/outdoors-v9",
-}) {
+}: MapProps) {
   const initialState = {
     viewport: { latitude, longitude, zoom, width, height },
     MapStyle: mapstyle,
     showMarkers: true,
     clickPnt: { lng: 0, lat: 0 },
-    openInfo: false,
   };
 
   const [state, setState] = useState(initialState);
@@ -88,10 +100,6 @@ export function MapPanel({
     });
   };
 
-  const toggleToasterInfo = () => {
-    setState({ ...state, openInfo: !state.openInfo });
-  };
-
   const mapClicked = (e) => {
     setState({
       ...state,
@@ -125,7 +133,7 @@ export function MapPanel({
           showMarkers={state.showMarkers}
           toggleShowMarkers={toggleShowMarkers}
         ></LayerMenu>
-        <FilterMenu hide={hide_filter}></FilterMenu>
+        <FilterMenu hide={hide_filter} on_map={on_map}></FilterMenu>
       </div>
       <div>
         <MapGl

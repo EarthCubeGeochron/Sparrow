@@ -5,3 +5,4 @@ export {
   GeologicFormationSelector,
   NoLocalSampleSelector,
 } from "./MultiSelect";
+export { MapSelector } from "./MapSelector";

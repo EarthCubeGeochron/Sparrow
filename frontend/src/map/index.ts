@@ -4,7 +4,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import React, { useEffect, useState } from "react";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import {
   Menu,
   MenuItem,
@@ -14,6 +15,7 @@ import {
   Button,
   Collapse,
 } from "@blueprintjs/core";
+// @ts-ignore
 import { hyperStyled, classed } from "@macrostrat/hyper";
 // @ts-ignore
 import styles from "./module.styl";
@@ -64,11 +66,9 @@ const MapPage = (props) => {
     //     h(AuthStatus, { large: false }),
     //   ]),
     // ]),
-
     h(MapPanel, {
+      on_map: false,
       hide_filter: false,
-      className: "main-map",
-      accessToken: process.env.MAPBOX_API_TOKEN,
       width: "100vw",
       height: "100vh",
     }),
