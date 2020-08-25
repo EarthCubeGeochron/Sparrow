@@ -24,6 +24,8 @@ class APIResponse(JSONResponse):
         super().__init__(*args, **kwargs)
 
     def render(self, content: Any):
+        """Creates output JSON representation of the API route, optionally applying
+        paging if it exists"""
         # Use output schema to validate and format data
 
         paging = getattr(content, "paging", None)
