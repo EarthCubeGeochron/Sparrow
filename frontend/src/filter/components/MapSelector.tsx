@@ -22,5 +22,5 @@ export function MapSelector() {
     maxLong: 0,
   });
 
-  return h(Map, { width: "500px", height: "400px" });
+  return h(Map, { width: "500px", height: "300px" });
 }
