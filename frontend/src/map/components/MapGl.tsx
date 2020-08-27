@@ -30,6 +30,10 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
     minlat: 0,
     maxlat: 0,
   });
+
+  const [test, setTest] = useState();
+  console.log(test);
+
   console.log(state.selectedFeature);
   console.log(coordinates);
   const mapRef = useRef();
@@ -37,6 +41,7 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
 
   const onUpdate = (object) => {
     setState({ ...state, selectedFeature: object.data });
+    console.log(object);
     // const geometry = object.data.map((object) => object.geometry);
     // const coordinates = geometry.map((object) => object.coordinates);
   };
@@ -45,6 +50,12 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
     ? //@ts-ignore
       mapRef.current.getMap().getBounds().toArray().flat()
     : null;
+
+  const ModeHandler = state.selectedFeature
+    ? state.selectedFeature.length >= 1
+      ? new EditingMode()
+      : new DrawRectangleMode()
+    : new DrawRectangleMode();
 
   useEffect(() => {
     if (state.selectedFeature != null) {
@@ -65,7 +76,8 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
   }, [state.selectedFeature]);
 
   const setFeature = (GEOJsonObject) => {
-    setState({ ...state, selectedFeature: GEOJsonObject });
+    //setState({ ...state, selectedFeature: GEOJsonObject });
+    setTest(GEOJsonObject);
   };
 
   return h("div", { style: { display: "flex" } }, [
@@ -92,7 +104,7 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
             features: state.selectedFeature,
             //onSelect: console.log,
             onUpdate: onUpdate,
-            mode: new DrawRectangleMode(),
+            mode: ModeHandler,
             clickRadius: 12,
           }),
         ]
@@ -102,20 +114,28 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
 }
 
 export function MapFilterInputs({ coordinates, setFeature }) {
-  const { maxlng, minlng, maxlat, minlat } = coordinates;
   const [state, setState] = useState<coordinates>({
-    minlng,
-    maxlng,
-    minlat,
-    maxlat,
+    minlng: null,
+    maxlng: null,
+    minlat: null,
+    maxlat: null,
   });
   console.log(state);
 
   useEffect(() => {
-    const { maxlng, minlng, maxlat, minlat } = state;
-    const feature = CoordinatesToGEOJson({ maxlng, minlng, maxlat, minlat });
-    console.log(feature);
-    //setFeature(feature);
+    setState(coordinates);
+  }, [coordinates]);
+
+  useEffect(() => {
+    if (state != coordinates) {
+      const featureList = [];
+      const { maxlng, minlng, maxlat, minlat } = state;
+      const feature = CoordinatesToGEOJson({ maxlng, minlng, maxlat, minlat });
+      featureList.push(feature);
+      console.log(featureList);
+
+      setFeature(featureList);
+    }
   }, [state]);
 
   return h(Card, [
@@ -124,9 +144,11 @@ export function MapFilterInputs({ coordinates, setFeature }) {
       ["Maximum Longitude:"],
       h("br"),
       h(NumericInput, {
-        defaultValue: maxlng,
-        value: Number(maxlng).toFixed(0),
-        onValueChange: () => setState({ ...state, maxlng: maxlng }),
+        defaultValue: state.maxlng,
+        value: Number(state.maxlng).toFixed(0),
+        onValueChange: (change) => setState({ ...state, maxlng: change }),
+        min: -180,
+        max: 180,
       }),
     ]),
     h("div", [
@@ -134,9 +156,11 @@ export function MapFilterInputs({ coordinates, setFeature }) {
       ["Minimum Longitude:"],
       h("br"),
       h(NumericInput, {
-        defaultValue: minlng,
-        value: Number(minlng).toFixed(0),
-        onValueChange: () => setState({ ...state, minlng: minlng }),
+        defaultValue: state.minlng,
+        value: Number(state.minlng).toFixed(0),
+        onValueChange: (change) => setState({ ...state, minlng: change }),
+        min: -180,
+        max: 180,
       }),
     ]),
     h("div", [
@@ -144,9 +168,11 @@ export function MapFilterInputs({ coordinates, setFeature }) {
       ["Maximum Latitude:  "],
       h("br"),
       h(NumericInput, {
-        defaultValue: maxlat,
-        value: Number(maxlat).toFixed(0),
+        defaultValue: state.maxlat,
+        value: Number(state.maxlat).toFixed(0),
         onValueChange: (change) => setState({ ...state, maxlat: change }),
+        min: -90,
+        max: 90,
       }),
     ]),
     h("div", [
@@ -155,9 +181,10 @@ export function MapFilterInputs({ coordinates, setFeature }) {
       h("br"),
       h(NumericInput, {
         //defaultValue: minlat,
-        value: Number(minlat).toFixed(0),
-        onValueChange: (change) =>
-          setState({ ...state, minlat: minlat + change }),
+        value: Number(state.minlat).toFixed(0),
+        onValueChange: (change) => setState({ ...state, minlat: change }),
+        min: -90,
+        max: 90,
       }),
     ]),
   ]);
@@ -171,14 +198,19 @@ export function CoordinatesToGEOJson({
 }: coordinates) {
   return {
     type: "Feature",
+    properties: {
+      shape: "Rectangle",
+    },
     geometry: {
       type: "Polygon",
       coordinates: [
-        [minlng, maxlat],
-        [minlng, minlat],
-        [maxlng, minlat],
-        [maxlng, maxlat],
-        [minlng, maxlat],
+        [
+          [minlng, maxlat],
+          [minlng, minlat],
+          [maxlng, minlat],
+          [maxlng, maxlat],
+          [minlng, maxlat],
+        ],
       ],
     },
   };
