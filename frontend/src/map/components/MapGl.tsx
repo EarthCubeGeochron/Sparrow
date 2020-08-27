@@ -1,4 +1,3 @@
-//import * as React from "react";
 import { useState, useEffect, useRef } from "react";
 import h from "@macrostrat/hyper";
 import MapGl from "react-map-gl";
@@ -156,7 +155,7 @@ export function MapFilterInputs({ coordinates, setFeature }) {
       h("br"),
       h(NumericInput, {
         //defaultValue: minlat,
-        value: Number(state.minlat).toFixed(0),
+        value: Number(minlat).toFixed(0),
         onValueChange: (change) =>
           setState({ ...state, minlat: minlat + change }),
       }),
