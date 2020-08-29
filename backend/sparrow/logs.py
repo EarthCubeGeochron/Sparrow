@@ -37,6 +37,6 @@ def get_logger(name, level=logging.DEBUG, handler=None):
 # We may want to customize this further eventually
 # https://github.com/encode/uvicorn/issues/410
 logger = logging.getLogger("sparrow")
-if logger.hasHandlers():
-    logger.handlers.clear()
+# if logger.hasHandlers():
+#    logger.handlers.clear()
 logger.addHandler(console_handler)
