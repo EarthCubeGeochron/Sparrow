@@ -52,6 +52,10 @@ def schema(request):
 
 
 class APIv2(Starlette):
+    """
+    API v2 based on Starlette
+    """
+
     def __init__(self, app):
         self._app = app
         self.route_descriptions = []
@@ -68,7 +72,8 @@ class APIv2(Starlette):
         self._add_routes()
 
     def add_schema_route(self):
-        self._schemas = APISpecSchemaGenerator(self.spec)
+        # We will want to layer this back in eventually
+        # self._schemas = APISpecSchemaGenerator(self.spec)
         self.add_route("/schema", schema, methods=["GET"], include_in_schema=False)
 
     def _add_routes(self):

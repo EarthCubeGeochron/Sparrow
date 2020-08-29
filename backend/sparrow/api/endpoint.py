@@ -34,7 +34,10 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self.instance_schema = dict(nest=DelimitedList(Str(), missing=[]),)
 
         self.args_schema = dict(
-            **self.instance_schema, page=Str(missing=None), per_page=Int(missing=20),
+            **self.instance_schema,
+            has=DelimitedList(Str(), missing=[]),
+            page=Str(missing=None),
+            per_page=Int(missing=20),
         )
 
     def query(self, schema):
@@ -65,11 +68,36 @@ class ModelAPIEndpoint(HTTPEndpoint):
         log.info(args)
 
         schema = self.meta.schema(many=True, allowed_nests=args["nest"])
+        model = schema.opts.model
+
+        q = self.query(schema)
+
+        fields = {getattr(f, "data_key", k): f for k, f in schema.fields.items()}
+
+        filters = []
+        for has_field in args["has"]:
+            try:
+                field = fields[has_field]
+            except KeyError:
+                raise ValidationError(f"'{has_field}' is not a valid field")
+            orm_attr = getattr(model, field.name)
+            log.debug(field)
+            log.debug(orm_attr)
+
+            if hasattr(field, "related_model"):
+                if orm_attr.property.uselist:
+                    filters.append(orm_attr.any())
+                else:
+                    filters.append(orm_attr.has())
+            else:
+                filters.append(orm_attr.isnot(None))
+        for filter in filters:
+            q = q.filter(filter)
 
         # By default, we order by the "natural" order of Primary Keys. This
         # is not really what we want in most cases, probably.
-        pk = [desc(p) for p in get_primary_keys(schema.opts.model)]
-        q = self.query(schema).order_by(*pk)
+        pk = [desc(p) for p in get_primary_keys(model)]
+        q = q.order_by(*pk)
         # https://github.com/djrobstep/sqlakeyset
         try:
             res = get_page(q, per_page=args["per_page"], page=args["page"])
