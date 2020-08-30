@@ -36,9 +36,6 @@ class APIResponse(JSONResponse):
         except Exception:
             raise SerializationError(status_code=500)
 
-        if not content:
-            return b""
-
         return self._encode(dict(data=content, **page))
 
     def _encode(self, content: Any) -> bytes:

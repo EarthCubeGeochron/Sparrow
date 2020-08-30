@@ -81,8 +81,6 @@ class ModelAPIEndpoint(HTTPEndpoint):
             except KeyError:
                 raise ValidationError(f"'{has_field}' is not a valid field")
             orm_attr = getattr(model, field.name)
-            log.debug(field)
-            log.debug(orm_attr)
 
             if hasattr(field, "related_model"):
                 if orm_attr.property.uselist:
