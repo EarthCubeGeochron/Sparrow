@@ -51,6 +51,8 @@ class Enum(Related):
 
 class SmartNested(Nested, Related):
     # https://github.com/marshmallow-code/marshmallow/blob/dev/src/marshmallow/fields.py
+    # TODO: better conformance of this field to Marshmallow's OpenAPI schema generation
+    # https://apispec.readthedocs.io/en/latest/using_plugins.html
     def __init__(
         self, name, *, only=None, exclude=(), many=False, unknown=None, **field_kwargs
     ):

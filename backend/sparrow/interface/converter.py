@@ -99,7 +99,7 @@ class SparrowConverter(ModelConverter):
             return f"{prop.target.schema}_{prop.target.name}"
 
         # Otherwise, we go with the name of the target model.
-        return prop.target.name
+        return str(prop.target.name)
 
     def fields_for_model(self, model, **kwargs):
         fields = super().fields_for_model(model, **kwargs)
@@ -190,6 +190,7 @@ class SparrowConverter(ModelConverter):
         return None
 
     def property2field(self, prop, **kwargs):
+        """This override improves our handling of relationships"""
         if not isinstance(prop, RelationshipProperty):
             return super().property2field(prop, **kwargs)
 
@@ -214,6 +215,7 @@ class SparrowConverter(ModelConverter):
         exclude = []
         for p in cls.__mapper__.relationships:
             if self._should_exclude_field(p):
+                # Fields that are already excluded do not need to be excluded again.
                 continue
             id_ = self._get_field_name(p)
             if p.mapper.entity == prop.parent.entity:
