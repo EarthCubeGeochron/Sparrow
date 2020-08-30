@@ -76,6 +76,8 @@ class ModelAPIEndpoint(HTTPEndpoint):
         fields = {getattr(f, "data_key", k): f for k, f in schema.fields.items()}
 
         filters = []
+
+        # Filter by has
         for has_field in args["has"]:
             try:
                 field = fields[has_field]
@@ -91,6 +93,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
             else:
                 filters.append(orm_attr.isnot(None))
 
+        # Filter by not_has
         for k in args["not_has"]:
             try:
                 field = fields[k]
