@@ -15,6 +15,7 @@ class APIResponse(JSONResponse):
 
     def __init__(self, schema=None, *args, **kwargs):
         self.schema = schema
+        self.total_count = kwargs.pop("total_count", None)
         super().__init__(*args, **kwargs)
 
     def render(self, content: Any):
@@ -24,6 +25,8 @@ class APIResponse(JSONResponse):
 
         paging = getattr(content, "paging", None)
         page = {}
+        if self.total_count is not None:
+            page["total_count"] = self.total_count
         if paging is not None:
             page["next_page"] = paging.bookmark_next if paging.has_next else None
             page["previous_page"] = (
