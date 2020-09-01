@@ -89,6 +89,8 @@ def sparrow_test(
         print(
             "\nAll other command line options are passed to the [bold]pytest[/bold] test runner."
             "\npytest's commands can be printed using the [cyan]--pytest-help[/cyan] command."
+            "\nSome common options:"
+            "  [cyan]sparrow test --capture=no --maxfail=0[/cyan]"
         )
         ctx.exit()
 
