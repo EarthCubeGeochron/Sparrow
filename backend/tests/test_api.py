@@ -15,4 +15,4 @@ class TestAPIV2:
         res = client.get(route)
         assert res.status_code == 200
         data = res.json()
-        assert data["Hello"] == "world!"
+        assert data["routes"] is not None
