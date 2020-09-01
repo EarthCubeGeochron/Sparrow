@@ -6,8 +6,11 @@
 import sys
 import re
 import click
+import typing
 from click import echo, style, secho
+from click_default_group import DefaultGroup
 from os import environ, getcwd, chdir, path
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 from rich import print
@@ -47,12 +50,14 @@ def find_subcommand(directories, name):
             return str(fn)
 
 
-@click.command(
-    "sparrow", context_settings=dict(ignore_unknown_options=True, help_option_names=[],)
-)
-@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+@dataclass
+class SparrowConfig:
+    bin_directories: typing.List[Path]
+
+
+@click.group(name="sparrow", cls=DefaultGroup, default="main", default_if_no_args=True)
 @click.pass_context
-def cli(ctx, args):
+def cli(ctx):
     environ["SPARROW_WORKDIR"] = getcwd()
     here = Path(environ["SPARROW_WORKDIR"])
 
@@ -89,9 +94,18 @@ def cli(ctx, args):
             pth = this_exe.parent.parent.parent
             environ["SPARROW_PATH"] = str(pth)
 
-    bin_directories = setup_command_path()
+    cfg = SparrowConfig(bin_directories=setup_command_path())
+    ctx.obj = cfg
     prepare_docker_environment()
 
+
+@cli.command(
+    "main", context_settings=dict(ignore_unknown_options=True, help_option_names=[],)
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+@click.pass_context
+def main(ctx, args):
+    cfg = ctx.find_object(SparrowConfig)
     rest = []
     try:
         (subcommand, *rest) = args
@@ -99,7 +113,7 @@ def cli(ctx, args):
         subcommand = "--help"
 
     if subcommand in ["--help", "help"]:
-        echo_help(*bin_directories)
+        echo_help(*cfg.bin_directories)
         sys.exit(0)
 
     if subcommand == "compose":
@@ -111,7 +125,7 @@ def cli(ctx, args):
         _args = [v for v in rest if v != "--psql"]
         return ctx.invoke(sparrow_test, args=_args, psql="--psql" in rest)
 
-    _command = find_subcommand(bin_directories, subcommand)
+    _command = find_subcommand(cfg.bin_directories, subcommand)
 
     if _command is None:
         # Run a command against sparrow within a docker container
