@@ -65,7 +65,7 @@ class SmartNested(Nested, Related):
     def _deserialize(self, value, attr=None, data=None, **kwargs):
         if isinstance(value, self.schema.opts.model):
             return value
-        return super(Nested, self)._deserialize(value, attr, data, **kwargs)
+        return super()._deserialize(value, attr, data, **kwargs)
 
     def _serialize_related_key(self, value):
         """Serialize the primary key for a related model. In the (common) special
