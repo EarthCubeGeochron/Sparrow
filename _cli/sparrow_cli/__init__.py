@@ -44,12 +44,6 @@ def main(ctx, args):
     if subcommand == "compose":
         return compose(*rest)
 
-    if subcommand == "test":
-        # This is an ugly hack that results from poor ability to pass command-line
-        # arguments to the sparrow-test command
-        _args = [v for v in rest if v != "--psql"]
-        return ctx.invoke(sparrow_test, args=_args, psql="--psql" in rest)
-
     _command = find_subcommand(cfg.bin_directories, subcommand)
 
     if _command is None:
@@ -64,3 +58,6 @@ def main(ctx, args):
             return compose("--log-level ERROR run --rm backend sparrow", *args)
     else:
         return cmd(_command, *rest)
+
+
+cli.add_command(sparrow_test)

@@ -2,7 +2,7 @@ import click
 import sys
 from os import environ, path, chdir
 from rich import print
-from .util import cmd, container_is_running
+from .util import cmd
 
 
 def compose(*args, **kwargs):
@@ -19,16 +19,41 @@ def compose(*args, **kwargs):
 
 
 # Ideally this would be a subcommand, not its own separate command
-@click.command("sparrow-test", context_settings=dict(ignore_unknown_options=True,))
-@click.argument("args", nargs=-1, type=click.UNPROCESSED)
-@click.option("--psql", is_flag=True, default=False)
-@click.option("--standalone", is_flag=True, default=False)
+@click.command(
+    "test", context_settings=dict(ignore_unknown_options=True),
+)
+@click.argument("pytest_args", nargs=-1, type=click.UNPROCESSED)
+@click.option("--help", is_flag=True, default=False, help="Print this page and exit")
+@click.option(
+    "--pytest-help", is_flag=True, default=False, help="Print the PyTest help"
+)
+@click.option(
+    "--psql",
+    is_flag=True,
+    default=False,
+    help="Provide a psql prompt when testing concludes",
+)
+@click.option(
+    "--teardown", is_flag=True, default=False, help="Teardown database on exit"
+)
 @click.pass_context
-def sparrow_test(ctx, args, psql=False, standalone=False):
-
-    if "--help" in args:
+def sparrow_test(
+    ctx, pytest_args, help=False, psql=False, teardown=False, pytest_help=False,
+):
+    """Test runner for the Sparrow application. The testing framework is based on
+    PyTest."""
+    if help:
+        # We override the help method so we can add extra information.
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
+        print(
+            "\nAll other command line options are passed to the [bold]pytest[/bold] test runner."
+            "\npytest's commands can be printed using the [cyan]--pytest-help[/cyan] command."
+        )
+        ctx.exit()
+
+    if pytest_help:
+        cmd("pytest --help")
         ctx.exit()
 
     pth = environ.get("SPARROW_PATH", None)
@@ -43,9 +68,6 @@ def sparrow_test(ctx, args, psql=False, standalone=False):
     # First, test basic operation of command-line application
     # We should probably just import pytest directly and run
     pass_conditions = {0: "Tests passed", 5: "No tests collected"}
-    pytest_args = [
-        a for a in args if a not in ["--psql", "--keep-database", "--standalone"]
-    ]
 
     chdir(pth)
     res = cmd(path.join(pth, "_cli/_scripts/test-cli"), *pytest_args)
@@ -59,15 +81,16 @@ def sparrow_test(ctx, args, psql=False, standalone=False):
     chdir(path.join(pth, "backend-tests"))
     compose("build --quiet")
 
-    flag = "--psql" if psql else ""
-
     # Need to bring up database separately to ensure ports are mapped...
     compose("up -d db")
     # if container_is_running("backend") and not standalone:
     #     res = compose("exec backend", "/bin/run-tests", *args, flag)
     # else:
-    res = compose("run --rm --service-ports backend", "/bin/run-tests", *args, flag)
+    flag = "--psql" if psql else ""
+    res = compose(
+        "run --rm --service-ports backend", "/bin/run-tests", *pytest_args, flag
+    )
     # if "--keep-database" not in args:
-    if standalone:
+    if teardown:
         compose("down")
     sys.exit(res.returncode)

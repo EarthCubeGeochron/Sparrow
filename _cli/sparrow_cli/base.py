@@ -39,6 +39,10 @@ class SparrowConfig:
 @click.group(name="sparrow", cls=DefaultGroup, default="main", default_if_no_args=True)
 @click.pass_context
 def cli(ctx):
+    """Startup function that sets configuration environment variables. Much of the
+    structure of this is inherited from when the application was bootstrapped by a
+    `zsh` script.
+    """
     environ["SPARROW_WORKDIR"] = getcwd()
     here = Path(environ["SPARROW_WORKDIR"])
 
