@@ -15,7 +15,7 @@ function useElementHeight(ref: React.RefObject<HTMLElement>): number | null {
   // Also respond on window resize
   useEffect(() => {
     window.addEventListener("resize", setSize);
-    return function () {
+    return function() {
       window.removeEventListener("resize", setSize);
     };
   }, [ref.current]);

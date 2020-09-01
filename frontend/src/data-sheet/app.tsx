@@ -25,9 +25,9 @@ const Sheet = ({ className, children }) => {
     <table className={className}>
       <thead>
         <tr className="cell header">
-          <th>Index</th>
+          <td>Index</td>
           {columns.map((col) => (
-            <th key={col.name}>{col.name}</th>
+            <td key={col.name}>{col.name}</td>
           ))}
         </tr>
       </thead>
@@ -37,14 +37,14 @@ const Sheet = ({ className, children }) => {
 };
 
 const columnSpec = [
-  { name: "Sample Name", key: "name" },
-  { name: "IGSN", key: "igsn" },
-  { name: "Public", key: "is_public" },
-  { name: "Material", key: "material" },
-  { name: "Latitude", key: "latitude" },
-  { name: "Longitude", key: "longitude" },
-  { name: "Location name", key: "location_name" },
-  { name: "Project", key: "project_name" },
+  { name: "Sample Name", key: "name", width: 10 },
+  { name: "IGSN", key: "igsn", width: 10 },
+  { name: "Public", key: "is_public", width: 10 },
+  { name: "Material", key: "material", width: 10 },
+  { name: "Latitude", key: "latitude", width: 10 },
+  { name: "Longitude", key: "longitude", width: 10 },
+  { name: "Location name", key: "location_name", width: 10 },
+  { name: "Project", key: "project_name", width: 10 },
 ];
 
 function unwrapSampleData(sampleData) {
@@ -120,6 +120,7 @@ function DataSheet() {
 
   const buildCellProps = (value: any, row: number, key: string) => {
     // Check if values is the same as the initial data key
+
     const isChanged = value != initialData[row][key];
     const className = isChanged ? "edited" : null;
     return { value, className };
