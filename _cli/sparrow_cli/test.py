@@ -2,7 +2,9 @@ import click
 import sys
 from os import environ, path, chdir
 from rich import print
+from click_default_group import DefaultGroup
 from .util import cmd
+from .base import cli
 
 
 def compose(*args, **kwargs):
@@ -18,9 +20,48 @@ def compose(*args, **kwargs):
     return cmd("docker-compose", *args, **kwargs)
 
 
+__ctx = dict(ignore_unknown_options=True, help_option_names=[])
+
+
+@cli.group(name="test", cls=DefaultGroup, default="app", default_if_no_args=True)
+@click.pass_context
+def sparrow_test(ctx):
+    """Test runner for the Sparrow application. The testing framework is based on
+    PyTest."""
+    pth = environ.get("SPARROW_PATH", None)
+    if pth is None:
+        print(
+            "SPARROW_PATH not found. For now, tests can only be run when "
+            "a source directory is available."
+        )
+        ctx.exit()
+    chdir(pth)
+
+
 # Ideally this would be a subcommand, not its own separate command
-@click.command(
-    "test", context_settings=dict(ignore_unknown_options=True),
+@sparrow_test.command(
+    "cli", context_settings=__ctx,
+)
+@click.argument("pytest_args", nargs=-1, type=click.UNPROCESSED)
+@click.pass_context
+def cli_tests(
+    ctx, pytest_args,
+):
+    # First, test basic operation of command-line application
+    # We should probably just import pytest directly and run
+    pass_conditions = {0: "Tests passed", 5: "No tests collected"}
+
+    res = cmd("_cli/_scripts/test-cli", *pytest_args)
+    if res.returncode not in pass_conditions.keys():
+        print("CLI tests failed, exiting")
+        sys.exit(res.returncode)
+    else:
+        print(f"CLI: {pass_conditions[res.returncode]}")
+
+
+# Ideally this would be a subcommand, not its own separate command
+@sparrow_test.command(
+    "app", context_settings=__ctx,
 )
 @click.argument("pytest_args", nargs=-1, type=click.UNPROCESSED)
 @click.option("--help", is_flag=True, default=False, help="Print this page and exit")
@@ -40,8 +81,7 @@ def compose(*args, **kwargs):
 def sparrow_test(
     ctx, pytest_args, help=False, psql=False, teardown=False, pytest_help=False,
 ):
-    """Test runner for the Sparrow application. The testing framework is based on
-    PyTest."""
+    """Run the Sparrow's main application tests"""
     if help:
         # We override the help method so we can add extra information.
         ctx = click.get_current_context()
@@ -64,18 +104,6 @@ def sparrow_test(
         return
 
     print("Running sparrow tests")
-
-    # First, test basic operation of command-line application
-    # We should probably just import pytest directly and run
-    pass_conditions = {0: "Tests passed", 5: "No tests collected"}
-
-    chdir(pth)
-    res = cmd(path.join(pth, "_cli/_scripts/test-cli"), *pytest_args)
-    if res.returncode not in pass_conditions.keys():
-        print("CLI tests failed, exiting")
-        sys.exit(res.returncode)
-    else:
-        print(f"CLI: {pass_conditions[res.returncode]}")
 
     # Main backend tests
     chdir(path.join(pth, "backend-tests"))

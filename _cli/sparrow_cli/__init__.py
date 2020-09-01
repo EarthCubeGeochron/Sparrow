@@ -60,4 +60,4 @@ def main(ctx, args):
         return cmd(_command, *rest)
 
 
-cli.add_command(sparrow_test)
+# cli.add_command(sparrow_test)
