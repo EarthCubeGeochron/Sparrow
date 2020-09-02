@@ -170,18 +170,18 @@ class SparrowConverter(ModelConverter):
             elif not col.nullable:
                 kwargs["required"] = True
 
-            # We allow setting of UUIDs for now, but maybe we shouldn't
-            if isinstance(col.type, postgresql.UUID):
-                # This should be covered by the "default" case, but for some reason
-                # defaults don't show up
-                kwargs["required"] = False
-
             dump_only = kwargs.get("dump_only", False)
             if not dump_only and not col.nullable:
                 kwargs["required"] = True
             if dump_only:
                 kwargs["required"] = False
             if col.default is not None:
+                kwargs["required"] = False
+
+            # We allow setting of UUIDs for now, but maybe we shouldn't
+            if isinstance(col.type, postgresql.UUID):
+                # This should be covered by the "default" case, but for some reason
+                # server-set defaults don't show up
                 kwargs["required"] = False
 
         return kwargs
