@@ -157,7 +157,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 instance = self.opts.model(**data)
                 self.session.add(instance)
                 log.debug(f"Created instance {instance} with parameters {data}")
-                self.session.flush(objects=[instance])
+                # self.session.flush(objects=[instance])
                 self.session.commit()
                 log.debug("Successfully persisted to database")
             except IntegrityError as err:

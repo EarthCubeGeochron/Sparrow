@@ -121,7 +121,7 @@ class Database(MappedDatabaseMixin):
                 log.info("Entering final commit phase of import")
                 log.info(f"Adding top-level object {res}")
                 self.session.add(res)
-                self._flush_nested_objects()
+                # self._flush_nested_objects()
                 log.info("Committing entire transaction")
                 self.session.commit()
             return res
