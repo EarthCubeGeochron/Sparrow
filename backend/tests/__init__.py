@@ -1,3 +1,3 @@
 import logging
 
-logging.disable(level=logging.INFO)
+logging.disable(level=logging.WARNING)

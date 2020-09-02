@@ -156,13 +156,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 self.session.begin_nested()
                 instance = self.opts.model(**data)
                 self.session.add(instance)
-                log.info(f"Created instance {instance} with parameters {data}")
+                log.debug(f"Created instance {instance} with parameters {data}")
                 self.session.flush(objects=[instance])
                 self.session.commit()
-                log.info("Successfully persisted to database")
+                log.debug("Successfully persisted to database")
             except IntegrityError as err:
                 self.session.rollback()
-                log.info("Could not persist but will try again later")
+                log.debug("Could not persist but will try again later")
                 log.debug(err)
 
         return instance

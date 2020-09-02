@@ -5,7 +5,8 @@ data from the Sparrow database.
 Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
 from marshmallow_sqlalchemy.fields import Related, Nested
-from marshmallow.fields import Field, Raw, UUID
+from marshmallow.fields import Field, Raw
+from marshmallow.fields import UUID as _UUID
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
 from collections.abc import Iterable
@@ -15,7 +16,7 @@ from ..logs import get_logger
 log = get_logger(__name__)
 
 
-class _UUID(UUID):
+class UUID(_UUID):
     def _deserialize(self, value, attr, data, **kwargs):
         """We need to deserialize to a string to make SQLAlchemy happy"""
         return str(self._validated(value))
