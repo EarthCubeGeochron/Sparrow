@@ -36,6 +36,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self.args_schema = dict(
             **self.instance_schema,
             has=DelimitedList(Str(), missing=[]),
+            not_has=DelimitedList(Str(), missing=[]),
             page=Str(missing=None),
             per_page=Int(missing=20),
         )
@@ -75,6 +76,8 @@ class ModelAPIEndpoint(HTTPEndpoint):
         fields = {getattr(f, "data_key", k): f for k, f in schema.fields.items()}
 
         filters = []
+
+        # Filter by has
         for has_field in args["has"]:
             try:
                 field = fields[has_field]
@@ -89,6 +92,23 @@ class ModelAPIEndpoint(HTTPEndpoint):
                     filters.append(orm_attr.has())
             else:
                 filters.append(orm_attr.isnot(None))
+
+        # Filter by not_has
+        for k in args["not_has"]:
+            try:
+                field = fields[k]
+            except KeyError:
+                raise ValidationError(f"'{k}' is not a valid field")
+            orm_attr = getattr(model, field.name)
+
+            if hasattr(field, "related_model"):
+                if orm_attr.property.uselist:
+                    filters.append(~orm_attr.any())
+                else:
+                    filters.append(~orm_attr.has())
+            else:
+                filters.append(orm_attr.is_(None))
+
         for filter in filters:
             q = q.filter(filter)
 
@@ -102,4 +122,4 @@ class ModelAPIEndpoint(HTTPEndpoint):
         except ValueError:
             raise ValidationError("Invalid page token.")
 
-        return APIResponse(schema, res)
+        return APIResponse(schema, res, total_count=q.count())

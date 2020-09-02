@@ -19,7 +19,7 @@ formatter = ColoredFormatter(
 
 console_handler = StreamHandler()
 # create console handler and set level to debug
-console_handler.setLevel(logging.DEBUG)
+# console_handler.setLevel(logging.CRITICAL)
 # create formatter
 # add formatter to ch
 console_handler.setFormatter(formatter)
