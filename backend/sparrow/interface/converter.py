@@ -12,7 +12,7 @@ from sqlalchemy.types import Integer
 from sqlalchemy.dialects import postgresql
 
 from ..database.mapper.util import trim_postfix
-from .fields import Geometry, Enum, JSON, SmartNested, _UUID
+from .fields import Geometry, Enum, JSON, SmartNested, UUID
 from .util import to_schema_name
 
 from ..logs import get_logger
@@ -64,7 +64,7 @@ class SparrowConverter(ModelConverter):
                 geo.Geography: Geometry,
                 postgresql.JSON: JSON,
                 postgresql.JSONB: JSON,
-                postgresql.UUID: _UUID,
+                postgresql.UUID: UUID,
             }.items()
         )
     )
@@ -171,9 +171,10 @@ class SparrowConverter(ModelConverter):
                 kwargs["required"] = True
 
             # We allow setting of UUIDs for now, but maybe we shouldn't
-            # if isinstance(col.type, postgresql.UUID):
-            #    #kwargs["dump_only"] = True
-            #    #kwargs["required"] = False
+            if isinstance(col.type, postgresql.UUID):
+                # This should be covered by the "default" case, but for some reason
+                # defaults don't show up
+                kwargs["required"] = False
 
             dump_only = kwargs.get("dump_only", False)
             if not dump_only and not col.nullable:

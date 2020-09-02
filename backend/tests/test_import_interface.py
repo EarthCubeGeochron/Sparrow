@@ -21,8 +21,6 @@ app = App(__name__)
 
 session = dict(sample_id="A-0", date=datetime.now())
 
-logging.basicConfig(level=logging.CRITICAL)
-
 
 class TestImperativeImport(object):
     def test_imperative_import(self, db):
@@ -374,7 +372,7 @@ class TestDeclarativeImporter:
         db.load_data("session", data)
 
     def test_expand_id(self, caplog, db):
-        caplog.set_level(logging.INFO, "sqlalchemy.engine")
+        # caplog.set_level(logging.INFO, "sqlalchemy.engine")
 
         data = {"parameter": "test param", "unit": "test unit"}
         val = db.load_data("datum_type", data)

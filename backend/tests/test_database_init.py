@@ -1,6 +1,5 @@
 from datetime import datetime
 from pytest import mark
-import logging
 from sparrow.logs import get_logger
 import numpy as N
 
@@ -9,8 +8,6 @@ log = get_logger(__name__)
 # pytestmark = mark.filterwarnings("ignore", "*", SAWarning)
 
 session = dict(sample_id="A-0", date=datetime.now())
-
-logging.basicConfig(level=logging.CRITICAL)
 
 
 class TestDB:
