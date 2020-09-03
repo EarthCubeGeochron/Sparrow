@@ -4,8 +4,10 @@ from click import echo, style, secho
 from os import environ
 from pathlib import Path
 from rich import print
+from itertools import chain
 from rich.console import Console
 from subprocess import PIPE, STDOUT
+from click.formatting import HelpFormatter
 from .util import compose
 
 console = Console()
@@ -23,7 +25,7 @@ def get_description(script):
     return ""
 
 
-def cmd_help(title, directory: Path, extra_commands={}):
+def cmd_help(title, directories: Path, extra_commands={}):
     echo("", err=True)
     print(title + ":", file=sys.stderr)
 
@@ -33,12 +35,14 @@ def cmd_help(title, directory: Path, extra_commands={}):
         echo("  {0:24}".format(cmd), err=True, nl=False)
         console.print(help_text, highlight=True)
 
-    for f in directory.iterdir():
+    for f in chain(*(d.iterdir() for d in directories)):
         if not f.is_file():
             continue
         name = f.stem
         prefix = "sparrow-"
         if not name.startswith(prefix):
+            continue
+        if name.startswith("sparrow-db-"):
             continue
 
         echo("  {0:24}".format(name[len(prefix) :]), err=True, nl=False)
@@ -46,19 +50,25 @@ def cmd_help(title, directory: Path, extra_commands={}):
         console.print(desc, highlight=True)
 
 
+class SparrowHelpFormatter(HelpFormatter):
+    def write_line(self, text=""):
+        self.write(text + "\n")
+
+
 def echo_help(core_commands=None, user_commands=None):
-    echo(
-        "Usage: " + style("sparrow", bold=True) + " [options] <command> [args]...",
-        err=True,
-    )
-    echo("", err=True)
-    echo("Config: " + style(environ.get("SPARROW_CONFIG", "None"), fg="cyan"), err=True)
-    echo(
-        "Lab: " + style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True),
-        err=True,
-    )
-    # Ideally we'd use a TTY here with -T, but this may have problems on Ubuntu.
-    # so we omit it for now.
+    fmt = SparrowHelpFormatter()
+
+    fmt.write_usage("sparrow", "[options] <command> [args]...")
+    fmt.write_line()
+    d0 = style(environ.get("SPARROW_CONFIG", "None"), fg="cyan")
+    fmt.write_line(f"Config: {d0}")
+    d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
+    fmt.write_line(f"Lab: {d1}")
+
+    sys.stderr.write(fmt.getvalue())
+
+    # Note: TTY flag (-T) has issues on older versions of docker-compose (<~1.23).
+    # We solve this by bundling a newer version of docker-compose.
     out = compose("run --no-deps -T backend sparrow", stdout=PIPE, stderr=STDOUT)
     if out.returncode != 0:
         secho("Could not access help text for the Sparrow backend", err=True, fg="red")

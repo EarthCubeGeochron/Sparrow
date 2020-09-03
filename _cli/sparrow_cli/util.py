@@ -2,6 +2,17 @@ from os import environ, chdir
 from subprocess import run, PIPE, STDOUT
 from shlex import split
 from .env import validate_environment
+from typing import List
+from pathlib import Path
+
+
+def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
+    if name is None:
+        return None
+    for dir in directories:
+        fn = dir / (prefix + name)
+        if fn.is_file():
+            return str(fn)
 
 
 def cmd(*v, **kwargs):
