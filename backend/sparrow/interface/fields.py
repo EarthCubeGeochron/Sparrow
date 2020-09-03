@@ -6,6 +6,7 @@ Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
 from marshmallow_sqlalchemy.fields import Related, Nested
 from marshmallow.fields import Field, Raw
+from marshmallow.fields import UUID as _UUID
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
 from collections.abc import Iterable
@@ -13,6 +14,12 @@ from .util import primary_key
 from ..logs import get_logger
 
 log = get_logger(__name__)
+
+
+class UUID(_UUID):
+    def _deserialize(self, value, attr, data, **kwargs):
+        """We need to deserialize to a string to make SQLAlchemy happy"""
+        return str(self._validated(value))
 
 
 class JSON(Raw):
@@ -51,6 +58,8 @@ class Enum(Related):
 
 class SmartNested(Nested, Related):
     # https://github.com/marshmallow-code/marshmallow/blob/dev/src/marshmallow/fields.py
+    # TODO: better conformance of this field to Marshmallow's OpenAPI schema generation
+    # https://apispec.readthedocs.io/en/latest/using_plugins.html
     def __init__(
         self, name, *, only=None, exclude=(), many=False, unknown=None, **field_kwargs
     ):
@@ -63,7 +72,7 @@ class SmartNested(Nested, Related):
     def _deserialize(self, value, attr=None, data=None, **kwargs):
         if isinstance(value, self.schema.opts.model):
             return value
-        return super(Nested, self)._deserialize(value, attr, data, **kwargs)
+        return super()._deserialize(value, attr, data, **kwargs)
 
     def _serialize_related_key(self, value):
         """Serialize the primary key for a related model. In the (common) special

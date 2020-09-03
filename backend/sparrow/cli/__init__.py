@@ -8,7 +8,7 @@ from click_plugins import with_plugins
 from pkg_resources import iter_entry_points
 from contextlib import redirect_stdout
 from subprocess import run
-
+import logging
 from .util import with_database, with_app, with_full_app
 from ..util import working_directory
 from ..app import App
@@ -29,6 +29,7 @@ class SparrowCLI(click.Group):
         # This pulls in configuration from environment variable or a configuration
         # object, if provided; I don't see another option to support lazily loading plugins
         config = kwargs.pop("config", environ.get("SPARROW_BACKEND_CONFIG"))
+        # logging.disable(level=logging.WARNING)
 
         kwargs.setdefault("context_settings", {})
         # Ideally we would add the Application _and_ config objects to settings

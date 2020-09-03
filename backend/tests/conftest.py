@@ -2,6 +2,22 @@ from sparrow.app import App
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
 
+# Slow tests are opt-in
+def pytest_addoption(parser):
+    parser.addoption(
+        "--include-slow",
+        action="store_true",
+        dest="slow",
+        default=False,
+        help="enable slow-decorated tests",
+    )
+
+
+def pytest_configure(config):
+    if not config.option.slow:
+        setattr(config.option, "markexpr", "not slow")
+
+
 app = App(__name__)
 
 

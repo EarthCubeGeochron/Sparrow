@@ -12,7 +12,7 @@ from sqlalchemy.types import Integer
 from sqlalchemy.dialects import postgresql
 
 from ..database.mapper.util import trim_postfix
-from .fields import Geometry, Enum, JSON, SmartNested
+from .fields import Geometry, Enum, JSON, SmartNested, UUID
 from .util import to_schema_name
 
 from ..logs import get_logger
@@ -64,6 +64,7 @@ class SparrowConverter(ModelConverter):
                 geo.Geography: Geometry,
                 postgresql.JSON: JSON,
                 postgresql.JSONB: JSON,
+                postgresql.UUID: UUID,
             }.items()
         )
     )
@@ -99,7 +100,7 @@ class SparrowConverter(ModelConverter):
             return f"{prop.target.schema}_{prop.target.name}"
 
         # Otherwise, we go with the name of the target model.
-        return prop.target.name
+        return str(prop.target.name)
 
     def fields_for_model(self, model, **kwargs):
         fields = super().fields_for_model(model, **kwargs)
@@ -169,16 +170,18 @@ class SparrowConverter(ModelConverter):
             elif not col.nullable:
                 kwargs["required"] = True
 
-            if isinstance(col.type, postgresql.UUID):
-                kwargs["dump_only"] = True
-                kwargs["required"] = False
-
             dump_only = kwargs.get("dump_only", False)
             if not dump_only and not col.nullable:
                 kwargs["required"] = True
             if dump_only:
                 kwargs["required"] = False
             if col.default is not None:
+                kwargs["required"] = False
+
+            # We allow setting of UUIDs for now, but maybe we shouldn't
+            if isinstance(col.type, postgresql.UUID):
+                # This should be covered by the "default" case, but for some reason
+                # server-set defaults don't show up
                 kwargs["required"] = False
 
         return kwargs
@@ -190,6 +193,7 @@ class SparrowConverter(ModelConverter):
         return None
 
     def property2field(self, prop, **kwargs):
+        """This override improves our handling of relationships"""
         if not isinstance(prop, RelationshipProperty):
             return super().property2field(prop, **kwargs)
 
@@ -214,6 +218,7 @@ class SparrowConverter(ModelConverter):
         exclude = []
         for p in cls.__mapper__.relationships:
             if self._should_exclude_field(p):
+                # Fields that are already excluded do not need to be excluded again.
                 continue
             id_ = self._get_field_name(p)
             if p.mapper.entity == prop.parent.entity:
