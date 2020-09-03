@@ -1,4 +1,5 @@
 from sparrow.util import relative_path
+from sparrow.interface import model_interface
 from sparrow.ext.detrital_zircon import DetritalZirconTableImporter
 from pandas import read_csv
 from pytest import mark, fixture
@@ -18,13 +19,18 @@ def test_dz_import(db, dz_data):
     db.load_data("session", dz_data)
 
 
-@mark.xfail(reason="This doesn't work yet.")
+@mark.xfail(reason="This doesn't work for some reason.")
 def test_dz_import_iterative(db, dz_data):
     """A potentially quicker method to add analyses after creation"""
     analysis_list = dz_data.pop("analysis")
 
-    session = db.load_data("session", dz_data)
-    assert session.id is not None
+    _session = model_interface(db.model.session, session=db.session)()
+    _analysis = model_interface(db.model.analysis, session=db.session)()
 
-    for a in analysis_list:
-        db.load_data("analysis", dict(session=session.id, **a))
+    with db.session.no_autoflush:
+        session = _session.load(dz_data, session=db.session)
+        for a in analysis_list:
+            a1 = _analysis.load(a, session=db.session, partial=True)
+            session.analysis_collection.append(a1)
+        db.session.add(session)
+        db.session.commit()
