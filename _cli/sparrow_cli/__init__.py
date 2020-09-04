@@ -11,6 +11,7 @@ from .help import echo_help
 from .util import cmd, compose, exec_or_run, find_subcommand
 from .test import sparrow_test
 from .database import sparrow_db
+from .docs import sparrow_docs
 
 console = Console(highlight=True)
 

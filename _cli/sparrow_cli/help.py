@@ -15,6 +15,7 @@ desc_regex = re.compile("^#\\s+Description:\\s+(.+)$")
 
 
 def format_description(desc):
+    desc = re.sub("\[(.*?)\]", style("\\1", fg="green", bold=True), desc)
     desc = re.sub("\[\[(.*?)\]\]", style("\\1", fg="red", bold=True), desc)
     return re.sub("`(.*?)`", style("\\1", fg="cyan"), desc)
 
@@ -44,6 +45,8 @@ def command_dl(directories: Path, extra_commands={}):
             continue
         if name.startswith("sparrow-db-"):
             continue
+        if name.startswith("sparrow-docs-"):
+            continue
 
         yield (name[len(prefix) :], get_description(f).strip())
 
@@ -60,6 +63,7 @@ class SparrowHelpFormatter(HelpFormatter):
 sections = {
     "db": "Manage the `sparrow` database",
     "test": "Run `sparrow`'s test suite",
+    "docs": "Manage `sparrow`'s documentation",
 }
 
 
