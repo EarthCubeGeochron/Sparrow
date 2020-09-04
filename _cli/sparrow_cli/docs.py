@@ -13,7 +13,7 @@ shell_commands = {
 
 
 @cli.group(name="docs")
-def sparrow_docs(ctx):
+def sparrow_docs():
     pass
 
 

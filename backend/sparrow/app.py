@@ -43,7 +43,6 @@ class App(Flask):
             self.config.from_pyfile(cfg)
         except RuntimeError as err:
             log.info("No lab-specific configuration file found.")
-            log.exception(str(err))
 
         self.db = None
         dburl = self.config.get("DATABASE")

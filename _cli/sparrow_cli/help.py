@@ -15,8 +15,8 @@ desc_regex = re.compile("^#\\s+Description:\\s+(.+)$")
 
 
 def format_description(desc):
-    desc = re.sub("\[(.*?)\]", style("\\1", fg="green", bold=True), desc)
     desc = re.sub("\[\[(.*?)\]\]", style("\\1", fg="red", bold=True), desc)
+    desc = re.sub("\[(.*?)\]", style("\\1", fg="green", bold=True), desc)
     return re.sub("`(.*?)`", style("\\1", fg="cyan"), desc)
 
 

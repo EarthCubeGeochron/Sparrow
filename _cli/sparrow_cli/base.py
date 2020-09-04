@@ -1,7 +1,7 @@
 import sys
 import click
 import typing
-from click import echo
+from click import echo, make_pass_decorator
 from click_default_group import DefaultGroup
 from os import environ, getcwd, chdir
 from dataclasses import dataclass

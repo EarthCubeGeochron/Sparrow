@@ -3,7 +3,7 @@ import sys
 from os import environ, path, chdir
 from rich import print
 from click_default_group import DefaultGroup
-from .util import cmd, container_is_running
+from .util import cmd, container_is_running, exec_or_run, compose
 from .base import cli
 
 
@@ -78,7 +78,7 @@ def cli_tests(ctx, pytest_args):
     "--quick", is_flag=True, default=False, help="Keep databases and Docker containers",
 )
 @click.pass_context
-def sparrow_test(
+def sparrow_test_main(
     ctx,
     pytest_args,
     help=False,
@@ -137,3 +137,22 @@ def sparrow_test(
     if teardown:
         compose("down")
     sys.exit(res.returncode)
+
+
+def indb(*args, **kwargs):
+    return compose("exec db", *args, **kwargs)
+
+
+@sparrow_test.command("dump-database")
+def dump_database():
+    """Dump a basic test database containing one detrital zircon sample to stdout"""
+    dbname = "sparrow_test_1"
+    cmd("sparrow db await")
+    indb("createdb -Upostgres", dbname)
+    # exec_or_run(
+    #     "backend",
+    #     "tests/scripts/dump-test-database.py",
+    #     f"postgresql://postgres@db:5432/{dbname}",
+    # )
+    # indb("pg_dump -Fc -C -Upostgres", dbname)
+    indb("dropdb -Upostgres", dbname)

@@ -6,6 +6,7 @@ from click_default_group import DefaultGroup
 from .base import cli, SparrowConfig
 from .util import find_subcommand, cmd
 from .help import format_description
+from .group import CommandGroup
 
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {
@@ -19,17 +20,11 @@ shell_commands = {
 }
 
 
-@cli.group(name="db")
+@cli.group(name="db", cls=CommandGroup)
+@click.pass_context
 def sparrow_db(ctx):
     pass
 
 
 for k, v in shell_commands.items():
-
-    @sparrow_db.command(name=k, short_help=format_description(v))
-    @click.argument("args", nargs=-1, type=click.UNPROCESSED)
-    @click.pass_context
-    def cmd(ctx, args):
-        obj = ctx.find_object(SparrowConfig)
-        fn = find_subcommand(obj.bin_directories, k, prefix="sparrow-db-")
-        cmd(fn, *args)
+    sparrow_db.add_shell_command(k, v, prefix="sparrow-db-")
