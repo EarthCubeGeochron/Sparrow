@@ -31,30 +31,18 @@ def sparrow_test(ctx):
     pth = environ.get("SPARROW_PATH", None)
     if pth is None:
         print(
-<<<<<<< HEAD
-            "SPARROW_PATH not found. For now, tests can only "
-            "be run when a source directory is available."
-        )
-        sys.exit(1)
-=======
             "SPARROW_PATH not found. For now, tests can only be run when "
             "a source directory is available."
         )
         ctx.exit()
     chdir(pth)
->>>>>>> 2b2a67abdf483b705546f7daf3940d42fab42252
 
 
-<<<<<<< HEAD
-    cli_args = [a for a in args if a != "--psql"]
-
-=======
 # Ideally this would be a subcommand, not its own separate command
 @sparrow_test.command("cli", context_settings=__ctx)
 @click.argument("pytest_args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
 def cli_tests(ctx, pytest_args):
->>>>>>> 2b2a67abdf483b705546f7daf3940d42fab42252
     # First, test basic operation of command-line application
     # We should probably just import pytest directly and run
     pass_conditions = {0: "Tests passed", 5: "No tests collected"}
@@ -67,8 +55,6 @@ def cli_tests(ctx, pytest_args):
         print(f"CLI: {pass_conditions[res.returncode]}")
 
 
-<<<<<<< HEAD
-=======
 # Ideally this would be a subcommand, not its own separate command
 @sparrow_test.command("app", context_settings=__ctx)
 @click.argument("pytest_args", nargs=-1, type=click.UNPROCESSED)
@@ -134,7 +120,6 @@ def sparrow_test(
 
     compose("build --quiet")
 
->>>>>>> 2b2a67abdf483b705546f7daf3940d42fab42252
     # Need to bring up database separately to ensure ports are mapped...
     # if not container_is_running("db"):
     # compose("up -d db")

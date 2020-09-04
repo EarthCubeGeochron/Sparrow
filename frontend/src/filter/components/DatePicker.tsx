@@ -19,8 +19,6 @@ import h from "@macrostrat/hyper";
  *
  */
 export function DatePicker() {
-  const [precision, setPrecision] = useState("day");
-
   return h(Card, [
     h("h5", ["Session Date: "]),
     h(DateRangeInput, {

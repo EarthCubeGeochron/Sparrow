@@ -21,6 +21,7 @@ import { AppToaster } from "./toaster";
 import { Catalog } from "./admin";
 import { PageSkeleton, PageStyle } from "./components/page-skeleton";
 import { MapPage } from "./map";
+import NewSample from "./new-sample/new-sample";
 
 import DataSheet from "./data-sheet/app";
 
@@ -62,6 +63,11 @@ function AppMain(props) {
         },
       }),
       h(PageRoute, {
+        path: "/new-sample",
+        style: PageStyle.WIDE,
+        component: NewSample,
+      }),
+      h(PageRoute, {
         path: "/map",
         style: PageStyle.FULLSCREEN,
         component: MapPage,
@@ -81,7 +87,7 @@ function AppMain(props) {
   );
 }
 
-const errorHandler = function (route, response) {
+const errorHandler = function(route, response) {
   let msg;
   const { error } = response;
   if (error != null) {
@@ -91,7 +97,7 @@ const errorHandler = function (route, response) {
   return AppToaster.show({ message, intent: Intent.DANGER });
 };
 
-const App = function () {
+const App = function() {
   // Nest application in React context providers
   const baseURL = process.env.BASE_URL || "/";
   const apiBaseURL = join(baseURL, "/api/v1");
