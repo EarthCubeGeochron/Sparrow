@@ -32,6 +32,7 @@ class App(Flask):
         verbose = kwargs.pop("verbose", True)
         super().__init__(*args, **kwargs)
         self.is_loaded = False
+        self.database_ready = False
         self.api_loaded = False
         self.verbose = verbose
 
@@ -56,10 +57,11 @@ class App(Flask):
         echo(msg, err=True)
 
     def setup_database(self, db=None):
+        # This bootstrapping order leaves much to be desired
         from .database import Database
 
         self.load()
-        if self.db is not None:
+        if self.db is not None and self.database_ready:
             return self.db
         if db is None:
             db = Database(self)
@@ -68,6 +70,7 @@ class App(Flask):
         # Database is only "ready" when it is mapped
         if self.db.automap_base is not None:
             self.run_hook("database-ready")
+            self.database_ready = True
         return db
 
     @property

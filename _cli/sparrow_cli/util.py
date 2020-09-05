@@ -29,6 +29,13 @@ def compose(*args, **kwargs):
     return cmd("docker-compose", overrides, *args, **kwargs)
 
 
+def container_id(container):
+    res = compose("ps -q", container, capture_output=True).stdout.strip()
+    if res == "":
+        return None
+    return res
+
+
 def container_is_running(name):
     res = compose("exec", name, "true", stdout=PIPE, stderr=STDOUT)
     return res.returncode == 0

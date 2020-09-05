@@ -2,17 +2,9 @@ import os
 from click import echo
 from sparrow.util import run
 from time import sleep
-from sqlalchemy import create_engine, exc
+from sqlalchemy import create_engine
 from contextlib import contextmanager
-
-
-def db_exists(engine):
-    try:
-        with engine.connect():
-            return True
-    except exc.OperationalError:
-        return False
-    return False
+from sqlalchemy_utils import create_database, database_exists, drop_database
 
 
 def connection_args(engine):
@@ -27,8 +19,8 @@ def testing_database(conn_string):
 
     dbargs = connection_args(engine)
 
-    if not db_exists(engine):
-        run("createdb", dbargs, engine.url.database)
+    if not database_exists(engine.url):
+        create_database(engine.url)
 
     while not run("pg_isready", dbargs).returncode == 0:
         echo("Waiting for database...")
@@ -41,4 +33,4 @@ def testing_database(conn_string):
     try:
         yield engine
     finally:
-        run("dropdb", dbargs, engine.url.database)
+        drop_database(engine.url)

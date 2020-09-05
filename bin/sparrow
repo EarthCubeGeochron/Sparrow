@@ -1,8 +1,0 @@
-#!/bin/bash
-# A development version of the Sparrow command that can be run directly
-# from the source folder.
-incantation="import os,sys; print(os.path.dirname(os.path.realpath(os.path.expanduser(sys.argv[1]))))"
-HERE="$(python -c "$incantation" "${1}")"
-
-source "$HERE/build/venv/bin/activate"
-python3 "$HERE/sparrow" $@
