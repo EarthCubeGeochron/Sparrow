@@ -58,7 +58,7 @@ else:
 args.append("--disable-warnings")
 
 print("Running tests")
-run(["pytest", "/app/tests", *args])
+run(["pytest", "/app/sparrow_tests", *args])
 
 if psql:
     echo(

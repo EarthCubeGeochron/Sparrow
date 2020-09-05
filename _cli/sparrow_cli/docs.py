@@ -1,7 +1,5 @@
-import click
-from .base import cli, SparrowConfig
-from .util import find_subcommand, cmd
-from .help import format_description
+from .base import cli
+from .group import CommandGroup
 
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {
@@ -12,17 +10,10 @@ shell_commands = {
 }
 
 
-@cli.group(name="docs")
+@cli.group(name="docs", cls=CommandGroup)
 def sparrow_docs():
     pass
 
 
 for k, v in shell_commands.items():
-
-    @sparrow_docs.command(name=k, short_help=format_description(v))
-    @click.argument("args", nargs=-1, type=click.UNPROCESSED)
-    @click.pass_context
-    def cmd(ctx, args):
-        obj = ctx.find_object(SparrowConfig)
-        fn = find_subcommand(obj.bin_directories, k, prefix="sparrow-docs-")
-        cmd(fn, *args)
+    sparrow_docs.add_shell_command(k, v, prefix="sparrow-docs-")

@@ -146,13 +146,4 @@ def indb(*args, **kwargs):
 @sparrow_test.command("dump-database")
 def dump_database():
     """Dump a basic test database containing one detrital zircon sample to stdout"""
-    dbname = "sparrow_test_1"
-    cmd("sparrow db await")
-    indb("createdb -Upostgres", dbname)
-    # exec_or_run(
-    #     "backend",
-    #     "tests/scripts/dump-test-database.py",
-    #     f"postgresql://postgres@db:5432/{dbname}",
-    # )
-    # indb("pg_dump -Fc -C -Upostgres", dbname)
-    indb("dropdb -Upostgres", dbname)
+    exec_or_run("backend", "tests/scripts/dump-test-database.py")

@@ -1,11 +1,5 @@
 import click
-import sys
-from os import environ, path, chdir
-from rich import print
-from click_default_group import DefaultGroup
-from .base import cli, SparrowConfig
-from .util import find_subcommand, cmd
-from .help import format_description
+from .base import cli
 from .group import CommandGroup
 
 # Commands inherited from earlier shell version of CLI.

@@ -24,9 +24,7 @@ RUN mkdir /app
 WORKDIR /app
 
 ## Copy app core
-COPY ./setup.py /app
-COPY ./sparrow /app/sparrow
-COPY ./core_plugins /app/core_plugins
+COPY ./ /app/
 
 RUN pip install -e .
 
