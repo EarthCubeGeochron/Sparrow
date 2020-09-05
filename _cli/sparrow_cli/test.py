@@ -146,4 +146,4 @@ def indb(*args, **kwargs):
 @sparrow_test.command("dump-database")
 def dump_database():
     """Dump a basic test database containing one detrital zircon sample to stdout"""
-    exec_or_run("backend", "tests/scripts/dump-test-database.py")
+    exec_or_run("backend", "sparrow_tests/scripts/dump-test-database.py")
