@@ -24,6 +24,7 @@ def test_dz_import(db, dz_data):
 
 
 @mark.xfail(reason="This doesn't work for some reason.")
+@mark.skip(reason="This test is super-slow")
 def test_dz_import_iterative(db, dz_data):
     """A potentially quicker method to add analyses after creation"""
     analysis_list = dz_data.pop("analysis")
