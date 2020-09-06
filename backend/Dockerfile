@@ -32,4 +32,5 @@ CMD ["/bin/run"]
 
 FROM main AS testing
 
-COPY ./tests /app/tests
+# For right now, the testing target is the same as the "main" target, but
+# we could grab or create additional artifacts or fixtures here.
