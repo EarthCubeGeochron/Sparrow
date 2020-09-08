@@ -107,9 +107,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _get_instance(self, data):
         """Gets pre-existing instances if they are available."""
 
-        # __hash = hash(frozenset(data.items()))
-        # if __hash in self.__instance_cache:
-        #    return self.__instance_cache[__hash]
+        if isinstance(data, self.opts.model):
+            return data
 
         filters, related_models = self._build_filters(data)
 
@@ -146,8 +145,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     @pre_load
     def expand_primary_keys(self, value, **kwargs):
+        # If we have a database model, leave it alone.
+        if isinstance(value, self.opts.model):
+            return value
+        # We might have a mapping of values
+        # TODO: a better way to do this might test for whether primary key
+        # columns are specifically present...
         try:
-            # Typically, we are deserializing from a mapping of values
             return dict(**value)
         except TypeError:
             pass

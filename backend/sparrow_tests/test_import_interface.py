@@ -391,6 +391,15 @@ class TestDeclarativeImporter:
         assert isinstance(res, db.model.datum)
 
 
+class TestStagedImport:
+    def test_staged_import(self, db):
+        """Test that we can import items with references to previously imported items"""
+        sample = basic_data.pop("sample")
+        session = db.load_data("session", basic_data)
+        sample["session"] = [session]
+        db.load_data("sample", sample)
+
+
 class TestImportDataTypes(object):
     def test_simple_cosmo_import(self, db):
         # Test import of simple cosmogenic nuclides data types

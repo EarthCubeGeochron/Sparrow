@@ -1,4 +1,5 @@
 import os
+import sys
 from click import echo
 from sparrow.util import run
 from time import sleep
@@ -22,8 +23,8 @@ def testing_database(conn_string):
     if not database_exists(engine.url):
         create_database(engine.url)
 
-    while not run("pg_isready", dbargs).returncode == 0:
-        echo("Waiting for database...")
+    while not run("pg_isready", dbargs, stdout=sys.stderr).returncode == 0:
+        echo("Waiting for database...", err=True)
         sleep(1)
 
     # This makes sure we can run Sparrow by specifying the database

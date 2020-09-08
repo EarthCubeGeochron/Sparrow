@@ -70,6 +70,7 @@ class SmartNested(Nested, Related):
         self._instances = set()
 
     def _deserialize(self, value, attr=None, data=None, **kwargs):
+        log.info(value)
         if isinstance(value, self.schema.opts.model):
             return value
         return super()._deserialize(value, attr, data, **kwargs)
