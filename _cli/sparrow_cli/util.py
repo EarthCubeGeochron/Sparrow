@@ -2,6 +2,17 @@ from os import environ, chdir
 from subprocess import run, PIPE, STDOUT
 from shlex import split
 from .env import validate_environment
+from typing import List
+from pathlib import Path
+
+
+def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
+    if name is None:
+        return None
+    for dir in directories:
+        fn = dir / (prefix + name)
+        if fn.is_file():
+            return str(fn)
 
 
 def cmd(*v, **kwargs):
@@ -16,6 +27,13 @@ def compose(*args, **kwargs):
     chdir(environ["SPARROW_PATH"])
     overrides = environ.get("_SPARROW_DEPRECATED_OVERRIDES", "")
     return cmd("docker-compose", overrides, *args, **kwargs)
+
+
+def container_id(container):
+    res = compose("ps -q", container, capture_output=True).stdout.strip()
+    if res == "":
+        return None
+    return res
 
 
 def container_is_running(name):

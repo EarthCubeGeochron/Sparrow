@@ -15,4 +15,4 @@ def load_relative(*pth):
 
 
 def json_fixture(*pth):
-    return load_relative(__file__, "fixtures", *pth)
+    return load_relative(__file__, "..", "fixtures", *pth)

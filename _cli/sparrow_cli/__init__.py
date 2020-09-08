@@ -8,19 +8,12 @@ import click
 from rich.console import Console
 from .base import cli, SparrowConfig
 from .help import echo_help
-from .util import cmd, compose, exec_or_run
+from .util import cmd, compose, exec_or_run, find_subcommand, container_id
 from .test import sparrow_test
+from .database import sparrow_db
+from .docs import sparrow_docs
 
 console = Console(highlight=True)
-
-
-def find_subcommand(directories, name):
-    if name is None:
-        return None
-    for dir in directories:
-        fn = dir / ("sparrow-" + name)
-        if fn.is_file():
-            return str(fn)
 
 
 @cli.command(
@@ -37,7 +30,7 @@ def main(ctx, args):
         subcommand = "--help"
 
     if subcommand in ["--help", "help"]:
-        echo_help(*cfg.bin_directories)
+        echo_help(cfg.bin_directories)
         sys.exit(0)
 
     if subcommand == "compose":
@@ -49,3 +42,9 @@ def main(ctx, args):
         return exec_or_run("backend", "sparrow", *args)
     else:
         return cmd(_command, *rest)
+
+
+@cli.command(name="container-id")
+@click.argument("container", type=str)
+def _container_id(container):
+    click.echo(container_id(container))

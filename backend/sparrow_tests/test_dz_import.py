@@ -5,21 +5,26 @@ from pandas import read_csv
 from pytest import mark, fixture
 
 
-@fixture(scope="module")
-def dz_data():
-    """Importing ~300 DZ measurements is slow"""
+def import_dz_test_data():
     importer = DetritalZirconTableImporter()
     fn = relative_path(__file__, "fixtures", "detrital-zircon-F-90.csv")
     df = read_csv(fn)
-    yield importer(df)
+    return importer(df)
+
+
+@fixture(scope="module")
+def dz_data():
+    yield import_dz_test_data()
 
 
 @mark.slow
 def test_dz_import(db, dz_data):
+    """Importing ~300 DZ measurements is slow"""
     db.load_data("session", dz_data)
 
 
 @mark.xfail(reason="This doesn't work for some reason.")
+@mark.skip(reason="This test is super-slow")
 def test_dz_import_iterative(db, dz_data):
     """A potentially quicker method to add analyses after creation"""
     analysis_list = dz_data.pop("analysis")

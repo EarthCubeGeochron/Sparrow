@@ -13,7 +13,7 @@ install: _cli/dist/sparrow install-hooks
 install-dev: install-hooks
 	_cli/_scripts/build-local
 	mkdir -p $(SPARROW_INSTALL_PATH)/bin
-	ln -sf $(shell pwd)/bin/sparrow $(SPARROW_INSTALL_PATH)/bin/sparrow
+	ln -sf $(shell pwd)/_cli/sparrow-dev-shim $(SPARROW_INSTALL_PATH)/bin/sparrow
 
 test:
 	_cli/_scripts/test-cli

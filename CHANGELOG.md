@@ -11,15 +11,16 @@ We hope to arrive at full conformance for milestone `2.0.0`.
 ## [Unreleased] - 2020-08-31
 
 - Refactored command-line application to a simpler python-based framework.
+- Packaged tests into a `sparrow_test` package.
 
 ## [Unreleased] - 2020-07-24
 
 ### Changed
 
-- More robust testing framework, including transaction isolation between
+- More robust testing framework, including database transaction isolation between
   test classes.
 - Bumped `sparrowdata/backend-base` Docker image to `v1.2` to include `uvloop`
-  (enables high-performance asynchronous code).
+  (enables high-performance asynchronous serving).
 - Switched Sparrow's backend to "ASGI" (a fast, asynchronous server interface)
   and switched web server to `gunicorn` for robustness.
 

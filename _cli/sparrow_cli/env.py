@@ -8,6 +8,10 @@ def setup_command_path():
     bin_directories = []
 
     if "SPARROW_PATH" in environ:
+        bin = Path(environ["SPARROW_PATH"]) / "_cli" / "bin"
+        bin_directories.append(bin)
+
+        # This should be removed
         bin = Path(environ["SPARROW_PATH"]) / "bin"
         bin_directories.append(bin)
     else:
