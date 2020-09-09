@@ -4,7 +4,6 @@ from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from datetime import datetime
 from pytest import mark
-import logging
 from sparrow.logs import get_logger
 
 from .fixtures import basic_data, incomplete_analysis, basic_project

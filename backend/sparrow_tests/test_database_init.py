@@ -25,42 +25,52 @@ class TestDBRollback:
 
 
 class TestDatabaseInitialization:
+    core_automapped_tables = [
+        "enum_date_precision",
+        "instrument",
+        "publication",
+        "sample",
+        "vocabulary_material",
+        "vocabulary_method",
+        "vocabulary_error_metric",
+        "vocabulary_unit",
+        "vocabulary_parameter",
+        "analysis",
+        "vocabulary_analysis_type",
+        "constant",
+        "researcher",
+        "data_file",
+        "data_file_type",
+        "attribute",
+        "data_file_link",
+        "datum",
+        "user",
+        "project",
+        "session",
+        "datum_type",
+        "vocabulary_entity_type",
+        "vocabulary_entity_reference",
+        "geo_entity",
+        "sample_geo_entity",
+        "core_view_datum",
+    ]
+
     def test_db_automap(self, db):
         """
         Make sure that all core tables are automapped by the
         SQLAlchemy mapper.
         """
-        core_automapped_tables = [
-            "enum_date_precision",
-            "instrument",
-            "publication",
-            "sample",
-            "vocabulary_material",
-            "vocabulary_method",
-            "vocabulary_error_metric",
-            "vocabulary_unit",
-            "vocabulary_parameter",
-            "analysis",
-            "vocabulary_analysis_type",
-            "constant",
-            "researcher",
-            "data_file",
-            "data_file_type",
-            "attribute",
-            "data_file_link",
-            "datum",
-            "user",
-            "project",
-            "session",
-            "datum_type",
-            "vocabulary_entity_type",
-            "vocabulary_entity_reference",
-            "geo_entity",
-            "sample_geo_entity",
-            "core_view_datum",
-        ]
-        for t in core_automapped_tables:
+        for t in self.core_automapped_tables:
             assert t in db.model.keys()
+
+    def test_db_interface(self, db):
+        """
+        Make sure all mapped tables have an import interface attached
+        """
+        for t in self.core_automapped_tables:
+            if t in ("enum_date_precision", "core_view_datum"):
+                continue
+            assert t in db.interface.keys()
 
 
 class TestGenericData(object):

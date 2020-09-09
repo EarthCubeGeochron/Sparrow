@@ -16,6 +16,7 @@ from .mapper import MappedDatabaseMixin
 from ..logs import get_logger
 from ..util import relative_path
 from ..interface import ModelSchema
+from ..exceptions import DatabaseMappingError
 
 metadata = MetaData()
 
@@ -100,8 +101,10 @@ class Database(MappedDatabaseMixin):
         try:
             iface = getattr(self.interface, model_name)
             return iface()
-        except AttributeError:
-            log.error(f"Could not find schema interface for model '{model_name}'")
+        except AttributeError as err:
+            raise DatabaseMappingError(
+                f"Could not find schema interface for model '{model_name}'"
+            )
 
     def _flush_nested_objects(self):
         """
@@ -116,20 +119,24 @@ class Database(MappedDatabaseMixin):
                 self.session.rollback()
                 log.debug(err)
 
-    def load_data(self, model_name, data):
+    def load_data(self, model_name, data, session=None):
+        """Load data into the database using a schema-based importing tool"""
+        if session is None:
+            session = self.session
         schema = self.model_schema(model_name)
         try:
-            with self.session.no_autoflush:
-                res = schema.load(data, session=self.session)
-                log.info("Entering final commit phase of import")
-                log.info(f"Adding top-level object {res}")
-                self.session.add(res)
-                # self._flush_nested_objects()
-                log.info("Committing entire transaction")
-                self.session.commit()
+            # session.begin_nested()
+            # with session.no_autoflush:
+            res = schema.load(data, session=session)
+            log.info("Entering final commit phase of import")
+            log.info(f"Adding top-level object {res}")
+            session.add(res)
+            # self._flush_nested_objects()
+            log.info("Committing entire transaction")
+            session.commit()
             return res
         except (IntegrityError, ValidationError) as err:
-            self.session.rollback()
+            session.rollback()
             log.debug(err)
             raise err
 

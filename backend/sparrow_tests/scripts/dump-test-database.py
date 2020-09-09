@@ -3,6 +3,7 @@
 Initialize database and dump data into it.
 """
 from sparrow.app import App
+from sparrow.interface import model_interface
 from sparrow_tests.helpers.database import testing_database, connection_args
 from sparrow_tests.test_dz_import import import_dz_test_data
 from sparrow.util import run
@@ -17,9 +18,14 @@ log = get_logger(level=logging.DEBUG, handler=console_handler)
 with redirect_stdout(stderr), testing_database(
     "postgresql://postgres@db:5432/sparrow_test_1"
 ) as engine:
-    app = App(__name__)
-    app.database.initialize()
+    a1 = App(__name__)
+    a1.database.initialize()
+    # Re-initialize app
+    app = App(__name__ + "1")
+    app.load()
     app.load_phase_2()
+
+    project = app.database.load_data("project", basic_project)
 
     dz_data = import_dz_test_data()
     session = app.database.load_data("session", dz_data)
@@ -31,15 +37,12 @@ with redirect_stdout(stderr), testing_database(
     }
     sample = app.database.load_data("sample", sample_data)
 
-    project = app.database.load_data("project", basic_project)
-
     # Bind models together...
     # We should be able to do this in the import, but we can't yet
     sample.session_collection = [session]
     project.session_collection = [session]
 
     app.database.session.add(sample)
-    app.database.session.add(project)
 
     # Prepare for dump
     app.database.session.execute("TRUNCATE TABLE spatial_ref_sys;")
