@@ -92,9 +92,15 @@ class APIv2(Starlette):
             database = self._app.database
             schema = iface
 
-        name = classname_for_table(iface.opts.model.__table__)
-        cls = type(name + "_route", (ModelAPIEndpoint,), {"Meta": Meta})
-        endpoint = "/" + name
+        table = iface.opts.model.__table__
+        # Schema-qualified name
+        _schema_name = classname_for_table(table)
+        root_route = table.schema or "models"
+        name = table.name
+
+        cls = type(_schema_name + "_route", (ModelAPIEndpoint,), {"Meta": Meta})
+        endpoint = f"/{root_route}/{name}"
+
         self.add_route(endpoint, cls, include_in_schema=False)
         self.add_route(endpoint + "/{id}", cls, include_in_schema=False)
 

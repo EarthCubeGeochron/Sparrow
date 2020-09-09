@@ -15,6 +15,7 @@ flask.load_phase_2()
 
 FlaskApp = WsgiToAsgi(flask)
 
+
 # Shim redirect for root path.
 # TODO: clean this up
 async def redirect(*args):

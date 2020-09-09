@@ -34,6 +34,8 @@ class InterfaceCollection(ModelCollection):
             # TODO: we could probably generalize this.
             if cls.__table__.name == "spatial_ref_sys":
                 continue
+            if cls.__table__.schema == "enum":
+                continue
             self._register_model(cls)
 
     def _register_model(self, cls):
