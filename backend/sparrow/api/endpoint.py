@@ -77,6 +77,10 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
         filters = []
 
+        # for field in fields:
+        #     ## We'll put field-specific filters here
+        #     pass
+
         # Filter by has
         for has_field in args["has"]:
             try:

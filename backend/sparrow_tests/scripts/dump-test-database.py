@@ -21,6 +21,15 @@ with redirect_stdout(stderr), testing_database(
     app.load_phase_2()
 
     dz_data = import_dz_test_data()
-    app.database.load_data("session", dz_data)
+    s_ = app.database.load_data("session", dz_data)
+    sample = {
+        "session": [s_],
+        "name": "F-90",
+        "location": {"type": "Point", "coordinates": [-10, 10],},
+        "elevation": 1400,
+    }
+    app.database.load_data("sample", sample)
+    app.database.session.execute("TRUNCATE TABLE spatial_ref_sys;")
+
     dbargs = connection_args(engine)
-    run("pg_dump", "-Fc", dbargs, engine.url.database, stdout=stdout)
+    run("pg_dump", "-Fc", "-Z9", dbargs, engine.url.database, stdout=stdout)

@@ -30,6 +30,10 @@ def model_interface(model, session=None) -> ModelSchema:
 class InterfaceCollection(ModelCollection):
     def register(self, *classes):
         for cls in classes:
+            # Don't build model for spatial_ref_sys PostGIS table
+            # TODO: we could probably generalize this.
+            if cls.__table__.name == "spatial_ref_sys":
+                continue
             self._register_model(cls)
 
     def _register_model(self, cls):
