@@ -7,7 +7,7 @@ from pytest import mark
 import logging
 from sparrow.logs import get_logger
 
-from .fixtures import basic_data, incomplete_analysis
+from .fixtures import basic_data, incomplete_analysis, basic_project
 from .helpers import json_fixture, ensure_single
 
 log = get_logger(__name__)
@@ -390,8 +390,26 @@ class TestDeclarativeImporter:
         res = db.get_instance("datum", dict(id=2))
         assert isinstance(res, db.model.datum)
 
+    def test_import_instance_instead_of_list(self, db):
+        """Do we get a meaningful error message if we import an instance rather
+        than a list?"""
+
+        invalid_project = dict(**basic_project)
+        # The researcher model should be a collection, not an individual item.
+        invalid_project["researcher"] = basic_project["researcher"][0]
+
+        try:
+            db.load_data("project", invalid_project)
+            assert False  # Did not raise
+        except ValidationError as err:
+            assert (
+                err.messages["researcher"][0]
+                == "Provided a single object for a collection field"
+            )
+
 
 class TestStagedImport:
+    @mark.xfail(reason="Need to update interface to support this.")
     def test_staged_import(self, db):
         """Test that we can import items with references to previously imported items"""
         sample = basic_data.pop("sample")

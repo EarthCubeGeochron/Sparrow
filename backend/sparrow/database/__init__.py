@@ -97,8 +97,11 @@ class Database(MappedDatabaseMixin):
         """
         Create a SQLAlchemy instance from data conforming to an import schema
         """
-        iface = getattr(self.interface, model_name)
-        return iface()
+        try:
+            iface = getattr(self.interface, model_name)
+            return iface()
+        except AttributeError:
+            log.error(f"Could not find schema interface for model '{model_name}'")
 
     def _flush_nested_objects(self):
         """

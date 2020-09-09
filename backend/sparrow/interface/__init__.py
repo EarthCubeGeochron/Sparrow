@@ -23,7 +23,7 @@ def model_interface(model, session=None) -> ModelSchema:
         # All conversion logic comes from ModelSchema
         return type(schema_name, (ModelSchema,), {"Meta": metacls})
     except exceptions.ModelConversionError as err:
-        secho(type(err).__name__ + ": " + schema_name + " - " + str(err), fg="red")
+        log.error(type(err).__name__ + ": " + schema_name + " - " + str(err))
         return None
 
 
