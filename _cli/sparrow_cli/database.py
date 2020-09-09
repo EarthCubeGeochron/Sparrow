@@ -35,7 +35,6 @@ shell_commands = {
     "export": "Export database to a binary `pg_dump` archive",
     "graph": "Graph database schema to `dot` format.",
     "import": "Import database from binary `pg_dump` archive",
-    "migration": "Generate a changeset against the optimal database schema",
 }
 
 
@@ -43,6 +42,12 @@ shell_commands = {
 @click.pass_context
 def sparrow_db(ctx):
     pass
+
+
+@sparrow_db.command(name="migration")
+def migration():
+    """Generate a changeset against the optimal database schema"""
+    compose("run --rm", "backend", "sparrow db-migration")
 
 
 for k, v in shell_commands.items():
