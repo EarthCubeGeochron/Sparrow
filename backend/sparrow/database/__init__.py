@@ -15,7 +15,7 @@ from .models import User, Project, Session, DatumType
 from .mapper import MappedDatabaseMixin
 from ..logs import get_logger
 from ..util import relative_path
-from ..interface import ModelSchema
+from ..interface import ModelSchema, model_interface
 from ..exceptions import DatabaseMappingError
 
 metadata = MetaData()
@@ -123,15 +123,15 @@ class Database(MappedDatabaseMixin):
         """Load data into the database using a schema-based importing tool"""
         if session is None:
             session = self.session
-        schema = self.model_schema(model_name)
+        # Do an end-around for lack of creating interfaces on app startup
+        model = getattr(self.model, model_name)
+        schema = model_interface(model, session)()
+
         try:
-            # session.begin_nested()
-            # with session.no_autoflush:
             res = schema.load(data, session=session)
             log.info("Entering final commit phase of import")
             log.info(f"Adding top-level object {res}")
             session.add(res)
-            # self._flush_nested_objects()
             log.info("Committing entire transaction")
             session.commit()
             return res
