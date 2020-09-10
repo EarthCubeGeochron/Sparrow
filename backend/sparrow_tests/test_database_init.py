@@ -72,6 +72,10 @@ class TestDatabaseInitialization:
                 continue
             assert t in db.interface.keys()
 
+    def test_interface_ready(self, db):
+        for iface in db.interface:
+            iface()
+
 
 class TestGenericData(object):
     @mark.xfail(reason="'get_instance' has a poorly written API.")
