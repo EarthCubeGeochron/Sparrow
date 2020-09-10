@@ -1,8 +1,10 @@
+# Standalone docker-compose file for backend testing.
+# Only spins up backend and database, not frontend.
 version: "3.6"
 services:
   backend:
     build:
-      context: ../backend
+      context: ./backend
       target: testing
     command: /bin/run-tests
     # Make sure we get colorized terminal output
@@ -17,7 +19,7 @@ services:
       # We could change this to port 54321 if we were cool with
       # it conflicting with our default for Sparrow itself. This
       # might make it harder to run tests, though.
-      - '54322:5432'
+      - "54322:5432"
     expose:
       - 5432
     environment:

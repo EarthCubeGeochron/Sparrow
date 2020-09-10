@@ -10,7 +10,7 @@ if (( $exit_code == 0 )); then
   echo "$(tput bold)Containers built successfully! Following logs.$(tput sgr0)"
   # Reload nginx just in case that container was not rebuilt/restarted
   sparrow compose exec gateway nginx -s reload
-  sparrow compose logs -f
+  sparrow compose logs -f --tail=500
 else
   echo "$(tput bold)One or more containers did not build properly, aborting.$(tput sgr0)"
   # Forward exit code to workers
