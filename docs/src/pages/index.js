@@ -65,7 +65,7 @@ const features = [
 function Feature({imageUrl, title, description}) {
   const imgUrl = useBaseUrl(imageUrl);
   return (
-    <div className={classnames('col col--4', styles.feature)}>
+    <div className={classnames('col', styles.feature)}>
       {imgUrl && (
         <div className="text--center">
           <img className={styles.featureImage} src={imgUrl} alt={title} />
@@ -82,26 +82,19 @@ function Home() {
   const {siteConfig = {}} = context;
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      title={`${siteConfig.title} data system`}
+      description="A small and sophisticated data system for geochronology and geochemistry labs.">
       <header className={classnames('hero hero--primary', styles.heroBanner)}>
-        <div className="container">
-          <div className="row">
-            <div>
-              <h1 className="hero__title">{siteConfig.title}</h1>
-              <p className="hero__subtitle">{siteConfig.tagline}</p>
-            </div>
-          </div>
-        </div>
+        <h2 className="hero-description">A small and sophisticated data system for geochronology and geochemistry labs.</h2>
       </header>
       <main>
         {features && features.length && (
           <section className={styles.features}>
             <div className="container">
-              <div className="row">
-                <Feature>
-                  <img src="/img/sparrow-logo.svg" width="300" />
-                </Feature>
+              <div className="logo-container">
+                <img src="/images/sparrow-logo.png" width="100%" />
+              </div>
+              <div className="feature-container">
                 {features.map((props, idx) => (
                   <Feature key={idx} {...props} />
                 ))}

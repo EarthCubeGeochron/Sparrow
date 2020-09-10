@@ -24,14 +24,25 @@ test -f /build/schema.html
 
 # Then build the overall documentation site:
 FROM node:12-slim AS docs-base
-COPY docs/package.json /docs/package.json
-WORKDIR /docs
-RUN npm --unsafe-perm=true --allow-root install
 
-EXPOSE 3000
+WORKDIR /docs
+
 COPY --from=schema-builder /build/schema.html /build/schema.html
+EXPOSE 3000
+
+## WE STOP HERE IN DEVELOPMENT MODE ##
+## node_modules are installed on startup against mounted code volume.
+
+# New build stage where we actually install and build
 
 FROM docs-base AS docs-builder
+
+# Copy files needed for installation
+COPY docs/package.json /docs/package.json
+COPY docs/package-lock.json /docs/package-lock.json
+
+# Install node modules
+RUN npm --unsafe-perm=true --allow-root install
 
 COPY docs/ /docs/
 
@@ -39,7 +50,11 @@ RUN npm run build
 
 FROM nginx:1.19 AS docs
 
+# Copy site content into docker container
 COPY --from=docs-builder /docs/build /usr/share/nginx/html
-COPY ./docs/docs-site.conf /etc/nginx/conf.d/docs-site.conf
+
+# Copy nginx config into docker container
+COPY ./docs/server-config/conf.d/production.conf /etc/nginx/conf.d/default.conf
+COPY ./docs/server-config/snippets /etc/nginx/snippets
 
 EXPOSE 80
