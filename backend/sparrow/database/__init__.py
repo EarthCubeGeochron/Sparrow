@@ -15,6 +15,8 @@ from .models import User, Project, Session, DatumType
 from .mapper import MappedDatabaseMixin
 from ..logs import get_logger
 from ..util import relative_path
+from ..interface import ModelSchema, model_interface
+from ..exceptions import DatabaseMappingError
 
 metadata = MetaData()
 
@@ -32,6 +34,7 @@ class Database(MappedDatabaseMixin):
         self.config = None
         if app is None:
             from ..app import App
+
             # Set config from environment variable
             app = App(__name__)
             # Load plugins
@@ -59,39 +62,50 @@ class Database(MappedDatabaseMixin):
     def automap(self):
         super().automap()
         # Database models we have extended with our own functions
-        # (we need to add these to the automapped classes since they are not
-        #  included by default)
-        # TODO: there is probably a way to do this without having to manually register the models
+        # (we need to add these to the automapped classes since
+        #  they are not included by default)
+        # TODO: there is probably a way to do this without having to
+        # manually register the models
         self.register_models(User, Project, Session, DatumType)
         # Register a new class
         # Automap the core_view.datum relationship
-        cls = self.automap_view("datum",
+        cls = self.automap_view(
+            "datum",
             Column("datum_id", Integer, primary_key=True),
             Column("analysis_id", Integer, ForeignKey(self.table.analysis.c.id)),
             Column("session_id", Integer, ForeignKey(self.table.session.c.id)),
-            schema='core_view')
+            schema="core_view",
+        )
         self.register_models(cls)
-        self.app.run_hook('database-mapped')
+        self.app.run_hook("database-mapped")
 
     @contextmanager
-    def session_scope():
+    def session_scope(self):
         """Provide a transactional scope around a series of operations."""
+        self.__old_session = self.session
         session = self._session_factory()
+        self.session = session
         try:
             yield session
             session.commit()
-        except:
+        except Exception:
             session.rollback()
             raise
         finally:
             session.close()
+            self.session = self.__old_session
 
-    def model_schema(self, model_name):
+    def model_schema(self, model_name) -> ModelSchema:
         """
         Create a SQLAlchemy instance from data conforming to an import schema
         """
-        iface = getattr(self.interface, model_name)
-        return iface()
+        try:
+            iface = getattr(self.interface, model_name)
+            return iface()
+        except AttributeError as err:
+            raise DatabaseMappingError(
+                f"Could not find schema interface for model '{model_name}'"
+            )
 
     def _flush_nested_objects(self):
         """
@@ -106,20 +120,28 @@ class Database(MappedDatabaseMixin):
                 self.session.rollback()
                 log.debug(err)
 
-    def load_data(self, model_name, data):
-        schema = self.model_schema(model_name)
+    def load_data(self, model_name, data, session=None):
+        """Load data into the database using a schema-based importing tool"""
+        if session is None:
+            session = self.session
+        # Do an end-around for lack of creating interfaces on app startup
+        model = getattr(self.model, model_name)
+        if not hasattr(model, "__mapper__"):
+            raise DatabaseMappingError(
+                f"Model {model} does not have appropriate field mapping"
+            )
+        schema = model_interface(model, session)()
+
         try:
-            with self.session.no_autoflush:
-                res = schema.load(data, session=self.session)
-                log.info("Entering final commit phase of import")
-                log.info(f"Adding top-level object {res}")
-                self.session.add(res)
-                self._flush_nested_objects()
-                log.info(f"Committing entire transaction")
-                self.session.commit()
+            res = schema.load(data, session=session)
+            log.info("Entering final commit phase of import")
+            log.info(f"Adding top-level object {res}")
+            session.add(res)
+            log.info("Committing entire transaction")
+            session.commit()
             return res
         except (IntegrityError, ValidationError) as err:
-            self.session.rollback()
+            session.rollback()
             log.debug(err)
             raise err
 
@@ -133,7 +155,8 @@ class Database(MappedDatabaseMixin):
         return res
 
     def exec_sql(self, fn):
-        secho(Path(fn).name, fg='cyan', bold=True)
+        # TODO: refactor this to exec_sql_file
+        secho(Path(fn).name, fg="cyan", bold=True)
         run_sql_file(self.session, str(fn))
 
     def exec_query(self, *args):
@@ -156,7 +179,7 @@ class Database(MappedDatabaseMixin):
     def get(self, model, *args, **kwargs):
         if isinstance(model, str):
             model = getattr(self.model, model)
-        return self.session.query(model).get(*args,**kwargs)
+        return self.session.query(model).get(*args, **kwargs)
 
     def get_or_create(self, model, **kwargs):
         """
@@ -182,7 +205,7 @@ class Database(MappedDatabaseMixin):
             self.exec_sql(fn)
 
         try:
-            self.app.run_hook('core-tables-initialized', self)
+            self.app.run_hook("core-tables-initialized", self)
         except AttributeError as err:
-            secho("Could not load plugins", fg='red', dim=True)
+            secho("Could not load plugins", fg="red", dim=True)
             secho(str(err))

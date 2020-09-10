@@ -1,4 +1,5 @@
 from marshmallow_sqlalchemy import ModelConverter
+
 # We need to use marshmallow_sqlalchemy's own implementation
 # of the 'Nested' field in order to pass along the SQLAlchemy session
 # to nested schemas.
@@ -11,26 +12,34 @@ from sqlalchemy.types import Integer
 from sqlalchemy.dialects import postgresql
 
 from ..database.mapper.util import trim_postfix
-from .fields import Geometry, Enum, JSON, SmartNested
+from .fields import Geometry, Enum, JSON, SmartNested, UUID
 from .util import to_schema_name
 
+from ..logs import get_logger
+
+log = get_logger(__name__)
 
 # Control how relationships can be resolved
 allowed_collections = {
-    'sample': ['session', 'material', 'sample_geo_entity'],
-    'geo_entity': 'all',
-    'sample_geo_entity': 'all',
-    'session': 'all',
-    'analysis': ['datum', 'attribute', 'constant', 'analysis_type', 'material'],
-    'attribute': ['parameter', 'unit'],
-    'project': ['researcher', 'publication', 'session'],
-    'datum': ['datum_type'],
-    'datum_type': [
-        'parameter',
-        'unit',
-        'error_unit',
-        'error_metric'
-    ]
+    "data_file": ["data_file_link"],
+    "data_file_link": ["session", "sample", "analysis"],
+    "sample": ["session", "material", "sample_geo_entity"],
+    "geo_entity": "all",
+    "sample_geo_entity": "all",
+    "session": [
+        "analysis",
+        "attribute",
+        "project",
+        "publication",
+        "sample",
+        "instrument",
+        "target",
+    ],
+    "analysis": ["datum", "attribute", "constant", "analysis_type", "material"],
+    "attribute": ["parameter", "unit"],
+    "project": ["researcher", "publication", "session"],
+    "datum": ["datum_type"],
+    "datum_type": ["parameter", "unit", "error_unit", "error_metric"],
 }
 
 
@@ -39,22 +48,26 @@ def allow_nest(outer, inner):
         # Tables can always nest themselves
         return True
     coll = allowed_collections.get(outer, [])
-    if coll == 'all':
+    if coll == "all":
         return True
     return inner in coll
+
 
 class SparrowConverter(ModelConverter):
     # Make sure that we can properly convert geometries
     # and geographies
     SQLA_TYPE_MAPPING = dict(
         list(ModelConverter.SQLA_TYPE_MAPPING.items())
-        + list({
-            geo.Geometry: Geometry,
-            geo.Geography: Geometry,
-            postgresql.JSON: JSON,
-            postgresql.JSONB: JSON
+        + list(
+            {
+                geo.Geometry: Geometry,
+                geo.Geography: Geometry,
+                postgresql.JSON: JSON,
+                postgresql.JSONB: JSON,
+                postgresql.UUID: UUID,
             }.items()
-        ))
+        )
+    )
 
     def _get_key(self, prop):
         # Only change columns for relationship properties
@@ -63,17 +76,31 @@ class SparrowConverter(ModelConverter):
 
         # Relationship with a single local column should be named for its
         # column (less '_id' postfix)
-        if hasattr(prop, 'local_columns') and len(prop.local_columns) == 1:
+        if hasattr(prop, "local_columns") and len(prop.local_columns) == 1:
             col_name = list(prop.local_columns)[0].name
-            if col_name != 'id':
+            # Special case for 'data_file_link'
+            if col_name == "file_hash":
+                return "data_file"
+            if col_name != "id":
                 return trim_postfix(col_name, "_id")
 
         # One-to-many models should have the field
         # named after the local column
         if prop.secondary is None and not prop.uselist:
             return prop.key
+
+        # For tables not in Sparrow's standard schemas, we make sure to append the
+        # schema name in front of keys, in order for views etc. to not trample
+        # on already-used names. This was added in order to solve problems
+        # with the automapping of `core_view.datum`.
+        #
+        # It may be desirable to improve this by adding a __prefix before views,
+        # OR by making _ALL_ non-public schema tables require a prefix.
+        if prop.target.schema not in [None, "vocabulary", "enum"]:
+            return f"{prop.target.schema}_{prop.target.name}"
+
         # Otherwise, we go with the name of the target model.
-        return prop.target.name
+        return str(prop.target.name)
 
     def fields_for_model(self, model, **kwargs):
         fields = super().fields_for_model(model, **kwargs)
@@ -90,7 +117,7 @@ class SparrowConverter(ModelConverter):
 
         # ## Deal with relationships here #
 
-        if prop.target.name == 'data_file_link':
+        if prop.target.name == "data_file_link":
             # Data files are currently exclusively dealt with internally...
             # (this may change)
             return True
@@ -99,11 +126,11 @@ class SparrowConverter(ModelConverter):
         this_table = prop.parent.tables[0]
         other_table = prop.target
 
-        if prop.target == this_table and prop.uselist:
+        if other_table == this_table and prop.uselist:
             # Don't allow self-referential collections
             return True
 
-        if prop.uselist and not allow_nest(this_table.name, prop.target.name):
+        if prop.uselist and not allow_nest(this_table.name, other_table.name):
             # Disallow list fields that aren't related (these usually don't have
             # corresponding local columns)
             return True
@@ -113,47 +140,49 @@ class SparrowConverter(ModelConverter):
     def _get_field_kwargs_for_property(self, prop):
         # Somewhat ugly method, mostly to decide if field is dump_only or required
         kwargs = super()._get_field_kwargs_for_property(prop)
-        kwargs['data_key'] = self._get_key(prop)
+        kwargs["data_key"] = self._get_key(prop)
 
-        kwargs['allow_nan'] = True
+        kwargs["allow_nan"] = True
 
-        if isinstance(prop, RelationshipProperty): # Relationship property
-            cols = list(getattr(prop, 'local_columns', []))
-            kwargs['required'] = False
+        if isinstance(prop, RelationshipProperty):  # Relationship property
+            cols = list(getattr(prop, "local_columns", []))
+            kwargs["required"] = False
             for col in cols:
                 if not col.nullable:
-                    kwargs['required'] = True
+                    kwargs["required"] = True
             if prop.uselist:
-                kwargs['required'] = False
+                kwargs["required"] = False
 
             return kwargs
 
         for col in prop.columns:
             is_integer = isinstance(col.type, Integer)
             # Special case for audit columns
-            if col.name == 'audit_id' and is_integer:
-                kwargs['dump_only'] = True
+            if col.name == "audit_id" and is_integer:
+                kwargs["dump_only"] = True
                 return kwargs
 
             if is_integer and col.primary_key:
                 # Integer primary keys should be dump-only, probably
                 # We could probably check for a default sequence
                 # if we wanted to be general...
-                kwargs['dump_only'] = True
+                kwargs["dump_only"] = True
             elif not col.nullable:
-                kwargs['required'] = True
+                kwargs["required"] = True
 
-            if isinstance(col.type, postgresql.UUID):
-                kwargs['dump_only'] = True
-                kwargs['required'] = False
-
-            dump_only = kwargs.get('dump_only', False)
+            dump_only = kwargs.get("dump_only", False)
             if not dump_only and not col.nullable:
-                kwargs['required'] = True
+                kwargs["required"] = True
             if dump_only:
-                kwargs['required'] = False
+                kwargs["required"] = False
             if col.default is not None:
-                kwargs['required'] = False
+                kwargs["required"] = False
+
+            # We allow setting of UUIDs for now, but maybe we shouldn't
+            if isinstance(col.type, postgresql.UUID):
+                # This should be covered by the "default" case, but for some reason
+                # server-set defaults don't show up
+                kwargs["required"] = False
 
         return kwargs
 
@@ -164,6 +193,7 @@ class SparrowConverter(ModelConverter):
         return None
 
     def property2field(self, prop, **kwargs):
+        """This override improves our handling of relationships"""
         if not isinstance(prop, RelationshipProperty):
             return super().property2field(prop, **kwargs)
 
@@ -178,16 +208,17 @@ class SparrowConverter(ModelConverter):
         this_table = prop.parent.tables[0]
         if not allow_nest(this_table.name, prop.target.name):
             # Fields that are not allowed to be nested
-            return Related(name, **field_kwargs)
-        if prop.target.schema == 'enum':
+            return Related(**field_kwargs)
+        if prop.target.schema == "enum":
             # special carve-out for enums represented as foreign keys
             # (these should be stored in the 'enum' schema):
-            return Enum(name, **field_kwargs)
+            return Enum(**field_kwargs)
 
         # Ignore fields that reference parent models in a nesting relationship
         exclude = []
         for p in cls.__mapper__.relationships:
             if self._should_exclude_field(p):
+                # Fields that are already excluded do not need to be excluded again.
                 continue
             id_ = self._get_field_name(p)
             if p.mapper.entity == prop.parent.entity:

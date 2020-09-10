@@ -7,13 +7,19 @@ from click import echo
 from subprocess import run
 from shlex import split
 from time import sleep
+from sqlalchemy import create_engine, exc
 
 args = argv[1:]
 
 psql = False
-if '--psql' in args:
+if "--psql" in args:
     psql = True
-    args.remove('--psql')
+    args.remove("--psql")
+
+keep_database = False
+if "--keep-database" in args:
+    keep_database = True
+    args.remove("--keep-database")
 
 os.chdir("/app")
 
@@ -29,22 +35,39 @@ while not db_ready():
     echo("Waiting for database...")
     sleep(1)
 
-# Create the database
-run(["createdb", *dbargs, "sparrow_test"])
-echo("Database is ready...")
-
 os.environ["SPARROW_DATABASE"] = "postgresql://postgres@db:5432/sparrow_test"
 
-run(["sparrow", "init"])
+
+db_exists = False
+try:
+    engine = create_engine(os.environ["SPARROW_DATABASE"]).connect()
+    db_exists = True
+except exc.OperationalError:
+    db_exists = False
+
+if db_exists and keep_database:
+    echo("Using existing testing database")
+else:
+    c = run(["createdb", *dbargs, "sparrow_test"])
+    echo("Database is ready...")
+
+    run(["sparrow", "init"])
+
+# This prevents us from getting absolutely spammed by SAWarning
+# TODO: improve warning handling for database automapping
+args.append("--disable-warnings")
 
 print("Running tests")
-run(["pytest", "/app/tests", *args])
+run(["pytest", "/app/sparrow_tests", *args])
 
 if psql:
-    echo("Initializing psql shell. "
-         "The database is also available on localhost port 54322")
+    echo(
+        "Initializing psql shell. "
+        "The database is also available on localhost port 54322"
+    )
     run(["psql", *dbargs, "sparrow_test"])
 
-print("Tearing down database...")
-run(["dropdb", *dbargs, "sparrow_test"])
+if not keep_database:
+    print("Tearing down database...")
+    run(["dropdb", *dbargs, "sparrow_test"])
 echo("Done!")

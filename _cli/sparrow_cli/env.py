@@ -8,7 +8,7 @@ def setup_command_path():
     bin_directories = []
 
     if "SPARROW_PATH" in environ:
-        bin = Path(environ["SPARROW_PATH"]) / "bin"
+        bin = Path(environ["SPARROW_PATH"]) / "_cli" / "bin"
         bin_directories.append(bin)
     else:
         secho(
@@ -47,8 +47,10 @@ def prepare_docker_environment():
 
     prepare_compose_overrides()
 
+
 def is_defined(envvar):
     return environ.get(envvar) is not None
+
 
 def prepare_compose_overrides():
     base = environ["SPARROW_PATH"]
@@ -59,7 +61,9 @@ def prepare_compose_overrides():
     is_production = environ.get("SPARROW_ENV", "development") == "production"
 
     # Use certbot for SSL  if certain conditions are met
-    use_certbot = is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
+    use_certbot = (
+        is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
+    )
 
     if use_certbot:
         compose_files.append(path.join(base, "docker-compose.certbot.yaml"))
@@ -68,7 +72,6 @@ def prepare_compose_overrides():
 
     if is_production:
         compose_files.append(path.join(base, "docker-compose.production.yaml"))
-
 
     # Overrides should now be formatted as a COMPOSE_FILE colon-separated list
     overrides = environ.get("SPARROW_COMPOSE_OVERRIDES", "")
