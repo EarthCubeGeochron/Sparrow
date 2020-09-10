@@ -28,7 +28,9 @@
     ]
   },
   "devDependencies": {
+    "date-fns": "^2.16.1",
     "html-loader": "^1.1.0",
+    "shelljs": "^0.8.4",
     "stylus": "^0.54.7",
     "stylus-relative-loader": "^4.0.0"
   }
