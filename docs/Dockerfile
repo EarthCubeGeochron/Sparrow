@@ -4,9 +4,9 @@
 # Build schema documentation in one layer:
 FROM pandoc/core AS schema-builder
 # Install additional dependencies
-RUN apk add --no-cache --update coreutils python3 && \
-pip3 install --upgrade pip setuptools && \
-pip3 install pyparsing
+RUN apk add --no-cache --update coreutils python3 cmd:pip3 && \
+  pip3 install --upgrade pip setuptools && \
+  pip3 install pyparsing
 
 COPY backend/sparrow/database/fixtures/02-tables.sql /sql/input.sql
 COPY docs/bin/sql-to-markdown /bin/sql-to-markdown
