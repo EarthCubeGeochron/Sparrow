@@ -6,6 +6,7 @@
 import sys
 import click
 from rich.console import Console
+from rich import print
 from .base import cli, SparrowConfig
 from .help import echo_help
 from .util import cmd, compose, exec_or_run, find_subcommand, container_id
@@ -48,3 +49,13 @@ def main(ctx, args):
 @click.argument("container", type=str)
 def _container_id(container):
     click.echo(container_id(container))
+
+
+@cli.command(name="shell")
+@click.argument("container", type=str, required=False, default=None)
+def shell(container):
+    """Get an iPython or container shell"""
+    if container is not None:
+        return exec_or_run(container, "sh")
+    print("Running [bold]iPython[/bold] shell in application context.")
+    exec_or_run("backend", "sparrow shell")

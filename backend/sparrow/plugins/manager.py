@@ -15,7 +15,10 @@ class SparrowPluginManager(object):
         self.__store = None
 
     def __iter__(self):
-        yield from self.__store
+        try:
+            yield from self.__store
+        except TypeError:
+            raise SparrowPluginError("Cannot list plugins until loading is finished.")
 
     @property
     def is_ready(self):
@@ -26,7 +29,7 @@ class SparrowPluginManager(object):
             self.__init_store.append(plugin)
         except AttributeError:
             raise SparrowPluginError(
-                "Cannot add plugins after " "Sparrow is finished loading."
+                "Cannot add plugins after Sparrow is finished loading."
             )
 
     def order_plugins(self, store=None):

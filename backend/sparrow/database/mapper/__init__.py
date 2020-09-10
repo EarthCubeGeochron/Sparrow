@@ -2,6 +2,7 @@ from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
 from click import secho
 from ...logs import get_logger
+from ...exceptions import DatabaseMappingError
 
 log = get_logger(__name__)
 
@@ -44,13 +45,14 @@ class MappedDatabaseMixin(object):
         try:
             self.automap()
         except Exception as err:
-            log.error(str(err))
-            kw = dict(err=True, fg="red")
-            secho("Could not automap at database initialization", **kw)
-            secho(f"  {err}", **kw)
+            # raise DatabaseMappingError(str(err))
+            log.exception(err)
+            # kw = dict(err=True, fg="red")
+            log.error("Could not automap at database initialization")
+            # secho(f"  {err}", **kw)
             # TODO: We should raise this error, and find another way to
             # test if we've initialized the database yet.
-            self.automap_error = err
+            # self.automap_error = err
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """

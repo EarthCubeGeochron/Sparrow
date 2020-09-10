@@ -1,3 +1,10 @@
+"""
+Fixtures for testing.
+
+- detrital-zircon-F-90.csv: Detrital zircon data for a single sample.
+- e57d74b-detrital-zircon-F-90.pg-dump: Dump of simple database to test migration functionality
+"""
+
 from datetime import datetime
 
 basic_data = {
@@ -56,4 +63,12 @@ incomplete_analysis = {
             "type": {"parameter": "soil water content", "unit": "weight %"},
         }
     ],
+}
+
+basic_project = {
+    "name": "Zebra Nappe stratigraphy",
+    "description": "Mapping and stratigraphy of the southern Naukluft Mountains",
+    "embargo_date": "2021-04-05T00:00:00",
+    # The project model should actually receive a list, so this is invalid
+    "researcher": [{"name": "Daven Quinn", "orcid": "0000-0003-1895-3742"}],
 }

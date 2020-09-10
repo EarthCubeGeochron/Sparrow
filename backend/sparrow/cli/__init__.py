@@ -1,18 +1,13 @@
 import click
-from os import path, environ, devnull
 from click import echo, style, secho
-from sqlalchemy import create_engine
 from sys import exit
+from os import environ
 from json import dumps
-from click_plugins import with_plugins
-from pkg_resources import iter_entry_points
-from contextlib import redirect_stdout
-from subprocess import run
-import logging
 from .util import with_database, with_app, with_full_app
 from ..util import working_directory
 from ..app import App
 from ..auth.create_user import create_user
+from ..database.migration import db_migration
 
 
 def _build_app_context(config):
@@ -88,9 +83,9 @@ def dev_server(app):
     app.run(debug=True, host="0.0.0.0")
 
 
-@cli.command(name="console")
+@cli.command(name="shell")
 @with_full_app
-def console(app):
+def shell(app):
     """
     Get a Python shell within the application
     """
@@ -147,3 +142,9 @@ def plugins(app):
     with app.app_context():
         for p in app.plugins.order_plugins():
             print(p.name)
+
+
+@cli.command(name="db-migration")
+@with_database
+def _db_migration(db):
+    db_migration(db)

@@ -131,8 +131,8 @@ class App(Flask):
 
             self.register_module_plugins(sparrow_plugins)
         except ModuleNotFoundError as err:
-            log.error("Could not find external Sparrow plugins.")
-            log.error(err)
+            log.info("Could not find external Sparrow plugins.")
+            log.info(err)
 
         self.__loaded()
 
