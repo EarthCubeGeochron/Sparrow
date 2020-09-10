@@ -1,7 +1,7 @@
-backend
+sparrow
 =======
 
 .. toctree::
    :maxdepth: 4
 
-   backend
+   sparrow

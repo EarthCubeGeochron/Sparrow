@@ -1,10 +1,10 @@
-backend.sparrow.import\_helpers package
+sparrow.import\_helpers package
 =======================================
 
 Module contents
 ---------------
 
-.. automodule:: backend.sparrow.import_helpers
+.. automodule:: sparrow.import_helpers
     :members:
     :undoc-members:
     :show-inheritance:
