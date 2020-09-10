@@ -1,3 +1,10 @@
+"""
+Fixtures for testing.
+
+- detrital-zircon-F-90.csv: Detrital zircon data for a single sample.
+- e57d74b-detrital-zircon-F-90.pg-dump: Dump of simple database to test migration functionality
+"""
+
 from datetime import datetime
 
 basic_data = {

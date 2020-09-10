@@ -62,9 +62,10 @@ class Database(MappedDatabaseMixin):
     def automap(self):
         super().automap()
         # Database models we have extended with our own functions
-        # (we need to add these to the automapped classes since they are not
-        #  included by default)
-        # TODO: there is probably a way to do this without having to manually register the models
+        # (we need to add these to the automapped classes since
+        #  they are not included by default)
+        # TODO: there is probably a way to do this without having to
+        # manually register the models
         self.register_models(User, Project, Session, DatumType)
         # Register a new class
         # Automap the core_view.datum relationship
@@ -154,6 +155,7 @@ class Database(MappedDatabaseMixin):
         return res
 
     def exec_sql(self, fn):
+        # TODO: refactor this to exec_sql_file
         secho(Path(fn).name, fg="cyan", bold=True)
         run_sql_file(self.session, str(fn))
 

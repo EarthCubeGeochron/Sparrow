@@ -8,6 +8,11 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## [Unreleased] - 2020-09-10
+
+- Moved database migration scripts to Python and created test of basic migration
+  functionality.
+
 ## [Unreleased] - 2020-08-31
 
 - Refactored command-line application to a simpler python-based framework.
