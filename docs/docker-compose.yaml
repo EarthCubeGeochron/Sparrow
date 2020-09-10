@@ -17,12 +17,14 @@ services:
       - .:/docs
       - node_modules:/docs/node_modules
       - cache:/docs/.docusaurus
+  backend:
+    build: python-api
   gateway:
     build:
       context: server-config
       dockerfile: Dockerfile.dev
     ports:
-      - '3000:80'
+      - "3000:80"
 volumes:
   cache:
   node_modules:
