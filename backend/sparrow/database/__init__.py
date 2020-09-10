@@ -125,6 +125,10 @@ class Database(MappedDatabaseMixin):
             session = self.session
         # Do an end-around for lack of creating interfaces on app startup
         model = getattr(self.model, model_name)
+        if not hasattr(model, "__mapper__"):
+            raise DatabaseMappingError(
+                f"Model {model} does not have appropriate field mapping"
+            )
         schema = model_interface(model, session)()
 
         try:

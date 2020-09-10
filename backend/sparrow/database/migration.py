@@ -1,45 +1,35 @@
 import os
-import sys
-from click import echo
-from sparrow.util import run
-from time import sleep
+from sparrow.app import App
 from sqlalchemy import create_engine
 from contextlib import contextmanager
 from sqlalchemy_utils import create_database, database_exists, drop_database
+from migra import Migration
 
 
 @contextmanager
 def temp_database(conn_string):
-    """Create a testing database and tear it down after tests."""
+    """Create a temporary database and tear it down after tests."""
     engine = create_engine(conn_string)
 
     if not database_exists(engine.url):
         create_database(engine.url)
-
-    conn = engine.connect()
-
     try:
         yield engine
     finally:
         drop_database(engine.url)
 
 
-def db_migration(db):
+def db_migration(db, safe=True):
+    """Create a database migration against the idealized schema"""
     url = "postgres://postgres@db:5432/sparrow_temp_migration"
     with temp_database(url) as engine:
-        engine.connect()
-        # m = Migration(s_current, s_target)
-        # m.set_safety(False)
-        # m.add_all_changes()
-        #
-        # if m.statements:
-        #     print("THE FOLLOWING CHANGES ARE PENDING:", end="\n\n")
-        #     print(m.sql)
-        #     print()
-        #     if input("Apply these changes?") == "yes":
-        #         print("Applying...")
-        #         m.apply()
-        #     else:
-        #         print("Not applying.")
-        # else:
-        #     print("Already synced.")
+        os.environ["SPARROW_DATABASE"] = url
+        app = App(__name__)
+        app.database.initialize()
+
+        m = Migration(db.engine, engine)
+        m.set_safety(safe)
+        # Not sure what this does
+        m.add_all_changes()
+        for s in m.statements:
+            print(s)

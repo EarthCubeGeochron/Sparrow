@@ -21,11 +21,13 @@ def pytest_configure(config):
         setattr(config.option, "markexpr", "not slow")
 
 
-app = App(__name__)
+@fixture(scope="session")
+def app():
+    return App(__name__)
 
 
 @fixture(scope="class")
-def db():
+def db(app):
     connection = app.database.session.connection()
     transaction = connection.begin()
     session_factory = sessionmaker(bind=connection)

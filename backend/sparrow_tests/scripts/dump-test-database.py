@@ -3,7 +3,6 @@
 Initialize database and dump data into it.
 """
 from sparrow.app import App
-from sparrow.interface import model_interface
 from sparrow_tests.helpers.database import testing_database, connection_args
 from sparrow_tests.test_dz_import import import_dz_test_data
 from sparrow.util import run
@@ -15,9 +14,8 @@ import logging
 
 log = get_logger(level=logging.DEBUG, handler=console_handler)
 
-with redirect_stdout(stderr), testing_database(
-    "postgresql://postgres@db:5432/sparrow_test_1"
-) as engine:
+conn = "postgresql://postgres@db:5432/sparrow_test_1"
+with redirect_stdout(stderr), testing_database(conn) as engine:
     a1 = App(__name__)
     a1.database.initialize()
     # Re-initialize app
