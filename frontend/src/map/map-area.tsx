@@ -5,16 +5,11 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useContext,
-  createElement,
-} from "react";
+import * as React from "react";
+import { useState, useEffect, useRef } from "react";
 import MapGl, { Marker, FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { mapStyle } from "./MapStyle";
+import { mapStyles } from "../../plugins/MapStyle";
 import h, { compose } from "@macrostrat/hyper";
 import useSuperCluster from "use-supercluster";
 import { Button, Intent, Toaster, Position } from "@blueprintjs/core";
@@ -26,7 +21,6 @@ import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
-import { Editor, DrawRectangleMode } from "react-map-gl-draw";
 
 const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
@@ -36,12 +30,12 @@ const MapToaster = Toaster.create({
 interface MapProps {
   on_map?: boolean;
   hide_filter?: boolean;
-  width: any;
-  height: any;
-  latitude: number;
-  longitude: number;
-  zoom: number;
-  mapstyle: any;
+  width?: any;
+  height?: any;
+  latitude?: number;
+  longitude?: number;
+  zoom?: number;
+  mapstyle?: any;
 }
 
 export function MapPanel({
@@ -63,17 +57,14 @@ export function MapPanel({
 
   const [state, setState] = useState(initialState);
 
-  const mapstyles = {
-    initialMapStyle: "mapbox://styles/mapbox/outdoors-v9",
-    topoMapStyle: "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub",
-    sateliteMapStyle: "mapbox://styles/jczaplewski/cjeycrpxy1yv22rqju6tdl9xb",
-    mapStyle: mapStyle,
-  };
-
   const mapRef = useRef();
 
   const bounds = mapRef.current
-    ? mapRef.current.getMap().getBounds().toArray().flat()
+    ? mapRef.current
+        .getMap()
+        .getBounds()
+        .toArray()
+        .flat()
     : null;
 
   const toggleShowMarkers = () => {
@@ -129,7 +120,7 @@ export function MapPanel({
           hide={hide_filter}
           MapStyle={state.MapStyle}
           chooseMapStyle={chooseMapStyle}
-          mapstyles={mapstyles}
+          mapstyles={mapStyles}
           showMarkers={state.showMarkers}
           toggleShowMarkers={toggleShowMarkers}
         ></LayerMenu>

@@ -151,11 +151,7 @@ function DataSheet() {
    * will return an array with components
    * indexs are 0 - 7
    */
-  const [[...ele]] = cellData;
-  var [, , , object] = ele;
-  object = { ...object, Component: h(testComponent) };
-  //console.log(ele);
-  //console.log(object);
+
   const components = ["0", "1", "2", "3", "4", "5", "6", "7"];
 
   const testData = cellData.map((ele) => {
