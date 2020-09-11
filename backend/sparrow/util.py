@@ -2,6 +2,8 @@ import os
 from os import path
 from pathlib import Path
 from contextlib import contextmanager
+from subprocess import run as _run
+from shlex import split
 
 
 def relative_path(base, *parts):
@@ -30,3 +32,8 @@ def get_qualified_name(obj):
     if module is None or module == str.__class__.__module__:
         return obj.__class__.__name__
     return module + "." + obj.__class__.__name__
+
+
+def run(*v, **kwargs):
+    val = " ".join(v)
+    return _run(split(val), **kwargs)

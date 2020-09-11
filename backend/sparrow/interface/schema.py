@@ -5,6 +5,7 @@ from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError
+from sqlalchemy import inspect
 
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter
@@ -32,12 +33,21 @@ class BaseMeta:
     load_instance = True
 
 
-class ModelSchema(SQLAlchemyAutoSchema):
-    value_index = {}
+def is_model_ready(model, data):
+    mapper = inspect(model)
+    required_props = [a for a in mapper.attrs if prop_is_required(a)]
+    for attr in required_props:
+        val = data.get(attr.key, None)
+        if val is None:
+            return False
+    return True
 
+
+class ModelSchema(SQLAlchemyAutoSchema):
     def __init__(self, *args, **kwargs):
         self.allowed_nests = kwargs.pop("allowed_nests", [])
         self._show_audit_id = kwargs.pop("audit_id", False)
+        self.__instance_cache = {}
 
         super().__init__(*args, **kwargs)
 
@@ -97,6 +107,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _get_instance(self, data):
         """Gets pre-existing instances if they are available."""
 
+        if isinstance(data, self.opts.model):
+            return data
+
         filters, related_models = self._build_filters(data)
 
         # Try to get value from session
@@ -126,13 +139,19 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # if self.opts.model.__name__ == 'analysis':
         #     print(filters)
         #     import pdb; pdb.set_trace()
+        # self.__instance_cache[__hash] = instance
 
         return instance
 
     @pre_load
     def expand_primary_keys(self, value, **kwargs):
+        # If we have a database model, leave it alone.
+        if isinstance(value, self.opts.model):
+            return value
+        # We might have a mapping of values
+        # TODO: a better way to do this might test for whether primary key
+        # columns are specifically present...
         try:
-            # Typically, we are deserializing from a mapping of values
             return dict(**value)
         except TypeError:
             pass
@@ -151,10 +170,15 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def make_instance(self, data, **kwargs):
         instance = self._get_instance(data)
         if instance is None:
+            # if not is_model_ready(self.opts.model, data):
+            #    return None
             try:
                 # Begin a nested subtransaction
                 self.session.begin_nested()
                 instance = self.opts.model(**data)
+                # if not is_model_ready(self.opts.model, data):
+                #     self.session.rollback()
+                #     return instance
                 self.session.add(instance)
                 log.debug(f"Created instance {instance} with parameters {data}")
                 # self.session.flush(objects=[instance])

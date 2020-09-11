@@ -23,13 +23,19 @@ def model_interface(model, session=None) -> ModelSchema:
         # All conversion logic comes from ModelSchema
         return type(schema_name, (ModelSchema,), {"Meta": metacls})
     except exceptions.ModelConversionError as err:
-        secho(type(err).__name__ + ": " + schema_name + " - " + str(err), fg="red")
+        log.error(type(err).__name__ + ": " + schema_name + " - " + str(err))
         return None
 
 
 class InterfaceCollection(ModelCollection):
     def register(self, *classes):
         for cls in classes:
+            # Don't build model for spatial_ref_sys PostGIS table
+            # TODO: we could probably generalize this.
+            if cls.__table__.name == "spatial_ref_sys":
+                continue
+            if cls.__table__.schema == "enum":
+                continue
             self._register_model(cls)
 
     def _register_model(self, cls):

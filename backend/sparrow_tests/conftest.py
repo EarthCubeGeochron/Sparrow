@@ -1,6 +1,9 @@
 from sparrow.app import App
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
+import logging
+
+logging.disable(level=logging.WARNING)
 
 # Slow tests are opt-in
 def pytest_addoption(parser):
@@ -18,16 +21,17 @@ def pytest_configure(config):
         setattr(config.option, "markexpr", "not slow")
 
 
-app = App(__name__)
+@fixture(scope="session")
+def app():
+    return App(__name__)
 
 
 @fixture(scope="class")
-def db():
-    _db = app.database
-    connection = _db.session.connection()
+def db(app):
+    connection = app.database.session.connection()
     transaction = connection.begin()
     session_factory = sessionmaker(bind=connection)
-    _db.session = scoped_session(session_factory)
-    yield _db
-    _db.session.close()
+    app.database.session = scoped_session(session_factory)
+    yield app.database
+    app.database.session.close()
     transaction.rollback()

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Make sure we fail if any command in the chain fails
+set -e
+
 source docs/.ci/_defs.bash
 
 # Pull existing built images from GitHub Package Repository, to provide build

@@ -25,7 +25,7 @@ console_handler = StreamHandler()
 console_handler.setFormatter(formatter)
 
 
-def get_logger(name, level=logging.DEBUG, handler=None):
+def get_logger(name=None, level=logging.DEBUG, handler=None):
     log = logging.getLogger(name)
     log.setLevel(level)
     if handler:
