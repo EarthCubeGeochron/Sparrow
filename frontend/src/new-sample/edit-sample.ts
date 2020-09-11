@@ -12,6 +12,18 @@ import { useToggle } from "../map/components/APIResult";
 
 /** Form for Editing an Existing Sample */
 
+/**
+ * Things to go on an Editing Metadata Form
+ * Name
+ * Location: coordinates, nearby?
+ * Material: Tree?
+ * Lithology: Javscript Graph?
+ * Formation: Suggestions from MacroStrat
+ * Session Date w/time precision
+ *
+ *
+ */
+
 // Need the time precision for a session
 // Coordinates can be set by clicking a map
 function EditSample() {
@@ -38,6 +50,8 @@ export default EditSample;
 
 /** Form component that includes the FormGroup, InputGroup/NumericInput
  * Should have intent changes based on a set min and max value
+ *
+ * Form Vailidation for text based inputs?
  */
 
 interface MyInput {
@@ -47,9 +61,9 @@ interface MyInput {
   onChange: any;
   value: any;
   rightElement?: any;
-  leftIcon: any;
+  leftIcon?: any;
 }
-function MyTextInput(props: MyInput) {
+export function MyTextInput(props: MyInput) {
   return h("div", [
     h(FormGroup, { helperText: props.helperText, label: props.label }),
     [
@@ -75,11 +89,11 @@ interface MyInputNum {
   onChange: any;
   value: any;
   rightElement?: any;
-  leftIcon: any;
+  leftIcon?: any;
 }
 
 /** Numeric Input that has intent validation */
-function MyNumericInput(props: MyInputNum) {
+export function MyNumericInput(props: MyInputNum) {
   const intent =
     props.value < props.min || props.value > props.max ? "Danger" : "Primary";
   return h("div", [

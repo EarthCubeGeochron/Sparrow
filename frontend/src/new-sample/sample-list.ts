@@ -1,10 +1,10 @@
 import * as React from "react";
 import h from "@macrostrat/hyper";
 import { List } from "react-virtualized";
-import { Button, Spinner } from "@blueprintjs/core";
+import { Button, Spinner, Card } from "@blueprintjs/core";
 import { APIResultView } from "@macrostrat/ui-components/lib/types";
 import { useAPIResult } from "../map/components/APIResult";
-
+import styles from "../admin/sample/module.styl";
 /** Left column of Sample Page. A virtualized list of buttons */
 
 function getNames(data: []) {
@@ -12,6 +12,17 @@ function getNames(data: []) {
     const list = [];
     data.forEach((sample) => {
       list.push(sample.name);
+    });
+    return list;
+  } else {
+    return null;
+  }
+}
+function getMaterials(data: []) {
+  if (data !== null) {
+    const list = [];
+    data.forEach((sample) => {
+      list.push(sample.material);
     });
     return list;
   } else {
@@ -46,17 +57,21 @@ export function SampleList({ data, sendInfo }) {
     if (data !== null) {
       const sampleNames = getNames(data);
       const ids = getId(data);
+      const material = getMaterials(data);
       return h("div", [
         h(
-          Button,
+          Card,
           {
-            fill: true,
-            outlined: true,
-            minimal: true,
-            intent: "primary",
+            interactive: true,
             onClick: () => setId(ids[index]),
           },
-          [h("h2", { key: ids[index] }, [sampleNames[index]])]
+          [
+            h("h4", { key: ids[index], className: "sample-list-card" }, [
+              "Sample: ",
+              h("span.name", sampleNames[index]),
+            ]),
+            h.if(material != null)("div.material", material[index]),
+          ]
         ),
       ]);
     }

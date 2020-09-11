@@ -14,6 +14,7 @@ interface coordinates {
 
 // Simplfy things!! No useEffects in the first component. Create a function to unwrap coordinates and then rewrap. State should handle only coordinates. Makes it easier.
 // Remove refs
+/** Maybe Checkout Urbica map gl for this component, looks like they have a simpler version */
 export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
   const [state, setState] = useState({
     MapStyle: "mapbox://styles/mapbox/outdoors-v9",
@@ -50,7 +51,11 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
 
   const bounds = mapRef.current
     ? //@ts-ignore
-      mapRef.current.getMap().getBounds().toArray().flat()
+      mapRef.current
+        .getMap()
+        .getBounds()
+        .toArray()
+        .flat()
     : null;
 
   const ModeHandler = state.selectedFeature

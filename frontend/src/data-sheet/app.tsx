@@ -5,7 +5,7 @@ import { SheetHeader } from "./header";
 import { VirtualizedSheet } from "./virtualized";
 import { DataSheetContext, DataSheetProvider } from "./provider";
 import update from "immutability-helper";
-
+import h from "@macrostrat/hyper";
 import "./datasheet.css";
 import styles from "./module.styl";
 
@@ -22,12 +22,14 @@ const Row = ({ row, children, className }) => {
 const Sheet = ({ className, children }) => {
   const { columns } = useContext(DataSheetContext);
   return (
-    <table className={className}>
-      <thead>
-        <tr className="cell header">
+    <table className={className} style={{ width: 1000 }}>
+      <thead style={{ width: 1000 }}>
+        <tr className="cell header" style={{ width: 1000 }}>
           <td>Index</td>
           {columns.map((col) => (
-            <td key={col.name}>{col.name}</td>
+            <td key={col.name} style={{ width: col.width }}>
+              {col.name}
+            </td>
           ))}
         </tr>
       </thead>
@@ -37,14 +39,14 @@ const Sheet = ({ className, children }) => {
 };
 
 const columnSpec = [
-  { name: "Sample Name", key: "name", width: 10 },
-  { name: "IGSN", key: "igsn", width: 10 },
-  { name: "Public", key: "is_public", width: 10 },
-  { name: "Material", key: "material", width: 10 },
-  { name: "Latitude", key: "latitude", width: 10 },
-  { name: "Longitude", key: "longitude", width: 10 },
-  { name: "Location name", key: "location_name", width: 10 },
-  { name: "Project", key: "project_name", width: 10 },
+  { name: "Sample Name", key: "name", width: 1000 / 8 },
+  { name: "IGSN", key: "igsn", width: 0 },
+  { name: "Public", key: "is_public", width: 0 },
+  { name: "Material", key: "material", width: 1000 / 8 },
+  { name: "Latitude", key: "latitude", width: 1000 / 8 },
+  { name: "Longitude", key: "longitude", width: 1000 / 8 },
+  { name: "Location name", key: "location_name", width: 1000 / 8 },
+  { name: "Project", key: "project_name", width: 1000 / 2 },
 ];
 
 function unwrapSampleData(sampleData) {
@@ -133,6 +135,39 @@ function DataSheet() {
   const cellData = data.map((obj, row) =>
     columns.map(({ key }) => buildCellProps(obj[key], row, key))
   );
+  console.log(cellData);
+
+  const testComponent = () => {
+    return h("button", { onClick: console.log("Hello Casey") }, ["Click This"]);
+  };
+
+  /**
+   * Function to Add components to the grid data structure
+   * current Structure:
+   *   [[{value: "name"},{value: igsn},{value: public},{value: material},{value: Latitude},{value: Longitude},{value: Location Name},{value: Project Name},]]
+   *  Need to add specific components like:
+   *   [[{value: 'name', component: (<Component/>)}]]
+   *
+   * will return an array with components
+   * indexs are 0 - 7
+   */
+  const [[...ele]] = cellData;
+  var [, , , object] = ele;
+  object = { ...object, Component: h(testComponent) };
+  //console.log(ele);
+  //console.log(object);
+  const components = ["0", "1", "2", "3", "4", "5", "6", "7"];
+
+  const testData = cellData.map((ele) => {
+    const newList = [];
+    // ele is an Array of 8 objects
+    ele.map((ele, index) => {
+      const newEle = { ...ele, component: components[index] };
+      newList.push(newEle);
+    });
+    return newList;
+  });
+  console.log(testData);
 
   return (
     <DataSheetProvider columns={columns}>

@@ -1,13 +1,15 @@
 import { useLayoutEffect, useEffect, useState, useCallback } from "react";
 
 // Should factor this into UI Components
-function useElementHeight(ref: React.RefObject<HTMLElement>): number | null {
+function useElementHeight(ref: React.RefObject<HTMLElement>): number[] | null {
   const [height, setHeight] = useState<number>(null);
+  const [width, setWidth] = useState<number>(null);
 
   const setSize = useCallback(() => {
     if (ref.current == null) return;
-    const { height } = ref.current.getBoundingClientRect();
+    const { height, width } = ref.current.getBoundingClientRect();
     setHeight(height);
+    setWidth(width);
   }, [ref.current]);
 
   useLayoutEffect(setSize, [ref.current]);
@@ -20,7 +22,9 @@ function useElementHeight(ref: React.RefObject<HTMLElement>): number | null {
     };
   }, [ref.current]);
 
-  return height;
+  const dimensions = [height, width];
+
+  return dimensions;
 }
 
 function useScrollOffset(ref: React.RefObject<HTMLElement>): number {

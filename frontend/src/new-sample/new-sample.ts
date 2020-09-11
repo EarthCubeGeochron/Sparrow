@@ -4,6 +4,8 @@ import { SampleFilter } from "../filter";
 import { SampleList } from "./sample-list";
 import { useAPIResult } from "../map/components/APIResult";
 import SampleInfo from "./sample-info";
+//import { SampleList } from "../admin/sample/list";
+import { SamplePage } from "../admin/sample/page";
 import styles from "./sample-page.module.css";
 
 /** Rough Drafting for the new ui's sample page */
@@ -30,20 +32,19 @@ function NewSample() {
         setState({ ...state, Info: sample });
       }
     });
-    //setState({ ...state, Info: clickedSample });
   }
 
   return h("div", [
     h("h1", ["Welcome to the New Sample Page"]),
     h(SampleFilter),
-    h("div", { className: styles.row }, [
-      h("div", { className: styles.column }, [
+    h("div", { className: styles.container }, [
+      h("div", { className: styles.item1 }, [
         h(SampleList, {
           data: state.List,
           sendInfo: infoFromClick,
         }),
       ]),
-      h("div", { className: styles.column }, [
+      h("div", { className: styles.item2 }, [
         h(SampleInfo, { data: state.Info }),
       ]),
     ]),

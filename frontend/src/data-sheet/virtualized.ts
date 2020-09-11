@@ -1,18 +1,19 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useContext, useRef } from "react";
+import { useContext, useRef, createContext, useState } from "react";
 import { useElementHeight, useScrollOffset } from "./util";
 import ReactDataSheet from "react-datasheet";
 import { DataSheetContext } from "./provider";
 import styles from "./module.styl";
 const h = hyperStyled(styles);
 
-export function VirtualizedSheet(props) {
-  const { data, rowRenderer, onCellsChanged, ...rest } = props;
+function VirtualizedSheet(props) {
+  const { data, rowRenderer, sheetRenderer, onCellsChanged, ...rest } = props;
   const { rowHeight } = useContext(DataSheetContext);
 
   const ref = useRef<HTMLDivElement>();
 
-  const height = useElementHeight(ref) ?? 100;
+  const [height, width] = useElementHeight(ref) ?? [100, 20];
+  console.log(width);
   const scrollOffset = useScrollOffset(ref);
   const buffer = 50;
 
@@ -24,14 +25,18 @@ export function VirtualizedSheet(props) {
   function virtualRowRenderer({ row, children, className }) {
     return rowRenderer({ row: row + rowOffset, children, className });
   }
+  function virtualSheetRenderer({ column, children, className }) {
+    return sheetRenderer({ column: column + width, children, className });
+  }
 
   const lastRow = Math.min(rowOffset + rowsToDisplay, data.length - 1);
 
   return h("div.virtualized-sheet", { ref }, [
-    h("div.ui", { style: { height } }, [
+    h("div.ui", { style: { height, width } }, [
       h(ReactDataSheet, {
         data: data.slice(rowOffset, lastRow),
         rowRenderer: virtualRowRenderer,
+        sheetRenderer: virtualSheetRenderer,
         onCellsChanged(changes) {
           changes.forEach((d) => (d.row += rowOffset));
           onCellsChanged(changes);
@@ -44,3 +49,5 @@ export function VirtualizedSheet(props) {
     }),
   ]);
 }
+
+export { VirtualizedSheet };

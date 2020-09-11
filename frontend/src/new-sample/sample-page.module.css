@@ -1,6 +1,13 @@
-.column {
-  float: left;
-  width: 50%;
+.container {
+  display: flex;
+  flex-direction: row;
+}
+
+.item1 {
+  order: 1;
+}
+.item2 {
+  order: 2;
 }
 
 /* Clear floats after the columns */
@@ -9,3 +16,6 @@
   display: table;
   clear: both;
 }
+
+
+  

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import { useAPIResult } from "./APIResult";
 import useSuperCluster from "use-supercluster";
 import classNames from "classnames";
@@ -92,9 +93,6 @@ export function MarkerCluster({ viewport, changeViewport, bounds }) {
             longitude={longitude}
             offsetLeft={-15}
             offsetTop={-20}
-            captureClick={(e) => {
-              markerClicked(e);
-            }}
           >
             <Popover
               content={
