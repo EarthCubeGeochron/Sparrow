@@ -1,0 +1,10 @@
+#!/bin/bash
+# Description: Utility that blocks until database is ready
+
+sparrow compose up -d db
+# We are running in a docker container
+>&2 echo "Waiting for database..."
+until sparrow compose exec db pg_isready ; do
+  >&2 echo "."
+  sleep 0.5
+done

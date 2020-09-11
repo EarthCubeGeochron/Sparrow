@@ -1,6 +1,10 @@
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
 from click import secho
+from ...logs import get_logger
+from ...exceptions import DatabaseMappingError
+
+log = get_logger(__name__)
 
 # Drag in geographic types for database reflection
 from geoalchemy2 import Geometry, Geography
@@ -41,12 +45,14 @@ class MappedDatabaseMixin(object):
         try:
             self.automap()
         except Exception as err:
-            kw = dict(err=True, fg="red")
-            secho("Could not automap at database initialization", **kw)
-            secho(f"  {err}", **kw)
+            # raise DatabaseMappingError(str(err))
+            log.exception(err)
+            # kw = dict(err=True, fg="red")
+            log.error("Could not automap at database initialization")
+            # secho(f"  {err}", **kw)
             # TODO: We should raise this error, and find another way to
             # test if we've initialized the database yet.
-            self.automap_error = err
+            # self.automap_error = err
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """
@@ -75,6 +81,7 @@ class MappedDatabaseMixin(object):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
         # TODO: add the process flow described below:
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
+
         BaseModel.query = self.session.query_property()
         BaseModel.db = self
 
@@ -90,7 +97,7 @@ class MappedDatabaseMixin(object):
             # Reflect tables in schemas we care about
             # Note: this will not reflect views because they don't have
             # primary keys.
-            print("Reflecting schema " + schema)
+            log.info("Reflecting schema " + schema)
             BaseModel.metadata.reflect(
                 bind=self.engine, schema=schema, **reflection_kwargs
             )
@@ -99,6 +106,7 @@ class MappedDatabaseMixin(object):
 
         self.__models__ = ModelCollection(self.automap_base.classes)
         self.__tables__ = TableCollection(self.__models__)
+        log.info("Finished automapping database")
 
     def register_models(self, *models):
         # Could allow overriding name functions etc.

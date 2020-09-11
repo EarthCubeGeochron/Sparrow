@@ -1,18 +1,13 @@
 import click
-from os import path, environ, devnull
 from click import echo, style, secho
-from sqlalchemy import create_engine
 from sys import exit
+from os import environ
 from json import dumps
-from click_plugins import with_plugins
-from pkg_resources import iter_entry_points
-from contextlib import redirect_stdout
-from subprocess import run
-
 from .util import with_database, with_app, with_full_app
 from ..util import working_directory
 from ..app import App
 from ..auth.create_user import create_user
+from ..database.migration import db_migration
 
 
 def _build_app_context(config):
@@ -29,6 +24,7 @@ class SparrowCLI(click.Group):
         # This pulls in configuration from environment variable or a configuration
         # object, if provided; I don't see another option to support lazily loading plugins
         config = kwargs.pop("config", environ.get("SPARROW_BACKEND_CONFIG"))
+        # logging.disable(level=logging.WARNING)
 
         kwargs.setdefault("context_settings", {})
         # Ideally we would add the Application _and_ config objects to settings
@@ -87,9 +83,9 @@ def dev_server(app):
     app.run(debug=True, host="0.0.0.0")
 
 
-@cli.command(name="console")
+@cli.command(name="shell")
 @with_full_app
-def console(app):
+def shell(app):
     """
     Get a Python shell within the application
     """
@@ -146,3 +142,9 @@ def plugins(app):
     with app.app_context():
         for p in app.plugins.order_plugins():
             print(p.name)
+
+
+@cli.command(name="db-migration")
+@with_database
+def _db_migration(db):
+    db_migration(db)

@@ -4,3 +4,4 @@ envbash
 pytest
 pyyaml
 docker-compose==1.26.0
+click-default-group==1.2.2
