@@ -14,7 +14,9 @@
 # limitations under the License.
 # ===============================================================================
 import os
+import re
 import subprocess
+from itertools import groupby
 
 try:
     from backend.sparrow.ext.pychron import PyChronJSONImporter
@@ -22,6 +24,18 @@ except ImportError:
     class PyChronJSONImporter:
         def import_file(self, *args, **kw):
             pass
+
+iare = re.compile('(?P<cnt>_\d{5}\.ia\.json)')
+
+
+def key(x):
+    return '_'.join(x.split('_')[:-1])
+
+def counterkey(x):
+    cnt = iare.search(x).group('cnt')
+    # re returns cnt in form '_00000.ia.json'
+    cnt = cnt.split('.')[0][1:]
+    return int(cnt)
 
 
 class PychronRepo:
@@ -42,17 +56,24 @@ class PychronRepo:
             subprocess.run(['git', 'clone', self._url, root])
 
         importer = PyChronJSONImporter()
+
         # scan repo looking for ia files
         for d, ds, fs in os.walk(root):
-            for fi in fs:
-                if fi.endswith('.ia.json'):
-                    p = os.path.join(d, fi)
-                    print('importing file. {}'.format(p))
-                    importer.import_file(p)
+            ias = [fi for fi in fs if iare.search(fi)]
+            # only import the latest ia file for each group
+
+            b = os.path.basename(os.path.dirname(d))
+            for gi, gs in groupby(sorted(ias, key=key), key=key):
+                uid = '{}{}'.format(b, gi)
+                # sort group by the counter suffix
+                gs = sorted(gs, key=counterkey, reverse=True)
+                p = os.path.join(d, gs[0])
+
+                print('importing id={} file. {}'.format(uid, p))
+                importer.import_file(p)
 
 
 if __name__ == '__main__':
-
     name = 'NOB-Unknowns'
     remote = 'https://github.com/WiscArData'
     pr = PychronRepo(name, remote)
