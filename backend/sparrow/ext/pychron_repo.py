@@ -31,6 +31,7 @@ iare = re.compile('(?P<cnt>_\d{5}\.ia\.json)')
 def key(x):
     return '_'.join(x.split('_')[:-1])
 
+
 def counterkey(x):
     cnt = iare.search(x).group('cnt')
     # re returns cnt in form '_00000.ia.json'
