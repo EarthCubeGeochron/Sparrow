@@ -40,21 +40,30 @@ def counterkey(x):
 
 
 class PychronRepo:
-    def __init__(self, name, remote):
+    def __init__(self, names, remote):
         local_repos_root = os.path.join(os.path.expanduser('~'), 'local_repo')
         if not os.path.isdir(local_repos_root):
             os.mkdir(local_repos_root)
 
-        self._root = os.path.join(local_repos_root, name)
-        self._url = '{}/{}'.format(remote, name)
+        self._local_root = local_repos_root
+        if not isinstance(names, (list, tuple)):
+            names = (names,)
+
+        self._names = names
+        self._remote = remote
 
     def scan(self):
+        for name in self._names:
+            print('scanning repo. {}'.format(name))
+            self.scan_repo(name)
+
+    def scan_repo(self, name):
         # check if repo exists
         # clone otherwise
-
-        root = self._root
+        root = os.path.join(self._local_root, name)
         if not os.path.isdir(root):
-            subprocess.run(['git', 'clone', self._url, root])
+            url = '{}/{}'.format(self._remote, name)
+            subprocess.run(['git', 'clone', url, root])
 
         importer = PyChronJSONImporter()
 
