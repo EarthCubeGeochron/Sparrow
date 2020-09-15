@@ -4,6 +4,8 @@ import { useAPIResult } from "@macrostrat/ui-components";
 import { SheetHeader } from "./header";
 import { VirtualizedSheet } from "./virtualized";
 import { DataSheetContext, DataSheetProvider } from "./provider";
+import { DataSheetSuggest } from "./sheet-enter-components/datasheet-suggest";
+import { MapSelector } from "./sheet-enter-components/map-selector";
 import update from "immutability-helper";
 import h from "@macrostrat/hyper";
 import "./datasheet.css";
@@ -151,8 +153,18 @@ function DataSheet() {
    * will return an array with components
    * indexs are 0 - 7
    */
+  const MaterialList = ["Lava", "Prophriclastic Rocks"];
 
-  const components = ["0", "1", "2", "3", "4", "5", "6", "7"];
+  const components = [
+    h(testComponent),
+    h(testComponent),
+    h(testComponent),
+    h(DataSheetSuggest, { items: MaterialList }),
+    h(MapSelector),
+    h(MapSelector),
+    h(testComponent),
+    h(testComponent),
+  ];
 
   const testData = cellData.map((ele) => {
     const newList = [];
@@ -175,7 +187,7 @@ function DataSheet() {
         ></SheetHeader>
         <div className="sheet">
           <VirtualizedSheet
-            data={cellData}
+            data={testData}
             valueRenderer={(cell) => cell.value}
             sheetRenderer={Sheet}
             rowRenderer={Row}

@@ -103,7 +103,7 @@ export function MyNumericInput(props: MyInputNum) {
         id: props.label + "-input",
         placeholder: props.placeholder,
         value: props.value,
-        onChange: props.onChange,
+        onValueChange: props.onChange,
         intent,
         leftIcon: props.leftIcon,
         rightElement: props.rightElement,

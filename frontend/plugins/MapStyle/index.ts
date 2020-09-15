@@ -1,5 +1,6 @@
-import * as React from "react";
 import { mapStyle } from "../../src/map/MapStyle";
+//import { Frame, FrameChild } from "../../src/frame";
+import h from "@macrostrat/hyper";
 
 /** This is where you Add your Own Custom MapStyles!!! */
 
@@ -27,3 +28,5 @@ export const mapStyles = [
     style: "mapbox://styles/jczaplewski/cjeycrpxy1yv22rqju6tdl9xb",
   },
 ];
+
+//export const mapStyles = h(FrameChild, { id: "MapStyles" });

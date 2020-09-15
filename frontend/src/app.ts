@@ -24,6 +24,7 @@ import { MapPage } from "./map";
 import NewSample from "./new-sample/new-sample";
 
 import DataSheet from "./data-sheet/app";
+import { MapSelector } from "./data-sheet/sheet-enter-components";
 
 function PageRoute(props) {
   /** A custom route to manage page header, footer, and style associated
@@ -66,6 +67,11 @@ function AppMain(props) {
         path: "/new-sample",
         style: PageStyle.WIDE,
         component: NewSample,
+      }),
+      h(PageRoute, {
+        path: "/map-selector",
+        style: PageStyle.WIDE,
+        component: MapSelector,
       }),
       h(PageRoute, {
         path: "/map",

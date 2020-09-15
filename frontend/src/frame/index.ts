@@ -7,14 +7,30 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import { StatefulComponent } from "@macrostrat/ui-components";
-import { Component, createContext, useContext } from "react";
+import {
+  Component,
+  createContext,
+  useContext,
+  useState,
+  Children,
+} from "react";
 import { ErrorBoundary } from "../util";
 import T from "prop-types";
 import h from "react-hyperscript";
 
-const FrameContext = createContext({});
+export const FrameContext = createContext({});
 
-class FrameProvider extends StatefulComponent {
+// custom hook to retrieve data from FrameContext 
+
+// function FrameProvider({ overrides: {} }) {
+//   const [state, setState] = useState({ registry: {} });
+//   const getElement = (id, overrides) => {
+//     return overrides[id] || null;
+//   };
+//   const value = { register: state.registry, getElement };
+//   return h(FrameContext.Provider, { value }, Children);
+// }
+class FrameProvider extends Component {
   static propTypes = {
     overrides: T.objectOf(T.node),
   };
