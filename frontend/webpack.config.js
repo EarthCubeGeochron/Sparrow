@@ -143,6 +143,7 @@ module.exports = {
       ".md",
     ],
     alias: {
+      "~": path.resolve(__dirname, "src/"),
       app: path.resolve(__dirname, "src/"),
       sparrow: path.resolve(__dirname, "src/"),
       plugins: path.resolve(__dirname, "plugins/"),

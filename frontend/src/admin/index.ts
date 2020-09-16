@@ -26,6 +26,7 @@ import { ProjectListComponent, ProjectComponent } from "./project";
 import { SessionListComponent } from "./session-list-component";
 import { SessionComponent } from "./session-component";
 import { SampleMain } from "./sample";
+import { DataFilesPage } from "./data-files";
 
 import { NavButton } from "app/components";
 import { InsetText } from "app/components/layout";
@@ -145,6 +146,10 @@ const CatalogBody = (
     h(Route, {
       path: base + "/sample",
       component: SampleMain,
+    }),
+    h(Route, {
+      path: base + "/data-files",
+      component: DataFilesPage,
     }),
     h(Route, {
       path: base,
