@@ -11,6 +11,7 @@ import {
   InputGroup,
 } from "@blueprintjs/core";
 import "../cluster.css";
+import h from "@macrostrat/hyper";
 
 export const LayerMenu = ({
   hide,
@@ -22,42 +23,17 @@ export const LayerMenu = ({
 }) => {
   const dropMenu = (
     <Menu>
-      <MenuItem
-        intent={MapStyle == mapstyles.initialMapStyle ? "primary" : null}
-        labelElement={
-          MapStyle == mapstyles.initialMapStyle ? (
-            <Icon icon="tick"></Icon>
-          ) : null
-        }
-        text="Standard Map"
-        onClick={() => chooseMapStyle(mapstyles.initialMapStyle)}
-      />
-      <MenuItem
-        intent={MapStyle == mapstyles.topoMapStyle ? "primary" : null}
-        labelElement={
-          MapStyle == mapstyles.topoMapStyle ? <Icon icon="tick"></Icon> : null
-        }
-        text="Topographic"
-        onClick={() => chooseMapStyle(mapstyles.topoMapStyle)}
-      />
-      <MenuItem
-        intent={MapStyle == mapstyles.mapStyle ? "primary" : null}
-        labelElement={
-          MapStyle == mapstyles.mapStyle ? <Icon icon="tick"></Icon> : null
-        }
-        onClick={() => chooseMapStyle(mapstyles.mapStyle)}
-        text="Bedrock Geology"
-      />
-      <MenuItem
-        intent={MapStyle == mapstyles.sateliteMapStyle ? "primary" : null}
-        labelElement={
-          MapStyle == mapstyles.sateliteMapStyle ? (
-            <Icon icon="tick"></Icon>
-          ) : null
-        }
-        onClick={() => chooseMapStyle(mapstyles.sateliteMapStyle)}
-        text="Satelite"
-      />
+      {mapstyles.map((styleOb) => {
+        const { name, style } = styleOb;
+        return (
+          <MenuItem
+            intent={MapStyle == style ? "primary" : null}
+            labelElement={MapStyle == style ? <Icon icon="tick"></Icon> : null}
+            text={name}
+            onClick={() => chooseMapStyle(style)}
+          />
+        );
+      })}
 
       <MenuDivider />
       <MenuItem
@@ -72,7 +48,7 @@ export const LayerMenu = ({
     <div>
       {hide ? null : (
         <div className="mappagemenu">
-          <Popover content={dropMenu} position={Position.BOTTOM}>
+          <Popover content={dropMenu} minimal={true} position={Position.BOTTOM}>
             <Tooltip content="Change Map">
               <Button icon="layers"></Button>
             </Tooltip>

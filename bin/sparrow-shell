@@ -1,9 +1,0 @@
-#!/bin/bash
-# Description: Get a shell in a particular container
-container=$1
-
-if docker-compose exec $container true > /dev/null 2>&1 ; then
-  sparrow compose --log-level ERROR exec $container sh
-else
-  sparrow compose --log-level ERROR run --rm $container sh
-fi

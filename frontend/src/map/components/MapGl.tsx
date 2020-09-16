@@ -12,6 +12,9 @@ interface coordinates {
   maxlat: number;
 }
 
+// Simplfy things!! No useEffects in the first component. Create a function to unwrap coordinates and then rewrap. State should handle only coordinates. Makes it easier.
+// Remove refs
+/** Maybe Checkout Urbica map gl for this component, looks like they have a simpler version */
 export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
   const [state, setState] = useState({
     MapStyle: "mapbox://styles/mapbox/outdoors-v9",
@@ -48,7 +51,11 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
 
   const bounds = mapRef.current
     ? //@ts-ignore
-      mapRef.current.getMap().getBounds().toArray().flat()
+      mapRef.current
+        .getMap()
+        .getBounds()
+        .toArray()
+        .flat()
     : null;
 
   const ModeHandler = state.selectedFeature
@@ -59,29 +66,31 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
 
   useEffect(() => {
     if (state.selectedFeature != null) {
-      const geometry = state.selectedFeature.map((object) => object.geometry);
-      const coordinates = geometry.map((object) => object.coordinates);
+      state.selectedFeature.map((object) => {
+        console.log(object.geometry.coordinates);
+        const minlng = object.geometry.coordinates[0][0][0];
+        const maxlng = object.geometry.coordinates[0][2][0];
+        const minlat = object.geometry.coordinates[0][1][1];
+        const maxlat = object.geometry.coordinates[0][0][1];
+        const coordinates = {
+          minlng: minlng,
+          maxlng: maxlng,
+          minlat: minlat,
+          maxlat: maxlat,
+        };
+        console.log(coordinates);
+      });
       //console.log(coordinates);
-      coordinates.forEach((array) =>
-        array.forEach((element) => {
-          setCoordinates({
-            minlng: element[0][0],
-            minlat: element[1][1],
-            maxlng: element[2][0],
-            maxlat: element[0][1],
-          });
-        })
-      );
     }
   }, [state.selectedFeature]);
 
-  const setFeature = (GEOJsonObject) => {
-    //setState({ ...state, selectedFeature: GEOJsonObject });
+  const setFeature = (GEOJsonObject, viewport) => {
+    // setState({ ...state, selectedFeature: GEOJsonObject, viewport: viewport });
     setTest(GEOJsonObject);
   };
 
   return h("div", { style: { display: "flex" } }, [
-    h(MapFilterInputs, { coordinates: coordinates, setFeature: setFeature }),
+    //h(MapFilterInputs, { coordinates: coordinates, setFeature: setFeature }),
     h(Card, [
       h(
         MapGl,
@@ -130,7 +139,7 @@ export function MapFilterInputs({ coordinates, setFeature }) {
     if (state != coordinates) {
       const featureList = [];
       const { maxlng, minlng, maxlat, minlat } = state;
-      const feature = CoordinatesToGEOJson({ maxlng, minlng, maxlat, minlat });
+      const feature = coordinatesToGeoJSON({ maxlng, minlng, maxlat, minlat });
       featureList.push(feature);
       console.log(featureList);
 
@@ -190,7 +199,7 @@ export function MapFilterInputs({ coordinates, setFeature }) {
   ]);
 }
 
-export function CoordinatesToGEOJson({
+export function coordinatesToGeoJSON({
   maxlng,
   minlng,
   maxlat,
@@ -214,4 +223,20 @@ export function CoordinatesToGEOJson({
       ],
     },
   };
+}
+
+export function coordinatesFromGeoJSON(geoarray) {
+  const geometry = geoarray.map((object) => object.geometry);
+  const coordinate = geometry.map((object) => object.coordinates);
+  const coordinates = coordinate.forEach((array) =>
+    array.forEach((element) => {
+      return {
+        minlng: element[0][0],
+        minlat: element[1][1],
+        maxlng: element[2][0],
+        maxlat: element[0][1],
+      };
+    })
+  );
+  return coordinates;
 }

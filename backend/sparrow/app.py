@@ -6,7 +6,6 @@ import logging
 
 from .encoders import JSONEncoder
 from .api.v1 import APIv1
-from .util import relative_path
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .interface import InterfacePlugin
 from .auth import AuthPlugin
@@ -33,6 +32,7 @@ class App(Flask):
         verbose = kwargs.pop("verbose", True)
         super().__init__(*args, **kwargs)
         self.is_loaded = False
+        self.database_ready = False
         self.api_loaded = False
         self.verbose = verbose
 
@@ -43,7 +43,6 @@ class App(Flask):
             self.config.from_pyfile(cfg)
         except RuntimeError as err:
             log.info("No lab-specific configuration file found.")
-            log.exception(str(err))
 
         self.db = None
         dburl = self.config.get("DATABASE")
@@ -58,10 +57,11 @@ class App(Flask):
         echo(msg, err=True)
 
     def setup_database(self, db=None):
+        # This bootstrapping order leaves much to be desired
         from .database import Database
 
         self.load()
-        if self.db is not None:
+        if self.db is not None and self.database_ready:
             return self.db
         if db is None:
             db = Database(self)
@@ -70,6 +70,7 @@ class App(Flask):
         # Database is only "ready" when it is mapped
         if self.db.automap_base is not None:
             self.run_hook("database-ready")
+            self.database_ready = True
         return db
 
     @property
@@ -130,8 +131,8 @@ class App(Flask):
 
             self.register_module_plugins(sparrow_plugins)
         except ModuleNotFoundError as err:
-            log.error("Could not find external Sparrow plugins.")
-            log.error(err)
+            log.info("Could not find external Sparrow plugins.")
+            log.info(err)
 
         self.__loaded()
 

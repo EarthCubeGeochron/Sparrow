@@ -6,6 +6,9 @@ Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
 from marshmallow_sqlalchemy.fields import Related, Nested
 from marshmallow.fields import Field, Raw
+from marshmallow.exceptions import ValidationError
+from marshmallow.fields import UUID as _UUID
+from marshmallow.utils import is_collection
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
 from collections.abc import Iterable
@@ -13,6 +16,12 @@ from .util import primary_key
 from ..logs import get_logger
 
 log = get_logger(__name__)
+
+
+class UUID(_UUID):
+    def _deserialize(self, value, attr, data, **kwargs):
+        """We need to deserialize to a string to make SQLAlchemy happy"""
+        return str(self._validated(value))
 
 
 class JSON(Raw):
@@ -51,6 +60,8 @@ class Enum(Related):
 
 class SmartNested(Nested, Related):
     # https://github.com/marshmallow-code/marshmallow/blob/dev/src/marshmallow/fields.py
+    # TODO: better conformance of this field to Marshmallow's OpenAPI schema generation
+    # https://apispec.readthedocs.io/en/latest/using_plugins.html
     def __init__(
         self, name, *, only=None, exclude=(), many=False, unknown=None, **field_kwargs
     ):
@@ -58,12 +69,19 @@ class SmartNested(Nested, Related):
             name, only=only, exclude=exclude, many=many, unknown=unknown, **field_kwargs
         )
         super(Related, self).__init__(**field_kwargs)
+        self._many = many
         self._instances = set()
 
     def _deserialize(self, value, attr=None, data=None, **kwargs):
         if isinstance(value, self.schema.opts.model):
             return value
-        return super(Nested, self)._deserialize(value, attr, data, **kwargs)
+        # Better error message for collections.
+        if not is_collection(value) and self._many:
+            raise ValidationError("Provided a single object for a collection field")
+        if is_collection(value) and not self._many:
+            raise ValidationError("Provided a collection for a instance field")
+
+        return super()._deserialize(value, attr, data, **kwargs)
 
     def _serialize_related_key(self, value):
         """Serialize the primary key for a related model. In the (common) special
@@ -103,3 +121,8 @@ class SmartNested(Nested, Related):
         if isinstance(value, Iterable):
             return [self._serialize_instance(v) for v in value]
         return self._serialize_instance(value)
+
+    def _validate(self, value):
+        # Should also validate against Related field
+        log.info(value)
+        return super(Nested, self)._validate(value)

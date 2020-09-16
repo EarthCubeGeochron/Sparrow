@@ -12,10 +12,11 @@ import { FilterListComponent } from "app/components/filter-list";
 import { SampleCard } from "./detail-card";
 import { FilterMenu } from "../../map/components/filterMenu";
 import styles from "./module.styl";
+import { Card, Button } from "@blueprintjs/core";
 
 const h = hyper.styled(styles);
 
-const SampleListCard = function (props) {
+const SampleListCard = function(props) {
   const { material, id, name, location_name } = props;
   return h(
     LinkCard,
@@ -32,7 +33,7 @@ const SampleListCard = function (props) {
   );
 };
 
-const SampleList = function () {
+const SampleList = function() {
   const route = "/sample";
   const filterFields = {
     name: "Sample name",
@@ -58,4 +59,4 @@ const SampleList = function () {
   ]);
 };
 
-export { SampleList };
+export { SampleList, SampleListCard };

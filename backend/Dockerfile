@@ -24,9 +24,7 @@ RUN mkdir /app
 WORKDIR /app
 
 ## Copy app core
-COPY ./setup.py /app
-COPY ./sparrow /app/sparrow
-COPY ./core_plugins /app/core_plugins
+COPY ./ /app/
 
 RUN pip install -e .
 
@@ -34,4 +32,5 @@ CMD ["/bin/run"]
 
 FROM main AS testing
 
-COPY ./tests /app/tests
+# For right now, the testing target is the same as the "main" target, but
+# we could grab or create additional artifacts or fixtures here.

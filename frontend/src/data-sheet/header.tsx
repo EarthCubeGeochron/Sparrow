@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import * as React from "react";
+import { useState } from "react";
 import { Dialog, Classes } from "@blueprintjs/core";
 import {
   SaveButton,
