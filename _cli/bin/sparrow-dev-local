@@ -1,0 +1,10 @@
+#!/bin/bash
+# Description: Reload web browser if app is in development mode
+# This will eventually be folded into a `sparrow dev` command
+
+sparrow compose up -d --build backend
+
+cd "$SPARROW_PATH/frontend"
+export SPARROW_BASE_URL="http://localhost:5002/"
+npm install
+npm run dev

@@ -31,13 +31,12 @@ let bs_cfg = {
   },
 };
 
-if (!process.env.CONTAINERIZED) {
-  // Configuration for running locally
-  // This configuration is probably wrong
-  bs_cfg.proxy = "http://0.0.0.0:5000";
-  bs_cfg.serveStatic = [{ route: assetsRoute, dir: assetsDir }];
-  bs_cfg.server = "./";
-}
+// if (!process.env.CONTAINERIZED) {
+//   // Configuration for running locally
+//   // This configuration is probably wrong
+//bs_cfg.serveStatic = [{ route: assetsRoute, dir: assetsDir }];
+bs_cfg.server = "./_assets";
+//}
 
 let browserSync = new BrowserSyncPlugin(bs_cfg);
 
