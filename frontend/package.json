@@ -16,7 +16,7 @@
     "@emotion/styled": "^10.0.7",
     "@loadable/component": "^5.10.2",
     "@macrostrat/hyper": "^1.2.11",
-    "@macrostrat/ui-components": "^0.3.5",
+    "@macrostrat/ui-components": "^0.4.0-a.2",
     "@mongodb-js/react-mapbox-gl-leaflet": "^1.0.0",
     "@tippy.js/react": "3.1.1",
     "@turf/bbox": "^6.0.1",
@@ -86,7 +86,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "linklocal"
+    "preinstall": "linklocal",
+    "dev": "./run-docker"
   },
   "author": "Daven Quinn",
   "license": "ISC"

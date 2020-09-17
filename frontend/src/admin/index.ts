@@ -7,14 +7,7 @@
  */
 import { hyperStyled } from "@macrostrat/hyper";
 import { Component, useContext } from "react";
-import {
-  NonIdealState,
-  Intent,
-  Button,
-  ButtonGroup,
-  Icon,
-  Callout,
-} from "@blueprintjs/core";
+import { NonIdealState, Button, Callout } from "@blueprintjs/core";
 import { Switch } from "react-router-dom";
 import { ErrorBoundaryRoute as Route } from "app/util/route";
 import T from "prop-types";
@@ -120,6 +113,7 @@ const AdminMain = (props) =>
       h(LinkCard, { to: "/project" }, h("h2", "Projects")),
       h(LinkCard, { to: "/sample" }, h("h2", "Samples")),
       h(LinkCard, { to: "/session" }, h("h2", "Sessions")),
+      h(LinkCard, { to: "/data-file" }, h("h2", "Data files")),
     ]),
   ]);
 
@@ -148,7 +142,7 @@ const CatalogBody = (
       component: SampleMain,
     }),
     h(Route, {
-      path: base + "/data-files",
+      path: base + "/data-file",
       component: DataFilesPage,
     }),
     h(Route, {
