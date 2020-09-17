@@ -1,9 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 import h from "@macrostrat/hyper";
 import { useEffect } from "react";
 import { join } from "path";
@@ -87,7 +81,7 @@ function AppMain(props) {
   );
 }
 
-const errorHandler = function(route, response) {
+const errorHandler = function (route, response) {
   let msg;
   const { error } = response;
   if (error != null) {
@@ -97,10 +91,11 @@ const errorHandler = function(route, response) {
   return AppToaster.show({ message, intent: Intent.DANGER });
 };
 
-const App = function() {
+const App = function () {
   // Nest application in React context providers
-  const baseURL = process.env.BASE_URL || "/";
-  const apiBaseURL = join(baseURL, "/api/v1");
+  const baseURL = "/";
+  const apiBaseURL = "http://localhost:5002/api/v1"; //process.env.BASE_URL || "/";
+  //const apiBaseURL = join(baseURL, "/api/v1");
   console.log(apiBaseURL);
 
   return h(

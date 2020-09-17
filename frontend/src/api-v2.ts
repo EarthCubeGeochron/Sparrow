@@ -11,7 +11,7 @@ export function APIExplorerV2(props) {
   return h(SwaggerUI, { url: "/api/v2/schema" });
 }
 
-const APIV2Context = createAPIContext();
+//const APIV2Context = createAPIContext();
 
 export function useAPIv2Result(
   route,
@@ -19,6 +19,6 @@ export function useAPIv2Result(
   opts: Partial<APIOptions> = {}
 ) {
   /** Temporary shim to convert V1 API to V2 */
-  opts.context = APIV2Context;
+  //opts.context = APIV2Context;
   return useAPIResult(route, params, opts);
 }
