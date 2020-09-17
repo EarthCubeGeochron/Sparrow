@@ -154,6 +154,8 @@ module.exports = {
       sparrow: path.resolve(__dirname, "src/"),
       plugins: path.resolve(__dirname, "plugins/"),
       "site-content": siteContent,
+      // For node module resolution + hooks
+      react: path.resolve(__dirname, "node_modules", "react"),
     },
   },
   entry: {
