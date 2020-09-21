@@ -49,7 +49,7 @@ const columnSpec = [
   { name: "Latitude", key: "latitude", width: 1000 / 8 },
   { name: "Longitude", key: "longitude", width: 1000 / 8 },
   { name: "Location name", key: "location_name", width: 1000 / 8 },
-  { name: "Project", key: "project_name", width: 1000 / 2 },
+  { name: "Project", key: "project_name", width: null },
 ];
 
 function unwrapSampleData(sampleData) {
