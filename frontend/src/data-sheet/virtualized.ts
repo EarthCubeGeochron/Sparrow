@@ -53,6 +53,17 @@ function VirtualizedSheet(props) {
     setSelection(selected);
     setOffsetSelection({ start, end });
   }
+
+  // useEffect(() => {
+  //   if (selection) {
+  //     const offSelection = {
+  //       start: { i: selection.start.i - rowOffset, j: selection.start.j },
+  //       end: { i: selection.end.i - rowOffset, j: selection.end.j },
+  //     };
+  //     setOffsetSelection(offSelection);
+  //   }
+  // }, [selection, rowOffset]);
+
   console.log(selection);
   console.log(offsetSelection);
   console.log(rowOffset);
@@ -61,7 +72,7 @@ function VirtualizedSheet(props) {
     h("div.ui", { style: { height, width } }, [
       h(ReactDataSheet, {
         data: data.slice(rowOffset, lastRow),
-        //selected: offsetSelection,
+        //selected: selection,
         onSelect,
         rowRenderer: virtualRowRenderer,
         sheetRenderer: virtualSheetRenderer,
