@@ -3,6 +3,7 @@ import { PageFooter } from "app/shared/footer";
 import { CatalogNavLinks } from "app/admin";
 import { AppNavbar, NavButton } from "./navbar";
 import { PropsWithChildren } from "react";
+import { Route } from "react-router-dom";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -46,5 +47,16 @@ function PageSkeleton(props: PageSkeletonProps) {
 
 PageSkeleton.defaultProps = { style: PageStyle.BASIC };
 
+function PageRoute(props) {
+  /** A custom route to manage page header, footer, and style associated
+      with a specific route */
+  const { render, component: base, style, ...rest } = props;
+  const component = (p) => {
+    const children = base != null ? h(base, p) : render(p);
+    return h(PageSkeleton, { style, children });
+  };
+  return h(Route, { ...rest, component });
+}
+
 export * from "./navbar";
-export { PageSkeleton, PageStyle };
+export { PageSkeleton, PageStyle, PageRoute };

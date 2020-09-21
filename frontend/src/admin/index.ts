@@ -14,12 +14,13 @@ import T from "prop-types";
 
 import { LinkButton, LinkCard } from "@macrostrat/ui-components";
 import { Frame } from "app/frame";
-import { AuthContext } from "app/auth/context";
+import { AuthContext } from "~/auth/context";
 import { ProjectListComponent, ProjectComponent } from "./project";
 import { SessionListComponent } from "./session-list-component";
 import { SessionComponent } from "./session-component";
 import { SampleMain } from "./sample";
 import { DataFilesPage } from "./data-files";
+import { PageRoute, PageStyle } from "~/components/page-skeleton";
 
 import { NavButton } from "app/components";
 import { InsetText } from "app/components/layout";
@@ -102,20 +103,24 @@ const LoginSuggest = function () {
   );
 };
 
-const AdminMain = (props) =>
-  h(Frame, { id: "adminBase", ...props }, [
+const AdminMain = ({ base, ...rest }) => {
+  if (base == null) {
+    base = "/catalog";
+  }
+  return h(Frame, { id: "adminBase", ...rest }, [
     h("h1", "Catalog"),
     h("div.catalog-index", [
       h(
         InsetText,
         "The lab's data catalog can be browsed using several entrypoints:"
       ),
-      h(LinkCard, { to: "/project" }, h("h2", "Projects")),
-      h(LinkCard, { to: "/sample" }, h("h2", "Samples")),
-      h(LinkCard, { to: "/session" }, h("h2", "Sessions")),
-      h(LinkCard, { to: "/data-file" }, h("h2", "Data files")),
+      h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
+      h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
+      h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
+      h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
     ]),
   ]);
+};
 
 const CatalogBody = (
   { base } // Render main body
@@ -141,8 +146,9 @@ const CatalogBody = (
       path: base + "/sample",
       component: SampleMain,
     }),
-    h(Route, {
+    h(PageRoute, {
       path: base + "/data-file",
+      style: PageStyle.WIDE,
       component: DataFilesPage,
     }),
     h(Route, {

@@ -52,6 +52,7 @@ function AppMain(props) {
       }),
       h(PageRoute, {
         path: "/catalog",
+        pageStyle: PageStyle.WIDE,
         render() {
           return h(Catalog, { base: "/catalog" });
         },
@@ -94,9 +95,7 @@ const errorHandler = function (route, response) {
 const App = function () {
   // Nest application in React context providers
   const baseURL = "/";
-  const apiBaseURL = "http://localhost:5002/api/v1"; //process.env.BASE_URL || "/";
-  //const apiBaseURL = join(baseURL, "/api/v1");
-  console.log(apiBaseURL);
+  const apiBaseURL = join(process.env.BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
 
   return h(
     FrameProvider,

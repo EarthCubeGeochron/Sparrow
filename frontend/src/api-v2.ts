@@ -6,13 +6,14 @@ import {
   useAPIResult,
   APIOptions,
 } from "@macrostrat/ui-components";
+import { join } from "path";
 
 export function APIExplorerV2(props) {
   return h(SwaggerUI, { url: "/api/v2/schema" });
 }
 
 const APIV2Context = createAPIContext({
-  baseURL: "http://localhost:5002/api/v2",
+  baseURL: join(process.env.BASE_URL ?? "/", "/api/v2"),
 });
 
 export function useAPIv2Result(
