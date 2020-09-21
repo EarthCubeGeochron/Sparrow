@@ -20,15 +20,19 @@ import h from "react-hyperscript";
 
 export const FrameContext = createContext({});
 
-// custom hook to retrieve data from FrameContext 
+// custom hook to retrieve data from FrameContext
 
-// function FrameProvider({ overrides: {} }) {
+// function FrameProvider({ props }) {
+//   const { overrides, ...rest } = props;
 //   const [state, setState] = useState({ registry: {} });
-//   const getElement = (id, overrides) => {
+//   const getElement = (id) => {
 //     return overrides[id] || null;
 //   };
-//   const value = { register: state.registry, getElement };
-//   return h(FrameContext.Provider, { value }, Children);
+//   const register = (registry) => {
+//     setState({ registry: registry });
+//   };
+//   const value = { register: register, getElement };
+//   return h(FrameContext.Provider, { value }, props.children);
 // }
 class FrameProvider extends Component {
   static propTypes = {

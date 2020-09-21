@@ -66,7 +66,13 @@ export function MarkerCluster({ viewport, changeViewport, bounds }) {
         });
         if (isCluster) {
           return (
-            <Marker key={cluster.id} longitude={longitude} latitude={latitude}>
+            <Marker
+              key={cluster.id}
+              longitude={longitude}
+              latitude={latitude}
+              captureClick={true}
+              captureDoubleClick={true}
+            >
               <div
                 className={clusterClass}
                 style={{
@@ -93,6 +99,8 @@ export function MarkerCluster({ viewport, changeViewport, bounds }) {
             longitude={longitude}
             offsetLeft={-15}
             offsetTop={-20}
+            captureClick={true}
+            captureDoubleClick={true}
           >
             <Popover
               content={

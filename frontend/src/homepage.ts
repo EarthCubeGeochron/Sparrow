@@ -10,8 +10,6 @@ import { useContext } from "react";
 const h = hyperStyled(styles);
 
 const HomePage = () => {
-  const data = h(Frame, { id: "MapStyles" });
-  console.log(data);
   return h("div.homepage", [
     h(InsetText, [
       h(Frame, { id: "landingText" }),

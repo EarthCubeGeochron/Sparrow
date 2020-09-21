@@ -2,8 +2,21 @@ import * as React from "react";
 import { useState, useEffect, useRef } from "react";
 import h from "@macrostrat/hyper";
 import MapGl, { Marker } from "react-map-gl";
-import { Card, Icon, Button, Popover } from "@blueprintjs/core";
+import {
+  Card,
+  Icon,
+  Button,
+  Popover,
+  Overlay,
+  Dialog,
+} from "@blueprintjs/core";
 import { MyNumericInput } from "../../new-sample/edit-sample";
+import {
+  SaveButton,
+  CancelButton,
+  DeleteButton,
+} from "@macrostrat/ui-components";
+import { useToggle } from "../../map/components/APIResult";
 
 /**
  * This can be used to set Latitude and Longitude fields in datasheet or other components.
@@ -11,19 +24,46 @@ import { MyNumericInput } from "../../new-sample/edit-sample";
  * Dragging Marker would be good too
  */
 
-export function MapSelector() {
+export function MapSelector({ onCellsChanged, row, col, colTwo }) {
   const [state, setState] = useState({
-    MapStyle: "mapbox://styles/mapbox/outdoors-v9",
     viewport: {
-      width: "50vw",
+      width: "100%",
       height: "500px",
       latitude: 30,
       longitude: 0,
       zoom: 0,
     },
-    longitude: 1,
-    latitude: 1,
+    longitude: 0,
+    latitude: 0,
   });
+
+  const [open, toggle] = useToggle(true);
+
+  const onClickHandle = () => {
+    //col is latitude, colTwo is longitude if col < colTwo
+    // col is longitude, colTwo is latitude of col > colTwo
+    if (col > colTwo) {
+      const latitude = Number(state.latitude).toFixed(3);
+      const longitude = Number(state.longitude).toFixed(3);
+      const changes = [
+        { row: row, col: col, value: latitude },
+        { row: row, col: colTwo, value: longitude },
+      ];
+      console.log(changes);
+      onCellsChanged(changes);
+      toggle;
+    } else if (col > colTwo) {
+      const latitude = Number(state.latitude).toFixed(3);
+      const longitude = Number(state.longitude).toFixed(3);
+      const changes = [
+        { row: row, col: col, value: longitude },
+        { row: row, col: colTwo, value: latitude },
+      ];
+      console.log(changes);
+      onCellsChanged(changes);
+      toggle;
+    }
+  };
 
   console.log(state.latitude, state.longitude);
 
@@ -56,54 +96,70 @@ export function MapSelector() {
     const onChangeLat = (value) => {
       setState({ ...state, latitude: value });
     };
-    return h("div", { style: { display: "flex" } }, [
-      h(MyNumericInput, {
-        value: state.longitude,
-        onChange: onChangeLng,
-        helperText: "-180 to 180",
-        label: "Longitude",
-      }),
-      h(MyNumericInput, {
-        value: state.latitude,
-        onChange: onChangeLat,
-        helperText: "-90 to 90",
-        label: "Latitude",
-      }),
-    ]);
+    return h(
+      "div",
+      { style: { display: "flex", justifyContent: "space-between" } },
+      [
+        h(MyNumericInput, {
+          value: Number(state.longitude).toFixed(3),
+          onChange: onChangeLng,
+          helperText: "(-180 to 180)",
+          min: -180,
+          max: 180,
+          label: "Longitude",
+        }),
+        h(MyNumericInput, {
+          value: Number(state.latitude).toFixed(3),
+          onChange: onChangeLat,
+          helperText: "(-90 to 90)",
+          label: "Latitude",
+          min: -90,
+          max: 90,
+        }),
+      ]
+    );
   }
 
   return h("div", { style: { display: "flex" } }, [
-    h(Card, [
-      h(
-        MapGl,
-        {
-          onClick: (e) => mapClicked(e),
-          mapStyle: state.MapStyle,
-          mapboxApiAccessToken: process.env.MAPBOX_API_TOKEN,
-          ...state.viewport,
-          onViewportChange: (viewport) => {
-            setState({
-              ...state,
-              //@ts-ignore
-              viewport: viewport,
-            });
-          },
-          ref: mapRef,
-        },
-        [
-          h.if(state.longitude != null)(
-            Marker,
-            {
-              longitude: state.longitude,
-              latitude: state.latitude,
-              draggable: true,
-              onDragEnd,
+    h(Dialog, { isOpen: open }, [
+      h(Card, [
+        h(
+          MapGl,
+          {
+            onClick: (e) => mapClicked(e),
+            mapStyle: "mapbox://styles/mapbox/outdoors-v9",
+            mapboxApiAccessToken: process.env.MAPBOX_API_TOKEN,
+            ...state.viewport,
+            onViewportChange: (viewport) => {
+              setState({
+                ...state,
+                //@ts-ignore
+                viewport: viewport,
+              });
             },
-            [h(Icon, { icon: "map-marker" })]
-          ),
-        ]
-      ),
-      h(LongLatInputs),
+            ref: mapRef,
+          },
+          [
+            h.if(state.longitude != null)(
+              Marker,
+              {
+                longitude: state.longitude,
+                latitude: state.latitude,
+                draggable: true,
+                onDragEnd,
+                offsetLeft: -10,
+                offsetTop: -15,
+              },
+              [h(Icon, { icon: "map-marker" })]
+            ),
+          ]
+        ),
+        h(LongLatInputs),
+        h("div", { style: { display: "flex", justifyContent: "flex-end" } }, [
+          h(SaveButton, { onClick: onClickHandle }, ["Save Changes"]),
+          h(CancelButton, { onClick: toggle }, ["Cancel"]),
+        ]),
+      ]),
     ]),
   ]);
 }

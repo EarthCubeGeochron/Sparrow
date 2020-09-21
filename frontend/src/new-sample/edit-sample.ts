@@ -9,6 +9,7 @@ import {
   NumericInput,
 } from "@blueprintjs/core";
 import { useToggle } from "../map/components/APIResult";
+import { NormalModuleReplacementPlugin } from "webpack";
 
 /** Form for Editing an Existing Sample */
 
@@ -65,7 +66,7 @@ interface MyInput {
 }
 export function MyTextInput(props: MyInput) {
   return h("div", [
-    h(FormGroup, { helperText: props.helperText, label: props.label }),
+    h(FormGroup, { labelInfo: props.helperText, label: props.label }),
     [
       h(InputGroup, {
         id: props.label + "-input",
@@ -95,19 +96,26 @@ interface MyInputNum {
 /** Numeric Input that has intent validation */
 export function MyNumericInput(props: MyInputNum) {
   const intent =
-    props.value < props.min || props.value > props.max ? "Danger" : "Primary";
+    props.value < props.min || props.value > props.max ? "Danger" : null;
   return h("div", [
-    h(FormGroup, { helperText: props.helperText, label: props.label }),
-    [
-      h(NumericInput, {
-        id: props.label + "-input",
-        placeholder: props.placeholder,
-        value: props.value,
-        onValueChange: props.onChange,
-        intent,
-        leftIcon: props.leftIcon,
-        rightElement: props.rightElement,
-      }),
-    ],
+    h(
+      FormGroup,
+      {
+        labelInfo: props.helperText,
+        label: props.label,
+        labelFor: props.label + "-input",
+      },
+      [
+        h(NumericInput, {
+          id: props.label + "-input",
+          placeholder: props.placeholder,
+          value: props.value,
+          onValueChange: props.onChange,
+          intent,
+          leftIcon: props.leftIcon,
+          rightElement: props.rightElement,
+        }),
+      ]
+    ),
   ]);
 }

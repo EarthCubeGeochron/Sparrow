@@ -17,11 +17,21 @@ import { Card, MenuItem, ITagProps, Icon } from "@blueprintjs/core";
 
 interface Suggester {
   items: [];
+  onCellsChanged: any;
+  defaultValue?: any;
 }
 
-function DataSheetSuggest({ items }: Suggester) {
+function DataSheetSuggest({
+  items,
+  defaultValue,
+  onCellsChanged,
+  onCommit,
+  row,
+  col,
+  cell,
+}) {
   const [state, setState] = useState({
-    selectedItem: [],
+    selectedItem: [defaultValue],
   });
 
   // Renders Each Item in Item as a MenuItem
@@ -37,17 +47,24 @@ function DataSheetSuggest({ items }: Suggester) {
   };
   const itemSelect = (item) => {
     setState({ ...state, selectedItem: item });
+    const changes = [{ cell: cell, row: row, col: col, value: item }];
+    console.log(changes);
+    onCellsChanged(changes);
+    onCommit(defaultValue);
   };
 
   const filterItem = (query, item) => {
     return item.toLowerCase().indexOf(query.toLowerCase()) >= 0;
   };
+  const newItems = items.concat(defaultValue);
+
   return h(Suggest, {
     inputValueRenderer: (item) => item,
     itemRenderer: itemRenderer,
-    items: items,
+    items: newItems,
     onItemSelect: itemSelect,
     itemPredicate: filterItem,
+    createNewItemFromQuery: (query) => query,
   });
 }
 

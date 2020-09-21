@@ -25,8 +25,13 @@ function VirtualizedSheet(props) {
   function virtualRowRenderer({ row, children, className }) {
     return rowRenderer({ row: row + rowOffset, children, className });
   }
-  function virtualSheetRenderer({ column, children, className }) {
-    return sheetRenderer({ column: column + width, children, className });
+  function virtualSheetRenderer({ column, children, className, width }) {
+    return sheetRenderer({
+      column: column,
+      children,
+      className,
+      width: width,
+    });
   }
 
   const lastRow = Math.min(rowOffset + rowsToDisplay, data.length - 1);
