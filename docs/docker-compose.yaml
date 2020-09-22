@@ -22,7 +22,7 @@ services:
   backend:
     build: python-api
     volumes:
-      - py_docs:/docs/build/html/core
+      - py_docs:/docs/build/html
     command: make watch-html
   gateway:
     build:
@@ -31,7 +31,7 @@ services:
     ports:
       - "3000:80"
     volumes:
-      - py_docs:/usr/share/nginx/html
+      - py_docs:/usr/share/nginx/html/core
 volumes:
   cache:
   node_modules:

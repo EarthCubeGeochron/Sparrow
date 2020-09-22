@@ -1,7 +1,5 @@
 FROM sparrowdata/backend
 
-RUN apk add --no-cache make
-
 WORKDIR /docs
 
 COPY ./requirements.txt /docs/requirements.txt

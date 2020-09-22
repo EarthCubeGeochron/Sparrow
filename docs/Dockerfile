@@ -1,6 +1,7 @@
 # Note: the build context for this dockerfile is actually
 # the "Sparrow" project directory, not the docs directory
 
+## Schema Docs
 # Build schema documentation in one layer:
 FROM pandoc/core AS schema-builder
 # Install additional dependencies
@@ -21,6 +22,21 @@ cat /sql/input.sql \
 > /build/schema.html && \
 test -f /build/schema.html
 
+## Core docs
+
+FROM sparrowdata/backend AS core-docs
+
+WORKDIR /docs
+
+COPY ./docs/python-api/requirements.txt /docs/requirements.txt
+RUN pip install --no-cache -r /docs/requirements.txt
+
+ENV BACKEND_ROOT=/app
+ENV SPARROW_SECRET_KEY=docs
+
+COPY ./docs/python-api/ /docs/
+
+RUN make html
 
 # Then build the overall documentation site:
 FROM node:12-slim AS docs-base
@@ -52,6 +68,7 @@ FROM nginx:1.19 AS docs
 
 # Copy site content into docker container
 COPY --from=docs-builder /docs/build /usr/share/nginx/html
+COPY --from=core-docs /docs/build/html /usr/share/nginx/html/core
 
 # Copy nginx config into docker container
 COPY ./docs/server-config/conf.d/production.conf /etc/nginx/conf.d/default.conf
