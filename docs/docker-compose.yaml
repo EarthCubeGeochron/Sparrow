@@ -24,6 +24,8 @@ services:
     volumes:
       - py_docs:/docs/build/html
     command: make watch-html
+    ports:
+      - "5104:8000"
   gateway:
     build:
       context: server-config
