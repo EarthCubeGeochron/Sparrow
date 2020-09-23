@@ -19,4 +19,4 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 watch-html:
-	sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)" --port 5108 $(SPHINXOPTS) $(O)
+	sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)" --port 5000 --host 0.0.0.0 $(SPHINXOPTS) $(O)

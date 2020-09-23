@@ -21,7 +21,7 @@ sys.path.append(os.environ["BACKEND_ROOT"])
 # -- Project information -----------------------------------------------------
 
 project = u"Sparrow"
-copyright = u"2019, Daven Quinn"
+copyright = u"2020, EarthCube Geochronology team"
 author = u"Daven Quinn"
 
 # The short X.Y version
@@ -80,7 +80,7 @@ pygments_style = None
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
-html_logo = "/img/sparrow-bird-flat.svg"
+html_logo = "_static/img/sparrow-bird-flat.svg"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

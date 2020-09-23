@@ -29,6 +29,8 @@ FROM sparrowdata/backend AS core-docs
 WORKDIR /docs
 
 COPY ./docs/python-api/requirements.txt /docs/requirements.txt
+# Copy images/logos into container
+COPY ./docs/static/img/ /docs/_static/img/
 RUN pip install --no-cache -r /docs/requirements.txt
 
 ENV BACKEND_ROOT=/app

@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
+cd "$SPARROW_PATH/docs"
+
+cp -r "static/img" "python-api/source/_static/img"
+
 sparrow compose build backend
 
-cd "$SPARROW_PATH/docs"
 
 export COMPOSE_PROJECT_NAME="sparrow_docs"
 export COMPOSE_FILE="docker-compose.yaml"

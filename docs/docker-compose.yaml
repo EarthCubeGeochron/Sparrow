@@ -24,14 +24,14 @@ services:
     volumes:
       - py_docs:/docs/build/html
     command: make watch-html
-    ports:
-      - "5104:8000"
+    expose:
+      - 5000
   gateway:
     build:
       context: server-config
       dockerfile: Dockerfile.dev
     ports:
-      - "3000:80"
+      - "3002:80"
     volumes:
       - py_docs:/usr/share/nginx/html/core
 volumes:
