@@ -1,5 +1,3 @@
-
-
 def classname_for_table(table):
     if table.schema is not None:
         return f"{table.schema}_{table.name}"
@@ -11,9 +9,9 @@ def _classname_for_table(cls, table_name, table):
     return classname_for_table(table)
 
 
-def trim_postfix(target, postfix='_id'):
+def trim_postfix(target, postfix="_id"):
     if target.endswith(postfix):
-        return target[:-len(postfix)]
+        return target[: -len(postfix)]
     return target
 
 
@@ -28,11 +26,11 @@ def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
     #     if n != 'id':
     #         base_name = trim_postfix(n)
 
-    return "_"+base_name
+    return "_" + base_name
 
 
 def name_for_collection_relationship(base, local_cls, referred_cls, constraint):
-    #if referred_cls.__table__.name == 'datum_type' and local_cls.__table__.name == 'unit':
+    # if referred_cls.__table__.name == 'datum_type' and local_cls.__table__.name == 'unit':
     return referred_cls.__name__.lower() + "_collection"
 
 

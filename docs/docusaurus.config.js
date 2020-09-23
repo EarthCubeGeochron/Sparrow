@@ -1,4 +1,5 @@
 const { join } = require("path");
+const { format } = require("date-fns");
 
 module.exports = {
   title: "Sparrow",
@@ -23,19 +24,23 @@ module.exports = {
           to: "docs/guides",
           activeBasePath: "Guides",
           label: "Guides",
-          position: "left",
         },
-
         {
-          to: "docs/introduction",
-          activeBasePath: "docs",
-          label: "Docs",
+          to: "docs/motivation-and-design",
+          activeBasePath: "Guides",
+          label: "Motivation and design",
           position: "left",
         },
         {
           to: "docs/getting-started",
           activeBasePath: "Guides",
           label: "Getting started",
+          position: "left",
+        },
+        {
+          to: "docs/introduction",
+          activeBasePath: "docs",
+          label: "Docs",
           position: "left",
         },
         {
@@ -72,6 +77,14 @@ module.exports = {
             {
               label: "GitHub",
               href: "https://github.com/EarthCubeGeochron/Sparrow",
+            },
+          ],
+        },
+        {
+          title: "Info",
+          items: [
+            {
+              html: `Updated <i>${format(new Date(), "MMMMMM do, yyyy")}</i>`,
             },
           ],
         },

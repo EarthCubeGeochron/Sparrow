@@ -11,6 +11,7 @@ services:
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend:
+    image: sparrowdata/backend
     build:
       context: backend
       target: main
@@ -38,7 +39,7 @@ services:
       # Volume for scripts to make things like
       # migrations work...
       # TODO: come up with a better way to organize
-      - ./bin:/sparrow-bin
+      - ./_cli/bin:/sparrow-bin
       # Read-only volume for source code
       - ./backend/:/app
       # Nested volume to keep built files

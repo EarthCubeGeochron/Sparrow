@@ -44,6 +44,7 @@
     "react-router-hash-link": "^1.2.2",
     "react-simple-maps": "^0.12.1",
     "store": "^2.0.12",
+    "swagger-ui-react": "^3.32.3",
     "viewport-mercator-project": "^6.2.2"
   },
   "devDependencies": {

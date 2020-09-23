@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required
 
 from sparrow import get_logger
-from sparrow.api import APIResourceCollection, ModelEditParser
+from sparrow.api.v1 import APIResourceCollection, ModelEditParser
 from sparrow.plugins import SparrowCorePlugin
 from marshmallow.exceptions import ValidationError
 from sparrow.util import get_qualified_name
