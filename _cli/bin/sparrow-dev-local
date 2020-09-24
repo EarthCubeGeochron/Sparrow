@@ -1,0 +1,17 @@
+#!/bin/bash -e
+# Description: Reload web browser if app is in development mode
+# This will eventually be folded into a `sparrow dev` command
+
+sparrow compose up -d --build gateway
+
+cd "$SPARROW_PATH/frontend"
+export SPARROW_BASE_URL="/"
+export API_BASE_URL="http://localhost:${SPARROW_HTTP_PORT:-5002}/"
+npm install
+
+rm -f "$(pwd)/site-content"
+ln -s "${SPARROW_SITE_CONTENT:-"default-content"}" "$(pwd)/site-content"
+export SPARROW_SITE_CONTENT="$(pwd)/site-content"
+echo $SPARROW_SITE_CONTENT
+echo "Running on port 3000..."
+npm run dev

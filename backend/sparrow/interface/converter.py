@@ -80,7 +80,7 @@ class SparrowConverter(ModelConverter):
             col_name = list(prop.local_columns)[0].name
             # Special case for 'data_file_link'
             if col_name == "file_hash":
-                return "data_file"
+                return prop.target.name
             if col_name != "id":
                 return trim_postfix(col_name, "_id")
 
@@ -117,10 +117,10 @@ class SparrowConverter(ModelConverter):
 
         # ## Deal with relationships here #
 
-        if prop.target.name == "data_file_link":
-            # Data files are currently exclusively dealt with internally...
-            # (this may change)
-            return True
+        # if prop.target.name == "data_file_link":
+        #     # Data files are currently exclusively dealt with internally...
+        #     # (this may change)
+        #     return True
 
         # # Exclude field based on table name
         this_table = prop.parent.tables[0]

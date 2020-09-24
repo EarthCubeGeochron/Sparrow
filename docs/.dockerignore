@@ -1,4 +1,5 @@
 docker-compose.yaml
+.docusaurus
 Dockerfile
 node_modules
 public

@@ -1,9 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 import { useContext, useState } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import {
@@ -24,6 +18,7 @@ import {
   SaveButton,
   useModelEditor,
   APIContext,
+  APIHelpers,
 } from "@macrostrat/ui-components";
 import { MinimalNavbar } from "app/components";
 import { put } from "axios";
@@ -136,9 +131,7 @@ const EditStatusButtons = function () {
 const EditableProjectDetails = function (props) {
   const { project } = props;
   const { login } = useAuth();
-  const {
-    helpers: { buildURL },
-  } = useContext(APIContext);
+  const { buildURL } = APIHelpers(useContext(APIContext));
 
   return h(
     ModelEditor,

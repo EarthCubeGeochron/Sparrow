@@ -11,6 +11,7 @@ services:
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend:
+    image: sparrowdata/backend
     build:
       context: backend
       target: main
