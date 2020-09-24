@@ -10,7 +10,7 @@ import {
   Overlay,
   Dialog,
 } from "@blueprintjs/core";
-import { MyNumericInput } from "../../new-sample/edit-sample";
+import { MyNumericInput } from "../../components/edit-sample";
 import {
   SaveButton,
   CancelButton,

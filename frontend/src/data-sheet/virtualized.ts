@@ -11,7 +11,10 @@ function VirtualizedSheet(props) {
   const { rowHeight } = useContext(DataSheetContext);
 
   // { start: { i: number, j; number }, end: { i: number, j: number } }
-  const [selection, setSelection] = useState(null);
+  const [selection, setSelection] = useState({
+    offset: null,
+    notOffset: null,
+  });
 
   const ref = useRef<HTMLDivElement>();
 
@@ -49,30 +52,30 @@ function VirtualizedSheet(props) {
       end: { i: endI, j: endJ },
     };
     console.log({ start, end });
-    setSelection(selected);
+    setSelection({ offset: selected, notOffset: { start, end } });
   }
 
-  const offSetSelection = () => {
-    if (selection) {
-      return {
-        start: { i: selection.start.i - rowOffset, j: selection.start.j },
-        end: { i: selection.end.i - rowOffset, j: selection.end.j },
-      };
-    }
-  };
+  // const offSetSelection = () => {
+  //   if (selection) {
+  //     return {
+  //       start: { i: selection.start.i - rowOffset, j: selection.start.j },
+  //       end: { i: selection.end.i - rowOffset, j: selection.end.j },
+  //     };
+  //   }
+  // };
 
-  let offsetSelection = offSetSelection();
+  //let offsetSelection = offSetSelection();
 
-  console.log(selection);
-  console.log(offsetSelection);
+  console.log(selection.offset);
+  // console.log(offsetSelection);
   console.log(rowOffset);
 
   return h("div.virtualized-sheet", { ref }, [
     h("div.ui", { style: { height, width } }, [
       h(ReactDataSheet, {
         data: data.slice(rowOffset, lastRow),
-        selected: offsetSelection,
-        onSelect,
+        //selected: selection.notOffset,
+        //onSelect,
         rowRenderer: virtualRowRenderer,
         sheetRenderer: virtualSheetRenderer,
         onCellsChanged(changes) {
