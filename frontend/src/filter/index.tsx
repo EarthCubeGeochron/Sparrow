@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Button, Tooltip, Collapse, Card, MenuItem } from "@blueprintjs/core";
 import {
   AgeSlideSelect,
@@ -15,11 +14,11 @@ import h from "@macrostrat/hyper";
  * pages. Some of the filters may be hidden depending on what page the user
  * is on, (i.e. a location selector wouldn't be rendered on the MapPanel
  */
-interface filter {
+interface Filter {
   on_map?: boolean;
 }
 
-const SampleFilter = ({ on_map = false }) => {
+function SampleFilter({ on_map = false }: Filter) {
   const [open, toggleOpen] = useToggle(false);
 
   return h("div", [
@@ -35,6 +34,6 @@ const SampleFilter = ({ on_map = false }) => {
       ]),
     ]),
   ]);
-};
+}
 
 export { SampleFilter };

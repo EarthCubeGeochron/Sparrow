@@ -5,20 +5,25 @@ const { readFileSync } = require("fs");
 const { EnvironmentPlugin } = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-process.env["BASE_URL"] = process.env.SPARROW_BASE_URL;
+process.env["BASE_URL"] =
+  process.env.API_BASE_URL || process.env.SPARROW_BASE_URL;
 
 let assetsDir = path.resolve(__dirname, "_assets");
 let siteContent = process.env.SPARROW_SITE_CONTENT;
 
+console.log("Base url:", process.env.BASE_URL);
 console.log("Site content:", siteContent);
 
-let assetsRoute = process.env.SPARROW_BASE_URL;
+let assetsRoute = process.env.SPARROW_BASE_URL || process.env.BASE_URL;
+
+console.log(process.env.BASE_URL, process.env.API_BASE_URL);
 
 let bs_cfg = {
   open: false,
   // These don't appear to work?
   logLevel: "silent",
   logSnippet: false,
+  single: true,
   // Actual external port
   port: 3000,
   //proxy: "http://backend:5000"
@@ -31,13 +36,12 @@ let bs_cfg = {
   },
 };
 
-if (!process.env.CONTAINERIZED) {
-  // Configuration for running locally
-  // This configuration is probably wrong
-  bs_cfg.proxy = "http://0.0.0.0:5000";
-  bs_cfg.serveStatic = [{ route: assetsRoute, dir: assetsDir }];
-  bs_cfg.server = "./";
-}
+// if (!process.env.CONTAINERIZED) {
+//   // Configuration for running locally
+//   // This configuration is probably wrong
+//bs_cfg.serveStatic = [{ route: assetsRoute, dir: assetsDir }];
+bs_cfg.server = "./_assets";
+//}
 
 let browserSync = new BrowserSyncPlugin(bs_cfg);
 
@@ -131,6 +135,8 @@ module.exports = {
   },
   devtool: "source-map",
   resolve: {
+    // Resolve node modules from local directory if not found in plugins
+    modules: ["node_modules", path.resolve(__dirname, "node_modules/")],
     extensions: [
       ".ts",
       ".tsx",
@@ -143,14 +149,20 @@ module.exports = {
       ".md",
     ],
     alias: {
+      "~": path.resolve(__dirname, "src/"),
       app: path.resolve(__dirname, "src/"),
       sparrow: path.resolve(__dirname, "src/"),
       plugins: path.resolve(__dirname, "plugins/"),
       "site-content": siteContent,
+      // For node module resolution + hooks
+      react: path.resolve(__dirname, "node_modules", "react"),
     },
   },
   entry: {
     index: "./src/index.ts",
+  },
+  stats: {
+    chunks: false,
   },
   output: {
     path: assetsDir,

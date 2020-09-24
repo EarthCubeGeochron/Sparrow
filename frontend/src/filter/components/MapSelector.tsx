@@ -1,9 +1,8 @@
-import * as React from "react";
 import { useState } from "react";
-import MapGl from "react-map-gl";
+//import MapGl from "react-map-gl";
 import { Map } from "../../map/components/MapGl";
-import { Editor, DrawRectangleMode, EditingMode } from "react-map-gl-draw";
-import { Card, Popover, Tooltip, Button } from "@blueprintjs/core";
+//import { Editor, DrawRectangleMode, EditingMode } from "react-map-gl-draw";
+//import { Card, Popover, Tooltip, Button } from "@blueprintjs/core";
 import h from "@macrostrat/hyper";
 
 /**
