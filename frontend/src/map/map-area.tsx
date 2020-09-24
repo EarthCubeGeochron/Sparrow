@@ -53,7 +53,12 @@ export function MapPanel({
     MapStyle: mapstyle,
     showMarkers: true,
     clickPnt: { lng: 0, lat: 0 },
+    mounted: false,
   };
+  useEffect(() => {
+    setState({ ...state, mounted: true });
+  }, []);
+
   const initialViewport = {
     latitude,
     longitude,
@@ -67,7 +72,29 @@ export function MapPanel({
   const [state, setState] = useState(initialState);
   const [viewport, setViewport] = useState(initialViewport);
 
-  console.log(window.location.hash);
+  // getting url hash to set location from
+  let firstWindowHash = window.location.hash;
+
+  // function that parses {zoom, latitude, longitude} from url hash
+  function setLocationFromHash(hash) {
+    if (hash == null) {
+      ({ hash } = window.location);
+    }
+    const s = hash.slice(1);
+    const v = s.split("/");
+    if (v.length !== 3) {
+      return {};
+    }
+    const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
+    console.log(zoom, latitude, longitude);
+    setViewport({ ...viewport, zoom, latitude, longitude });
+  }
+
+  useEffect(() => {
+    if (firstWindowHash !== "") {
+      setLocationFromHash(firstWindowHash);
+    }
+  }, [firstWindowHash]);
 
   const mapRef = useRef();
 
@@ -144,7 +171,9 @@ export function MapPanel({
           mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
           {...viewport}
           onViewportChange={(viewport) => {
-            setViewport(viewport);
+            if (state.mounted) {
+              setViewport(viewport);
+            }
           }}
           ref={mapRef}
         >
