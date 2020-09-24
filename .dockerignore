@@ -1,3 +1,4 @@
 .git
-node_modules
-.docusaurus
+.pytest_cache
+**/node_modules
+frontend/.docusaurus
