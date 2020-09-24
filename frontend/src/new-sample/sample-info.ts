@@ -2,7 +2,7 @@ import * as React from "react";
 import h from "@macrostrat/hyper";
 import { Card, Dialog, Divider } from "@blueprintjs/core";
 import { buildQueryString } from "@macrostrat/ui-components/lib/types";
-import EditSample from "./edit-sample";
+import EditSample from "../components/edit-sample";
 
 /** Info that propagates the right column when a left column button is clicked */
 
