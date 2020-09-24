@@ -58,6 +58,7 @@ export function MapPanel({
   useEffect(() => {
     setState({ ...state, mounted: true });
   }, []);
+  const initialData = useAPIResult("/sample", { all: true });
 
   const initialViewport = {
     latitude,
@@ -179,6 +180,7 @@ export function MapPanel({
         >
           {state.showMarkers ? (
             <MarkerCluster
+              data={initialData}
               viewport={viewport}
               changeViewport={changeViewport}
               bounds={bounds}

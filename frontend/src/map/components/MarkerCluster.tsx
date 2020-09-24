@@ -10,9 +10,9 @@ import { Marker, FlyToInterpolator } from "react-map-gl";
 
 // This component controls the State and the UI for the markers and the markercluster
 
-export function MarkerCluster({ viewport, changeViewport, bounds }) {
+export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
   const [markers, setMarkers] = useState([]);
-  const initialData = useAPIResult("/sample", { all: true });
+  const initialData = data;
   useEffect(() => {
     // Set the data back to the initial data
     if (initialData == null) return;
