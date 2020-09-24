@@ -27,6 +27,7 @@ export const LayerMenu = ({
         const { name, style } = styleOb;
         return (
           <MenuItem
+            key={name}
             intent={MapStyle == style ? "primary" : null}
             labelElement={MapStyle == style ? <Icon icon="tick"></Icon> : null}
             text={name}

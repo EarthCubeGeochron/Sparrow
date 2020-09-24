@@ -49,13 +49,25 @@ export function MapPanel({
   mapstyle = "mapbox://styles/mapbox/outdoors-v9",
 }: MapProps) {
   const initialState = {
-    viewport: { latitude, longitude, zoom, width, height },
+    //viewport: { latitude, longitude, zoom, width, height },
     MapStyle: mapstyle,
     showMarkers: true,
     clickPnt: { lng: 0, lat: 0 },
   };
+  const initialViewport = {
+    latitude,
+    longitude,
+    zoom,
+    width,
+    height,
+    transitionInterpolator: null,
+    transitionDuration: null,
+  };
 
   const [state, setState] = useState(initialState);
+  const [viewport, setViewport] = useState(initialViewport);
+
+  console.log(window.location.hash);
 
   const mapRef = useRef();
 
@@ -76,18 +88,15 @@ export function MapPanel({
   };
 
   const changeViewport = ({ expansionZoom, longitude, latitude }) => {
-    setState({
-      ...state,
-      viewport: {
-        ...state.viewport,
-        longitude: longitude,
-        latitude: latitude,
-        zoom: expansionZoom,
-        transitionInterpolator: new FlyToInterpolator({
-          speed: 1,
-        }),
-        transitionDuration: "auto",
-      },
+    setViewport({
+      ...viewport,
+      longitude: longitude,
+      latitude: latitude,
+      zoom: expansionZoom,
+      transitionInterpolator: new FlyToInterpolator({
+        speed: 1,
+      }),
+      transitionDuration: "auto",
     });
   };
 
@@ -133,15 +142,15 @@ export function MapPanel({
           }}
           mapStyle={state.MapStyle}
           mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
-          {...state.viewport}
+          {...viewport}
           onViewportChange={(viewport) => {
-            setState({ ...state, viewport: viewport });
+            setViewport(viewport);
           }}
           ref={mapRef}
         >
           {state.showMarkers ? (
             <MarkerCluster
-              viewport={state.viewport}
+              viewport={viewport}
               changeViewport={changeViewport}
               bounds={bounds}
             ></MarkerCluster>

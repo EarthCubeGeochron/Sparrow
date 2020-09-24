@@ -4,7 +4,7 @@ import h from "@macrostrat/hyper";
 import { TagInput } from "@blueprintjs/core";
 
 /** component for creating tags from input
- *
+ * 
  */
 
 export default function TagInputs() {
