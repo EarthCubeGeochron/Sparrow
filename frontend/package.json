@@ -51,7 +51,7 @@
     "react-table": "7.2.2",
     "react-virtualized": "^9.21.2",
     "store": "^2.0.12",
-    "swagger-ui-react": "^3.32.3",
+    "swagger-ui-react": "^3.34.0",
     "use-supercluster": "0.2.8",
     "viewport-mercator-project": "^6.2.2"
   },

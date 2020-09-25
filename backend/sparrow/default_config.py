@@ -12,7 +12,6 @@ SECRET_KEY = environ.get("SPARROW_SECRET_KEY")
 if SECRET_KEY is None:
     raise KeyError("Environment variable `SPARROW_SECRET_KEY` must be set")
 
-
 JWT_SECRET_KEY = SECRET_KEY
 # We store JWT tokens in cookies because it's more secure.
 # https://flask-jwt-extended.readthedocs.io/en/latest/tokens_in_cookies.html

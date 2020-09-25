@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Editor, EditingMode, DrawRectangleMode } from "react-map-gl-draw";
 import h from "@macrostrat/hyper";
 import { Select } from "@blueprintjs/select";
@@ -25,9 +24,7 @@ export function MapDrawer() {
   const [state, setState] = useState(initialState);
 
   const modeSwitcher = () => {
-      return(
-          h(Select, )
-      )
+    return h(Select);
   };
   return h(Editor, { mode: state.modeHandler });
 }

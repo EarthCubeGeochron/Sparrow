@@ -1,22 +1,11 @@
-/*
- * decaffeinate suggestions:
- * DS001: Remove Babel/TypeScript constructor workaround
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
-import MapGl, { Marker, FlyToInterpolator } from "react-map-gl";
+import { useState, useRef } from "react";
+import MapGl, { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyles } from "../../plugins/MapStyle";
-import h, { compose } from "@macrostrat/hyper";
-import useSuperCluster from "use-supercluster";
-import { Button, Intent, Toaster, Position } from "@blueprintjs/core";
-import classNames from "classnames";
+import { Button, Toaster, Position } from "@blueprintjs/core";
 import "./cluster.css";
 import { Link } from "react-router-dom";
-import { useAPIResult, useToggle } from "./components/APIResult";
 import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
@@ -60,11 +49,7 @@ export function MapPanel({
   const mapRef = useRef();
 
   const bounds = mapRef.current
-    ? mapRef.current
-        .getMap()
-        .getBounds()
-        .toArray()
-        .flat()
+    ? mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
   const toggleShowMarkers = () => {

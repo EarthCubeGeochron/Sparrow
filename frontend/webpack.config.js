@@ -117,6 +117,12 @@ module.exports = {
       ...styleRules,
       { test: /\.coffee$/, use: [babelLoader, "coffee-loader"] },
       { test: /\.(js|jsx|ts|tsx)$/, use: babelLoader, exclude: /node_modules/ },
+      {
+        // Rule for 'modern' javascript
+        type: "javascript/auto",
+        test: /\.mjs$/,
+        use: [],
+      },
       { test: /\.(eot|svg|ttf|woff|woff2)$/, use: [fontLoader] },
       { test: /\.md$/, use: ["html-loader", "markdown-loader"] },
       { test: /\.html$/, use: ["html-loader"] },
@@ -162,7 +168,7 @@ module.exports = {
     index: "./src/index.ts",
   },
   stats: {
-    chunks: false,
+    colors: true,
   },
   output: {
     path: assetsDir,
@@ -180,12 +186,6 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({ title: process.env.SPARROW_LAB_NAME }),
     browserSync,
-    new EnvironmentPlugin([
-      "NODE_ENV",
-      "DEBUG",
-      "BASE_URL",
-      "SPARROW_LAB_NAME",
-      "MAPBOX_API_TOKEN",
-    ]),
+    new EnvironmentPlugin(["BASE_URL", "SPARROW_LAB_NAME", "MAPBOX_API_TOKEN"]),
   ],
 };

@@ -23,6 +23,7 @@ services:
     depends_on:
       - db
     environment:
+      - SPARROW_ENV
       - SPARROW_SECRET_KEY
       - SPARROW_BASE_URL
       - SPARROW_LAB_NAME
