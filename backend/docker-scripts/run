@@ -29,11 +29,10 @@ PORT=5000
 if [ $SPARROW_ENV = 'development' ]; then
   ## Could also try hypercorn for better reloading...
   echo "Running in development mode"
-  exec uvicorn --reload \
-    --reload-dir core_plugins \
-    --reload-dir sparrow \
-    --log-level debug \
-    --host $HOST --port $PORT "sparrow.asgi:app"
+  exec hypercorn --bind $HOST:$PORT -w 1 --reload \
+    --log-file - \
+    --debug \
+    --log-level debug "sparrow.asgi:app"
 else
   exec gunicorn \
     --worker-tmp-dir /dev/shm \
