@@ -4,9 +4,16 @@ module.exports = {
       'guides',
       "motivation-and-design",
       "getting-started",
+      "server-configuration", // not loading
       "sparrow-on-windows",
-      "dataSci",
+      "datasci/dataSci",
+      "schema-imp", // not loading
     ],
-    Documentation: ["introduction", "command-line-interface"],
+    Documentation: [
+      "introduction",
+      "command-line-interface", 
+      "frontend/local-dev", 
+      "frontend/frames",
+    ],
   },
 };

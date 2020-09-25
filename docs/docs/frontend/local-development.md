@@ -1,3 +1,9 @@
+---
+id: local-dev
+title: Local Development
+sidebar_label: Local Development
+---
+
 Sometimes, it can be helpful to develop the web frontend
 outside of the Docker container environment. This can be
 especially helpful when you need to test in-development

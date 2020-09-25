@@ -34,9 +34,9 @@ Also become familiar with basic python logic and syntax such as:
 
 Below are a collection of Jupyter Notebooks as static HTML pages. They go in order as they are listed from top to bottom. It isn't necessary to follow in order, however it may be unclear what dataframes are being referred to if they are looked at out of order. It is suggested to at least skim over all in order and then focus more on the notebooks that contain the most pertinent information for you.
 
-- [Requests and Uploads](/docs/requestsUploads)
-- [Column Splitting](/docs/columnSplit)
-- [Combining and Exporting](/docs/combine)
-- [Basic Data Analytics](/docs/dataAnalytics)
-- [Exporting Meaningful Data](/docs/export)
-- [Mapping with Folium](/docs/mapping)
+- [Requests and Uploads](/docs/datascience/requestsUploads)
+- [Column Splitting](/docs/datascience/columnSplit)
+- [Combining and Exporting](/docs/datascience/combine)
+- [Basic Data Analytics](/docs/datascience/dataAnalytics)
+- [Exporting Meaningful Data](/docs/datascience/export)
+- [Mapping with Folium](/docs/datascience/mapping)
