@@ -60,7 +60,7 @@ class APIv2(Starlette):
         self._app = app
         self.route_descriptions = []
 
-        super().__init__(exception_handlers=exception_handlers)
+        super().__init__(exception_handlers=exception_handlers, debug=True)
         self.spec = APISpec(
             title="Sparrow API",
             version="2.0",
@@ -118,7 +118,8 @@ class APIv2(Starlette):
         )
 
         tbl = iface.opts.model.__table__
+        desc = getattr(cls, "description", "—")
         basic_info = dict(
-            route=endpoint, table=tbl.name, schema=tbl.schema, description="A route!",
+            route=endpoint, table=tbl.name, schema=tbl.schema, description=str(desc),
         )
         self.route_descriptions.append(basic_info)
