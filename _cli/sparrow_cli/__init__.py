@@ -13,6 +13,7 @@ from .util import cmd, compose, exec_or_run, find_subcommand, container_id
 from .test import sparrow_test
 from .database import sparrow_db
 from .docs import sparrow_docs
+from .env import validate_environment
 
 console = Console(highlight=True)
 
@@ -36,6 +37,12 @@ def main(ctx, args):
 
     if subcommand == "compose":
         return compose(*rest)
+
+    if subcommand == "up":
+        # Validate the presence of SPARROW_SECREY_KEY only if we are bringing
+        # the application up. Eventually, this should be wrapped into a Python
+        # version of the `sparrow up` command.
+        validate_environment()
 
     _command = find_subcommand(cfg.bin_directories, subcommand)
 
