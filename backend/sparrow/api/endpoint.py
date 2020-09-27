@@ -5,6 +5,7 @@ from webargs.fields import DelimitedList, Str, Int
 from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
+from starlette.responses import JSONResponse
 
 from ..database.mapper.util import classname_for_table
 from ..logs import get_logger
@@ -56,6 +57,18 @@ class ModelAPIEndpoint(HTTPEndpoint):
         # https://github.com/djrobstep/sqlakeyset
         return APIResponse(schema, res)
 
+    async def api_docs(self, request):
+        return JSONResponse(
+            {
+                "parameters": {
+                    "has": "string, model field",
+                    "not_has": "string, model field",
+                    "per_page": "integer, number of results per page",
+                    "page": "string, token of the page to fetch",
+                }
+            }
+        )
+
     async def get(self, request):
         """Handler for all GET requests"""
 
@@ -63,8 +76,11 @@ class ModelAPIEndpoint(HTTPEndpoint):
             # Pass off to the single-item handler
             return await self.get_single(request)
 
+        if not len(request.query_params.keys()):
+            return await self.api_docs(request)
+
         log.info(request)
-        log.info(request.path_params)
+        log.info(request.query_params)
         args = await parser.parse(self.args_schema, request, location="querystring")
         log.info(args)
 
