@@ -133,10 +133,10 @@ class SparrowConverter(ModelConverter):
             # Don't allow self-referential collections
             return True
 
-        if prop.uselist and not allow_nest(this_table.name, other_table.name):
-            # Disallow list fields that aren't related (these usually don't have
-            # corresponding local columns)
-            return True
+        # if prop.uselist and not allow_nest(this_table.name, other_table.name):
+        #     # Disallow list fields that aren't related (these usually don't have
+        #     # corresponding local columns)
+        #     return True
 
         return False
 
