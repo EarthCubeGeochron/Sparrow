@@ -9,7 +9,7 @@ from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
-from .endpoint import ModelAPIEndpoint
+from .endpoint import ModelAPIEndpoint, model_description
 
 log = get_logger(__name__)
 
@@ -118,7 +118,7 @@ class APIv2(Starlette):
         )
 
         tbl = iface.opts.model.__table__
-        desc = getattr(cls, "description", "—")
+        desc = model_description(iface)
         basic_info = dict(
             route=endpoint, table=tbl.name, schema=tbl.schema, description=str(desc),
         )
