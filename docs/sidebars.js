@@ -1,24 +1,41 @@
 module.exports = {
   someSidebar: {
     Guides: [
-      'guides',
       "motivation-and-design",
       "getting-started",
-      "server-configuration", // not loading
+      "server-configuration",
       "sparrow-on-windows",
-      "datasci/dataSci",
-      "schema-imp", // not loading
+      "datascience/dataSci",
+      "schema-imp",
     ],
     Documentation: [
       "introduction",
-      "command-line-interface", 
-      "frontend/local-dev", 
-      "frontend/frames",
+      "command-line-interface",
+      {
+        type: "category",
+        label: "Frontend",
+        items: [
+          "frontend/local-dev",
+          "frontend/frames",
+          "frontend/data-input-form",
+        ],
+      },
     ],
   },
 };
 
 /*
+To access subfolders in the docs directory:
+just add the name of the folder before the id separated by /
+
+ex)
+  docs->
+    -> subfolder-name ->
+        -> id.mdx
+
+  ["subfolder-name/id"]
+
+
 To create subfolders in sidebar:
 someSidebar: {
     Guides: [
@@ -30,6 +47,4 @@ someSidebar: {
       "other ids"...,
       ]
 }
-
-
 */
