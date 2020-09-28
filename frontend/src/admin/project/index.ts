@@ -79,7 +79,10 @@ margin: 0 -5px;\
 `;
 
 function AddSampleArea() {
-  const samples = useAPIv2Result("/models/sample?nest=material");
+  const samples = useAPIv2Result("/models/sample", {
+    nest: "material",
+    not_has: "project",
+  });
   if (samples == null) return null;
 
   return h(

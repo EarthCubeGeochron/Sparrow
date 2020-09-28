@@ -20,6 +20,10 @@ def _schema_fields(schema):
     return {getattr(f, "data_key", k): f for k, f in schema.fields.items()}
 
 
+def _field_description(schema, field):
+    return field.__class__.__name__
+
+
 with open(relative_path(__file__, "api-help.yaml"), "r") as f:
     api_help = safe_load(f)
 
@@ -85,11 +89,15 @@ class ModelAPIEndpoint(HTTPEndpoint):
                 "parameters": {
                     "has": "string, [field]",
                     "not_has": "string, [field]",
+                    "nest": "string, related models to nest within response [allowed_nests]",
                     "per_page": "integer, number of results per page",
                     "page": "string, token of the page to fetch",
                 },
                 "allowed_nests": schema._available_nests(),
-                "fields": [k for k, v in _schema_fields(schema).items()],
+                "fields": {
+                    k: _field_description(schema, v)
+                    for k, v in _schema_fields(schema).items()
+                },
             }
         )
 

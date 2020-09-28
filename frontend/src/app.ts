@@ -1,4 +1,4 @@
-import h from "@macrostrat/hyper";
+import h, { C, compose } from "@macrostrat/hyper";
 import { useEffect } from "react";
 import { join } from "path";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -7,7 +7,11 @@ import { HomePage } from "./homepage";
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
-import { APIProvider } from "@macrostrat/ui-components";
+import {
+  APIProvider,
+  DarkModeProvider,
+  inDarkMode,
+} from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
 import { APIExplorerV2 } from "./api-v2";
 import { AuthProvider } from "./auth";
@@ -31,7 +35,12 @@ function PageRoute(props) {
   return h(Route, { ...rest, component });
 }
 
-function AppMain(props) {
+function DarkModeWrapper(props) {
+  const className = inDarkMode() ? "bp3-dark" : null;
+  return h("div", { className, ...props });
+}
+
+function AppRouter(props) {
   // Handles routing for the application between pages
   const { baseURL } = props;
 
@@ -98,20 +107,21 @@ const errorHandler = function (route, response) {
   return AppToaster.show({ message, intent: Intent.DANGER });
 };
 
-const App = function () {
+function App() {
   // Nest application in React context providers
   const baseURL = "/";
   const apiBaseURL = join(process.env.BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
 
   return h(
-    FrameProvider,
-    { overrides: siteContent },
-    h(
-      APIProvider,
-      { baseURL: apiBaseURL, onError: errorHandler },
-      h(AuthProvider, null, h(AppMain, { baseURL }))
+    compose(
+      C(FrameProvider, { overrides: siteContent }),
+      C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
+      AuthProvider,
+      DarkModeProvider,
+      DarkModeWrapper,
+      C(AppRouter, { baseURL })
     )
   );
-};
+}
 
 export { App };
