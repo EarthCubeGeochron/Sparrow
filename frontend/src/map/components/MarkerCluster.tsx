@@ -12,34 +12,34 @@ import { Marker, FlyToInterpolator } from "react-map-gl";
 
 export function MarkerCluster({ viewport, changeViewport, bounds }) {
   const [markers, setMarkers] = useState([]);
-  const initialData = useAPIResult("/sample", { all: true });
+  const initialData: any[] = useAPIResult("/sample", { all: true });
   useEffect(() => {
     // Set the data back to the initial data
     if (initialData == null) return;
-    const markers = initialData.filter((d) => d.geometry != null);
+    const markers = initialData
+      .filter((d) => d.geometry != null)
+      .map((markers) => ({
+        type: "Feature",
+        properties: {
+          cluster: false,
+          id: markers.id,
+          Sample_name: markers.name,
+          project_name: markers.project_name,
+        },
+        geometry: {
+          type: "Point",
+          coordinates: [
+            markers.geometry.coordinates[0],
+            markers.geometry.coordinates[1],
+          ],
+        },
+      }));
 
     setMarkers(markers);
   }, [initialData]);
 
-  const points = markers.map((markers) => ({
-    type: "Feature",
-    properties: {
-      cluster: false,
-      id: markers.id,
-      Sample_name: markers.name,
-      project_name: markers.project_name,
-    },
-    geometry: {
-      type: "Point",
-      coordinates: [
-        markers.geometry.coordinates[0],
-        markers.geometry.coordinates[1],
-      ],
-    },
-  }));
-
   const { clusters, supercluster } = useSuperCluster({
-    points,
+    points: markers,
     zoom: viewport.zoom,
     bounds,
     options: { radius: 75, maxZoom: 5 },
@@ -76,8 +76,8 @@ export function MarkerCluster({ viewport, changeViewport, bounds }) {
               <div
                 className={clusterClass}
                 style={{
-                  width: `${20 + (pointCount / points.length) * 250}px`,
-                  height: `${20 + (pointCount / points.length) * 250}px`,
+                  width: `${20 + (pointCount / markers.length) * 250}px`,
+                  height: `${20 + (pointCount / markers.length) * 250}px`,
                 }}
                 onClick={() => {
                   const expansionZoom = Math.min(

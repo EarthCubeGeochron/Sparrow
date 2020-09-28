@@ -1,22 +1,12 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import { Component } from "react";
 import hyper from "@macrostrat/hyper";
 import { Callout } from "@blueprintjs/core";
-import { PagedAPIView, LinkCard } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components";
 import { FilterListComponent } from "app/components/filter-list";
-import { SampleCard } from "./detail-card";
-import { FilterMenu } from "../../map/components/filterMenu";
 import styles from "./module.styl";
-import { Card, Button } from "@blueprintjs/core";
 
 const h = hyper.styled(styles);
 
-const SampleListCard = function(props) {
+const SampleListCard = function (props) {
   const { material, id, name, location_name } = props;
   return h(
     LinkCard,
@@ -33,7 +23,7 @@ const SampleListCard = function(props) {
   );
 };
 
-const SampleList = function() {
+const SampleList = function () {
   const route = "/sample";
   const filterFields = {
     name: "Sample name",

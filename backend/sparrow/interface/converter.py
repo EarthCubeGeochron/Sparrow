@@ -19,7 +19,10 @@ from ..logs import get_logger
 
 log = get_logger(__name__)
 
-# Control how relationships can be resolved
+# Control how relationships can be resolved for import and serialization
+# TODO:
+# - we might want to slightly decouple the import and representation sides of this
+# - we also might want to move this to a configuration section so it can be modified
 allowed_collections = {
     "data_file": ["data_file_link"],
     "data_file_link": ["session", "sample", "analysis"],
@@ -130,10 +133,10 @@ class SparrowConverter(ModelConverter):
             # Don't allow self-referential collections
             return True
 
-        if prop.uselist and not allow_nest(this_table.name, other_table.name):
-            # Disallow list fields that aren't related (these usually don't have
-            # corresponding local columns)
-            return True
+        # if prop.uselist and not allow_nest(this_table.name, other_table.name):
+        #     # Disallow list fields that aren't related (these usually don't have
+        #     # corresponding local columns)
+        #     return True
 
         return False
 

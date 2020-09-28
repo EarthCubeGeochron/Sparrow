@@ -5,10 +5,11 @@ from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError
+from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy import inspect
 
 from .util import is_pk_defined, pk_values, prop_is_required
-from .converter import SparrowConverter
+from .converter import SparrowConverter, allow_nest
 
 from sparrow import get_logger
 
@@ -199,5 +200,15 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     def to_json_schema(model):
         return json_schema.dump(model)
+
+    def _available_nests(self):
+        model = self.opts.model
+        nests = []
+        for prop in model.__mapper__.iterate_properties:
+            if not isinstance(prop, RelationshipProperty):
+                continue
+            if allow_nest(model.__table__.name, prop.target.name):
+                nests.append(prop.target.name)
+        return nests
 
     from .display import pretty_print

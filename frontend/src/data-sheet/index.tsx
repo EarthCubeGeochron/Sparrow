@@ -5,6 +5,7 @@ import { SheetHeader } from "./header";
 import { VirtualizedSheet } from "./virtualized";
 import { useElementHeight } from "./util";
 import { DataSheetContext, DataSheetProvider } from "./provider";
+import { Frame } from "~/frame";
 import { DataSheetSuggest } from "./sheet-enter-components/datasheet-suggest";
 import { MapSelector } from "./sheet-enter-components/map-selector";
 import update from "immutability-helper";
@@ -150,8 +151,8 @@ function DataSheet() {
   /** We now build cell properties in the render function, rather than storing
       them using a precomputed useEffect hook. We decide what cells have changed using
       a direct comparison with the equivalent value of initialData. (That's the
-      power of immutable data.) 
-      
+      power of immutable data.)
+
       This is where the Components should be attached.
       */
 
@@ -219,4 +220,8 @@ function DataSheet() {
   );
 }
 
-export default DataSheet;
+function DataSheetPage(props) {
+  return h(Frame, { id: "dataSheet" }, h(DataSheet, props));
+}
+
+export default DataSheetPage;

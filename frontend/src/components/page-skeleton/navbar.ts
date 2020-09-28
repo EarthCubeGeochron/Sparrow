@@ -1,7 +1,7 @@
 import { hyperStyled, classed, addClassNames } from "@macrostrat/hyper";
 import { Navbar } from "@blueprintjs/core";
 import { NavLink } from "react-router-dom";
-import { NavLinkButton } from "@macrostrat/ui-components";
+import { NavLinkButton, DarkModeButton } from "@macrostrat/ui-components";
 
 import { AuthStatus } from "app/auth";
 import { Frame } from "app/frame";
@@ -30,6 +30,7 @@ function AppNavbar({ children, fullTitle, subtitle, ...rest }) {
       h.if(children != null)(Navbar.Divider),
       children,
       h(AuthStatus, { className: "auth-right" }),
+      h(DarkModeButton),
     ]),
   ]);
 }

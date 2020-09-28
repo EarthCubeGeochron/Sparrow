@@ -21,9 +21,6 @@ def cmd(*v, **kwargs):
 
 
 def compose(*args, **kwargs):
-
-    validate_environment()
-
     chdir(environ["SPARROW_PATH"])
     overrides = environ.get("_SPARROW_DEPRECATED_OVERRIDES", "")
     return cmd("docker-compose", overrides, *args, **kwargs)
