@@ -10,13 +10,12 @@ import { Marker, FlyToInterpolator } from "react-map-gl";
 
 // This component controls the State and the UI for the markers and the markercluster
 
-export function MarkerCluster({ viewport, changeViewport, bounds }) {
+export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
   const [markers, setMarkers] = useState([]);
-  const initialData: any[] = useAPIResult("/sample", { all: true });
   useEffect(() => {
     // Set the data back to the initial data
-    if (initialData == null) return;
-    const markers = initialData
+    if (data == null) return;
+    const markers = data
       .filter((d) => d.geometry != null)
       .map((markers) => ({
         type: "Feature",
@@ -36,7 +35,7 @@ export function MarkerCluster({ viewport, changeViewport, bounds }) {
       }));
 
     setMarkers(markers);
-  }, [initialData]);
+  }, [data]);
 
   const { clusters, supercluster } = useSuperCluster({
     points: markers,
