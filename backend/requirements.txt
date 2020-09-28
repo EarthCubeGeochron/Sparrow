@@ -78,6 +78,7 @@ rich==6.0.0
 
 # ASGI
 starlette==0.13.4
+Hypercorn==0.10.2
 uvicorn[watchgodreload]==0.11.8
 asgiref==3.2.8
 gunicorn==20.0.4
