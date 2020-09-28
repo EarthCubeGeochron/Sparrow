@@ -8,10 +8,6 @@ sidebar_label: Data Science Intro
 
 This collection of notebooks is designed to guide a programming novice through a basic process of handling metadata collection for geologic samples. We start by fetching data from an API and uploading data from local excel spreadsheets. With that gathered data we then do some dataframe manipulation to un-nest some of the columns. After that, we go over an example of how to use Numpy and Pandas to gather some meaningful statistics about the state of data collection. We also learn how to create dataframes for specific samples, like ones that still need metadata, and we export the pandas dataframes into excel sheets for easy access. We also learn how to do some mapping. The code in these notebooks are bits of code that I wrote and used, with explanations of what the code does and why it is used.
 
-### Bio:
-
-I work for the WiscAr lab at the University of Wisconsin Madison. This code was written as part of an effort to collect metadata for samples proccessed in the lab, and upload them to Sparrow. As part of collecting metadata for samples, I searched through the primary literature for samples as well as reached out to P.I's in labs for missing data. I wrote this code to fetch data from an API and from local excell sheets, and to then perform some basic analysis such as finding percentages of samples with data and those without data, etc. I also used python to generate JSON of samples with new data that could be uploaded to an API. When I began writing this code I was an undergraduate Geoscience major and had **_no_** experience in python or any programming language. Now on top of python, I have taught myself React.js (which uses javascript/typescript, JSX and ES6).
-
 ### The Code
 
 If you are new to coding don't worry! There is a plethora of free, online resources that makes learning the basics of python easy and unintimidating. A little bit of time dedication and learning and you'll be up to speed in no time!

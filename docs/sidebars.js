@@ -17,3 +17,19 @@ module.exports = {
     ],
   },
 };
+
+/*
+To create subfolders in sidebar:
+someSidebar: {
+    Guides: [
+      'guides', {
+        type: "category",
+        label: "Example Subcategory",
+        items: ["id1", "id2", ....]
+      },
+      "other ids"...,
+      ]
+}
+
+
+*/
