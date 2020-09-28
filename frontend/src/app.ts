@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { join } from "path";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { HomePage } from "./homepage";
+import loadable from "@loadable/component";
 
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
@@ -21,8 +22,9 @@ import { PageSkeleton, PageStyle } from "./components/page-skeleton";
 import { MapPage } from "./map";
 import NewSample from "./new-sample/new-sample";
 
-import DataSheet from "./data-sheet/app";
-import { MapSelector } from "./data-sheet/sheet-enter-components";
+//import { MapSelector } from "./data-sheet/sheet-enter-components";
+
+const DataSheet = loadable(() => import("./data-sheet"));
 
 function PageRoute(props) {
   /** A custom route to manage page header, footer, and style associated
@@ -71,11 +73,6 @@ function AppRouter(props) {
         path: "/new-sample",
         style: PageStyle.WIDE,
         component: NewSample,
-      }),
-      h(PageRoute, {
-        path: "/map-selector",
-        style: PageStyle.WIDE,
-        component: MapSelector,
       }),
       h(PageRoute, {
         path: "/map",
