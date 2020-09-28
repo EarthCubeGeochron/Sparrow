@@ -34,12 +34,15 @@ if [ $SPARROW_ENV = 'development' ]; then
     --debug \
     --log-level debug "sparrow.asgi:app"
 else
-  exec gunicorn \
-    --worker-tmp-dir /dev/shm \
-    --bind $HOST:$PORT \
-    -w 1 -k uvicorn.workers.UvicornWorker \
-    --log-level warning --log-file - "sparrow.asgi:app"
+  exec hypercorn --bind $HOST:$PORT \
+    -w 3 \
+    --log-file - \
+    --log-level warning \
+    "sparrow.asgi:app"
 fi
+
+### Alternative Uvicorn config ###
+
 #uvicorn --debug --port 5000 --host 0.0.0.0 --access-log sparrow.asgi:app
 
 # echo "Running in development mode"
@@ -48,3 +51,10 @@ fi
 #   --reload-dir sparrow \
 #   --log-level debug \
 #   --host $HOST --port $PORT "sparrow.asgi:app"
+
+# Former Gunicorn worker
+# exec gunicorn \
+#   --worker-tmp-dir /dev/shm \
+#   --bind $HOST:$PORT \
+#   -w 1 -k uvicorn.workers.UvicornWorker \
+#   --log-level warning --log-file - "sparrow.asgi:app"

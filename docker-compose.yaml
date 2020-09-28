@@ -42,7 +42,13 @@ services:
       # TODO: come up with a better way to organize
       - ./_cli/bin:/sparrow-bin
       # Read-only volume for source code
-      - ./backend/:/app
+      # How this mount is set up has severe implications for dev-mode performance,
+      # as server reloaders tend to use non-performant file watchers...
+      - type: bind
+        source: ./backend/
+        target: /app
+        read_only: true
+        consistency: cached
       # Nested volume to keep built files
       # separate from those on our local system
       - /app/sparrow.egg-info
