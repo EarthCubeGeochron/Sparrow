@@ -2,6 +2,7 @@ import sys
 from os import environ, path
 from pathlib import Path
 from click import secho
+from rich import print
 
 
 def setup_command_path():

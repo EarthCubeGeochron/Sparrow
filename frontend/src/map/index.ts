@@ -22,7 +22,7 @@ import { useToggle } from "./components/APIResult";
 
 const h = hyperStyled(styles);
 
-const MapNavbar = function (props) {
+const MapNavbar = function(props) {
   const { children, ...rest } = props;
   return h(Menu, { className: "map-navbar", ...rest }, [
     h(MenuItem, {
@@ -34,6 +34,7 @@ const MapNavbar = function (props) {
 };
 
 const MapHome = (props) => {
+  const link = LocationLink(props);
   return h("div.map-home", [
     h("div.mapHome", [h(MapPanel, { width: "750px", hide_filter: true })]),
     h("div.map-butn", [
@@ -47,17 +48,7 @@ const MapHome = (props) => {
 };
 
 const MapPage = (props) => {
-  const [open, toggleOpen] = useToggle(false);
-
   return h("div.map-page", [
-    // h(Button, { icon: "menu", onClick: toggleOpen, className: "nav-btn" }),
-    // h(Collapse, { isOpen: true }, [
-    //   h(MapNavbar, [
-    //     h(CatalogNavLinks),
-    //     h(Menu.Divider),
-    //     h(AuthStatus, { large: false }),
-    //   ]),
-    // ]),
     h(MapPanel, {
       on_map: false,
       hide_filter: false,
@@ -67,7 +58,13 @@ const MapPage = (props) => {
   ]);
 };
 
-const MapLink = function (props) {
+const LocationLink = function(props) {
+  const { zoom, latitude, longitude, children, ...rest } = props;
+  const link = `/map#${zoom}/${latitude}/${longitude}`;
+  return link;
+};
+
+const MapLink = function(props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
   return h(
     HashLink,

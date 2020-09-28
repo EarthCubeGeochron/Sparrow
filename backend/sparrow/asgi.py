@@ -30,4 +30,4 @@ routes = [
     Mount("/", app=FlaskApp),
 ]
 
-app = Starlette(routes=routes)
+app = Starlette(routes=routes, debug=True)

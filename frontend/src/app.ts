@@ -1,13 +1,18 @@
-import h from "@macrostrat/hyper";
+import h, { C, compose } from "@macrostrat/hyper";
 import { useEffect } from "react";
 import { join } from "path";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { HomePage } from "./homepage";
+import loadable from "@loadable/component";
 
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
-import { APIProvider } from "@macrostrat/ui-components";
+import {
+  APIProvider,
+  DarkModeProvider,
+  inDarkMode,
+} from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
 import { APIExplorerV2 } from "./api-v2";
 import { AuthProvider } from "./auth";
@@ -17,8 +22,9 @@ import { PageSkeleton, PageStyle } from "./components/page-skeleton";
 import { MapPage } from "./map";
 import NewSample from "./new-sample/new-sample";
 
-import DataSheet from "./data-sheet/app";
-import { MapSelector } from "./data-sheet/sheet-enter-components";
+//import { MapSelector } from "./data-sheet/sheet-enter-components";
+
+const DataSheet = loadable(() => import("./data-sheet"));
 
 function PageRoute(props) {
   /** A custom route to manage page header, footer, and style associated
@@ -31,7 +37,12 @@ function PageRoute(props) {
   return h(Route, { ...rest, component });
 }
 
-function AppMain(props) {
+function DarkModeWrapper(props) {
+  const className = inDarkMode() ? "bp3-dark" : null;
+  return h("div", { className, ...props });
+}
+
+function AppRouter(props) {
   // Handles routing for the application between pages
   const { baseURL } = props;
 
@@ -64,11 +75,6 @@ function AppMain(props) {
         component: NewSample,
       }),
       h(PageRoute, {
-        path: "/map-selector",
-        style: PageStyle.WIDE,
-        component: MapSelector,
-      }),
-      h(PageRoute, {
         path: "/map",
         style: PageStyle.FULLSCREEN,
         component: MapPage,
@@ -98,20 +104,21 @@ const errorHandler = function (route, response) {
   return AppToaster.show({ message, intent: Intent.DANGER });
 };
 
-const App = function () {
+function App() {
   // Nest application in React context providers
   const baseURL = "/";
   const apiBaseURL = join(process.env.BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
 
   return h(
-    FrameProvider,
-    { overrides: siteContent },
-    h(
-      APIProvider,
-      { baseURL: apiBaseURL, onError: errorHandler },
-      h(AuthProvider, null, h(AppMain, { baseURL }))
+    compose(
+      C(FrameProvider, { overrides: siteContent }),
+      C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
+      AuthProvider,
+      DarkModeProvider,
+      DarkModeWrapper,
+      C(AppRouter, { baseURL })
     )
   );
-};
+}
 
-export { App };
+export default App;

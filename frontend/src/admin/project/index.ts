@@ -2,13 +2,12 @@ import { Component } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Callout } from "@blueprintjs/core";
 import styled from "@emotion/styled";
-import T from "prop-types";
 import { FilterListComponent } from "../../components/filter-list";
-import { LinkCard, APIResultView } from "@macrostrat/ui-components";
+import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
 import { ProjectMap } from "./map";
 import { EditableProjectDetails } from "./editor";
+import { useAPIv2Result } from "~/api-v2";
 
-import classNames from "classnames";
 import { SampleCard } from "../sample/detail-card";
 import "../main.styl";
 import styles from "../module.styl";
@@ -79,6 +78,22 @@ flex-flow: row wrap;
 margin: 0 -5px;\
 `;
 
+function AddSampleArea() {
+  const samples = useAPIv2Result("/models/sample", {
+    nest: "material",
+    not_has: "project",
+  });
+  if (samples == null) return null;
+
+  return h(
+    "div.samples",
+    samples.data.map((d) => {
+      const { name, id, location_name, material } = d;
+      return h(SampleCard, { name, id, location_name, material, link: false });
+    })
+  );
+}
+
 const ProjectSamples = function ({ data }) {
   let content = [h("p", "No samples")];
   if (data != null) {
@@ -87,6 +102,7 @@ const ProjectSamples = function ({ data }) {
   return h("div.sample-area", [
     h("h4", "Samples"),
     h(SampleContainer, content),
+    //h(AddSampleArea),
   ]);
 };
 
@@ -164,28 +180,19 @@ const ProjectPage = function (props) {
   ]);
 };
 
-const ProjectComponent = function (props) {
+interface ProjectProps {
+  id?: number;
+}
+
+const ProjectComponent = function (props: ProjectProps) {
   const { id } = props;
-  if (id == null) {
+  const data = useAPIResult("/project", { id });
+  if (id == null || data == null) {
     return null;
   }
-  return h("div.data-view.project", [
-    h(
-      APIResultView,
-      {
-        route: "/project",
-        params: { id },
-      },
-      (data) => {
-        const project = data[0];
-        return h(ProjectPage, { project });
-      }
-    ),
-  ]);
-};
 
-ProjectComponent.propTypes = {
-  id: T.number,
+  const project = data[0];
+  return h("div.data-view.project", null, h(ProjectPage, { project }));
 };
 
 export { ProjectListComponent, ProjectComponent };

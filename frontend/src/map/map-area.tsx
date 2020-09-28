@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import MapGl, { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyles } from "../../plugins/MapStyle";
@@ -10,6 +10,7 @@ import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
+import { useAPIResult } from "@macrostrat/ui-components";
 
 const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
@@ -38,13 +39,53 @@ export function MapPanel({
   mapstyle = "mapbox://styles/mapbox/outdoors-v9",
 }: MapProps) {
   const initialState = {
-    viewport: { latitude, longitude, zoom, width, height },
+    //viewport: { latitude, longitude, zoom, width, height },
     MapStyle: mapstyle,
     showMarkers: true,
     clickPnt: { lng: 0, lat: 0 },
+    mounted: false,
+  };
+  useEffect(() => {
+    setState({ ...state, mounted: true });
+  }, []);
+  const initialData = useAPIResult("/sample", { all: true });
+
+  const initialViewport = {
+    latitude,
+    longitude,
+    zoom,
+    width,
+    height,
+    transitionInterpolator: null,
+    transitionDuration: null,
   };
 
   const [state, setState] = useState(initialState);
+  const [viewport, setViewport] = useState(initialViewport);
+
+  // getting url hash to set location from
+  let firstWindowHash = window.location.hash;
+
+  // function that parses {zoom, latitude, longitude} from url hash
+  function setLocationFromHash(hash) {
+    if (hash == null) {
+      ({ hash } = window.location);
+    }
+    const s = hash.slice(1);
+    const v = s.split("/");
+    if (v.length !== 3) {
+      return {};
+    }
+    const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
+    console.log(zoom, latitude, longitude);
+    setViewport({ ...viewport, zoom, latitude, longitude });
+  }
+
+  useEffect(() => {
+    if (firstWindowHash !== "") {
+      setLocationFromHash(firstWindowHash);
+    }
+  }, [firstWindowHash]);
 
   const mapRef = useRef();
 
@@ -61,18 +102,15 @@ export function MapPanel({
   };
 
   const changeViewport = ({ expansionZoom, longitude, latitude }) => {
-    setState({
-      ...state,
-      viewport: {
-        ...state.viewport,
-        longitude: longitude,
-        latitude: latitude,
-        zoom: expansionZoom,
-        transitionInterpolator: new FlyToInterpolator({
-          speed: 1,
-        }),
-        transitionDuration: "auto",
-      },
+    setViewport({
+      ...viewport,
+      longitude: longitude,
+      latitude: latitude,
+      zoom: expansionZoom,
+      transitionInterpolator: new FlyToInterpolator({
+        speed: 1,
+      }),
+      transitionDuration: "auto",
     });
   };
 
@@ -118,15 +156,18 @@ export function MapPanel({
           }}
           mapStyle={state.MapStyle}
           mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
-          {...state.viewport}
+          {...viewport}
           onViewportChange={(viewport) => {
-            setState({ ...state, viewport: viewport });
+            if (state.mounted) {
+              setViewport(viewport);
+            }
           }}
           ref={mapRef}
         >
           {state.showMarkers ? (
             <MarkerCluster
-              viewport={state.viewport}
+              data={initialData}
+              viewport={viewport}
               changeViewport={changeViewport}
               bounds={bounds}
             ></MarkerCluster>

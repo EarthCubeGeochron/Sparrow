@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Dialog, Classes } from "@blueprintjs/core";
+import { Dialog, Classes, Button } from "@blueprintjs/core";
 import {
   SaveButton,
   CancelButton,
@@ -52,9 +52,9 @@ export function SheetHeader(props) {
           content={constant}
           disabled={!hasChanges}
         ></SubmitDialog>
-        <DeleteButton onClick={onUndo} disabled={!hasChanges}>
+        <Button onClick={onUndo} disabled={!hasChanges}>
           Reset changes
-        </DeleteButton>
+        </Button>
       </div>
     </div>
   );
