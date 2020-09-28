@@ -102,7 +102,7 @@ const ProjectSamples = function ({ data }) {
   return h("div.sample-area", [
     h("h4", "Samples"),
     h(SampleContainer, content),
-    h(AddSampleArea),
+    //h(AddSampleArea),
   ]);
 };
 
