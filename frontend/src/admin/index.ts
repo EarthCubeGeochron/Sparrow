@@ -1,9 +1,8 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { Component, useContext } from "react";
+import { useContext } from "react";
 import { NonIdealState, Button, Callout } from "@blueprintjs/core";
 import { Switch } from "react-router-dom";
 import { ErrorBoundaryRoute as Route } from "app/util/route";
-import T from "prop-types";
 
 import { LinkButton, LinkCard } from "@macrostrat/ui-components";
 import { Frame } from "app/frame";
@@ -44,8 +43,7 @@ const CatalogNavbar = (
   { base, ...rest } // A standalone navbar for the admin panel, can be enabled by default
 ) =>
   h("div.minimal-navbar", { ...rest, subtitle: "Admin" }, [
-    h("h4", "Admin"),
-    h(HomeButton, { to: base, exact: true }),
+    h(NavButton, { to: base, exact: true }, h("h4", "Data Catalog")),
     h(CatalogNavLinks, { base }),
   ]);
 
@@ -152,26 +150,19 @@ const CatalogBody = (
   ]);
 
 const Catalog = ({ base }) =>
-  h("div.catalog", [h(LoginSuggest), h(CatalogBody, { base })]);
+  h("div.catalog", [
+    h(CatalogNavbar, { base }),
+    h(LoginSuggest),
+    h(CatalogBody, { base }),
+  ]);
 
-class Admin extends Component {
-  static initClass() {
-    // A login-required version of the catalog
-    this.contextType = AuthContext;
-    this.propTypes = {
-      base: T.string.isRequired,
-    };
+function Admin(props) {
+  const { base } = props;
+  const { login, requestLoginForm } = useContext(AuthContext);
+  if (!login) {
+    return h(LoginRequired, { requestLoginForm });
   }
-  render() {
-    const { base } = this.props;
-    const { login, requestLoginForm } = this.context;
-    if (!login) {
-      return h(LoginRequired, { requestLoginForm });
-    }
-
-    return h("div.admin", [h(CatalogBody, { base })]);
-  }
+  return h("div.admin", [h(CatalogBody, { base })]);
 }
-Admin.initClass();
 
 export { Catalog, CatalogNavLinks };

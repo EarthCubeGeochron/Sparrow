@@ -1,28 +1,17 @@
-import {
-  Menu,
-  MenuItem,
-  Popover,
-  Tooltip,
-  Icon,
-  Button,
-  Collapse,
-} from "@blueprintjs/core";
+import { Menu, MenuItem, Tooltip, Button } from "@blueprintjs/core";
 // @ts-ignore
-import { hyperStyled, classed } from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 // @ts-ignore
 import styles from "./module.styl";
 import { SiteTitle } from "app/components";
-import { CatalogNavLinks } from "../admin";
-import { AuthStatus } from "app/auth";
 import { MapPanel } from "./map-area";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import "./mappages.modules.css";
-import { useToggle } from "./components/APIResult";
 
 const h = hyperStyled(styles);
 
-const MapNavbar = function(props) {
+const MapNavbar = function (props) {
   const { children, ...rest } = props;
   return h(Menu, { className: "map-navbar", ...rest }, [
     h(MenuItem, {
@@ -58,13 +47,13 @@ const MapPage = (props) => {
   ]);
 };
 
-const LocationLink = function(props) {
+const LocationLink = function (props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
   const link = `/map#${zoom}/${latitude}/${longitude}`;
   return link;
 };
 
-const MapLink = function(props) {
+const MapLink = function (props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
   return h(
     HashLink,

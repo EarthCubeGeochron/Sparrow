@@ -29,8 +29,11 @@ function AppNavbar({ children, fullTitle, subtitle, ...rest }) {
       ]),
       h.if(children != null)(Navbar.Divider),
       children,
+    ]),
+    h("div.navbar-spacer"),
+    h(Navbar.Group, [
+      h(DarkModeButton, { minimal: true }),
       h(AuthStatus, { className: "auth-right" }),
-      h(DarkModeButton),
     ]),
   ]);
 }

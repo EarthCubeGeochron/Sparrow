@@ -19,12 +19,15 @@ import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
 import { Catalog } from "./admin";
 import { PageSkeleton, PageStyle } from "./components/page-skeleton";
-import { MapPage } from "./map";
 import NewSample from "./new-sample/new-sample";
 
 //import { MapSelector } from "./data-sheet/sheet-enter-components";
 
 const DataSheet = loadable(() => import("./data-sheet"));
+const MapPage = loadable(async function () {
+  const module = await import("./map");
+  return module.MapPage;
+});
 
 function PageRoute(props) {
   /** A custom route to manage page header, footer, and style associated
@@ -38,7 +41,16 @@ function PageRoute(props) {
 }
 
 function DarkModeWrapper(props) {
-  const className = inDarkMode() ? "bp3-dark" : null;
+  const isDark = inDarkMode();
+  const className = isDark ? "bp3-dark" : null;
+  // To make modals etc. work, we need to add the dark-mode class to the body
+  useEffect(() => {
+    if (isDark) {
+      document.body.classList.add("bp3-dark");
+    } else {
+      document.body.classList.remove("bp3-dark");
+    }
+  }, [isDark]);
   return h("div", { className, ...props });
 }
 

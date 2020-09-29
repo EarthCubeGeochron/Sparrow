@@ -1,6 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { PageFooter } from "app/shared/footer";
-import { CatalogNavLinks } from "app/admin";
 import { AppNavbar, NavButton } from "./navbar";
 import { PropsWithChildren } from "react";
 import { Route } from "react-router-dom";
@@ -17,11 +16,12 @@ enum PageStyle {
 
 const MainNavbar = (props) =>
   h(AppNavbar, { ...props, fullTitle: true }, [
-    h(CatalogNavLinks, { base: "/catalog" }),
+    h(NavButton, { to: "/catalog" }, "Catalog"),
     h(NavButton, { to: "/map" }, "Map"),
-    h(NavButton, { to: "/data-sheet" }, "Data Sheet"),
+    h(NavButton, { to: "/admin" }, "Admin"),
     h(AppNavbar.Divider),
-    h(NavButton, { to: "/api-explorer/v1" }, "API"), // NavButton, similar to React-Router 'Link' takes the 'to' arg
+    h(NavButton, { to: "/api-explorer/v1" }, "API"),
+    // NavButton, similar to React-Router 'Link' takes the 'to' arg
   ]);
 
 type PageSkeletonProps = PropsWithChildren<{
