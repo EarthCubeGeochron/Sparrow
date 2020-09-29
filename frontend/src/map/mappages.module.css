@@ -1,0 +1,31 @@
+.map-home {
+  position: relative;
+}
+.main-map {
+  position: "absolute";
+  z-index: 1;
+}
+
+.nav-btn {
+  position: absolute;
+  z-index: 99;
+}
+
+.map-butn {
+  position: absolute;
+  z-index: 2;
+  top: 1;
+  left: 0;
+}
+
+.map-page {
+  position: absolute;
+}
+
+.mapContainer {
+}
+
+.mapNavbar {
+  display: flex;
+  flex-direction: row;
+}

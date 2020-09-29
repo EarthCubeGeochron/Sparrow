@@ -5,8 +5,17 @@ import useSuperCluster from "use-supercluster";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 import "../cluster.css";
-import { Tooltip, Popover, Button, Intent } from "@blueprintjs/core";
+import {
+  Tooltip,
+  Popover,
+  Button,
+  Intent,
+  Icon,
+  Card,
+} from "@blueprintjs/core";
 import { Marker, FlyToInterpolator } from "react-map-gl";
+import styles from "./components.module.css";
+import { SampleCard } from "../../admin/sample/detail-card";
 
 // This component controls the State and the UI for the markers and the markercluster
 
@@ -24,6 +33,7 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
           id: markers.id,
           Sample_name: markers.name,
           project_name: markers.project_name,
+          material: markers.material,
         },
         geometry: {
           type: "Point",
@@ -96,25 +106,27 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
             key={cluster.properties.id}
             latitude={latitude}
             longitude={longitude}
-            offsetLeft={-15}
-            offsetTop={-20}
+            offsetLeft={-5}
+            offsetTop={-10}
             captureClick={true}
             captureDoubleClick={true}
           >
             <Popover
+              inheritDarkTheme={false}
               content={
                 <Link to={`/catalog/sample/${cluster.properties.id}`}>
-                  <Button>Go to Sample {cluster.properties.Sample_name}</Button>
+                  <Card>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <b>{cluster.properties.Sample_name}</b>
+                      {cluster.properties.material && (
+                        <i>{cluster.properties.material}</i>
+                      )}
+                    </div>
+                  </Card>
                 </Link>
               }
             >
-              <Tooltip content={cluster.properties.Sample_name}>
-                <Button
-                  minimal={true}
-                  className="mrker-btn"
-                  icon="map-marker"
-                />
-              </Tooltip>
+              <div className={styles.markerButton} />
             </Popover>
           </Marker>
         );

@@ -12,8 +12,11 @@ interface SampleCardProps {
   material: string;
   location_name?: string;
 }
-
-const SampleCard = function (props: SampleCardProps) {
+/**
+ *
+ * @param props : name (string), id (number), link (boolean), material (string), location_name? (string)
+ */
+const SampleCard = function(props: SampleCardProps) {
   let { material, id, name, location_name, link } = props;
   console.log(props);
   if (link == null) {

@@ -1,8 +1,7 @@
-import { Button, Tooltip, Collapse, Card, MenuItem } from "@blueprintjs/core";
+import { Button, Tooltip, Card, Popover, Icon } from "@blueprintjs/core";
 import {
   AgeSlideSelect,
   DatePicker,
-  MultipleSelectFilter,
   GeologicFormationSelector,
   MapSelector,
 } from "./components";
@@ -21,18 +20,31 @@ interface Filter {
 function SampleFilter({ on_map = false }: Filter) {
   const [open, toggleOpen] = useToggle(false);
 
+  const filterCard = () => {
+    return h(Card, [
+      h(AgeSlideSelect),
+      h(DatePicker),
+      h(GeologicFormationSelector),
+      h.if(!on_map)(MapSelector),
+    ]);
+  };
+
   return h("div", [
-    h(Tooltip, { content: "Choose Multiple Filters" }, [
-      h(Button, { onClick: toggleOpen, icon: "filter" }),
-    ]),
-    h(Collapse, { isOpen: open }, [
-      h(Card, [
-        h(AgeSlideSelect),
-        h(DatePicker),
-        h(GeologicFormationSelector),
-        h.if(!on_map)(MapSelector),
-      ]),
-    ]),
+    h(
+      Popover,
+      {
+        content: h(filterCard),
+        minimal: true,
+        position: "bottom",
+      },
+      [
+        h(Tooltip, { content: "Choose Multiple Filters" }, [
+          h(Button, { onClick: toggleOpen, minimal: true }, [
+            h(Icon, { icon: "filter" }),
+          ]),
+        ]),
+      ]
+    ),
   ]);
 }
 

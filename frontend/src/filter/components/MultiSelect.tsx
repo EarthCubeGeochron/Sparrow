@@ -7,7 +7,8 @@ import {
   ItemPredicate,
   IMultiSelectProps,
 } from "@blueprintjs/select";
-import { useToggle, useAPIResult } from "../../map/components/APIResult";
+import { useToggle } from "../../map/components/APIResult";
+import { useAPIResult } from "@macrostrat/ui-components";
 
 /**
 This component is a search bar with a drop down menu.
@@ -90,12 +91,9 @@ export function MultipleSelectFilter({ text, items, sendQuery }) {
 export function GeologicFormationSelector() {
   const [searchText, setSearchText] = React.useState("");
   const [stratNames, setStratNames] = React.useState([]);
-  const MacGeoFormationUrl =
-    "https://macrostrat.org/api/v2/defs/strat_names?strat_name_like=" +
-    searchText;
+  const MacGeoFormationUrl = `https://macrostrat.org/api/v2/defs/strat_names?strat_name_like=${searchText}`;
 
-  const geologicFormations: object = useAPIResult(MacGeoFormationUrl);
-  //console.log(geologicFormations);
+  const geologicFormations = useAPIResult(MacGeoFormationUrl);
 
   React.useEffect(() => {
     if (geologicFormations !== null) {

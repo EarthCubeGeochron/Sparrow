@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
-import MapGl, { FlyToInterpolator } from "react-map-gl";
+import MapGl, { FlyToInterpolator, Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyles } from "../../plugins/MapStyle";
-import { Button, Toaster, Position } from "@blueprintjs/core";
+import { Button, Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
 import { Link } from "react-router-dom";
 import { LayerMenu } from "./components/LayerMenu";
@@ -11,10 +11,14 @@ import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
 import { useAPIResult } from "@macrostrat/ui-components";
+import { MapNav } from "./components/map-nav";
+import styles from "./mappages.module.css";
+
+const onMap = window.location.pathname == "/map";
 
 const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
-  maxToasts: 1,
+  maxToasts: onMap ? 1 : 0,
 });
 
 interface MapProps {
@@ -39,7 +43,6 @@ export function MapPanel({
   mapstyle = "mapbox://styles/mapbox/outdoors-v9",
 }: MapProps) {
   const initialState = {
-    //viewport: { latitude, longitude, zoom, width, height },
     MapStyle: mapstyle,
     showMarkers: true,
     clickPnt: { lng: 0, lat: 0 },
@@ -77,7 +80,6 @@ export function MapPanel({
       return {};
     }
     const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
-    console.log(zoom, latitude, longitude);
     setViewport({ ...viewport, zoom, latitude, longitude });
   }
 
@@ -90,7 +92,11 @@ export function MapPanel({
   const mapRef = useRef();
 
   const bounds = mapRef.current
-    ? mapRef.current.getMap().getBounds().toArray().flat()
+    ? mapRef.current
+        .getMap()
+        .getBounds()
+        .toArray()
+        .flat()
     : null;
 
   const toggleShowMarkers = () => {
@@ -128,7 +134,7 @@ export function MapPanel({
             lat={e.lngLat[1]}
           />
         ),
-        timeout: 0,
+        timeout: 5000,
       });
     }
   };
@@ -136,18 +142,30 @@ export function MapPanel({
   return (
     <div className="map-container">
       <div className="layer-button">
-        <Link to="/">
-          <Button icon="home"></Button>
-        </Link>
-        <LayerMenu
-          hide={hide_filter}
-          MapStyle={state.MapStyle}
-          chooseMapStyle={chooseMapStyle}
-          mapstyles={mapStyles}
-          showMarkers={state.showMarkers}
-          toggleShowMarkers={toggleShowMarkers}
-        ></LayerMenu>
-        <FilterMenu hide={hide_filter} on_map={on_map}></FilterMenu>
+        {on_map && (
+          <Navbar>
+            <Navbar.Group className={styles.mapNavbar}>
+              <Navbar.Heading>
+                <Link to="/">
+                  <h1>
+                    <b>WiscAr</b>
+                  </h1>
+                </Link>
+              </Navbar.Heading>
+              <Navbar.Divider />
+              <MapNav />
+              <LayerMenu
+                hide={hide_filter}
+                MapStyle={state.MapStyle}
+                chooseMapStyle={chooseMapStyle}
+                mapstyles={mapStyles}
+                showMarkers={state.showMarkers}
+                toggleShowMarkers={toggleShowMarkers}
+              ></LayerMenu>
+              <FilterMenu hide={hide_filter} on_map={on_map}></FilterMenu>
+            </Navbar.Group>
+          </Navbar>
+        )}
       </div>
       <div>
         <MapGl
@@ -164,6 +182,17 @@ export function MapPanel({
           }}
           ref={mapRef}
         >
+          {state.clickPnt.lng && (
+            <Marker
+              latitude={state.clickPnt.lat}
+              longitude={state.clickPnt.lng}
+              offsetLeft={-5}
+              offsetTop={-10}
+            >
+              <Icon icon="map-marker" color="black"></Icon>
+            </Marker>
+          )}
+
           {state.showMarkers ? (
             <MarkerCluster
               data={initialData}

@@ -51,7 +51,9 @@ export const LayerMenu = ({
         <div className="mappagemenu">
           <Popover content={dropMenu} minimal={true} position={Position.BOTTOM}>
             <Tooltip content="Change Map">
-              <Button icon="layers"></Button>
+              <Button minimal={true}>
+                <Icon icon="layers" iconSize={17} />
+              </Button>
             </Tooltip>
           </Popover>
         </div>

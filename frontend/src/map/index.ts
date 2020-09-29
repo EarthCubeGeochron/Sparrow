@@ -10,14 +10,14 @@ import {
 // @ts-ignore
 import { hyperStyled, classed } from "@macrostrat/hyper";
 // @ts-ignore
-import styles from "./module.styl";
+//import styles from "./module.styl";
 import { SiteTitle } from "app/components";
 import { CatalogNavLinks } from "../admin";
 import { AuthStatus } from "app/auth";
 import { MapPanel } from "./map-area";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
-import "./mappages.modules.css";
+import styles from "./mappages.module.css";
 import { useToggle } from "./components/APIResult";
 
 const h = hyperStyled(styles);
@@ -36,7 +36,6 @@ const MapNavbar = function(props) {
 const MapHome = (props) => {
   const link = LocationLink(props);
   return h("div.map-home", [
-    h("div.mapHome", [h(MapPanel, { width: "750px", hide_filter: true })]),
     h("div.map-butn", [
       h(
         Tooltip,
@@ -44,13 +43,14 @@ const MapHome = (props) => {
         h(Link, { to: "/map" }, h(Button, { icon: "maximize" }))
       ),
     ]),
+    h("div.mapHome", [h(MapPanel, { width: "750px", hide_filter: true })]),
   ]);
 };
 
 const MapPage = (props) => {
   return h("div.map-page", [
     h(MapPanel, {
-      on_map: false,
+      on_map: true,
       hide_filter: false,
       width: "100vw",
       height: "100vh",
