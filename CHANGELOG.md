@@ -8,6 +8,10 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## [Unreleased] - 2020-09-28
+
+- Moved from `uvicorn` (dev) + `gunicorn` (production) to `hypercorn` for ASGI serving.
+
 ## [Unreleased] - 2020-07-31
 
 ## Changed
@@ -33,7 +37,6 @@ We hope to arrive at full conformance for milestone `2.0.0`.
 
 - More robust testing framework, including transaction isolation between
   test classes.
-  =======
 
 ## [1.6.0] - 2020-09-10
 
@@ -42,7 +45,6 @@ We hope to arrive at full conformance for milestone `2.0.0`.
 - Refactored command-line application to a simpler Python-based framework.
 - Packaged tests into a `sparrow_test` package, and added robustness,
   including database transaction isolation between test classes.
-  > > > > > > > develop
 - Bumped `sparrowdata/backend-base` Docker image to `v1.2` to include `uvloop`
   (enables high-performance asynchronous serving).
 - Switched Sparrow's backend to "ASGI" (a fast, asynchronous server interface)

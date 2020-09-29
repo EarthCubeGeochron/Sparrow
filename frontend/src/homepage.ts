@@ -1,11 +1,15 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import siteContent from "site-content";
-import { Frame, FrameProvider, FrameContext } from "./frame";
+import { Frame } from "./frame";
 import { InsetText } from "app/components/layout";
 // @ts-ignore
 import styles from "./styles.module.css";
-import { MapHome } from "./map";
+import loadable from "@loadable/component";
 import { useContext } from "react";
+
+const MapHome = loadable(async function () {
+  const module = await import("./map");
+  return module.MapHome;
+});
 
 const h = hyperStyled(styles);
 

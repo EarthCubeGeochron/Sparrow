@@ -8,7 +8,7 @@ import h from "@macrostrat/hyper";
 import { ContextMap, StaticMarker } from "app/components";
 import bbox from "@turf/bbox";
 import WebMercatorViewport from "viewport-mercator-project";
-import { MapLink } from "app/map";
+import { MapLink } from "~/map";
 
 const ProjectMap = function (props) {
   let { width, height, samples, padding, minExtent } = props;

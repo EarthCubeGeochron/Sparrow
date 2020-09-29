@@ -1,46 +1,30 @@
 import h, { C, compose } from "@macrostrat/hyper";
 import { useEffect } from "react";
 import { join } from "path";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
 import { HomePage } from "./homepage";
 import loadable from "@loadable/component";
 
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
-import {
-  APIProvider,
-  DarkModeProvider,
-  inDarkMode,
-} from "@macrostrat/ui-components";
+import { DarkModeManager, PageRoute, NoMatchPage } from "~/util";
+import { APIProvider } from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
 import { APIExplorerV2 } from "./api-v2";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
-import { Catalog } from "./admin";
-import { PageSkeleton, PageStyle } from "./components/page-skeleton";
-import { MapPage } from "./map";
+import { Catalog } from "./catalog";
+import { AdminRoute } from "./admin";
+import { PageStyle } from "~/components/page-skeleton";
 import NewSample from "./new-sample/new-sample";
 
 //import { MapSelector } from "./data-sheet/sheet-enter-components";
 
-const DataSheet = loadable(() => import("./data-sheet"));
-
-function PageRoute(props) {
-  /** A custom route to manage page header, footer, and style associated
-      with a specific route */
-  const { render, component: base, style, ...rest } = props;
-  const component = (p) => {
-    const children = base != null ? h(base, p) : render(p);
-    return h(PageSkeleton, { style, children });
-  };
-  return h(Route, { ...rest, component });
-}
-
-function DarkModeWrapper(props) {
-  const className = inDarkMode() ? "bp3-dark" : null;
-  return h("div", { className, ...props });
-}
+const MapPage = loadable(async function () {
+  const module = await import("./map");
+  return module.MapPage;
+});
 
 function AppRouter(props) {
   // Handles routing for the application between pages
@@ -64,10 +48,7 @@ function AppRouter(props) {
       }),
       h(PageRoute, {
         path: "/catalog",
-        pageStyle: PageStyle.WIDE,
-        render() {
-          return h(Catalog, { base: "/catalog" });
-        },
+        component: () => h(Catalog, { base: "/catalog" }),
       }),
       h(PageRoute, {
         path: "/new-sample",
@@ -79,17 +60,14 @@ function AppRouter(props) {
         style: PageStyle.FULLSCREEN,
         component: MapPage,
       }),
-      h(PageRoute, {
-        path: "/data-sheet",
-        style: PageStyle.WIDE,
-        component: DataSheet,
-      }),
+      h(AdminRoute, { path: "/admin" }),
       h(PageRoute, {
         path: "/api-explorer",
         component: APIExplorerV2,
         exact: true,
       }),
       h(PageRoute, { path: "/api-explorer-v1", component: APIExplorer }),
+      h(PageRoute, { path: "*", component: NoMatchPage }),
     ])
   );
 }
@@ -114,8 +92,7 @@ function App() {
       C(FrameProvider, { overrides: siteContent }),
       C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
       AuthProvider,
-      DarkModeProvider,
-      DarkModeWrapper,
+      DarkModeManager,
       C(AppRouter, { baseURL })
     )
   );

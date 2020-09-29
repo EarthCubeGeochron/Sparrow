@@ -9,7 +9,7 @@ import {
   Popover,
   ButtonGroup,
 } from "@blueprintjs/core";
-import { useAuth } from "../../auth";
+import { useAuth } from "~/auth";
 import {
   ModelEditor,
   ModelEditorContext,
@@ -20,11 +20,11 @@ import {
   APIContext,
   APIHelpers,
 } from "@macrostrat/ui-components";
-import { MinimalNavbar } from "app/components";
+import { MinimalNavbar } from "~/components";
 import { put } from "axios";
 
 import "../main.styl";
-import styles from "../module.styl";
+import styles from "~/admin/module.styl";
 const h = hyperStyled(styles);
 
 const ModelEditableText = function (props) {

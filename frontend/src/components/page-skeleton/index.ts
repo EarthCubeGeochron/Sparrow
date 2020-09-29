@@ -1,6 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { PageFooter } from "app/shared/footer";
-import { CatalogNavLinks } from "app/admin";
 import { AppNavbar, NavButton } from "./navbar";
 import { PropsWithChildren } from "react";
 import { Route } from "react-router-dom";
@@ -17,27 +16,29 @@ enum PageStyle {
 
 const MainNavbar = (props) =>
   h(AppNavbar, { ...props, fullTitle: true }, [
-    h(CatalogNavLinks, { base: "/catalog" }),
+    h(NavButton, { to: "/catalog" }, "Catalog"),
     h(NavButton, { to: "/map" }, "Map"),
-    h(NavButton, { to: "/data-sheet" }, "Data Sheet"),
+    h(NavButton, { to: "/admin" }, "Admin"),
     h(AppNavbar.Divider),
-    h(NavButton, { to: "/api-explorer/v1" }, "API"), // NavButton, similar to React-Router 'Link' takes the 'to' arg
+    h(NavButton, { to: "/api-explorer/v1" }, "API"),
+    // NavButton, similar to React-Router 'Link' takes the 'to' arg
   ]);
 
 type PageSkeletonProps = PropsWithChildren<{
   style: PageStyle;
+  navComponent: React.ComponentType;
 }>;
 
 function PageSkeleton(props: PageSkeletonProps) {
   /** A basic page skeleton */
-  const { style, children } = props;
+  const { style, children, navComponent = MainNavbar } = props;
 
   const showNavbar = style != PageStyle.FULLSCREEN;
   const showFooter = style == PageStyle.BASIC;
 
   return h("div.page-skeleton", { className: style }, [
     h("div.expander", [
-      h.if(showNavbar)(MainNavbar, { fixedToTop: style == PageStyle.WIDE }),
+      h.if(showNavbar)(navComponent, { fixedToTop: style == PageStyle.WIDE }),
       // Render component if it exists, otherwise use render function
       h("div.page-content", null, children),
     ]),
@@ -47,13 +48,18 @@ function PageSkeleton(props: PageSkeletonProps) {
 
 PageSkeleton.defaultProps = { style: PageStyle.BASIC };
 
-function PageRoute(props) {
+type PageRouteProps = PageSkeletonProps & {
+  component?: React.ComponentType;
+  render?: React.FunctionComponent;
+};
+
+function PageRoute(props: PageRouteProps) {
   /** A custom route to manage page header, footer, and style associated
       with a specific route */
-  const { render, component: base, style, ...rest } = props;
+  const { render, component: base, style, navComponent, ...rest } = props;
   const component = (p) => {
     const children = base != null ? h(base, p) : render(p);
-    return h(PageSkeleton, { style, children });
+    return h(PageSkeleton, { style, navComponent, children });
   };
   return h(Route, { ...rest, component });
 }

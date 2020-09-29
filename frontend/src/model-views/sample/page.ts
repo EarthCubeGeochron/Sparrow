@@ -17,7 +17,7 @@ const h = hyper.styled(styles);
 const Parameter = ({ name, value, ...rest }) =>
   h("div.parameter", rest, [h("h4.subtitle", name), h("p.value", null, value)]);
 
-const ProjectLink = function({ project_name, project_id }) {
+const ProjectLink = function ({ project_name, project_id }) {
   if (project_name == null || project_id == null) {
     return h("em", "None");
   }
@@ -36,7 +36,7 @@ const ProjectInfo = ({ sample: d }) =>
     h("p.value", [h(ProjectLink, d)]),
   ]);
 
-const LocationBlock = function(props) {
+const LocationBlock = function (props) {
   const { sample } = props;
   const { geometry, location_name } = sample;
   if (geometry == null) {
@@ -55,7 +55,7 @@ const LocationBlock = function(props) {
   ]);
 };
 
-const Material = function(props) {
+const Material = function (props) {
   const { material } = props;
   return h(Parameter, {
     name: "Material",
@@ -63,7 +63,7 @@ const Material = function(props) {
   });
 };
 
-const SamplePage = function(props) {
+const SamplePage = function (props) {
   /*
   Render sample page based on ID provided in URL through react router
   */
