@@ -26,6 +26,7 @@ export function MultipleSelectFilter({ text, items, sendQuery }) {
     //console.log(itemProps);
     const isSelected = state.selectedItems.includes(item);
     return h(MenuItem, {
+      key: item,
       labelElement: h.if(isSelected)(Icon, { icon: "tick" }),
       intent: isSelected ? "primary" : null,
       text: item,
