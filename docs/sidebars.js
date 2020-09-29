@@ -1,5 +1,6 @@
 module.exports = {
   someSidebar: {
+    CHECK_THIS_OUT: ["live-code"],
     Guides: [
       "motivation-and-design",
       "getting-started",
