@@ -14,11 +14,9 @@ import { useAPIResult } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
 import styles from "./mappages.module.css";
 
-const onMap = window.location.pathname == "/map";
-
 const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
-  maxToasts: onMap ? 1 : 0,
+  maxToasts: 1,
 });
 
 interface MapProps {
@@ -82,6 +80,12 @@ export function MapPanel({
     const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
     setViewport({ ...viewport, zoom, latitude, longitude });
   }
+  useEffect(() => {
+    const onMap = window.location.pathname == "/map";
+    if (!onMap) {
+      MapToaster.clear();
+    }
+  }, [window.location.pathname]);
 
   useEffect(() => {
     if (firstWindowHash !== "") {
@@ -134,7 +138,7 @@ export function MapPanel({
             lat={e.lngLat[1]}
           />
         ),
-        timeout: 5000,
+        timeout: 0,
       });
     }
   };
