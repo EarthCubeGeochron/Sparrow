@@ -8,16 +8,13 @@ import loadable from "@loadable/component";
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
-import {
-  APIProvider,
-  DarkModeProvider,
-  inDarkMode,
-} from "@macrostrat/ui-components";
+import { DarkModeManager } from "~/util";
+import { APIProvider } from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
 import { APIExplorerV2 } from "./api-v2";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
-import { Catalog } from "./admin";
+import { Catalog } from "./catalog";
 import { PageSkeleton, PageStyle } from "./components/page-skeleton";
 import NewSample from "./new-sample/new-sample";
 
@@ -38,20 +35,6 @@ function PageRoute(props) {
     return h(PageSkeleton, { style, children });
   };
   return h(Route, { ...rest, component });
-}
-
-function DarkModeWrapper(props) {
-  const isDark = inDarkMode();
-  const className = isDark ? "bp3-dark" : null;
-  // To make modals etc. work, we need to add the dark-mode class to the body
-  useEffect(() => {
-    if (isDark) {
-      document.body.classList.add("bp3-dark");
-    } else {
-      document.body.classList.remove("bp3-dark");
-    }
-  }, [isDark]);
-  return h("div", { className, ...props });
 }
 
 function AppRouter(props) {
@@ -126,8 +109,7 @@ function App() {
       C(FrameProvider, { overrides: siteContent }),
       C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
       AuthProvider,
-      DarkModeProvider,
-      DarkModeWrapper,
+      DarkModeManager,
       C(AppRouter, { baseURL })
     )
   );

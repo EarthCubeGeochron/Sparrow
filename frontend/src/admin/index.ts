@@ -2,20 +2,19 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { useContext } from "react";
 import { NonIdealState, Button, Callout } from "@blueprintjs/core";
 import { Switch } from "react-router-dom";
-import { ErrorBoundaryRoute as Route } from "app/util/route";
+import { ErrorBoundaryRoute as Route } from "~/util/route";
 
-import { LinkButton, LinkCard } from "@macrostrat/ui-components";
+import { LinkButton } from "@macrostrat/ui-components";
 import { Frame } from "app/frame";
 import { AuthContext } from "~/auth/context";
 import { ProjectListComponent, ProjectComponent } from "./project";
-import { SessionListComponent } from "./session-list-component";
 import { SessionComponent } from "./session-component";
 import { SampleMain } from "./sample";
 import { DataFilesPage } from "./data-files";
 import { PageRoute, PageStyle } from "~/components/page-skeleton";
+import { DataModelLinks } from "~/catalog";
 
-import { NavButton } from "app/components";
-import { InsetText } from "app/components/layout";
+import { NavButton } from "~/components";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -95,22 +94,7 @@ const LoginSuggest = function () {
 };
 
 const AdminMain = ({ base, ...rest }) => {
-  if (base == null) {
-    base = "/catalog";
-  }
-  return h(Frame, { id: "adminBase", ...rest }, [
-    h("h1", "Catalog"),
-    h("div.catalog-index", [
-      h(
-        InsetText,
-        "The lab's data catalog can be browsed using several entrypoints:"
-      ),
-      h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
-      h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
-      h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
-      h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
-    ]),
-  ]);
+  return h(Frame, { id: "adminBase", ...rest }, [h(DataModelLinks, { base })]);
 };
 
 const CatalogBody = (
@@ -123,7 +107,7 @@ const CatalogBody = (
     }),
     h(Route, {
       path: base + "/session",
-      component: SessionListComponent,
+      component: "div",
     }),
     h(Route, {
       path: base + "/project/:id",
@@ -149,20 +133,13 @@ const CatalogBody = (
     }),
   ]);
 
-const Catalog = ({ base }) =>
-  h("div.catalog", [
-    h(CatalogNavbar, { base }),
-    h(LoginSuggest),
-    h(CatalogBody, { base }),
-  ]);
-
 function Admin(props) {
   const { base } = props;
   const { login, requestLoginForm } = useContext(AuthContext);
   if (!login) {
     return h(LoginRequired, { requestLoginForm });
   }
-  return h("div.admin", [h(CatalogBody, { base })]);
+  return h("div.admin", "This is the admin dashboard");
 }
 
-export { Catalog, CatalogNavLinks };
+export { Admin };
