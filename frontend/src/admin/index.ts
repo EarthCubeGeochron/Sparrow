@@ -7,10 +7,9 @@ import { Frame } from "~/frame";
 import { LoginRequired } from "~/auth";
 import { ErrorBoundaryRoute as Route, NoMatchPage } from "~/util";
 import { AuthContext } from "~/auth/context";
-import { ProjectListComponent, ProjectComponent } from "./project";
-import { SessionComponent } from "./session-component";
-import { SampleMain } from "./sample";
-import { DataFilesPage } from "./data-files";
+import { ProjectListComponent } from "~/model-views/project";
+import { SampleMain } from "~/model-views/sample";
+import { DataFilesPage } from "~/model-views/data-files";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
 import { DataModelLinks } from "~/catalog";
 import { NavButton } from "~/components";
@@ -24,22 +23,12 @@ const h = hyperStyled(styles);
 const AdminNavbar = (props) => {
   const { base, ...rest } = props;
   return h(AppNavbar, { ...rest, fullTitle: true, subtitle: "Admin" }, [
-    h(NavButton, { to: base + "/data-sheet" }, "Data Sheet"),
     h(CatalogNavLinks, { base }),
     h(AppNavbar.Divider),
+    h(NavButton, { to: base + "/data-sheet" }, "Sheet"),
     h(NavButton, { to: "/map" }, "Map"),
     h(NavButton, { to: base + "/lexicon" }, "Lexicon"),
   ]);
-};
-
-const SessionMatch = function ({ match }) {
-  const { id } = match.params;
-  return h(SessionComponent, { id });
-};
-
-const ProjectMatch = function ({ match }) {
-  const { id } = match.params;
-  return h(ProjectComponent, { id });
 };
 
 const AdminBody = ({ base, ...rest }) => {

@@ -1,6 +1,6 @@
 import h from "react-hyperscript";
 import { Callout } from "@blueprintjs/core";
-import { SessionInfoLink } from "~/admin/session-component/info-card";
+import { SessionInfoLink } from "~/model-views/session/info-card";
 import { FilterListComponent } from "../components/filter-list";
 
 const SessionListComponent = function () {

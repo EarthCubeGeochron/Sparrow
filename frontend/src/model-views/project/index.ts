@@ -2,14 +2,14 @@ import { useState, Component } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Callout, Button } from "@blueprintjs/core";
 import styled from "@emotion/styled";
-import { FilterListComponent } from "../../components/filter-list";
+import { FilterListComponent } from "~/components/filter-list";
 import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
 import { ProjectMap } from "./map";
 import { EditableProjectDetails } from "./editor";
 import { SampleCard } from "../sample/detail-card";
 import { SampleSelectDialog } from "./sample-select";
 import "../main.styl";
-import styles from "../module.styl";
+import styles from "~/admin/module.styl";
 const h = hyperStyled(styles);
 
 const pluralize = function (term, arrayOrNumber) {
