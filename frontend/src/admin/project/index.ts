@@ -1,14 +1,13 @@
-import { Component } from "react";
+import { useState, Component } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import { Callout } from "@blueprintjs/core";
+import { Callout, Button } from "@blueprintjs/core";
 import styled from "@emotion/styled";
 import { FilterListComponent } from "../../components/filter-list";
 import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
 import { ProjectMap } from "./map";
 import { EditableProjectDetails } from "./editor";
-import { useAPIv2Result } from "~/api-v2";
-
 import { SampleCard } from "../sample/detail-card";
+import { SampleSelectDialog } from "./sample-select";
 import "../main.styl";
 import styles from "../module.styl";
 const h = hyperStyled(styles);
@@ -78,20 +77,25 @@ flex-flow: row wrap;
 margin: 0 -5px;\
 `;
 
-function AddSampleArea() {
-  const samples = useAPIv2Result("/models/sample", {
-    nest: "material",
-    not_has: "project",
-  });
-  if (samples == null) return null;
-
-  return h(
-    "div.samples",
-    samples.data.map((d) => {
-      const { name, id, location_name, material } = d;
-      return h(SampleCard, { name, id, location_name, material, link: false });
-    })
-  );
+function AddSampleControls() {
+  const [isOpen, setIsOpen] = useState(false);
+  return h([
+    h(SampleSelectDialog, {
+      isOpen,
+      onClose() {
+        setIsOpen(false);
+      },
+    }),
+    h(
+      Button,
+      {
+        onClick() {
+          setIsOpen(!isOpen);
+        },
+      },
+      "Edit"
+    ),
+  ]);
 }
 
 const ProjectSamples = function ({ data }) {
@@ -102,7 +106,7 @@ const ProjectSamples = function ({ data }) {
   return h("div.sample-area", [
     h("h4", "Samples"),
     h(SampleContainer, content),
-    //h(AddSampleArea),
+    h(AddSampleControls),
   ]);
 };
 
@@ -170,13 +174,15 @@ const ProjectPage = function (props) {
   const { project } = props;
   const { samples } = project;
   return h("div.project-page", [
-    h(EditableProjectDetails, { project }),
-    h(ProjectPublications, { data: project.publications }),
-    h(ProjectResearchers, { data: project.researchers }),
     h("div.flex-row", [
-      h(ProjectSamples, { data: project.samples }),
+      h("div.basic-info", [
+        h(EditableProjectDetails, { project }),
+        h(ProjectPublications, { data: project.publications }),
+        h(ProjectResearchers, { data: project.researchers }),
+      ]),
       h("div", [h("h4", "Location"), h(ProjectMap, { samples })]),
     ]),
+    h(ProjectSamples, { data: project.samples }),
   ]);
 };
 
