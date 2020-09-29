@@ -2,7 +2,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { Switch } from "react-router-dom";
 import { LinkCard } from "@macrostrat/ui-components";
 import { Frame } from "~/frame";
-import { ErrorBoundaryRoute as Route } from "~/util/route";
+import { ErrorBoundaryRoute as Route } from "~/util";
 import { ProjectListComponent, ProjectComponent } from "~/admin/project";
 import { SessionListComponent } from "./session-list";
 import { SessionComponent } from "~/admin/session-component";

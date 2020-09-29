@@ -2,10 +2,10 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { useContext } from "react";
 import { NonIdealState, Button, Callout } from "@blueprintjs/core";
 import { Switch } from "react-router-dom";
-import { ErrorBoundaryRoute as Route } from "~/util/route";
 
 import { LinkButton } from "@macrostrat/ui-components";
-import { Frame } from "app/frame";
+import { Frame } from "~/frame";
+import { ErrorBoundaryRoute as Route } from "~/util";
 import { AuthContext } from "~/auth/context";
 import { ProjectListComponent, ProjectComponent } from "./project";
 import { SessionComponent } from "./session-component";

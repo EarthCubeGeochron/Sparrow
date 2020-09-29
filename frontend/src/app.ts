@@ -8,14 +8,14 @@ import loadable from "@loadable/component";
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
-import { DarkModeManager } from "~/util";
+import { DarkModeManager, PageRoute, NoMatchPage } from "~/util";
 import { APIProvider } from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
 import { APIExplorerV2 } from "./api-v2";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
 import { Catalog } from "./catalog";
-import { PageSkeleton, PageStyle } from "./components/page-skeleton";
+import { PageStyle } from "./components/page-skeleton";
 import NewSample from "./new-sample/new-sample";
 
 //import { MapSelector } from "./data-sheet/sheet-enter-components";
@@ -25,17 +25,6 @@ const MapPage = loadable(async function () {
   const module = await import("./map");
   return module.MapPage;
 });
-
-function PageRoute(props) {
-  /** A custom route to manage page header, footer, and style associated
-      with a specific route */
-  const { render, component: base, style, ...rest } = props;
-  const component = (p) => {
-    const children = base != null ? h(base, p) : render(p);
-    return h(PageSkeleton, { style, children });
-  };
-  return h(Route, { ...rest, component });
-}
 
 function AppRouter(props) {
   // Handles routing for the application between pages
@@ -85,6 +74,7 @@ function AppRouter(props) {
         exact: true,
       }),
       h(PageRoute, { path: "/api-explorer-v1", component: APIExplorer }),
+      h(PageRoute, { path: "*", component: NoMatchPage }),
     ])
   );
 }
