@@ -10,13 +10,13 @@ import {
   Overlay,
   Dialog,
 } from "@blueprintjs/core";
-import { MyNumericInput } from "../../components/edit-sample";
+import { MyNumericInput } from "~/components/edit-sample";
 import {
   SaveButton,
   CancelButton,
   DeleteButton,
 } from "@macrostrat/ui-components";
-import { useToggle } from "../../map/components/APIResult";
+import { useToggle } from "~/map/components/APIResult";
 
 /**
  * This can be used to set Latitude and Longitude fields in datasheet or other components.
@@ -71,11 +71,7 @@ export function MapSelector({ onCellsChanged, row, col, colTwo }) {
 
   const bounds = mapRef.current
     ? //@ts-ignore
-      mapRef.current
-        .getMap()
-        .getBounds()
-        .toArray()
-        .flat()
+      mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
   const mapClicked = (e) => {

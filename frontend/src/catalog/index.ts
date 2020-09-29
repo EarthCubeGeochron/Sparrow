@@ -1,3 +1,8 @@
+/*
+The catalog is the public-facing data display for Sparrow.
+It shares many attributes with the /admin section, but does
+not include editing functionality.
+*/
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch } from "react-router-dom";
 import { LinkCard } from "@macrostrat/ui-components";
@@ -10,30 +15,11 @@ import { SampleMain } from "~/admin/sample";
 import { DataFilesPage } from "~/admin/data-files";
 import { PageRoute, PageStyle } from "~/components/page-skeleton";
 import { LoginSuggest } from "~/auth";
-import { NavButton } from "~/components";
 import { InsetText } from "~/components/layout";
-import styles from "~/admin/module.styl";
+import { CatalogNavbar } from "./nav";
+import styles from "./module.styl";
 
 const h = hyperStyled(styles);
-
-const CatalogNavLinks = function ({ base, ...rest }) {
-  if (base == null) {
-    base = "/catalog";
-  }
-  return h([
-    h(NavButton, { to: base + "/project" }, "Projects"),
-    h(NavButton, { to: base + "/sample" }, "Samples"),
-    h(NavButton, { to: base + "/session" }, "Sessions"),
-  ]);
-};
-
-const CatalogNavbar = (
-  { base, ...rest } // A standalone navbar for the admin panel, can be enabled by default
-) =>
-  h("div.minimal-navbar", { ...rest, subtitle: "Admin" }, [
-    h(NavButton, { to: base, exact: true }, h("h4", "Data Catalog")),
-    h(CatalogNavLinks, { base }),
-  ]);
 
 const SessionMatch = function ({ match }) {
   const { id } = match.params;
@@ -59,7 +45,7 @@ const CatalogMain = ({ base, ...rest }) => {
   if (base == null) {
     base = "/catalog";
   }
-  return h(Frame, { id: "adminBase", ...rest }, [
+  return h(Frame, { id: "catalogBase", ...rest }, [
     h("h1", "Catalog"),
     h("div.catalog-index", [
       h(
@@ -114,4 +100,4 @@ const Catalog = ({ base }) =>
     h(CatalogBody, { base }),
   ]);
 
-export { Catalog, CatalogNavLinks, DataModelLinks };
+export { Catalog, DataModelLinks };

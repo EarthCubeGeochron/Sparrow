@@ -1,7 +1,7 @@
 import h, { C, compose } from "@macrostrat/hyper";
 import { useEffect } from "react";
 import { join } from "path";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
 import { HomePage } from "./homepage";
 import loadable from "@loadable/component";
 
@@ -15,12 +15,12 @@ import { APIExplorerV2 } from "./api-v2";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
 import { Catalog } from "./catalog";
-import { PageStyle } from "./components/page-skeleton";
+import { AdminRoute } from "./admin";
+import { PageStyle } from "~/components/page-skeleton";
 import NewSample from "./new-sample/new-sample";
 
 //import { MapSelector } from "./data-sheet/sheet-enter-components";
 
-const DataSheet = loadable(() => import("./data-sheet"));
 const MapPage = loadable(async function () {
   const module = await import("./map");
   return module.MapPage;
@@ -48,10 +48,7 @@ function AppRouter(props) {
       }),
       h(PageRoute, {
         path: "/catalog",
-        pageStyle: PageStyle.WIDE,
-        render() {
-          return h(Catalog, { base: "/catalog" });
-        },
+        component: () => h(Catalog, { base: "/catalog" }),
       }),
       h(PageRoute, {
         path: "/new-sample",
@@ -63,11 +60,7 @@ function AppRouter(props) {
         style: PageStyle.FULLSCREEN,
         component: MapPage,
       }),
-      h(PageRoute, {
-        path: "/data-sheet",
-        style: PageStyle.WIDE,
-        component: DataSheet,
-      }),
+      h(AdminRoute, { path: "/admin" }),
       h(PageRoute, {
         path: "/api-explorer",
         component: APIExplorerV2,

@@ -1,15 +1,16 @@
 import * as React from "react";
 import { useState, useEffect, useContext, useRef } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
+import update from "immutability-helper";
+import h from "@macrostrat/hyper";
+
+import { Frame } from "~/frame";
+import { DataSheetContext, DataSheetProvider } from "./provider";
 import { SheetHeader } from "./header";
 import { VirtualizedSheet } from "./virtualized";
 import { useElementHeight } from "./util";
-import { DataSheetContext, DataSheetProvider } from "./provider";
-import { Frame } from "~/frame";
 import { DataSheetSuggest } from "./sheet-enter-components/datasheet-suggest";
 import { MapSelector } from "./sheet-enter-components/map-selector";
-import update from "immutability-helper";
-import h from "@macrostrat/hyper";
 import "./datasheet.css";
 import styles from "./module.styl";
 
@@ -130,7 +131,7 @@ function DataSheet() {
     console.log(spec);
     setData(update(data, spec));
   };
-  const MaterialList = ["Lava", "Prophriclastic Rocks"];
+  const MaterialList = ["Lava", "Porphriclastic Rocks"];
 
   /** Builds the properties for the cell */
   const buildCellProps = (
