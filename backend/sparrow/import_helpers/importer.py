@@ -83,6 +83,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         secho(str(message), fg="yellow")
 
     def import_datafile(self, fn, rec, **kwargs):
+        """An importer must `yield` models that are to be tracked in the `data_file_link` table."""
         raise NotImplementedError()
 
     def delete_session(self, rec):
@@ -256,7 +257,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         Track the import of a given model from a data file
         """
         params = dict(_data_file=rec, defaults=defaults)
-
+        print(model, params)
         if isinstance(model, self.m.session):
             params["_session"] = model
         elif isinstance(model, self.m.analysis):

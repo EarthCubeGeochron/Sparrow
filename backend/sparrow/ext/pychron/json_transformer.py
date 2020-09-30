@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class PyChronJSONImporter:
-    """Basic transformation class for PyChron interpreted age data files."""
+    """Basic transformation class for PyChron interpreted age data files"""
 
     def __init__(self):
         pass
@@ -35,7 +35,10 @@ class PyChronJSONImporter:
         lon = sample.get("longitude")
         location = None
         if lat != 0 and lon != 0:
-            location = {"type": "Point", "coordinates": [lon, lat]}
+            try:
+                location = {"type": "Point", "coordinates": [float(lon), float(lat)]}
+            except (TypeError, ValueError):
+                pass
 
         res = {"name": sample["sample"], "location": location}
 
@@ -51,7 +54,6 @@ class PyChronJSONImporter:
 
     def import_file(self, data):
         """Build basic nested JSON representation of a PyChron IA file."""
-        print(data)
         analyses = [self.transform_analysis(a) for a in data["analyses"]]
         analyses.append(self.transform_ages(data["preferred"]["ages"]))
 
