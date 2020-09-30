@@ -1,8 +1,7 @@
-from click import echo, style, secho
+from click import echo, style
 from os import environ
 from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
-import logging
 
 from .encoders import JSONEncoder
 from .api.v1 import APIv1
@@ -12,7 +11,7 @@ from .auth import AuthPlugin
 
 # from .graph import GraphQLPlugin
 from .web import WebPlugin
-from .logs import get_logger, console_handler
+from .logs import get_logger
 
 log = get_logger(__name__)
 

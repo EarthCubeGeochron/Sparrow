@@ -147,7 +147,7 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         self.db.session.add(rec)
 
-        self.__set_file_info(fn, rec)
+        self.__set_file_info(infile, rec)
         return rec, added
 
     def __import_datafile(self, fn, rec=None, **kwargs):

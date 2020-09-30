@@ -2,7 +2,6 @@ import os
 import re
 import subprocess
 from itertools import groupby
-from .json_transformer import PyChronJSONImporter
 
 # Find IA files by regex
 iare = re.compile("(?P<cnt>_\d{5}\.ia\.json)")
@@ -20,12 +19,14 @@ def counterkey(x):
 
 
 class PyChronRepoCrawler:
-    def __init__(self, names, remote):
-        local_repos_root = os.path.join(os.path.expanduser("~"), "local_repo")
-        if not os.path.isdir(local_repos_root):
-            os.mkdir(local_repos_root)
+    def __init__(self, names, remote, local_root=None):
+        if local_root is None:
+            local_root = os.path.join(os.path.expanduser("~"), "local_repo")
+        self._local_root = local_root
 
-        self._local_root = local_repos_root
+        if not os.path.isdir(self._local_root):
+            os.mkdir(self._local_root)
+
         if not isinstance(names, (list, tuple)):
             names = (names,)
 
@@ -35,17 +36,17 @@ class PyChronRepoCrawler:
     def scan(self):
         for name in self._names:
             print("scanning repo. {}".format(name))
-            self.scan_repo(name)
+            yield from self.scan_repo(name)
 
     def scan_repo(self, name):
         # check if repo exists
         # clone otherwise
         root = os.path.join(self._local_root, name)
+        url = f"{self._remote}/{name}"
         if not os.path.isdir(root):
-            url = "{}/{}".format(self._remote, name)
             subprocess.run(["git", "clone", url, root])
-
-        importer = PyChronJSONImporter()
+        else:
+            subprocess.run(["git", "pull", "origin", "master"], cwd=root)
 
         # scan repo looking for ia files
         for d, ds, fs in os.walk(root):
@@ -59,12 +60,4 @@ class PyChronRepoCrawler:
                 gs = sorted(gs, key=counterkey, reverse=True)
                 p = os.path.join(d, gs[0])
 
-                print("importing id={} file. {}".format(uid, p))
-                importer.import_file(p)
-
-
-if __name__ == "__main__":
-    name = "NOB-Unknowns"
-    remote = "https://github.com/WiscArData"
-    pr = PyChronRepoCrawler(name, remote)
-    pr.scan()
+                yield uid, p

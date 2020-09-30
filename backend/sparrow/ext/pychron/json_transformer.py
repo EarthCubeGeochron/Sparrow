@@ -51,6 +51,7 @@ class PyChronJSONImporter:
 
     def import_file(self, data):
         """Build basic nested JSON representation of a PyChron IA file."""
+        print(data)
         analyses = [self.transform_analysis(a) for a in data["analyses"]]
         analyses.append(self.transform_ages(data["preferred"]["ages"]))
 
