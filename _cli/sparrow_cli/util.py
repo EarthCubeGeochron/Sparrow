@@ -21,9 +21,8 @@ def cmd(*v, **kwargs):
 
 
 def compose(*args, **kwargs):
-    chdir(environ["SPARROW_PATH"])
-    overrides = environ.get("_SPARROW_DEPRECATED_OVERRIDES", "")
-    return cmd("docker-compose", overrides, *args, **kwargs)
+    kwargs.setdefault("cwd", environ["SPARROW_PATH"])
+    return cmd("docker-compose", *args, **kwargs)
 
 
 def container_id(container):
