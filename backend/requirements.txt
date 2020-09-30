@@ -28,7 +28,7 @@ requests==2.22.0
 toposort==1.5
 
 # Command-line interface
-Click==7.0
+click==7.1.2
 click-plugins==1.1.1
 ipython==7.11.1
 

@@ -7,7 +7,8 @@ from itertools import chain
 from rich.console import Console
 from subprocess import PIPE, STDOUT
 from click.formatting import HelpFormatter
-from .util import compose
+from json import loads
+from .util import exec_or_run
 
 console = Console()
 
@@ -85,6 +86,27 @@ def format_config_path(cfg):
     return path.join(*tokens)
 
 
+def backend_help(fmt):
+    # Grab commands file from backend
+    out = exec_or_run(
+        "backend", "cat /run/cli-info.json", tty=False, stdout=PIPE, stderr=STDOUT
+    )
+    if out.returncode != 0:
+        secho("Could not access help text for the Sparrow backend", err=True, fg="red")
+        _err = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"
+        secho(_err, dim=True)
+        return
+
+    commands = loads(str(out.stdout, "utf-8"))
+    with fmt.section("Backend"):
+        fmt.write_dl(
+            [(k, format_description(v)) for k, v in commands.items()], col_spacing=2
+        )
+        fmt.write("\n")
+    fmt.flush()
+    return fmt
+
+
 def echo_help(core_commands=None, user_commands=None):
     fmt = SparrowHelpFormatter()
 
@@ -100,14 +122,7 @@ def echo_help(core_commands=None, user_commands=None):
     fmt.write_line(f"Lab: {d1}")
     fmt.flush()
 
-    # Note: TTY flag (-T) has issues on older versions of docker-compose (<~1.23).
-    # We solve this by bundling a newer version of docker-compose.
-    out = compose("run --no-deps -T backend sparrow", stdout=PIPE, stderr=STDOUT)
-    if out.returncode != 0:
-        secho("Could not access help text for the Sparrow backend", err=True, fg="red")
-        return
-    else:
-        fmt.write(str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n")
+    fmt.write("")
 
     with fmt.section("Command groups"):
         fmt.write_dl(
@@ -116,6 +131,8 @@ def echo_help(core_commands=None, user_commands=None):
         fmt.write("\n")
 
     fmt.flush()
+
+    fmt = backend_help(fmt)
 
     if user_commands is not None:
         lab_name = environ.get("SPARROW_LAB_NAME", "Lab-specific")

@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class PyChronJSONImporter:
-    """Basic transformation class for PyChron data files"""
+    """Basic transformation class for PyChron interpreted age data files."""
 
     def __init__(self):
         pass
