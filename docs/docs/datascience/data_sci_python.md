@@ -1,12 +1,12 @@
 ---
-id: dataSci
+id: data-sci
 title: Introductory Python for Data Science
 sidebar_label: Data Science Intro
 ---
 
 ### Metadata Handling and Exporting in Python
 
-This collection of notebooks is designed to guide a programming novice through a basic process of handling metadata collection for geologic samples. We start by fetching data from an API and uploading data from local excel spreadsheets. With that gathered data we then do some dataframe manipulation to un-nest some of the columns. After that, we go over an example of how to use Numpy and Pandas to gather some meaningful statistics about the state of data collection. We also learn how to create dataframes for specific samples, like ones that still need metadata, and we export the pandas dataframes into excel sheets for easy access. We also learn how to do some mapping. The code in these notebooks are bits of code that I wrote and used, with explanations of what the code does and why it is used.
+This collection of notebooks is designed to guide a programming novice through a basic process of handling metadata collection for geologic samples. We start by fetching data from Sparrow and uploading data from local excel spreadsheets. With that gathered data we then do some dataframe manipulation to un-nest some of the columns. After that, we go over an example of how to use Numpy and Pandas to gather some meaningful statistics about the state of data collection. We also learn how to create dataframes for specific samples, like ones that still need metadata, and we export the pandas dataframes into excel sheets for easy access. We also learn how to do some mapping. The code in these notebooks are bits of code that I wrote and used, with explanations of what the code does and why it is used.
 
 ### The Code
 
@@ -30,9 +30,9 @@ Also become familiar with basic python logic and syntax such as:
 
 Below are a collection of Jupyter Notebooks as static HTML pages. They go in order as they are listed from top to bottom. It isn't necessary to follow in order, however it may be unclear what dataframes are being referred to if they are looked at out of order. It is suggested to at least skim over all in order and then focus more on the notebooks that contain the most pertinent information for you.
 
-- [Requests and Uploads](/docs/datascience/requestsUploads)
-- [Column Splitting](/docs/datascience/columnSplit)
+- [Requests and Uploads](/docs/datascience/requests-uploads)
+- [Column Splitting](/docs/datascience/column-splitting)
 - [Combining and Exporting](/docs/datascience/combine)
-- [Basic Data Analytics](/docs/datascience/dataAnalytics)
+- [Basic Data Analytics](/docs/datascience/data-analytics)
 - [Exporting Meaningful Data](/docs/datascience/export)
 - [Mapping with Folium](/docs/datascience/mapping)

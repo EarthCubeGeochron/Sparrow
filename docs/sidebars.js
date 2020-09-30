@@ -6,7 +6,7 @@ module.exports = {
       "getting-started",
       "server-configuration",
       "sparrow-on-windows",
-      "datascience/dataSci",
+      "datascience/data-sci",
       "schema-imp",
     ],
     Documentation: [
