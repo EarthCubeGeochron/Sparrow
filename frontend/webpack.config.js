@@ -4,7 +4,6 @@ const { execSync } = require("child_process");
 const { readFileSync } = require("fs");
 const { EnvironmentPlugin } = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
 
 process.env["BASE_URL"] =
   process.env.API_BASE_URL || process.env.SPARROW_BASE_URL;
