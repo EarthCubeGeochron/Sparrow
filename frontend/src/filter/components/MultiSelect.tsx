@@ -9,6 +9,7 @@ import {
 } from "@blueprintjs/select";
 import { useToggle } from "../../map/components/APIResult";
 import { useAPIResult } from "@macrostrat/ui-components";
+import axios from "axios";
 
 /**
 This component is a search bar with a drop down menu.
@@ -90,11 +91,14 @@ export function MultipleSelectFilter({ text, items, sendQuery }) {
 }
 
 export function GeologicFormationSelector() {
-  const [searchText, setSearchText] = React.useState("");
+  const [searchText, setSearchText] = React.useState("b");
   const [stratNames, setStratNames] = React.useState([]);
-  const MacGeoFormationUrl = `https://macrostrat.org/api/v2/defs/strat_names?strat_name_like=${searchText}`;
+  const MacGeoFormationUrl = `https://macrostrat.org/api/v2/defs/strat_names`;
 
-  const geologicFormations = useAPIResult(MacGeoFormationUrl);
+  const geologicFormations = useAPIResult(MacGeoFormationUrl, {
+    strat_name_like: searchText,
+  });
+  console.log(geologicFormations);
 
   React.useEffect(() => {
     if (geologicFormations !== null) {

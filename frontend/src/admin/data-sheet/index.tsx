@@ -3,7 +3,6 @@ import { useState, useEffect, useContext, useRef } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
 import update from "immutability-helper";
 import h from "@macrostrat/hyper";
-
 import { Frame } from "~/frame";
 import { DataSheetContext, DataSheetProvider } from "./provider";
 import { SheetHeader } from "./header";
@@ -13,6 +12,7 @@ import { DataSheetSuggest } from "./sheet-enter-components/datasheet-suggest";
 import { MapSelector } from "./sheet-enter-components/map-selector";
 import "./datasheet.css";
 import styles from "./module.styl";
+import { MaterialCall, SampleNameCall } from "./api-calls";
 
 const Row = ({ row, children, className }) => {
   const { rowHeight } = useContext(DataSheetContext);
@@ -83,6 +83,10 @@ function DataSheet() {
     unwrapResponse
   );
 
+  const MaterialList = MaterialCall();
+  const SampleNameList = SampleNameCall();
+  console.log(SampleNameList);
+
   const ref = useRef<HTMLDivElement>();
   const [height, width] = useElementHeight(ref) ?? [100, 20];
 
@@ -131,7 +135,6 @@ function DataSheet() {
     console.log(spec);
     setData(update(data, spec));
   };
-  const MaterialList = ["Lava", "Porphriclastic Rocks"];
 
   /** Builds the properties for the cell */
   const buildCellProps = (
@@ -168,7 +171,15 @@ function DataSheet() {
   const dataEditorComponents = ({ row, col, value, onCommit, cell }) => {
     const { key } = columns[col];
     const components = {
-      name: null,
+      name: h(DataSheetSuggest, {
+        items: SampleNameList,
+        defaultValue: value,
+        onCellsChanged,
+        onCommit,
+        row: row,
+        col: col,
+        cell: cell,
+      }),
       igsn: null,
       is_public: null,
       material: h(DataSheetSuggest, {
