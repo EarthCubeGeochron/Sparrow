@@ -2,6 +2,7 @@ import h from "@macrostrat/hyper";
 import { FilterListComponent } from "~/components/filter-list";
 import { ProjectInfoLink } from "~/model-views/project";
 import InfiniteScroll from "~/components/infinite-scroll";
+//import { ForeverScroll } from "~/components/infinite-scroll;";
 //import { InfiniteScrollView } from "@macrostrat/ui-components";
 
 const ProjectListComponent = () => {
