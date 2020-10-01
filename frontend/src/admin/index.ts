@@ -7,7 +7,7 @@ import { Frame } from "~/frame";
 import { LoginRequired } from "~/auth";
 import { ErrorBoundaryRoute as Route, NoMatchPage } from "~/util";
 import { AuthContext } from "~/auth/context";
-import { ProjectListComponent } from "~/model-views/project";
+import { ProjectAdminPage } from "./project";
 import { SampleMain } from "~/model-views/sample";
 import { DataFilesPage } from "~/model-views/data-files";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
@@ -47,7 +47,7 @@ const AdminRouter = ({ base }) =>
     }),
     h(Route, {
       path: base + "/project",
-      component: ProjectListComponent,
+      component: ProjectAdminPage,
     }),
     h(Route, {
       path: base + "/sample",

@@ -6,6 +6,7 @@ import { useReducer } from "react";
 import { createContext } from "react";
 import { useContext } from "react";
 import { useOnScreen } from "./useOnScreen";
+import "./main.styl";
 
 // This Component uses Intersection Observer to know when an element is being displayed
 // And when that item is being displayed state is updated by the reducer callback.

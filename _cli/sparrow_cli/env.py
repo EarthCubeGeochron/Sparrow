@@ -78,14 +78,13 @@ def prepare_compose_overrides():
     overrides = environ.get("SPARROW_COMPOSE_OVERRIDES", "")
     if overrides.startswith("-f "):
         secho(
-            "You are using a deprecated signature for the SPARROW_COMPOSE_OVERRIDES "
-            "environment variable. This option should now be formatted as a "
+            "You are using an old signature for the SPARROW_COMPOSE_OVERRIDES "
+            "environment variable. This option must now be formatted as a "
             "colon-separated path similar to the COMPOSE_FILE docker-compose "
             "configuration parameter (https://docs.docker.com/compose/reference/envvars/#compose_file)",
-            fg="yellow",
+            fg="red",
             err=True,
         )
-        environ["_SPARROW_DEPRECATED_OVERRIDES"] = overrides
     elif overrides != "":
         compose_files += overrides.split(":")
 

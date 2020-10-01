@@ -94,29 +94,16 @@ const styleRules = [
   { test: /\.styl$/, use: stylusLoader },
 ];
 
-const babelLoader = {
-  loader: "babel-loader",
-  // options: {
-  //   presets: [
-  //     "@babel/preset-env",
-  //     "@babel/preset-react",
-  //     "@babel/preset-typescript"
-  //   ],
-  //   plugins: [
-  //     "emotion",
-  //     "@babel/plugin-proposal-nullish-coalescing-operator",
-  //     "@babel/plugin-proposal-optional-chaining",
-  //     "@babel/plugin-proposal-class-properties"
-  //   ]
-  // }
-};
-
 module.exports = {
   module: {
     rules: [
       ...styleRules,
-      { test: /\.coffee$/, use: [babelLoader, "coffee-loader"] },
-      { test: /\.(js|jsx|ts|tsx)$/, use: babelLoader, exclude: /node_modules/ },
+      { test: /\.coffee$/, use: ["babel-loader", "coffee-loader"] },
+      {
+        test: /\.(js|jsx|ts|tsx)$/,
+        use: "babel-loader",
+        exclude: /node_modules/,
+      },
       {
         // Rule for 'modern' javascript
         type: "javascript/auto",
@@ -178,13 +165,16 @@ module.exports = {
   // Always split chunks
   // We could turn this off in development if we wanted.
   // https://medium.com/hackernoon/the-100-correct-way-to-split-your-chunks-with-webpack-f8a9df5b7758
-  //optimization: {
-  //splitChunks: {
-  //chunks: 'all',
-  //},
-  //},
+  // optimization: {
+  // splitChunks: {
+  // chunks: 'all',
+  // },
+  // },
   plugins: [
-    new HtmlWebpackPlugin({ title: process.env.SPARROW_LAB_NAME }),
+    new HtmlWebpackPlugin({
+      title: process.env.SPARROW_LAB_NAME,
+      favicon: "static/img/favicon.png",
+    }),
     browserSync,
     new EnvironmentPlugin(["BASE_URL", "SPARROW_LAB_NAME", "MAPBOX_API_TOKEN"]),
   ],

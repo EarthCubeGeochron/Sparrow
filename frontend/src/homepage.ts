@@ -4,8 +4,10 @@ import { InsetText } from "app/components/layout";
 // @ts-ignore
 import styles from "./styles.module.css";
 import loadable from "@loadable/component";
+
 import { SampleMap } from "../plugins/globe";
 import { useContext } from "react";
+
 
 const MapHome = loadable(async function() {
   const module = await import("./map");

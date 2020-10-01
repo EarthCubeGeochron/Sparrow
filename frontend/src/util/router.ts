@@ -20,3 +20,9 @@ export function PageRoute(props) {
   };
   return h(Route, { ...rest, component });
 }
+
+export function useModelURL(tail) {
+  const { pathname } = useLocation();
+  const base = pathname.startsWith("/admin") ? "/admin" : "/catalog";
+  return base + tail;
+}

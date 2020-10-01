@@ -149,11 +149,6 @@ const EditableProjectDetails = function (props) {
     },
     [
       h("div.project-editor", [
-        h.if(login)(MinimalNavbar, { className: "project-editor-navbar" }, [
-          h("h4", "Manage project"),
-          h(EditStatusButtons),
-          h(EmbargoEditor),
-        ]),
         h("div.project-editor-content", [
           h(ModelEditableText, { is: "h3", field: "name", multiline: true }),
           h(ModelEditableText, {
@@ -162,9 +157,18 @@ const EditableProjectDetails = function (props) {
             multiline: true,
           }),
         ]),
+        h(MinimalNavbar, { className: "project-editor-navbar" }, [
+          h("h4", "Manage project"),
+          h(EditStatusButtons),
+          h(EmbargoEditor),
+        ]),
       ]),
     ]
   );
 };
+
+function EditableProjectPage(props) {
+  h(ModelEditor);
+}
 
 export { EditableProjectDetails };
