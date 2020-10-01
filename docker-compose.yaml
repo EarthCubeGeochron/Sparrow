@@ -27,6 +27,8 @@ services:
       - SPARROW_SECRET_KEY
       - SPARROW_BASE_URL
       - SPARROW_LAB_NAME
+      # A cache for files that need to persist but can be rebuilt.
+      - SPARROW_CACHE_DIR=/cache
       - SPARROW_INIT_SQL=/init-sql
       # For cloud data support
       # NOTE: it may be useful to split this into a
@@ -65,6 +67,10 @@ services:
       # Save ipython configuration to anonymous volume so
       # we keep command history between app runs
       - ipython_config:/root/.ipython/profile_default
+      # A working location for caching files that need to persist over time
+      # (for example, git repositorites for the PyChron importer). This could conceivably
+      # be delegated to a separate importer container, but that seems overcomplex for now.
+      - backend_cache:/cache
   db:
     image: mdillon/postgis:11
     expose:
@@ -107,5 +113,6 @@ volumes:
   # Anonymous volume to preserve `sparrow shell` history
   ipython_config:
   db_cluster:
+  backend_cache:
   # Placeholder volumes in case we don't have these volumes to mount
   placeholder:

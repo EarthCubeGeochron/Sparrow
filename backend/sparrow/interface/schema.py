@@ -116,6 +116,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # Try to get value from session
         log.debug(f"Finding instance of {self.opts.model.__name__}")
         log.debug(f"..filters: {filters}")
+        log.debug(f"..related models: {related_models}")
+        log.debug(f"..data: {data}")
         instance = self._get_session_instance(filters)
 
         # Need to get relationship columns for primary keys!
@@ -133,7 +135,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             instance = super().get_instance(data)
 
         if instance is not None:
-            for k, v in related_models.items():
+            for k, v in data.items():
                 setattr(instance, k, v)
 
         # Get rid of filters by value

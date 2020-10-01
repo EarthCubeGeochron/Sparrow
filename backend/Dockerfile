@@ -1,6 +1,9 @@
 FROM sparrowdata/backend-base:1.2 AS main
 # Multi-stage build of Sparrow backend.
 
+## Git is required for the PyChron importer
+RUN apk update && apk add git
+
 COPY ./requirements.txt /install/requirements.txt
 RUN pip install --no-cache "https://github.com/djrobstep/sqlakeyset/zipball/fec6936"
 RUN pip install --no-cache -r /install/requirements.txt
@@ -27,6 +30,10 @@ WORKDIR /app
 COPY ./ /app/
 
 RUN pip install -e .
+
+# Copy command-line options to a place where they can be easily accessed
+# by the wrapper CLI.
+RUN (SPARROW_SECRET_KEY=test sparrow get-cli-info 2>/dev/null) > /run/cli-info.json
 
 CMD ["/bin/run"]
 
