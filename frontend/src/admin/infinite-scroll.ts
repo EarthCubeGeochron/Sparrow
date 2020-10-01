@@ -4,16 +4,14 @@ import { ProjectInfoLink } from "~/model-views/project";
 
 const ProjectListComponent = () => {
   /* List of projects for the catalog. Could potentially move there... */
-  return h("div.data-view.projects", [
-    h(FilterListComponent, {
-      route: "/project",
-      filterFields: {
-        name: "Name",
-        description: "Description",
-      },
-      itemComponent: ProjectInfoLink,
-    }),
-  ]);
+  return h(FilterListComponent, {
+    route: "/project",
+    filterFields: {
+      name: "Name",
+      description: "Description",
+    },
+    itemComponent: ProjectInfoLink,
+  });
 };
 
 export { ProjectListComponent };
