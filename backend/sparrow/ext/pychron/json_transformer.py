@@ -10,7 +10,9 @@ class PyChronJSONImporter:
 
     def datum_type_for(self, key):
         # Right now we phone this in with "dimensionless" for everything
-        return {"unit": "dimensionless", "parameter": key}
+        if key.endswith("age"):
+            return {"unit": "Ma", "parameter": key}
+        return {"unit": "unknown", "parameter": key}
 
     def transform_datum(self, analysis, key):
         v = analysis.pop(key)
@@ -28,7 +30,11 @@ class PyChronJSONImporter:
         for k in ["age", "kca", "kcl", "radiogenic_yield"]:
             data.append(self.transform_datum(analysis, k))
         # TODO: allow UUIDs to be created in Analysis model aswell.
-        return {"analysis_name": analysis.pop("record_id"), "data": data}
+        return {
+            "analysis_name": analysis.pop("record_id"),
+            "datum": data,
+            "analysis_type": "Heating step",
+        }
 
     def transform_sample(self, sample):
         lat = sample.get("latitude")
@@ -56,6 +62,7 @@ class PyChronJSONImporter:
         """Build basic nested JSON representation of a PyChron IA file."""
         analyses = [self.transform_analysis(a) for a in data["analyses"]]
         analyses.append(self.transform_ages(data["preferred"]["ages"]))
+        print(analyses)
 
         res = {"analysis": analyses}
 
