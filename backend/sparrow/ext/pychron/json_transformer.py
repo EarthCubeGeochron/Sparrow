@@ -3,14 +3,16 @@ from datetime import datetime
 
 
 class PyChronJSONImporter:
-    """Basic transformation class for PyChron data files"""
+    """Basic transformation class for PyChron interpreted age data files"""
 
     def __init__(self):
         pass
 
     def datum_type_for(self, key):
         # Right now we phone this in with "dimensionless" for everything
-        return {"unit": "dimensionless", "parameter": key}
+        if key.endswith("age"):
+            return {"unit": "Ma", "parameter": key}
+        return {"unit": "unknown", "parameter": key}
 
     def transform_datum(self, analysis, key):
         v = analysis.pop(key)
@@ -28,14 +30,21 @@ class PyChronJSONImporter:
         for k in ["age", "kca", "kcl", "radiogenic_yield"]:
             data.append(self.transform_datum(analysis, k))
         # TODO: allow UUIDs to be created in Analysis model aswell.
-        return {"analysis_name": analysis.pop("record_id"), "data": data}
+        return {
+            "analysis_name": analysis.pop("record_id"),
+            "datum": data,
+            "analysis_type": "Heating step",
+        }
 
     def transform_sample(self, sample):
         lat = sample.get("latitude")
         lon = sample.get("longitude")
         location = None
         if lat != 0 and lon != 0:
-            location = {"type": "Point", "coordinates": [lon, lat]}
+            try:
+                location = {"type": "Point", "coordinates": [float(lon), float(lat)]}
+            except (TypeError, ValueError):
+                pass
 
         res = {"name": sample["sample"], "location": location}
 
@@ -53,6 +62,7 @@ class PyChronJSONImporter:
         """Build basic nested JSON representation of a PyChron IA file."""
         analyses = [self.transform_analysis(a) for a in data["analyses"]]
         analyses.append(self.transform_ages(data["preferred"]["ages"]))
+        print(analyses)
 
         res = {"analysis": analyses}
 

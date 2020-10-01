@@ -37,7 +37,9 @@ def container_is_running(name):
     return res.returncode == 0
 
 
-def exec_or_run(container, *args, log_level=None, run_args=("--rm",), tty=True):
+def exec_or_run(
+    container, *args, log_level=None, run_args=("--rm",), tty=True, **popen_kwargs
+):
     """Run a command against sparrow within a docker container
     This `exec`/`run` switch is added because there are apparently
     database/locking issues caused by spinning up arbitrary
@@ -51,7 +53,11 @@ def exec_or_run(container, *args, log_level=None, run_args=("--rm",), tty=True):
     if not tty:
         tty_args = ["-T"]
 
-    if container_is_running("backend"):
-        return compose(*compose_args, "exec", *tty_args, container, *args)
+    if container_is_running(container):
+        return compose(
+            *compose_args, "exec", *tty_args, container, *args, **popen_kwargs
+        )
     else:
-        return compose(*compose_args, "run", *tty_args, *run_args, container, *args)
+        return compose(
+            *compose_args, "run", *tty_args, *run_args, container, *args, **popen_kwargs
+        )
