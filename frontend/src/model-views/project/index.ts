@@ -1,6 +1,7 @@
 import { useState, Component } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Callout, Button } from "@blueprintjs/core";
+import { useRouteMatch } from "react-router-dom";
 import styled from "@emotion/styled";
 import { FilterListComponent } from "~/components/filter-list";
 import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
@@ -8,6 +9,7 @@ import { ProjectMap } from "./map";
 import { EditableProjectDetails } from "./editor";
 import { SampleCard } from "../sample/detail-card";
 import { SampleSelectDialog } from "./sample-select";
+import { useModelURL } from "~/util/router";
 import "../main.styl";
 import styles from "~/admin/module.styl";
 const h = hyperStyled(styles);
@@ -110,47 +112,67 @@ const ProjectSamples = function ({ data }) {
   ]);
 };
 
-const ContentArea = ({ data, title, className }) =>
+const ContentArea = ({ data, title, className, minimal = false }) =>
   h("div.content-area", [
     h("h5", [h("span.count", data.length), " ", pluralize(title, data)]),
-    h(
+    h.if(!minimal)(
       "ul",
       { className },
       data.map((d) => h("li", d))
     ),
   ]);
 
-const ProjectInfoLink = function (props) {
-  let { id, name, description, samples, publications } = props;
-  if (publications == null) {
-    publications = [];
-  }
+interface Project {
+  id: number;
+  name: string;
+  description: string;
+  samples: any[];
+  publications: any[];
+}
+
+interface ProjectInfoLinkProps extends Project {
+  minimal: boolean;
+}
+
+function ProjectInfoLink(props: ProjectInfoLinkProps) {
+  let {
+    id,
+    name,
+    description,
+    samples = [],
+    publications = [],
+    minimal = false,
+  } = props;
+
+  const to = useModelURL(`/project/${id}`);
+
   return h(
     LinkCard,
     {
-      to: `/catalog/project/${id}`,
+      to,
       key: id,
       className: "project-card",
     },
     [
       h("h3", name),
       h("p.description", description),
-      h.if(samples.length)(ContentArea, {
+      h.if(samples.length > 0)(ContentArea, {
         className: "samples",
         data: samples.map((d) => d.name),
         title: "sample",
       }),
-      h.if(publications.length)(ContentArea, {
+      h.if(publications.length > 0)(ContentArea, {
         className: "publications",
         data: publications.map((d) => d.title),
         title: "publication",
       }),
     ]
   );
-};
+}
 
-const ProjectListComponent = () =>
-  h("div.data-view.projects", [
+const ProjectListComponent = () => {
+  /* List of projects for the catalog. Could potentially move there... */
+  return h("div.data-view.projects", [
     h(
       Callout,
       {
@@ -169,6 +191,7 @@ Projects can be imported into Sparrow or defined using the managment interface.`
       itemComponent: ProjectInfoLink,
     }),
   ]);
+};
 
 const ProjectPage = function (props) {
   const { project } = props;
@@ -201,4 +224,11 @@ const ProjectComponent = function (props: ProjectProps) {
   return h("div.data-view.project", null, h(ProjectPage, { project }));
 };
 
-export { ProjectListComponent, ProjectComponent };
+function ProjectMatch() {
+  const {
+    params: { id },
+  } = useRouteMatch();
+  return h(ProjectComponent, { id });
+}
+
+export { ProjectComponent, ProjectMatch, ProjectInfoLink };

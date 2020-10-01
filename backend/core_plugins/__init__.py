@@ -1,3 +1,4 @@
+# flake8: noqa
 from .earthchem_vocabulary import EarthChemVocabularyPlugin
 from .location_names import LocationNamesPlugin
 from .project_edit import ProjectEditPlugin

@@ -9,7 +9,8 @@ import { LinkCard } from "@macrostrat/ui-components";
 import { Frame } from "~/frame";
 import { ErrorBoundaryRoute as Route } from "~/util";
 import { SessionListComponent } from "./session-list";
-import { ProjectListComponent, ProjectComponent } from "~/model-views/project";
+import { ProjectListComponent } from "./project-list";
+import { ProjectMatch } from "~/model-views/project";
 import { SessionComponent } from "~/model-views/session";
 import { SampleMain } from "~/model-views/sample";
 import { DataFilesPage } from "~/model-views/data-files";
@@ -24,11 +25,6 @@ const h = hyperStyled(styles);
 const SessionMatch = function ({ match }) {
   const { id } = match.params;
   return h(SessionComponent, { id });
-};
-
-const ProjectMatch = function ({ match }) {
-  const { id } = match.params;
-  return h(ProjectComponent, { id });
 };
 
 function DataModelLinks(props) {
