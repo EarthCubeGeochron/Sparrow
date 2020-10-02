@@ -7,6 +7,7 @@ from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
 from starlette.responses import JSONResponse
 
+from .fields import NestedModelField
 from ..database.mapper.util import classname_for_table
 from ..logs import get_logger
 from .response import APIResponse
@@ -53,7 +54,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self._model_name = classname_for_table(schema.opts.model.__table__)
         log.info(self._model_name)
 
-        self.instance_schema = dict(nest=DelimitedList(Str(), missing=[]),)
+        self.instance_schema = dict(nest=NestedModelField(Str(), missing=[]))
 
         self.args_schema = dict(
             **self.instance_schema,
@@ -117,6 +118,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         # We don't properly allow 'all' in nested field
         if len(args["nest"]) == 1 and args["nest"][0] == "all":
             args["nest"] = "all"
+        log.info(args["nest"])
 
         schema = self.meta.schema(many=True, allowed_nests=args["nest"])
         model = schema.opts.model

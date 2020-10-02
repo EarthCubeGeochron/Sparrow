@@ -51,12 +51,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     def __init__(self, *args, **kwargs):
         nests = kwargs.pop("allowed_nests", [])
-        if nests == "all":
-            nests = self._available_nests()
         self.allowed_nests = nests
         if len(self.allowed_nests) > 0:
             model = self.opts.model.__name__
-            nests = ", ".join(self.allowed_nests)
             log.debug(
                 f"\nSetting up schema for model {model}\n  allowed nests: {nests}"
             )

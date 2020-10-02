@@ -7,14 +7,12 @@ import sys
 import click
 from rich.console import Console
 from rich import print
-from subprocess import Popen
 from .base import cli, SparrowConfig
 from .help import echo_help
 from .util import cmd, compose, exec_or_run, find_subcommand, container_id
 from .test import sparrow_test  # noqa
 from .database import sparrow_db  # noqa
 from .docs import sparrow_docs  # noqa
-from .env import validate_environment
 from .containers import sparrow_up, sparrow_logs
 
 console = Console(highlight=True)

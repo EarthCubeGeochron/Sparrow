@@ -113,7 +113,8 @@ class SmartNested(Nested, Related):
         self._copy_config("_show_audit_id")
 
         other_name = self.related_model.__table__.name
-        if other_name in self.root.allowed_nests:
+        _allowed = self.root.allowed_nests
+        if other_name in _allowed or _allowed == "all":
             # Serialize as nested
             return super(Nested, self)._serialize(value, attr, obj)
 
