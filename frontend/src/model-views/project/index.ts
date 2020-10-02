@@ -62,11 +62,13 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
     [
       h("h3", name),
       h("p.description", description),
-      h.if(samples.length > 0)(ContentArea, {
-        className: "samples",
-        data: samples.map((d) => d.name),
-        title: "sample",
-      }),
+      samples
+        ? h(ContentArea, {
+            className: "samples",
+            data: samples.map((d) => d.name),
+            title: "sample",
+          })
+        : null,
       h.if(publications.length > 0)(ContentArea, {
         className: "publications",
         data: publications.map((d) => d.title),

@@ -15,9 +15,7 @@ const ProjectListComponent = () => {
 
   useEffect(() => {
     if (initData) {
-      const data = initData.filter((d) => d.samples !== null);
-      console.log(data);
-      setData(data);
+      setData(initData);
     }
   }, [initData]);
   /* List of projects for the catalog. Could potentially move there... */
