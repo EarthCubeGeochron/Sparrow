@@ -9,34 +9,17 @@ import "./main.styl";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { ProjectInfoLink } from "~/model-views/project";
 
-// This Component uses Intersection Observer to know when an element is being displayed
-// And when that item is being displayed state is updated by the reducer callback.
 
-// There are several important variables the application needs to keep track
-// of to know how much data is left to load above and below the list:
-//      loadingBottom: if data is being loaded, on the case 'start'
-//      hasMoreAfter: More to be loaded at bottom
-//      after: Point/index in data to load at bottom
+/**
+ * How do I make this virtualized?
+ * 
+ * Need to know height of items: need a callback for each item useElementDimensions?
+ * The height of the ENTIRE list once rendered
+ * A measurement that shows how far the list has scrolled
+ * 
+ */
 
-const IntergerList = () => {
-  const list = [];
-  for (let i = 0; i < 100; i++) {
-    list.push(i + 1);
-  }
-  return list;
-};
 
-// The reducer handles state updates for the application.
-// For the before and after variables there are 3 cases that need to be accounted for:
-
-//      1. When the list is first loaded there are only perPage (15 default) items
-//         rendered so the first load will be different than the middle load.
-
-//      2. The middle renders, the list rendered is 25 (default) items long because
-//         in order to get the scrolling effect the app renders the newly fetched data
-//         plus 10 items that were previously rendered.
-
-//      3. The end of the list there may be less than the perPage(15 default) in the list.
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -56,6 +39,14 @@ const reducer = (state, action) => {
 };
 const perPage = 15;
 
+/**
+ *
+ * This Component uses Intersection Observer to know when an element is being displayed
+ *  And when that item is being displayed state is updated by the reducer callback.
+ * @param initialData: An array of data that can be mapped into the component provided
+ * @param component: A component that can take in the mapped data and format it into what the user wants to display
+ *
+ */
 function ForeverScroll({ initialData, component }) {
   const [state, dispatch] = useReducer(reducer, {
     loadingBottom: false,
@@ -78,11 +69,11 @@ function ForeverScroll({ initialData, component }) {
   };
 
   const { loadingBottom, data, after, hasMoreAfter } = state;
-  console.log("loading Bottom: " + loadingBottom);
-  console.log("After: " + after);
-  console.log("Has More After: " + hasMoreAfter);
-  console.log(visibleBottom);
-  console.log(data);
+  // console.log("loading Bottom: " + loadingBottom);
+  // console.log("After: " + after);
+  // console.log("Has More After: " + hasMoreAfter);
+  // console.log(visibleBottom);
+  // console.log(data);
 
   useEffect(() => {
     if (visibleBottom) {
