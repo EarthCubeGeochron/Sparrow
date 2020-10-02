@@ -6,6 +6,8 @@ import { createContext } from "react";
 import { useContext } from "react";
 import { useOnScreen } from "./useOnScreen";
 import "./main.styl";
+import { useAPIResult } from "@macrostrat/ui-components";
+import { ProjectInfoLink } from "~/model-views/project";
 
 // This Component uses Intersection Observer to know when an element is being displayed
 // And when that item is being displayed state is updated by the reducer callback.
@@ -24,12 +26,23 @@ const IntergerList = () => {
   return list;
 };
 
+// The reducer handles state updates for the application.
+// For the before and after variables there are 3 cases that need to be accounted for:
+
+//      1. When the list is first loaded there are only perPage (15 default) items
+//         rendered so the first load will be different than the middle load.
+
+//      2. The middle renders, the list rendered is 25 (default) items long because
+//         in order to get the scrolling effect the app renders the newly fetched data
+//         plus 10 items that were previously rendered.
+
+//      3. The end of the list there may be less than the perPage(15 default) in the list.
+
 const reducer = (state, action) => {
   switch (action.type) {
     case "startBottom":
       return { ...state, loadingBottom: true };
     case "loadedBottom":
-      console.log(state.after);
       return {
         ...state,
         loadingBottom: false,
@@ -43,58 +56,34 @@ const reducer = (state, action) => {
 };
 const perPage = 15;
 
-// initialize context
-const MyContext = createContext();
-
-// context is made of a Provider and a Consumer
-// in Provider will add other values to state object to be updated by different reducer cases to handle top loading
-function Provider({ children }) {
+function ForeverScroll({ initialData }) {
   const [state, dispatch] = useReducer(reducer, {
     loadingBottom: false,
     hasMoreAfter: true,
     data: [],
     after: 0,
   });
+  const [setBottom, visibleBottom] = useOnScreen({
+    rootMargin: "900px",
+  });
 
   // List of Data that the application references for indexes
-  const totalData = IntergerList();
+  const totalData = initialData;
+  console.log(totalData);
 
   const loadBottom = () => {
     dispatch({ type: "startBottom" });
 
     const newData = totalData.slice(after, after + perPage);
 
-    dispatch({ type: "loadedBottom", newData, totalData });
+    dispatch({ type: "loadedBottom", newData });
   };
 
   const { loadingBottom, data, after, hasMoreAfter } = state;
-
-  return (
-    <MyContext.Provider
-      value={{
-        loadingBottom,
-        loadBottom,
-        hasMoreAfter,
-        after,
-        data,
-      }}
-    >
-      {children}
-    </MyContext.Provider>
-  );
-}
-
-function ForeverScroll() {
-  const { loadingBottom, loadBottom, data, hasMoreAfter, after } = useContext(
-    MyContext
-  );
-
-  const [setBottom, visibleBottom] = useOnScreen({
-    threshold: 1,
-  });
-
-  console.log("STARTS HERE");
+  console.log("loading Bottom: " + loadingBottom);
   console.log("After: " + after);
+  console.log("Has More After: " + hasMoreAfter);
+  console.log(visibleBottom);
   console.log(data);
 
   useEffect(() => {
@@ -105,25 +94,11 @@ function ForeverScroll() {
 
   return (
     <div className="ForeverScroll">
-      <ul>
-        {data.map((number) => (
-          <h4 key={number} style={{ backgroundColor: "aquamarine" }}>
-            {number}
-          </h4>
-        ))}
+      {data.map((d) => h(ProjectInfoLink, d))}
 
-        {loadingBottom && <h4>Loading...</h4>}
-
-        {!loadingBottom && hasMoreAfter && <div ref={setBottom}></div>}
-      </ul>
+      {!loadingBottom && hasMoreAfter && <div ref={setBottom}></div>}
     </div>
   );
 }
 
-export default () => {
-  return (
-    <Provider>
-      <ForeverScroll />
-    </Provider>
-  );
-};
+export default ForeverScroll;

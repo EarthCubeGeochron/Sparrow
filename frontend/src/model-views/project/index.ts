@@ -7,7 +7,7 @@ import "../main.styl";
 import styles from "~/admin/module.styl";
 const h = hyperStyled(styles);
 
-const pluralize = function (term, arrayOrNumber) {
+const pluralize = function(term, arrayOrNumber) {
   let count = arrayOrNumber;
   if (Array.isArray(arrayOrNumber)) {
     count = arrayOrNumber.length;
@@ -80,7 +80,7 @@ interface ProjectProps {
   id?: number;
 }
 
-const ProjectComponent = function (props: ProjectProps) {
+const ProjectComponent = function(props: ProjectProps) {
   const { id } = props;
   const data = useAPIResult("/project", { id });
   if (id == null || data == null) {
