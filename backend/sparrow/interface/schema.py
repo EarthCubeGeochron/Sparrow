@@ -45,8 +45,22 @@ def is_model_ready(model, data):
 
 
 class ModelSchema(SQLAlchemyAutoSchema):
+    """
+    :param: allowed_nests: List of strings or "all"
+    """
+
     def __init__(self, *args, **kwargs):
-        self.allowed_nests = kwargs.pop("allowed_nests", [])
+        nests = kwargs.pop("allowed_nests", [])
+        if nests == "all":
+            nests = self._available_nests()
+        self.allowed_nests = nests
+        if len(self.allowed_nests) > 0:
+            model = self.opts.model.__name__
+            nests = ", ".join(self.allowed_nests)
+            log.debug(
+                f"\nSetting up schema for model {model}\n  allowed nests: {nests}"
+            )
+
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
 
