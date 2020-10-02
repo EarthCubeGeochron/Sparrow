@@ -22,7 +22,7 @@ const ProjectListComponent = () => {
   }, [initData]);
   /* List of projects for the catalog. Could potentially move there... */
   return data.length > 0
-    ? h(InfiniteScroll, { initialData: data })
+    ? h(InfiniteScroll, { initialData: data, component: ProjectInfoLink })
     : h(Spinner);
   // return h(FilterListComponent, {
   //   route: "/project",

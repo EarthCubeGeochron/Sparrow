@@ -56,7 +56,7 @@ const reducer = (state, action) => {
 };
 const perPage = 15;
 
-function ForeverScroll({ initialData }) {
+function ForeverScroll({ initialData, component }) {
   const [state, dispatch] = useReducer(reducer, {
     loadingBottom: false,
     hasMoreAfter: true,
@@ -93,8 +93,8 @@ function ForeverScroll({ initialData }) {
   }, [visibleBottom]);
 
   return (
-    <div className="ForeverScroll">
-      {data.map((d) => h(ProjectInfoLink, d))}
+    <div className="ForeverScroll" style={{ marginTop: "20px" }}>
+      {data.map((d) => h(component, d))}
 
       {!loadingBottom && hasMoreAfter && <div ref={setBottom}></div>}
     </div>
