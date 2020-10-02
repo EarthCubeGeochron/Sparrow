@@ -7,7 +7,7 @@ import "../main.styl";
 import styles from "~/admin/module.styl";
 const h = hyperStyled(styles);
 
-const pluralize = function (term, arrayOrNumber) {
+const pluralize = function(term, arrayOrNumber) {
   let count = arrayOrNumber;
   if (Array.isArray(arrayOrNumber)) {
     count = arrayOrNumber.length;
@@ -62,11 +62,13 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
     [
       h("h3", name),
       h("p.description", description),
-      h.if(samples.length > 0)(ContentArea, {
-        className: "samples",
-        data: samples.map((d) => d.name),
-        title: "sample",
-      }),
+      samples
+        ? h(ContentArea, {
+            className: "samples",
+            data: samples.map((d) => d.name),
+            title: "sample",
+          })
+        : null,
       h.if(publications.length > 0)(ContentArea, {
         className: "publications",
         data: publications.map((d) => d.title),
@@ -80,7 +82,7 @@ interface ProjectProps {
   id?: number;
 }
 
-const ProjectComponent = function (props: ProjectProps) {
+const ProjectComponent = function(props: ProjectProps) {
   const { id } = props;
   const data = useAPIResult("/project", { id });
   if (id == null || data == null) {
