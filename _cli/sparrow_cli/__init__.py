@@ -7,12 +7,13 @@ import sys
 import click
 from rich.console import Console
 from rich import print
+from subprocess import Popen
 from .base import cli, SparrowConfig
 from .help import echo_help
 from .util import cmd, compose, exec_or_run, find_subcommand, container_id
-from .test import sparrow_test
-from .database import sparrow_db
-from .docs import sparrow_docs
+from .test import sparrow_test  # noqa
+from .database import sparrow_db  # noqa
+from .docs import sparrow_docs  # noqa
 from .env import validate_environment
 
 console = Console(highlight=True)
@@ -66,3 +67,21 @@ def shell(container):
         return exec_or_run(container, "sh")
     print("Running [bold]iPython[/bold] shell in application context.")
     exec_or_run("backend", "sparrow shell")
+
+
+@cli.command(name="up")
+@click.argument("container", type=str, required=False, default=None)
+@click.option("--force-recreate", is_flag=True, default=False)
+def sparrow_up(container, force_recreate=False):
+    """Bring up the application"""
+    if container is None:
+        container = ""
+    res = compose(
+        "up --build --no-start", "--force-recreate" if force_recreate else "", container
+    )
+    if res.returncode != 0:
+        print("[red]One or more containers did not build successfully, aborting.[/red]")
+        sys.exit(res.returncode)
+    p = Popen(["sparrow", "compose", "logs", "-f", "--tail=0", container])
+    compose("start", container)
+    p.wait()

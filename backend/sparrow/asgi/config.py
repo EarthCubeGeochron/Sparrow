@@ -3,9 +3,8 @@ include_server_header = False
 use_reloader = True
 workers = 1
 
-# Customize Sparrow's root logger so we don't get overridden by uvicorn
+# Customize Sparrow's root logger so we don't get overridden by hypercorn
 # We may want to customize this further eventually
-# https://github.com/encode/uvicorn/issues/410
 logconfig_dict = {
     "version": 1,
     "formatters": {
