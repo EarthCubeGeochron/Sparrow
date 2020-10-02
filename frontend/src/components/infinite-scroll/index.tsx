@@ -63,9 +63,7 @@ function ForeverScroll({ initialData, component }) {
     data: [],
     after: 0,
   });
-  const [setBottom, visibleBottom] = useOnScreen({
-    rootMargin: "900px",
-  });
+  const [setBottom, visibleBottom] = useOnScreen();
 
   // List of Data that the application references for indexes
   const totalData = initialData;
@@ -96,7 +94,11 @@ function ForeverScroll({ initialData, component }) {
     <div className="ForeverScroll" style={{ marginTop: "20px" }}>
       {data.map((d) => h(component, d))}
 
-      {!loadingBottom && hasMoreAfter && <div ref={setBottom}></div>}
+      {hasMoreAfter && (
+        <div ref={setBottom} style={{ marginTop: "50px" }}>
+          This is where it Refreshes
+        </div>
+      )}
     </div>
   );
 }

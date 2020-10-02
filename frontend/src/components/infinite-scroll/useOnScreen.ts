@@ -11,14 +11,17 @@ import h from "@macrostrat/hyper";
  * @example const [ref, visible] = useOnScreen({threshold: 1})
  *
  */
-export function useOnScreen(options) {
+export function useOnScreen() {
   const [ref, setRef] = useState(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      setVisible(entry.isIntersecting);
-    }, options);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setVisible(entry.isIntersecting);
+      },
+      { rootMargin: "300px 0px 0px 0px" }
+    );
 
     if (ref) {
       observer.observe(ref);
@@ -28,6 +31,6 @@ export function useOnScreen(options) {
         observer.unobserve(ref);
       }
     };
-  }, [ref, options]);
+  }, [ref]);
   return [setRef, visible];
 }
