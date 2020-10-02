@@ -163,6 +163,13 @@ class TestSchema:
         for k in schema.fields.keys():
             assert hasattr(model, k)
 
+    def test_no_extra_unit_fields(self, db):
+        """
+        We had a problem with gratuitous extra nested fields being created.
+        """
+        schema = db.interface.vocabulary_unit()
+        assert "sample_geo_entity_collection" not in schema.fields.keys()
+
 
 class TestDeclarativeImporter:
     def test_import_interface(self, db):

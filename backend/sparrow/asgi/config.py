@@ -1,6 +1,4 @@
-debug = True
 include_server_header = False
-use_reloader = True
 workers = 1
 
 # Customize Sparrow's root logger so we don't get overridden by hypercorn
