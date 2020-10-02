@@ -15,6 +15,7 @@ from .test import sparrow_test  # noqa
 from .database import sparrow_db  # noqa
 from .docs import sparrow_docs  # noqa
 from .env import validate_environment
+from .containers import sparrow_up, sparrow_logs
 
 console = Console(highlight=True)
 
@@ -33,17 +34,11 @@ def main(ctx, args):
         subcommand = "--help"
 
     if subcommand in ["--help", "help"]:
-        echo_help(cfg.bin_directories)
+        echo_help(ctx, cfg.bin_directories)
         sys.exit(0)
 
     if subcommand == "compose":
         return compose(*rest)
-
-    if subcommand == "up":
-        # Validate the presence of SPARROW_SECREY_KEY only if we are bringing
-        # the application up. Eventually, this should be wrapped into a Python
-        # version of the `sparrow up` command.
-        validate_environment()
 
     _command = find_subcommand(cfg.bin_directories, subcommand)
 
@@ -69,19 +64,5 @@ def shell(container):
     exec_or_run("backend", "sparrow shell")
 
 
-@cli.command(name="up")
-@click.argument("container", type=str, required=False, default=None)
-@click.option("--force-recreate", is_flag=True, default=False)
-def sparrow_up(container, force_recreate=False):
-    """Bring up the application"""
-    if container is None:
-        container = ""
-    res = compose(
-        "up --build --no-start", "--force-recreate" if force_recreate else "", container
-    )
-    if res.returncode != 0:
-        print("[red]One or more containers did not build successfully, aborting.[/red]")
-        sys.exit(res.returncode)
-    p = Popen(["sparrow", "compose", "logs", "-f", "--tail=0", container])
-    compose("start", container)
-    p.wait()
+cli.add_command(sparrow_up, name="up")
+cli.add_command(sparrow_logs, name="logs")

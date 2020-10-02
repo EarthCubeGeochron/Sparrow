@@ -67,6 +67,8 @@ services:
       # Save ipython configuration to anonymous volume so
       # we keep command history between app runs
       - ipython_config:/root/.ipython/profile_default
+      # Save CLI help info for rapid access
+      - runtime_data:/run:ro
       # A working location for caching files that need to persist over time
       # (for example, git repositorites for the PyChron importer). This could conceivably
       # be delegated to a separate importer container, but that seems overcomplex for now.
@@ -113,6 +115,7 @@ volumes:
   # Anonymous volume to preserve `sparrow shell` history
   ipython_config:
   db_cluster:
+  runtime_data:
   backend_cache:
   # Placeholder volumes in case we don't have these volumes to mount
   placeholder:

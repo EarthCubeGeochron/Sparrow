@@ -1,6 +1,5 @@
 from click.testing import CliRunner
 from sparrow_cli import cli
-from yaml import load, Loader
 
 runner = CliRunner()
 

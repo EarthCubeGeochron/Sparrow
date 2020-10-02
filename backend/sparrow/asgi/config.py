@@ -7,10 +7,7 @@ workers = 1
 # We may want to customize this further eventually
 logconfig_dict = {
     "version": 1,
-    "formatters": {
-        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
-        "colored": {"class": "sparrow.logs.SparrowLogFormatter"},
-    },
+    "formatters": {"colored": {"class": "sparrow.logs.SparrowLogFormatter"},},
     "handlers": {
         "error_console": {
             "level": "INFO",
@@ -31,6 +28,11 @@ logconfig_dict = {
         },
         "hypercorn.access": {"level": "ERROR", "propagate": False},
         "sparrow": {"handlers": ["default"], "level": "DEBUG", "propagate": False,},
+        "sqlalchemy.engine": {
+            "handlers": ["default"],
+            "level": "INFO",
+            "propagate": False,
+        },
         "__main__": {  # if __name__ == '__main__'
             "handlers": ["error_console"],
             "level": "DEBUG",
