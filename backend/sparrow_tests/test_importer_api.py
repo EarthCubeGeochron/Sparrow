@@ -39,9 +39,6 @@ class TestAPIImporter:
         db.load_data("session", complex_data["data"])
 
     def test_complex_import(self, client, db):
-        # Too much output
-        logging.disable(logging.DEBUG)
-
         complex_data = json_fixture("large-test.json")
         db.load_data("session", complex_data["data"])
 

@@ -63,7 +63,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
         self.__instance_cache = {}
 
         super().__init__(*args, **kwargs)
-        self.allow_null = True
 
     def _ready_for_flush(self, instance):
         if instance is None:
@@ -197,13 +196,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 #     return instance
                 self.session.add(instance)
                 log.debug(f"Created instance {instance} with parameters {data}")
-                # self.session.flush(objects=[instance])
+                self.session.flush(objects=[instance])
                 self.session.commit()
                 log.debug("Successfully persisted to database")
             except IntegrityError as err:
                 self.session.rollback()
                 log.debug("Could not persist but will try again later")
-                log.debug(err)
+                # log.debug(err)
 
         return instance
 

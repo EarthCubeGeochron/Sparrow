@@ -4,7 +4,7 @@ from marshmallow_sqlalchemy import ModelConverter
 # of the 'Nested' field in order to pass along the SQLAlchemy session
 # to nested schemas.
 # See https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/67
-from marshmallow_sqlalchemy.fields import Related
+from marshmallow_sqlalchemy.fields import Related, RelatedList
 
 import geoalchemy2 as geo
 from sqlalchemy.orm import RelationshipProperty
@@ -37,8 +37,9 @@ allowed_collections = {
         "sample",
         "instrument",
         "target",
+        "method",
     ],
-    "analysis": ["datum", "attribute", "constant", "analysis_type", "material"],
+    "analysis": ["datum", "attribute", "constant", "analysis_type", "material",],
     "attribute": ["parameter", "unit"],
     "project": ["researcher", "publication", "session"],
     "datum": ["datum_type"],
@@ -133,10 +134,17 @@ class SparrowConverter(ModelConverter):
             # Don't allow self-referential collections
             return True
 
-        # if prop.uselist and not allow_nest(this_table.name, other_table.name):
-        #     # Disallow list fields that aren't related (these usually don't have
-        #     # corresponding local columns)
-        #     return True
+        if prop.uselist and not allow_nest(this_table.name, other_table.name):
+            # Disallow list fields that aren't related (these usually don't have
+            # corresponding local columns)
+            return True
+
+        # if this_table.name == "datum_type" and other_table.name in [
+        #     "constant",
+        #     "datum",
+        # ]:
+        # Fields that are not allowed to be nested
+        #    return True
 
         return False
 
@@ -214,7 +222,10 @@ class SparrowConverter(ModelConverter):
         this_table = prop.parent.tables[0]
         if not allow_nest(this_table.name, prop.target.name):
             # Fields that are not allowed to be nested
-            return Related(**field_kwargs)
+            if prop.uselist:
+                return RelatedList(Related, **field_kwargs)
+            else:
+                return Related(**field_kwargs)
         if prop.target.schema == "enum":
             # special carve-out for enums represented as foreign keys
             # (these should be stored in the 'enum' schema):

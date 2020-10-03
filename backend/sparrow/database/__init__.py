@@ -18,6 +18,30 @@ from ..util import relative_path
 from ..interface import ModelSchema, model_interface
 from ..exceptions import DatabaseMappingError
 
+import threading
+from contextlib import contextmanager
+
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql.expression import Insert
+from sqlalchemy.dialects.postgresql.dml import OnConflictDoNothing
+
+state = threading.local()
+
+# https://stackoverflow.com/questions/33307250/postgresql-on-conflict-in-sqlalchemy/62305344#62305344
+@contextmanager
+def on_conflict_do_nothing():
+    state.active = True
+    yield
+    del state.active
+
+
+@compiles(Insert, "postgresql")
+def prefix_inserts(insert, compiler, **kw):
+    if getattr(state, "active", False):
+        insert._post_values_clause = OnConflictDoNothing()
+    return compiler.visit_insert(insert, **kw)
+
+
 metadata = MetaData()
 
 log = get_logger(__name__)
@@ -132,19 +156,20 @@ class Database(MappedDatabaseMixin):
             )
         schema = model_interface(model, session)()
 
-        try:
-            log.info(f"Initiating load of {model_name}")
-            res = schema.load(data, session=session)
-            log.info("Entering final commit phase of import")
-            log.info(f"Adding top-level object {res}")
-            session.add(res)
-            log.info("Committing entire transaction")
-            session.commit()
-            return res
-        except (IntegrityError, ValidationError) as err:
-            session.rollback()
-            log.debug(err)
-            raise err
+        with on_conflict_do_nothing():
+            try:
+                log.info(f"Initiating load of {model_name}")
+                res = schema.load(data, session=session)
+                log.info("Entering final commit phase of import")
+                log.info(f"Adding top-level object {res}")
+                session.add(res)
+                log.info("Committing entire transaction")
+                session.commit()
+                return res
+            except (IntegrityError, ValidationError) as err:
+                session.rollback()
+                log.debug(err)
+                raise err
 
     def get_existing_instance(self, model_name, filter_params):
         schema = self.model_schema(model_name)

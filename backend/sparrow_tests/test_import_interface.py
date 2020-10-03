@@ -190,11 +190,7 @@ class TestDeclarativeImporter:
 
     def test_get_sample(self, db):
         """Can we get a sample by its ID?"""
-        s = (
-            db.session.query(db.model.sample)
-            .filter_by(sample_name="test sample 1")
-            .first()
-        )
+        s = db.session.query(db.model.sample).filter_by(name="test sample 1").first()
         assert s is not None
         schema = db.interface.sample()
         res = schema.dump(s)

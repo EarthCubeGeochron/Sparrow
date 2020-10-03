@@ -6,7 +6,7 @@ class NestedModelField(DelimitedList):
     Field for for parsing nested model configurations
     """
 
-    def _deserialize(self, value, attr, data, **kwargs):
+    def _deserialize(self, value, *args, **kwargs):
         if value == "all":
             return value
-        return super()._deserialize(self, value, attr, data, **kwargs)
+        return super()._deserialize(value, *args, **kwargs)
