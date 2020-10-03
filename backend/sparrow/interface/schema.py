@@ -50,6 +50,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
     """
 
     def __init__(self, *args, **kwargs):
+        kwargs["unknown"] = True
         nests = kwargs.pop("allowed_nests", [])
         self.allowed_nests = nests
         if len(self.allowed_nests) > 0:
@@ -62,6 +63,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         self.__instance_cache = {}
 
         super().__init__(*args, **kwargs)
+        self.allow_null = True
 
     def _ready_for_flush(self, instance):
         if instance is None:

@@ -10,8 +10,8 @@ from starlette.responses import JSONResponse
 from .fields import NestedModelField
 from ..database.mapper.util import classname_for_table
 from ..logs import get_logger
-from .response import APIResponse
 from ..util import relative_path
+from .response import APIResponse
 from yaml import safe_load
 
 log = get_logger(__name__)

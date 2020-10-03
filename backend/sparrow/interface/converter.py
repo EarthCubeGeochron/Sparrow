@@ -155,6 +155,9 @@ class SparrowConverter(ModelConverter):
                     kwargs["required"] = True
             if prop.uselist:
                 kwargs["required"] = False
+            # # Empty collections can be represented by null values
+            # if not kwargs["required"]:
+            #     kwargs["allow_none"] = True
 
             return kwargs
 

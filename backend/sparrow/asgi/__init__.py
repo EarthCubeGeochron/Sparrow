@@ -15,10 +15,10 @@ from ..logs import console_handler
 # Customize Sparrow's root logger so we don't get overridden by uvicorn
 # We may want to customize this further eventually
 # https://github.com/encode/uvicorn/issues/410
-logger = logging.getLogger("sparrow")
-if logger.hasHandlers():
-    logger.handlers.clear()
-logger.addHandler(console_handler)
+# logger = logging.getLogger("sparrow")
+# if logger.hasHandlers():
+#     logger.handlers.clear()
+# logger.addHandler(console_handler)
 
 flask = App(__name__)
 flask.load()

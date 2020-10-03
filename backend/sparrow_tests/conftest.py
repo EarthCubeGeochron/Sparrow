@@ -1,9 +1,6 @@
 from sparrow.app import App
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
-import logging
-
-logging.disable(level=logging.WARNING)
 
 # Slow tests are opt-in
 def pytest_addoption(parser):

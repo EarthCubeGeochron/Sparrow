@@ -6,6 +6,7 @@ from .fixtures import basic_data
 
 @fixture
 def client():
+    # app = construct_app()
     _client = TestClient(app)
     yield _client
 

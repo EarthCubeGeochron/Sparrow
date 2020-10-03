@@ -71,8 +71,11 @@ class SmartNested(Nested, Related):
         super(Related, self).__init__(**field_kwargs)
         self._many = many
         self._instances = set()
+        self.allow_none = True
 
     def _deserialize(self, value, attr=None, data=None, **kwargs):
+        if value is None:
+            return None
         if isinstance(value, self.schema.opts.model):
             return value
         # Better error message for collections.
@@ -125,5 +128,4 @@ class SmartNested(Nested, Related):
 
     def _validate(self, value):
         # Should also validate against Related field
-        log.info(value)
         return super(Nested, self)._validate(value)

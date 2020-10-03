@@ -133,6 +133,7 @@ class Database(MappedDatabaseMixin):
         schema = model_interface(model, session)()
 
         try:
+            log.info(f"Initiating load of {model_name}")
             res = schema.load(data, session=session)
             log.info("Entering final commit phase of import")
             log.info(f"Adding top-level object {res}")
