@@ -3,11 +3,8 @@ from sqlalchemy import and_
 from datetime import datetime
 from pytest import mark, fixture
 import logging
-from sparrow.logs import get_logger
 from .fixtures import basic_data, basic_d18O_data
 from .helpers import json_fixture
-
-log = get_logger(__name__)
 
 
 @fixture
