@@ -183,7 +183,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         instance = self._get_instance(data)
         if instance is None:
             # if not is_model_ready(self.opts.model, data):
-            #    return None
+            #     return None
             try:
                 # Begin a nested subtransaction
                 self.session.begin_nested()
