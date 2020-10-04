@@ -75,6 +75,7 @@ boto3==1.12.25
 pytest==5.3.5
 colorlog==4.2.1
 rich==6.0.0
+deepdiff[murmur]==5.0.2
 
 # ASGI
 starlette==0.13.4

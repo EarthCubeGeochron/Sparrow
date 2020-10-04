@@ -17,30 +17,7 @@ from ..logs import get_logger
 from ..util import relative_path
 from ..interface import ModelSchema, model_interface
 from ..exceptions import DatabaseMappingError
-
-import threading
-from contextlib import contextmanager
-
-from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.sql.expression import Insert
-from sqlalchemy.dialects.postgresql.dml import OnConflictDoNothing
-
-state = threading.local()
-
-# https://stackoverflow.com/questions/33307250/postgresql-on-conflict-in-sqlalchemy/62305344#62305344
-@contextmanager
-def on_conflict_do_nothing():
-    state.active = True
-    yield
-    del state.active
-
-
-@compiles(Insert, "postgresql")
-def prefix_inserts(insert, compiler, **kw):
-    if getattr(state, "active", False):
-        insert._post_values_clause = OnConflictDoNothing()
-    return compiler.visit_insert(insert, **kw)
-
+from .postgresql import on_conflict
 
 metadata = MetaData()
 
@@ -156,7 +133,7 @@ class Database(MappedDatabaseMixin):
             )
         schema = model_interface(model, session)()
 
-        with on_conflict_do_nothing():
+        with on_conflict("do-update"):
             try:
                 log.info(f"Initiating load of {model_name}")
                 res = schema.load(data, session=session)

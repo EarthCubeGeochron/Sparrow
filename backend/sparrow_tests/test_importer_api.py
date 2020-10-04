@@ -1,19 +1,8 @@
-from sparrow.app import App
 from sqlalchemy import and_
 from datetime import datetime
-from pytest import mark, fixture
-import logging
+from pytest import mark
 from .fixtures import basic_data, basic_d18O_data
 from .helpers import json_fixture
-
-
-@fixture
-def client():
-    app = App(__name__)
-    app.load()
-    app.load_phase_2()
-    with app.test_client() as client:
-        yield client
 
 
 class TestAPIImporter:
@@ -101,7 +90,7 @@ class TestAPIImporter:
             "/api/v1/import-data/session", json={"filename": None, "data": data}
         )
         assert res.status_code == 400
-        err = res.json["error"]
+        err = res.json()["error"]
 
         assert err["type"] == "marshmallow.exceptions.ValidationError"
         # It could be useful to have a function that "unnests" these errors
