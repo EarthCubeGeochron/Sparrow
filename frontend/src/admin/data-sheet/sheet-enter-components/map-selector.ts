@@ -42,7 +42,7 @@ export function MapSelector({ onCellsChanged, row, col, colTwo }) {
   const onClickHandle = () => {
     //col is latitude, colTwo is longitude if col < colTwo
     // col is longitude, colTwo is latitude of col > colTwo
-    if (col > colTwo) {
+    if (col < colTwo) {
       const latitude = Number(state.latitude).toFixed(3);
       const longitude = Number(state.longitude).toFixed(3);
       const changes = [
@@ -71,7 +71,11 @@ export function MapSelector({ onCellsChanged, row, col, colTwo }) {
 
   const bounds = mapRef.current
     ? //@ts-ignore
-      mapRef.current.getMap().getBounds().toArray().flat()
+      mapRef.current
+        .getMap()
+        .getBounds()
+        .toArray()
+        .flat()
     : null;
 
   const mapClicked = (e) => {

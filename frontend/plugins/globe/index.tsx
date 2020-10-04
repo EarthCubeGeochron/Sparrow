@@ -19,64 +19,65 @@ import worldMap from "./assets/land-110m.json";
 import { APIResultView } from "@macrostrat/ui-components";
 import { Colors, H1, Tooltip } from "@blueprintjs/core";
 //import { Marker } from "react-map-gl";
-//import { Tooltip } from "@material-ui/core";
 
-class MapComponent extends Component {
-  render() {
-    let { markers } = this.props;
-    if (markers == null) {
-      markers = [];
-    }
-    const style = {
-      fill: "#e9fcea",
-      stroke: Colors.GRAY5,
-      strokeWidth: 0.75,
-      outline: "none",
-    };
+function MapComponent() {
+  const [tooltipContent, setTooltipContent] = React.useState("");
 
-    return (
-      <div>
-        <ComposableMap
-          projection="orthographic"
-          projectionConfig={{
-            scale: 400,
-          }}
-          width={820}
-          height={820}
-          style={{
-            width: "100%",
-            height: "auto",
-            maxHeight: "500px",
-          }}
+  let { markers } = this.props;
+  if (markers == null) {
+    markers = [];
+  }
+  const style = {
+    fill: "#e9fcea",
+    stroke: Colors.GRAY5,
+    strokeWidth: 0.75,
+    outline: "none",
+  };
+
+  return (
+    <div>
+      <ComposableMap
+        projection="orthographic"
+        projectionConfig={{
+          scale: 400,
+        }}
+        width={820}
+        height={820}
+        style={{
+          width: "100%",
+          height: "auto",
+          maxHeight: "500px",
+        }}
+      >
+        <ZoomableGlobe
+          center={[-120, 35]}
+          fill="#afe6f0"
+          stroke="#eceff1"
+          //style={{ cursor: "move" }}
         >
-          <ZoomableGlobe
-            center={[-120, 35]}
-            fill="#afe6f0"
-            stroke="#eceff1"
-            style={{ cursor: "move" }}
-          >
-            <circle cx={410} cy={410} r={400} fill="#afe6f0" stroke="#888888" />
-            <Geographies geography={worldMap} disableOptimization>
-              {(geographies, projection) => {
-                return geographies.map((geography, i) => {
-                  return (
-                    <Geography
-                      key={i}
-                      geography={geography}
-                      projection={projection}
-                      style={{
-                        default: style,
-                        hover: style,
-                        pressed: style,
-                      }}
-                    />
-                  );
-                });
-              }}
-            </Geographies>
-            <Markers>
-              {markers.map((marker, i) => {
+          <circle cx={410} cy={410} r={400} fill="#afe6f0" stroke="#888888" />
+          <Geographies geography={worldMap} disableOptimization>
+            {(geographies, projection) => {
+              return geographies.map((geography, i) => {
                 return (
+                  <Geography
+                    key={i}
+                    geography={geography}
+                    projection={projection}
+                    style={{
+                      default: style,
+                      hover: style,
+                      pressed: style,
+                    }}
+                  />
+                );
+              });
+            }}
+          </Geographies>
+          <Markers>
+            {markers.map((marker, i) => {
+              return (
+                <Tooltip content={tooltipContent}>
                   <Marker
                     key={i}
                     marker={marker}
@@ -85,7 +86,9 @@ class MapComponent extends Component {
                       hover: { fill: "#634dbf" },
                       pressed: { fill: "#FF5722" },
                       hidden: { opacity: 0 },
+                      cursor: "pointer",
                     }}
+                    onMouseEnter={setTooltipContent(marker.name)}
                   >
                     <circle
                       cx={0}
@@ -98,14 +101,14 @@ class MapComponent extends Component {
                       }}
                     />
                   </Marker>
-                );
-              })}
-            </Markers>
-          </ZoomableGlobe>
-        </ComposableMap>
-      </div>
-    );
-  }
+                </Tooltip>
+              );
+            })}
+          </Markers>
+        </ZoomableGlobe>
+      </ComposableMap>
+    </div>
+  );
 }
 
 class SampleMap extends Component {
@@ -117,7 +120,8 @@ class SampleMap extends Component {
         .filter((d) => d.geometry != null)
         .map((d) => ({
           coordinates: d.geometry.coordinates,
-          name: d.id,
+          id: d.id,
+          name: d.name,
         }));
 
       return h("div", [

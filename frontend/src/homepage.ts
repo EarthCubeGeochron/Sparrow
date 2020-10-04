@@ -5,7 +5,11 @@ import { InsetText } from "app/components/layout";
 import styles from "./styles.module.css";
 import loadable from "@loadable/component";
 
-const MapHome = loadable(async function () {
+import { SampleMap } from "../plugins/globe";
+import { useContext } from "react";
+
+
+const MapHome = loadable(async function() {
   const module = await import("./map");
   return module.MapHome;
 });
@@ -15,7 +19,11 @@ const h = hyperStyled(styles);
 const HomePage = () => {
   return h("div.homepage", [
     h(InsetText, [
-      h(Frame, { id: "landingText" }),
+      h(
+        Frame,
+        { id: "landingText" },
+        "This is where your lab's description text can go"
+      ),
       h(Frame, { id: "landingGraphic" }, h(MapHome)),
     ]),
   ]);

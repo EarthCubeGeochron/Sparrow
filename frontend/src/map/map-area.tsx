@@ -13,6 +13,7 @@ import { MapToast } from "./components/MapToast";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
 import styles from "./mappages.module.css";
+import { SiteTitle } from "app/components";
 
 const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
@@ -150,11 +151,7 @@ export function MapPanel({
           <Navbar>
             <Navbar.Group className={styles.mapNavbar}>
               <Navbar.Heading>
-                <Link to="/">
-                  <h1>
-                    <b>WiscAr</b>
-                  </h1>
-                </Link>
+                <SiteTitle />
               </Navbar.Heading>
               <Navbar.Divider />
               <MapNav />
@@ -186,7 +183,7 @@ export function MapPanel({
           }}
           ref={mapRef}
         >
-          {state.clickPnt.lng && (
+          {state.clickPnt.lng && on_map && (
             <Marker
               latitude={state.clickPnt.lat}
               longitude={state.clickPnt.lng}
