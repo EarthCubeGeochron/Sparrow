@@ -29,7 +29,7 @@ def container_id(container):
     res = compose("ps -q", container, capture_output=True).stdout.strip()
     if res == "":
         return None
-    return res
+    return res.decode("utf-8")
 
 
 def container_is_running(name):

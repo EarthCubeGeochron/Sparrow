@@ -7,10 +7,11 @@ from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
 from starlette.responses import JSONResponse
 
+from .fields import NestedModelField
 from ..database.mapper.util import classname_for_table
 from ..logs import get_logger
-from .response import APIResponse
 from ..util import relative_path
+from .response import APIResponse
 from yaml import safe_load
 
 log = get_logger(__name__)
@@ -53,7 +54,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self._model_name = classname_for_table(schema.opts.model.__table__)
         log.info(self._model_name)
 
-        self.instance_schema = dict(nest=DelimitedList(Str(), missing=[]),)
+        self.instance_schema = dict(nest=NestedModelField(Str(), missing=[]))
 
         self.args_schema = dict(
             **self.instance_schema,
@@ -61,6 +62,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
             not_has=DelimitedList(Str(), missing=[]),
             page=Str(missing=None),
             per_page=Int(missing=20),
+            parameter=DelimitedList(Str(), missing=None),
         )
 
     def query(self, schema):
@@ -75,7 +77,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         """Handler for single instance GET requests"""
         args = await parser.parse(self.instance_schema, request, location="querystring")
         id = request.path_params.get("id")
-        log.info(id, args)
+        log.info(request.query_params)
 
         schema = self.meta.schema(many=False, allowed_nests=args["nest"])
         res = self.query(schema).get(id)
@@ -113,6 +115,11 @@ class ModelAPIEndpoint(HTTPEndpoint):
         args = await parser.parse(self.args_schema, request, location="querystring")
         log.info(args)
 
+        # We don't properly allow 'all' in nested field
+        if len(args["nest"]) == 1 and args["nest"][0] == "all":
+            args["nest"] = "all"
+        log.info(args["nest"])
+
         schema = self.meta.schema(many=True, allowed_nests=args["nest"])
         model = schema.opts.model
 
@@ -124,6 +131,10 @@ class ModelAPIEndpoint(HTTPEndpoint):
         fields = _schema_fields(schema)
 
         filters = []
+
+        # if model == self.meta.database.model.datum:
+        #     if args["parameter"] is not None:
+        #         filters
 
         # for field in fields:
         #     ## We'll put field-specific filters here

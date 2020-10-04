@@ -45,8 +45,20 @@ def is_model_ready(model, data):
 
 
 class ModelSchema(SQLAlchemyAutoSchema):
+    """
+    :param: allowed_nests: List of strings or "all"
+    """
+
     def __init__(self, *args, **kwargs):
-        self.allowed_nests = kwargs.pop("allowed_nests", [])
+        kwargs["unknown"] = True
+        nests = kwargs.pop("allowed_nests", [])
+        self.allowed_nests = nests
+        if len(self.allowed_nests) > 0:
+            model = self.opts.model.__name__
+            log.debug(
+                f"\nSetting up schema for model {model}\n  allowed nests: {nests}"
+            )
+
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
 
@@ -122,15 +134,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         # Need to get relationship columns for primary keys!
         if instance is None:
-            try:
-                query = self.session.query(self.opts.model).filter_by(**filters)
-                instance = query.first()
-                if instance is None:
-                    log.debug("..none found")
-                else:
-                    log.debug("..success!")
-            except StatementError:
-                log.exception("..none found")
+            query = self.session.query(self.opts.model).filter_by(**filters)
+            instance = query.first()
+            if instance is None:
+                log.debug("..none found")
+            else:
+                log.debug("..success!")
         if instance is None:
             instance = super().get_instance(data)
 
@@ -174,7 +183,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         instance = self._get_instance(data)
         if instance is None:
             # if not is_model_ready(self.opts.model, data):
-            #    return None
+            #     return None
             try:
                 # Begin a nested subtransaction
                 self.session.begin_nested()
@@ -184,13 +193,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 #     return instance
                 self.session.add(instance)
                 log.debug(f"Created instance {instance} with parameters {data}")
-                # self.session.flush(objects=[instance])
+                self.session.flush(objects=[instance])
                 self.session.commit()
                 log.debug("Successfully persisted to database")
             except IntegrityError as err:
                 self.session.rollback()
                 log.debug("Could not persist but will try again later")
-                log.debug(err)
+                # log.debug(err)
 
         return instance
 
