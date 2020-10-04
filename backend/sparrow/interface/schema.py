@@ -134,15 +134,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         # Need to get relationship columns for primary keys!
         if instance is None:
-            try:
-                query = self.session.query(self.opts.model).filter_by(**filters)
-                instance = query.first()
-                if instance is None:
-                    log.debug("..none found")
-                else:
-                    log.debug("..success!")
-            except StatementError:
-                log.exception("..none found")
+            query = self.session.query(self.opts.model).filter_by(**filters)
+            instance = query.first()
+            if instance is None:
+                log.debug("..none found")
+            else:
+                log.debug("..success!")
         if instance is None:
             instance = super().get_instance(data)
 
