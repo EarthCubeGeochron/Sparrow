@@ -9,17 +9,18 @@ import "./main.styl";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { ProjectInfoLink } from "~/model-views/project";
 
-
 /**
  * How do I make this virtualized?
- * 
+ *
  * Need to know height of items: need a callback for each item useElementDimensions?
- * The height of the ENTIRE list once rendered
+ * The height of the ENTIRE list once rendered (innerHeight)
  * A measurement that shows how far the list has scrolled
- * 
+ *
+ * How to know when items intersect top and bottom of list:
+ *  divide pixel position of item by height of items. Math.floor() turns pixel position into index
+ *
+ *
  */
-
-
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -47,7 +48,7 @@ const perPage = 15;
  * @param component: A component that can take in the mapped data and format it into what the user wants to display
  *
  */
-function ForeverScroll({ initialData, component }) {
+function ForeverScroll({ initialData, component, fetch }) {
   const [state, dispatch] = useReducer(reducer, {
     loadingBottom: false,
     hasMoreAfter: true,
@@ -62,6 +63,8 @@ function ForeverScroll({ initialData, component }) {
 
   const loadBottom = () => {
     dispatch({ type: "startBottom" });
+
+    // api call to fetch more data
 
     const newData = totalData.slice(after, after + perPage);
 
@@ -78,6 +81,7 @@ function ForeverScroll({ initialData, component }) {
   useEffect(() => {
     if (visibleBottom) {
       loadBottom();
+      //  fetch();
     }
   }, [visibleBottom]);
 

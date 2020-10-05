@@ -7,12 +7,13 @@ import { Frame } from "~/frame";
 import { DataSheetContext, DataSheetProvider } from "./provider";
 import { SheetHeader } from "./header";
 import { VirtualizedSheet } from "./virtualized";
-import { useElementHeight } from "./util";
-import { DataSheetSuggest } from "./sheet-enter-components/datasheet-suggest";
-import { MapSelector } from "./sheet-enter-components/map-selector";
+import {
+  MapSelector,
+  MaterialSuggest,
+  DoiSuggest,
+} from "./sheet-enter-components";
 import "./datasheet.css";
 import styles from "./module.styl";
-import { MaterialCall, SampleNameCall } from "./api-calls";
 
 const Row = ({ row, children, className }) => {
   const { rowHeight } = useContext(DataSheetContext);
@@ -83,13 +84,6 @@ function DataSheet() {
     unwrapResponse
   );
 
-  const MaterialList = MaterialCall();
-  const SampleNameList = SampleNameCall();
-  console.log(SampleNameList);
-
-  const ref = useRef<HTMLDivElement>();
-  const [height, width] = useElementHeight(ref) ?? [100, 20];
-
   useEffect(() => {
     // Set data to start with the value of the initial data
     if (initialData == null) return;
@@ -99,8 +93,6 @@ function DataSheet() {
   if (data.length === 0) {
     return null;
   }
-
-  console.log(width);
 
   const columns = columnSpec;
 
@@ -171,19 +163,10 @@ function DataSheet() {
   const dataEditorComponents = ({ row, col, value, onCommit, cell }) => {
     const { key } = columns[col];
     const components = {
-      name: h(DataSheetSuggest, {
-        items: SampleNameList,
-        defaultValue: value,
-        onCellsChanged,
-        onCommit,
-        row: row,
-        col: col,
-        cell: cell,
-      }),
-      igsn: null,
-      is_public: null,
-      material: h(DataSheetSuggest, {
-        items: MaterialList,
+      name: h("div", [value]),
+      igsn: h("div", [value]),
+      is_public: h("div", [value]),
+      material: h(MaterialSuggest, {
         defaultValue: value,
         onCellsChanged,
         onCommit,
@@ -204,7 +187,14 @@ function DataSheet() {
         colTwo: col - 1,
       }),
       location_name: null,
-      project_name: null,
+      project_name: h(DoiSuggest, {
+        defaultValue: value,
+        onCellsChanged,
+        onCommit,
+        row: row,
+        col: col,
+        cell: cell,
+      }),
     };
     return components[key];
   };
@@ -217,7 +207,7 @@ function DataSheet() {
           onUndo={handleUndo}
           hasChanges={initialData != data}
         ></SheetHeader>
-        <div className="sheet" ref={ref}>
+        <div className="sheet">
           <VirtualizedSheet
             data={cellData}
             valueRenderer={(cell) => cell.value}

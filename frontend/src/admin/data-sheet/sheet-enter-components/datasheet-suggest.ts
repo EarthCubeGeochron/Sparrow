@@ -2,8 +2,12 @@ import * as React from "react";
 import { useState } from "react";
 import h from "@macrostrat/hyper";
 import { Suggest } from "@blueprintjs/select";
-import { Card, MenuItem, ITagProps, Icon, Menu } from "@blueprintjs/core";
-import { Send } from "@material-ui/icons";
+import {
+  MenuItem,
+  Icon,
+  Menu,
+  Tooltip,
+} from "@blueprintjs/core";
 
 /**
  * This component will be a select-like component from blueprint
@@ -17,7 +21,7 @@ import { Send } from "@material-ui/icons";
  */
 
 interface Suggester {
-  items: [];
+  items?: [];
   onCellsChanged: any;
   defaultValue?: any;
 }
@@ -30,6 +34,7 @@ function DataSheetSuggest({
   row,
   col,
   cell,
+  sendQuery,
 }) {
   const [state, setState] = useState({
     selectedItem: [defaultValue],
@@ -38,16 +43,20 @@ function DataSheetSuggest({
   // Renders Each Item in Item as a MenuItem
   const itemRenderer = (item, itemProps) => {
     const isSelected = state.selectedItem.includes(item);
+    const renderItem = item.length > 20 ? item.slice(0, 19) + "..." : item;
     return h(Menu, [
-      h(MenuItem, {
-        labelElement: h.if(isSelected)(Icon, { icon: "tick" }),
-        intent: isSelected ? "primary" : null,
-        text: item,
-        onClick: itemProps.handleClick,
-        active: isSelected ? "active" : itemProps.modifiers.active,
-      }),
+      h(Tooltip, { content: item }, [
+        h(MenuItem, {
+          labelElement: h.if(isSelected)(Icon, { icon: "tick" }),
+          intent: isSelected ? "primary" : null,
+          text: renderItem,
+          onClick: itemProps.handleClick,
+          active: isSelected ? "active" : itemProps.modifiers.active,
+        }),
+      ]),
     ]);
   };
+
   const itemSelect = (item) => {
     setState({ ...state, selectedItem: item });
     const changes = [{ cell: cell, row: row, col: col, value: item }];
@@ -57,6 +66,7 @@ function DataSheetSuggest({
   };
 
   const filterItem = (query, item) => {
+    sendQuery(query);
     return item.toLowerCase().indexOf(query.toLowerCase()) >= 0;
   };
   const itemz = items.length > 50 ? items.slice(0, 50) : items;

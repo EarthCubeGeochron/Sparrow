@@ -10,18 +10,32 @@ import { Spinner } from "@blueprintjs/core";
 
 const ProjectListComponent = () => {
   const [data, setData] = useState([]);
+  const url = "http://localhost:5002/api/v2/models/project";
 
-  const initData = useAPIResult("/project", { all: 1 });
+  const initData = useAPIResult("/project", {
+    all: 1,
+  });
 
   useEffect(() => {
     if (initData) {
       setData(initData);
     }
   }, [initData]);
+
+  const fetchNewData = () => {
+    const newData = getNextPageAPI(data, url, { per_page: 15 }); // next page of api data
+    const newState = newData.data + data;
+    setData(newState);
+  };
+  
   /* List of projects for the catalog. Could potentially move there... */
   return data.length > 0
-    ? h(InfiniteScroll, { initialData: data, component: ProjectInfoLink })
-    : h(Spinner);
+    ? h(InfiniteScroll, {
+        initialData: data,
+        component: ProjectInfoLink,
+        fetch: fetchNewData,
+      })
+    : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
   // return h(FilterListComponent, {
   //   route: "/project",
   //   filterFields: {
@@ -52,3 +66,9 @@ const ProjectListComponent = () => {
 };
 
 export { ProjectListComponent };
+
+function getNextPageAPI(initData, url, params) {
+  const nextPageUrl = initData.next_page;
+  const newData = useAPIResult(url, { params, page: nextPageUrl });
+  return newData;
+}
