@@ -33,7 +33,7 @@ interface Project {
   name: string;
   description: string;
   samples: any[];
-  publications: any[];
+  publication: any[];
 }
 
 interface ProjectInfoLinkProps extends Project {
@@ -46,7 +46,7 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
     name,
     description,
     samples = [],
-    publications = [],
+    publication = [],
     minimal = false,
   } = props;
 
@@ -69,9 +69,9 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
             title: "sample",
           })
         : null,
-      h.if(publications.length > 0)(ContentArea, {
+      h.if(publication.length > 0)(ContentArea, {
         className: "publications",
-        data: publications.map((d) => d.title),
+        data: publication.map((d) => d.title),
         title: "publication",
       }),
     ]

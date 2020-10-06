@@ -8,6 +8,7 @@ import { useOnScreen } from "./useOnScreen";
 import "./main.styl";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { ProjectInfoLink } from "~/model-views/project";
+import { Spinner } from "@blueprintjs/core";
 
 /**
  * How do I make this virtualized?
@@ -59,7 +60,7 @@ function ForeverScroll({ initialData, component, fetch }) {
 
   // List of Data that the application references for indexes
   const totalData = initialData;
-  console.log(totalData);
+  //console.log(totalData);
 
   const loadBottom = () => {
     dispatch({ type: "startBottom" });
@@ -72,22 +73,19 @@ function ForeverScroll({ initialData, component, fetch }) {
   };
 
   const { loadingBottom, data, after, hasMoreAfter } = state;
-  // console.log("loading Bottom: " + loadingBottom);
-  // console.log("After: " + after);
-  // console.log("Has More After: " + hasMoreAfter);
-  // console.log(visibleBottom);
-  // console.log(data);
 
   useEffect(() => {
     if (visibleBottom) {
       loadBottom();
-      //  fetch();
+      fetch();
     }
   }, [visibleBottom]);
 
   return (
     <div className="ForeverScroll" style={{ marginTop: "20px" }}>
       {data.map((d) => h(component, d))}
+
+      {loadingBottom && h(Spinner)}
 
       {hasMoreAfter && (
         <div ref={setBottom} style={{ marginTop: "50px" }}>
