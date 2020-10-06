@@ -17,6 +17,7 @@ from ..logs import get_logger
 from ..util import relative_path
 from ..interface import ModelSchema, model_interface
 from ..exceptions import DatabaseMappingError
+from .postgresql import on_conflict
 
 metadata = MetaData()
 
@@ -132,18 +133,20 @@ class Database(MappedDatabaseMixin):
             )
         schema = model_interface(model, session)()
 
-        try:
-            res = schema.load(data, session=session)
-            log.info("Entering final commit phase of import")
-            log.info(f"Adding top-level object {res}")
-            session.add(res)
-            log.info("Committing entire transaction")
-            session.commit()
-            return res
-        except (IntegrityError, ValidationError) as err:
-            session.rollback()
-            log.debug(err)
-            raise err
+        with on_conflict("do-update"):
+            try:
+                log.info(f"Initiating load of {model_name}")
+                res = schema.load(data, session=session)
+                log.info("Entering final commit phase of import")
+                log.info(f"Adding top-level object {res}")
+                session.add(res)
+                log.info("Committing entire transaction")
+                session.commit()
+                return res
+            except (IntegrityError, ValidationError) as err:
+                session.rollback()
+                log.debug(err)
+                raise err
 
     def get_existing_instance(self, model_name, filter_params):
         schema = self.model_schema(model_name)

@@ -78,15 +78,6 @@ def create_views(db):
         db.exec_sql("../database/fixtures/05-views.sql")
 
 
-@cli.command(name="serve")
-@with_full_app
-def dev_server(app):
-    """
-    Run a development WSGI server
-    """
-    app.run(debug=True, host="0.0.0.0")
-
-
 @cli.command(name="shell")
 @with_full_app
 def shell(app):
