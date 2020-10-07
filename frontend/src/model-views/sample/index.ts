@@ -2,7 +2,7 @@ import { Component } from "react";
 import h from "@macrostrat/hyper";
 import { Route, Switch } from "react-router-dom";
 import { SamplePage } from "./page";
-import { SampleList } from "./list";
+import { SampleComponent, SampleList, SampleMatch } from "./list";
 
 class SampleMain extends Component {
   render() {
@@ -12,7 +12,7 @@ class SampleMain extends Component {
     return h(Switch, [
       h(Route, {
         path: base + "/:id",
-        component: SamplePage,
+        component: SampleMatch,
       }),
       h(Route, {
         path: base,
