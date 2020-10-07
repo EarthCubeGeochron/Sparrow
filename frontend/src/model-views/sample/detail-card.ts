@@ -1,6 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { Card } from "@blueprintjs/core";
+import { Card, Icon } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
+import style from "./card.module.css";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -31,4 +32,14 @@ const SampleCard = function(props: SampleCardProps) {
   ]);
 };
 
-export { SampleCard };
+interface AddSample {
+  icon_name: string;
+  onClick: () => {};
+}
+
+const AddSampleCard = (props: AddSample) => {
+  const { onClick, icon_name } = props;
+  return h("div", { className: style.addSample, onClick }, ["+"]);
+};
+
+export { SampleCard, AddSampleCard };

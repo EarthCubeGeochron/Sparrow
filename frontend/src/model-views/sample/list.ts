@@ -57,6 +57,7 @@ const SampleList = function() {
 
 interface sample {
   id?: number;
+  sendQuery: () => {};
 }
 const SampleComponent = function(props: sample) {
   const { id } = props;

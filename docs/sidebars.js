@@ -1,18 +1,18 @@
 module.exports = {
   someSidebar: {
     Guides: [
-      'guides',
+      "guides",
       "motivation-and-design",
       "getting-started",
       "server-configuration", // not loading
       "sparrow-on-windows",
-      "datasci/dataSci",
+      "datascience/dataSci",
       "schema-imp", // not loading
     ],
     Documentation: [
       "introduction",
-      "command-line-interface", 
-      "frontend/local-dev", 
+      "command-line-interface",
+      "frontend/local-dev",
       "frontend/frames",
     ],
   },

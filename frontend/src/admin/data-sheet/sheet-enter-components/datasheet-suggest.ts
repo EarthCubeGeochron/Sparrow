@@ -2,12 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import h from "@macrostrat/hyper";
 import { Suggest } from "@blueprintjs/select";
-import {
-  MenuItem,
-  Icon,
-  Menu,
-  Tooltip,
-} from "@blueprintjs/core";
+import { MenuItem, Icon, Menu, Tooltip } from "@blueprintjs/core";
 
 /**
  * This component will be a select-like component from blueprint
@@ -22,8 +17,13 @@ import {
 
 interface Suggester {
   items?: [];
-  onCellsChanged: any;
+  onCellsChanged?: any;
   defaultValue?: any;
+  onCommit?: any;
+  row?: any;
+  col?: any;
+  cell?: any;
+  sendQuery?: any;
 }
 
 function DataSheetSuggest({
@@ -40,6 +40,7 @@ function DataSheetSuggest({
     selectedItem: [defaultValue],
   });
 
+  console.log(items);
   // Renders Each Item in Item as a MenuItem
   const itemRenderer = (item, itemProps) => {
     const isSelected = state.selectedItem.includes(item);
@@ -75,7 +76,7 @@ function DataSheetSuggest({
   return h(Suggest, {
     inputValueRenderer: (item) => item,
     itemRenderer: itemRenderer,
-    items: newItems,
+    items: defaultValue ? newItems : itemz,
     onItemSelect: itemSelect,
     itemPredicate: filterItem,
     createNewItemFromQuery: (query) => query,

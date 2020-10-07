@@ -24,7 +24,14 @@ import { useToggle } from "~/map/components/APIResult";
  * Dragging Marker would be good too
  */
 
-export function MapSelector({ onCellsChanged, row, col, colTwo }) {
+export function MapSelector({
+  onCellsChanged,
+  row,
+  col,
+  colTwo,
+  open,
+  toggle,
+}) {
   const [state, setState] = useState({
     viewport: {
       width: "100%",
@@ -37,7 +44,7 @@ export function MapSelector({ onCellsChanged, row, col, colTwo }) {
     latitude: 0,
   });
 
-  const [open, toggle] = useToggle(true);
+  //const [open, toggle] = useToggle(true);
 
   const onClickHandle = () => {
     //col is latitude, colTwo is longitude if col < colTwo
@@ -121,7 +128,7 @@ export function MapSelector({ onCellsChanged, row, col, colTwo }) {
   }
 
   return h("div", { style: { display: "flex" } }, [
-    h(Dialog, { isOpen: open }, [
+    h(Dialog, { isOpen: open, canOutsideClickClose: false }, [
       h(Card, [
         h(
           MapGl,
@@ -150,7 +157,7 @@ export function MapSelector({ onCellsChanged, row, col, colTwo }) {
                 offsetLeft: -10,
                 offsetTop: -15,
               },
-              [h(Icon, { icon: "map-marker" })]
+              [h(Icon, { icon: "map-marker", color: "black" })]
             ),
           ]
         ),

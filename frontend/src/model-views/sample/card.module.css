@@ -1,0 +1,25 @@
+.addSample {
+  background: rgb(212, 224, 228);
+  border-radius: 5px;
+  width: 60px;
+  display: flex;
+  flex-direction: row;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  justify-content: center;
+  color: black;
+  font-size: 30px;
+}
+.addSample:hover {
+  background: rgb(233, 232, 232);
+  border-radius: 5px;
+  width: 60px;
+  display: flex;
+  flex-direction: row;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  justify-content: center;
+  cursor: pointer;
+  color: rgb(161, 164, 170);
+  font-size: 30px;
+}
