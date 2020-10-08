@@ -4,51 +4,120 @@ import { ProjectInfoLink } from "~/model-views/project";
 import InfiniteScroll from "~/components/infinite-scroll";
 //import { ForeverScroll } from "~/components/infinite-scroll;";
 //import { InfiniteScrollView } from "@macrostrat/ui-components";
-import { useAPIResult } from "@macrostrat/ui-components";
+import { useAPIResult, useAPIActions } from "@macrostrat/ui-components";
 import { useState, useEffect } from "react";
 import { Spinner } from "@blueprintjs/core";
+import { SampleListCard } from "../model-views/sample/list";
+
+// function that performs an api call
+async function getNextPageAPI(nextPage, url, params) {
+  try {
+    const response = await fetch(url + "?" + params + "&page=" + nextPage);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// unwraps the data to be simpatico with the ProjectLink component, also gets the next page
+function unWrapProjectCardData(data, setPage) {
+  const dataObj = data.data.map((obj) => {
+    const { id, name, description, publication, session } = obj;
+    const samples = session.map((ob) => ob.sample);
+    return { id, name, description, publication, samples };
+  });
+  setPage(data.next_page);
+  return dataObj;
+}
+
+const params = "nest=publication,session,sample&per_page=15";
 
 const ProjectListComponent = () => {
   const [data, setData] = useState([]);
+  const [nextPage, setNextPage] = useState("");
 
-  const initData = useAPIResult("/project", { all: 1 });
+  const url = "http://localhost:5002/api/v2/models/project";
+
+  const initData = useAPIResult(url, {
+    nest: "publication,session,sample",
+    per_page: 15,
+  });
 
   useEffect(() => {
     if (initData) {
-      setData(initData);
+      const dataObj = unWrapProjectCardData(initData, setNextPage);
+      setData(dataObj);
     }
   }, [initData]);
+
+  const fetchNewData = () => {
+    if (!nextPage) return;
+    const newData = getNextPageAPI(nextPage, url, params);
+    newData.then((res) => {
+      const dataObj = unWrapProjectCardData(res, setNextPage);
+      const newState = [...data, ...dataObj];
+      setData(newState);
+    });
+  };
+
   /* List of projects for the catalog. Could potentially move there... */
   return data.length > 0
-    ? h(InfiniteScroll, { initialData: data, component: ProjectInfoLink })
-    : h(Spinner);
-  // return h(FilterListComponent, {
-  //   route: "/project",
-  //   filterFields: {
-  //     name: "Name",
-  //     description: "Description",
-  //   },
-  //   itemComponent: ProjectInfoLink,
-  // });
-  //return h("div");
-  // return h(
-  //   InfiniteScrollView,
-  //   {
-  //     route: "/project",
-  //     params: { all: true },
-  //     getItems(res) {
-  //       console.log(res);
-  //       return res;
-  //     },
-  //   },
-  //   ({ data }) => {
-  //     if (data == null) return null;
-  //     return h(
-  //       "div.results",
-  //       data.map((d) => h(ProjectInfoLink, d))
-  //     );
-  //   }
-  // );
+    ? h(InfiniteScroll, {
+        initialData: data,
+        component: ProjectInfoLink,
+        fetch: fetchNewData,
+      })
+    : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 };
 
-export { ProjectListComponent };
+function unWrapSampleCardData(data, setPage) {
+  const dataObj = data.data.map((obj) => {
+    const { id, name, material } = obj;
+    return { id, name, material };
+  });
+  setPage(data.next_page);
+  return dataObj;
+}
+
+const sampleURL = "http://localhost:5002/api/v2/models/sample";
+
+const sampleParams = "&per_page=15";
+
+//   const { material, id, name } = props;
+function SampleListComponent() {
+  const [data, setData] = useState([]);
+  const [nextPage, setNextPage] = useState("");
+
+  console.log(data);
+  console.log(nextPage);
+
+  const initData = useAPIResult<[]>(sampleURL, { per_page: 15 });
+
+  useEffect(() => {
+    if (initData) {
+      const unwrappedData = unWrapSampleCardData(initData, setNextPage);
+      setData(unwrappedData);
+    }
+  }, [initData]);
+
+  const fetchNewData = () => {
+    if (!nextPage) return;
+    const newData = getNextPageAPI(nextPage, sampleURL, sampleParams);
+    newData.then((res) => {
+      const dataObj = unWrapSampleCardData(res, setNextPage);
+      const newState = [...data, ...dataObj];
+      setData(newState);
+    });
+  };
+
+  return data.length > 0
+    ? h(InfiniteScroll, {
+        initialData: data,
+        component: SampleListCard,
+        fetch: fetchNewData,
+      })
+    : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
+}
+
+export { ProjectListComponent, SampleListComponent };

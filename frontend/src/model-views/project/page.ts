@@ -1,13 +1,15 @@
 import { useState, Component } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import { Button } from "@blueprintjs/core";
+import { Button, Icon } from "@blueprintjs/core";
 import styled from "@emotion/styled";
 import { ProjectMap } from "./map";
 import { EditableProjectDetails } from "./editor";
-import { SampleCard } from "../sample/detail-card";
+import { SampleCard, AddSampleCard } from "../sample/detail-card";
 import { SampleSelectDialog } from "./sample-select";
 import "../main.styl";
 import styles from "~/admin/module.styl";
+
+
 const h = hyperStyled(styles);
 
 class Publication extends Component {
@@ -37,7 +39,7 @@ class Publication extends Component {
   }
 }
 
-const ProjectPublications = function ({ data }) {
+const ProjectPublications = function({ data }) {
   if (data == null) {
     data = [];
   }
@@ -50,7 +52,7 @@ const ProjectPublications = function ({ data }) {
   ]);
 };
 
-const ProjectResearchers = function ({ data }) {
+const ProjectResearchers = function({ data }) {
   let content = [h("p", "No researchers")];
   if (data != null) {
     content = data.map((d) => h("div.researcher", d.name));
@@ -66,6 +68,10 @@ margin: 0 -5px;\
 
 function AddSampleControls() {
   const [isOpen, setIsOpen] = useState(false);
+
+  const onClick = () => {
+    setIsOpen(!isOpen);
+  };
   return h([
     h(SampleSelectDialog, {
       isOpen,
@@ -73,19 +79,11 @@ function AddSampleControls() {
         setIsOpen(false);
       },
     }),
-    h(
-      Button,
-      {
-        onClick() {
-          setIsOpen(!isOpen);
-        },
-      },
-      "Edit"
-    ),
+    h(AddSampleCard, { onClick, icon_name: "plus" }),
   ]);
 }
 
-const ProjectSamples = function ({ data }) {
+const ProjectSamples = function({ data }) {
   let content = [h("p", "No samples")];
   if (data != null) {
     content = data.map((d) => h(SampleCard, d));
@@ -97,7 +95,7 @@ const ProjectSamples = function ({ data }) {
   ]);
 };
 
-const ProjectPage = function (props) {
+const ProjectPage = function(props) {
   const { project } = props;
   const { samples } = project;
   return h("div.project-page", [

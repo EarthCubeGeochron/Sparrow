@@ -15,7 +15,7 @@ import { MapNav } from "./components/map-nav";
 import styles from "./mappages.module.css";
 import { SiteTitle } from "app/components";
 
-const MapToaster = Toaster.create({
+export const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
   maxToasts: 1,
 });
@@ -81,11 +81,13 @@ export function MapPanel({
     const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
     setViewport({ ...viewport, zoom, latitude, longitude });
   }
+  
   useEffect(() => {
     const onMap = window.location.pathname == "/map";
     if (!onMap) {
       MapToaster.clear();
     }
+    console.log(onMap);
   }, [window.location.pathname]);
 
   useEffect(() => {
