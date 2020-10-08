@@ -9,7 +9,7 @@ import { ErrorBoundaryRoute as Route, NoMatchPage } from "~/util";
 import { AuthContext } from "~/auth/context";
 import { ProjectAdminPage } from "./project";
 import { SampleMain } from "~/model-views/sample";
-import { DataFilesPage } from "~/model-views/data-files";
+import { DataFilesPage } from "./data-file";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
 import { DataModelLinks } from "~/catalog";
 import { NavButton } from "~/components";
@@ -47,7 +47,7 @@ const AdminRouter = ({ base }) =>
     }),
     h(Route, {
       path: base + "/project",
-      component: ProjectAdminPage,
+      component: () => h(ProjectAdminPage),
     }),
     h(Route, {
       path: base + "/sample",
