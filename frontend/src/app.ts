@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { join } from "path";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import { HomePage } from "./homepage";
-import { Map_Page } from "./map-page";
 import loadable from "@loadable/component";
 
 import siteContent from "site-content";
@@ -23,7 +22,7 @@ import { MapToaster } from "./map/map-area";
 
 //import { MapSelector } from "./data-sheet/sheet-enter-components";
 
-const MapPage = loadable(async function() {
+const MapPage = loadable(async function () {
   const module = await import("./map");
   return module.MapPage;
 });
@@ -74,7 +73,7 @@ function AppRouter(props) {
   );
 }
 
-const errorHandler = function(route, response) {
+const errorHandler = function (route, response) {
   let msg;
   const { error } = response;
   if (error != null) {

@@ -8,8 +8,8 @@ import { LoginRequired } from "~/auth";
 import { ErrorBoundaryRoute as Route, NoMatchPage } from "~/util";
 import { AuthContext } from "~/auth/context";
 import { ProjectAdminPage } from "./project";
+
 import { SampleAdminPage } from "./sample";
-import { DataFilesList } from "~/model-views/data-files";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
 import { DataModelLinks } from "~/catalog";
 import { NavButton } from "~/components";
@@ -49,7 +49,7 @@ const AdminRouter = ({ base }) =>
     }),
     h(Route, {
       path: base + "/project",
-      component: ProjectAdminPage,
+      component: () => h(ProjectAdminPage),
     }),
     h(Route, {
       path: base + "/sample",
