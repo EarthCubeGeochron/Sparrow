@@ -7,7 +7,6 @@ import { SampleCard } from "../sample/detail-card";
 function AddSampleArea() {
   const samples = useAPIv2Result("/models/sample", {
     nest: "material",
-    not_has: "project",
     per_page: 40,
   });
   if (samples == null) return null;

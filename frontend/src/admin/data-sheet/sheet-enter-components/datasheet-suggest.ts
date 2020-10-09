@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import h from "@macrostrat/hyper";
 import { Suggest } from "@blueprintjs/select";
-import { MenuItem, Icon, Menu, Tooltip } from "@blueprintjs/core";
+import { MenuItem, Icon, Menu, Tooltip, Button } from "@blueprintjs/core";
 
 /**
  * This component will be a select-like component from blueprint

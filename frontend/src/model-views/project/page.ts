@@ -9,7 +9,6 @@ import { SampleSelectDialog } from "./sample-select";
 import "../main.styl";
 import styles from "~/admin/module.styl";
 
-
 const h = hyperStyled(styles);
 
 class Publication extends Component {
@@ -96,8 +95,11 @@ const ProjectSamples = function({ data }) {
 };
 
 const ProjectPage = function(props) {
+  const [edit, setEdit] = useState(false);
+
   const { project } = props;
   const { samples } = project;
+
   return h("div.project-page", [
     h("div.flex-row", [
       h("div.basic-info", [

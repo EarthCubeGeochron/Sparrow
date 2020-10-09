@@ -3,6 +3,7 @@ import { Card, Icon } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
 import style from "./card.module.css";
 import styles from "./module.styl";
+import { useModelURL } from "~/util/router";
 
 const h = hyperStyled(styles);
 
@@ -24,7 +25,7 @@ const SampleCard = function(props: SampleCardProps) {
     link = true;
   }
   const component = link != null ? LinkCard : Card;
-  const to = `/catalog/sample/${id}`;
+  const to = useModelURL(`/sample/${id}`);
   return h(component, { className: "sample-card", to }, [
     h("h4.name", name),
     h("div.location-name", location_name),

@@ -32,6 +32,7 @@ import {
 } from "../../admin/data-sheet/sheet-enter-components";
 import { useToggle } from "../../map/components/APIResult";
 import { MultipleSelectFilter } from "../../filter/components";
+import { useModelURL } from "~/util/router";
 
 const h = hyper.styled(styles);
 
@@ -69,19 +70,6 @@ export const DOIPaperAdd = (props) => {
     h(Button, { minimal: true, icon: "search", onClick }),
   ]);
 };
-
-const PractPubs = [
-  {
-    title:
-      "Precise dating of biotite in distal volcanic ash: Isolating subtle alteration using 40Ar/39Ar laser incremental heating and electron microprobe techniques",
-    doi: "10.2138/am.2008.2517",
-  },
-  {
-    title:
-      "Using Tephrochronology and palynology to date the MIS 13 lacustrine sediments of the Mercure basin (Southern Apennines - Italy)",
-    doi: "10.3301/IJG.2013.22",
-  },
-];
 
 const Publications = (props) => {
   const { publication, onEdit, changeEdit } = props;
@@ -142,6 +130,8 @@ const Parameter = ({ name, value, ...rest }) => {
 
 const ProjectLink = function({ d, onEdit, changeEdit }) {
   const { project_name, project_id } = d;
+  const to = useModelURL(`/project/${project_id}`);
+
   if (project_name == null || project_id == null) {
     return h(
       Button,
@@ -155,7 +145,7 @@ const ProjectLink = function({ d, onEdit, changeEdit }) {
     return h(
       LinkCard,
       {
-        to: `/catalog/project/${project_id}`,
+        to,
       },
       project_name
     );
@@ -215,7 +205,7 @@ const Material = function(props) {
 };
 
 const Sessions = (props) => {
-  const { session, setEdit } = props;
+  const { session, setEdit, onEdit } = props;
   return h(Parameter, {
     name: "Session",
     value: session || h("em", "None"),

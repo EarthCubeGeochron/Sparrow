@@ -13,7 +13,7 @@ import { ProjectListComponent } from "./project-list";
 import { ProjectMatch } from "~/model-views/project";
 import { SessionComponent } from "~/model-views/session";
 import { SampleMain } from "~/model-views/sample";
-import { DataFilesPage } from "~/model-views/data-files";
+import { DataFilesMain } from "~/model-views/data-files";
 import { PageRoute, PageStyle } from "~/components/page-skeleton";
 import { LoginSuggest } from "~/auth";
 import { InsetText } from "~/components/layout";
@@ -22,7 +22,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const SessionMatch = function ({ match }) {
+const SessionMatch = function({ match }) {
   const { id } = match.params;
   return h(SessionComponent, { id });
 };
@@ -80,7 +80,7 @@ const CatalogBody = (
     h(PageRoute, {
       path: base + "/data-file",
       style: PageStyle.WIDE,
-      component: DataFilesPage,
+      component: DataFilesMain,
     }),
     h(Route, {
       path: base,

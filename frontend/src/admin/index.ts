@@ -9,12 +9,14 @@ import { ErrorBoundaryRoute as Route, NoMatchPage } from "~/util";
 import { AuthContext } from "~/auth/context";
 import { ProjectAdminPage } from "./project";
 import { SampleAdminPage } from "./sample";
-import { DataFilesPage } from "~/model-views/data-files";
+import { DataFilesList } from "~/model-views/data-files";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
 import { DataModelLinks } from "~/catalog";
 import { NavButton } from "~/components";
 import { CatalogNavLinks } from "~/catalog/nav";
 import styles from "./module.styl";
+import { SessionAdminPage } from "./session";
+import { DataFileAdminPage } from "./data-file";
 
 const DataSheet = loadable(() => import("./data-sheet"));
 
@@ -43,7 +45,7 @@ const AdminRouter = ({ base }) =>
     }),
     h(Route, {
       path: base + "/session",
-      component: "div",
+      component: SessionAdminPage,
     }),
     h(Route, {
       path: base + "/project",
@@ -56,7 +58,7 @@ const AdminRouter = ({ base }) =>
     h(PageRoute, {
       path: base + "/data-file",
       style: PageStyle.WIDE,
-      component: DataFilesPage,
+      component: DataFileAdminPage,
     }),
     h(Route, {
       path: base,
