@@ -18,19 +18,26 @@ let assetsRoute = process.env.SPARROW_BASE_URL || process.env.BASE_URL;
 
 console.log(process.env.BASE_URL, process.env.API_BASE_URL);
 
+let browserSyncTemplateOptions = {
+  templateParameters: {
+    browserSyncPort: process.env.SPARROW_HTTP_PORT,
+  },
+  template: "./dev-template.ejs",
+};
+
 let bs_cfg = {
   open: false,
   // These don't appear to work?
-  logLevel: "silent",
+  //logLevel: "silent",
   logSnippet: false,
-  single: true,
+  //single: true,
   // Actual external port
-  port: 3000,
+  //port: 3000,
   //proxy: "http://backend:5000"
   // socket: {
   //   // Client-side port for socket IO
-  //   port: process.env.SPARROW_HTTP_PORT
-  // }
+  //   port: process.env.SPARROW_HTTP_PORT,
+  // },
   socket: {
     domain: "localhost:5002",
   },
@@ -40,7 +47,7 @@ let bs_cfg = {
 //   // Configuration for running locally
 //   // This configuration is probably wrong
 //bs_cfg.serveStatic = [{ route: assetsRoute, dir: assetsDir }];
-bs_cfg.server = "./_assets";
+//bs_cfg.server = "./_assets";
 //}
 
 let browserSync = new BrowserSyncPlugin(bs_cfg);
@@ -174,6 +181,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: process.env.SPARROW_LAB_NAME,
       favicon: "static/img/favicon.png",
+      ...browserSyncTemplateOptions,
     }),
     browserSync,
     new EnvironmentPlugin(["BASE_URL", "SPARROW_LAB_NAME", "MAPBOX_API_TOKEN"]),

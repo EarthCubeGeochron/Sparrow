@@ -93,6 +93,9 @@ services:
       - CONTAINERIZED=1
       - SPARROW_LAB_NAME
       - SPARROW_BASE_URL
+      # We need to forward SPARROW_HTTP_PORT to the frontend so that we can
+      # load BrowserSync on the correct port if in development mode
+      - SPARROW_HTTP_PORT
       - MAPBOX_API_TOKEN
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container

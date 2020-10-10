@@ -39,7 +39,7 @@ span.data-grid-container:focus {
 }
 
 .data-grid-container .data-grid .cell.read-only {
-  background: whitesmoke;
+  background: var(--cell-read-only);
   color: #999;
   text-align: center;
 }
@@ -144,7 +144,7 @@ span.data-grid-container:focus {
 }
 
 .data-grid-container .data-grid .cell.read-only {
-  background: whitesmoke;
+  background: var(--datasheet-read-only-background);
   color: #999;
   text-align: center;
 }

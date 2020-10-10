@@ -3,11 +3,16 @@
   //@require "~react-datasheet/lib/react-datasheet.css";
   //@import "./datasheet.css"
 
+.bp3-dark .data-sheet
+  --datasheet-read-only-background: $dark-gray3
+
 .data-sheet
+  --datasheet-read-only-background: whitesmoke
+
   position absolute
   top 0px
-  left 0em
-  right 0em
+  left 2em
+  right 2em
   bottom 0px
   display flex
   flex-direction column
@@ -17,7 +22,7 @@
   th
     position sticky
     top 0
-    background-color: whitesmoke
+    background-color: var(--datasheet-read-only-background)
 
 .virtualized-sheet
   position: absolute;
