@@ -1,21 +1,17 @@
 {
   "emitDeclarationOnly": true,
+  "allowJS": true,
+  "checkJS": true,
   "compilerOptions": {
     "moduleResolution": "Node",
     "declaration": true,
     "sourceMap": true,
     "declarationDir": "dist/types",
     "jsx": "react",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "typeRoots": ["node_modules/@types"],
     "paths": {
-        "~/*": ["src/*"]
+      "~/*": ["src/*"]
     }
   },
-  "include": [
-    "src",
-    "plugins",
-    "default-content"
-  ]
+  "include": ["src", "plugins", "default-content"]
 }
