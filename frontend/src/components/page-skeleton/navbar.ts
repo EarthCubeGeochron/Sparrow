@@ -9,7 +9,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const NavButton = classed(NavLinkButton, "navbar-button");
+const NavButton = classed(NavLinkButton, styles["navbar-button"]);
 
 const SiteTitle = () =>
   h(NavLink, { to: "/" }, h(Frame, { id: "siteTitle" }, "Test Lab"));

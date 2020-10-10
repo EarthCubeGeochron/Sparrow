@@ -41,28 +41,28 @@ const AdminRouter = ({ base }) =>
   h(Switch, [
     h(Route, {
       path: base + "/data-sheet",
-      component: DataSheet,
+      render: () => h(DataSheet),
     }),
     h(Route, {
       path: base + "/session",
-      component: SessionAdminPage,
+      render: () => h(SessionAdminPage),
     }),
     h(Route, {
       path: base + "/project",
-      component: () => h(ProjectAdminPage),
+      render: () => h(ProjectAdminPage),
     }),
     h(Route, {
       path: base + "/sample",
-      component: SampleAdminPage,
+      render: () => h(SampleAdminPage),
     }),
     h(PageRoute, {
       path: base + "/data-file",
       style: PageStyle.WIDE,
-      component: DataFileAdminPage,
+      render: () => h(DataFileAdminPage),
     }),
     h(Route, {
       path: base,
-      component: () => h(AdminBody, { base }),
+      render: () => h(AdminBody, { base }),
       exact: true,
     }),
     h(Route, { path: "*", component: NoMatchPage }),
@@ -78,12 +78,13 @@ function AdminPage(props) {
 }
 
 function AdminRoute({ path }) {
+  /* Base route for the admin section of the website */
   const base = "/admin";
   return h(PageRoute, {
     path,
     style: PageStyle.WIDE,
     navComponent: () => h(AdminNavbar, { base }),
-    component: () => h(AdminPage, { base }),
+    render: () => h(AdminPage, { base }),
   });
 }
 

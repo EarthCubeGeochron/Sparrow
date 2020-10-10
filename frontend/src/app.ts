@@ -18,7 +18,6 @@ import { Catalog } from "./catalog";
 import { AdminRoute } from "./admin";
 import { PageStyle } from "~/components/page-skeleton";
 import NewSample from "./new-sample/new-sample";
-import { MapToaster } from "./map/map-area";
 
 //import { MapSelector } from "./data-sheet/sheet-enter-components";
 
@@ -49,7 +48,7 @@ function AppRouter(props) {
       }),
       h(PageRoute, {
         path: "/catalog",
-        component: () => h(Catalog, { base: "/catalog" }),
+        render: () => h(Catalog, { base: "/catalog" }),
       }),
       h(PageRoute, {
         path: "/new-sample",

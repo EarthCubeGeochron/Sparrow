@@ -20,14 +20,14 @@ export function SessionMainPanel() {
     ),
     h(Route, {
       path: base,
-      component: () => h("div"),
+      render: () => h("div"),
     }),
   ]);
 }
 
 export function SessionAdminPage() {
   return h("div.admin-page-main", [
-    h("div.left-panel", [h(SessionListComponent)]),
+    h("div.left-panel", null, h(SessionListComponent)),
     h("div.right-panel", [h(SessionMainPanel)]),
   ]);
 }

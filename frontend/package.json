@@ -87,6 +87,7 @@
     "dev": "webpack -c _webpack",
     "postinstall": "sed -i 's/var port = options/var port = socketOpts.port || options/g' node_modules/browser-sync/dist/connect-utils.js"
   },
+  "moduleRoots": "./_webpack/custom-resolver.js",
   "author": "Daven Quinn",
   "license": "ISC"
 }
