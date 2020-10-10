@@ -12,11 +12,11 @@ export function ProjectMainPanel() {
   return h(Switch, [
     h(Route, {
       path: base + "/:id",
-      component: () => h(ProjectMatch),
+      render: () => h(ProjectMatch),
     }),
     h(Route, {
       path: base,
-      component: () => h("div"),
+      render: () => h("div"),
     }),
   ]);
 }

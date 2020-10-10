@@ -41,11 +41,18 @@ class ErrorBoundary extends React.Component {
 }
 
 const ErrorBoundaryRoute = function (props) {
-  const { component, ...rest } = props;
+  const { component, render: baseRender, ...rest } = props;
+
+  // Use render function unless component is provided
+  let render = baseRender;
+  if (component != null) {
+    render = () => h(component);
+  }
+
   return h(Route, {
     ...rest,
-    component(p) {
-      return h(ErrorBoundary, null, h(component, p));
+    render() {
+      return h(ErrorBoundary, null, render());
     },
   });
 };
