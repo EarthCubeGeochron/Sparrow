@@ -16,7 +16,11 @@ import { APIResultView } from "@macrostrat/ui-components";
 import { useModelURL } from "~/util/router";
 import { useRouteMatch } from "react-router-dom";
 
-function DownloadButton(props) {
+/**
+ *
+ * @param props : file_hash, type: as file_type
+ */
+export function DownloadButton(props) {
   const { file_hash, file_type } = props;
 
   let text = "Data file";

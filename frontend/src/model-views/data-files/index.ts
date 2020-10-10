@@ -6,6 +6,7 @@ import { LinkCard } from "@macrostrat/ui-components";
 import { useModelURL } from "~/util/router";
 import { Route, Switch } from "react-router-dom";
 import { DataFilePage } from "./page";
+import { parse, format } from "date-fns";
 
 const h = hyperStyled(styles);
 
@@ -32,13 +33,16 @@ export function DataFilesList(props) {
     : h(Spinner);
 }
 
+// This is for the Infinite Scroll, had to change the structure of data being passed
 export function DataFilesCard(data) {
-  const { file_hash, basename, type } = data;
+  const { file_hash, basename, type, date } = data;
+
   return h("div.data-files", [
     h(
       LinkCard,
       { to: useModelURL(`/data-file/${file_hash}`) },
       h("div", { className: "data-file-card" }, [
+       // h("h4", [format(date, "MMMM D, YYYY")]),
         h("h2", basename),
         h("div.type", type),
       ])

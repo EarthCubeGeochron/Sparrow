@@ -82,7 +82,7 @@ function AddSampleControls() {
   ]);
 }
 
-const ProjectSamples = function({ data }) {
+export const ProjectSamples = function({ data }) {
   let content = [h("p", "No samples")];
   if (data != null) {
     content = data.map((d) => h(SampleCard, d));

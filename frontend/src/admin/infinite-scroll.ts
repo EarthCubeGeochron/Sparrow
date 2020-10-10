@@ -9,6 +9,7 @@ import { Spinner } from "@blueprintjs/core";
 import { SampleListCard } from "../model-views/sample/list";
 import { SessionInfoLink } from "../model-views/session/info-card";
 import { DataFilesCard } from "../model-views/data-files";
+import { SessionLinkCard } from "../model-views/data-files/page";
 
 // function that performs an api call
 async function getNextPageAPI(nextPage, url, params) {
@@ -121,49 +122,16 @@ function SampleListComponent() {
     : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 }
 
-// const { id, sample_id, sample_name, target, instrument_name, technique, project_name } = props;
+// const { id, date, target, technique } = props;
 function unWrapSessionCardData(data, setPage) {
   const dataObj = data.data.map((obj) => {
-    if (obj.project == null) {
-      const {
-        id,
-        sample: { name: sample_name, id: sample_id },
-        technique,
-        instrument: { name: instrument_name },
-        target,
-        date,
-      } = obj;
-      return {
-        id,
-        sample_name,
-        sample_id,
-        technique,
-        instrument_name,
-        target,
-        date,
-      };
-    } else if (obj.project !== null) {
-      const {
-        id,
-        sample: { name: sample_name, id: sample_id },
-        technique,
-        instrument: { name: instrument_name },
-        target,
-        date,
-        project: { name: project_name, id: project_id },
-      } = obj;
-      return {
-        id,
-        sample_name,
-        sample_id,
-        technique,
-        instrument_name,
-        target,
-        date,
-        project_name,
-        project_id,
-      };
-    }
+    const { id: session_id, technique, target, date: session_date } = obj;
+    return {
+      session_id,
+      technique,
+      target,
+      session_date,
+    };
   });
   setPage(data.next_page);
   return dataObj;
@@ -205,7 +173,7 @@ function SessionListComponent() {
   return data.length > 0
     ? h(InfiniteScroll, {
         initialData: data,
-        component: SessionInfoLink,
+        component: SessionLinkCard,
         fetch: fetchNewData,
       })
     : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
