@@ -10,6 +10,12 @@ import { useModelURL } from "~/util/router";
 
 const h = hyper.styled(styles);
 
+/**
+ *
+ * @param props : material, id, name (from samples)
+ *
+ *
+ */
 const SampleListCard = function(props) {
   const { material, id, name } = props;
 

@@ -18,16 +18,6 @@ const pluralize = function(term, arrayOrNumber) {
   return term;
 };
 
-const ContentArea = ({ data, title, className, minimal = false }) =>
-  h("div.content-area", [
-    h("h5", [h("span.count", data.length), " ", pluralize(title, data)]),
-    h.if(!minimal)(
-      "ul",
-      { className },
-      data.map((d) => h("li", d))
-    ),
-  ]);
-
 interface Project {
   id: number;
   name: string;
@@ -51,6 +41,12 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
   } = props;
 
   const to = useModelURL(`/project/${id}`);
+  const pubData =
+    publication.length > 0
+      ? publication.length > 1
+        ? publication[0].title + "...."
+        : publication[0].title
+      : null;
 
   return h(
     LinkCard,
@@ -69,14 +65,27 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
             title: "sample",
           })
         : null,
-      h.if(publication.length > 0)(ContentArea, {
-        className: "publications",
-        data: publication.map((d) => d.title),
-        title: "publication",
-      }),
+      h.if(publication.length > 0)("div.content-area", [
+        h("h5", [
+          h("span.count", [
+            publication.length + " " + pluralize("Publication", publication),
+          ]),
+          h("h5", [pubData]),
+        ]),
+      ]),
     ]
   );
 }
+
+const ContentArea = ({ data, title, className, minimal = false }) =>
+  h("div.content-area", [
+    h("h5", [h("span.count", data.length), " ", pluralize(title, data)]),
+    h.if(!minimal)(
+      "ul",
+      { className },
+      data.map((d) => h("li", d))
+    ),
+  ]);
 
 interface ProjectProps {
   id?: number;

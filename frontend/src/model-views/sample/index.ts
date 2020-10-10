@@ -4,23 +4,21 @@ import { Route, Switch } from "react-router-dom";
 import { SamplePage } from "./page";
 import { SampleComponent, SampleList, SampleMatch } from "./list";
 
-class SampleMain extends Component {
-  render() {
-    const { match } = this.props;
-    const base = match.path;
-    // Render main body
-    return h(Switch, [
-      h(Route, {
-        path: base + "/:id",
-        component: SampleMatch,
-      }),
-      h(Route, {
-        path: base,
-        component: SampleList,
-        exact: true,
-      }),
-    ]);
-  }
+function SampleMain(props) {
+  const { match } = props;
+  const base = match.path;
+  // Render main body
+  return h(Switch, [
+    h(Route, {
+      path: base + "/:id",
+      component: SampleMatch,
+    }),
+    h(Route, {
+      path: base,
+      component: SampleList,
+      exact: true,
+    }),
+  ]);
 }
 
 export { SampleMain, SamplePage, SampleList };

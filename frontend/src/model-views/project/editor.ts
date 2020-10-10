@@ -27,7 +27,7 @@ import "../main.styl";
 import styles from "~/admin/module.styl";
 const h = hyperStyled(styles);
 
-const ModelEditableText = function (props) {
+const ModelEditableText = function(props) {
   const el = props.is || "div";
   let { multiline, field, placeholder, ...rest } = props;
   if (placeholder == null) {
@@ -52,7 +52,7 @@ const ModelEditableText = function (props) {
   ]);
 };
 
-const EmbargoEditor = function (props) {
+const EmbargoEditor = function(props) {
   const { login } = useAuth();
   const { model, actions } = useContext(ModelEditorContext);
   const [isOpen, setOpen] = useState(false);
@@ -100,7 +100,7 @@ const EmbargoEditor = function (props) {
   ]);
 };
 
-const EditStatusButtons = function () {
+const EditStatusButtons = function() {
   const { isEditing, hasChanges, actions } = useModelEditor();
   const changed = hasChanges();
   return h("div.edit-status-controls", [
@@ -128,7 +128,7 @@ const EditStatusButtons = function () {
   ]);
 };
 
-const EditableProjectDetails = function (props) {
+const EditableProjectDetails = function(props) {
   const { project } = props;
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIContext));
@@ -166,6 +166,10 @@ const EditableProjectDetails = function (props) {
     ]
   );
 };
+
+function editNavBar() {
+  return;
+}
 
 function EditableProjectPage(props) {
   h(ModelEditor);
