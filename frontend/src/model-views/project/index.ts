@@ -67,7 +67,9 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
         : null,
       h.if(publication.length > 0)("div.content-area", [
         h("h5", [
-          h("span.count", [publication.length + " Publication"]),
+          h("span.count", [
+            publication.length + " " + pluralize("Publication", publication),
+          ]),
           h("h5", [pubData]),
         ]),
       ]),

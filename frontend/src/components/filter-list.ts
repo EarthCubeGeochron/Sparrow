@@ -1,8 +1,17 @@
-import h from "react-hyperscript";
-import { InputGroup, Menu, Popover, Button, Position } from "@blueprintjs/core";
+import h from "@macrostrat/hyper";
+import {
+  InputGroup,
+  Menu,
+  MenuItem,
+  Popover,
+  Button,
+  Position,
+  Icon,
+} from "@blueprintjs/core";
 import { PagedAPIView, StatefulComponent } from "@macrostrat/ui-components";
 import T from "prop-types";
 import { FilterMenu } from "../map/components/filterMenu";
+import { useState } from "react";
 
 class FilterListComponent extends StatefulComponent {
   static propTypes = {
@@ -87,4 +96,47 @@ class FilterListComponent extends StatefulComponent {
   }
 }
 
-export { FilterListComponent };
+function FilterBox({ filterFields }) {
+  const [state, setState] = useState({
+    filter: "",
+    pickedFilter: "",
+  });
+  console.log(state);
+
+  const handleFilterChange = (e) => {
+    setState({ ...state, filter: e.target.value });
+  };
+
+  const onClickHandle = (filter) => {
+    console.log(filter);
+    setState({ ...state, pickedFilter: filter });
+  };
+
+  const content = h(Menu, [
+    filterFields.map((filter) => {
+      const selected = filter == state.pickedFilter;
+      return h(MenuItem, {
+        intent: selected ? "primary" : null,
+        labelElement: selected ? h(Icon, { icon: "tick" }) : null,
+        key: filter,
+        text: filter,
+        onClick: () => onClickHandle(filter),
+      });
+    }),
+  ]);
+
+  const position = Position.BOTTOM_RIGHT;
+  const rightElement = h(Popover, { content, position }, [
+    h(Button, { minimal: true, rightIcon: "caret-down" }),
+  ]);
+
+  return h(InputGroup, {
+    leftIcon: "search",
+    placeholder: "Filter values",
+    value: state.filter,
+    onChange: handleFilterChange,
+    rightElement,
+  });
+}
+
+export { FilterListComponent, FilterBox };

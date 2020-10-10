@@ -10,6 +10,7 @@ import { SampleListCard } from "../model-views/sample/list";
 import { SessionInfoLink } from "../model-views/session/info-card";
 import { DataFilesCard } from "../model-views/data-files";
 import { SessionLinkCard } from "../model-views/data-files/page";
+import { FilterBox } from "../components/filter-list";
 
 // function that performs an api call
 async function getNextPageAPI(nextPage, url, params) {
@@ -62,14 +63,18 @@ const ProjectListComponent = () => {
       setData(newState);
     });
   };
+  const filterFields = ["Name", "Samples"];
 
   /* List of projects for the catalog. Could potentially move there... */
   return data.length > 0
-    ? h(InfiniteScroll, {
-        initialData: data,
-        component: ProjectInfoLink,
-        fetch: fetchNewData,
-      })
+    ? h("div", { style: { paddingTop: "10px" } }, [
+        h(FilterBox, { filterFields }),
+        h(InfiniteScroll, {
+          initialData: data,
+          component: ProjectInfoLink,
+          fetch: fetchNewData,
+        }),
+      ])
     : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 };
 
@@ -113,12 +118,17 @@ function SampleListComponent() {
     });
   };
 
+  const filterFields = ["Name", "Material", "id"];
+
   return data.length > 0
-    ? h(InfiniteScroll, {
-        initialData: data,
-        component: SampleListCard,
-        fetch: fetchNewData,
-      })
+    ? h("div", { style: { paddingTop: "10px" } }, [
+        h(FilterBox, { filterFields }),
+        h(InfiniteScroll, {
+          initialData: data,
+          component: SampleListCard,
+          fetch: fetchNewData,
+        }),
+      ])
     : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 }
 
@@ -170,12 +180,17 @@ function SessionListComponent() {
     });
   };
 
+  const filterFields = ["Technique", "Date Precision", "Target", "Instrument"];
+
   return data.length > 0
-    ? h(InfiniteScroll, {
-        initialData: data,
-        component: SessionLinkCard,
-        fetch: fetchNewData,
-      })
+    ? h("div", { style: { paddingTop: "10px" } }, [
+        h(FilterBox, { filterFields }),
+        h(InfiniteScroll, {
+          initialData: data,
+          component: SessionLinkCard,
+          fetch: fetchNewData,
+        }),
+      ])
     : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 }
 
@@ -223,12 +238,17 @@ function DataFilesListComponent() {
     });
   };
 
+  const filterFields = ["Type", "Basename", "Upload Date"];
+
   return data.length > 0
-    ? h(InfiniteScroll, {
-        initialData: data,
-        component: DataFilesCard,
-        fetch: fetchNewData,
-      })
+    ? h("div", { style: { paddingTop: "10px" } }, [
+        h(FilterBox, { filterFields }),
+        h(InfiniteScroll, {
+          initialData: data,
+          component: DataFilesCard,
+          fetch: fetchNewData,
+        }),
+      ])
     : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 }
 
