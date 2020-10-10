@@ -40,15 +40,15 @@ const Technique = function({ technique }) {
   ]);
 };
 
-const MeasurementGroup = function({ measurement_group_id }) {
-  if (typeof measurement_group === "undefined" || measurement_group === null) {
-    return null;
-  }
-  return h("div.group", [
-    h("h5.small-info", "Group"),
-    h("div", measurement_group_id),
-  ]);
-};
+// const MeasurementGroup = function({ measurement_group_id }) {
+//   if (typeof measurement_group === "undefined" || measurement_group === null) {
+//     return null;
+//   }
+//   return h("div.group", [
+//     h("h5.small-info", "Group"),
+//     h("div", measurement_group_id),
+//   ]);
+// };
 
 const SessionInfoComponent = function(props) {
   // add some links to Project, sample, etc

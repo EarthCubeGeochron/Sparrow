@@ -112,9 +112,10 @@ export const Samples = (props) => {
 };
 
 const SessionInfo = (props) => {
-  const { session_id, technique, target, session_date } = props;
+  const { session_id, technique, target, session_date, analysis } = props;
+  const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
   return h("div", { className: styles.sessionContainer }, [
-    h("h3", ["Session:", h(Button, { icon: "document-open", minimal: true })]),
+    h("h3", ["Session: " + analysis.length + " " + analysisList]),
     h(SessionLinkCard, { session_id, target, technique, session_date }),
   ]);
 };
@@ -152,6 +153,7 @@ export function DataFilePage({ props }) {
           technique,
           target,
           date_precision,
+          analysis,
           id: session_id,
           sample: {
             name: sample_name,
@@ -175,6 +177,7 @@ export function DataFilePage({ props }) {
         target,
         session_date,
         technique,
+        analysis,
       }),
       h("div", { className: styles.sampleContainer }, [
         h(Samples, { sample_name, sample_id, sample_material }),

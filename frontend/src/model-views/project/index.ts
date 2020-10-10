@@ -42,9 +42,11 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
 
   const to = useModelURL(`/project/${id}`);
   const pubData =
-    publication.length > 1
-      ? publication[0].title + "...."
-      : publication[0].title;
+    publication.length > 0
+      ? publication.length > 1
+        ? publication[0].title + "...."
+        : publication[0].title
+      : null;
 
   return h(
     LinkCard,
