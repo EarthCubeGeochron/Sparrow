@@ -2,35 +2,27 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
 import h from "@macrostrat/hyper";
-import { useAPIResult } from "@macrostrat/ui-components";
+import {
+  useAPIResult,
+  useAPIActions,
+  useAPIHelpers,
+} from "@macrostrat/ui-components";
 import { Spinner } from "@blueprintjs/core";
 
-async function getNextPageAPI(nextPage, url, params) {
-  try {
-    const response = await fetch(
-      url + "?" + params + "&per_page=15" + "&page=" + nextPage
-    );
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-}
-function unWrapData(data, destructure, optionalLogic) {
-  const dataObj = data.data.map((obj) => {
-    const destructure = obj;
-    optionalLogic;
-    return { ...destructure, ...optionalLogic };
-  });
-  return dataObj;
-}
+// function unWrapData(data, destructure, optionalLogic) {
+//   const dataObj = data.data.map((obj) => {
+//     const destructure = obj;
+//     optionalLogic;
+//     return { ...destructure, ...optionalLogic };
+//   });
+//   return dataObj;
+// }
 
 /**@description function to implement the infinite scroll component with certain API views
  *
  * @param {string} url: base url for API call.
- * @param {string} nest: Models to nest within base api. Optional
  * @param {function} unWrapData: function that destructures json from API call. Must return an object that is compatible with the component also passed
- * @param {string} params: string of full params to be added after base URL. Optional
+ * @param {object} params: object of params to be added to base URL. Optional
  * @param {component} component: react component designed to take in data object created by the unWrapData function
  *
  * 
@@ -44,30 +36,38 @@ function unWrapData(data, destructure, optionalLogic) {
 }
  return h(InfiniteAPIView, {
     url: projectURL,
-    nest: projectNest,
     unWrapData: unWrapProjectCardData,
-    params: projectParams,
+    params: {nest: "session,sample"},
     component: ProjectInfoLink,
   });
  */
-function InfiniteAPIView({ url, nest, unWrapData, params, component }) {
+function InfiniteAPIView({ url, unWrapData, params, component }) {
   const [data, setData] = useState([]);
   const [nextPage, setNextPage] = useState("");
+  const { get } = useAPIActions();
 
-  const initData =
-    nest == null
-      ? useAPIResult(url, { per_page: 15 })
-      : useAPIResult(url, { nest: nest, per_page: 15 });
+  async function getNextPageAPI(nextPage, url, params) {
+    const constParams =
+      nextPage == "" ? { per_page: 15 } : { per_page: 15, page: nextPage };
+    const newParams = { ...params, ...constParams };
+    try {
+      const data = await get(url, newParams, {});
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
-    if (initData) {
-      const dataObj = unWrapData(initData);
-      //@ts-ignore
-      const NextPage = initData.next_page;
+    const initData = getNextPageAPI("", url, params);
+    initData.then((res) => {
+      const dataObj = unWrapData(res);
+      const newState = [...data, ...dataObj];
+      const NextPage = res.next_page;
       setNextPage(NextPage);
-      setData(dataObj);
-    }
-  }, [initData]);
+      setData(newState);
+    });
+  }, []);
 
   const fetchNewData = () => {
     if (!nextPage) return;

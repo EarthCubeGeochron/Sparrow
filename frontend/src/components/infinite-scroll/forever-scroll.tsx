@@ -2,12 +2,8 @@ import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import h from "@macrostrat/hyper";
 import { useReducer } from "react";
-import { createContext } from "react";
-import { useContext } from "react";
 import { useOnScreen } from "./useOnScreen";
 import "./main.styl";
-import { useAPIResult } from "@macrostrat/ui-components";
-import { ProjectInfoLink } from "~/model-views/project";
 import { Spinner } from "@blueprintjs/core";
 
 /**
@@ -43,11 +39,11 @@ const perPage = 15;
 
 /**
  *
- * This Component uses Intersection Observer to know when an element is being displayed
+ * @description This component uses Intersection Observer to know when an element is being displayed
  *  And when that item is being displayed state is updated by the reducer callback.
- * @param initialData: An array of data that can be mapped into the component provided
+ * @param {string[]}initialData: An array of data that can be mapped into the component provided. Array of Objects
  * @param component: A component that can take in the mapped data and format it into what the user wants to display
- *
+ * @param {function} fetch A function that will call an API to fetch the next page of data when intersection is observed
  */
 function ForeverScroll({ initialData, component, fetch }) {
   const [state, dispatch] = useReducer(reducer, {

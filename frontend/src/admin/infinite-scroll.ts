@@ -2,13 +2,7 @@ import h from "@macrostrat/hyper";
 import {
   ProjectInfoLink, //@ts-ignore
 } from "~/model-views/project";
-//import { ForeverScroll } from "~/components/infinite-scroll;";
-//import { InfiniteScrollView } from "@macrostrat/ui-components";
-import { useAPIResult } from "@macrostrat/ui-components";
-import { useState, useEffect } from "react";
-import { Spinner } from "@blueprintjs/core";
 import { SampleListCard } from "../model-views/sample/list";
-import { SessionInfoLink } from "../model-views/session/info-card";
 import { DataFilesCard } from "../model-views/data-files";
 import { SessionLinkCard } from "../model-views/data-files/page";
 import { FilterBox } from "../components/filter-list";
@@ -24,9 +18,8 @@ function unWrapProjectCardData(data) {
   return dataObj;
 }
 
-const projectParams = "nest=publication,session,sample&per_page=15";
+const projectParams = { nest: "publication,session,samnple" };
 const projectURL = "http://localhost:5002/api/v2/models/project";
-const projectNest = "publication,session,sample";
 
 const ProjectListComponent = () => {
   const filterFields = ["Name", "Samples"];
@@ -38,7 +31,6 @@ const ProjectListComponent = () => {
     ]),
     h(InfiniteAPIView, {
       url: projectURL,
-      nest: projectNest,
       unWrapData: unWrapProjectCardData,
       params: projectParams,
       component: ProjectInfoLink,
@@ -56,7 +48,6 @@ function unWrapSampleCardData(data) {
 
 const sampleURL = "http://localhost:5002/api/v2/models/sample";
 
-//   const { material, id, name } = props;
 function SampleListComponent() {
   const filterFields = ["Name", "Material", "id"];
 
@@ -66,9 +57,8 @@ function SampleListComponent() {
     ]),
     h(InfiniteAPIView, {
       url: sampleURL,
-      nest: "",
       unWrapData: unWrapSampleCardData,
-      params: "",
+      params: {},
       component: SampleListCard,
     }),
   ]);
@@ -89,8 +79,7 @@ function unWrapSessionCardData(data) {
 }
 
 const sessionURL = "http://localhost:5002/api/v2/models/session";
-const sessionParams = "nest=instrument,project,sample";
-const sessionNest = "instrument,project,sample";
+const sessionParams = { nest: "instrument,project,sample" };
 
 // http://localhost:5002/api/v2/models/session?nest=instrument,sample&per_page=15
 function SessionListComponent() {
@@ -102,7 +91,6 @@ function SessionListComponent() {
     ]),
     h(InfiniteAPIView, {
       url: sessionURL,
-      nest: sessionNest,
       unWrapData: unWrapSessionCardData,
       params: sessionParams,
       component: SessionLinkCard,
@@ -111,8 +99,7 @@ function SessionListComponent() {
 }
 
 const dataFileURL = "http://localhost:5002/api/v2/models/data_file";
-const dataFileParams = "nest=data_file_link,sample,session,project&per_page=15";
-const dataFileNest = "data_file_link,sampel,session,project";
+const dataFileParams = { nest: "data_file_link,sample,session,project" };
 
 function unWrapDataFileCardData(data) {
   const dataObj = data.data.map((obj) => {
@@ -131,7 +118,6 @@ function DataFilesListComponent() {
     ]),
     h(InfiniteAPIView, {
       url: dataFileURL,
-      nest: dataFileNest,
       unWrapData: unWrapDataFileCardData,
       params: dataFileParams,
       component: DataFilesCard,
