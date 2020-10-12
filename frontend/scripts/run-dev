@@ -1,0 +1,13 @@
+#!/bin/sh
+
+echo "Dev"
+printenv
+# Link @macrostrat/ui-components submodule from a mounted directory,
+# if it exists.
+ui_components=/app/_local_modules/ui-components
+if [ -f $ui_components/package.json ]; then
+  echo "Using a locally-linked version of @macrostrat/ui-components"
+  ln -sf /app/node_modules/@macrostrat/ui-components $ui_components
+fi
+
+webpack

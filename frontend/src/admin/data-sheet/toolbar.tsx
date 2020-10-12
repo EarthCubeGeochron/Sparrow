@@ -1,13 +1,9 @@
 import * as React from "react";
 import { useState } from "react";
 import { Dialog, Classes, Button } from "@blueprintjs/core";
-import {
-  SaveButton,
-  CancelButton,
-  DeleteButton,
-} from "@macrostrat/ui-components";
+import { SaveButton, CancelButton } from "@macrostrat/ui-components";
 
-const SubmitDialog = ({ onClick, content, className = null, disabled }) => {
+function SubmitDialog({ onClick, content, className = null, disabled }) {
   const [open, setOpen] = useState(false);
   return (
     <div>
@@ -36,7 +32,7 @@ const SubmitDialog = ({ onClick, content, className = null, disabled }) => {
       </Dialog>
     </div>
   );
-};
+}
 
 export function SheetToolbar(props) {
   const { onSubmit, onUndo, hasChanges } = props;

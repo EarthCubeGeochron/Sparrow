@@ -84,8 +84,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack -c _webpack",
-    "postinstall": "sed -i 's/var port = options/var port = socketOpts.port || options/g' node_modules/browser-sync/dist/connect-utils.js"
+    "dev": "webpack -c _webpack"
   },
   "moduleRoots": "./_webpack/custom-resolver.js",
   "author": "Daven Quinn",

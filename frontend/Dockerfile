@@ -5,4 +5,4 @@ WORKDIR /app
 COPY package.json /app
 RUN npm install --unsafe-perm
 COPY ./ /app/
-CMD webpack
+CMD /app/scripts/run-dev
