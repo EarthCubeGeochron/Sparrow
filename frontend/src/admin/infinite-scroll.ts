@@ -7,7 +7,6 @@ import { useAPIResult } from "@macrostrat/ui-components";
 import { useState, useEffect } from "react";
 import { Spinner } from "@blueprintjs/core";
 import { SampleListCard } from "../model-views/sample/list";
-import { SessionInfoLink } from "../model-views/session/info-card";
 import { DataFilesCard } from "../model-views/data-files";
 import { SessionLinkCard } from "../model-views/data-files/page";
 import { FilterBox } from "../components/filter-list";

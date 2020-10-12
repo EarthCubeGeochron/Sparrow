@@ -1,53 +1,21 @@
 import * as React from "react";
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
 import update from "immutability-helper";
 import h from "@macrostrat/hyper";
 import { Frame } from "~/frame";
-import { DataSheetContext, DataSheetProvider } from "./provider";
-import { SheetHeader } from "./header";
+import { DataSheetProvider } from "./provider";
+import { SheetToolbar } from "./toolbar";
 import { VirtualizedSheet } from "./virtualized";
-import {
-  MapSelector,
-  MaterialSuggest,
-  DoiSuggest,
-} from "./sheet-enter-components";
+import classNames from "classnames";
 import "./datasheet.css";
 import styles from "./module.styl";
-
-const Row = ({ row, children, className }) => {
-  const { rowHeight } = useContext(DataSheetContext);
-  return (
-    <tr style={{ height: rowHeight }}>
-      <td className="cell read-only">{row + 1}</td>
-      {children}
-    </tr>
-  );
-};
-
-const Sheet = ({ className, children, width }) => {
-  const { columns } = useContext(DataSheetContext);
-  return (
-    <table className={className} style={{ width }}>
-      <thead style={{ width }}>
-        <tr className="cell header" style={{ width }}>
-          <td>Index</td>
-          {columns.map((col) => (
-            <td key={col.name} style={{ width: col.width }}>
-              {col.name}
-            </td>
-          ))}
-        </tr>
-      </thead>
-      <tbody>{children}</tbody>
-    </table>
-  );
-};
+import { Row, Sheet } from "./components";
 
 const columnSpec = [
   { name: "Sample Name", key: "name", width: 1000 / 8 },
-  { name: "IGSN", key: "igsn", width: 0 },
-  { name: "Public", key: "is_public", width: 0 },
+  { name: "IGSN", key: "igsn", width: 50 },
+  { name: "Public", key: "is_public", width: 50 },
   { name: "Material", key: "material", width: 1000 / 8 },
   { name: "Latitude", key: "latitude", width: 1000 / 8 },
   { name: "Longitude", key: "longitude", width: 1000 / 8 },
@@ -108,7 +76,7 @@ function DataSheet() {
     setData(data);
   };
 
-  const onCellsChanged = (changes) => {
+  function onCellsChanged(changes) {
     /** Cell change function that uses immutability-helper */
     const spec = {};
     console.log(changes);
@@ -126,7 +94,7 @@ function DataSheet() {
     });
     console.log(spec);
     setData(update(data, spec));
-  };
+  }
 
   /** Builds the properties for the cell */
   const buildCellProps = (
@@ -140,7 +108,7 @@ function DataSheet() {
     // Check if values is the same as the initial data key
 
     const isChanged = value != initialData[row][key];
-    const className = isChanged ? "edited" : null;
+    const className = classNames({ edited: isChanged }, "cell");
     return { value, className };
   };
 
@@ -158,55 +126,15 @@ function DataSheet() {
       columns.map(({ key }, col) => buildCellProps(obj[key], row, key, col))
     //key is name of column
   );
-  console.log(cellData);
-
-  const dataEditorComponents = ({ row, col, value, onCommit, cell }) => {
-    const { key } = columns[col];
-    const components = {
-      name: h("div", [value]),
-      igsn: h("div", [value]),
-      is_public: h("div", [value]),
-      material: h(MaterialSuggest, {
-        defaultValue: value,
-        onCellsChanged,
-        onCommit,
-        row: row,
-        col: col,
-        cell: cell,
-      }),
-      latitude: h(MapSelector, {
-        onCellsChanged,
-        row,
-        col,
-        colTwo: col + 1,
-      }),
-      longitude: h(MapSelector, {
-        onCellsChanged: onCommit,
-        row,
-        col,
-        colTwo: col - 1,
-      }),
-      location_name: null,
-      project_name: h(DoiSuggest, {
-        defaultValue: value,
-        onCellsChanged,
-        onCommit,
-        row: row,
-        col: col,
-        cell: cell,
-      }),
-    };
-    return components[key];
-  };
 
   return (
     <DataSheetProvider columns={columns}>
       <div className={styles["data-sheet"]}>
-        <SheetHeader
+        <SheetToolbar
           onSubmit={handleSubmit}
           onUndo={handleUndo}
           hasChanges={initialData != data}
-        ></SheetHeader>
+        />
         <div className="sheet">
           <VirtualizedSheet
             data={cellData}
@@ -214,7 +142,7 @@ function DataSheet() {
             sheetRenderer={Sheet}
             rowRenderer={Row}
             onCellsChanged={onCellsChanged}
-            dataEditor={dataEditorComponents}
+            // dataEditor={dataEditorComponents}
           />
         </div>
       </div>

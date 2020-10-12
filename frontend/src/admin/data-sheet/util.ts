@@ -1,30 +1,35 @@
 import { useLayoutEffect, useEffect, useState, useCallback } from "react";
 
-// Should factor this into UI Components
-function useElementHeight(ref: React.RefObject<HTMLElement>): number[] | null {
-  const [height, setHeight] = useState<number>(null);
-  const [width, setWidth] = useState<number>(null);
+type ElementSize = {
+  height: number;
+  width: number;
+};
 
-  const setSize = useCallback(() => {
+// Should factor this into UI Components
+function useElementSize(
+  ref: React.RefObject<HTMLElement>,
+  trackWindowResize: boolean = true
+): ElementSize | null {
+  const [size, setSize] = useState<ElementSize>(null);
+
+  const sizeCallback = useCallback(() => {
     if (ref.current == null) return;
     const { height, width } = ref.current.getBoundingClientRect();
-    setHeight(height);
-    setWidth(width);
+    setSize({ height, width });
   }, [ref.current]);
 
-  useLayoutEffect(setSize, [ref.current]);
+  useLayoutEffect(sizeCallback, [ref.current]);
 
-  // Also respond on window resize
+  // Also respond on window resize (if "trackWindowResize" is set)
   useEffect(() => {
-    window.addEventListener("resize", setSize);
-    return function() {
-      window.removeEventListener("resize", setSize);
+    if (!trackWindowResize) return;
+    window.addEventListener("resize", sizeCallback);
+    return function () {
+      window.removeEventListener("resize", sizeCallback);
     };
   }, [ref.current]);
 
-  const dimensions = [height, width];
-
-  return dimensions;
+  return size;
 }
 
 function useScrollOffset(ref: React.RefObject<HTMLElement>): number {
@@ -38,4 +43,4 @@ function useScrollOffset(ref: React.RefObject<HTMLElement>): number {
   return offset;
 }
 
-export { useScrollOffset, useElementHeight };
+export { useScrollOffset, useElementSize };

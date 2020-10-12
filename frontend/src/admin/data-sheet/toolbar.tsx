@@ -38,7 +38,7 @@ const SubmitDialog = ({ onClick, content, className = null, disabled }) => {
   );
 };
 
-export function SheetHeader(props) {
+export function SheetToolbar(props) {
   const { onSubmit, onUndo, hasChanges } = props;
   var constant =
     "Are you sure you want to save your edits? All changes will be final. If you do not want to submit, click Cancel.";

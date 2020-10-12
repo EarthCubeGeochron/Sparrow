@@ -1,13 +1,22 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useContext, useRef, createContext, useState, useEffect } from "react";
-import { useElementHeight, useScrollOffset } from "./util";
+import { useContext, useRef, useState } from "react";
+import { useElementSize, useScrollOffset } from "./util";
 import ReactDataSheet from "react-datasheet";
 import { DataSheetContext } from "./provider";
 import styles from "./module.styl";
 const h = hyperStyled(styles);
 
+const defaultSize = { height: 20, width: 100 };
+
 function VirtualizedSheet(props) {
-  const { data, rowRenderer, sheetRenderer, onCellsChanged, ...rest } = props;
+  const {
+    data,
+    rowRenderer,
+    sheetRenderer,
+    onCellsChanged,
+    scrollBuffer = 50,
+    ...rest
+  } = props;
   const { rowHeight } = useContext(DataSheetContext);
 
   // { start: { i: number, j; number }, end: { i: number, j: number } }
@@ -18,14 +27,12 @@ function VirtualizedSheet(props) {
 
   const ref = useRef<HTMLDivElement>();
 
-  const [height, width] = useElementHeight(ref) ?? [100, 20];
-  console.log(width);
+  const { height, width } = useElementSize(ref) ?? defaultSize;
   const scrollOffset = useScrollOffset(ref);
-  const buffer = 50;
 
   const scrollerHeight = data.length * rowHeight;
   const percentage = scrollOffset / scrollerHeight;
-  const rowsToDisplay = Math.ceil((height + buffer) / rowHeight);
+  const rowsToDisplay = Math.ceil((height + scrollBuffer) / rowHeight);
   const rowOffset = Math.floor(percentage * (data.length - rowsToDisplay + 5));
 
   function virtualRowRenderer({ row, children, className }) {
@@ -43,6 +50,7 @@ function VirtualizedSheet(props) {
   const lastRow = Math.min(rowOffset + rowsToDisplay, data.length - 1);
 
   function onSelect({ start, end }) {
+    /** Offset the row selection by the displayed range of rows */
     const startI = start.i + rowOffset;
     const startJ = start.j;
     const endI = end.i + rowOffset;
@@ -54,21 +62,6 @@ function VirtualizedSheet(props) {
     console.log({ start, end });
     setSelection({ offset: selected, notOffset: { start, end } });
   }
-
-  // const offSetSelection = () => {
-  //   if (selection) {
-  //     return {
-  //       start: { i: selection.start.i - rowOffset, j: selection.start.j },
-  //       end: { i: selection.end.i - rowOffset, j: selection.end.j },
-  //     };
-  //   }
-  // };
-
-  //let offsetSelection = offSetSelection();
-
-  console.log(selection.offset);
-  // console.log(offsetSelection);
-  console.log(rowOffset);
 
   return h("div.virtualized-sheet", { ref }, [
     h("div.ui", { style: { height, width } }, [
