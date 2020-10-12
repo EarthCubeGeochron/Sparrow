@@ -1,3 +1,5 @@
+import subprocess
+
 from rich import print
 from datetime import datetime
 
@@ -58,7 +60,7 @@ class PyChronJSONImporter:
                 datum.append(d)
         return {"datum": datum, "analysis_name": "Ages"}
 
-    def import_file(self, data):
+    def import_file(self, fn, data):
         """Build basic nested JSON representation of a PyChron IA file."""
         analyses = [self.transform_analysis(a) for a in data["analyses"]]
         analyses.append(self.transform_ages(data["preferred"]["ages"]))
@@ -74,7 +76,16 @@ class PyChronJSONImporter:
             res[k] = str(data[k])
 
         # There is no _DATE_ in the IA file!
-        res["date"] = datetime.min.isoformat()
+#        res["date"] = datetime.min.isoformat()
+
+        # extract date from commit
+        DT_FMT ='%Y-%m-%d %H:%M:%S'
+        ret = subprocess.check_output(
+            ['git', 'log', '-1', '--format="%ad"', '--date=format:{}'.format(DT_FMT), '--', fn])
+
+        date = ret.decode('utf8').strip()[1:-1]
+        date = datetime.strptime(date, DT_FMT)
+        ret['date'] = date.isoformat()
 
         res["sample"] = self.transform_sample(data["sample_metadata"])
 
