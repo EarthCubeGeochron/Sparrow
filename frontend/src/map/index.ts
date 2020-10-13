@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import styles from "./mappages.module.css";
 import { useToggle } from "./components/APIResult";
 import { useDarkMode } from "@macrostrat/ui-components";
+import { useEffect, useState } from "react";
 
 const h = hyperStyled(styles);
 
@@ -26,8 +27,16 @@ const MapNavbar = function(props) {
 
 const MapHome = (props) => {
   const link = LocationLink(props);
+  const [style, setStyle] = useState("");
 
   const { isEnabled } = useDarkMode();
+
+  useEffect(() => {
+    if (isEnabled) {
+      setStyle("mapbox://styles/mapbox/dark-v10");
+    }
+    setStyle("mapbox://styles/mapbox/outdoors-v9");
+  }, [isEnabled]);
 
   const StandMapMode = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
