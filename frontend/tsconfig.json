@@ -3,12 +3,14 @@
   "allowJS": true,
   "checkJS": true,
   "compilerOptions": {
+    "baseUrl": ".",
     "moduleResolution": "Node",
     "declaration": true,
     "sourceMap": true,
     "declarationDir": "dist/types",
     "lib": ["es6", "es7", "esnext", "dom"],
     "jsx": "react",
+    "esModuleInterop": true,
     "typeRoots": ["node_modules/@types"],
     "paths": {
       "~/*": ["src/*"]

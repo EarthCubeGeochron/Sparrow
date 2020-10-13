@@ -22,7 +22,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const SessionMatch = function({ match }) {
+const SessionMatch = function ({ match }) {
   const { id } = match.params;
   return h(SessionComponent, { id });
 };
@@ -96,4 +96,5 @@ const Catalog = ({ base }) =>
     h(CatalogBody, { base }),
   ]);
 
-export { Catalog, DataModelLinks };
+export default Catalog;
+export { DataModelLinks };
