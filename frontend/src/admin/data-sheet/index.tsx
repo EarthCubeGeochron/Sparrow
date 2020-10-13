@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
 import update from "immutability-helper";
 import h from "@macrostrat/hyper";
@@ -107,6 +107,21 @@ function DataSheet() {
 
   const [columns, setColumns] = useState(columnSpec);
 
+  const reorderColumns = useCallback(
+    (dragIndex: number, hoverIndex: number) => {
+      /** Reorder columns with drag/drop */
+      setColumns(
+        update(columns, {
+          $splice: [
+            [dragIndex, 1],
+            [hoverIndex, 0, columns[dragIndex]],
+          ],
+        })
+      );
+    },
+    [columns]
+  );
+
   useEffect(() => {
     console.log(size);
     const col = apportionWidth(initialData, columnSpec, size.width);
@@ -184,7 +199,7 @@ function DataSheet() {
     //key is name of column
   );
 
-  return h(DataSheetProvider, { columns }, [
+  return h(DataSheetProvider, { columns, reorderColumns }, [
     <div className={styles["data-sheet"]}>
       <SheetToolbar
         onSubmit={handleSubmit}
