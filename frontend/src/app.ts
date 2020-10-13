@@ -2,7 +2,6 @@ import h, { C, compose } from "@macrostrat/hyper";
 import { useEffect } from "react";
 import { join } from "path";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
-import { HomePage } from "./homepage";
 import loadable from "@loadable/component";
 
 import siteContent from "site-content";
@@ -11,15 +10,19 @@ import { Intent } from "@blueprintjs/core";
 import { DarkModeManager, PageRoute, NoMatchPage } from "~/util";
 import { APIProvider } from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
-import { APIExplorerV2 } from "./api-v2";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
-import { Catalog } from "./catalog";
 import { AdminRoute } from "./admin";
 import { PageStyle } from "~/components/page-skeleton";
-import NewSample from "./new-sample/new-sample";
+import HomePage from "./homepage";
+import Catalog from "./catalog";
 
 //import { MapSelector } from "./data-sheet/sheet-enter-components";
+
+const APIExplorerV2 = loadable(async function () {
+  const module = await import("./api-v2");
+  return module.APIExplorerV2;
+});
 
 const MapPage = loadable(async function () {
   const module = await import("./map");
@@ -49,11 +52,6 @@ function AppRouter(props) {
       h(PageRoute, {
         path: "/catalog",
         render: () => h(Catalog, { base: "/catalog" }),
-      }),
-      h(PageRoute, {
-        path: "/new-sample",
-        style: PageStyle.WIDE,
-        component: NewSample,
       }),
       h(PageRoute, {
         path: "/map",

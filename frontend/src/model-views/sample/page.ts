@@ -5,27 +5,15 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import * as React from "react";
-import { useState, ReactNode } from "react";
 
 import hyper from "@macrostrat/hyper";
-import {
-  APIResultView,
-  LinkCard,
-  useAPIResult,
-} from "@macrostrat/ui-components";
-import { Link } from "react-router-dom";
+import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
 import { SampleContextMap } from "app/components";
 import { GeoDeepDiveCard } from "./gdd-card";
 import styles from "./module.styl";
 import { MapLink } from "app/map";
 import { MapToaster } from "../../map/map-area";
-import {
-  Button,
-  Icon,
-  ControlGroup,
-  InputGroup,
-  Dialog,
-} from "@blueprintjs/core";
+import { Button, ControlGroup, InputGroup } from "@blueprintjs/core";
 import {
   MapSelector,
   MaterialSuggest,
@@ -128,7 +116,7 @@ const Parameter = ({ name, value, ...rest }) => {
   ]);
 };
 
-const ProjectLink = function({ d, onEdit, changeEdit }) {
+const ProjectLink = function ({ d, onEdit, changeEdit }) {
   const { project_name, project_id } = d;
   const to = useModelURL(`/project/${project_id}`);
 
@@ -158,7 +146,7 @@ const ProjectInfo = ({ sample: d, onEdit, changeEdit }) =>
     h("p.value", [h(ProjectLink, { d, onEdit, changeEdit })]),
   ]);
 
-const LocationBlock = function(props) {
+const LocationBlock = function (props) {
   const [open, toggleOpen] = useToggle(false);
   console.log(open);
   const { sample } = props;
@@ -187,7 +175,7 @@ const LocationBlock = function(props) {
   ]);
 };
 
-const Material = function(props) {
+const Material = function (props) {
   const { material, changeEdit, onEdit } = props;
   if (onEdit) {
     return h("div", [h("h4.subtitle", ["Add Material"]), h(MaterialSuggest)]);
@@ -269,7 +257,7 @@ function SampleTags(props) {
   }
 }
 
-const SamplePage = function(props) {
+const SamplePage = function (props) {
   const [edit, setEdit] = React.useState(false);
 
   const changeEdit = () => {

@@ -1,19 +1,8 @@
-/*
- * decaffeinate suggestions:
- * DS001: Remove Babel/TypeScript constructor workaround
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import MapGl, { Marker, Popup, FlyToInterpolator } from "react-map-gl";
-import h from "react-hyperscript";
-import React, { useState } from "react";
+import MapGl, { Marker } from "react-map-gl";
+import h from "@macrostrat/hyper";
+import { useState } from "react";
 import { APIResultView } from "@macrostrat/ui-components";
-import "./mapbox-gl.css";
 import styled from "@emotion/styled";
-import { Popover, Text } from "@blueprintjs/core";
-import Tippy from "@tippy.js/react";
-import useSuperCluster from "use-supercluster";
 
 const MarkerInner = styled.button`\
 display: block;
@@ -73,18 +62,15 @@ function GLMap() {
   };
 
   const { accessToken, ...rest } = this.props;
-  console.log(accessToken);
-  return (
-    <MapGl
-      {...rest}
-      mapStyle={"mapbox://styles/mapbox/outdoors-v9"}
-      mapboxApiAccessToken={accessToken}
-      width="800"
-      height="400"
-      {...viewport}
-      onViewportChange={onViewportChange}
-    ></MapGl>
-  );
+  return h(MapGl, {
+    ...rest,
+    mapStyle: "mapbox://styles/mapbox/outdoors-v9",
+    mapboxApiAccessToken: accessToken,
+    width: "800",
+    height: "400",
+    ...viewport,
+    onViewportChange,
+  });
 }
 
 export { GLMap };
