@@ -5,13 +5,17 @@ from datetime import datetime
 
 
 class PyChronJSONImporter:
-    """Basic transformation class for PyChron interpreted age data files"""
+    """Basic transformation class for PyChron interpreted age data files
+    to nested JSON.
+    """
 
     def __init__(self):
         pass
 
     def datum_type_for(self, key):
-        # Right now we phone this in with "dimensionless" for everything
+        if key == "age":
+            # We should be more specific about step ages
+            key = "step_age"
         if key.endswith("age"):
             return {"unit": "Ma", "parameter": key}
         return {"unit": "unknown", "parameter": key}
@@ -60,6 +64,17 @@ class PyChronJSONImporter:
                 datum.append(d)
         return {"datum": datum, "analysis_name": "Ages"}
 
+    def get_commit_date(self, fn):
+        # There is no _DATE_ in the IA file, so we use the commit date
+        # as a proxy.
+        DT_FMT = "%Y-%m-%d %H:%M:%S"
+        ret = subprocess.check_output(
+            ["git", "log", "-1", '--format="%ad"', f"--date=format:{DT_FMT}", "--", fn,]
+        )
+
+        date = ret.decode("utf8").strip()[1:-1]
+        return datetime.strptime(date, DT_FMT)
+
     def import_file(self, fn, data):
         """Build basic nested JSON representation of a PyChron IA file."""
         analyses = [self.transform_analysis(a) for a in data["analyses"]]
@@ -75,17 +90,7 @@ class PyChronJSONImporter:
         for k in ["name", "uuid"]:
             res[k] = str(data[k])
 
-        # There is no _DATE_ in the IA file!
-#        res["date"] = datetime.min.isoformat()
-
-        # extract date from commit
-        DT_FMT ='%Y-%m-%d %H:%M:%S'
-        ret = subprocess.check_output(
-            ['git', 'log', '-1', '--format="%ad"', '--date=format:{}'.format(DT_FMT), '--', fn])
-
-        date = ret.decode('utf8').strip()[1:-1]
-        date = datetime.strptime(date, DT_FMT)
-        ret['date'] = date.isoformat()
+        ret["date"] = self.get_commit_date(fn).isoformat()
 
         res["sample"] = self.transform_sample(data["sample_metadata"])
 
