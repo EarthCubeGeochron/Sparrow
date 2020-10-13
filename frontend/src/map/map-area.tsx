@@ -10,7 +10,7 @@ import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
-import { useAPIResult } from "@macrostrat/ui-components";
+import { useAPIResult, use } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
 import styles from "./mappages.module.css";
 import { SiteTitle } from "app/components";
@@ -39,7 +39,7 @@ export function MapPanel({
   latitude = 0,
   longitude = 0,
   zoom = 1,
-  mapstyle = "mapbox://styles/mapbox/outdoors-v9",
+  mapstyle,
 }: MapProps) {
   const initialState = {
     MapStyle: mapstyle,
@@ -81,7 +81,7 @@ export function MapPanel({
     const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
     setViewport({ ...viewport, zoom, latitude, longitude });
   }
-  
+
   useEffect(() => {
     const onMap = window.location.pathname == "/map";
     if (!onMap) {
@@ -161,7 +161,7 @@ export function MapPanel({
                 hide={hide_filter}
                 MapStyle={state.MapStyle}
                 chooseMapStyle={chooseMapStyle}
-                mapstyles={mapStyles}
+                //mapstyles={mapStyles}
                 showMarkers={state.showMarkers}
                 toggleShowMarkers={toggleShowMarkers}
               ></LayerMenu>

@@ -5,8 +5,15 @@
  */
 import h from "react-hyperscript";
 import styled from "@emotion/styled";
-import { Component } from "react";
-import { Callout, Icon, Card, NonIdealState } from "@blueprintjs/core";
+import { Component, useState } from "react";
+import {
+  Callout,
+  Icon,
+  Card,
+  NonIdealState,
+  Drawer,
+  Button,
+} from "@blueprintjs/core";
 import {
   CollapsePanel,
   APIResultView,
@@ -82,13 +89,20 @@ width: 20em;\
 `;
 
 function GeoDeepDiveCard(props) {
+  const [open, setOpen] = useState(false);
+
+  const toggleOpen = () => {
+    setOpen(!open);
+  };
+
   const { sample_name } = props;
   const route = "https://geodeepdive.org/api/v1/snippets";
   const params = { term: sample_name };
-  return h(
-    CollapsePanel,
-    { title: "GeoDeepDive results", storageID: "gdd-results" },
-    h(ResultsPanel, [
+  return (
+    h(Button, { onClick: toggleOpen, text: "GeoDeepDive Search" }),
+    h(
+      Drawer,
+      { isCloseButtonShown: true, onClose: toggleOpen },
       h(
         InfoCallout,
         {
@@ -109,8 +123,8 @@ publications`
           success: { data },
         } = res;
         return h(SnippetList, { items: data });
-      }),
-    ])
+      })
+    )
   );
 }
 

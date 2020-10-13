@@ -27,6 +27,7 @@ import {
   ControlGroup,
   InputGroup,
   Dialog,
+  EditableText,
 } from "@blueprintjs/core";
 import {
   MapSelector,
@@ -46,10 +47,14 @@ import {
 } from "@macrostrat/ui-components";
 import { EditNavBar, ModelEditableText } from "../project/editor";
 import { SessionInfo } from "../data-files/page";
+import { isSameDay } from "date-fns";
 
 const h = hyper.styled(styles);
 
 export const DOIPaperAdd = (props) => {
+  const { isEditing, hasChanges, actions } = React.useContext(
+    ModelEditorContext
+  );
   const { setPubs } = props;
   const [search, setSearch] = React.useState<string | "">();
   const [click, setClick] = React.useState(false);
@@ -62,10 +67,12 @@ export const DOIPaperAdd = (props) => {
 
   React.useEffect(() => {
     if (click && search.length > 0) {
-      const title = publication.success.data.map((pub) => {
-        return { title: pub.title, doi: search };
-      });
-      setPubs(title);
+      try {
+        const title = publication.success.data.map((pub) => {
+          return { title: pub.title, doi: search };
+        });
+        setPubs(title);
+      } catch (error) {}
     }
   }, [click]);
 
@@ -85,6 +92,9 @@ export const DOIPaperAdd = (props) => {
 };
 
 const Publications = (props) => {
+  const { isEditing, hasChanges, actions } = React.useContext(
+    ModelEditorContext
+  );
   const { publication, onEdit, changeEdit } = props;
   const [pubs, setPubs] = React.useState([]);
   console.log(pubs);
@@ -103,7 +113,7 @@ const Publications = (props) => {
     setPubs([...pubs, ...newPubs]);
   };
 
-  if (!onEdit && pubs.length > 0) {
+  if ((!onEdit && pubs.length > 0) || (!isEditing && pubs.length > 0)) {
     return h("div", [
       h("h4.subtitle", ["Publications"]),
       pubs.map((pub) => {
@@ -115,7 +125,7 @@ const Publications = (props) => {
       }),
     ]);
   }
-  if (onEdit) {
+  if (isEditing) {
     return h("div", [
       h("h4.subtitle", ["Add Publications Publications"]),
       h(DOIPaperAdd, { setPubs: addPubs }),
@@ -142,6 +152,9 @@ const Parameter = ({ name, value, ...rest }) => {
 };
 
 const ProjectLink = function({ d, onEdit, changeEdit }) {
+  const { isEditing, hasChanges, actions } = React.useContext(
+    ModelEditorContext
+  );
   const { project_name, project_id } = d;
   const to = useModelURL(`/project/${project_id}`);
 
@@ -152,9 +165,9 @@ const ProjectLink = function({ d, onEdit, changeEdit }) {
       ["Add Projects"]
     );
   }
-  if (onEdit) {
+  if (onEdit || isEditing) {
   }
-  if (!onEdit) {
+  if (!onEdit || !isEditing) {
     return h(
       LinkCard,
       {
@@ -172,11 +185,15 @@ const ProjectInfo = ({ sample: d, onEdit, changeEdit }) =>
   ]);
 
 const LocationBlock = function(props) {
+  const { isEditing, hasChanges, actions } = React.useContext(
+    ModelEditorContext
+  );
   const [open, toggleOpen] = useToggle(false);
   console.log(open);
-  const { sample } = props;
-  const { geometry, location_name } = sample;
-  if (geometry == null) {
+
+  const { location, location_name } = props;
+
+  if (location == null) {
     return h("div", [
       ///h("h4.subtitle", ["Set Latitude and Longitude"]),
       h(Button, {
@@ -188,11 +205,11 @@ const LocationBlock = function(props) {
     ]);
   }
   const zoom = 8;
-  const [longitude, latitude] = geometry.coordinates;
+  const [longitude, latitude] = location.coordinates;
   return h("div.location", [
     h(MapLink, { zoom, latitude, longitude }, [
       h(SampleContextMap, {
-        center: geometry.coordinates,
+        center: location.coordinates,
         zoom,
       }),
     ]),
@@ -202,10 +219,13 @@ const LocationBlock = function(props) {
 
 const Material = function(props) {
   const { material, changeEdit, onEdit } = props;
-  if (onEdit) {
+  const { isEditing, hasChanges, actions } = React.useContext(
+    ModelEditorContext
+  );
+  if (onEdit || isEditing) {
     return h("div", [h("h4.subtitle", ["Add Material"]), h(MaterialSuggest)]);
   }
-  if (!onEdit) {
+  if (!onEdit || !isEditing) {
     return h(Parameter, {
       name: "Material",
       value:
@@ -217,35 +237,8 @@ const Material = function(props) {
   }
 };
 
-const EditButton = (props) => {
-  const { onClick, onEdit } = props;
-  if (onEdit) {
-    return h("div", [
-      h(Button, {
-        minimal: true,
-        icon: "floppy-disk",
-        text: "Save",
-        onClick,
-        intent: "success",
-      }),
-      h(Button, {
-        minimal: true,
-        text: "Cancel",
-        onClick,
-        intent: "danger",
-      }),
-    ]);
-  }
-  return h(Button, {
-    onClick,
-    minimal: true,
-    icon: "edit",
-    text: "Edit",
-  });
-};
-
-function SampleTags(props) {
-  const { onEdit, changeEdit } = props;
+function SampleTags() {
+  const [onEdit, setOnEdit] = useState(false);
   const { isEditing, hasChanges, actions } = React.useContext(
     ModelEditorContext
   );
@@ -271,16 +264,20 @@ function SampleTags(props) {
   if (!onEdit || !isEditing) {
     return h("div", [
       h("h4.subtitle", ["Sample Tags"]),
-      h(Button, { minimal: true, rightIcon: "plus", onClick: changeEdit }, [
-        "Add Tags",
-      ]),
+      h(
+        Button,
+        { minimal: true, rightIcon: "plus", onClick: () => setOnEdit(true) },
+        ["Add Tags"]
+      ),
     ]);
   }
 }
 
 function Sessions(props) {
+  const { isEditing } = useModelEditor();
+
   const { session } = props;
-  if (!session) {
+  if (session.length == 0 && isEditing) {
     return h("div", "Add Session");
   }
   console.log(session);
@@ -291,12 +288,21 @@ function Sessions(props) {
 }
 
 function MetadataHelpers(props) {
+  const { isEditing } = useModelEditor();
   const { name } = props;
-  return h("div", [
-    "Metadata Helpers:",
-    //  h(GeoDeepDiveCard, { name }),
-    h(GeologicFormationSelector),
-  ]);
+  if (!isEditing) {
+    return h("div", { style: { paddingTop: "30px" } }, [
+      "No Geologic Formation",
+    ]);
+  }
+  if (isEditing) {
+    return h("div", { style: { paddingTop: "30px" } }, [
+      "Metadata Helpers:",
+      //  h(GeoDeepDiveCard, { name }),
+      h(GeologicFormationSelector),
+      h(GeoDeepDiveCard, { sample_name: name }),
+    ]);
+  }
 }
 
 const SamplePage = function(props) {
@@ -324,25 +330,29 @@ const SamplePage = function(props) {
 
   //const { match } = props;
   const { data: sample } = props;
-  const { name, material, session } = sample.data;
-  //console.log(name);
+  const { name, material, session, location, location_name } = sample.data;
+  console.log(sample);
   return h(
     ModelEditor,
     {
-      model: sample,
+      model: sample.data,
       canEdit: login,
       persistChanges: () => null,
     },
     [
       h("div.sample", [
-        h("h2.page-type", { style: { display: "flex" } }, [
-          "Sample",
-          h(EditButton, { onClick: changeEdit, onEdit: edit }),
-          h(EditNavBar, { header: "Manage Sample" }),
-        ]),
+        h(
+          "h2.page-type",
+          { style: { display: "flex", justifyContent: "center" } },
+          [h(EditNavBar, { header: "Manage Sample" })]
+        ),
         h("div.flex-row", [
           h("div.info-block", [
-            h("h1", name),
+            h(ModelEditableText, {
+              is: "h3",
+              field: "name",
+              multiline: true,
+            }),
             h("div.basic-info", [
               h(ProjectInfo, { sample, onEdit: edit, changeEdit }),
               h(Material, { material, changeEdit, onEdit: edit }),
@@ -353,11 +363,22 @@ const SamplePage = function(props) {
               h(SampleTags, { onEdit: edit, changeEdit }),
             ]),
           ]),
-          h(LocationBlock, { sample }),
-          h(MetadataHelpers, { sample_name: name }),
+          h(
+            "div",
+            {
+              style: {
+                display: "flex",
+                flexDirection: "column",
+                paddingTop: "30px",
+              },
+            },
+            [
+              h(LocationBlock, { location, location_name }),
+              h(MetadataHelpers, { sample_name: name }),
+            ]
+          ),
         ]),
         // h("h3", "Metadata helpers"),
-        h(GeoDeepDiveCard, { sample_name: name }),
         // find a better place for this
       ]),
     ]

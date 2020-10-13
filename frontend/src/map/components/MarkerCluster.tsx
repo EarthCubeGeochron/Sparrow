@@ -88,7 +88,8 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
                   width: `${20 + (pointCount / markers.length) * 250}px`,
                   height: `${20 + (pointCount / markers.length) * 250}px`,
                 }}
-                onClick={() => {
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
                   const expansionZoom = Math.min(
                     supercluster.getClusterExpansionZoom(cluster.id),
                     5
