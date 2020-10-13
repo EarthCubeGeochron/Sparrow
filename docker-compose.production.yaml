@@ -9,7 +9,3 @@ services:
     restart: unless-stopped
   db:
     restart: unless-stopped
-  frontend:
-    build:
-      target: production
-    command: webpack

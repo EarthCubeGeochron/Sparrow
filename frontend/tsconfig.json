@@ -7,6 +7,7 @@
     "declaration": true,
     "sourceMap": true,
     "declarationDir": "dist/types",
+    "lib": ["es6", "es7", "esnext", "dom"],
     "jsx": "react",
     "typeRoots": ["node_modules/@types"],
     "paths": {

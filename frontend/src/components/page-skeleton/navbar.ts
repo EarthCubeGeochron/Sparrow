@@ -32,7 +32,7 @@ function AppNavbar({ children, fullTitle, subtitle, ...rest }) {
     ]),
     h("div.navbar-spacer"),
     h(Navbar.Group, [
-      h(DarkModeButton, { minimal: true }),
+      h(DarkModeButton, { minimal: true, active: false }),
       h(AuthStatus, { className: "auth-right" }),
     ]),
   ]);

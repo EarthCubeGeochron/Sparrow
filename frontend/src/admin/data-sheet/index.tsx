@@ -13,14 +13,14 @@ import styles from "./module.styl";
 import { Row, Sheet } from "./components";
 
 const columnSpec = [
-  { name: "Sample Name", key: "name", width: 1000 / 8 },
+  { name: "Sample Name", key: "name", width: 300 },
   { name: "IGSN", key: "igsn", width: 50 },
   { name: "Public", key: "is_public", width: 50 },
-  { name: "Material", key: "material", width: 1000 / 8 },
+  { name: "Material", key: "material", width: 300 },
   { name: "Latitude", key: "latitude", width: 1000 / 8 },
   { name: "Longitude", key: "longitude", width: 1000 / 8 },
   { name: "Location name", key: "location_name", width: 1000 / 8 },
-  { name: "Project", key: "project_name", width: null },
+  { name: "Project", key: "project_name", width: 1000 },
 ];
 
 function unwrapSampleData(sampleData) {

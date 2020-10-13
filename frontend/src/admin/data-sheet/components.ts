@@ -4,9 +4,9 @@ import { DataSheetContext } from "./provider";
 
 function Row({ row, children, className }) {
   const { rowHeight } = useContext(DataSheetContext);
-  const style = { height: rowHeight };
+  const style = { height: rowHeight, width: 50 };
   return h("tr", { style, className }, [
-    h("td", { className: "cell read-only" }, row + 1),
+    h("td.index-cell", { className: "cell read-only" }, row + 1),
     children,
   ]);
 }
@@ -34,7 +34,7 @@ function Header({ width }) {
 
   return h("thead", { style }, [
     h("tr", { className: "header", style }, [
-      h("td", "Index"),
+      h("td.index-column", "Index"),
       columns.map((col) => h(HeaderCell, { col })),
     ]),
   ]);

@@ -1,5 +1,4 @@
 let path = require("path");
-
 const { EnvironmentPlugin } = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
@@ -30,7 +29,7 @@ let baseConfig = {
   devtool: "source-map",
   resolve: {
     // Resolve node modules from Sparrow's own node_modules if not found in plugins
-    modules: ["node_modules", relativePath("node_modules")],
+    modules: ["_local_modules", "node_modules", relativePath("node_modules")],
     extensions: [
       ".ts",
       ".tsx",

@@ -110,7 +110,7 @@ services:
       # A folder for a testing version of the @macrostrat/ui-components
       # Javascript library that will be linked into the container at runtime
       # to support tandem development within Docker
-      - ${SPARROW_UI_COMPONENTS:-placeholder}:/app/_local_modules/ui-components:ro
+      - ${SPARROW_UI_COMPONENTS:-placeholder}:/app/_local_modules/@macrostrat/ui-components:ro
   api-tests:
     build: api-tests
     # A placeholder command
