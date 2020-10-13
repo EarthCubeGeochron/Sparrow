@@ -3,7 +3,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { Button, Icon } from "@blueprintjs/core";
 import styled from "@emotion/styled";
 import { ProjectMap } from "./map";
-import { EditableProjectDetails } from "./editor";
+import { EditableProjectDetails, EditNavBar } from "./editor";
 import { SampleCard, AddSampleCard } from "../sample/detail-card";
 import { SampleSelectDialog } from "./sample-select";
 import "../main.styl";

@@ -111,11 +111,21 @@ export const Samples = (props) => {
   ]);
 };
 
-const SessionInfo = (props) => {
-  const { session_id, technique, target, session_date, analysis } = props;
-  const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
+/**
+ *
+ * @param props session_id, technique, target, session_date, analysis
+ */
+export const SessionInfo = (props) => {
+  const {
+    session_id,
+    technique,
+    target,
+    session_date,
+    //analysis,
+  } = props;
+  //const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
   return h("div", { className: styles.sessionContainer }, [
-    h("h3", ["Session: " + analysis.length + " " + analysisList]),
+    // h("h3", ["Session: " + analysis.length + " " + analysisList]),
     h(SessionLinkCard, { session_id, target, technique, session_date }),
   ]);
 };

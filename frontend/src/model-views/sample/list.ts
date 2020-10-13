@@ -67,13 +67,16 @@ interface sample {
 }
 const SampleComponent = function(props: sample) {
   const { id } = props;
-  const data = useAPIResult("/sample", { id });
+
+  const url = `http://localhost:5002/api/v2/models/sample/${id}`;
+
+  const data = useAPIResult(url, { nest: "session" });
   if (id == null || data == null) {
     return null;
   }
 
-  const sample = data[0];
-  return h("div.data-view.project", null, h(SamplePage, { sample }));
+  //const sample = data[0];
+  return h("div.data-view.project", null, h(SamplePage, { data }));
 };
 
 function SampleMatch() {

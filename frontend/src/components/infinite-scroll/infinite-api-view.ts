@@ -2,21 +2,8 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
 import h from "@macrostrat/hyper";
-import {
-  useAPIResult,
-  useAPIActions,
-  useAPIHelpers,
-} from "@macrostrat/ui-components";
+import { useAPIActions } from "@macrostrat/ui-components";
 import { Spinner } from "@blueprintjs/core";
-
-// function unWrapData(data, destructure, optionalLogic) {
-//   const dataObj = data.data.map((obj) => {
-//     const destructure = obj;
-//     optionalLogic;
-//     return { ...destructure, ...optionalLogic };
-//   });
-//   return dataObj;
-// }
 
 /**@description function to implement the infinite scroll component with certain API views
  *
@@ -80,6 +67,7 @@ function InfiniteAPIView({ url, unWrapData, params, component }) {
       setData(newState);
     });
   };
+
   return data.length > 0
     ? h(ForeverScroll, {
         initialData: data,

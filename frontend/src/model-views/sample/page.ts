@@ -6,12 +6,14 @@
  */
 import * as React from "react";
 import { useState, ReactNode } from "react";
-
+import { useAuth } from "~/auth";
 import hyper from "@macrostrat/hyper";
 import {
   APIResultView,
+  ModelEditorContext,
   LinkCard,
   useAPIResult,
+  useModelEditor,
 } from "@macrostrat/ui-components";
 import { Link } from "react-router-dom";
 import { SampleContextMap } from "app/components";
@@ -33,6 +35,17 @@ import {
 import { useToggle } from "../../map/components/APIResult";
 import { MultipleSelectFilter } from "../../filter/components";
 import { useModelURL } from "~/util/router";
+import { SampleEditing } from "./editor";
+import { GeologicFormationSelector } from "../../filter/components/MultiSelect";
+import {
+  ModelEditor,
+  ModelEditButton,
+  CancelButton,
+  SaveButton,
+  APIHelpers,
+} from "@macrostrat/ui-components";
+import { EditNavBar, ModelEditableText } from "../project/editor";
+import { SessionInfo } from "../data-files/page";
 
 const h = hyper.styled(styles);
 
@@ -204,15 +217,6 @@ const Material = function(props) {
   }
 };
 
-const Sessions = (props) => {
-  const { session, setEdit, onEdit } = props;
-  return h(Parameter, {
-    name: "Session",
-    value: session || h("em", "None"),
-    setEdit,
-  });
-};
-
 const EditButton = (props) => {
   const { onClick, onEdit } = props;
   if (onEdit) {
@@ -242,6 +246,11 @@ const EditButton = (props) => {
 
 function SampleTags(props) {
   const { onEdit, changeEdit } = props;
+  const { isEditing, hasChanges, actions } = React.useContext(
+    ModelEditorContext
+  );
+  console.log(isEditing);
+
   const tags = [
     "Needs Work",
     "Check Location",
@@ -250,7 +259,7 @@ function SampleTags(props) {
     "Add material",
   ];
 
-  if (onEdit) {
+  if (onEdit || isEditing) {
     return h("div", [
       h("h4.subtitle", ["Sample Tags"]),
       h(MultipleSelectFilter, {
@@ -259,7 +268,7 @@ function SampleTags(props) {
       }),
     ]);
   }
-  if (!onEdit) {
+  if (!onEdit || !isEditing) {
     return h("div", [
       h("h4.subtitle", ["Sample Tags"]),
       h(Button, { minimal: true, rightIcon: "plus", onClick: changeEdit }, [
@@ -269,8 +278,36 @@ function SampleTags(props) {
   }
 }
 
+function Sessions(props) {
+  const { session } = props;
+  if (!session) {
+    return h("div", "Add Session");
+  }
+  console.log(session);
+  return session.map((obj) => {
+    const { id: session_id, technique, target, date: session_date } = obj;
+    return h(SessionInfo, { session_id, technique, target, session_date });
+  });
+}
+
+function MetadataHelpers(props) {
+  const { name } = props;
+  return h("div", [
+    "Metadata Helpers:",
+    //  h(GeoDeepDiveCard, { name }),
+    h(GeologicFormationSelector),
+  ]);
+}
+
 const SamplePage = function(props) {
   const [edit, setEdit] = React.useState(false);
+  const { login } = useAuth();
+
+  const { isEditing, hasChanges, actions } = React.useContext(
+    ModelEditorContext
+  );
+  const changed = hasChanges;
+  console.log(isEditing);
 
   const changeEdit = () => {
     setEdit(!edit);
@@ -286,30 +323,45 @@ const SamplePage = function(props) {
   }, [window.location.pathname]);
 
   //const { match } = props;
-  const { sample } = props;
-  const { name, material } = sample;
-  return h("div.sample", [
-    h("h2.page-type", { style: { display: "flex" } }, [
-      "Sample",
-      h(EditButton, { onClick: changeEdit, onEdit: edit }),
-    ]),
-    h("div.flex-row", [
-      h("div.info-block", [
-        h("h1", name),
-        h("div.basic-info", [
-          h(ProjectInfo, { sample, onEdit: edit, changeEdit }),
-          h(Material, { material, changeEdit, onEdit: edit }),
-          //h(Sessions, { session }),
-          h(Publications, { publication: [], onEdit: edit, changeEdit }),
-          h(SampleTags, { onEdit: edit, changeEdit }),
+  const { data: sample } = props;
+  const { name, material, session } = sample.data;
+  //console.log(name);
+  return h(
+    ModelEditor,
+    {
+      model: sample,
+      canEdit: login,
+      persistChanges: () => null,
+    },
+    [
+      h("div.sample", [
+        h("h2.page-type", { style: { display: "flex" } }, [
+          "Sample",
+          h(EditButton, { onClick: changeEdit, onEdit: edit }),
+          h(EditNavBar, { header: "Manage Sample" }),
         ]),
+        h("div.flex-row", [
+          h("div.info-block", [
+            h("h1", name),
+            h("div.basic-info", [
+              h(ProjectInfo, { sample, onEdit: edit, changeEdit }),
+              h(Material, { material, changeEdit, onEdit: edit }),
+              h(Sessions, {
+                session,
+              }),
+              h(Publications, { publication: [], onEdit: edit, changeEdit }),
+              h(SampleTags, { onEdit: edit, changeEdit }),
+            ]),
+          ]),
+          h(LocationBlock, { sample }),
+          h(MetadataHelpers, { sample_name: name }),
+        ]),
+        // h("h3", "Metadata helpers"),
+        h(GeoDeepDiveCard, { sample_name: name }),
+        // find a better place for this
       ]),
-      h(LocationBlock, { sample }),
-    ]),
-    h("h3", "Metadata helpers"),
-    h(GeoDeepDiveCard, { sample_name: name }),
-    // find a better place for this
-  ]);
+    ]
+  );
 };
 
 export { SamplePage };
