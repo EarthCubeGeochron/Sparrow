@@ -1,11 +1,11 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import MapGl, { FlyToInterpolator, Marker } from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+//import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyles } from "../../plugins/MapStyle";
-import { Button, Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
+import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
@@ -81,7 +81,7 @@ export function MapPanel({
     const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
     setViewport({ ...viewport, zoom, latitude, longitude });
   }
-  
+
   useEffect(() => {
     const onMap = window.location.pathname == "/map";
     if (!onMap) {
@@ -99,11 +99,7 @@ export function MapPanel({
   const mapRef = useRef();
 
   const bounds = mapRef.current
-    ? mapRef.current
-        .getMap()
-        .getBounds()
-        .toArray()
-        .flat()
+    ? mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
   const toggleShowMarkers = () => {

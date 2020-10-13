@@ -8,19 +8,18 @@ import { DataSheetProvider } from "./provider";
 import { SheetToolbar } from "./toolbar";
 import { VirtualizedSheet } from "./virtualized";
 import classNames from "classnames";
-import "./datasheet.css";
 import styles from "./module.styl";
 import { Row, Sheet } from "./components";
 
 const columnSpec = [
-  { name: "Sample Name", key: "name", width: 1000 / 8 },
+  { name: "Sample Name", key: "name", width: 300 },
   { name: "IGSN", key: "igsn", width: 50 },
   { name: "Public", key: "is_public", width: 50 },
-  { name: "Material", key: "material", width: 1000 / 8 },
-  { name: "Latitude", key: "latitude", width: 1000 / 8 },
-  { name: "Longitude", key: "longitude", width: 1000 / 8 },
-  { name: "Location name", key: "location_name", width: 1000 / 8 },
-  { name: "Project", key: "project_name", width: null },
+  { name: "Material", key: "material", width: 50 },
+  { name: "Latitude", key: "latitude", width: 50 },
+  { name: "Longitude", key: "longitude", width: 50 },
+  { name: "Location name", key: "location_name", width: 50 },
+  { name: "Project", key: "project_name", width: 50 },
 ];
 
 function unwrapSampleData(sampleData) {
@@ -108,7 +107,12 @@ function DataSheet() {
     // Check if values is the same as the initial data key
 
     const isChanged = value != initialData[row][key];
-    const className = classNames({ edited: isChanged }, "cell");
+    const className = classNames(
+      { edited: isChanged },
+      "cell",
+      "nowrap",
+      "clip"
+    );
     return { value, className };
   };
 

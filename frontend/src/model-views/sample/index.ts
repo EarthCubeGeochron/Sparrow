@@ -1,8 +1,7 @@
-import { Component } from "react";
 import h from "@macrostrat/hyper";
 import { Route, Switch } from "react-router-dom";
 import { SamplePage } from "./page";
-import { SampleComponent, SampleList, SampleMatch } from "./list";
+import { SampleList, SampleMatch } from "./list";
 
 function SampleMain(props) {
   const { match } = props;
@@ -15,7 +14,9 @@ function SampleMain(props) {
     }),
     h(Route, {
       path: base,
-      component: SampleList,
+      render() {
+        return h(SampleList);
+      },
       exact: true,
     }),
   ]);

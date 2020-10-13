@@ -1,6 +1,8 @@
 import sys
 import click
 from subprocess import Popen
+from rich import print
+from time import sleep
 
 from .env import validate_environment
 from .util import compose, container_id, cmd
@@ -25,6 +27,7 @@ def sparrow_up(container, force_recreate=False):
         print("[red]One or more containers did not build successfully, aborting.[/red]")
         sys.exit(res.returncode)
     p = Popen(["sparrow", "logs", container])
+    print("[green]Following container logs[/green]")
     compose("start", container)
     p.wait()
 
