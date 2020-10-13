@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
 import update from "immutability-helper";
 import h from "@macrostrat/hyper";
@@ -10,15 +10,24 @@ import { VirtualizedSheet } from "./virtualized";
 import classNames from "classnames";
 import styles from "./module.styl";
 import { Row, Sheet } from "./components";
+import { useElementSize } from "./util";
+import { sum } from "d3-array";
 
-const columnSpec = [
-  { name: "Sample Name", key: "name", width: 300 },
+interface ColumnData {
+  name: string;
+  key: string;
+  width?: number;
+  editable?: boolean;
+}
+
+const columnSpec: ColumnData[] = [
+  { name: "Sample Name", key: "name", width: 300, editable: false },
   { name: "IGSN", key: "igsn", width: 50 },
   { name: "Public", key: "is_public", width: 50 },
   { name: "Material", key: "material", width: 50 },
   { name: "Latitude", key: "latitude", width: 50 },
   { name: "Longitude", key: "longitude", width: 50 },
-  { name: "Location name", key: "location_name", width: 50 },
+  { name: "Location name", key: "location_name", width: 50, editable: false },
   { name: "Project", key: "project_name", width: 50 },
 ];
 
@@ -30,6 +39,42 @@ function unwrapSampleData(sampleData) {
     [longitude, latitude] = geometry?.coordinates;
   }
   return { longitude, latitude, ...rest };
+}
+
+function calculateWidths(data, columns) {
+  const minWidth = 5;
+  const maxWidth = 30;
+  return data.reduce((acc, row) => {
+    let obj = {};
+    for (const col of columns) {
+      const contentLength = `${row[col.key]}`.length;
+      obj[col.key] = Math.min(
+        Math.max(minWidth, contentLength, acc[col.key] ?? 0),
+        maxWidth
+      );
+    }
+    return obj;
+  }, {});
+}
+
+function apportionWidth(
+  data,
+  columns: ColumnData[],
+  containerWidth: number
+): ColumnData[] {
+  if (data == null || columns == null || containerWidth == null) return columns;
+
+  const maxContentWidth = calculateWidths(data, columns);
+  const totalSize = sum(Object.values(maxContentWidth));
+
+  console.log(maxContentWidth);
+
+  return columns.map((col) => {
+    return {
+      ...col,
+      width: (maxContentWidth[col.key] / totalSize) * (containerWidth - 50),
+    };
+  });
 }
 
 function unwrapResponse(apiResult) {
@@ -57,11 +102,18 @@ function DataSheet() {
     setData(initialData);
   }, [initialData]);
 
-  if (data.length === 0) {
-    return null;
-  }
+  const ref = useRef<HTMLDivElement>();
+  const size = useElementSize(ref) ?? { width: 500, height: 100 };
 
-  const columns = columnSpec;
+  const [columns, setColumns] = useState(columnSpec);
+
+  useEffect(() => {
+    console.log(size);
+    const col = apportionWidth(initialData, columnSpec, size.width);
+    setColumns(col);
+  }, [initialData, size]);
+
+  if (data.length === 0) return null;
 
   // Change management
   const handleUndo = () => {
@@ -107,13 +159,14 @@ function DataSheet() {
     // Check if values is the same as the initial data key
 
     const isChanged = value != initialData[row][key];
+    const readOnly = !(columns[col].editable ?? true);
     const className = classNames(
-      { edited: isChanged },
+      { edited: isChanged, "read-only": readOnly },
       "cell",
       "nowrap",
       "clip"
     );
-    return { value, className };
+    return { value, className, readOnly };
   };
 
   /** We now build cell properties in the render function, rather than storing
@@ -131,27 +184,26 @@ function DataSheet() {
     //key is name of column
   );
 
-  return (
-    <DataSheetProvider columns={columns}>
-      <div className={styles["data-sheet"]}>
-        <SheetToolbar
-          onSubmit={handleSubmit}
-          onUndo={handleUndo}
-          hasChanges={initialData != data}
-        />
-        <div className="sheet">
-          <VirtualizedSheet
-            data={cellData}
-            valueRenderer={(cell) => cell.value}
-            sheetRenderer={Sheet}
-            rowRenderer={Row}
-            onCellsChanged={onCellsChanged}
-            // dataEditor={dataEditorComponents}
-          />
-        </div>
-      </div>
-    </DataSheetProvider>
-  );
+  return h(DataSheetProvider, { columns }, [
+    <div className={styles["data-sheet"]}>
+      <SheetToolbar
+        onSubmit={handleSubmit}
+        onUndo={handleUndo}
+        hasChanges={initialData != data}
+      />
+      {h("div.sheet", { ref }, [
+        <VirtualizedSheet
+          data={cellData}
+          valueRenderer={(cell) => `${cell.value ?? ""}`}
+          sheetRenderer={Sheet}
+          rowRenderer={Row}
+          onCellsChanged={onCellsChanged}
+          width={size?.width}
+          // dataEditor={dataEditorComponents}
+        />,
+      ])}
+    </div>,
+  ]);
 }
 
 function DataSheetPage(props) {

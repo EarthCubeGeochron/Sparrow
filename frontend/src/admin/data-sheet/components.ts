@@ -6,7 +6,7 @@ function Row({ row, children, className }) {
   const { rowHeight } = useContext(DataSheetContext);
   const style = { height: rowHeight };
   return h("tr", { style, className }, [
-    h("td.index-cell", { className: "cell read-only" }, row + 1),
+    h("td.index-cell.cell.read-only.index", row + 1),
     children,
   ]);
 }
@@ -18,21 +18,16 @@ type ColumnInfo = {
 
 function HeaderCell({ col }: { col: ColumnInfo }) {
   const { name, width } = col;
-  return h(
-    "td.cell.read-only",
-    {
-      key: name,
-      style: { width },
-    },
-    name
-  );
+  return h("td.cell.header.read-only", name);
 }
 
 function Columns({ width }) {
   const { columns } = useContext(DataSheetContext);
   return h("colgroup", [
-    h("col.index-column", { style: { width: 50 } }),
-    columns.map((col) => h("col", { style: { width: 100 } })),
+    h("col.index-column", { key: "index", style: { width: 50 } }),
+    columns.map((col) =>
+      h("col", { key: col.name, style: { width: col.width } })
+    ),
   ]);
 }
 
@@ -41,15 +36,15 @@ function Header({ width }) {
   const { columns } = useContext(DataSheetContext);
 
   return h("thead", { style }, [
-    h("tr", { className: "header", style }, [
-      h("td.index-column.cell.read-only", ""),
-      columns.map((col) => h(HeaderCell, { col })),
+    h("tr.header", { style }, [
+      h("td.index-column.cell.header", ""),
+      columns.map((col) => h(HeaderCell, { key: col.name, col })),
     ]),
   ]);
 }
 
 function Sheet({ className, children, width }) {
-  return h("table", { className, style: { width: 500 } }, [
+  return h("table", { className, style: { width } }, [
     h(Columns),
     h(Header, { width }),
     h("tbody", children),

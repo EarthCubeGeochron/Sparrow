@@ -59,7 +59,6 @@ function VirtualizedSheet(props) {
       start: { i: startI, j: startJ },
       end: { i: endI, j: endJ },
     };
-    console.log({ start, end });
     setSelection({ offset: selected, notOffset: { start, end } });
   }
 
