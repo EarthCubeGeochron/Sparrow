@@ -12,7 +12,7 @@ import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
 import { useAPIResult, use } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
-import styles from "./mappages.module.css";
+import styles from "./module.styl";
 import { SiteTitle } from "app/components";
 
 export const MapToaster = Toaster.create({
@@ -146,10 +146,12 @@ export function MapPanel({
     <div className="map-container">
       <div className="layer-button">
         {on_map && (
-          <Navbar>
-            <Navbar.Group className={styles.mapNavbar}>
+          <Navbar className={styles["map-navbar"]}>
+            <Navbar.Group className={styles["map-navbar-inner"]}>
               <Navbar.Heading>
-                <SiteTitle />
+                <h1 className="site-title">
+                  <SiteTitle />
+                </h1>
               </Navbar.Heading>
               <Navbar.Divider />
               <MapNav />
@@ -161,7 +163,11 @@ export function MapPanel({
                 showMarkers={state.showMarkers}
                 toggleShowMarkers={toggleShowMarkers}
               ></LayerMenu>
-              <FilterMenu hide={hide_filter} on_map={on_map}></FilterMenu>
+              <FilterMenu
+                //className={styles["filter-menu"]}
+                hide={hide_filter}
+                on_map={on_map}
+              ></FilterMenu>
             </Navbar.Group>
           </Navbar>
         )}

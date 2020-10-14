@@ -7,7 +7,7 @@ import { SiteTitle } from "app/components";
 import { MapPanel } from "./map-area";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
-import styles from "./mappages.module.css";
+import styles from "./module.styl";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { useEffect, useState } from "react";
 
