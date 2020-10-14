@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import MapGl, { FlyToInterpolator, Marker } from "react-map-gl";
 //import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyles } from "../../plugins/MapStyle";
+import h from "@macrostrat/hyper";
 import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
 //import { Link } from "react-router-dom";
@@ -10,7 +11,7 @@ import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
-import { useAPIResult, use } from "@macrostrat/ui-components";
+import { useAPIResult } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
 import styles from "./module.styl";
 import { SiteTitle } from "app/components";
@@ -187,17 +188,16 @@ export function MapPanel({
           }}
           ref={mapRef}
         >
-          {state.clickPnt.lng && on_map && (
-            <Marker
-              latitude={state.clickPnt.lat}
-              longitude={state.clickPnt.lng}
-              offsetLeft={-5}
-              offsetTop={-10}
-            >
-              <Icon icon="map-marker" color="black"></Icon>
-            </Marker>
+          {h.if(state.clickPnt.lng && on_map)(
+            Marker,
+            {
+              latitude: state.clickPnt.lat,
+              longitude: state.clickPnt.lng,
+              offsetLeft: -5,
+              offsetTop: -10,
+            },
+            h(Icon, { icon: "map-marker", color: "black" })
           )}
-
           {state.showMarkers ? (
             <MarkerCluster
               data={initialData}
