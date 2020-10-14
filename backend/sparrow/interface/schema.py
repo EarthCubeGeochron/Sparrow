@@ -180,7 +180,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        instance = self._get_instance(data)
+        with self.session.no_autoflush:
+            instance = self._get_instance(data)
         if instance is None:
             # if not is_model_ready(self.opts.model, data):
             #     return None
