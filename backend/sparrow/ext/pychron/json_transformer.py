@@ -83,7 +83,7 @@ class PyChronJSONImporter:
         date = ret.stdout.decode("utf-8").strip()
         return datetime.strptime(date, DT_FMT)
 
-    def import_file(self, fn, data):
+    def import_file(self, data, filename=None):
         """Build basic nested JSON representation of a PyChron IA file."""
         analyses = [self.transform_analysis(a) for a in data["analyses"]]
         analyses.append(self.transform_ages(data["preferred"]["ages"]))
@@ -98,7 +98,10 @@ class PyChronJSONImporter:
         for k in ["name", "uuid"]:
             res[k] = str(data[k])
 
-        res["date"] = self.get_commit_date(fn).isoformat()
+        if filename is not None:
+            res["date"] = self.get_commit_date(filename).isoformat()
+        else:
+            res["date"] = datetime.min.isoformat()
 
         res["sample"] = self.transform_sample(data["sample_metadata"])
 

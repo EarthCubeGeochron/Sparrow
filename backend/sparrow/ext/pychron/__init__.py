@@ -30,7 +30,7 @@ class PyChronImporter(BaseImporter):
     def import_datafile(self, fn, rec, **kwargs):
         secho(f"importing file={fn}", dim=True)
         with open(fn, "r") as f:
-            res = self._importer.import_file(fn, load(f))
+            res = self._importer.import_file(load(f), filename=fn)
         model = self.db.load_data("session", res)
         # model = self._schema.load(res, session=self.db.session)
         # self.db.session.add(model)
