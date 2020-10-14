@@ -31,11 +31,12 @@ const DetailPageHeader = (props) => {
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "baseline",
       },
     },
     [
       h("h2", [basename]),
-      h("h4", [format(date_upload, "MMMM D, YYYY")]),
+      h("h4", ["Uploaded " + format(date_upload, "MMMM D, YYYY")]),
       h("div", [h(DownloadButton, { file_type, file_hash })]),
     ]
   );
@@ -55,16 +56,17 @@ export const SessionCardInfo = (props) => {
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "baseline",
       },
     },
     [
       h(
         "h5",
         { style: { color: "red", fontStyle: "italic", padding: "0px" } },
-        [format(session_date, "MMMM D, YYYY")]
+        ["Session Date: " + format(session_date, "MMMM D, YYYY")]
       ),
       h("h4", [technique]),
-      h("h4", { style: { fontStyle: "italic" } }, [target]),
+      h("h4", { style: { fontStyle: "italic" } }, ["Target: " + target]),
     ]
   );
 };
@@ -111,11 +113,21 @@ export const Samples = (props) => {
   ]);
 };
 
-const SessionInfo = (props) => {
-  const { session_id, technique, target, session_date, analysis } = props;
-  const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
+/**
+ *
+ * @param props session_id, technique, target, session_date, analysis
+ */
+export const SessionInfo = (props) => {
+  const {
+    session_id,
+    technique,
+    target,
+    date: session_date,
+    //analysis,
+  } = props;
+  //const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
   return h("div", { className: styles.sessionContainer }, [
-    h("h3", ["Session: " + analysis.length + " " + analysisList]),
+    // h("h3", ["Session: " + analysis.length + " " + analysisList]),
     h(SessionLinkCard, { session_id, target, technique, session_date }),
   ]);
 };

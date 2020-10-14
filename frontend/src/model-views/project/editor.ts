@@ -22,14 +22,13 @@ import {
 } from "@macrostrat/ui-components";
 import { MinimalNavbar } from "~/components";
 import { put } from "axios";
-
 import "../main.styl";
 import styles from "~/admin/module.styl";
 const h = hyperStyled(styles);
 
 const ModelEditableText = function(props) {
-  const el = props.is || "div";
-  let { multiline, field, placeholder, ...rest } = props;
+  let { multiline, field, placeholder, is, ...rest } = props;
+  const el = is || "div";
   if (placeholder == null) {
     placeholder = "Add a " + field;
   }
@@ -128,9 +127,17 @@ const EditStatusButtons = function() {
   ]);
 };
 
+const EditNavBar = function(props) {
+  return h(MinimalNavbar, { className: "project-editor-navbar" }, [
+    h("h4", props.header),
+    h(EditStatusButtons),
+    h(EmbargoEditor),
+  ]);
+};
+
 const EditableProjectDetails = function(props) {
   const { project } = props;
-  const { login } = useAuth();
+  const { login } = useAuth(); // this appears to be a boolean
   const { buildURL } = APIHelpers(useContext(APIContext));
 
   return h(
@@ -149,6 +156,9 @@ const EditableProjectDetails = function(props) {
     },
     [
       h("div.project-editor", [
+        h("div", { style: { display: "flex", justifyContent: "center" } }, [
+          h(EditNavBar, { header: "Manage Project" }),
+        ]),
         h("div.project-editor-content", [
           h(ModelEditableText, { is: "h3", field: "name", multiline: true }),
           h(ModelEditableText, {
@@ -157,22 +167,9 @@ const EditableProjectDetails = function(props) {
             multiline: true,
           }),
         ]),
-        h(MinimalNavbar, { className: "project-editor-navbar" }, [
-          h("h4", "Manage project"),
-          h(EditStatusButtons),
-          h(EmbargoEditor),
-        ]),
       ]),
     ]
   );
 };
 
-function editNavBar() {
-  return;
-}
-
-function EditableProjectPage(props) {
-  h(ModelEditor);
-}
-
-export { EditableProjectDetails };
+export { EditableProjectDetails, EditNavBar, ModelEditableText };

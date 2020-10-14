@@ -11,21 +11,14 @@ import { ErrorBoundaryRoute as Route } from "~/util";
 import { SessionListComponent } from "./session-list";
 import { ProjectListComponent } from "./project-list";
 import { ProjectMatch } from "~/model-views/project";
-import { SessionComponent } from "~/model-views/session";
 import { SampleMain } from "~/model-views/sample";
-import { DataFilesMain } from "~/model-views/data-files";
-import { PageRoute, PageStyle } from "~/components/page-skeleton";
 import { LoginSuggest } from "~/auth";
 import { InsetText } from "~/components/layout";
 import { CatalogNavbar } from "./nav";
 import styles from "./module.styl";
+import { SessionMatch } from "../model-views/session";
 
 const h = hyperStyled(styles);
-
-const SessionMatch = function ({ match }) {
-  const { id } = match.params;
-  return h(SessionComponent, { id });
-};
 
 function DataModelLinks(props) {
   const { base = "/catalog" } = props;
@@ -33,7 +26,7 @@ function DataModelLinks(props) {
     h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
     h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
     h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
-    h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
+    //h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
   ]);
 }
 
@@ -77,11 +70,11 @@ const CatalogBody = (
       path: base + "/sample",
       component: SampleMain,
     }),
-    h(PageRoute, {
-      path: base + "/data-file",
-      style: PageStyle.WIDE,
-      component: DataFilesMain,
-    }),
+    // h(PageRoute, {
+    //   path: base + "/data-file",
+    //   style: PageStyle.WIDE,
+    //   component: DataFilesMain,
+    // }),
     h(Route, {
       path: base,
       component: CatalogMain,
