@@ -96,6 +96,10 @@ class FilterListComponent extends StatefulComponent {
   }
 }
 
+/**
+ * @description A search Box with right side drop down menu
+ * @param {array} filterFields An array of strings that will be mapped over for the dropdown menu
+ */
 function FilterBox({ filterFields }) {
   const [state, setState] = useState({
     filter: "",

@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import MapGl, { FlyToInterpolator, Marker } from "react-map-gl";
 //import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyles } from "../../plugins/MapStyle";
+import h from "@macrostrat/hyper";
 import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
 //import { Link } from "react-router-dom";
@@ -12,7 +13,7 @@ import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
-import styles from "./mappages.module.css";
+import styles from "./module.styl";
 import { SiteTitle } from "app/components";
 
 export const MapToaster = Toaster.create({
@@ -39,7 +40,7 @@ export function MapPanel({
   latitude = 0,
   longitude = 0,
   zoom = 1,
-  mapstyle = "mapbox://styles/mapbox/outdoors-v9",
+  mapstyle,
 }: MapProps) {
   const initialState = {
     MapStyle: mapstyle,
@@ -146,10 +147,12 @@ export function MapPanel({
     <div className="map-container">
       <div className="layer-button">
         {on_map && (
-          <Navbar>
-            <Navbar.Group className={styles.mapNavbar}>
+          <Navbar className={styles["map-navbar"]}>
+            <Navbar.Group className={styles["map-navbar-inner"]}>
               <Navbar.Heading>
-                <SiteTitle />
+                <h1 className="site-title">
+                  <SiteTitle />
+                </h1>
               </Navbar.Heading>
               <Navbar.Divider />
               <MapNav />
@@ -157,11 +160,15 @@ export function MapPanel({
                 hide={hide_filter}
                 MapStyle={state.MapStyle}
                 chooseMapStyle={chooseMapStyle}
-                mapstyles={mapStyles}
+                //mapstyles={mapStyles}
                 showMarkers={state.showMarkers}
                 toggleShowMarkers={toggleShowMarkers}
               ></LayerMenu>
-              <FilterMenu hide={hide_filter} on_map={on_map}></FilterMenu>
+              <FilterMenu
+                //className={styles["filter-menu"]}
+                hide={hide_filter}
+                on_map={on_map}
+              ></FilterMenu>
             </Navbar.Group>
           </Navbar>
         )}
@@ -181,17 +188,16 @@ export function MapPanel({
           }}
           ref={mapRef}
         >
-          {state.clickPnt.lng && on_map && (
-            <Marker
-              latitude={state.clickPnt.lat}
-              longitude={state.clickPnt.lng}
-              offsetLeft={-5}
-              offsetTop={-10}
-            >
-              <Icon icon="map-marker" color="black"></Icon>
-            </Marker>
+          {h.if(state.clickPnt.lng && on_map)(
+            Marker,
+            {
+              latitude: state.clickPnt.lat,
+              longitude: state.clickPnt.lng,
+              offsetLeft: -5,
+              offsetTop: -10,
+            },
+            h(Icon, { icon: "map-marker", color: "black" })
           )}
-
           {state.showMarkers ? (
             <MarkerCluster
               data={initialData}

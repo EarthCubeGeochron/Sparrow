@@ -12,18 +12,38 @@ import {
 } from "@blueprintjs/core";
 import "../cluster.css";
 import h from "@macrostrat/hyper";
+import { useDarkMode } from "@macrostrat/ui-components";
+import { mapStyle } from "../MapStyle";
 
 export const LayerMenu = ({
   hide,
   MapStyle,
   chooseMapStyle,
-  mapstyles,
+  //mapstyles,
   showMarkers,
   toggleShowMarkers,
 }) => {
+  const { isEnabled } = useDarkMode();
+
+  const StandMapMode = isEnabled
+    ? "mapbox://styles/mapbox/dark-v10"
+    : "mapbox://styles/mapbox/outdoors-v9";
+
+  const mapStyles = [
+    { name: "Standard Map", style: StandMapMode },
+    {
+      name: "Topographic Map",
+      style: "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub",
+    },
+    { name: "Geologic Map", style: mapStyle },
+    {
+      name: "Satelite Map",
+      style: "mapbox://styles/jczaplewski/cjeycrpxy1yv22rqju6tdl9xb",
+    },
+  ];
   const dropMenu = (
     <Menu>
-      {mapstyles.map((styleOb) => {
+      {mapStyles.map((styleOb) => {
         const { name, style } = styleOb;
         return (
           <MenuItem

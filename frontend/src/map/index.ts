@@ -7,7 +7,9 @@ import { SiteTitle } from "app/components";
 import { MapPanel } from "./map-area";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
-import styles from "./mappages.module.css";
+import styles from "./module.styl";
+import { useDarkMode } from "@macrostrat/ui-components";
+import { useEffect, useState } from "react";
 
 const h = hyperStyled(styles);
 
@@ -24,6 +26,20 @@ const MapNavbar = function (props) {
 
 const MapHome = (props) => {
   const link = LocationLink(props);
+  const [style, setStyle] = useState("");
+
+  const { isEnabled } = useDarkMode();
+
+  useEffect(() => {
+    if (isEnabled) {
+      setStyle("mapbox://styles/mapbox/dark-v10");
+    }
+    setStyle("mapbox://styles/mapbox/outdoors-v9");
+  }, [isEnabled]);
+
+  const StandMapMode = isEnabled
+    ? "mapbox://styles/mapbox/dark-v10"
+    : "mapbox://styles/mapbox/outdoors-v9";
   return h("div.map-home", [
     h("div.map-butn", [
       h(
@@ -32,17 +48,30 @@ const MapHome = (props) => {
         h(Link, { to: "/map" }, h(Button, { icon: "maximize" }))
       ),
     ]),
-    h("div.mapHome", [h(MapPanel, { width: "750px", hide_filter: true })]),
+    h("div.mapHome", [
+      h(MapPanel, {
+        width: "750px",
+        hide_filter: true,
+        mapstyle: StandMapMode,
+      }),
+    ]),
   ]);
 };
 
 const MapPage = (props) => {
+  const { isEnabled } = useDarkMode();
+
+  const StandMapMode = isEnabled
+    ? "mapbox://styles/mapbox/dark-v10"
+    : "mapbox://styles/mapbox/outdoors-v9";
+
   return h("div.map-page", [
     h(MapPanel, {
       on_map: true,
       hide_filter: false,
       width: "100vw",
       height: "100vh",
+      mapstyle: StandMapMode,
     }),
   ]);
 };

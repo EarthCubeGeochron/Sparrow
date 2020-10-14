@@ -18,6 +18,7 @@ import h from "@macrostrat/hyper";
  */
 export const mapStyles = [
   { name: "Standard Map", style: "mapbox://styles/mapbox/outdoors-v9" },
+  { name: "DarkMode", style: "mapbox://styles/mapbox/dark-v10" },
   {
     name: "Topographic Map",
     style: "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub",

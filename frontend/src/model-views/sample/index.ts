@@ -5,13 +5,16 @@ import { SampleList, SampleMatch } from "./list";
 
 function SampleMain(props) {
   const { match } = props;
-  const base = match.path;
+  const base = "/catalog/sample";
   // Render main body
   return h(Switch, [
-    h(Route, {
-      path: base + "/:id",
-      component: SampleMatch,
-    }),
+    h(
+      Route,
+      {
+        path: base + "/:id",
+      },
+      [h(SampleMatch)]
+    ),
     h(Route, {
       path: base,
       render() {
