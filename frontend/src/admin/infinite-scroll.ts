@@ -7,6 +7,7 @@ import { DataFilesCard } from "../model-views/data-files";
 import { SessionLinkCard } from "../model-views/data-files/page";
 import { FilterBox } from "../components/filter-list";
 import { InfiniteAPIView } from "../components/infinite-scroll/infinite-api-view";
+import { APIV2Context } from "~/api-v2";
 
 // unwraps the data to be simpatico with the ProjectLink component, also gets the next page
 function unWrapProjectCardData(data) {
@@ -18,9 +19,6 @@ function unWrapProjectCardData(data) {
   return dataObj;
 }
 
-const projectParams = { nest: "publication,session,samnple" };
-const projectURL = "http://localhost:5002/api/v2/models/project";
-
 const ProjectListComponent = () => {
   const filterFields = ["Name", "Samples"];
 
@@ -30,10 +28,11 @@ const ProjectListComponent = () => {
       h(FilterBox, { filterFields }),
     ]),
     h(InfiniteAPIView, {
-      url: projectURL,
+      url: "/models/project",
       unWrapData: unWrapProjectCardData,
-      params: projectParams,
+      params: { nest: "publication,session,samnple" },
       component: ProjectInfoLink,
+      context: APIV2Context,
     }),
   ]);
 };
@@ -46,8 +45,6 @@ function unWrapSampleCardData(data) {
   return dataObj;
 }
 
-const sampleURL = "http://localhost:5002/api/v2/models/sample";
-
 function SampleListComponent() {
   const filterFields = ["Name", "Material", "id"];
 
@@ -56,10 +53,11 @@ function SampleListComponent() {
       h(FilterBox, { filterFields }),
     ]),
     h(InfiniteAPIView, {
-      url: sampleURL,
+      url: "/models/sample",
       unWrapData: unWrapSampleCardData,
       params: {},
       component: SampleListCard,
+      context: APIV2Context,
     }),
   ]);
 }
@@ -78,10 +76,6 @@ function unWrapSessionCardData(data) {
   return dataObj;
 }
 
-const sessionURL = "http://localhost:5002/api/v2/models/session";
-const sessionParams = { nest: "instrument,project,sample" };
-
-// http://localhost:5002/api/v2/models/session?nest=instrument,sample&per_page=15
 function SessionListComponent() {
   const filterFields = ["Technique", "Date Precision", "Target", "Instrument"];
 
@@ -90,16 +84,14 @@ function SessionListComponent() {
       h(FilterBox, { filterFields }),
     ]),
     h(InfiniteAPIView, {
-      url: sessionURL,
+      url: "/models/session",
       unWrapData: unWrapSessionCardData,
-      params: sessionParams,
+      params: { nest: "instrument,project,sample" },
       component: SessionLinkCard,
+      context: APIV2Context,
     }),
   ]);
 }
-
-const dataFileURL = "http://localhost:5002/api/v2/models/data_file";
-const dataFileParams = { nest: "data_file_link,sample,session,project" };
 
 function unWrapDataFileCardData(data) {
   const dataObj = data.data.map((obj) => {
@@ -117,10 +109,11 @@ function DataFilesListComponent() {
       h(FilterBox, { filterFields }),
     ]),
     h(InfiniteAPIView, {
-      url: dataFileURL,
+      url: "/models/data_file",
       unWrapData: unWrapDataFileCardData,
-      params: dataFileParams,
+      params: { nest: "data_file_link,sample,session,project" },
       component: DataFilesCard,
+      context: APIV2Context,
     }),
   ]);
 }

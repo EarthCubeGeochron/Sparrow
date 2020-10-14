@@ -26,7 +26,7 @@ function DataModelLinks(props) {
     h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
     h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
     h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
-    //h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
+    h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
   ]);
 }
 

@@ -34,7 +34,7 @@ const AdminNavbar = (props) => {
 };
 
 const AdminBody = ({ base, ...rest }) => {
-  return h(Frame, { id: "adminBase", ...rest }, [h(DataModelLinks, { base })]);
+  return h(Frame, { id: "adminBase", ...rest }, h(DataModelLinks, { base }));
 };
 
 const AdminRouter = ({ base }) =>

@@ -4,7 +4,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const CatalogNavLinks = function({ base, ...rest }) {
+const CatalogNavLinks = function ({ base, ...rest }) {
   if (base == null) {
     base = "/catalog";
   }
@@ -12,7 +12,7 @@ const CatalogNavLinks = function({ base, ...rest }) {
     h(NavButton, { to: base + "/project" }, "Projects"),
     h(NavButton, { to: base + "/sample" }, "Samples"),
     h(NavButton, { to: base + "/session" }, "Sessions"),
-   // h(NavButton, { to: base + "/data-file" }, "Data Files"),
+    h(NavButton, { to: base + "/data-file" }, "Data Files"),
   ]);
 };
 
