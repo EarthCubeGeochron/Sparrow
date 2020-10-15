@@ -41,7 +41,7 @@
     "react-dom": "^16.13.1",
     "react-json-view": "^1.19.1",
     "react-leaflet": "^2.3.0",
-    "react-map-gl": "^4.1.2",
+    "react-map-gl": "^4.1.16",
     "react-map-gl-draw": "^0.19.3",
     "react-markdown": "^4.0.6",
     "react-router": "^5.2.0",
