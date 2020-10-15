@@ -47,8 +47,8 @@ const DetailPageHeader = (props) => {
  * @param props target, session_date, technique
  */
 export const SessionCardInfo = (props) => {
-  const { session_id, target, session_date, technique } = props;
-  console.log(session_date);
+  const { session_id, target, date, technique } = props;
+  console.log(date);
   return h(
     "div",
     {
@@ -62,8 +62,8 @@ export const SessionCardInfo = (props) => {
     [
       h(
         "h5",
-        { style: { color: "red", fontStyle: "italic", padding: "0px" } },
-        ["Session Date: " + format(session_date, "MMMM D, YYYY")]
+        { style: { color: "#1CBAFF", fontStyle: "italic", padding: "0px" } },
+        ["Session Date: " + format(date, "MMMM D, YYYY")]
       ),
       h("h4", [technique]),
       h("h4", { style: { fontStyle: "italic" } }, ["Target: " + target]),
@@ -88,11 +88,11 @@ export const SessionLinkCard = function(props) {
 };
 
 export const Samples = (props) => {
-  const { sample_name, sample_id, sample_material } = props;
+  const { name, sample_id, sample_material } = props;
   //let content = [h("p", "No samples")];
   if (props != null) {
     h(SampleCard, {
-      name: sample_name,
+      name,
       id: sample_id,
       material: sample_material,
       link: true,
@@ -104,7 +104,7 @@ export const Samples = (props) => {
       "div",
       { style: { display: "flex", flexFlow: "row wrap", margin: "0 -5px" } },
       h(SampleCard, {
-        name: sample_name,
+        name,
         id: sample_id,
         material: sample_material,
         link: true,
@@ -122,13 +122,13 @@ export const SessionInfo = (props) => {
     session_id,
     technique,
     target,
-    date: session_date,
+    date,
     //analysis,
   } = props;
   //const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
   return h("div", { className: styles.sessionContainer }, [
     // h("h3", ["Session: " + analysis.length + " " + analysisList]),
-    h(SessionLinkCard, { session_id, target, technique, session_date }),
+    h(SessionLinkCard, { session_id, target, technique, date }),
   ]);
 };
 
@@ -161,17 +161,13 @@ export function DataFilePage({ props }) {
       {
         date: date_upload,
         session: {
-          date: session_date,
+          date,
           technique,
           target,
           date_precision,
           analysis,
           id: session_id,
-          sample: {
-            name: sample_name,
-            id: sample_id,
-            material: sample_material,
-          },
+          sample: { name, id: sample_id, material: sample_material },
           project,
         },
       },
@@ -187,12 +183,12 @@ export function DataFilePage({ props }) {
       h(SessionInfo, {
         session_id,
         target,
-        session_date,
+        date,
         technique,
         analysis,
       }),
       h("div", { className: styles.sampleContainer }, [
-        h(Samples, { sample_name, sample_id, sample_material }),
+        h(Samples, { name, sample_id, sample_material }),
       ]),
       h("div", { className: styles.projects }, [h(ProjectLinks, { project })]),
     ]),

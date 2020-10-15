@@ -7,6 +7,7 @@ import { SampleComponent, SampleList, SampleMatch } from "./list";
 function SampleMain(props) {
   const { match } = props;
   const base = "/catalog/sample";
+  const Edit = false;
   // Render main body
   return h(Switch, [
     h(
@@ -14,7 +15,7 @@ function SampleMain(props) {
       {
         path: base + "/:id",
       },
-      [h(SampleMatch)]
+      [h(SampleMatch, { Edit })]
     ),
     h(Route, {
       path: base,

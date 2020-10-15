@@ -12,7 +12,19 @@ const CatalogNavLinks = function({ base, ...rest }) {
     h(NavButton, { to: base + "/project" }, "Projects"),
     h(NavButton, { to: base + "/sample" }, "Samples"),
     h(NavButton, { to: base + "/session" }, "Sessions"),
-   // h(NavButton, { to: base + "/data-file" }, "Data Files"),
+    // h(NavButton, { to: base + "/data-file" }, "Data Files"),
+  ]);
+};
+
+const AdminNavLinks = function({ base, ...rest }) {
+  if (base == null) {
+    base = "/catalog";
+  }
+  return h([
+    h(NavButton, { to: base + "/project" }, "Projects"),
+    h(NavButton, { to: base + "/sample" }, "Samples"),
+    h(NavButton, { to: base + "/session" }, "Sessions"),
+    h(NavButton, { to: base + "/data-file" }, "Data Files"),
   ]);
 };
 
@@ -24,4 +36,4 @@ const CatalogNavbar = (
     h(CatalogNavLinks, { base }),
   ]);
 
-export { CatalogNavLinks, CatalogNavbar };
+export { CatalogNavLinks, CatalogNavbar, AdminNavLinks };
