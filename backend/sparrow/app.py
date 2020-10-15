@@ -65,10 +65,10 @@ class App(Flask):
         if db is None:
             db = Database(self)
         self.db = db
-        self.run_hook("database-available")
+        self.run_hook("database-available", db)
         # Database is only "ready" when it is mapped
         if self.db.automap_base is not None:
-            self.run_hook("database-ready")
+            self.run_hook("database-ready", db)
             self.database_ready = True
         return db
 
@@ -172,3 +172,4 @@ class App(Flask):
                 return send_from_directory(assets, filename)
 
         self.api_loaded = True
+        self.run_hook("load-complete")

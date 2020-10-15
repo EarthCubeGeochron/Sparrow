@@ -1,18 +1,36 @@
 import { createContext } from "react";
-import h from "@macrostrat/hyper";
+import h, { compose, C } from "@macrostrat/hyper";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
-const defaultContext = { columns: [], rowHeight: 20, offset: 0 };
+const defaultContext = { columns: [], rowHeight: 20, offset: 0, actions: null };
+
+type ColumnInfo = {
+  name: string;
+  width: number | null;
+};
+
+interface DataSheetContext {
+  columns: ColumnInfo[];
+  rowHeight: number;
+}
 
 const DataSheetContext = createContext(defaultContext);
 
-function DataSheetProvider(props) {
+function DataSheetProviderBase(props) {
   /** This context/context provider don't do much right now, but they will
       take an increasing role in state management going forward */
-  const { columns, rowHeight, offset, children } = props;
-  const value = { columns, rowHeight, offset };
+
+  const { columns, rowHeight, offset, reorderColumns, children } = props;
+  const value = { columns, rowHeight, offset, actions: { reorderColumns } };
   return h(DataSheetContext.Provider, { value }, children);
 }
 
-DataSheetProvider.defaultProps = defaultContext;
+DataSheetProviderBase.defaultProps = defaultContext;
 
-export { DataSheetContext, DataSheetProvider };
+const DataSheetProvider = compose(
+  C(DndProvider, { backend: HTML5Backend }),
+  DataSheetProviderBase
+);
+
+export { DataSheetContext, DataSheetProvider, ColumnInfo };

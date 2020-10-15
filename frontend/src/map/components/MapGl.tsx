@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import h from "@macrostrat/hyper";
 import MapGl from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+//import "mapbox-gl/dist/mapbox-gl.css";
 import { Editor, DrawRectangleMode, EditingMode } from "react-map-gl-draw";
 import { Card, NumericInput } from "@blueprintjs/core";
 
@@ -51,11 +51,7 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
 
   const bounds = mapRef.current
     ? //@ts-ignore
-      mapRef.current
-        .getMap()
-        .getBounds()
-        .toArray()
-        .flat()
+      mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
   const ModeHandler = state.selectedFeature

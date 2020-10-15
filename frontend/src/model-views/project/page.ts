@@ -1,6 +1,5 @@
 import { useState, Component } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import { Button, Icon } from "@blueprintjs/core";
 import styled from "@emotion/styled";
 import { ProjectMap } from "./map";
 import { EditableProjectDetails, EditNavBar } from "./editor";
@@ -38,7 +37,7 @@ class Publication extends Component {
   }
 }
 
-const ProjectPublications = function({ data }) {
+const ProjectPublications = function ({ data }) {
   if (data == null) {
     data = [];
   }
@@ -51,7 +50,7 @@ const ProjectPublications = function({ data }) {
   ]);
 };
 
-const ProjectResearchers = function({ data }) {
+const ProjectResearchers = function ({ data }) {
   let content = [h("p", "No researchers")];
   if (data != null) {
     content = data.map((d) => h("div.researcher", d.name));
@@ -82,7 +81,7 @@ function AddSampleControls() {
   ]);
 }
 
-export const ProjectSamples = function({ data }) {
+export const ProjectSamples = function ({ data }) {
   let content = [h("p", "No samples")];
   if (data != null) {
     content = data.map((d) => h(SampleCard, d));
@@ -94,7 +93,7 @@ export const ProjectSamples = function({ data }) {
   ]);
 };
 
-const ProjectPage = function(props) {
+const ProjectPage = function (props) {
   const [edit, setEdit] = useState(false);
 
   const { project, Edit } = props;

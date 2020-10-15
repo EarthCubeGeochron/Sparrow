@@ -1,4 +1,6 @@
 @import "~app/shared/colors"
+:global
+  @import "./datasheet"
 
   //@require "~react-datasheet/lib/react-datasheet.css";
   //@import "./datasheet.css"
@@ -8,11 +10,10 @@
 
 .data-sheet
   --datasheet-read-only-background: whitesmoke
-
   position absolute
   top 0px
-  left 2em
-  right 2em
+  left 0em
+  right 0em
   bottom 0px
   display flex
   flex-direction column
@@ -64,12 +65,8 @@
     position relative
 
   table.data-grid
-    display block
     position absolute
     top 0
     left 0
     right 0
     bottom 0
-
-  input.data-editor
-    height 20px !important

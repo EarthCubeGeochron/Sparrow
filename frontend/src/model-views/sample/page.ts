@@ -199,7 +199,7 @@ const ProjectInfo = ({ sample: d }) => {
   ]);
 };
 
-const LocationBlock = function(props) {
+const LocationBlock = function (props) {
   const { isEditing, hasChanges, actions } = React.useContext(
     ModelEditorContext
   );
@@ -234,7 +234,7 @@ const LocationBlock = function(props) {
   ]);
 };
 
-const Material = function(props) {
+const Material = function (props) {
   const { material, changeEdit, onEdit } = props;
   const { isEditing, hasChanges, actions } = React.useContext(
     ModelEditorContext
@@ -344,7 +344,7 @@ function MetadataHelpers(props) {
   }
 }
 
-const SamplePage = function(props) {
+const SamplePage = function (props) {
   const [edit, setEdit] = React.useState(false);
   const { login } = useAuth();
 

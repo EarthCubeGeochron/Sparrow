@@ -111,7 +111,7 @@ class SecretResource(Resource):
 class AuthPlugin(SparrowCorePlugin):
     name = "auth"
 
-    def on_database_ready(self):
+    def on_database_ready(self, db):
         # Manage JSON Web tokens
         JWTManager(self.app)
 

@@ -25,3 +25,5 @@ export function useAPIv2Result(
   opts.context = APIV2Context;
   return useAPIResult(route, params, opts);
 }
+
+export { APIV2Context };

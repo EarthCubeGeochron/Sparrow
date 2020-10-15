@@ -12,7 +12,7 @@ import { Spinner } from "@blueprintjs/core";
  * @param {object} params: object of params to be added to base URL. Optional
  * @param {component} component: react component designed to take in data object created by the unWrapData function
  *
- * 
+ *
  * @example function unWrapProjectCardData(data) {
   const dataObj = data.data.map((obj) => {
     const { id, name, description, publication, session } = obj;
@@ -28,10 +28,10 @@ import { Spinner } from "@blueprintjs/core";
     component: ProjectInfoLink,
   });
  */
-function InfiniteAPIView({ url, unWrapData, params, component }) {
+function InfiniteAPIView({ url, unWrapData, params, component, context }) {
   const [data, setData] = useState([]);
   const [nextPage, setNextPage] = useState("");
-  const { get } = useAPIActions();
+  const { get } = useAPIActions(context);
 
   async function getNextPageAPI(nextPage, url, params) {
     const constParams =
@@ -50,8 +50,7 @@ function InfiniteAPIView({ url, unWrapData, params, component }) {
     initData.then((res) => {
       const dataObj = unWrapData(res);
       const newState = [...data, ...dataObj];
-      const NextPage = res.next_page;
-      setNextPage(NextPage);
+      setNextPage(res.next_page);
       setData(newState);
     });
   }, []);
@@ -62,8 +61,7 @@ function InfiniteAPIView({ url, unWrapData, params, component }) {
     newData.then((res) => {
       const dataObj = unWrapData(res);
       const newState = [...data, ...dataObj];
-      const NextPage = res.next_page;
-      setNextPage(NextPage);
+      setNextPage(res.next_page);
       setData(newState);
     });
   };

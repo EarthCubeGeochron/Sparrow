@@ -1,18 +1,19 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import MapGl, { FlyToInterpolator, Marker } from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+//import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyles } from "../../plugins/MapStyle";
-import { Button, Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
+import h from "@macrostrat/hyper";
+import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
-import { useAPIResult, use } from "@macrostrat/ui-components";
+import { useAPIResult } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
-import styles from "./mappages.module.css";
+import styles from "./module.styl";
 import { SiteTitle } from "app/components";
 
 export const MapToaster = Toaster.create({
@@ -99,11 +100,7 @@ export function MapPanel({
   const mapRef = useRef();
 
   const bounds = mapRef.current
-    ? mapRef.current
-        .getMap()
-        .getBounds()
-        .toArray()
-        .flat()
+    ? mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
   const toggleShowMarkers = () => {
@@ -150,10 +147,12 @@ export function MapPanel({
     <div className="map-container">
       <div className="layer-button">
         {on_map && (
-          <Navbar>
-            <Navbar.Group className={styles.mapNavbar}>
+          <Navbar className={styles["map-navbar"]}>
+            <Navbar.Group className={styles["map-navbar-inner"]}>
               <Navbar.Heading>
-                <SiteTitle />
+                <h1 className="site-title">
+                  <SiteTitle />
+                </h1>
               </Navbar.Heading>
               <Navbar.Divider />
               <MapNav />
@@ -165,7 +164,11 @@ export function MapPanel({
                 showMarkers={state.showMarkers}
                 toggleShowMarkers={toggleShowMarkers}
               ></LayerMenu>
-              <FilterMenu hide={hide_filter} on_map={on_map}></FilterMenu>
+              <FilterMenu
+                //className={styles["filter-menu"]}
+                hide={hide_filter}
+                on_map={on_map}
+              ></FilterMenu>
             </Navbar.Group>
           </Navbar>
         )}
@@ -185,17 +188,16 @@ export function MapPanel({
           }}
           ref={mapRef}
         >
-          {state.clickPnt.lng && on_map && (
-            <Marker
-              latitude={state.clickPnt.lat}
-              longitude={state.clickPnt.lng}
-              offsetLeft={-5}
-              offsetTop={-10}
-            >
-              <Icon icon="map-marker" color="black"></Icon>
-            </Marker>
+          {h.if(state.clickPnt.lng && on_map)(
+            Marker,
+            {
+              latitude: state.clickPnt.lat,
+              longitude: state.clickPnt.lng,
+              offsetLeft: -5,
+              offsetTop: -10,
+            },
+            h(Icon, { icon: "map-marker", color: "black" })
           )}
-
           {state.showMarkers ? (
             <MarkerCluster
               data={initialData}

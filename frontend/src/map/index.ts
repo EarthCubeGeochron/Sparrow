@@ -7,14 +7,13 @@ import { SiteTitle } from "app/components";
 import { MapPanel } from "./map-area";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
-import styles from "./mappages.module.css";
-import { useToggle } from "./components/APIResult";
+import styles from "./module.styl";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { useEffect, useState } from "react";
 
 const h = hyperStyled(styles);
 
-const MapNavbar = function(props) {
+const MapNavbar = function (props) {
   const { children, ...rest } = props;
   return h(Menu, { className: "map-navbar", ...rest }, [
     h(MenuItem, {
@@ -77,13 +76,13 @@ const MapPage = (props) => {
   ]);
 };
 
-const LocationLink = function(props) {
+const LocationLink = function (props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
   const link = `/map#${zoom}/${latitude}/${longitude}`;
   return link;
 };
 
-const MapLink = function(props) {
+const MapLink = function (props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
   return h(
     HashLink,

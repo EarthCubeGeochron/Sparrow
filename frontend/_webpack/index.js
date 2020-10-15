@@ -1,5 +1,4 @@
 let path = require("path");
-
 const { EnvironmentPlugin } = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
@@ -7,6 +6,15 @@ const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
 const isDev = process.env.SPARROW_ENV == "development";
 const mode = isDev ? "development" : "production";
 console.log(`Bundling frontend for ${mode}`);
+
+// Create HTML template configuration
+let htmlConfig = {
+  title: process.env.SPARROW_LAB_NAME,
+  favicon: relativePath("static/img/favicon.png"),
+};
+if (isDev) {
+  htmlConfig = relativePath("_webpack/dev-template.ejs");
+}
 
 process.env["BASE_URL"] =
   process.env.API_BASE_URL || process.env.SPARROW_BASE_URL;
@@ -30,7 +38,7 @@ let baseConfig = {
   devtool: "source-map",
   resolve: {
     // Resolve node modules from Sparrow's own node_modules if not found in plugins
-    modules: ["node_modules", relativePath("node_modules")],
+    modules: ["_local_modules", "node_modules", relativePath("node_modules")],
     extensions: [
       ".ts",
       ".tsx",
@@ -66,17 +74,13 @@ let baseConfig = {
   // Always split chunks
   // We could turn this off in development if we wanted.
   // https://medium.com/hackernoon/the-100-correct-way-to-split-your-chunks-with-webpack-f8a9df5b7758
-  // optimization: {
-  // splitChunks: {
-  // chunks: 'all',
-  // },
-  // },
+  optimization: {
+    splitChunks: {
+      chunks: "all",
+    },
+  },
   plugins: [
-    new HtmlWebpackPlugin({
-      title: process.env.SPARROW_LAB_NAME,
-      favicon: relativePath("static/img/favicon.png"),
-      template: isDev ? relativePath("_webpack/dev-template.ejs") : null,
-    }),
+    new HtmlWebpackPlugin(htmlConfig),
     new EnvironmentPlugin(["BASE_URL", "SPARROW_LAB_NAME", "MAPBOX_API_TOKEN"]),
   ],
 };

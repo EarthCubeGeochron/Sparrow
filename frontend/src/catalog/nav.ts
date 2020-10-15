@@ -4,7 +4,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const CatalogNavLinks = function({ base, ...rest }) {
+const CatalogNavLinks = function ({ base, ...rest }) {
   if (base == null) {
     base = "/catalog";
   }
