@@ -6,6 +6,7 @@ from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError
 from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import inspect
 
 from .util import is_pk_defined, pk_values, prop_is_required
@@ -102,6 +103,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             val = data.get(prop.key, None)
             if getattr(prop, "uselist", False):
                 continue
+
             if val is not None:
                 if hasattr(prop, "direction"):
                     # For relationships

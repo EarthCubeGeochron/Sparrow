@@ -31,3 +31,8 @@ class TestProjectImport:
         removed = dd["dictionary_item_removed"]
         assert len(removed) > 0
         assert len(omit_key(removed, "in_plateau")) == 0
+
+    def test_reimport_dumpfile(self, db):
+        """We should be able to idempotently import a data file..."""
+        data = json_fixture("project-dump.json")
+        db.load_data("project", data["data"])
