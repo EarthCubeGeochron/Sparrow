@@ -6,9 +6,13 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import h from 'react-hyperscript';
-import {APIContext, StatefulComponent} from '@macrostrat/ui-components';
-import {createContext, useContext} from 'react';
+import h from "react-hyperscript";
+import {
+  APIContext,
+  StatefulComponent,
+  APIActions,
+} from "@macrostrat/ui-components";
+import { createContext, useContext } from "react";
 
 const AuthContext = createContext({});
 
@@ -16,7 +20,7 @@ class AuthProvider extends StatefulComponent {
   static initClass() {
     this.contextType = APIContext;
   }
-  constructor(props){
+  constructor(props) {
     super(props);
     this.requestLoginForm = this.requestLoginForm.bind(this);
     this.render = this.render.bind(this);
@@ -24,7 +28,7 @@ class AuthProvider extends StatefulComponent {
       login: false,
       username: null,
       isLoggingIn: false,
-      invalidAttempt: false
+      invalidAttempt: false,
     };
   }
 
@@ -40,20 +44,23 @@ class AuthProvider extends StatefulComponent {
     // when editing information becomes a factor) to
     // only refresh tokens when access is proactively
     // granted by the application.
-    const {get} = this.context;
-    const {login, username} = await get('/auth/status');
-    return this.setState({login, username});
+    const { get } = APIActions(this.context);
+    const { login, username } = await get("/auth/status");
+    return this.setState({ login, username });
   };
 
-  requestLoginForm(v){
+  requestLoginForm(v) {
     console.log("Requesting login form");
-    if (v == null) { v = true; }
-    return this.setState({isLoggingIn: v});
+    if (v == null) {
+      v = true;
+    }
+    return this.setState({ isLoggingIn: v });
   }
 
-  doLogin = async data=> {
-    const {post} = this.context;
-    const {login, username} = await post('/auth/login', data);
+  doLogin = async (data) => {
+    const { post } = APIActions(this.context);
+    console.log(data);
+    const { login, username } = await post("/auth/login", data);
     let invalidAttempt = false;
     let isLoggingIn = false;
     if (!login) {
@@ -64,29 +71,31 @@ class AuthProvider extends StatefulComponent {
       login,
       username,
       isLoggingIn,
-      invalidAttempt
+      invalidAttempt,
     });
   };
 
   doLogout = async () => {
-    const {post} = this.context;
-    const {login} = await post('/auth/logout', {});
+    const { post } = APIActions(this.context);
+    const { login } = await post("/auth/logout", {});
     return this.setState({
       login,
       username: null,
-      isLoggingIn: false
+      isLoggingIn: false,
     });
   };
 
   render() {
-    const methods = (() => { let doLogin, doLogout, requestLoginForm;
-    return ({doLogin, doLogout, requestLoginForm} = this); })();
-    const value = {...methods, ...this.state};
-    return h(AuthContext.Provider, {value}, this.props.children);
+    const methods = (() => {
+      let doLogin, doLogout, requestLoginForm;
+      return ({ doLogin, doLogout, requestLoginForm } = this);
+    })();
+    const value = { ...methods, ...this.state };
+    return h(AuthContext.Provider, { value }, this.props.children);
   }
 }
 AuthProvider.initClass();
 
 const useAuth = () => useContext(AuthContext);
 
-export {AuthContext, AuthProvider, useAuth};
+export { AuthContext, AuthProvider, useAuth };

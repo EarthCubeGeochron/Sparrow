@@ -1,5 +1,15 @@
+@import './colors'
+@import './color-aliases'
+
 *
   box-sizing: border-box
+
+:root
+  --panel-background-secondary: $light-gray4
+  --subtle-background: $light-gray5
+  --card-hover: $light-gray5
+  --active-highlight: $light-gray3
+
 
 page_margin=2em
 
@@ -7,13 +17,12 @@ body
   margin 0
   padding 0
   min-height: 100vh
-
-#container
-  max-width 60em
-  margin 0 auto
-  min-height: 100vh
-
-@import './colors'
+  &.bp3-dark
+    --active-highlight: $gray1
+    --panel-background-secondary: $dark-gray5
+    --subtle-background: $dark-gray5
+    --card-hover: $dark-gray5
+    background-color: $dark-gray2
 
 h1.site-title
   color $gray1

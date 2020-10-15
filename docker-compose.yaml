@@ -11,6 +11,7 @@ services:
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend:
+    image: sparrowdata/backend
     build:
       context: backend
       target: main
@@ -22,9 +23,12 @@ services:
     depends_on:
       - db
     environment:
+      - SPARROW_ENV
       - SPARROW_SECRET_KEY
       - SPARROW_BASE_URL
       - SPARROW_LAB_NAME
+      # A cache for files that need to persist but can be rebuilt.
+      - SPARROW_CACHE_DIR=/cache
       - SPARROW_INIT_SQL=/init-sql
       # For cloud data support
       # NOTE: it may be useful to split this into a
@@ -40,7 +44,13 @@ services:
       # TODO: come up with a better way to organize
       - ./_cli/bin:/sparrow-bin
       # Read-only volume for source code
-      - ./backend/:/app
+      # How this mount is set up has severe implications for dev-mode performance,
+      # as server reloaders tend to use non-performant file watchers...
+      - type: bind
+        source: ./backend/
+        target: /app
+        read_only: true
+        consistency: cached
       # Nested volume to keep built files
       # separate from those on our local system
       - /app/sparrow.egg-info
@@ -57,6 +67,12 @@ services:
       # Save ipython configuration to anonymous volume so
       # we keep command history between app runs
       - ipython_config:/root/.ipython/profile_default
+      # Save CLI help info for rapid access
+      - runtime_data:/run:ro
+      # A working location for caching files that need to persist over time
+      # (for example, git repositorites for the PyChron importer). This could conceivably
+      # be delegated to a separate importer container, but that seems overcomplex for now.
+      - backend_cache:/cache
   db:
     image: mdillon/postgis:11
     expose:
@@ -77,6 +93,9 @@ services:
       - CONTAINERIZED=1
       - SPARROW_LAB_NAME
       - SPARROW_BASE_URL
+      # We need to forward SPARROW_HTTP_PORT to the frontend so that we can
+      # load BrowserSync on the correct port if in development mode
+      - SPARROW_HTTP_PORT
       - MAPBOX_API_TOKEN
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container
@@ -88,6 +107,10 @@ services:
       # Right now, we configure default site content
       # rather than allowing any customization
       - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/app/site-content
+      # A folder for a testing version of the @macrostrat/ui-components
+      # Javascript library that will be linked into the container at runtime
+      # to support tandem development within Docker
+      - ${SPARROW_UI_COMPONENTS:-placeholder}:/app/_local_modules/@macrostrat/ui-components:ro
   api-tests:
     build: api-tests
     # A placeholder command
@@ -99,5 +122,7 @@ volumes:
   # Anonymous volume to preserve `sparrow shell` history
   ipython_config:
   db_cluster:
+  runtime_data:
+  backend_cache:
   # Placeholder volumes in case we don't have these volumes to mount
   placeholder:

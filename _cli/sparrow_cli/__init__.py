@@ -10,9 +10,10 @@ from rich import print
 from .base import cli, SparrowConfig
 from .help import echo_help
 from .util import cmd, compose, exec_or_run, find_subcommand, container_id
-from .test import sparrow_test
-from .database import sparrow_db
-from .docs import sparrow_docs
+from .test import sparrow_test  # noqa
+from .database import sparrow_db  # noqa
+from .docs import sparrow_docs  # noqa
+from .containers import sparrow_up, sparrow_logs
 
 console = Console(highlight=True)
 
@@ -31,7 +32,7 @@ def main(ctx, args):
         subcommand = "--help"
 
     if subcommand in ["--help", "help"]:
-        echo_help(cfg.bin_directories)
+        echo_help(ctx, cfg.bin_directories)
         sys.exit(0)
 
     if subcommand == "compose":
@@ -59,3 +60,7 @@ def shell(container):
         return exec_or_run(container, "sh")
     print("Running [bold]iPython[/bold] shell in application context.")
     exec_or_run("backend", "sparrow shell")
+
+
+cli.add_command(sparrow_up, name="up")
+cli.add_command(sparrow_logs, name="logs")

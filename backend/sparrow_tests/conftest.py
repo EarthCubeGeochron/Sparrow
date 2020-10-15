@@ -1,9 +1,9 @@
 from sparrow.app import App
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
-import logging
+from starlette.testclient import TestClient
+from sparrow.asgi import app as app_
 
-logging.disable(level=logging.WARNING)
 
 # Slow tests are opt-in
 def pytest_addoption(parser):
@@ -35,3 +35,9 @@ def db(app):
     yield app.database
     app.database.session.close()
     transaction.rollback()
+
+
+@fixture
+def client():
+    _client = TestClient(app_)
+    yield _client

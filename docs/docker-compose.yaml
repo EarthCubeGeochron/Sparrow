@@ -17,12 +17,24 @@ services:
       - .:/docs
       - node_modules:/docs/node_modules
       - cache:/docs/.docusaurus
+      # Mount the backend code directory to the 'app' folder
+      - ../backend:/app
+  backend:
+    build: python-api
+    volumes:
+      - py_docs:/docs/build/html
+    command: make watch-html
+    expose:
+      - 5000
   gateway:
     build:
       context: server-config
       dockerfile: Dockerfile.dev
     ports:
-      - '3000:80'
+      - "8080:80"
+    volumes:
+      - py_docs:/usr/share/nginx/html/core
 volumes:
   cache:
   node_modules:
+  py_docs:

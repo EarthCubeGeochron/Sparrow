@@ -1,7 +1,7 @@
 .map-navbar
-  max-width: 3em
-  min-width: 140px
+  min-width: 320px
   z-index: 20
+  border-radius 5px
   position absolute
   top 2em
   left 2em
@@ -18,9 +18,41 @@
   position fixed
   top 0
   left 0
-  width 100vw
-  height 100vh
+  /* width 100vw
+  height 100vh */
   .main-map
     position absolute
     top 0
     left 0
+
+.map-home {
+  position: relative;
+}
+.main-map {
+  position: "absolute";
+  z-index: 1;
+}
+
+.nav-btn {
+  position: absolute;
+  z-index: 99;
+}
+
+.map-butn {
+  position: absolute;
+  z-index: 2;
+  top: 1;
+  left: 0;
+}
+
+.map-page {
+  position: absolute;
+}
+
+.mapContainer {
+}
+
+.map-navbar-inner {
+  display: flex;
+  flex-direction: row;
+}

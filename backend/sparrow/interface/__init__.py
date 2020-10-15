@@ -49,9 +49,8 @@ class InterfaceCollection(ModelCollection):
 class InterfacePlugin(SparrowCorePlugin):
     name = "schema-interface"
 
-    def on_database_ready(self):
-        iface = InterfaceCollection(self.app.database.model)
-        db = self.app.database
+    def on_database_ready(self, db):
+        iface = InterfaceCollection(db.model)
         db.interface = iface
 
     def on_setup_cli(self, cli):

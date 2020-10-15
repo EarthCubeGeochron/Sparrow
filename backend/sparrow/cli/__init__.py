@@ -3,6 +3,7 @@ from click import echo, style, secho
 from sys import exit
 from os import environ
 from json import dumps
+from click import pass_context
 from .util import with_database, with_app, with_full_app
 from ..util import working_directory
 from ..app import App
@@ -17,6 +18,9 @@ def _build_app_context(config):
 
 
 class SparrowCLI(click.Group):
+    """Sparrow's internal command-line application is integrated tightly with
+    the version that also organizes Docker containers"""
+
     def __init__(self, *args, **kwargs):
         # https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
         # https://click.palletsprojects.com/en/7.x/complex/#interleaved-commands
@@ -72,15 +76,6 @@ def create_views(db):
     # Don't need to build the app just for this
     with working_directory(__file__):
         db.exec_sql("../database/fixtures/05-views.sql")
-
-
-@cli.command(name="serve")
-@with_full_app
-def dev_server(app):
-    """
-    Run a development WSGI server
-    """
-    app.run(debug=True, host="0.0.0.0")
 
 
 @cli.command(name="shell")
@@ -148,3 +143,18 @@ def plugins(app):
 @with_database
 def _db_migration(db):
     db_migration(db)
+
+
+def command_info(ctx, cli):
+    for name in cli.list_commands(ctx):
+        cmd = cli.get_command(ctx, name)
+        if cmd.hidden:
+            continue
+        help = cmd.get_short_help_str()
+        yield name, help
+
+
+@cli.command(name="get-cli-info", hidden=True)
+@pass_context
+def _get_cli_info(ctx):
+    print(dumps({k: v for k, v in command_info(ctx, cli)}))

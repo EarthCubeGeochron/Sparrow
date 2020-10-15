@@ -58,7 +58,22 @@ class Enum(Related):
     pass
 
 
+class NullableRelated(Related):
+    def __init__(self, *args, **kwargs):
+        kwargs["allow_none"] = True
+        super().__init__(*args, **kwargs)
+
+    def _deserialize(self, value, attr=None, data=None, **kwargs):
+        if value is None:
+            if self.many:
+                return []
+            return None
+        return super()._deserialize(value, attr, data, **kwargs)
+
+
 class SmartNested(Nested, Related):
+    """This field allows us to resolve relationships as either primary keys or nested models."""
+
     # https://github.com/marshmallow-code/marshmallow/blob/dev/src/marshmallow/fields.py
     # TODO: better conformance of this field to Marshmallow's OpenAPI schema generation
     # https://apispec.readthedocs.io/en/latest/using_plugins.html
@@ -71,6 +86,7 @@ class SmartNested(Nested, Related):
         super(Related, self).__init__(**field_kwargs)
         self._many = many
         self._instances = set()
+        self.allow_none = True
 
     def _deserialize(self, value, attr=None, data=None, **kwargs):
         if isinstance(value, self.schema.opts.model):
@@ -113,16 +129,12 @@ class SmartNested(Nested, Related):
         self._copy_config("_show_audit_id")
 
         other_name = self.related_model.__table__.name
-        if other_name in self.root.allowed_nests:
+        _allowed = self.root.allowed_nests
+        if other_name in _allowed or _allowed == "all":
             # Serialize as nested
             return super(Nested, self)._serialize(value, attr, obj)
 
         # If we don't want to nest
-        if isinstance(value, Iterable):
+        if self._many:
             return [self._serialize_instance(v) for v in value]
         return self._serialize_instance(value)
-
-    def _validate(self, value):
-        # Should also validate against Related field
-        log.info(value)
-        return super(Nested, self)._validate(value)

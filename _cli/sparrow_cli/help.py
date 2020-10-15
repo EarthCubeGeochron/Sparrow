@@ -1,13 +1,15 @@
 import sys
 import re
+import json
 from click import style, secho
+from click.formatting import HelpFormatter
 from os import environ, path
 from pathlib import Path
 from itertools import chain
 from rich.console import Console
 from subprocess import PIPE, STDOUT
-from click.formatting import HelpFormatter
-from .util import compose
+from .util import cmd, exec_or_run
+from .base import cli
 
 console = Console()
 
@@ -85,7 +87,48 @@ def format_config_path(cfg):
     return path.join(*tokens)
 
 
-def echo_help(core_commands=None, user_commands=None):
+def get_backend_command_help():
+    out = cmd(
+        "docker run -it --rm -v wiscar_runtime_data:/run busybox cat /run/cli-info.json",
+        stdout=PIPE,
+        stderr=STDOUT,
+    )
+    if out.returncode != 0:
+        out = exec_or_run(
+            "backend", "cat /run/cli-info.json", tty=False, stdout=PIPE, stderr=STDOUT
+        )
+    if out.returncode != 0:
+        secho("Could not access help text for the Sparrow backend", err=True, fg="red")
+        _err = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"
+        secho(_err, dim=True)
+        return None
+    return json.loads(str(out.stdout, "utf-8"))
+
+
+def backend_help(fmt):
+    # Grab commands file from backend
+    commands = get_backend_command_help()
+    if commands is None:
+        return
+    with fmt.section("Backend"):
+        fmt.write_dl(
+            [(k, format_description(v)) for k, v in commands.items()], col_spacing=2
+        )
+        fmt.write("\n")
+    fmt.flush()
+    return fmt
+
+
+def command_info(ctx, cli):
+    for name in cli.list_commands(ctx):
+        cmd = cli.get_command(ctx, name)
+        if any([cmd.hidden, name in sections.keys(), name == "main"]):
+            continue
+        help = cmd.get_short_help_str()
+        yield name, help
+
+
+def echo_help(ctx, core_commands=None, user_commands=None):
     fmt = SparrowHelpFormatter()
 
     fmt.write_usage("sparrow", "[options] <command> [args]...")
@@ -100,14 +143,7 @@ def echo_help(core_commands=None, user_commands=None):
     fmt.write_line(f"Lab: {d1}")
     fmt.flush()
 
-    # Note: TTY flag (-T) has issues on older versions of docker-compose (<~1.23).
-    # We solve this by bundling a newer version of docker-compose.
-    out = compose("run --no-deps -T backend sparrow", stdout=PIPE, stderr=STDOUT)
-    if out.returncode != 0:
-        secho("Could not access help text for the Sparrow backend", err=True, fg="red")
-        return
-    else:
-        fmt.write(str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n")
+    fmt.write("")
 
     with fmt.section("Command groups"):
         fmt.write_dl(
@@ -116,6 +152,8 @@ def echo_help(core_commands=None, user_commands=None):
         fmt.write("\n")
 
     fmt.flush()
+
+    fmt = backend_help(fmt)
 
     if user_commands is not None:
         lab_name = environ.get("SPARROW_LAB_NAME", "Lab-specific")
@@ -127,6 +165,7 @@ def echo_help(core_commands=None, user_commands=None):
                 core_commands,
                 extra_commands={
                     "compose": "Alias to `docker-compose` that respects `sparrow` config",
+                    **{k: v for k, v in command_info(ctx, cli)},
                 },
             ),
             col_spacing=9,

@@ -1,10 +1,10 @@
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
+from sqlalchemy import interfaces
+from sqlalchemy.ext.automap import generate_relationship
 from click import secho
 from ...logs import get_logger
 from ...exceptions import DatabaseMappingError
-
-log = get_logger(__name__)
 
 # Drag in geographic types for database reflection
 from geoalchemy2 import Geometry, Geography
@@ -20,6 +20,20 @@ from .util import (
     name_for_collection_relationship,
 )
 from .base import BaseModel
+
+log = get_logger(__name__)
+
+
+def _gen_relationship(
+    base, direction, return_fn, attrname, local_cls, referred_cls, **kw
+):
+    if local_cls.__table__.schema is None and referred_cls.__table__.schema is not None:
+        kw["backref"] = None
+    # make use of the built-in function to actually return
+    # the result.
+    return generate_relationship(
+        base, direction, return_fn, attrname, local_cls, referred_cls, **kw
+    )
 
 
 class AutomapError(Exception):
@@ -90,6 +104,7 @@ class MappedDatabaseMixin(object):
             name_for_scalar_relationship=name_for_scalar_relationship,
             name_for_collection_relationship=name_for_collection_relationship,
             classname_for_table=_classname_for_table,
+            generate_relationship=_gen_relationship,
         )
 
         BaseModel.prepare(self.engine, reflect=True, **reflection_kwargs)

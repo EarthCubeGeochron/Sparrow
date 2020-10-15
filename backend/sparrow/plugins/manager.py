@@ -34,6 +34,11 @@ class SparrowPluginManager(object):
 
     def order_plugins(self, store=None):
         store = store or self.__store
+        for p in store:
+            if getattr(p, "name") is None:
+                raise SparrowPluginError(
+                    f"Sparrow plugin '{p}' must have a name attribute."
+                )
         struct = {p.name: set(p.dependencies) for p in store}
         map = {p.name: p for p in store}
         res = toposort_flatten(struct)

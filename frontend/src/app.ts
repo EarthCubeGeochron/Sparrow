@@ -1,109 +1,73 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import h from "react-hyperscript";
-import { Component } from "react";
+import h, { C, compose } from "@macrostrat/hyper";
+import { useEffect } from "react";
 import { join } from "path";
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  useLocation,
-} from "react-router-dom";
-import { HomePage } from "./homepage";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
+import loadable from "@loadable/component";
 
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
+import { DarkModeManager, PageRoute, NoMatchPage } from "~/util";
 import { APIProvider } from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
-import { APIExplorerV2 } from "./api-v2";
-import { PageFooter } from "./shared/footer";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
-import { Catalog, CatalogNavLinks } from "./admin";
-import { AppNavbar, NavButton } from "./components/navbar";
-import { MapPage } from "./map";
-import styled from "@emotion/styled";
+import { AdminRoute } from "./admin";
+import { PageStyle } from "~/components/page-skeleton";
+import HomePage from "./homepage";
+import Catalog from "./catalog";
 
-const AppHolder = styled.div`\
-display: flex;
-flex-direction: column;
-min-height: 100vh;\
-`;
+//import { MapSelector } from "./data-sheet/sheet-enter-components";
 
-const Expander = styled.div`\
-flex-grow: 1;\
-`;
+const APIExplorerV2 = loadable(async function () {
+  const module = await import("./api-v2");
+  return module.APIExplorerV2;
+});
 
-const HideNavbarSometimes = function (props) {
-  /*
-  Defines a hideable global UI component
-  */
-  const location = useLocation();
-  const hidePaths = ["/map"];
-  if (hidePaths.includes(location.pathname)) {
-    return null;
-  }
-  return h([props.children]);
-};
+const MapPage = loadable(async function () {
+  const module = await import("./map");
+  return module.MapPage;
+});
 
-const MainNavbar = (props) =>
-  h(AppNavbar, { fullTitle: true }, [
-    h(CatalogNavLinks, { base: "/catalog" }),
-    h(NavButton, { to: "/map" }, "Map"),
-    h(AppNavbar.Divider),
-    h(NavButton, { to: "/api-explorer/v1" }, "API"),
-  ]);
-
-class AppMain extends Component {
+function AppRouter(props) {
   // Handles routing for the application between pages
-  render() {
-    const { baseURL } = this.props;
-    return h(
-      Router,
-      { basename: baseURL },
-      h(AppHolder, [
-        h(Expander, [
-          h(HideNavbarSometimes, null, h(MainNavbar)),
-          h(Switch, [
-            h(Route, {
-              path: "/",
-              exact: true,
-              render() {
-                return h(HomePage);
-              },
-            }),
-            h(Route, {
-              path: "/catalog",
-              render() {
-                return h(Catalog, { base: "/catalog" });
-              },
-            }),
-            h(Route, {
-              path: "/map",
-              component: MapPage,
-            }),
-            h(Route, {
-              path: "/api-explorer",
-              component: APIExplorerV2,
-              exact: true,
-            }),
-            h(Route, { path: "/api-explorer/v1", component: APIExplorer }),
-          ]),
-        ]),
-        h(HideNavbarSometimes, null, h(PageFooter)),
-      ])
-    );
-  }
-  componentDidMount() {
+  const { baseURL } = props;
+
+  // Tab Title becomes WiscAr-Sparrow
+  // TODO: We could use the 'react-helmet' library to manage this...
+  useEffect(() => {
     const labname = process.env.SPARROW_LAB_NAME;
-    return (document.title =
-      labname != null ? `${labname} – Sparrow` : "Sparrow");
-  }
+    document.title = labname != null ? `${labname} – Sparrow` : "Sparrow";
+  }, []);
+
+  return h(
+    Router,
+    { basename: baseURL },
+    h(Switch, [
+      h(PageRoute, {
+        path: "/",
+        exact: true,
+        component: HomePage,
+      }),
+      h(PageRoute, {
+        path: "/catalog",
+        render: () => h(Catalog, { base: "/catalog" }),
+      }),
+      h(PageRoute, {
+        path: "/map",
+        style: PageStyle.FULLSCREEN,
+        component: MapPage,
+      }),
+      h(AdminRoute, { path: "/admin" }),
+      h(PageRoute, {
+        path: "/api-explorer",
+        component: APIExplorerV2,
+        exact: true,
+      }),
+      h(PageRoute, { path: "/api-explorer-v1", component: APIExplorer }),
+      h(PageRoute, { path: "*", component: NoMatchPage }),
+    ])
+  );
 }
 
 const errorHandler = function (route, response) {
@@ -116,21 +80,20 @@ const errorHandler = function (route, response) {
   return AppToaster.show({ message, intent: Intent.DANGER });
 };
 
-const App = function () {
+function App() {
   // Nest application in React context providers
-  const baseURL = process.env.BASE_URL || "/";
-  const apiBaseURL = join(baseURL, "/api/v1");
-  console.log(apiBaseURL);
+  const baseURL = "/";
+  const apiBaseURL = join(process.env.BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
 
   return h(
-    FrameProvider,
-    { overrides: siteContent },
-    h(
-      APIProvider,
-      { baseURL: apiBaseURL, onError: errorHandler },
-      h(AuthProvider, null, h(AppMain, { baseURL }))
+    compose(
+      C(FrameProvider, { overrides: siteContent }),
+      C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
+      AuthProvider,
+      DarkModeManager,
+      C(AppRouter, { baseURL })
     )
   );
-};
+}
 
-export { App };
+export default App;
