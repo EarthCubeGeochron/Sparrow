@@ -99,6 +99,25 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # Filter on properties that actually have a local column
         filters = {}
         related_models = {}
+
+        # Try to get filters for unique and pk columns first
+        for prop in self.opts.model.__mapper__.iterate_properties:
+            columns = getattr(prop, "columns", False)
+            if columns:
+                is_fully_defined = all(
+                    [any([c.primary_key, c.unique]) for c in columns]
+                )
+                # Shim for the fact that we don't correctly find Session.uuid as unique at the moment...
+                # TODO: fix this in general
+                if self.opts.model.__name__ == "Session" and prop.key == "uuid":
+                    is_fully_defined = True
+                if is_fully_defined:
+                    val = data.get(prop.key, None)
+                    if val is not None:
+                        filters[prop.key] = val
+        if filters:
+            return filters, related_models
+
         for prop in self.opts.model.__mapper__.iterate_properties:
             val = data.get(prop.key, None)
             if getattr(prop, "uselist", False):
@@ -127,11 +146,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         filters, related_models = self._build_filters(data)
 
+        msg = f"Finding instance of {self.opts.model.__name__}"
         # Try to get value from session
-        log.debug(f"Finding instance of {self.opts.model.__name__}")
-        log.debug(f"..filters: {filters}")
-        log.debug(f"..related models: {related_models}")
-        log.debug(f"..data: {data}")
+        # log.debug(msg)
+        #
+        # log.debug(f"..related models: {related_models}")
+        # log.debug(f"..data: {data}")
         instance = self._get_session_instance(filters)
 
         # Need to get relationship columns for primary keys!
@@ -139,9 +159,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
             query = self.session.query(self.opts.model).filter_by(**filters)
             instance = query.first()
             if instance is None:
-                log.debug("..none found")
+                log.debug(msg + "...none found")
             else:
-                log.debug("..success!")
+                log.debug(msg + f"...success!\n...filters: {filters}")
         if instance is None:
             instance = super().get_instance(data)
 
