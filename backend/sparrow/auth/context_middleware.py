@@ -16,6 +16,12 @@ infrastructure provides a way to build something much cleaner and more sophistic
 
 - https://github.com/encode/starlette/issues/420
 - https://github.com/retnikt/star_jwt/blob/master/star_jwt/backend.py
+
+# A nice explanation of JWT:
+
+- https://jwt.io/
+
+
 """
 
 from contextvars import ContextVar
