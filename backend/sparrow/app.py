@@ -8,6 +8,7 @@ from .api.v1 import APIv1
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .interface import InterfacePlugin
 from .auth import AuthPlugin
+from .auth.api import AuthV2Plugin
 
 # from .graph import GraphQLPlugin
 from .web import WebPlugin
@@ -118,6 +119,7 @@ class App(Flask):
         import core_plugins
 
         self.register_plugin(AuthPlugin)
+        self.register_plugin(AuthV2Plugin)
         # GraphQL is disabled for now
         # self.register_plugin(GraphQLPlugin)
         self.register_plugin(WebPlugin)

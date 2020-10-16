@@ -24,6 +24,7 @@ from flask_jwt_extended import (
 from ..api.v1.base import APIResourceCollection
 from ..database.models import User
 from ..plugins import SparrowCorePlugin
+from jwt.exceptions import InvalidSignatureError
 
 parser = reqparse.RequestParser()
 parser.add_argument("username", help="This field cannot be blank", required=True)
