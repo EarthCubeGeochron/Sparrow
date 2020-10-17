@@ -40,10 +40,10 @@ class JWTBackend(AuthenticationBackend):
     def __init__(self, encode_key: str):
         self.encode_key = encode_key
 
-    def set_cookie(response: Response, type, **data):
+    def set_cookie(self, response: Response, type, **data):
         """set a basic cookie on the response"""
         now = time.time()
-        max_age = data.pop(max_age, 60 * 60)
+        max_age = data.pop("max_age", 60 * 60)
         name = type + "_token_cookie"
 
         payload = dict(iat=now, nbf=now, exp=now + max_age, type=type)
@@ -51,7 +51,7 @@ class JWTBackend(AuthenticationBackend):
 
         response.set_cookie(
             name,
-            value=self._encode(payload),
+            value=self._encode(payload).decode("utf-8"),
             max_age=max_age,
             # We could set this to make cookies valid only at secure paths
             secure=False,

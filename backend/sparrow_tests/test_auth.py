@@ -9,6 +9,13 @@ def auth_backend():
     return JWTBackend(environ.get("SPARROW_SECRET_KEY"))
 
 
+def check_forbidden(res):
+    assert res.status_code == 403
+    data = res.json()["error"]
+    assert data["detail"] == "Forbidden"
+    assert data["status_code"] == 403
+
+
 class TestSparrowAuth:
     def test_create_user(self, db):
         user = "Test"
@@ -25,6 +32,10 @@ class TestSparrowAuth:
         user = db.session.query(db.model.user).get("Test")
         assert user.username == "Test"
 
+    def test_forbidden(self, client):
+        res = client.get("/api/v2/auth/secret")
+        check_forbidden(res)
+
     def test_login(self, client, auth_backend):
         res = client.post(
             "/api/v2/auth/login", json={"username": "Test", "password": "test"}
@@ -39,5 +50,15 @@ class TestSparrowAuth:
             assert payload.get("type") == type
             assert payload.get("identity") == "Test"
 
+    def test_bad_login(self, client):
+        res = client.post(
+            "/api/v2/auth/login", json={"username": "TestA", "password": "test"}
+        )
+        assert res.status_code == 401
+        assert res.json()["login"] == False
+
     def test_invalid_token(self, client):
-        pass
+        res = client.get(
+            "/api/v2/auth/secret", cookies={"access_token_cookie": "ekadqw4fw"}
+        )
+        check_forbidden(res)

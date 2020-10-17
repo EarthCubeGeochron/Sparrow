@@ -27,11 +27,11 @@ async def login(request, username: str, password: str):
     log.debug(current_user)
 
     if current_user is None:
-        response = JSONResponse(dict(login=False, username=None))
+        response = JSONResponse(dict(login=False, username=None), status_code=401)
         return backend.logout(response)
 
     if not current_user.is_correct_password(password):
-        response = JSONResponse(dict(login=False, username=username))
+        response = JSONResponse(dict(login=False, username=username), status_code=401)
         return backend.logout(response)
 
     # access_token = create_access_token(identity=username)
