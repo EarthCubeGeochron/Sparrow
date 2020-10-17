@@ -1,7 +1,7 @@
 from sparrow.auth.create_user import _create_user
 from sparrow.auth.backend import JWTBackend
 from os import environ
-from pytest import fixture
+from pytest import fixture, mark
 
 
 @fixture(scope="class")
@@ -16,17 +16,27 @@ def check_forbidden(res):
     assert data["status_code"] == 403
 
 
+def get_access_cookie(response):
+    return {"access_token_cookie": response.cookies.get("access_token_cookie")}
+
+
 def verify_credentials(client, cred):
     login = client.post("/api/v2/auth/login", json=cred)
-    res = client.get(
-        "/api/v2/auth/status",
-        cookies={"access_token_cookie": login.cookies.get("access_token_cookie")},
-    )
+    res = client.get("/api/v2/auth/status", cookies=get_access_cookie(login))
     assert res.status_code == 200
     data = res.json()
     assert data["username"] == cred["username"]
     assert data["login"]
     return res
+
+
+bad_credentials = [
+    {"username": "TestA", "password": "test"},
+    {"username": "TestA", "password": "xxxxx"},
+    {"username": "", "password": ""},
+    {},
+    None,
+]
 
 
 class TestSparrowAuth:
@@ -63,12 +73,12 @@ class TestSparrowAuth:
             assert payload.get("type") == type
             assert payload.get("identity") == "Test"
 
-    def test_bad_login(self, client):
-        res = client.post(
-            "/api/v2/auth/login", json={"username": "TestA", "password": "test"}
-        )
-        assert res.status_code == 401
-        assert res.json()["login"] == False
+    @mark.parametrize("bad_credentials", bad_credentials)
+    def test_bad_login(self, client, bad_credentials):
+        res = client.post("/api/v2/auth/login", json=bad_credentials)
+        assert res.status_code in [401, 422]
+        if res.status_code == 401:
+            assert not res.json()["login"]
 
     def test_invalid_token(self, client):
         res = client.get(
@@ -89,7 +99,11 @@ class TestSparrowAuth:
         assert data["username"] is None
 
     def test_login_flow(self, client):
-        verify_credentials(client, {"username": "Test", "password": "test"})
+        res = verify_credentials(client, {"username": "Test", "password": "test"})
+        secret = client.get("/api/v2/auth/secret", cookies=get_access_cookie(res))
+        assert secret.status_code == 200
+        data = secret.json()
+        assert data["answer"] == 42
 
     def test_invalid_login(self, client):
         try:
