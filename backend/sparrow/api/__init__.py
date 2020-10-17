@@ -17,6 +17,7 @@ log = get_logger(__name__)
 
 async def http_exception(request, exc):
     log.error(f"{exc.status_code} {exc.detail}")
+    # if exc.detail == "Internal Server Error":
     log.exception(exc)
     return JSONResponse(
         {"error": {"detail": exc.detail, "status_code": exc.status_code}},

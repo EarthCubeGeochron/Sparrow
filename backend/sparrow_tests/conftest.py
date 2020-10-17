@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
 from starlette.testclient import TestClient
 from sparrow.asgi import app as app_
+from sparrow.context import _setup_context
 
 
 # Slow tests are opt-in
@@ -32,6 +33,7 @@ def db(app):
     transaction = connection.begin()
     session_factory = sessionmaker(bind=connection)
     app.database.session = scoped_session(session_factory)
+    _setup_context(app)
     yield app.database
     app.database.session.close()
     transaction.rollback()
