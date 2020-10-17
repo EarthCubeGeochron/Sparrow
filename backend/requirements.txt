@@ -62,7 +62,6 @@ graphene==2.1.8
 graphene_sqlalchemy==2.2.2
 
 # API version 2
-flama==0.15.0
 webargs-starlette==2.0.0
 sqlakeyset
 apispec==3.3.1
@@ -79,5 +78,5 @@ deepdiff[murmur]==5.0.2
 
 # ASGI
 starlette==0.13.4
-Hypercorn==0.11.0
+Hypercorn==0.11.1
 asgiref==3.2.8

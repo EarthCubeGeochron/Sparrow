@@ -16,13 +16,15 @@ log = get_logger(__name__)
 
 
 async def http_exception(request, exc):
+    log.error(f"{exc.status_code} {exc.detail}")
+    log.exception(exc)
     return JSONResponse(
         {"error": {"detail": exc.detail, "status_code": exc.status_code}},
         status_code=exc.status_code,
     )
 
 
-exception_handlers = {}  # HTTPException: http_exception}
+exception_handlers = {HTTPException: http_exception}
 
 
 class OpenAPIResponse(Response):
