@@ -26,6 +26,16 @@ function DataModelLinks(props) {
     h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
     h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
     h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
+    // h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
+  ]);
+}
+
+function AdminDataModelLinks(props) {
+  const { base = "/catalog" } = props;
+  return h("div.data-model-links", [
+    h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
+    h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
+    h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
     h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
   ]);
 }
@@ -90,4 +100,4 @@ const Catalog = ({ base }) =>
   ]);
 
 export default Catalog;
-export { DataModelLinks };
+export { AdminDataModelLinks, DataModelLinks };

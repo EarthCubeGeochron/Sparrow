@@ -11,9 +11,9 @@ import { ProjectAdminPage } from "./project";
 
 import { SampleAdminPage } from "./sample";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
-import { DataModelLinks } from "~/catalog";
+import { DataModelLinks, AdminDataModelLinks } from "~/catalog";
 import { NavButton } from "~/components";
-import { CatalogNavLinks } from "~/catalog/nav";
+import { AdminNavLinks } from "~/catalog/nav";
 import styles from "./module.styl";
 import { SessionAdminPage } from "./session";
 import { DataFileAdminPage } from "./data-file";
@@ -25,16 +25,18 @@ const h = hyperStyled(styles);
 const AdminNavbar = (props) => {
   const { base, ...rest } = props;
   return h(AppNavbar, { ...rest, fullTitle: true, subtitle: "Admin" }, [
-    h(CatalogNavLinks, { base }),
+    h(AdminNavLinks, { base }),
     h(AppNavbar.Divider),
-    h(NavButton, { to: base + "/data-sheet" }, "Sheet"),
+    //h(NavButton, { to: base + "/data-sheet" }, "Sheet"),
     h(NavButton, { to: "/map" }, "Map"),
     h(NavButton, { to: base + "/lexicon" }, "Lexicon"),
   ]);
 };
 
 const AdminBody = ({ base, ...rest }) => {
-  return h(Frame, { id: "adminBase", ...rest }, h(DataModelLinks, { base }));
+  return h(Frame, { id: "adminBase", ...rest }, [
+    h(AdminDataModelLinks, { base }),
+  ]);
 };
 
 const AdminRouter = ({ base }) =>

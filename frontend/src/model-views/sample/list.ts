@@ -62,28 +62,29 @@ const SampleList = function() {
 };
 
 interface sample {
+  Edit?: boolean;
   id?: number;
   sendQuery: () => {};
 }
 const SampleComponent = function(props: sample) {
-  const { id } = props;
+  const { id, Edit } = props;
 
   const url = `http://localhost:5002/api/v2/models/sample/${id}`;
 
-  const data = useAPIResult(url, { nest: "session" });
+  const data = useAPIResult(url, { nest: "session,project" });
   if (id == null || data == null) {
     return null;
   }
 
   //const sample = data[0];
-  return h("div.data-view.project", null, h(SamplePage, { data }));
+  return h("div.data-view.project", null, h(SamplePage, { data, Edit }));
 };
 
-function SampleMatch() {
+function SampleMatch({ Edit }) {
   const {
     params: { id },
   } = useRouteMatch();
-  return h(SampleComponent, { id });
+  return h(SampleComponent, { id, Edit });
 }
 
 export { SampleList, SampleListCard, SampleMatch, SampleComponent };

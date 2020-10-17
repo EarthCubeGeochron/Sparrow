@@ -9,10 +9,11 @@ const h = hyperStyled(styles);
 
 export function ProjectMainPanel() {
   const base = "/admin/project";
+  const Edit = true;
   return h(Switch, [
     h(Route, {
       path: base + "/:id",
-      render: () => h(ProjectMatch),
+      render: () => h(ProjectMatch, { Edit }),
     }),
     h(Route, {
       path: base,

@@ -65,12 +65,12 @@ function SampleListComponent() {
 // const { id, date, target, technique } = props;
 function unWrapSessionCardData(data) {
   const dataObj = data.data.map((obj) => {
-    const { id: session_id, technique, target, date: session_date } = obj;
+    const { id: session_id, technique, target, date } = obj;
     return {
       session_id,
       technique,
       target,
-      session_date,
+      date,
     };
   });
   return dataObj;

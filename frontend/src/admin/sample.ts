@@ -16,7 +16,7 @@ export function SampleMainPanel() {
       {
         path: base + "/:id",
       },
-      h(SampleMatch)
+      h(SampleMatch, { Edit: true })
     ),
     h(Route, {
       path: base,
