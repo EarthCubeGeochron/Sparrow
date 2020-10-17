@@ -33,7 +33,7 @@ RUN pip install -e .
 
 # Copy command-line options to a place where they can be easily accessed
 # by the wrapper CLI.
-RUN (SPARROW_SECRET_KEY=test sparrow get-cli-info 2>/dev/null) > /run/cli-info.json
+RUN SPARROW_SECRET_KEY=test sparrow get-cli-info > /run/cli-info.json
 
 CMD ["/bin/run"]
 

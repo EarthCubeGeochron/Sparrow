@@ -1,9 +1,8 @@
-from flask import current_app, jsonify
-from flask_restful import Resource, reqparse
-from flask_jwt_extended import jwt_required
-
+from flask import current_app
+from flask_restful import Resource
 from sparrow import get_logger
-from sparrow.api.v1 import APIResourceCollection, ModelEditParser
+from sparrow.api.v1.base import APIResourceCollection
+from sparrow.api.v1 import ModelEditParser, get_jwt_identity
 from sparrow.plugins import SparrowCorePlugin
 
 log = get_logger(__name__)
@@ -13,8 +12,8 @@ ProjectEditAPI = APIResourceCollection()
 
 @ProjectEditAPI.resource("/<int:id>")
 class ProjectEditResource(Resource):
-    @jwt_required
     def put(self, id):
+        get_jwt_identity(required=True)
 
         db = current_app.database
         model = db.model.project

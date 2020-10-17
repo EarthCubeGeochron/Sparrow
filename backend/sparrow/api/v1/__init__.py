@@ -1,11 +1,10 @@
-from flask import Flask, Blueprint
+from flask import Blueprint, abort, request
 from flask_restful import Resource, reqparse, inputs, abort
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
-from flask import jsonify
-from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from textwrap import dedent
 from datetime import datetime
+from sparrow.auth import get_backend, AuthenticationError
 from ...logs import get_logger
 
 from .base import API, APIResourceCollection
@@ -17,6 +16,17 @@ log = get_logger(__name__)
 
 # eventually should use **Marshmallow** or similar
 # for parsing incoming API requests
+
+
+def get_jwt_identity(required=True):
+    auth = get_backend()
+    try:
+        ident = auth.get_identity(request)
+    except AuthenticationError:
+        ident = None
+    if required and ident is None:
+        abort(401)
+    return ident
 
 
 def date(date_string):
@@ -221,13 +231,13 @@ class APIv1(API):
                     record=dict(route=get_route, key=key.name, type=tname),
                 )
 
-            @jwt_optional
+            # JWT is optional...
             def get(self):
 
                 args = parser.parse_args()
 
                 # Check identity and abort if unauthorized
-                identity = get_jwt_identity()
+                identity = get_jwt_identity(required=False)
                 # If we are logged in, always request private
                 # (this should probably be handled better in the long term)
                 # private = identity is not None
@@ -321,8 +331,9 @@ class APIv1(API):
                     db.session.close()
 
         class RecordModel(Resource):
-            @jwt_required
+            # JWT is required
             def get(self, id):
+                ident = get_jwt_identity(required=True)
                 # Should fail if more than one record is returned
                 return db.session.query(table).filter(key == id).first()
 

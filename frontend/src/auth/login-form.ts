@@ -43,9 +43,7 @@ class LoginFormInner extends Component {
 }
 
 class LoginForm extends StatefulComponent {
-  static initClass() {
-    this.contextType = AuthContext;
-  }
+  static contextType = AuthContext;
   constructor() {
     super(...arguments);
     this.resetState = this.resetState.bind(this);
@@ -195,6 +193,5 @@ class LoginForm extends StatefulComponent {
     );
   }
 }
-LoginForm.initClass();
 
 export { LoginForm };
