@@ -1,21 +1,17 @@
-from os import environ
-from sparrow.plugins import SparrowCorePlugin
 from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
 from starlette.authentication import requires, AuthenticationError
-from starlette.middleware.authentication import AuthenticationMiddleware
 from webargs_starlette import use_annotations
 from sparrow.database.models import User
 from sparrow.context import app_context
 from sparrow.logs import get_logger
-from .backend import JWTBackend
 
 log = get_logger(__name__)
 
 
 def get_backend():
     ctx = app_context()
-    return ctx.plugins.get("auth-v2").backend
+    return ctx.plugins.get("auth").backend
 
 
 def UnauthorizedResponse(**kwargs):
@@ -68,22 +64,12 @@ def secret(request):
     return JSONResponse({"answer": 42})
 
 
-routes = [
-    Route("/login", endpoint=login, methods=["POST"]),
-    Route("/logout", endpoint=logout, methods=["POST"]),
-    Route("/refresh", endpoint=refresh, methods=["POST"]),
-    Route("/status", endpoint=status),
-    Route("/secret", endpoint=secret),
-]
-
-
-class AuthV2Plugin(SparrowCorePlugin):
-    name = "auth-v2"
-
-    backend = JWTBackend(environ.get("SPARROW_SECRET_KEY", ""))
-
-    def on_asgi_setup(self, api):
-        api.add_middleware(AuthenticationMiddleware, backend=self.backend)
-
-    def on_api_initialized_v2(self, api):
-        api.mount("/auth", Router(routes), name="auth_api")
+AuthAPI = Router(
+    [
+        Route("/login", endpoint=login, methods=["POST"]),
+        Route("/logout", endpoint=logout, methods=["POST"]),
+        Route("/refresh", endpoint=refresh, methods=["POST"]),
+        Route("/status", endpoint=status),
+        Route("/secret", endpoint=secret),
+    ]
+)
