@@ -22,7 +22,7 @@ async def http_exception(request, exc):
     )
 
 
-exception_handlers = {HTTPException: http_exception}
+exception_handlers = {}  # HTTPException: http_exception}
 
 
 class OpenAPIResponse(Response):
@@ -125,6 +125,9 @@ class APIv2(Starlette):
         tbl = iface.opts.model.__table__
         desc = model_description(iface)
         basic_info = dict(
-            route=endpoint, table=tbl.name, schema=tbl.schema, description=str(desc),
+            route=endpoint,
+            table=tbl.name,
+            schema=tbl.schema,
+            description=str(desc),
         )
         self.route_descriptions[root_route].append(basic_info)

@@ -9,18 +9,22 @@ infrastructure provides a way to build something much cleaner and more sophistic
 
 # Prior art:
 
-- https://github.com/amitripshtos/starlette-jwt/tree/master/starlette_jwt
+- https://github.com/amitripshtos/starlette-jwt/tree/master/starlette_jwt [Uses headers]
+- https://github.com/retnikt/star_jwt/blob/master/star_jwt/backend.py [Uses cookies]
 - https://www.starlette.io/authentication/
 
 # Context vars
 
 - https://github.com/encode/starlette/issues/420
-- https://github.com/retnikt/star_jwt/blob/master/star_jwt/backend.py
 
 # A nice explanation of JWT:
 
 - https://jwt.io/
 
+# We store JWT tokens in cookies because it's more secure.
+- https://flask-jwt-extended.readthedocs.io/en/latest/tokens_in_cookies.html
+
+# However, we might want to include storing tokens API headers for programmatic access...
 
 """
 

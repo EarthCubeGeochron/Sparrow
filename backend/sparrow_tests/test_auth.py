@@ -11,3 +11,4 @@ class TestSparrowAuth:
         res = client.post(
             "/api/v2/auth/login", data={"username": "Test", "password": "test"}
         )
+        assert False
