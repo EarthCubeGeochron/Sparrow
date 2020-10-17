@@ -2,7 +2,7 @@ from os import environ
 from sparrow.plugins import SparrowCorePlugin
 from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
-from starlette.authentication import requires
+from starlette.authentication import requires, AuthenticationError
 from starlette.middleware.authentication import AuthenticationMiddleware
 from webargs_starlette import use_annotations
 from sparrow.database.models import User
@@ -18,6 +18,10 @@ def get_backend():
     return ctx.plugins.get("auth-v2").backend
 
 
+def UnauthorizedResponse(**kwargs):
+    return JSONResponse(dict(login=False, username=None), **kwargs)
+
+
 @use_annotations(location="json")
 async def login(request, username: str, password: str):
     db = app_context().database
@@ -26,38 +30,27 @@ async def login(request, username: str, password: str):
     current_user = db.session.query(User).get(username)
     log.debug(current_user)
 
-    if current_user is None:
-        response = JSONResponse(dict(login=False, username=None), status_code=401)
-        return backend.logout(response)
+    if current_user is not None and current_user.is_correct_password(password):
+        resp = JSONResponse(dict(login=True, username=username))
+        return backend.set_login_cookies(resp, identity=username)
 
-    if not current_user.is_correct_password(password):
-        response = JSONResponse(dict(login=False, username=username), status_code=401)
-        return backend.logout(response)
-
-    # access_token = create_access_token(identity=username)
-    # refresh_token = create_refresh_token(identity=username)
-
-    resp = JSONResponse(dict(login=True, username=username))
-    return backend.set_login_cookies(resp, identity=username)
-
-    # set_access_cookies(resp, access_token)
-    # set_refresh_cookies(resp, refresh_token)
-    # return resp
+    return backend.logout(UnauthorizedResponse(status_code=401))
 
 
 def logout(request):
     backend = get_backend()
-    response = JSONResponse(dict(login=False))
-    return backend.logout(response)
+    return backend.logout(UnauthorizedResponse(status_code=200))
 
 
 def status(request):
-    username = None
-    # get_jwt_identity()
-    if username:
-        resp = JSONResponse(dict(login=True, username=username))
-        return resp
-    return JSONResponse(dict(login=False))
+    backend = get_backend()
+    try:
+        identity = backend.get_identity(request)
+        return JSONResponse(dict(login=True, username=identity))
+    except AuthenticationError:
+        # We have to handle authentication errors to return a 200 response
+        # even though the user is logged out
+        return UnauthorizedResponse(status_code=200)
 
 
 def refresh(request):

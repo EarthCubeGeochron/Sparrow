@@ -16,6 +16,19 @@ def check_forbidden(res):
     assert data["status_code"] == 403
 
 
+def verify_credentials(client, cred):
+    login = client.post("/api/v2/auth/login", json=cred)
+    res = client.get(
+        "/api/v2/auth/status",
+        cookies={"access_token_cookie": login.cookies.get("access_token_cookie")},
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["username"] == cred["username"]
+    assert data["login"]
+    return res
+
+
 class TestSparrowAuth:
     def test_create_user(self, db):
         user = "Test"
@@ -66,3 +79,24 @@ class TestSparrowAuth:
     def test_v1_restricted(self, client):
         res = client.get("/api/v1/sample", params={"all": True})
         assert res.status_code == 200
+
+    def test_status(self, client):
+        """We should be logged out"""
+        res = client.get("/api/v2/auth/status")
+        assert res.status_code == 200
+        data = res.json()
+        assert not data["login"]
+        assert data["username"] is None
+
+    def test_login_flow(self, client):
+        verify_credentials(client, {"username": "Test", "password": "test"})
+
+    def test_invalid_login(self, client):
+        try:
+            res = verify_credentials(
+                client, {"username": "TestAAA", "password": "test"}
+            )
+        except AssertionError:
+            # We expect an assertion error here...
+            return
+        assert False
