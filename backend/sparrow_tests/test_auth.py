@@ -62,3 +62,7 @@ class TestSparrowAuth:
             "/api/v2/auth/secret", cookies={"access_token_cookie": "ekadqw4fw"}
         )
         check_forbidden(res)
+
+    def test_v1_restricted(self, client):
+        res = client.get("/api/v1/sample", params={"all": True})
+        assert res.status_code == 200

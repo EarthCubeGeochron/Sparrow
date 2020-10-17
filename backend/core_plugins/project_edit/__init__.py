@@ -1,9 +1,10 @@
-from flask import current_app, jsonify
-from flask_restful import Resource, reqparse
+from flask import current_app
+from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 
 from sparrow import get_logger
-from sparrow.api.v1 import APIResourceCollection, ModelEditParser
+from sparrow.api.v1.base import APIResourceCollection
+from sparrow.api.v1 import ModelEditParser
 from sparrow.plugins import SparrowCorePlugin
 
 log = get_logger(__name__)
