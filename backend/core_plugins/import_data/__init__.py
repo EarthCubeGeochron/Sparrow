@@ -1,6 +1,5 @@
 from flask import current_app, jsonify, request
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import jwt_required
 
 from sparrow import get_logger
 from sparrow.api.v1 import APIResourceCollection, ModelEditParser
@@ -14,8 +13,7 @@ ImportDataAPI = APIResourceCollection()
 
 
 def construct_error_response(err: Exception, code: int):
-    """Constructs an error response for a Marshmallow validation error
-    """
+    """Constructs an error response for a Marshmallow validation error"""
     try:
         # ValidationErrors have "messages" but most errors don't
         msg = err.messages
@@ -47,6 +45,7 @@ class ImportDataResource(Resource):
 
     def put(self, model_name):
         db = current_app.database
+        # TODO: lock this down so that login is required...!!!!
         try:
             req = request.get_json()
             log.debug(req)
