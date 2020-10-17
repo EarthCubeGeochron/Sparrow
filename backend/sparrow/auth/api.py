@@ -14,7 +14,7 @@ from starlette.responses import PlainTextResponse
 log = get_logger(__name__)
 
 
-@use_annotations(location="query")
+@use_annotations(location="json")
 async def login(request, username: str, password: str):
     ctx = app_context()
     db = ctx.database
@@ -24,17 +24,17 @@ async def login(request, username: str, password: str):
     log.debug(current_user)
 
     if current_user is None:
-        response = APIResponse(dict(login=False, username=None))
+        response = JSONResponse(dict(login=False, username=None))
         return response  # backend.logout(response)
 
     if not current_user.is_correct_password(password):
-        response = APIResponse(dict(login=False, username=username))
+        response = JSONResponse(dict(login=False, username=username))
         return response  # backend.logout(response)
 
     # access_token = create_access_token(identity=username)
     # refresh_token = create_refresh_token(identity=username)
 
-    resp = APIResponse(dict(login=True, username=username))
+    resp = JSONResponse(dict(login=True, username=username))
     return resp  # backend.set_login_cookie(resp)
 
     # set_access_cookies(resp, access_token)
@@ -43,30 +43,29 @@ async def login(request, username: str, password: str):
 
 
 def logout(request):
-    return APIResponse(dict(login=False))
+    return JSONResponse(dict(login=False))
 
 
 def status(request):
     username = None
     # get_jwt_identity()
     if username:
-        resp = APIResponse(dict(login=True, username=username))
+        resp = JSONResponse(dict(login=True, username=username))
         return resp
-    return APIResponse(dict(login=False))
+    return JSONResponse(dict(login=False))
 
 
 def refresh(request):
     # JWT refresh token required
     username = None  # get_jwt_identity()
     # access_token = create_access_token(identity=username)
-    resp = APIResponse(dict(login=True, refresh=True, username=username))
+    resp = JSONResponse(dict(login=True, refresh=True, username=username))
     # set_access_cookies(resp, access_token)
     return resp
 
 
 def secret(request):
     # JWT required
-    log.debug("Secret route")
     return JSONResponse({"answer": 42})
 
 
