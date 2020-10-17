@@ -1,9 +1,8 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
 
-import { ProjectMatch } from "~/model-views/project";
-import { SampleMatch } from "../model-views/sample/list";
-import { ProjectListComponent, SampleListComponent } from "./infinite-scroll";
+import { SampleMatch } from "~/model-views/sample/list";
+import { SampleListComponent } from "./infinite-scroll";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);

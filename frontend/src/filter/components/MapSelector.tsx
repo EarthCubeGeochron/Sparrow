@@ -23,3 +23,7 @@ import h from "@macrostrat/hyper";
 
 //   return h(Map, { width: "500px", height: "300px" });
 // }
+
+export function MapSelector() {
+  return null;
+}
