@@ -1,10 +1,10 @@
-from flama.exceptions import SerializationError
 from starlette.responses import JSONResponse
 from json import dumps
 from typing import Any
 
 from ..logs import get_logger
 from ..encoders import JSONEncoder
+from .exceptions import SerializationError
 
 log = get_logger(__name__)
 

@@ -7,6 +7,7 @@ from starlette.exceptions import HTTPException
 from sparrow.logs import get_logger
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
+from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
 from .endpoint import ModelAPIEndpoint, model_description
@@ -15,6 +16,9 @@ log = get_logger(__name__)
 
 
 async def http_exception(request, exc):
+    log.error(f"{exc.status_code} {exc.detail}")
+    # if exc.detail == "Internal Server Error":
+    log.exception(exc)
     return JSONResponse(
         {"error": {"detail": exc.detail, "status_code": exc.status_code}},
         status_code=exc.status_code,
@@ -41,8 +45,11 @@ class APIEntry(HTTPEndpoint):
             200:
                 description: It's alive!
         """
-        desc = {d["route"]: d["description"] for d in request.app.route_descriptions}
-        return JSONResponse({"routes": desc})
+        routes = {}
+        for k, v in request.app.route_descriptions.items():
+            desc = {d["route"]: d["description"] for d in v}
+            routes[k] = desc
+        return JSONResponse({"routes": routes})
 
 
 def schema(request):
@@ -58,7 +65,7 @@ class APIv2(Starlette):
 
     def __init__(self, app):
         self._app = app
-        self.route_descriptions = []
+        self.route_descriptions = defaultdict(list)
 
         super().__init__(exception_handlers=exception_handlers, debug=True)
         self.spec = APISpec(
@@ -70,6 +77,7 @@ class APIv2(Starlette):
         )
 
         self._add_routes()
+        self._app.run_hook("api-initialized-v2", self)
 
     def add_schema_route(self):
         # We will want to layer this back in eventually
@@ -120,6 +128,9 @@ class APIv2(Starlette):
         tbl = iface.opts.model.__table__
         desc = model_description(iface)
         basic_info = dict(
-            route=endpoint, table=tbl.name, schema=tbl.schema, description=str(desc),
+            route=endpoint,
+            table=tbl.name,
+            schema=tbl.schema,
+            description=str(desc),
         )
-        self.route_descriptions.append(basic_info)
+        self.route_descriptions[root_route].append(basic_info)
