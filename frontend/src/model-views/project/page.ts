@@ -96,13 +96,13 @@ export const ProjectSamples = function ({ data }) {
 const ProjectPage = function (props) {
   const [edit, setEdit] = useState(false);
 
-  const { project } = props;
+  const { project, Edit } = props;
   const { samples } = project;
 
   return h("div.project-page", [
     h("div.flex-row", [
       h("div.basic-info", [
-        h(EditableProjectDetails, { project }),
+        h(EditableProjectDetails, { project, Edit }),
         h(ProjectPublications, { data: project.publications }),
         h(ProjectResearchers, { data: project.researchers }),
       ]),

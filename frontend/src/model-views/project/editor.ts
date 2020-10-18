@@ -136,7 +136,7 @@ const EditNavBar = function(props) {
 };
 
 const EditableProjectDetails = function(props) {
-  const { project } = props;
+  const { project, Edit } = props;
   const { login } = useAuth(); // this appears to be a boolean
   const { buildURL } = APIHelpers(useContext(APIContext));
 
@@ -157,7 +157,7 @@ const EditableProjectDetails = function(props) {
     [
       h("div.project-editor", [
         h("div", { style: { display: "flex", justifyContent: "center" } }, [
-          h(EditNavBar, { header: "Manage Project" }),
+          Edit ? h(EditNavBar, { header: "Manage Project" }) : null,
         ]),
         h("div.project-editor-content", [
           h(ModelEditableText, { is: "h3", field: "name", multiline: true }),

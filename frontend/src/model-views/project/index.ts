@@ -88,25 +88,26 @@ const ContentArea = ({ data, title, className, minimal = false }) =>
   ]);
 
 interface ProjectProps {
+  Edit: boolean;
   id?: number;
 }
 
 const ProjectComponent = function(props: ProjectProps) {
-  const { id } = props;
+  const { id, Edit } = props;
   const data = useAPIResult("/project", { id });
   if (id == null || data == null) {
     return null;
   }
 
   const project = data[0];
-  return h("div.data-view.project", null, h(ProjectPage, { project }));
+  return h("div.data-view.project", null, h(ProjectPage, { project, Edit }));
 };
 
-function ProjectMatch() {
+function ProjectMatch({ Edit }) {
   const {
     params: { id },
   } = useRouteMatch();
-  return h(ProjectComponent, { id });
+  return h(ProjectComponent, { id, Edit });
 }
 
 export { ProjectComponent, ProjectMatch, ProjectInfoLink };

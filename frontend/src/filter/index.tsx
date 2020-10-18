@@ -3,7 +3,7 @@ import {
   AgeSlideSelect,
   DatePicker,
   GeologicFormationSelector,
-  MapSelector,
+  //MapSelector,
 } from "./components";
 import { useToggle, useAPIResult } from "../map/components/APIResult";
 import h from "@macrostrat/hyper";

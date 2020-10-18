@@ -8,12 +8,12 @@ import { Spinner } from "@blueprintjs/core";
 /**@description function to implement the infinite scroll component with certain API views
  *
  * @param {string} url: base url for API call.
- * @param {function} unWrapData: function that destructures json from API call. Must return an object that is compatible with the component also passed
+ * @param {function} unwrapData: function that destructures json from API call. Must return an object that is compatible with the component also passed
  * @param {object} params: object of params to be added to base URL. Optional
- * @param {component} component: react component designed to take in data object created by the unWrapData function
+ * @param {component} component: react component designed to take in data object created by the unwrapData function
  *
  *
- * @example function unWrapProjectCardData(data) {
+ * @example function unwrapProjectCardData(data) {
   const dataObj = data.data.map((obj) => {
     const { id, name, description, publication, session } = obj;
     const samples = session.map((ob) => ob.sample);
@@ -23,12 +23,12 @@ import { Spinner } from "@blueprintjs/core";
 }
  return h(InfiniteAPIView, {
     url: projectURL,
-    unWrapData: unWrapProjectCardData,
+    unwrapData: unwrapProjectCardData,
     params: {nest: "session,sample"},
     component: ProjectInfoLink,
   });
  */
-function InfiniteAPIView({ url, unWrapData, params, component, context }) {
+function InfiniteAPIView({ url, unwrapData, params, component, context }) {
   const [data, setData] = useState([]);
   const [nextPage, setNextPage] = useState("");
   const { get } = useAPIActions(context);
@@ -48,7 +48,7 @@ function InfiniteAPIView({ url, unWrapData, params, component, context }) {
   useEffect(() => {
     const initData = getNextPageAPI("", url, params);
     initData.then((res) => {
-      const dataObj = unWrapData(res);
+      const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
       setNextPage(res.next_page);
       setData(newState);
@@ -59,7 +59,7 @@ function InfiniteAPIView({ url, unWrapData, params, component, context }) {
     if (!nextPage) return;
     const newData = getNextPageAPI(nextPage, url, params);
     newData.then((res) => {
-      const dataObj = unWrapData(res);
+      const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
       setNextPage(res.next_page);
       setData(newState);
