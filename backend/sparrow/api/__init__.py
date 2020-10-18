@@ -93,6 +93,8 @@ class APIv2(Starlette):
         for iface in db.interface:
             self._add_model_route(iface)
 
+        # self._add_view_route()
+
         self.add_schema_route()
 
     def _add_model_route(self, iface):
@@ -134,3 +136,7 @@ class APIv2(Starlette):
             description=str(desc),
         )
         self.route_descriptions[root_route].append(basic_info)
+
+    def _add_view_route(self, tablename, schema="core_view"):
+        table = db.reflect_table(tablename, schema=schema)
+        pass
