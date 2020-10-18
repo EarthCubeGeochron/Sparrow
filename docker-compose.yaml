@@ -103,6 +103,7 @@ services:
       - SPARROW_ENV
     volumes:
       - ./frontend/src:/app/src
+      - ./frontend/plugins:/app/plugins
       - frontend_build:/app/_assets
       # Right now, we configure default site content
       # rather than allowing any customization
