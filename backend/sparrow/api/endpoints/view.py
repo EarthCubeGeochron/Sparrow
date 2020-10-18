@@ -49,11 +49,11 @@ class ViewAPIEndpoint(HTTPEndpoint):
         q = db.session.query(self.meta.table)
         if args["all"]:
             res = q.all()
-            return APIResponse(res, total_count=len(res))
+            return APIResponse(res, total_count=len(res), to_dict=True)
 
         try:
             res = get_page(q, per_page=args["per_page"], page=args["page"])
         except ValueError:
             raise ValidationError("Invalid page token.")
 
-        return APIResponse(res, total_count=q.count())
+        return APIResponse(res, total_count=q.count(), to_dict=True)

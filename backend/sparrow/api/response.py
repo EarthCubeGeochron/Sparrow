@@ -16,6 +16,7 @@ class APIResponse(JSONResponse):
     def __init__(self, *args, **kwargs):
         self.schema = kwargs.pop("schema", None)
         self.total_count = kwargs.pop("total_count", None)
+        self.to_dict = kwargs.pop("to_dict", False)
         super().__init__(*args, **kwargs)
 
     def render(self, content: Any):
@@ -36,6 +37,9 @@ class APIResponse(JSONResponse):
         try:
             if self.schema is not None:
                 content = self.schema.dump(content)
+            if self.to_dict:
+                # This helps us deal with sequence rows
+                content = [c._asdict() for c in content]
         except Exception:
             raise SerializationError(status_code=500)
 
