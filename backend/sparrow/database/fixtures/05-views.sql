@@ -399,6 +399,6 @@ SELECT DISTINCT authority FROM vocabulary.analysis_type
 UNION
 SELECT DISTINCT authority FROM geo_entity
 )
-SELECT DISTINCT authority FROM a
+SELECT DISTINCT authority id FROM a
 WHERE authority IS NOT null
 ORDER BY authority;

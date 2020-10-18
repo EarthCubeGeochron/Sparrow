@@ -26,7 +26,10 @@ log = get_logger(__name__)
 
 def _field_description(schema, field):
     if schema := getattr(field, "schema", None):
-        return schema.__class__.__name__
+        name = schema.__class__.__name__
+        if schema.many:
+            name += "[]"
+        return name
     return field.__class__.__name__
 
 
