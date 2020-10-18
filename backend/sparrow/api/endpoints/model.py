@@ -10,6 +10,7 @@ from yaml import safe_load
 from ..exceptions import ValidationError
 from ..fields import NestedModelField
 from ..response import APIResponse
+from ..filters import BaseFilter, AuthorityFilter
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
 from ...util import relative_path
@@ -42,6 +43,15 @@ class ModelAPIEndpoint(HTTPEndpoint):
         database = None
         schema = None
 
+    param_help = {
+        "has": "string, [field]",
+        "not_has": "string, [field]",
+        "nest": "string, related models to nest within response [allowed_nests]",
+        "per_page": "integer, number of results per page",
+        "page": "string, token of the page to fetch",
+        "all": "boolean, return all results",
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.meta = self.Meta()
@@ -59,13 +69,31 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
         self.args_schema = dict(
             **self.instance_schema,
-            has=DelimitedList(Str(), missing=[]),
-            not_has=DelimitedList(Str(), missing=[]),
+            has=DelimitedList(Str(), missing=[], description="[field]"),
+            not_has=DelimitedList(Str(), missing=[], description="[field]"),
             page=Str(missing=None),
             per_page=Int(missing=20),
             parameter=DelimitedList(Str(), missing=None),
-            authority=Str(missing=None),
         )
+
+        self._filters = []
+        self.register_filter(AuthorityFilter)
+
+    @property
+    def model(self):
+        return self.meta.schema.opts.model
+
+    def register_filter(self, _filter: BaseFilter):
+        """Register a filter specification to control parametrization of the
+        model query"""
+        f = _filter(self.model)
+        if not f.should_apply():
+            return
+        if params := getattr(f, "params"):
+            self.args_schema.update(**params)
+        if help := getattr(f, "help"):
+            self.param_help.update(**help)
+        self._filters.append(f)
 
     def query(self, schema):
         db = self.meta.database
@@ -90,14 +118,8 @@ class ModelAPIEndpoint(HTTPEndpoint):
         return JSONResponse(
             {
                 "description": str(self.description),
-                "parameters": {
-                    "has": "string, [field]",
-                    "not_has": "string, [field]",
-                    "nest": "string, related models to nest within response [allowed_nests]",
-                    "per_page": "integer, number of results per page",
-                    "page": "string, token of the page to fetch",
-                },
-                "allowed_nests": schema._available_nests(),
+                "parameters": self.param_help,
+                "allowed_nests": list(set(schema._available_nests())),
                 "fields": {
                     k: _field_description(schema, v)
                     for k, v in _schema_fields(schema).items()
@@ -142,10 +164,6 @@ class ModelAPIEndpoint(HTTPEndpoint):
         #     ## We'll put field-specific filters here
         #     pass
 
-        authority = getattr(model, "authority")
-        if authority is not None and args["authority"] is not None:
-            filters.append(authority == args["authority"])
-
         # Filter by has
         for has_field in args["has"]:
             try:
@@ -180,6 +198,9 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
         for filter in filters:
             q = q.filter(filter)
+
+        for _filter in self._filters:
+            q = _filter(q, args)
 
         # By default, we order by the "natural" order of Primary Keys. This
         # is not really what we want in most cases, probably.
