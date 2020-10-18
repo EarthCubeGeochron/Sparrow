@@ -69,11 +69,27 @@ CREATE TABLE IF NOT EXISTS vocabulary.parameter (
   authority text
 );
 
+CREATE TABLE IF NOT EXISTS vocabulary.parameter_link (
+  id serial PRIMARY KEY,
+  parent text REFERENCES vocabulary.parameter(id),
+  child text REFERENCES vocabulary.parameter(id),
+  UNIQUE (parent, child),
+  CHECK (parent != child)
+);
+
 CREATE TABLE IF NOT EXISTS vocabulary.material (
   id text PRIMARY KEY,
   description text,
   authority text,
   type_of text REFERENCES vocabulary.material(id)
+);
+
+CREATE TABLE IF NOT EXISTS vocabulary.material_link (
+  id serial PRIMARY KEY,
+  parent text REFERENCES vocabulary.material(id),
+  child text REFERENCES vocabulary.material(id),
+  UNIQUE (parent, child),
+  CHECK (parent != child)
 );
 
 CREATE TABLE IF NOT EXISTS vocabulary.method (

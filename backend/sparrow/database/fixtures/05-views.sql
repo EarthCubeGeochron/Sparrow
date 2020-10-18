@@ -377,7 +377,8 @@ This view is a shim for a foreign-keyed table that should be made available.
 We currently have this on this `base_schema_change` branch but we
 need to merge it in...
 */
-CREATE OR REPLACE VIEW vocabulary.authority AS
+DROP VIEW IF EXISTS vocabulary.authority;
+CREATE VIEW vocabulary.authority AS
 WITH a AS (
 SELECT DISTINCT authority FROM vocabulary.analysis_type
 UNION

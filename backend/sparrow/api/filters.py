@@ -34,6 +34,8 @@ class AuthorityFilter(BaseFilter):
         return hasattr(self.model, "authority")
 
     def apply(self, args, query):
+        if args["authority"] is None:
+            return query
         return query.filter(self.model.authority == args["authority"])
 
 
