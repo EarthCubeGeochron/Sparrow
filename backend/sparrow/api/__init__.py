@@ -10,7 +10,7 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
-from .endpoint import ModelAPIEndpoint, model_description
+from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description
 
 log = get_logger(__name__)
 
@@ -93,7 +93,7 @@ class APIv2(Starlette):
         for iface in db.interface:
             self._add_model_route(iface)
 
-        # self._add_view_route()
+        self.add_view_route("authority", schema="vocabulary")
 
         self.add_schema_route()
 
@@ -137,6 +137,23 @@ class APIv2(Starlette):
         )
         self.route_descriptions[root_route].append(basic_info)
 
-    def _add_view_route(self, tablename, schema="core_view"):
-        table = db.reflect_table(tablename, schema=schema)
-        pass
+    def add_view_route(self, tablename, schema="core_view"):
+        _tbl = self._app.database.reflect_table(tablename, schema=schema)
+
+        class Meta:
+            table = _tbl
+
+        name = _tbl.name
+        cls = type(name + "_route", (ViewAPIEndpoint,), {"Meta": Meta})
+        root_route = schema
+        endpoint = f"/{root_route}/{name}"
+
+        self.add_route(endpoint, cls, include_in_schema=False)
+
+        basic_info = dict(
+            route=endpoint,
+            table=_tbl.name,
+            schema=schema,
+            description="",
+        )
+        self.route_descriptions[root_route].append(basic_info)

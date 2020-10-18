@@ -13,8 +13,8 @@ class APIResponse(JSONResponse):
     # copied from https://github.com/perdy/flama/blob/master/flama/responses.py
     media_type = "application/json"
 
-    def __init__(self, schema=None, *args, **kwargs):
-        self.schema = schema
+    def __init__(self, *args, **kwargs):
+        self.schema = kwargs.pop("schema", None)
         self.total_count = kwargs.pop("total_count", None)
         super().__init__(*args, **kwargs)
 

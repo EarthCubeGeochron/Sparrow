@@ -370,3 +370,35 @@ ORDER BY p.id;
 COMMENT ON COLUMN core_view.project.samples IS
 'Array of objects representing samples in the project
 (each object follows the schema of "core_view.sample")';
+
+/*
+TODO: Oct 2020
+This view is a shim for a foreign-keyed table that should be made available.
+We currently have this on this `base_schema_change` branch but we
+need to merge it in...
+*/
+CREATE OR REPLACE VIEW vocabulary.authority AS
+WITH a AS (
+SELECT DISTINCT authority FROM vocabulary.analysis_type
+UNION
+SELECT DISTINCT authority FROM vocabulary.material
+UNION
+SELECT DISTINCT authority FROM vocabulary.entity_reference
+UNION
+SELECT DISTINCT authority FROM vocabulary.parameter
+UNION
+SELECT DISTINCT authority FROM vocabulary.material
+UNION
+SELECT DISTINCT authority FROM vocabulary.method
+UNION
+SELECT DISTINCT authority FROM vocabulary.unit
+UNION
+SELECT DISTINCT authority FROM vocabulary.error_metric
+UNION
+SELECT DISTINCT authority FROM vocabulary.analysis_type
+UNION
+SELECT DISTINCT authority FROM geo_entity
+)
+SELECT DISTINCT authority FROM a
+WHERE authority IS NOT null
+ORDER BY authority;

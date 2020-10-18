@@ -5,14 +5,14 @@ from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
 from starlette.responses import JSONResponse
-
-from .exceptions import ValidationError
-from .fields import NestedModelField
-from ..database.mapper.util import classname_for_table
-from ..logs import get_logger
-from ..util import relative_path
-from .response import APIResponse
 from yaml import safe_load
+
+from ..exceptions import ValidationError
+from ..fields import NestedModelField
+from ..response import APIResponse
+from ...database.mapper.util import classname_for_table
+from ...logs import get_logger
+from ...util import relative_path
 
 log = get_logger(__name__)
 
@@ -25,7 +25,7 @@ def _field_description(schema, field):
     return field.__class__.__name__
 
 
-with open(relative_path(__file__, "api-help.yaml"), "r") as f:
+with open(relative_path(__file__, "..", "api-help.yaml"), "r") as f:
     api_help = safe_load(f)
 
 
@@ -84,7 +84,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         schema = self.meta.schema(many=False, allowed_nests=args["nest"])
         res = self.query(schema).get(id)
         # https://github.com/djrobstep/sqlakeyset
-        return APIResponse(schema, res)
+        return APIResponse(res, schema=schema)
 
     async def api_docs(self, request, schema):
         return JSONResponse(
@@ -191,4 +191,4 @@ class ModelAPIEndpoint(HTTPEndpoint):
         except ValueError:
             raise ValidationError("Invalid page token.")
 
-        return APIResponse(schema, res, total_count=q.count())
+        return APIResponse(res, schema=schema, total_count=q.count())
