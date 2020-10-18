@@ -38,3 +38,8 @@ class TestProjectImport:
         proj.embargo_date = datetime.max
         db.session.add(proj)
         db.session.commit()
+
+    def test_reimport_dumpfile(self, db):
+        """We should be able to idempotently import a data file..."""
+        data = json_fixture("project-dump.json")
+        db.load_data("project", data["data"])
