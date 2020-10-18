@@ -25,6 +25,8 @@ log = get_logger(__name__)
 
 
 def _field_description(schema, field):
+    if schema := getattr(field, "schema", None):
+        return schema.__class__.__name__
     return field.__class__.__name__
 
 
@@ -167,7 +169,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
         if args["all"]:
             res = q.all()
-            return APIResponse(res, total_count=len(res))
+            return APIResponse(res, schema=schema, total_count=len(res))
 
         # By default, we order by the "natural" order of Primary Keys. This
         # is not really what we want in most cases, probably.
