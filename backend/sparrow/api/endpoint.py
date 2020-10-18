@@ -64,6 +64,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
             page=Str(missing=None),
             per_page=Int(missing=20),
             parameter=DelimitedList(Str(), missing=None),
+            authority=Str(missing=None),
         )
 
     def query(self, schema):
@@ -140,6 +141,10 @@ class ModelAPIEndpoint(HTTPEndpoint):
         # for field in fields:
         #     ## We'll put field-specific filters here
         #     pass
+
+        authority = getattr(model, "authority")
+        if authority is not None and args["authority"] is not None:
+            filters.append(authority == args["authority"])
 
         # Filter by has
         for has_field in args["has"]:
