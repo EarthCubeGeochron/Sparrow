@@ -10,6 +10,7 @@ import { Button, Spinner } from "@blueprintjs/core";
 import { parse, format } from "date-fns";
 import { LinkCard } from "@macrostrat/ui-components";
 import { SampleCard } from "../sample/detail-card";
+import { useAPIv2Result } from "~/api-v2";
 
 /**
  * http://localhost:5002/api/v2/models/data_file?nest=data_file_link,sample,session
@@ -99,7 +100,7 @@ export const Samples = (props) => {
     });
   }
   return h("div.sample-area", [
-    h("h4", "Samples:"),
+    h("h4", "Samples"),
     h(
       "div",
       { style: { display: "flex", flexFlow: "row wrap", margin: "0 -5px" } },
@@ -127,7 +128,7 @@ export const SessionInfo = (props) => {
   } = props;
   //const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
   return h("div", { className: styles.sessionContainer }, [
-    // h("h3", ["Session: " + analysis.length + " " + analysisList]),
+    h("h4", ["Session "]),
     h(SessionLinkCard, { session_id, target, technique, date }),
   ]);
 };
@@ -143,10 +144,7 @@ const ProjectLinks = (props) => {
     ]);
   }
   if (project == null) {
-    return h("div.project", [
-      h("h5.info", "Project: "),
-      h("div", { style: { fontStyle: "italic" } }, ["No project associated"]),
-    ]);
+    return null;
   }
 };
 
@@ -199,9 +197,9 @@ export function DataFilePage({ props }) {
 
 const DataFileComponent = function(props) {
   const { file_hash } = props;
-  const dataFileURL = `http://localhost:5002/api/v2/models/data_file/${file_hash}`;
+  const dataFileURL = `/models/data_file/${file_hash}`;
 
-  const initdata = useAPIResult(dataFileURL, {
+  const initdata = useAPIv2Result(dataFileURL, {
     nest: "data_file_link,session,sample,project",
   });
   if (file_hash == null || initdata == null) {

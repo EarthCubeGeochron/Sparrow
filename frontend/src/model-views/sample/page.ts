@@ -36,18 +36,13 @@ import {
 import { useToggle } from "../../map/components/APIResult";
 import { MultipleSelectFilter } from "../../filter/components";
 import { useModelURL } from "~/util/router";
-import { SampleEditing } from "./editor";
 import { GeologicFormationSelector } from "../../filter/components/MultiSelect";
 import {
   ModelEditor,
   ModelEditButton,
-  CancelButton,
-  SaveButton,
-  APIHelpers,
 } from "@macrostrat/ui-components";
 import { EditNavBar, ModelEditableText } from "../project/editor";
 import { SessionInfo } from "../data-files/page";
-import { isSameDay } from "date-fns";
 
 const h = hyper.styled(styles);
 
@@ -318,7 +313,7 @@ function Sessions(props) {
     return null;
   }
   return h("div.parameter", [
-    h("h4.subtitle", "Session"),
+   // h("h4.subtitle", "Session"),
     h("p.value", [
       session.map((obj) => {
         const { id: session_id, technique, target, date } = obj;

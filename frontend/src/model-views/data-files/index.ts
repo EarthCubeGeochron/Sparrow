@@ -5,7 +5,7 @@ import styles from "./module.styl";
 import { LinkCard } from "@macrostrat/ui-components";
 import { useModelURL } from "~/util/router";
 import { Route, Switch } from "react-router-dom";
-import { DataFilePage } from "./page";
+import { DataFilePage, DataFileMatch } from "./page";
 
 const h = hyperStyled(styles);
 
@@ -52,11 +52,11 @@ export function DataFilesCard(data) {
 // for catalog
 function DataFilesMain(props) {
   const { match } = props;
-  const base = match.path;
+  const base = "/catalog/data-file";
   return h(Switch, [
     h(Route, {
       path: base + "/:file_hash",
-      component: DataFilePage,
+      component: DataFileMatch,
     }),
     h(Route, {
       path: base,

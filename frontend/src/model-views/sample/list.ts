@@ -7,6 +7,7 @@ import { useRouteMatch } from "react-router-dom";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { SamplePage } from "./page";
 import { useModelURL } from "~/util/router";
+import { useAPIv2Result } from "~/api-v2";
 
 const h = hyper.styled(styles);
 
@@ -69,9 +70,9 @@ interface sample {
 const SampleComponent = function(props: sample) {
   const { id, Edit } = props;
 
-  const url = `http://localhost:5002/api/v2/models/sample/${id}`;
+  const url = `/models/sample/${id}`;
 
-  const data = useAPIResult(url, { nest: "session,project" });
+  const data = useAPIv2Result(url, { nest: "session,project" });
   if (id == null || data == null) {
     return null;
   }
