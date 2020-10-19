@@ -159,7 +159,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             query = self.session.query(self.opts.model).filter_by(**filters)
             instance = query.first()
             if instance is None:
-                log.debug(msg + "...none found")
+                log.debug(msg + f"...none found\n...filters: {filters}")
             else:
                 log.debug(msg + f"...success!\n...filters: {filters}")
         if instance is None:
@@ -168,6 +168,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
         if instance is not None:
             for k, v in data.items():
                 setattr(instance, k, v)
+            self.session.add(instance)
+            self.session.flush(objects=[instance])
 
         # Get rid of filters by value
         # if self.opts.model.__name__ == 'analysis':
@@ -198,6 +200,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         res = {}
         for col, val in zip(pk, val_list):
             res[col.key] = val
+
         return res
 
     @post_load
@@ -205,24 +208,19 @@ class ModelSchema(SQLAlchemyAutoSchema):
         with self.session.no_autoflush:
             instance = self._get_instance(data)
         if instance is None:
-            # if not is_model_ready(self.opts.model, data):
-            #     return None
             try:
                 # Begin a nested subtransaction
                 self.session.begin_nested()
                 instance = self.opts.model(**data)
-                # if not is_model_ready(self.opts.model, data):
-                #     self.session.rollback()
-                #     return instance
                 self.session.add(instance)
                 log.debug(f"Created instance {instance} with parameters {data}")
+
                 self.session.flush(objects=[instance])
                 self.session.commit()
                 log.debug("Successfully persisted to database")
             except IntegrityError as err:
                 self.session.rollback()
-                log.debug("Could not persist but will try again later")
-                # log.debug(err)
+                log.debug("Could not persist")
 
         return instance
 
