@@ -119,7 +119,7 @@ function DataFilesListComponent() {
     ]),
     h(InfiniteAPIView, {
       url: "/models/data_file",
-      unWrapData: unWrapDataFileCardData,
+      unwrapData: unwrapDataFileCardData,
       params: {
         nest: "data_file_link,sample,session,project",
         has: "data_file_link",
