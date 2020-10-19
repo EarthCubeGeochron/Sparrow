@@ -1,7 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { PageFooter } from "app/shared/footer";
 import { AppNavbar, NavButton } from "./navbar";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, memo } from "react";
 import { Route } from "react-router-dom";
 import styles from "./module.styl";
 
@@ -57,11 +57,11 @@ function PageRoute(props: PageRouteProps) {
   /** A custom route to manage page header, footer, and style associated
       with a specific route */
   const { render, component: base, style, navComponent, ...rest } = props;
-  const component = (p) => {
+  const newRender = (p) => {
     const children = base != null ? h(base, p) : render(p);
     return h(PageSkeleton, { style, navComponent, children });
   };
-  return h(Route, { ...rest, component });
+  return h(Route, { ...rest, render: newRender });
 }
 
 export * from "./navbar";

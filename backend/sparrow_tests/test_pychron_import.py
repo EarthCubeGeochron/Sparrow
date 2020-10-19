@@ -28,7 +28,7 @@ class TestPyChronImport:
     def test_pychron_poor_quality_import(self, db):
         ia = json_fixture("pychron-interpreted-age.json")
         assert ia is not None
-        data = TestPyChronJSONImporter().import_file(ia)
+        data = TestPyChronJSONImporter().import_file(ia, filename=None)
         res = db.load_data("session", data)
         check_age_units(res, "dimensionless")
 
@@ -36,6 +36,6 @@ class TestPyChronImport:
     def test_pychron_import(self, db):
         ia = json_fixture("pychron-interpreted-age.json")
         assert ia is not None
-        data = PyChronJSONImporter().import_file(ia)
+        data = PyChronJSONImporter().import_file(ia, filename=None)
         res = db.load_data("session", data)
         check_age_units(res, "Ma")

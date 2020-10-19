@@ -2,6 +2,7 @@ from .helpers import json_fixture
 from deepdiff import DeepDiff
 from json import dumps, loads
 from sparrow.encoders import JSONEncoder
+from datetime import datetime
 
 
 def omit_key(changeset, key):
@@ -31,3 +32,9 @@ class TestProjectImport:
         removed = dd["dictionary_item_removed"]
         assert len(removed) > 0
         assert len(omit_key(removed, "in_plateau")) == 0
+
+    def test_make_private(self, db):
+        proj = db.session.query(db.model.project).first()
+        proj.embargo_date = datetime.max
+        db.session.add(proj)
+        db.session.commit()

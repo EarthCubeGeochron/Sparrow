@@ -16,3 +16,11 @@ INSERT INTO vocabulary.entity_reference(id)
 VALUES
   ('base'),
   ('top');
+
+
+INSERT INTO vocabulary.parameter(id, description, authority)
+VALUES
+  ('Detrital grain age', 'Formation age of a detrital mineral grain in sedimentary rock', 'Sparrow'),
+  ('Surface exposure age', 'Duration of surface exposure to present', 'Sparrow'),
+  ('Burial age', 'Age of last surface exposure', 'Sparrow'),
+  ('Igneous crystallization age', 'Age of crystallization', 'Sparrow');

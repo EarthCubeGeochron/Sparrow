@@ -16,10 +16,9 @@ uvloop
 
 # Core application
 Flask==1.1.1
-Flask-JWT-Extended==3.24.1
 Flask-RESTful==0.3.7
 MarkupSafe==1.1.1
-migra==1.0.1599083968
+migra==1.0.1603010105
 Pygments==2.5.2
 SQLAlchemy==1.3.13
 sqlalchemy-utils==0.36.8
@@ -54,7 +53,7 @@ stringcase==1.2.0
 
 # (De)serialization of geographic data
 GeoAlchemy2==0.6.3
-shapely # Should already be installed
+shapely # Should already be installed in base image
 
 # Prototype GraphQL API
 Flask-GraphQL==2.0.1
@@ -62,7 +61,6 @@ graphene==2.1.8
 graphene_sqlalchemy==2.2.2
 
 # API version 2
-flama==0.15.0
 webargs-starlette==2.0.0
 sqlakeyset
 apispec==3.3.1
@@ -77,7 +75,10 @@ colorlog==4.2.1
 rich==6.0.0
 deepdiff[murmur]==5.0.2
 
+# Authentication
+PyJWT==1.7.1
+
 # ASGI
 starlette==0.13.4
-Hypercorn==0.11.0
+Hypercorn==0.11.1
 asgiref==3.2.8

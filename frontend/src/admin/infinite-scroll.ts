@@ -10,7 +10,7 @@ import { InfiniteAPIView } from "../components/infinite-scroll/infinite-api-view
 import { APIV2Context } from "~/api-v2";
 
 // unwraps the data to be simpatico with the ProjectLink component, also gets the next page
-function unWrapProjectCardData(data) {
+function unwrapProjectCardData(data) {
   const dataObj = data.data.map((obj) => {
     const { id, name, description, publication, session } = obj;
     const samples = session.map((ob) => ob.sample);
@@ -29,7 +29,7 @@ const ProjectListComponent = () => {
     ]),
     h(InfiniteAPIView, {
       url: "/models/project",
-      unWrapData: unWrapProjectCardData,
+      unwrapData: unwrapProjectCardData,
       params: { nest: "publication,session,samnple" },
       component: ProjectInfoLink,
       context: APIV2Context,
@@ -37,7 +37,7 @@ const ProjectListComponent = () => {
   ]);
 };
 
-function unWrapSampleCardData(data) {
+function unwrapSampleCardData(data) {
   const dataObj = data.data.map((obj) => {
     const { id, name, material } = obj;
     return { id, name, material };
@@ -54,7 +54,7 @@ function SampleListComponent() {
     ]),
     h(InfiniteAPIView, {
       url: "/models/sample",
-      unWrapData: unWrapSampleCardData,
+      unwrapData: unwrapSampleCardData,
       params: {},
       component: SampleListCard,
       context: APIV2Context,
@@ -63,7 +63,7 @@ function SampleListComponent() {
 }
 
 // const { id, date, target, technique } = props;
-function unWrapSessionCardData(data) {
+function unwrapSessionCardData(data) {
   const dataObj = data.data.map((obj) => {
     const { id: session_id, technique, target, date } = obj;
     return {
@@ -85,7 +85,7 @@ function SessionListComponent() {
     ]),
     h(InfiniteAPIView, {
       url: "/models/session",
-      unWrapData: unWrapSessionCardData,
+      unwrapData: unwrapSessionCardData,
       params: { nest: "instrument,project,sample" },
       component: SessionLinkCard,
       context: APIV2Context,
@@ -93,7 +93,7 @@ function SessionListComponent() {
   ]);
 }
 
-function unWrapDataFileCardData(data) {
+function unwrapDataFileCardData(data) {
   const dataObj = data.data.map((obj) => {
     if (obj.data_file_link.length > 0) {
       const {

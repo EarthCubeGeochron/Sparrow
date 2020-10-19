@@ -13,7 +13,7 @@ let htmlConfig = {
   favicon: relativePath("static/img/favicon.png"),
 };
 if (isDev) {
-  htmlConfig = relativePath("_webpack/dev-template.ejs");
+  htmlConfig.template = relativePath("_webpack/dev-template.ejs");
 }
 
 process.env["BASE_URL"] =

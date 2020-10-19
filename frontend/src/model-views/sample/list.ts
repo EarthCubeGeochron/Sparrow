@@ -1,13 +1,13 @@
 import hyper from "@macrostrat/hyper";
 import { Callout } from "@blueprintjs/core";
-import { LinkCard } from "@macrostrat/ui-components";
+import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
 import { FilterListComponent } from "app/components/filter-list";
 import styles from "./module.styl";
 import { useRouteMatch } from "react-router-dom";
-import { useAPIResult } from "@macrostrat/ui-components";
 import { SamplePage } from "./page";
 import { useModelURL } from "~/util/router";
 import { useAPIv2Result } from "~/api-v2";
+import { APIV2Context } from "~/api-v2";
 
 const h = hyper.styled(styles);
 
@@ -17,7 +17,7 @@ const h = hyper.styled(styles);
  *
  *
  */
-const SampleListCard = function(props) {
+const SampleListCard = function (props) {
   const { material, id, name } = props;
 
   const to = useModelURL(`/sample/${id}`);
@@ -36,7 +36,7 @@ const SampleListCard = function(props) {
   );
 };
 
-const SampleList = function() {
+const SampleList = function () {
   const route = "/sample";
   const filterFields = {
     name: "Sample name",
@@ -62,17 +62,25 @@ const SampleList = function() {
   ]);
 };
 
-interface sample {
+interface SampleProps {
   Edit?: boolean;
   id?: number;
   sendQuery: () => {};
 }
-const SampleComponent = function(props: sample) {
+const SampleComponent = function (props: SampleProps) {
   const { id, Edit } = props;
 
   const url = `/models/sample/${id}`;
 
+<<<<<<< HEAD
   const data = useAPIv2Result(url, { nest: "session,project" });
+=======
+  const data = useAPIResult(
+    url,
+    { nest: "session,project" },
+    { context: APIV2Context }
+  );
+>>>>>>> 161dc88d6e9f011889ae9569b420b17e5e8a279d
   if (id == null || data == null) {
     return null;
   }

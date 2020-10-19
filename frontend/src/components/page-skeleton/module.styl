@@ -39,16 +39,17 @@
 .expander
   flex-grow 1
 
-
 .minimal-navbar
   display: flex
   flex-direction: row
   align-items: baseline
+  :global(.navbar-spacer)
+    flex-grow 1
   minimal-navbar()
   h4
     margin: 0
     padding: 0.1em 1em 0.1em 0.4em
-    color: #5c7080
+    color: var(--text-color-muted)
     min-width: 5em
 
 

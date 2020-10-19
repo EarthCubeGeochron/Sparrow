@@ -12,13 +12,14 @@ import {
   StatefulComponent,
   APIActions,
 } from "@macrostrat/ui-components";
+import { APIV2Context } from "~/api-v2";
 import { createContext, useContext } from "react";
 
 const AuthContext = createContext({});
 
 class AuthProvider extends StatefulComponent {
   static initClass() {
-    this.contextType = APIContext;
+    this.contextType = APIV2Context;
   }
   constructor(props) {
     super(props);
