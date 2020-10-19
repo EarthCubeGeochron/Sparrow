@@ -1,31 +1,39 @@
 from starlette.endpoints import HTTPEndpoint
 from webargs_starlette import parser
-from webargs.fields import DelimitedList, Str, Int
+from webargs.fields import DelimitedList, Str, Int, Boolean
 from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
 from starlette.responses import JSONResponse
-
-from .exceptions import ValidationError
-from .fields import NestedModelField
-from ..database.mapper.util import classname_for_table
-from ..logs import get_logger
-from ..util import relative_path
-from .response import APIResponse
 from yaml import safe_load
+
+from ..exceptions import ValidationError
+from ..fields import NestedModelField
+from ..response import APIResponse
+from ..filters import (
+    BaseFilter,
+    AuthorityFilter,
+    FieldExistsFilter,
+    FieldNotExistsFilter,
+    _schema_fields,
+)
+from ...database.mapper.util import classname_for_table
+from ...logs import get_logger
+from ...util import relative_path
 
 log = get_logger(__name__)
 
 
-def _schema_fields(schema):
-    return {getattr(f, "data_key", k): f for k, f in schema.fields.items()}
-
-
 def _field_description(schema, field):
+    if schema := getattr(field, "schema", None):
+        name = schema.__class__.__name__
+        if schema.many:
+            name += "[]"
+        return name
     return field.__class__.__name__
 
 
-with open(relative_path(__file__, "api-help.yaml"), "r") as f:
+with open(relative_path(__file__, "..", "api-help.yaml"), "r") as f:
     api_help = safe_load(f)
 
 
@@ -55,16 +63,39 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self._model_name = classname_for_table(schema.opts.model.__table__)
         log.info(self._model_name)
 
-        self.instance_schema = dict(nest=NestedModelField(Str(), missing=[]))
+        self.instance_schema = dict(
+            nest=NestedModelField(
+                Str(),
+                missing=[],
+                description="related models to nest within response [allowed_nests]",
+            )
+        )
 
         self.args_schema = dict(
             **self.instance_schema,
-            has=DelimitedList(Str(), missing=[]),
-            not_has=DelimitedList(Str(), missing=[]),
-            page=Str(missing=None),
-            per_page=Int(missing=20),
-            parameter=DelimitedList(Str(), missing=None),
+            page=Str(missing=None, description="number of results per page"),
+            per_page=Int(missing=20, description="token of the page to fetch"),
+            all=Boolean(missing=False, description="return all results"),
         )
+
+        self._filters = []
+        self.register_filter(AuthorityFilter)
+        self.register_filter(FieldExistsFilter)
+        self.register_filter(FieldNotExistsFilter)
+
+    @property
+    def model(self):
+        return self.meta.schema.opts.model
+
+    def register_filter(self, _filter: BaseFilter):
+        """Register a filter specification to control parametrization of the
+        model query"""
+        f = _filter(self.model, schema=self.meta.schema)
+        if not f.should_apply():
+            return
+        if params := getattr(f, "params"):
+            self.args_schema.update(**params)
+        self._filters.append(f)
 
     def query(self, schema):
         db = self.meta.database
@@ -73,6 +104,20 @@ class ModelAPIEndpoint(HTTPEndpoint):
     @property
     def description(self):
         return model_description(self.meta.schema)
+
+    def _arg_description(self, field):
+        type = field.__class__.__name__.lower()
+        if isinstance(field, DelimitedList):
+            type = (
+                f"list of {field.inner.__class__.__name__.lower()}s (comma-delimited)"
+            )
+        if d := field.metadata.get("description"):
+            type += ", " + d
+        return type
+
+    def build_param_help(self):
+        for k, v in self.args_schema.items():
+            yield k, self._arg_description(v)
 
     async def get_single(self, request):
         """Handler for single instance GET requests"""
@@ -83,20 +128,14 @@ class ModelAPIEndpoint(HTTPEndpoint):
         schema = self.meta.schema(many=False, allowed_nests=args["nest"])
         res = self.query(schema).get(id)
         # https://github.com/djrobstep/sqlakeyset
-        return APIResponse(schema, res)
+        return APIResponse(res, schema=schema)
 
     async def api_docs(self, request, schema):
         return JSONResponse(
             {
                 "description": str(self.description),
-                "parameters": {
-                    "has": "string, [field]",
-                    "not_has": "string, [field]",
-                    "nest": "string, related models to nest within response [allowed_nests]",
-                    "per_page": "integer, number of results per page",
-                    "page": "string, token of the page to fetch",
-                },
-                "allowed_nests": schema._available_nests(),
+                "parameters": dict(self.build_param_help()),
+                "allowed_nests": list(set(schema._available_nests())),
                 "fields": {
                     k: _field_description(schema, v)
                     for k, v in _schema_fields(schema).items()
@@ -128,53 +167,12 @@ class ModelAPIEndpoint(HTTPEndpoint):
             return await self.api_docs(request, schema)
 
         q = self.query(schema)
+        for _filter in self._filters:
+            q = _filter(q, args)
 
-        fields = _schema_fields(schema)
-
-        filters = []
-
-        # if model == self.meta.database.model.datum:
-        #     if args["parameter"] is not None:
-        #         filters
-
-        # for field in fields:
-        #     ## We'll put field-specific filters here
-        #     pass
-
-        # Filter by has
-        for has_field in args["has"]:
-            try:
-                field = fields[has_field]
-            except KeyError:
-                raise ValidationError(f"'{has_field}' is not a valid field")
-            orm_attr = getattr(model, field.name)
-
-            if hasattr(field, "related_model"):
-                if orm_attr.property.uselist:
-                    filters.append(orm_attr.any())
-                else:
-                    filters.append(orm_attr.has())
-            else:
-                filters.append(orm_attr.isnot(None))
-
-        # Filter by not_has
-        for k in args["not_has"]:
-            try:
-                field = fields[k]
-            except KeyError:
-                raise ValidationError(f"'{k}' is not a valid field")
-            orm_attr = getattr(model, field.name)
-
-            if hasattr(field, "related_model"):
-                if orm_attr.property.uselist:
-                    filters.append(~orm_attr.any())
-                else:
-                    filters.append(~orm_attr.has())
-            else:
-                filters.append(orm_attr.is_(None))
-
-        for filter in filters:
-            q = q.filter(filter)
+        if args["all"]:
+            res = q.all()
+            return APIResponse(res, schema=schema, total_count=len(res))
 
         # By default, we order by the "natural" order of Primary Keys. This
         # is not really what we want in most cases, probably.
@@ -186,4 +184,4 @@ class ModelAPIEndpoint(HTTPEndpoint):
         except ValueError:
             raise ValidationError("Invalid page token.")
 
-        return APIResponse(schema, res, total_count=q.count())
+        return APIResponse(res, schema=schema, total_count=q.count())
