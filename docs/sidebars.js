@@ -1,6 +1,6 @@
 module.exports = {
   someSidebar: {
-    CHECK_THIS_OUT: ["live-code"],
+    //CHECK_THIS_OUT: ["live-code"],
     Guides: [
       "motivation-and-design",
       "getting-started",
@@ -17,7 +17,7 @@ module.exports = {
         label: "Frontend",
         items: [
           "frontend/local-dev",
-          "frontend/frames",
+          //"frontend/frames",
           "frontend/data-input-form",
         ],
       },
