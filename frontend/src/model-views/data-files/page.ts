@@ -6,7 +6,7 @@ import { useAPIResult } from "@macrostrat/ui-components";
 import { SampleListCard } from "../sample/list";
 import styles from "./module.styl";
 import { DownloadButton } from "../session";
-import { Button, Spinner } from "@blueprintjs/core";
+import { Button, Divider, Spinner } from "@blueprintjs/core";
 import { parse, format } from "date-fns";
 import { LinkCard } from "@macrostrat/ui-components";
 import { SampleCard } from "../sample/detail-card";
@@ -139,7 +139,7 @@ const ProjectLinks = (props) => {
     const projectTo = useModelURL(`/project/${project.id}`);
 
     return h("div.project", [
-      h("h5.info", "Project"),
+      h("h4.info", "Project"),
       h("div", null, [h("a", { href: projectTo }, project.name) || "—"]),
     ]);
   }
@@ -177,7 +177,12 @@ export function DataFilePage({ props }) {
     h("div", { className: styles.header }, [
       h(DetailPageHeader, { date_upload, basename, type, file_hash }),
     ]),
+    h(Divider),
     h("div", { className: styles.infoContainer }, [
+      h("div", { className: styles.projects }, [h(ProjectLinks, { project })]),
+      h("div", { className: styles.sampleContainer }, [
+        h(Samples, { name, sample_id, sample_material }),
+      ]),
       h(SessionInfo, {
         session_id,
         target,
@@ -185,15 +190,9 @@ export function DataFilePage({ props }) {
         technique,
         analysis,
       }),
-      h("div", { className: styles.sampleContainer }, [
-        h(Samples, { name, sample_id, sample_material }),
-      ]),
-      h("div", { className: styles.projects }, [h(ProjectLinks, { project })]),
     ]),
   ]);
 }
-
-//localhost:5002/api/v2/models/data_file/ff1bfe14-f808-761c-ad87-693bf6edaeb8?nest=data_file_link,session,sample,project
 
 const DataFileComponent = function(props) {
   const { file_hash } = props;

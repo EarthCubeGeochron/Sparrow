@@ -6,6 +6,7 @@ import { LinkCard } from "@macrostrat/ui-components";
 import { useModelURL } from "~/util/router";
 import { Route, Switch } from "react-router-dom";
 import { DataFilePage, DataFileMatch } from "./page";
+import { parse, format } from "date-fns";
 
 const h = hyperStyled(styles);
 
@@ -41,9 +42,24 @@ export function DataFilesCard(data) {
       LinkCard,
       { to: useModelURL(`/data-file/${file_hash}`) },
       h("div", { className: "data-file-card" }, [
-        // h("h4", [format(date, "MMMM D, YYYY")]),
-        h("h2", basename),
-        h("div.type", type),
+        h(
+          "div",
+          {
+            style: {
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-start",
+              alignContent: "center",
+            },
+          },
+          [
+            h.if(date !== null)("h4", { style: { padding: "0px" } }, [
+              format(date, "MMMM D, YYYY"),
+            ]),
+            h("h2", basename),
+            h("div.type", type),
+          ]
+        ),
       ])
     ),
   ]);
