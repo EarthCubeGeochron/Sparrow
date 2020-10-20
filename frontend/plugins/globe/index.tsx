@@ -12,12 +12,12 @@ import {
 import worldMap from "./assets/land-110m.json";
 import { APIResultView } from "@macrostrat/ui-components";
 import { Colors, H1, Tooltip } from "@blueprintjs/core";
-//import { Marker } from "react-map-gl";
+import { useHistory } from "react-router-dom";
 
 function MapComponent(props) {
-  const [tooltipContent, setTooltipContent] = React.useState("");
-
   let { markers } = props;
+  const history = useHistory();
+
   if (markers == null) {
     markers = [];
   }
@@ -52,6 +52,7 @@ function MapComponent(props) {
           <circle cx={410} cy={410} r={400} fill="#afe6f0" stroke="#888888" />
           <Geographies geography={worldMap} disableOptimization>
             {(geographies, projection) => {
+              console.log(projection);
               return geographies.map((geography, i) => {
                 return (
                   <Geography
@@ -71,31 +72,31 @@ function MapComponent(props) {
           <Markers>
             {markers.map((marker, i) => {
               return (
-                <Tooltip content={tooltipContent}>
-                  <Marker
-                    key={i}
-                    marker={marker}
+                <Marker
+                  key={i}
+                  marker={marker}
+                  style={{
+                    default: { fill: "#ad99ff" },
+                    hover: { fill: "#634dbf" },
+                    pressed: { fill: "#FF5722" },
+                    hidden: { opacity: 0 },
+                    cursor: "pointer",
+                  }}
+                >
+                  <circle
+                    cx={0}
+                    cy={0}
+                    r={10}
                     style={{
-                      default: { fill: "#ad99ff" },
-                      hover: { fill: "#634dbf" },
-                      pressed: { fill: "#FF5722" },
-                      hidden: { opacity: 0 },
-                      cursor: "pointer",
+                      stroke: "#634dbf",
+                      strokeWidth: 3,
+                      opacity: 0.9,
                     }}
-                    onMouseEnter={setTooltipContent(marker.name)}
-                  >
-                    <circle
-                      cx={0}
-                      cy={0}
-                      r={10}
-                      style={{
-                        stroke: "#634dbf",
-                        strokeWidth: 3,
-                        opacity: 0.9,
-                      }}
-                    />
-                  </Marker>
-                </Tooltip>
+                    onClick={function () {
+                      history.push(`/catalog/sample/${marker.id}`);
+                    }}
+                  />
+                </Marker>
               );
             })}
           </Markers>
