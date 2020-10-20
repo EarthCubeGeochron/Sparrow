@@ -1,12 +1,8 @@
-import re
 import json
 import os
-from click import secho, echo
 from pathlib import Path
-from rich.console import Console
-from subprocess import PIPE, STDOUT
-from ..util import cmd, exec_or_run
 from hashlib import md5
+from ..util import compose
 from ..exc import SparrowCommandError
 
 
@@ -18,7 +14,7 @@ def dirhash(path):
 
 def cache_dir(create=False):
     """Unixy cache directory for application files"""
-    __dir = Path.home() / ".cache" / "sparrow"
+    __dir = Path.home() / ".cache" / "org.earthcube.sparrow"
     if create:
         __dir.mkdir(parents=True, exist_ok=True)
     return __dir
@@ -32,16 +28,27 @@ def cli_cache_file():
     return cache_dir(create=True) / f"{prefix}-cli-hash.json"
 
 
-def get_backend_command_help():
-    cachefile = cli_cache_file()
-    if cachefile.is_file():
-        with cachefile.open("r") as f:
-            return json.load(f)
-    out = exec_or_run(
-        "backend", "cat /run/cli-info.json", tty=False, stdout=PIPE, stderr=STDOUT
+def get_backend_help_info(cache=True):
+    out = compose(
+        "run --rm -T", "backend", "cat /run/cli-info.json", capture_output=True
     )
     if out.returncode != 0:
-        raise SparrowCommandError("Could not access help text for sparrow backend")
-    with cachefile.open("w") as f:
-        f.write_line("sdwrqewrfedif")
-    return json.loads(str(out.stdout, "utf-8"))
+        details = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"
+        raise SparrowCommandError(
+            "Could not access help text for sparrow backend", details=details
+        )
+
+    data = str(out.stdout, "utf-8")
+    if cache:
+        cachefile.open("w").write(data)
+    return json.loads(data)
+
+
+def get_backend_command_help():
+    cachefile = cli_cache_file()
+    try:
+        if cachefile.is_file():
+            return json.load(cachefile.open("r"))
+    except Exception:
+        pass
+    return get_backend_help_info(cache=True)

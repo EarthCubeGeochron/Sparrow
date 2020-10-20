@@ -1,10 +1,11 @@
 from os import environ, chdir
 from subprocess import run, PIPE, STDOUT
 from shlex import split
-from .env import validate_environment
-from .exc import SparrowCommandError
 from typing import List
 from pathlib import Path
+from json import loads
+from .env import validate_environment
+from .exc import SparrowCommandError
 
 
 def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
@@ -66,11 +67,11 @@ def exec_or_run(
 
 def fail_without_docker():
     try:
-        res = cmd("dockers info --format '{{json .ServerErrors}}'", capture_output=True)
+        res = cmd("docker info --format '{{json .ServerErrors}}'", capture_output=True)
     except FileNotFoundError:
         raise SparrowCommandError(
             "Cannot find the docker command. Is docker installed?"
         )
-    errors = json.loads(str(res.stdout, "utf-8"))
-    if len(errors) > 0:
+    errors = loads(str(res.stdout, "utf-8"))
+    if errors is not None and len(errors) > 0:
         raise SparrowCommandError(errors[0])

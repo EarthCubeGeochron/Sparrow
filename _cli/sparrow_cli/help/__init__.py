@@ -124,11 +124,9 @@ def echo_help(ctx, core_commands=None, user_commands=None):
         fmt.write_line("Config: " + style(d0, fg="cyan"))
     d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
     fmt.write_line(f"Lab: {d1}")
-
-    fmt.write("")
     fmt.flush()
-
     fail_without_docker()
+    fmt.write("")
 
     with fmt.section("Command groups"):
         fmt.write_dl(
