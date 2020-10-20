@@ -26,6 +26,7 @@ class SparrowDefaultCommand(DefaultGroup):
             details = getattr(exc, "details", None)
             if details is not None:
                 secho(details, dim=True)
+            raise exc
 
 
 def find_config_file(dir: Path) -> Optional[Path]:

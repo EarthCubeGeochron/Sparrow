@@ -1,5 +1,7 @@
 
 export SPARROW_LAB_NAME="Sparrow Test Lab"
+
+# Change the SPARROW_ENV to production for smaller development bundles
 export SPARROW_ENV="development"
 export COMPOSE_PROJECT_NAME="sparrow_test"
 
