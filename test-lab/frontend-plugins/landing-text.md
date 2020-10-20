@@ -9,11 +9,13 @@ The code for this test implementation is housed in [the Sparrow GitHub repositor
 a local version of the configuration can be created using the `sparrow create-test-lab`
 command.
 
-## Administrator console access
+## Administration interface
 
 This instance of the application is automatically set up with a user (normally, you would
 run `sparrow create-user` to handle this process).
-You can log into the administration console using the username `Test` and password `Test`.
+
+Username: **`Test`**  
+Password: **`Test`**
 
 ## Database console
 
