@@ -2,6 +2,7 @@ from os import environ, chdir
 from subprocess import run, PIPE, STDOUT
 from shlex import split
 from .env import validate_environment
+from .exc import SparrowCommandError
 from typing import List
 from pathlib import Path
 
@@ -61,3 +62,15 @@ def exec_or_run(
         return compose(
             *compose_args, "run", *tty_args, *run_args, container, *args, **popen_kwargs
         )
+
+
+def fail_without_docker():
+    try:
+        res = cmd("dockers info --format '{{json .ServerErrors}}'", capture_output=True)
+    except FileNotFoundError:
+        raise SparrowCommandError(
+            "Cannot find the docker command. Is docker installed?"
+        )
+    errors = json.loads(str(res.stdout, "utf-8"))
+    if len(errors) > 0:
+        raise SparrowCommandError(errors[0])
