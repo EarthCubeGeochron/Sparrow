@@ -89,20 +89,13 @@ width: 20em;\
 `;
 
 function GeoDeepDiveCard(props) {
-  const [open, setOpen] = useState(false);
-
-  const toggleOpen = () => {
-    setOpen(!open);
-  };
-
   const { sample_name } = props;
   const route = "https://geodeepdive.org/api/v1/snippets";
   const params = { term: sample_name };
-  return (
-    h(Button, { onClick: toggleOpen, text: "GeoDeepDive Search" }),
-    h(
-      Drawer,
-      { isCloseButtonShown: true, onClose: toggleOpen },
+  return h(
+    CollapsePanel,
+    { title: "GeoDeepDive results", storageID: "gdd-results" },
+    h(ResultsPanel, [
       h(
         InfoCallout,
         {
@@ -123,9 +116,25 @@ publications`
           success: { data },
         } = res;
         return h(SnippetList, { items: data });
-      })
-    )
+      }),
+    ])
   );
 }
 
-export { GeoDeepDiveCard };
+function GDDDrawer(props) {
+  const { name } = props;
+  const [open, setOpen] = useState(false);
+
+  const toggleOpen = () => {
+    setOpen(!open);
+  };
+
+  return (
+    h(Button, { onClick: toggleOpen }, ["GeoDeepDive Helper"]),
+    h(Drawer, { isOpen: open, onClose: toggleOpen }, [
+      h("p", ["GeoDeepDive: " + name]),
+    ])
+  );
+}
+
+export { GeoDeepDiveCard, GDDDrawer };

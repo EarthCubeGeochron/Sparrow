@@ -25,7 +25,7 @@ function SampleFilter({ on_map = false }: Filter) {
       h(AgeSlideSelect),
       h(DatePicker),
       h(GeologicFormationSelector),
-      h.if(!on_map)(MapSelector),
+      //h.if(!on_map)(MapSelector),
     ]);
   };
 

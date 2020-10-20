@@ -17,6 +17,7 @@ import { InsetText } from "~/components/layout";
 import { CatalogNavbar } from "./nav";
 import styles from "./module.styl";
 import { SessionMatch } from "../model-views/session";
+import { DataFilesMain } from "../model-views/data-files";
 
 const h = hyperStyled(styles);
 
@@ -26,7 +27,7 @@ function DataModelLinks(props) {
     h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
     h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
     h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
-    // h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
+    h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
   ]);
 }
 
@@ -80,11 +81,11 @@ const CatalogBody = (
       path: base + "/sample",
       component: SampleMain,
     }),
-    // h(PageRoute, {
-    //   path: base + "/data-file",
-    //   style: PageStyle.WIDE,
-    //   component: DataFilesMain,
-    // }),
+    h(Route, {
+      path: base + "/data-file",
+      // style: PageStyle.WIDE,
+      component: DataFilesMain,
+    }),
     h(Route, {
       path: base,
       component: CatalogMain,
