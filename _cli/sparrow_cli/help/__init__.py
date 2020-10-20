@@ -50,7 +50,8 @@ def command_dl(directories: Path, extra_commands={}):
             continue
         if name.startswith("sparrow-docs-"):
             continue
-
+        if name.startswith("sparrow-dev-"):
+            continue
         yield (name[len(prefix) :], get_description(f).strip())
 
 
@@ -67,6 +68,7 @@ sections = {
     "db": "Manage the `sparrow` database",
     "test": "Run `sparrow`'s test suite",
     "docs": "Manage `sparrow`'s documentation",
+    "dev": "Helper commands for development",
 }
 
 

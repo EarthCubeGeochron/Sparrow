@@ -13,6 +13,7 @@ from .util import cmd, compose, exec_or_run, find_subcommand, container_id
 from .test import sparrow_test  # noqa
 from .database import sparrow_db  # noqa
 from .docs import sparrow_docs  # noqa
+from .dev import sparrow_dev  # noqa
 from .containers import sparrow_up, sparrow_logs
 from .build import sparrow_build
 
@@ -70,3 +71,4 @@ def shell(container):
 cli.add_command(sparrow_up, name="up")
 cli.add_command(sparrow_logs, name="logs")
 cli.add_command(sparrow_build, name="build")
+cli.add_command(sparrow_dev, name="dev")
