@@ -1,9 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 import React, { Component } from "react";
 import h from "react-hyperscript";
 import {
@@ -20,10 +14,10 @@ import { APIResultView } from "@macrostrat/ui-components";
 import { Colors, H1, Tooltip } from "@blueprintjs/core";
 //import { Marker } from "react-map-gl";
 
-function MapComponent() {
+function MapComponent(props) {
   const [tooltipContent, setTooltipContent] = React.useState("");
 
-  let { markers } = this.props;
+  let { markers } = props;
   if (markers == null) {
     markers = [];
   }
