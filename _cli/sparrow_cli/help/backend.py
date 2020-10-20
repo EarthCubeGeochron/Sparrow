@@ -25,12 +25,15 @@ def cli_cache_file():
     prefix = "sparrow"
     if cfg is not None:
         prefix = dirhash(cfg)
-    return cache_dir(create=True) / f"{prefix}-cli-hash.json"
+    return cache_dir(create=True) / f"{prefix}-cli-options.json"
 
 
 def get_backend_help_info(cache=True):
     out = compose(
-        "run --rm -T", "backend", "cat /run/cli-info.json", capture_output=True
+        "run --no-deps --rm -T",
+        "backend",
+        "cat /run/cli-info.json",
+        capture_output=True,
     )
     if out.returncode != 0:
         details = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"
@@ -40,6 +43,7 @@ def get_backend_help_info(cache=True):
 
     data = str(out.stdout, "utf-8")
     if cache:
+        cachefile = cli_cache_file()
         cachefile.open("w").write(data)
     return json.loads(data)
 
