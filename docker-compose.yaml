@@ -7,7 +7,8 @@ services:
     ports:
       - ${SPARROW_HTTP_PORT:-5002}:80
     volumes:
-      - ./nginx-config/locations:/etc/nginx/locations:ro
+      - ./nginx-config/locations/core.conf:/etc/nginx/locations/core.conf:ro
+      - ./nginx-config/locations/browser-sync.conf:/etc/nginx/locations/browser-sync.conf:ro
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend:

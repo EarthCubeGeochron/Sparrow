@@ -1,4 +1,4 @@
-from click import graph
+from click import group
 from .group import CommandGroup
 from .util import compose
 
