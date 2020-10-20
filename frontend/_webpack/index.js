@@ -81,7 +81,12 @@ let baseConfig = {
   },
   plugins: [
     new HtmlWebpackPlugin(htmlConfig),
-    new EnvironmentPlugin(["BASE_URL", "SPARROW_LAB_NAME", "MAPBOX_API_TOKEN"]),
+    new EnvironmentPlugin([
+      "BASE_URL",
+      "SPARROW_LAB_NAME",
+      "MAPBOX_API_TOKEN",
+      "SPARROW_ENV",
+    ]),
   ],
 };
 

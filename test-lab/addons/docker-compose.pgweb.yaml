@@ -10,4 +10,7 @@ services:
       - db
   gateway:
     volumes:
-      - ${SPARROW_CONFIG_DIR}/addons/pgweb.conf:/etc/nginx/locations/pgweb.conf:ro
+      - type: bind
+        source: ${SPARROW_CONFIG_DIR}/addons/pgweb.conf
+        target: /etc/nginx/locations/pgweb.conf
+        read_only: true
