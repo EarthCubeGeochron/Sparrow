@@ -31,7 +31,12 @@ def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
 
 def name_for_collection_relationship(base, local_cls, referred_cls, constraint):
     # if referred_cls.__table__.name == 'datum_type' and local_cls.__table__.name == 'unit':
-    return referred_cls.__name__.lower() + "_collection"
+    cls_name = referred_cls.__name__.lower()
+    # Collection creation override for self-referential relationships.
+    # We could probably generalize this for all 'through' models
+    # if referred_cls.__table__.name in ["parameter", "material"]:
+    #    cls_name += "_" + "_".join(col.name for col in constraint.columns)
+    return cls_name + "_collection"
 
 
 class BaseCollection(object):

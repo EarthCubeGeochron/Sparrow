@@ -20,15 +20,6 @@
   z-index: 99;
 }
 
-.mrker-btn {
-  justify-self: center;
-}
-
-/* .mrker-btn img {
-  width: 30px;
-  height: 30px;
-} */
-
 .cluster-marker {
   color: #fff;
   background: #1978c8;
@@ -72,7 +63,3 @@
 .tooltip {
   background: white;
 }
-
-@import "~normalize.css";
-@import "~@blueprintjs/core/lib/css/blueprint.css";
-@import "~@blueprintjs/icons/lib/css/blueprint-icons.css";

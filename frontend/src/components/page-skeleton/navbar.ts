@@ -1,7 +1,7 @@
 import { hyperStyled, classed, addClassNames } from "@macrostrat/hyper";
 import { Navbar } from "@blueprintjs/core";
 import { NavLink } from "react-router-dom";
-import { NavLinkButton } from "@macrostrat/ui-components";
+import { NavLinkButton, DarkModeButton } from "@macrostrat/ui-components";
 
 import { AuthStatus } from "app/auth";
 import { Frame } from "app/frame";
@@ -9,7 +9,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const NavButton = classed(NavLinkButton, "navbar-button");
+const NavButton = classed(NavLinkButton, styles["navbar-button"]);
 
 const SiteTitle = () =>
   h(NavLink, { to: "/" }, h(Frame, { id: "siteTitle" }, "Test Lab"));
@@ -29,6 +29,10 @@ function AppNavbar({ children, fullTitle, subtitle, ...rest }) {
       ]),
       h.if(children != null)(Navbar.Divider),
       children,
+    ]),
+    h("div.navbar-spacer"),
+    h(Navbar.Group, [
+      h(DarkModeButton, { minimal: true, active: false }),
       h(AuthStatus, { className: "auth-right" }),
     ]),
   ]);

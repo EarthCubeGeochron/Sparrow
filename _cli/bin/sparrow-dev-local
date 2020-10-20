@@ -1,6 +1,5 @@
 #!/bin/bash -e
-# Description: Reload web browser if app is in development mode
-# This will eventually be folded into a `sparrow dev` command
+# Description: Run sparrow with a locally-installed frontend (this can be less resource-intensive)
 
 sparrow compose up -d --build gateway
 

@@ -5,10 +5,11 @@ from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError
+from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy import inspect
 
 from .util import is_pk_defined, pk_values, prop_is_required
-from .converter import SparrowConverter
+from .converter import SparrowConverter, allow_nest
 
 from sparrow import get_logger
 
@@ -44,8 +45,20 @@ def is_model_ready(model, data):
 
 
 class ModelSchema(SQLAlchemyAutoSchema):
+    """
+    :param: allowed_nests: List of strings or "all"
+    """
+
     def __init__(self, *args, **kwargs):
-        self.allowed_nests = kwargs.pop("allowed_nests", [])
+        kwargs["unknown"] = True
+        nests = kwargs.pop("allowed_nests", [])
+        self.allowed_nests = nests
+        if len(self.allowed_nests) > 0:
+            model = self.opts.model.__name__
+            log.debug(
+                f"\nSetting up schema for model {model}\n  allowed nests: {nests}"
+            )
+
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
 
@@ -115,24 +128,23 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # Try to get value from session
         log.debug(f"Finding instance of {self.opts.model.__name__}")
         log.debug(f"..filters: {filters}")
+        log.debug(f"..related models: {related_models}")
+        log.debug(f"..data: {data}")
         instance = self._get_session_instance(filters)
 
         # Need to get relationship columns for primary keys!
         if instance is None:
-            try:
-                query = self.session.query(self.opts.model).filter_by(**filters)
-                instance = query.first()
-                if instance is None:
-                    log.debug("..none found")
-                else:
-                    log.debug("..success!")
-            except StatementError:
-                log.exception("..none found")
+            query = self.session.query(self.opts.model).filter_by(**filters)
+            instance = query.first()
+            if instance is None:
+                log.debug("..none found")
+            else:
+                log.debug("..success!")
         if instance is None:
             instance = super().get_instance(data)
 
         if instance is not None:
-            for k, v in related_models.items():
+            for k, v in data.items():
                 setattr(instance, k, v)
 
         # Get rid of filters by value
@@ -168,10 +180,11 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        instance = self._get_instance(data)
+        with self.session.no_autoflush:
+            instance = self._get_instance(data)
         if instance is None:
             # if not is_model_ready(self.opts.model, data):
-            #    return None
+            #     return None
             try:
                 # Begin a nested subtransaction
                 self.session.begin_nested()
@@ -181,13 +194,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 #     return instance
                 self.session.add(instance)
                 log.debug(f"Created instance {instance} with parameters {data}")
-                # self.session.flush(objects=[instance])
+                self.session.flush(objects=[instance])
                 self.session.commit()
                 log.debug("Successfully persisted to database")
             except IntegrityError as err:
                 self.session.rollback()
                 log.debug("Could not persist but will try again later")
-                log.debug(err)
+                # log.debug(err)
 
         return instance
 
@@ -199,5 +212,15 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     def to_json_schema(model):
         return json_schema.dump(model)
+
+    def _available_nests(self):
+        model = self.opts.model
+        nests = []
+        for prop in model.__mapper__.iterate_properties:
+            if not isinstance(prop, RelationshipProperty):
+                continue
+            if allow_nest(model.__table__.name, prop.target.name):
+                nests.append(prop.target.name)
+        return nests
 
     from .display import pretty_print

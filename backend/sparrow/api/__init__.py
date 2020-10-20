@@ -7,14 +7,18 @@ from starlette.exceptions import HTTPException
 from sparrow.logs import get_logger
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
+from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
-from .endpoint import ModelAPIEndpoint
+from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description
 
 log = get_logger(__name__)
 
 
 async def http_exception(request, exc):
+    log.error(f"{exc.status_code} {exc.detail}")
+    # if exc.detail == "Internal Server Error":
+    log.exception(exc)
     return JSONResponse(
         {"error": {"detail": exc.detail, "status_code": exc.status_code}},
         status_code=exc.status_code,
@@ -41,8 +45,11 @@ class APIEntry(HTTPEndpoint):
             200:
                 description: It's alive!
         """
-        desc = {d["route"]: d["description"] for d in request.app.route_descriptions}
-        return JSONResponse({"routes": desc})
+        routes = {}
+        for k, v in request.app.route_descriptions.items():
+            desc = {d["route"]: d["description"] for d in v}
+            routes[k] = desc
+        return JSONResponse({"routes": routes})
 
 
 def schema(request):
@@ -58,9 +65,9 @@ class APIv2(Starlette):
 
     def __init__(self, app):
         self._app = app
-        self.route_descriptions = []
+        self.route_descriptions = defaultdict(list)
 
-        super().__init__(exception_handlers=exception_handlers)
+        super().__init__(exception_handlers=exception_handlers, debug=True)
         self.spec = APISpec(
             title="Sparrow API",
             version="2.0",
@@ -70,6 +77,7 @@ class APIv2(Starlette):
         )
 
         self._add_routes()
+        self._app.run_hook("api-initialized-v2", self)
 
     def add_schema_route(self):
         # We will want to layer this back in eventually
@@ -84,6 +92,8 @@ class APIv2(Starlette):
 
         for iface in db.interface:
             self._add_model_route(iface)
+
+        self.add_view_route("authority", schema="vocabulary")
 
         self.add_schema_route()
 
@@ -118,7 +128,32 @@ class APIv2(Starlette):
         )
 
         tbl = iface.opts.model.__table__
+        desc = model_description(iface)
         basic_info = dict(
-            route=endpoint, table=tbl.name, schema=tbl.schema, description="A route!",
+            route=endpoint,
+            table=tbl.name,
+            schema=tbl.schema,
+            description=str(desc),
         )
-        self.route_descriptions.append(basic_info)
+        self.route_descriptions[root_route].append(basic_info)
+
+    def add_view_route(self, tablename, schema="core_view"):
+        _tbl = self._app.database.reflect_table(tablename, schema=schema)
+
+        class Meta:
+            table = _tbl
+
+        name = _tbl.name
+        cls = type(name + "_route", (ViewAPIEndpoint,), {"Meta": Meta})
+        root_route = schema
+        endpoint = f"/{root_route}/{name}"
+
+        self.add_route(endpoint, cls, include_in_schema=False)
+
+        basic_info = dict(
+            route=endpoint,
+            table=_tbl.name,
+            schema=schema,
+            description="",
+        )
+        self.route_descriptions[root_route].append(basic_info)

@@ -9,7 +9,6 @@ import {
   NumericInput,
 } from "@blueprintjs/core";
 import { useToggle } from "../map/components/APIResult";
-import { NormalModuleReplacementPlugin } from "webpack";
 
 /** Form for Editing an Existing Sample */
 

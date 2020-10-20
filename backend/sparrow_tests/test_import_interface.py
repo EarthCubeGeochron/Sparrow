@@ -163,6 +163,18 @@ class TestSchema:
         for k in schema.fields.keys():
             assert hasattr(model, k)
 
+    def test_no_extra_unit_fields(self, db):
+        """
+        We had a problem with gratuitous extra nested fields being created.
+        """
+        schema = db.interface.vocabulary_unit()
+        assert "sample_geo_entity_collection" not in schema.fields.keys()
+
+    @mark.skip(reason="There are more pressing matters...")
+    def test_constant_session_fields(self, db):
+        schema = db.interface.datum_type()
+        assert "constant_collection" not in schema.fields.keys()
+
 
 class TestDeclarativeImporter:
     def test_import_interface(self, db):
@@ -175,6 +187,14 @@ class TestDeclarativeImporter:
         db.load_data("sample", sample)
         db.load_data("sample", sample)
         ensure_single(db, "sample", **sample)
+
+    def test_get_sample(self, db):
+        """Can we get a sample by its ID?"""
+        s = db.session.query(db.model.sample).filter_by(name="test sample 1").first()
+        assert s is not None
+        schema = db.interface.sample()
+        res = schema.dump(s)
+        assert res["session"] == []
 
     def test_standalone_datum_type(self, db):
         data = {"parameter": "Oxygen fugacity", "unit": "dimensionless"}

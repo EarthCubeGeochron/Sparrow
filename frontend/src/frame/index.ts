@@ -6,7 +6,6 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import { StatefulComponent } from "@macrostrat/ui-components";
 import {
   Component,
   createContext,
@@ -16,7 +15,7 @@ import {
 } from "react";
 import { ErrorBoundary } from "../util";
 import T from "prop-types";
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 
 export const FrameContext = createContext({});
 
