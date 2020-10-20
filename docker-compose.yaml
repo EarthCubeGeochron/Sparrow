@@ -49,7 +49,7 @@ services:
       - type: bind
         source: ./backend/
         target: /app
-        read_only: true
+        read_only: false
         consistency: cached
       # Nested volume to keep built files
       # separate from those on our local system
