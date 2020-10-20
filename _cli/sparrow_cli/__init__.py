@@ -14,12 +14,17 @@ from .test import sparrow_test  # noqa
 from .database import sparrow_db  # noqa
 from .docs import sparrow_docs  # noqa
 from .containers import sparrow_up, sparrow_logs
+from .build import sparrow_build
 
 console = Console(highlight=True)
 
 
 @cli.command(
-    "main", context_settings=dict(ignore_unknown_options=True, help_option_names=[],)
+    "main",
+    context_settings=dict(
+        ignore_unknown_options=True,
+        help_option_names=[],
+    ),
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
@@ -64,3 +69,4 @@ def shell(container):
 
 cli.add_command(sparrow_up, name="up")
 cli.add_command(sparrow_logs, name="logs")
+cli.add_command(sparrow_build, name="build")

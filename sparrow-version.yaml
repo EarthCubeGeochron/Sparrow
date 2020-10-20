@@ -1,7 +1,20 @@
 # This test version file is a shim to guide our efforts to figure
 # out how to properly manage versions in a multipart project
-sparrow:
-  core: 1.6.0
-  frontend: 0.0.1
-  schema: 1.0.0
-  cli: pre
+core: 1.6.0
+frontend: 2.0-alpha
+schema: 1.0.1
+cli: 2.0-alpha
+docker_images:
+  # Spec to control building of docker images
+  backend-base:
+    context: ./base-images/backend
+    version: "1.2"
+  db-mysql-fdw:
+    context: ./base-images/db-mysql-fdw
+    version: "1.0"
+  frontend:
+    version: "2.0-dev"
+    context: ./frontend
+  backend:
+    version: "1.6"
+    context: ./backend

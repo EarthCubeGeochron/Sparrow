@@ -11,9 +11,11 @@ services:
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend:
-    image: sparrowdata/backend
+    image: sparrowdata/backend:1.6
     build:
       context: backend
+      cache_from:
+        - sparrowdata/backend:1.6
       target: main
     command: /bin/run
     # Make sure we get colorized terminal output
@@ -86,7 +88,12 @@ services:
     volumes:
       - db_cluster:/var/lib/postgresql/data
   frontend:
-    build: frontend
+    image: sparrowdata/frontend:2.0-dev
+    build:
+      context: frontend
+      cache_from:
+        - sparrowdata/frontend:2.0-dev
+    command: webpack
     depends_on:
       - backend
     environment:
