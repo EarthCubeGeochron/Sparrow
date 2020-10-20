@@ -17,7 +17,7 @@ const h = hyper.styled(styles);
  *
  *
  */
-const SampleListCard = function(props) {
+const SampleListCard = function (props) {
   const { material, id, name } = props;
 
   const to = useModelURL(`/sample/${id}`);
@@ -36,7 +36,7 @@ const SampleListCard = function(props) {
   );
 };
 
-const SampleList = function() {
+const SampleList = function () {
   const route = "/sample";
   const filterFields = {
     name: "Sample name",
@@ -67,7 +67,7 @@ interface SampleProps {
   id?: number;
   sendQuery: () => {};
 }
-const SampleComponent = function(props: SampleProps) {
+const SampleComponent = function (props: SampleProps) {
   const { id, Edit } = props;
 
   const url = `/models/sample/${id}`;
@@ -77,8 +77,10 @@ const SampleComponent = function(props: SampleProps) {
     return null;
   }
 
+  console.log(data);
+
   //const sample = data[0];
-  return h("div.data-view.project", null, h(SamplePage, { data, Edit }));
+  return h("div.data-view.sample", null, h(SamplePage, { id, data, Edit }));
 };
 
 function SampleMatch({ Edit }) {

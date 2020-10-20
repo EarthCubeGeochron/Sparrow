@@ -134,7 +134,7 @@ const Parameter = ({ name, value, ...rest }) => {
   ]);
 };
 
-const ProjectLink = function({ d }) {
+const ProjectLink = function ({ d }) {
   const project = d.data.session.map((obj) => {
     if (obj.project !== null) {
       const { name: project_name, id: project_id } = obj.project;
@@ -191,7 +191,7 @@ const ProjectInfo = ({ sample: d }) => {
   ]);
 };
 
-const LocationBlock = function(props) {
+const LocationBlock = function (props) {
   const { isEditing, hasChanges, actions } = React.useContext(
     ModelEditorContext
   );
@@ -226,7 +226,7 @@ const LocationBlock = function(props) {
   ]);
 };
 
-const Material = function(props) {
+const Material = function (props) {
   const { material, changeEdit, onEdit } = props;
   const { isEditing, hasChanges, actions } = React.useContext(
     ModelEditorContext
@@ -335,7 +335,9 @@ function MetadataHelpers(props) {
   }
 }
 
-const SamplePage = function(props) {
+const SamplePage = function (props) {
+  const { data: sample, Edit } = props;
+
   const [edit, setEdit] = React.useState(false);
   const { login } = useAuth();
 
@@ -357,8 +359,9 @@ const SamplePage = function(props) {
     }
   }, [window.location.pathname]);
 
-  const { data: sample, Edit } = props;
   const { name, material, session, location, location_name } = sample.data;
+  console.log(sample);
+
   return h(
     ModelEditor,
     {

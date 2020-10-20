@@ -10,13 +10,12 @@ const h = hyperStyled(styles);
 export function SampleMainPanel() {
   const base = "/admin/sample";
   return h(Switch, [
-    h(
-      Route,
-      {
-        path: base + "/:id",
+    h(Route, {
+      path: base + "/:id",
+      render() {
+        return h(SampleMatch, { Edit: true });
       },
-      h(SampleMatch, { Edit: true })
-    ),
+    }),
     h(Route, {
       path: base,
       component: () => h("div"),
