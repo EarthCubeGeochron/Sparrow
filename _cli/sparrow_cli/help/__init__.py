@@ -7,9 +7,10 @@ from os import environ, path
 from pathlib import Path
 from itertools import chain
 from rich.console import Console
-from subprocess import PIPE, STDOUT
-from .util import cmd, exec_or_run
-from .base import cli
+from ..util import cmd, fail_without_docker
+from .backend import get_backend_command_help
+from ..base import cli
+from ..exc import SparrowCommandError
 
 console = Console()
 
@@ -49,7 +50,8 @@ def command_dl(directories: Path, extra_commands={}):
             continue
         if name.startswith("sparrow-docs-"):
             continue
-
+        if name.startswith("sparrow-dev-"):
+            continue
         yield (name[len(prefix) :], get_description(f).strip())
 
 
@@ -66,6 +68,7 @@ sections = {
     "db": "Manage the `sparrow` database",
     "test": "Run `sparrow`'s test suite",
     "docs": "Manage `sparrow`'s documentation",
+    "dev": "Helper commands for development",
 }
 
 
@@ -85,24 +88,6 @@ def format_config_path(cfg):
         else:
             tokens.append(token)
     return path.join(*tokens)
-
-
-def get_backend_command_help():
-    out = cmd(
-        "docker run -it --rm -v wiscar_runtime_data:/run busybox cat /run/cli-info.json",
-        stdout=PIPE,
-        stderr=STDOUT,
-    )
-    if out.returncode != 0:
-        out = exec_or_run(
-            "backend", "cat /run/cli-info.json", tty=False, stdout=PIPE, stderr=STDOUT
-        )
-    if out.returncode != 0:
-        secho("Could not access help text for the Sparrow backend", err=True, fg="red")
-        _err = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"
-        secho(_err, dim=True)
-        return None
-    return json.loads(str(out.stdout, "utf-8"))
 
 
 def backend_help(fmt):
@@ -142,7 +127,7 @@ def echo_help(ctx, core_commands=None, user_commands=None):
     d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
     fmt.write_line(f"Lab: {d1}")
     fmt.flush()
-
+    fail_without_docker()
     fmt.write("")
 
     with fmt.section("Command groups"):

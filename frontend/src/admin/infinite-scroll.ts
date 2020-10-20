@@ -95,6 +95,15 @@ function SessionListComponent() {
 
 function unwrapDataFileCardData(data) {
   const dataObj = data.data.map((obj) => {
+    if (obj.data_file_link.length > 0) {
+      const {
+        basename,
+        file_hash,
+        type,
+        data_file_link: [{ date }],
+      } = obj;
+      return { basename, file_hash, type, date };
+    }
     const { basename, file_hash, type } = obj;
     return { basename, file_hash, type };
   });
@@ -111,7 +120,10 @@ function DataFilesListComponent() {
     h(InfiniteAPIView, {
       url: "/models/data_file",
       unwrapData: unwrapDataFileCardData,
-      params: { nest: "data_file_link,sample,session,project" },
+      params: {
+        nest: "data_file_link,sample,session,project",
+        has: "data_file_link",
+      },
       component: DataFilesCard,
       context: APIV2Context,
     }),

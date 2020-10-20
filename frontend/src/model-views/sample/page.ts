@@ -17,7 +17,7 @@ import {
 } from "@macrostrat/ui-components";
 import { Link } from "react-router-dom";
 import { SampleContextMap } from "app/components";
-import { GeoDeepDiveCard } from "./gdd-card";
+import { GeoDeepDiveCard, GDDDrawer } from "./gdd-card";
 import styles from "./module.styl";
 import { MapLink } from "app/map";
 import { MapToaster } from "../../map/map-area";
@@ -36,18 +36,10 @@ import {
 import { useToggle } from "../../map/components/APIResult";
 import { MultipleSelectFilter } from "../../filter/components";
 import { useModelURL } from "~/util/router";
-import { SampleEditing } from "./editor";
 import { GeologicFormationSelector } from "../../filter/components/MultiSelect";
-import {
-  ModelEditor,
-  ModelEditButton,
-  CancelButton,
-  SaveButton,
-  APIHelpers,
-} from "@macrostrat/ui-components";
+import { ModelEditor, ModelEditButton } from "@macrostrat/ui-components";
 import { EditNavBar, ModelEditableText } from "../project/editor";
 import { SessionInfo } from "../data-files/page";
-import { isSameDay } from "date-fns";
 
 const h = hyper.styled(styles);
 
@@ -142,7 +134,7 @@ const Parameter = ({ name, value, ...rest }) => {
   ]);
 };
 
-const ProjectLink = function({ d }) {
+const ProjectLink = function ({ d }) {
   const project = d.data.session.map((obj) => {
     if (obj.project !== null) {
       const { name: project_name, id: project_id } = obj.project;
@@ -318,7 +310,7 @@ function Sessions(props) {
     return null;
   }
   return h("div.parameter", [
-    h("h4.subtitle", "Session"),
+    // h("h4.subtitle", "Session"),
     h("p.value", [
       session.map((obj) => {
         const { id: session_id, technique, target, date } = obj;
@@ -339,12 +331,13 @@ function MetadataHelpers(props) {
       "Metadata Helpers:",
       //  h(GeoDeepDiveCard, { name }),
       h(GeologicFormationSelector),
-      h(GeoDeepDiveCard, { sample_name: name }),
     ]);
   }
 }
 
 const SamplePage = function (props) {
+  const { data: sample, Edit } = props;
+
   const [edit, setEdit] = React.useState(false);
   const { login } = useAuth();
 
@@ -366,8 +359,9 @@ const SamplePage = function (props) {
     }
   }, [window.location.pathname]);
 
-  const { data: sample, Edit } = props;
   const { name, material, session, location, location_name } = sample.data;
+  console.log(sample);
+
   return h(
     ModelEditor,
     {
@@ -390,6 +384,7 @@ const SamplePage = function (props) {
               multiline: true,
             }),
             Edit ? h(DataSheetButton) : null,
+            h(GDDDrawer, { name }),
 
             h("div.basic-info", [
               h(ProjectInfo, { sample }),
@@ -416,8 +411,6 @@ const SamplePage = function (props) {
             ]
           ),
         ]),
-        // h("h3", "Metadata helpers"),
-        // find a better place for this
       ]),
     ]
   );

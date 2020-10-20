@@ -6,6 +6,7 @@ import styles from "./module.styl";
 import { useRouteMatch } from "react-router-dom";
 import { SamplePage } from "./page";
 import { useModelURL } from "~/util/router";
+import { useAPIv2Result } from "~/api-v2";
 import { APIV2Context } from "~/api-v2";
 
 const h = hyper.styled(styles);
@@ -71,17 +72,15 @@ const SampleComponent = function (props: SampleProps) {
 
   const url = `/models/sample/${id}`;
 
-  const data = useAPIResult(
-    url,
-    { nest: "session,project" },
-    { context: APIV2Context }
-  );
+  const data = useAPIv2Result(url, { nest: "session,project" });
   if (id == null || data == null) {
     return null;
   }
 
+  console.log(data);
+
   //const sample = data[0];
-  return h("div.data-view.project", null, h(SamplePage, { data, Edit }));
+  return h("div.data-view.sample", null, h(SamplePage, { id, data, Edit }));
 };
 
 function SampleMatch({ Edit }) {

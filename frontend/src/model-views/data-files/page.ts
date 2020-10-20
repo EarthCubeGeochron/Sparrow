@@ -6,10 +6,11 @@ import { useAPIResult } from "@macrostrat/ui-components";
 import { SampleListCard } from "../sample/list";
 import styles from "./module.styl";
 import { DownloadButton } from "../session";
-import { Button, Spinner } from "@blueprintjs/core";
+import { Button, Divider, Spinner } from "@blueprintjs/core";
 import { parse, format } from "date-fns";
 import { LinkCard } from "@macrostrat/ui-components";
 import { SampleCard } from "../sample/detail-card";
+import { useAPIv2Result } from "~/api-v2";
 
 /**
  * http://localhost:5002/api/v2/models/data_file?nest=data_file_link,sample,session
@@ -99,7 +100,7 @@ export const Samples = (props) => {
     });
   }
   return h("div.sample-area", [
-    h("h4", "Samples:"),
+    h("h4", "Samples"),
     h(
       "div",
       { style: { display: "flex", flexFlow: "row wrap", margin: "0 -5px" } },
@@ -127,7 +128,7 @@ export const SessionInfo = (props) => {
   } = props;
   //const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
   return h("div", { className: styles.sessionContainer }, [
-    // h("h3", ["Session: " + analysis.length + " " + analysisList]),
+    h("h4", ["Session "]),
     h(SessionLinkCard, { session_id, target, technique, date }),
   ]);
 };
@@ -138,15 +139,12 @@ const ProjectLinks = (props) => {
     const projectTo = useModelURL(`/project/${project.id}`);
 
     return h("div.project", [
-      h("h5.info", "Project"),
+      h("h4.info", "Project"),
       h("div", null, [h("a", { href: projectTo }, project.name) || "—"]),
     ]);
   }
   if (project == null) {
-    return h("div.project", [
-      h("h5.info", "Project: "),
-      h("div", { style: { fontStyle: "italic" } }, ["No project associated"]),
-    ]);
+    return null;
   }
 };
 
@@ -179,7 +177,12 @@ export function DataFilePage({ props }) {
     h("div", { className: styles.header }, [
       h(DetailPageHeader, { date_upload, basename, type, file_hash }),
     ]),
+    h(Divider),
     h("div", { className: styles.infoContainer }, [
+      h("div", { className: styles.projects }, [h(ProjectLinks, { project })]),
+      h("div", { className: styles.sampleContainer }, [
+        h(Samples, { name, sample_id, sample_material }),
+      ]),
       h(SessionInfo, {
         session_id,
         target,
@@ -187,21 +190,15 @@ export function DataFilePage({ props }) {
         technique,
         analysis,
       }),
-      h("div", { className: styles.sampleContainer }, [
-        h(Samples, { name, sample_id, sample_material }),
-      ]),
-      h("div", { className: styles.projects }, [h(ProjectLinks, { project })]),
     ]),
   ]);
 }
 
-//localhost:5002/api/v2/models/data_file/ff1bfe14-f808-761c-ad87-693bf6edaeb8?nest=data_file_link,session,sample,project
-
 const DataFileComponent = function(props) {
   const { file_hash } = props;
-  const dataFileURL = `http://localhost:5002/api/v2/models/data_file/${file_hash}`;
+  const dataFileURL = `/models/data_file/${file_hash}`;
 
-  const initdata = useAPIResult(dataFileURL, {
+  const initdata = useAPIv2Result(dataFileURL, {
     nest: "data_file_link,session,sample,project",
   });
   if (file_hash == null || initdata == null) {

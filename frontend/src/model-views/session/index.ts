@@ -63,9 +63,9 @@ function SessionComponent(props) {
           h(SessionInfoCard, res),
           h("div.data-files", [
             h("h3", "Data sources"),
-            h(Frame, { id: "dataFileDownloadButton", ...rest }, (props) => {
-              return h(DownloadButton, props);
-            }),
+            // h(Frame, { id: "dataFileDownloadButton", ...rest }, (props) => {
+            //   return h(DownloadButton, props);
+            // }),
           ]),
           h(Frame, { id: "sessionDetail", session_id: id }, (props) => {
             return h(SessionDetailPanel, { showTitle: true, ...props });

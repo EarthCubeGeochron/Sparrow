@@ -17,6 +17,7 @@ import { AdminNavLinks } from "~/catalog/nav";
 import styles from "./module.styl";
 import { SessionAdminPage } from "./session";
 import { DataFileAdminPage } from "./data-file";
+import { VocabularyPage } from "./vocabulary";
 
 const DataSheet = loadable(() => import("./data-sheet"));
 
@@ -29,7 +30,7 @@ const AdminNavbar = (props) => {
     h(AppNavbar.Divider),
     //h(NavButton, { to: base + "/data-sheet" }, "Sheet"),
     h(NavButton, { to: "/map" }, "Map"),
-    h(NavButton, { to: base + "/lexicon" }, "Lexicon"),
+    h(NavButton, { to: base + "/terms", icon: "data-lineage" }, "Terms"),
   ]);
 };
 
@@ -56,6 +57,10 @@ const AdminRouter = ({ base }) =>
     h(Route, {
       path: base + "/sample",
       render: () => h(SampleAdminPage),
+    }),
+    h(Route, {
+      path: base + "/terms",
+      render: () => h(VocabularyPage),
     }),
     h(PageRoute, {
       path: base + "/data-file",
