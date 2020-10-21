@@ -43,7 +43,7 @@ git clone https://github.com/EarthCubeGeochron/Sparrow.git
 cd Sparrow
 ```
 
-### Installing the command-line interface
+## Installing the command-line interface
 
 **Sparrow** is administered using the `sparrow` command-line
 interface. This command wraps application management, database management,
@@ -56,33 +56,35 @@ To install the command-line application, run the setup command within the
 `Sparrow` repository directory:
 
 ```
-sudo make install-dev
+make install
 ```
 
 This will build a development version of the
 `sparrow` command-line runner.
 
 :::caution
-The **`sudo`** privilege elevation is required because the `make install-dev`
-command tries to install `sparrow` to `/usr/local/bin` by default, so the command can be
-run without a path prefix. If you want to install to a different location, you can
-instead run `SPARROW_INSTALL_PREFIX=<root-path> install-dev`. This will install `sparrow`
+`make install` requests **`sudo`** privilege elevation so that it can
+install `sparrow` to `/usr/local/bin`, which allows the command to be
+run without a path prefix on most systems. If you want to install to a different location, you can
+instead run `SPARROW_INSTALL_DIR=<root-path> make install`. This will install `sparrow`
 to `<root-path>/bin/sparrow`.
 :::
 
-Typing `sparrow` at the command line will download and build containers
-(this will take a long time on initial run) and then show the [application's help page](/docs/cli).
+## Running Sparrow
 
-### Running Sparrow
+Typing `sparrow` at the command line will download and build containers
+(this will take a long time on initial run)
+and show the [application's help page](/docs/cli).
+Seeing the help page successfully means the application has been installed.
 
 The **Sparrow** application can be run using the command
-`sparrow up`. In all cases, the environment variable
+`sparrow up`. The environment variable
 `SPARROW_SECRET_KEY` must be set before running, but other variables
 will be set to default values if not provided. Thus, a minimal working
 **Sparrow** demo can be run using the following command:
 
 ```
-SPARROW_SECRET_KEY="TemporaryKey" sparrow up
+SPARROW_SECRET_KEY=TemporaryKey sparrow up
 ```
 
 This command will spin up a database engine, frontend, backend,
@@ -92,19 +94,6 @@ command to set up database tables.
 The **Sparrow** web interface can then be accessed at `http://localhost:5002`;
 the API can be found at `http://localhost:5002/api`.
 
-### Configuring the application
-
-**Sparrow** is configured using a shell script that exports environment
-variables to customize the **Sparrow** installation. An example of this script
-is shown in `sparrow-config.sh.example`. While not _required_ (environment
-variables can be set externally), this approach is strongly preferred.
-
-At runtime, the `sparrow` application finds a configuration file by searching
-upwards from the current directory until the first file named
-`sparrow-config.sh` is found. Alternatively, the location of the configuration
-file can be set using the `SPARROW_CONFIG` environment variable. This will
-allow the `sparrow` command to be run from anywhere on the system.
-
 ### Creating a user
 
 On navigating to the web interface for the first time, you will not be logged
@@ -113,26 +102,56 @@ the `user` table after running this command. Note: the `SPARROW_SECRET_KEY`
 environment variable is used to encrypt passwords, so make sure
 this value is kept consistent through the lifetime of the application.
 
+## Running a configured application
+
+**Sparrow** is configured using a shell script that exports environment
+variables to customize the **Sparrow** installation. An example of this script
+is shown in [`sparrow-config.sh.example`](). While not _required_ (environment
+variables can be set externally), this approach is strongly preferred.
+
+At runtime, the `sparrow` application finds a configuration file by searching
+upwards from the current directory until the first file named
+`sparrow-config.sh` is found. Alternatively, the location of the configuration
+file can be set using the `SPARROW_CONFIG` environment variable. This will
+allow the `sparrow` command to be run from anywhere on the system.
+
+The best way to get a basic configured application to test is by running the
+`sparrow create-test-lab <your-directory>` command, which will give you a
+basic lab with a few plugins and a small test dataset, based on the configuration
+[in this directory](https://github.com/EarthCubeGeochron/Sparrow/tree/master/test-lab).
+
+Managing lab implementations of Sparrow as Git repositories is a good idea, as it
+allows plugins and site content to be versioned and pinned (using [Git submodules]())
+to a specific version of Sparrow. This has the added benefit of allowing configurations
+and lab-specific code to be publicly available to guide future implementations. This approach
+is taken by the [UW Cosmogenic Nuclide lab](https://github.com/EarthCubeGeochron/sparrow-uw-cosmo),
+[Arizona Laserchron Center](https://github.com/EarthCubeGeochron/Sparrow-LaserChron),
+[WiscAr](https://github.com/EarthCubeGeochron/Sparrow-WiscAr),
+[the Desert Research Institute](https://github.com/EarthCubeGeochron/Sparrow-luminescence-demo),
+and other implementing facilities.
+
 ### Inspecting the running application
 
 Several `sparrow` subcommands allow inspection of the running
 **Sparrow** application:
 
+- `sparrow test` runs the application's testing suite.
 - `sparrow psql` allows interaction with the **Sparrow** database
   using the standard `psql` management tool that ships with PostgreSQL.
 - `sparrow db-tunnel` exposes the PostgreSQL database engine
   on `localhost` port `54321` (database `sparrow`, user `postgres`).
   This is useful for schema introspection and data management
   using GUI tools such as [Postico](https://eggerapps.at/postico/).
+- `sparrow shell` runs an iPython shell within the application.
 - `sparrow shell <container>` creates a command-line shell within a Docker
   container in the application.
-- `sparrow console` creates a Python shell within the application,
-  allowing inspection of the API server runtime.
 - `sparrow config` prints the API server configuration.
 - `sparrow compose config` prints the `docker-compose` configuration
   in use for running the containerized application.
 
-## Local development
+## Appendix
+
+### Local development
 
 In certain situations, development on your local machine can be easier than
 working with a containerized version of the application. However, configuration
@@ -152,26 +171,19 @@ management commands from the `sparrow` command-line interface
 are also unavailable; these could be implemented separately from the
 Docker versions of the commands if there is demand.
 
-## Environment variables index
+### Environment variables index
 
 - `SPARROW_SECRET_KEY="very secret string"`: A secret key used for management
   of passwords. Set this in your **LOCAL** environment (it will be copied to
-  the Docker runtime as needed). It is the only variable required to get up and
-  running with a basic Dockerized version.
+  the Docker runtime as needed). It is the only variable required to run a basic test application.
 - `SPARROW_BACKEND_CONFIG="<path>"`: Location of `.cfg` files containing data.
 - The frontend is confugured using the variables `SPARROW_SITE_CONTENT`
   and `SPARROW_BASE_URL`. These values replace the former function of the `SPARROW_CONFIG_JSON` file.
+- The `SPARROW_ENV=<development,production>` environment variable defaults to
+  `production`, which disable development-focused features such
+  as live code reloading and sourcemaps for performance and security.
 
-## Development vs. production
-
-In the current beta implementation of this server, the frontend and backend server
-currently both run only in development mode — changes to the code are compiled in
-real time and should be available upon browser reload. This will be disabled in
-the future with a `SPARROW_ENV=<development,production>` environment variable
-that will default to `production` and disable development-focused features such
-as live code reloading and sourcemaps for performance and security.
-
-## Extensions
+### Extensions
 
 The `base-images/db-mysql-fdw` image is provided to build a
 Sparrow-compatible PostGIS image with the MySQL foreign data wrapper extension (for connecting with external MySQL databases).
