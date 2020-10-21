@@ -115,6 +115,10 @@ def command_info(ctx, cli):
 
 def echo_help(ctx, core_commands=None, user_commands=None):
 
+    # We want to run `sparrow up` first so we don't get surprised by container errors later
+    fail_without_docker()
+    compose("up --no-start --remove-orphans")
+
     fmt = SparrowHelpFormatter()
 
     fmt.write_usage("sparrow", "[options] <command> [args]...")
@@ -128,10 +132,6 @@ def echo_help(ctx, core_commands=None, user_commands=None):
     d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
     fmt.write_line(f"Lab: {d1}")
     fmt.flush()
-
-    ## We want to run `sparrow up` first so we don't get surprised by container errors later
-    fail_without_docker()
-    compose("up --no-start --remove-orphans")
 
     fmt.write("")
 
