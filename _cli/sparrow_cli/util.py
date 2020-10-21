@@ -6,6 +6,7 @@ from pathlib import Path
 from json import loads
 from .env import validate_environment
 from .exc import SparrowCommandError
+from json.decoder import JSONDecodeError
 
 
 def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
@@ -72,6 +73,10 @@ def fail_without_docker():
         raise SparrowCommandError(
             "Cannot find the docker command. Is docker installed?"
         )
-    errors = loads(str(res.stdout, "utf-8"))
+    try:
+        errors = loads(str(res.stdout, "utf-8"))
+    except JSONDecodeError:
+        print(res.stdout)
+        return
     if errors is not None and len(errors) > 0:
         raise SparrowCommandError(errors[0])
