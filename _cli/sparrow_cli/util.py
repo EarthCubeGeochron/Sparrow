@@ -28,7 +28,7 @@ def compose(*args, **kwargs):
 
 
 def container_id(container):
-    res = compose("ps -q", container, capture_output=True).stdout.strip()
+    res = compose("ps -q", container, stdout=PIPE).stdout.strip()
     if res == "":
         return None
     return res.decode("utf-8")
@@ -67,7 +67,7 @@ def exec_or_run(
 
 def fail_without_docker():
     try:
-        res = cmd("docker info --format '{{json .ServerErrors}}'", capture_output=True)
+        res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
     except FileNotFoundError:
         raise SparrowCommandError(
             "Cannot find the docker command. Is docker installed?"
