@@ -49,3 +49,6 @@ install-hooks:
 	git config --local core.hooksPath .githooks
 	# Always git prune on config
 	git config --local remote.origin.prune true
+	# Initialize submodules if we haven't already
+	-[ ! -d .git/modules ] && git submodule update --init
+
