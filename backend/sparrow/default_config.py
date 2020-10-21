@@ -4,7 +4,7 @@ import logging
 from .logs import console_handler
 
 LAB_NAME = environ.get("SPARROW_LAB_NAME", "Test lab")
-DATABASE = environ.get("SPARROW_DATABASE", "postgresql:///sparrow")
+DATABASE = environ.get("SPARROW_DATABASE", "postgresql+psycopg2:///sparrow")
 BASE_URL = environ.get("SPARROW_BASE_URL", "/")
 
 # We want to check most of our config into version control,
