@@ -26,12 +26,12 @@ module.exports = {
           activeBasePath: "Guides",
           label: "Guides",
         },
-        {
+        /*{
           to: "docs/motivation-and-design",
           activeBasePath: "Guides",
           label: "Motivation and design",
           position: "left",
-        },
+        },*/
         {
           to: "docs/getting-started",
           activeBasePath: "Guides",

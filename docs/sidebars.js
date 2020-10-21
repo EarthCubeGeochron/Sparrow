@@ -4,14 +4,23 @@ module.exports = {
     Guides: [
       "motivation-and-design",
       "getting-started",
-      "server-configuration",
-      "sparrow-on-windows",
       "datascience/data-sci",
       "schema-imp",
+      "embargo-mgmt",
     ],
+    Resources: ["presentations"],
     Documentation: [
       "introduction",
-      "command-line-interface",
+      {
+        type: "category",
+        label: "Core application",
+        items: [
+          "command-line-interface",
+          "sparrow-on-windows",
+          "backend/server-configuration",
+          "backend/environment-vars",
+        ],
+      },
       {
         type: "category",
         label: "Frontend",
