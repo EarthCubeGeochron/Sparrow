@@ -46,7 +46,11 @@ class StepHeatingChart extends Component {
     const innerWidth = width - 2 * margin;
     const innerHeight = height - 2 * margin;
 
-    const heatingSteps = data.filter((d) => d.session_index != null);
+    console.log(data);
+
+    const heatingSteps = data.filter(
+      (d) => d.session_index != null || d.analysis_type == "Heating step"
+    );
     heatingSteps.sort((a, b) => b.session_index - a.session_index);
 
     const ages = heatingSteps.map((d) => ({
