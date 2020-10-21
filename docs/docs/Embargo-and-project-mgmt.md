@@ -1,8 +1,12 @@
 ---
-id: embargo-mgmt
+id: embargo
 title: Embargo and project management
 sidebar_label: Embargo and project management
 ---
+
+## Basic design: lab-controlled embargo
+
+Sparrow’s core contains tools for labs to set **permanent or expiring** embargos for any data they track within Sparrow, and tools limit access based on that policy. Embargoes are optional and the default option is a 2-year term. For data to be embargoed, a **Sparrow administrator** (usually a member of the geochronology lab where the original measurements were made) must activate a global, project, or sample/session level embargo. The key parameters for the basic embargo system are “embargo duration” and “embargo level”.
 
 ## General principles of data availability
 
@@ -10,7 +14,7 @@ sidebar_label: Embargo and project management
 2. Embargoes in Sparrow serve these goals by A) enabling all geochronological data to be fully integrated with Sparrow capabilities, B) protecting the first-use rights of geochronology labs, clients, and collaborators to privately analyze and prepare data prior to publication or other forms of public release, and C) creating clearly defined pathways and norms to openly release geochronological data.
 3. Because geochronological labs work with a variety of collaborators and clients, public and private, Sparrow supports multiple levels of data restriction, from full public to full private, with temporary embargoes the default option.
 
-## Embargo Design and Policy
+## Embargo design and policy
 
 Embargoes in Sparrow can be set and enforced at several levels, with settings made at higher granularity (higher in list) overriding more generic settings (lower in list):
 
@@ -26,10 +30,6 @@ The Sparrow embargo design supports several levels of protection:
 **Temporary:** For temporarily embargoed datasets, basic metadata are publicly viewable, but the analytical datasets themselves are not. Basic metadata include current end date of embargo, lab identity, and researchers’ names. Geospatial coordinates are normally but not always included in basic metadata. Standard tools for searching public webfacing servers supported by Sparrow can return basic metadata for embargoed data. No age estimates or analytical data will be returned for embargoed data. Temporary embargoes end when trigger conditions are met. (This is the default for all data if no embargo policy is not set.)
 
 **Private:** No information exposed to unauthorized users. This level is appropriate only for data where commercial contracts preclude outside disclosure.
-
-## Basic design: configurable, lab-controlled embargo
-
-Sparrow’s core contains tools for labs to set permanent or expiring embargos for their data and and limit access based on that policy. Embargoes are optional and the default option is a 2-year term. For data to be embargoed, a **Sparrow administrator** (usually a member of the geochronology lab where the original measurements were made) must activate a global, project, or sample/session level embargo. The key parameters for the basic embargo system are “embargo duration” and “embargo level”.
 
 ## Embargo management
 

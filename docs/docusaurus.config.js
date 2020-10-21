@@ -22,9 +22,16 @@ module.exports = {
       },
       items: [
         {
+          to: "docs/getting-started",
+          activeBasePath: "Guides",
+          label: "Getting started",
+          position: "left",
+        },
+        {
           to: "docs/guides",
           activeBasePath: "Guides",
           label: "Guides",
+          position: "left",
         },
         /*{
           to: "docs/motivation-and-design",
@@ -32,12 +39,6 @@ module.exports = {
           label: "Motivation and design",
           position: "left",
         },*/
-        {
-          to: "docs/getting-started",
-          activeBasePath: "Guides",
-          label: "Getting started",
-          position: "left",
-        },
         {
           to: "docs/introduction",
           activeBasePath: "docs",
