@@ -1,6 +1,6 @@
 # Sparrow
 
-![NSF-1740694](https://img.shields.io/badge/NSF-1740694-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1740694)
+[![NSF-1740694](https://img.shields.io/badge/NSF-1740694-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1740694)
 
 See [the documentation at sparrow-data.org](https://sparrow-data.org) for more information.
 
