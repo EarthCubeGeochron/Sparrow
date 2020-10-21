@@ -76,11 +76,14 @@ const MapPage = (props) => {
   ]);
 };
 
+<<<<<<< HEAD
+=======
 const LocationLink = function (props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
   const link = `/map#${zoom}/${latitude}/${longitude}`;
   return link;
 };
+>>>>>>> master
 
 const MapLink = function (props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
