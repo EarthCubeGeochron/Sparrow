@@ -106,7 +106,8 @@ this value is kept consistent through the lifetime of the application.
 
 **Sparrow** is configured using a shell script that exports environment
 variables to customize the **Sparrow** installation. An example of this script
-is shown in [`sparrow-config.sh.example`](). While not _required_ (environment
+is shown in [`sparrow-config.sh.example`](https://github.com/EarthCubeGeochron/Sparrow/blob/master/sparrow-config.sh.example).
+While not _required_ (environment
 variables can be set externally), this approach is strongly preferred.
 
 At runtime, the `sparrow` application finds a configuration file by searching
@@ -121,7 +122,7 @@ basic lab with a few plugins and a small test dataset, based on the configuratio
 [in this directory](https://github.com/EarthCubeGeochron/Sparrow/tree/master/test-lab).
 
 Managing lab implementations of Sparrow as Git repositories is a good idea, as it
-allows plugins and site content to be versioned and pinned (using [Git submodules]())
+allows plugins and site content to be versioned and pinned (using [Git submodules](https://git-scm.com/docs/git-submodule))
 to a specific version of Sparrow. This has the added benefit of allowing configurations
 and lab-specific code to be publicly available to guide future implementations. This approach
 is taken by the [UW Cosmogenic Nuclide lab](https://github.com/EarthCubeGeochron/sparrow-uw-cosmo),

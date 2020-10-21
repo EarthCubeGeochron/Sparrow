@@ -64,7 +64,7 @@ RUN npm --unsafe-perm=true --allow-root install
 
 COPY docs/ /docs/
 
-RUN npm run build
+RUN node_modules/.bin/docusaurus clear && npm run build --no-minify
 
 FROM nginx:1.19 AS docs
 

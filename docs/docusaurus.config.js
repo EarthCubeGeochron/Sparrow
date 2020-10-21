@@ -98,7 +98,9 @@ module.exports = {
     [
       "@docusaurus/preset-classic",
       {
+        debug: false,
         docs: {
+          routeBasePath: "/docs",
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           editUrl:
@@ -106,6 +108,7 @@ module.exports = {
         },
         blog: {
           showReadingTime: false,
+          routeBasePath: "/blog",
           // Please change this to your repo.
           editUrl:
             "https://github.com/EarthCubeGeochron/Sparrow/edit/master/docs/blog/",
