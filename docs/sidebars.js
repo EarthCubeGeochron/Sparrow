@@ -9,7 +9,7 @@ module.exports = {
       "schema-imp",
       "embargo",
     ],
-    Resources: ["presentations"],
+    Resources: ["presentations", "implementations"],
     Documentation: [
       "introduction",
       {

@@ -53,7 +53,7 @@ Lab-specific subcommands (e.g. for import scripts) can be included in this
 interface.
 
 To install the command-line application, run the setup command within the
-`Sparrow` repository directory:
+`Sparrow` repository directory (you will be asked for a password).
 
 ```
 make install
@@ -62,7 +62,7 @@ make install
 This will build a development version of the
 `sparrow` command-line runner.
 
-:::caution
+:::note
 `make install` requests **`sudo`** privilege elevation so that it can
 install `sparrow` to `/usr/local/bin`, which allows the command to be
 run without a path prefix on most systems. If you want to install to a different location, you can

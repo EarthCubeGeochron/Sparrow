@@ -1,7 +1,7 @@
 ---
 id: embargo
-title: Embargo and project management
-sidebar_label: Embargo and project management
+title: Embargo policy
+sidebar_label: Embargo policy
 ---
 
 ## Basic design: lab-controlled embargo

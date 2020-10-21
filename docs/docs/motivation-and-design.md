@@ -4,27 +4,28 @@ title: Motivation and design
 sidebar_label: Motivation and design
 ---
 
-## Public interface for lab data
+![Chart](pathname:///images/simplified-chart.png)
+
+## A lab information management system
 
 **Sparrow** is software for managing the geochemical data
-created by an individual geochronology laboratory. This software has the goal of managing analytical data for indexing and public access.
+created by an individual geochronology laboratory.
 It is designed for flexibility and extensibility, so that it can
 be tailored to the needs of individual analytical labs that manage a
 wide variety of data.
 
-![Chart](pathname:///images/simplified-chart.png)
+## An interface to the community
 
-## Principles
+When data is created at an analytical lab, it is archived internally by the lab itself.
+However, it must also be interpreted by outside researchers, integrated into publications,
+and archived in publication records and global databases. This process is time-consuming
+for labs, which would like to focus on their core competency of zapping rocks.
 
-- *Lab-level* data store
-- Standardized basic schema
-- Standardized web-facing API
-- Flexible and extensible
+Our hope is that a well architected, _lab-controlled_ data store with a standardized basic schema and
+web-facing API will provide a flexible and extensible way to automate connections to the community.
 
 ## Modes of access
 
-When data leaves an analytical lab, it is integrated into publications
-and archived by authors. It is also archived internally by the lab itself.
 We intend to provide several modes of data access to ease parts of this
 process.
 
@@ -40,6 +41,8 @@ of analytical data:
 - Track measurement versions (e.g. new corrections)
 - Download data (for authors' own analysis and archival purposes)
 
+## Getting data in and out
+
 On the server, direct database access and a
 command line interface will allow the lab to:
 
@@ -54,8 +57,10 @@ A web frontend will allow users outside the lab to
 - Access data directly from the lab through an API for meta-analysis
 - Browse a snapshot of the lab's publicly available data, possibly
   with data visualizations.
-- Pull the lab's data into other endpoints, such as the Geochron
-  and Macrostrat databases.
+
+Finally, a standardized API will allow third parties to pull the lab's
+public data into other endpoints, such as [Geochron.org](https://geochron.org)
+and [Macrostrat](https://macrostrat.org).
 
 ## Place within the lab
 
@@ -73,6 +78,7 @@ sit immediately prior to this system in a typical lab's data production pipeline
 
 ## Meta-goals
 
+- Train lab workers in managing their data in a more powerful way
 - Emphasize the power of scientists taking control of their own software
 
 # Design
@@ -102,7 +108,6 @@ functionality.
 
 Code and issues for this project are tracked [on Github](https://github.com/EarthCubeGeochron/Sparrow).
 
-
 ## Data model
 
 ### Hierarchical levels of analytical data
@@ -111,18 +116,17 @@ Code and issues for this project are tracked [on Github](https://github.com/Eart
 
 - **`datum`**: an individual data point (any numerical parameter and its error)
 - **`analysis`**: an collection of data points measured at the same time
-  (roughly synonymous with *aliquot*)
+  (roughly synonymous with _aliquot_)
 - **`session`**: a set of measurements conducted on the same sample
   at the same time
 - **`sample`**: A geological sample
-
 
 ### Database schema
 
 - A data-storage schema to store heterogeneous geochronology data
 - **Flexible** to store lab-specific data shapes
 - A common core of standardized tables
-- Standard *vocabularies* to manage meaning
+- Standard _vocabularies_ to manage meaning
 
 Data must be loaded into this standardized core in order to be
 exposed to the outside world.
