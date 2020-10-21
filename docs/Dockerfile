@@ -57,7 +57,7 @@ FROM docs-base AS docs-builder
 
 # Copy files needed for installation
 COPY docs/package.json /docs/package.json
-COPY docs/package-lock.json /docs/package-lock.json
+#COPY docs/package-lock.json /docs/package-lock.json
 
 # Install node modules
 RUN npm --unsafe-perm=true --allow-root install
