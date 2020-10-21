@@ -12,6 +12,7 @@ import styles from "./module.styl";
 import { Row, Sheet } from "./components";
 import { useElementSize } from "./util";
 import { sum } from "d3-array";
+import { APIV2Context } from "~/api-v2";
 
 interface ColumnData {
   name: string;
@@ -34,11 +35,12 @@ const columnSpec: ColumnData[] = [
 function unwrapSampleData(sampleData) {
   /** Unwrap samples from API response to a flattened version */
   const { geometry, ...rest } = sampleData;
+  console.log(rest);
   let longitude: number, latitude: number;
   if (geometry != null) {
     [longitude, latitude] = geometry?.coordinates;
   }
-  return { longitude, latitude, ...rest };
+  return { longitude, latitude, is_public: true, ...rest };
 }
 
 function calculateWidths(data, columns) {
@@ -92,8 +94,11 @@ function DataSheet() {
   const [data, setData] = useState<SampleData[]>([]);
   const initialData = useAPIResult<SampleData[]>(
     "/sample",
-    { all: true },
-    unwrapResponse
+    { all: true }, //, nest: "sample_geo_entity,geo_entity" },
+    {
+      //context: APIV2Context,
+      unwrapResponse,
+    }
   );
 
   useEffect(() => {
