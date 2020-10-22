@@ -47,7 +47,7 @@ def sparrow_db(ctx):
 @sparrow_db.command(name="migration")
 def migration():
     """Generate a changeset against the optimal database schema"""
-    compose("run --rm", "-T", "backend", "sparrow db migration")
+    compose("run --rm", "-T", "backend", "/app/sparrow/__main__.py db-migration")
 
 
 for k, v in shell_commands.items():
