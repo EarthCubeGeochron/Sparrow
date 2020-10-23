@@ -1,0 +1,56 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.routes {
+  display: flex;
+  flex-direction: column;
+  margin-left: 100px;
+}
+.output {
+  margin-left: 250px;
+}
+
+.resetbtn {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  background-color: white;
+  color: rgb(163, 0, 0);
+  border: 2px solid rgb(163, 0, 0);
+  border-radius: 5px;
+  transition-duration: 0.1s;
+  font-size: large;
+  padding: 4px 5px 4px 5px;
+}
+.resetbtn:hover,
+.resetbtn:active {
+  background-color: rgb(163, 0, 0);
+  color: white;
+}
+
+.routebtn {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: white;
+  color: rgb(0, 0, 0);
+  border: 2px solid rgb(28, 170, 134);
+  border-radius: 5px;
+  transition-duration: 0.1s;
+  font-size: large;
+  padding: 4px 5px 4px 5px;
+}
+
+.routebtn:hover,
+.routebtn:active {
+  background-color: rgb(28, 170, 134);
+  color: white;
+}
+
+title {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+}
