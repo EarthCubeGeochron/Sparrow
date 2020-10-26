@@ -13,9 +13,12 @@ class TestAPIV2:
     @mark.xfail(
         reason="This fails due to transaction isolation in the testing database."
     )
-    def test_api_models_sample(self, client):
-        """Practice with Python Tests"""
-        res = client.get("/api/v2/models/")
+
+    @mark.parametrize("route", ["/api/v2/models/sample", "/api/v2/models/sample/"])
+    def test_api_models_sample(self, client, route):
+        """Checks if models/sample is working"""
+
+        res = client.get(route)
         assert res.status_code == 200
         data = res.json()
         assert data["description"] is not None
@@ -25,7 +28,7 @@ class TestAPIV2:
         db.load_data("session", basic_data)
 
         res = client.get("/api/v2/session")
-        assert res.status_code == 200 ## this breaks
+        assert res.status_code == 200
         data = res.json()
         assert data["total_count"] == 1
         assert data["data"][0]["name"] == "Declarative import test"
