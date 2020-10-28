@@ -1,23 +1,44 @@
 ---
 id: data-sci
 title: Introductory Python for Data Science
-sidebar_label: Data Science Intro
+sidebar_label: Data science intro
 ---
+
+:::info
+This series was written by Casey Idzikowski, Sparrow lab assistant and (now) software developer, summer 2020.
+:::
 
 ### Metadata Handling and Exporting in Python
 
-This collection of notebooks is designed to guide a programming novice through a basic process of handling metadata collection for geologic samples. We start by fetching data from Sparrow and uploading data from local excel spreadsheets. With that gathered data we then do some dataframe manipulation to un-nest some of the columns. After that, we go over an example of how to use Numpy and Pandas to gather some meaningful statistics about the state of data collection. We also learn how to create dataframes for specific samples, like ones that still need metadata, and we export the pandas dataframes into excel sheets for easy access. We also learn how to do some mapping. The code in these notebooks are bits of code that I wrote and used, with explanations of what the code does and why it is used.
+This collection of notebooks is designed to guide a programming novice through a
+basic process of handling metadata collection for geologic samples. We start by
+fetching data from Sparrow and uploading data from local excel spreadsheets.
+With that gathered data we then do some dataframe manipulation to un-nest some
+of the columns. After that, we go over an example of how to use Numpy and Pandas
+to gather some meaningful statistics about the state of data collection. We also
+learn how to create dataframes for specific samples, like ones that still need
+metadata, and we export the pandas dataframes into excel sheets for easy access.
+We also learn how to do some mapping. The code in these notebooks are bits of
+code that I wrote and used, with explanations of what the code does and why it
+is used.
 
 ### The Code
 
-If you are new to coding don't worry! There is a plethora of free, online resources that makes learning the basics of python easy and unintimidating. A little bit of time dedication and learning and you'll be up to speed in no time!
+If you are new to coding don't worry! There are many free, online resources that
+make learning the basics of Python simple and painless. A little bit of time,
+dedication, and learning and you'll be up to speed in no time!
 
-I try to explain my code as best I can in the notebooks but I would reccomend becoming familiar with these python libraries:
+I try to explain my code as best I can in the notebooks but I would recommend becoming familiar with these python libraries:
 
 - [Pandas](https://pandas.pydata.org/)
 - [Numpy](https://numpy.org/)
-- [JSON](https://www.w3schools.com/whatis/whatis_json.asp) (this isn't a library but its good to be familiar with JSON because it is the main way information is transferred)
-  **You can look through the notebooks before hand to see what functions I use from specific libraries and then search for those specifically**
+- [JSON](https://www.w3schools.com/whatis/whatis_json.asp)
+
+:::note
+JSON isn't a library but its good to be familiar with JSON because it is the main way information is transferred.
+
+**You can look through the notebooks beforehand to see what functions I use from specific libraries and then search for those specifically**
+:::
 
 Also become familiar with basic python logic and syntax such as:
 

@@ -7,7 +7,7 @@ from os import environ, path
 from pathlib import Path
 from itertools import chain
 from rich.console import Console
-from ..util import fail_without_docker, compose
+from ..util import cmd, fail_without_docker, compose
 from .backend import get_backend_command_help
 from ..base import cli
 from ..exc import SparrowCommandError
@@ -114,7 +114,6 @@ def command_info(ctx, cli):
 
 
 def echo_help(ctx, core_commands=None, user_commands=None):
-
     # We want to run `sparrow up` first so we don't get surprised by container errors later
     fail_without_docker()
     compose("up --no-start --remove-orphans")
@@ -132,7 +131,6 @@ def echo_help(ctx, core_commands=None, user_commands=None):
     d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
     fmt.write_line(f"Lab: {d1}")
     fmt.flush()
-
     fmt.write("")
 
     with fmt.section("Command groups"):

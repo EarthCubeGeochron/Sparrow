@@ -6,6 +6,7 @@ with new async server architecture available in Python 3.6+.
 """
 import logging
 from contextvars import ContextVar
+from starlette.responses import PlainTextResponse
 from starlette.applications import Starlette
 from starlette.routing import Mount, Route, RedirectResponse
 from asgiref.wsgi import WsgiToAsgi
@@ -29,6 +30,8 @@ from ..context import _setup_context
 async def redirect(*args):
     return RedirectResponse("/api/v2/")
 
+def Hello_World(request):
+    return PlainTextResponse("Hello, World")
 
 def construct_app():
     flask = App(__name__)
@@ -41,6 +44,7 @@ def construct_app():
 
     routes = [
         Route("/api/v2", endpoint=redirect),
+        Route("/api/v2/hello", Hello_World),
         Mount("/api/v2/", app=api_v2),
         Mount("/", app=WsgiToAsgi(flask)),
     ]
