@@ -29,7 +29,6 @@ from ..context import _setup_context
 async def redirect(*args):
     return RedirectResponse("/api/v2/")
 
-
 def construct_app():
     flask = App(__name__)
     flask.load()
