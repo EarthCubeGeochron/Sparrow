@@ -37,7 +37,7 @@ class Publication extends Component {
   }
 }
 
-const ProjectPublications = function ({ data }) {
+const ProjectPublications = function({ data }) {
   if (data == null) {
     data = [];
   }
@@ -50,7 +50,7 @@ const ProjectPublications = function ({ data }) {
   ]);
 };
 
-const ProjectResearchers = function ({ data }) {
+const ProjectResearchers = function({ data }) {
   let content = [h("p", "No researchers")];
   if (data != null) {
     content = data.map((d) => h("div.researcher", d.name));
@@ -81,7 +81,7 @@ function AddSampleControls() {
   ]);
 }
 
-export const ProjectSamples = function ({ data }) {
+export const ProjectSamples = function({ data }) {
   let content = [h("p", "No samples")];
   if (data != null) {
     content = data.map((d) => h(SampleCard, d));
@@ -93,7 +93,7 @@ export const ProjectSamples = function ({ data }) {
   ]);
 };
 
-const ProjectPage = function (props) {
+const ProjectPage = function(props) {
   const [edit, setEdit] = useState(false);
 
   const { project, Edit } = props;
@@ -105,10 +105,17 @@ const ProjectPage = function (props) {
         h(EditableProjectDetails, { project, Edit }),
         h(ProjectPublications, { data: project.publications }),
         h(ProjectResearchers, { data: project.researchers }),
+        h("div", [
+          h("div", { style: { display: "flex", flexDirection: "row" } }, [
+            h("div", { style: { paddingRight: "10px" } }, [
+              h("h4", "Location"),
+              h(ProjectMap, { samples }),
+            ]),
+            h(ProjectSamples, { data: project.samples }),
+          ]),
+        ]),
       ]),
-      h("div", [h("h4", "Location"), h(ProjectMap, { samples })]),
     ]),
-    h(ProjectSamples, { data: project.samples }),
   ]);
 };
 
