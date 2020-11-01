@@ -23,17 +23,29 @@ const ProjectListComponent = () => {
   const filterFields = ["Name", "Samples"];
 
   /* List of projects for the catalog. Could potentially move there... */
-  return h("div", [
-    h("div", { style: { paddingTop: "10px" } }, [
-      h(FilterBox, { filterFields }),
+  return h("div", { style: { position: "relative" } }, [
+    h(
+      "div",
+      {
+        style: {
+          position: "fixed",
+          paddingTop: "10px",
+          left: "41px",
+          width: "28%",
+          backgroundColor: "white",
+        },
+      },
+      [h(FilterBox, { filterFields })]
+    ),
+    h("div", { style: { paddingTop: "30px" } }, [
+      h(InfiniteAPIView, {
+        url: "/models/project",
+        unwrapData: unwrapProjectCardData,
+        params: { nest: "publication,session,samnple" },
+        component: ProjectInfoLink,
+        context: APIV2Context,
+      }),
     ]),
-    h(InfiniteAPIView, {
-      url: "/models/project",
-      unwrapData: unwrapProjectCardData,
-      params: { nest: "publication,session,samnple" },
-      component: ProjectInfoLink,
-      context: APIV2Context,
-    }),
   ]);
 };
 
@@ -49,16 +61,28 @@ function SampleListComponent() {
   const filterFields = ["Name", "Material", "id"];
 
   return h("div", [
-    h("div", { style: { paddingTop: "10px" } }, [
-      h(FilterBox, { filterFields }),
+    h(
+      "div",
+      {
+        style: {
+          position: "fixed",
+          paddingTop: "10px",
+          left: "41px",
+          width: "28%",
+          backgroundColor: "white",
+        },
+      },
+      [h(FilterBox, { filterFields })]
+    ),
+    h("div", { style: { paddingTop: "30px" } }, [
+      h(InfiniteAPIView, {
+        url: "/models/sample",
+        unwrapData: unwrapSampleCardData,
+        params: {},
+        component: SampleListCard,
+        context: APIV2Context,
+      }),
     ]),
-    h(InfiniteAPIView, {
-      url: "/models/sample",
-      unwrapData: unwrapSampleCardData,
-      params: {},
-      component: SampleListCard,
-      context: APIV2Context,
-    }),
   ]);
 }
 
@@ -80,16 +104,28 @@ function SessionListComponent() {
   const filterFields = ["Technique", "Date Precision", "Target", "Instrument"];
 
   return h("div", [
-    h("div", { style: { paddingTop: "10px" } }, [
-      h(FilterBox, { filterFields }),
+    h(
+      "div",
+      {
+        style: {
+          position: "fixed",
+          paddingTop: "10px",
+          left: "41px",
+          width: "28%",
+          backgroundColor: "white",
+        },
+      },
+      [h(FilterBox, { filterFields })]
+    ),
+    h("div", { style: { paddingTop: "30px" } }, [
+      h(InfiniteAPIView, {
+        url: "/models/session",
+        unwrapData: unwrapSessionCardData,
+        params: { nest: "instrument,project,sample" },
+        component: SessionLinkCard,
+        context: APIV2Context,
+      }),
     ]),
-    h(InfiniteAPIView, {
-      url: "/models/session",
-      unwrapData: unwrapSessionCardData,
-      params: { nest: "instrument,project,sample" },
-      component: SessionLinkCard,
-      context: APIV2Context,
-    }),
   ]);
 }
 
@@ -114,19 +150,31 @@ function DataFilesListComponent() {
   const filterFields = ["Type", "Basename", "Upload Date"];
 
   return h("div", [
-    h("div", { style: { paddingTop: "10px" } }, [
-      h(FilterBox, { filterFields }),
-    ]),
-    h(InfiniteAPIView, {
-      url: "/models/data_file",
-      unwrapData: unwrapDataFileCardData,
-      params: {
-        nest: "data_file_link,sample,session,project",
-        has: "data_file_link",
+    h(
+      "div",
+      {
+        style: {
+          position: "fixed",
+          paddingTop: "10px",
+          left: "41px",
+          width: "28%",
+          backgroundColor: "white",
+        },
       },
-      component: DataFilesCard,
-      context: APIV2Context,
-    }),
+      [h(FilterBox, { filterFields })]
+    ),
+    h("div", { style: { paddingTop: "30px" } }, [
+      h(InfiniteAPIView, {
+        url: "/models/data_file",
+        unwrapData: unwrapDataFileCardData,
+        params: {
+          nest: "data_file_link,sample,session,project",
+          has: "data_file_link",
+        },
+        component: DataFilesCard,
+        context: APIV2Context,
+      }),
+    ]),
   ]);
 }
 
