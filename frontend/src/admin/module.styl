@@ -93,10 +93,16 @@
   left 0
   right 0
   .left-panel
-    width 30em
+    width 28em
     overflow-y: scroll
     overflow-x hidden
-    padding 0 1em 0 3em
+    padding 0 1em 0 1em
+    &.hidden
+      position absolute
+      left -999px
+      visibility hidden
+
+      
 
   .right-panel
     flex 1

@@ -30,7 +30,7 @@ const ProjectListComponent = () => {
         style: {
           position: "fixed",
           paddingTop: "10px",
-          left: "41px",
+          left: "49px",
           width: "28%",
           backgroundColor: "white",
         },

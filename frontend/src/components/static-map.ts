@@ -2,6 +2,7 @@ import { StaticMap as MGLStaticMap, Marker } from "react-map-gl";
 import { hyperStyled, classed } from "@macrostrat/hyper";
 import { Component } from "react";
 import T from "prop-types";
+import { Tooltip } from "@blueprintjs/core";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -16,8 +17,6 @@ const StaticMarker = function(props) {
 
   const className =
     id == hoverID ? "map-marker.static.match" : "map-marker.static";
-
-  const testClass = "map-marker.static.match";
 
   return h(
     Marker,
