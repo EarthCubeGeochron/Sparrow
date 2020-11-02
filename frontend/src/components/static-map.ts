@@ -6,17 +6,23 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const StaticMarker = function (props) {
+const StaticMarker = function(props) {
   let offsetTop;
-  let { size, ...rest } = props;
+  let { size, id, hoverID, ...rest } = props;
   if (size == null) {
     size = 10;
   }
   const offsetLeft = (offsetTop = -size / 2);
+
+  const className =
+    id == hoverID ? "map-marker.static.match" : "map-marker.static";
+
+  const testClass = "map-marker.static.match";
+
   return h(
     Marker,
     { offsetLeft, offsetTop, ...rest },
-    h("span.map-marker.static", { style: { width: size, height: size } })
+    h(`span.${className}`, { style: { width: size, height: size } })
   );
 };
 

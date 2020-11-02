@@ -81,10 +81,13 @@ function AddSampleControls() {
   ]);
 }
 
-export const ProjectSamples = function({ data }) {
+export const ProjectSamples = function({ data, setID }) {
   let content = [h("p", "No samples")];
   if (data != null) {
-    content = data.map((d) => h(SampleCard, d));
+    content = data.map((d) => {
+      const { material, id, name, location_name } = d;
+      return h(SampleCard, { material, id, name, location_name, setID });
+    });
   }
   return h("div.sample-area", [
     h("h4", "Samples"),
@@ -92,6 +95,21 @@ export const ProjectSamples = function({ data }) {
     h(AddSampleControls),
   ]);
 };
+
+function SampleMapComponent(props) {
+  const { samples, project } = props;
+  const [hoverID, setHoverID] = useState();
+
+  return h("div", [
+    h("div", { style: { display: "flex", flexDirection: "row" } }, [
+      h("div", { style: { paddingRight: "10px" } }, [
+        h("h4", "Location"),
+        h(ProjectMap, { samples, hoverID }),
+      ]),
+      h(ProjectSamples, { data: project.samples, setID: setHoverID }),
+    ]),
+  ]);
+}
 
 const ProjectPage = function(props) {
   const [edit, setEdit] = useState(false);
@@ -105,15 +123,7 @@ const ProjectPage = function(props) {
         h(EditableProjectDetails, { project, Edit }),
         h(ProjectPublications, { data: project.publications }),
         h(ProjectResearchers, { data: project.researchers }),
-        h("div", [
-          h("div", { style: { display: "flex", flexDirection: "row" } }, [
-            h("div", { style: { paddingRight: "10px" } }, [
-              h("h4", "Location"),
-              h(ProjectMap, { samples }),
-            ]),
-            h(ProjectSamples, { data: project.samples }),
-          ]),
-        ]),
+        h(SampleMapComponent, { project, samples }),
       ]),
     ]),
   ]);
