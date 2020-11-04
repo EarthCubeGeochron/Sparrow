@@ -1,7 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
 import { DataFileMatch } from "../model-views/data-files/page";
-
+import { NoStateAdmin } from "./baseview";
 import { DataFilesListComponent } from "./infinite-scroll";
 import styles from "./module.styl";
 
@@ -16,7 +16,7 @@ export function DataFilesMainPanel() {
     }),
     h(Route, {
       path: base,
-      component: () => h("div"),
+      component: () => h(NoStateAdmin, { name: "Data File" }),
     }),
   ]);
 }

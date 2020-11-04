@@ -1,10 +1,11 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
 import { useState } from "react";
-import { Button, Icon } from "@blueprintjs/core";
+import { Button, Icon, NonIdealState } from "@blueprintjs/core";
 import { ProjectMatch } from "~/model-views/project";
 import { ProjectListComponent } from "./infinite-scroll";
 import styles from "./module.styl";
+import { NoStateAdmin } from "./baseview";
 
 const h = hyperStyled(styles);
 
@@ -18,7 +19,7 @@ export function ProjectMainPanel() {
     }),
     h(Route, {
       path: base,
-      render: () => h("div"),
+      render: () => h(NoStateAdmin, { name: "Project" }),
     }),
   ]);
 }

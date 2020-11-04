@@ -1,6 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
-
+import { NoStateAdmin } from "./baseview";
 import { ProjectMatch } from "~/model-views/project";
 import { SessionMatch } from "../model-views";
 import { SessionListComponent } from "./infinite-scroll";
@@ -20,7 +20,7 @@ export function SessionMainPanel() {
     ),
     h(Route, {
       path: base,
-      render: () => h("div"),
+      render: () => h(NoStateAdmin, { name: "Session" }),
     }),
   ]);
 }

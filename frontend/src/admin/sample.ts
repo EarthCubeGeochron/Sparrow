@@ -1,6 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
-
+import { NoStateAdmin } from "./baseview";
 import { SampleMatch } from "~/model-views/sample/list";
 import { SampleListComponent } from "./infinite-scroll";
 import styles from "./module.styl";
@@ -18,7 +18,7 @@ export function SampleMainPanel() {
     }),
     h(Route, {
       path: base,
-      component: () => h("div"),
+      component: () => h(NoStateAdmin, { name: "Sample" }),
     }),
   ]);
 }
