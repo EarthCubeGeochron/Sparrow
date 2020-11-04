@@ -4,6 +4,7 @@ import { NoStateAdmin } from "./baseview";
 import { ProjectMatch } from "~/model-views/project";
 import { SessionMatch } from "../model-views";
 import { SessionListComponent } from "./infinite-scroll";
+import { AdminPage } from "./AdminPage";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -26,8 +27,8 @@ export function SessionMainPanel() {
 }
 
 export function SessionAdminPage() {
-  return h("div.admin-page-main", [
-    h("div.left-panel", null, h(SessionListComponent)),
-    h("div.right-panel", [h(SessionMainPanel)]),
-  ]);
+  return h(AdminPage, {
+    ListComponent: h(SessionListComponent),
+    MainPageComponent: h(SessionMainPanel),
+  });
 }

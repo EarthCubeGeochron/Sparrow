@@ -3,6 +3,7 @@ import { Switch, Route } from "react-router-dom";
 import { NoStateAdmin } from "./baseview";
 import { SampleMatch } from "~/model-views/sample/list";
 import { SampleListComponent } from "./infinite-scroll";
+import { AdminPage } from "./AdminPage";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -24,8 +25,8 @@ export function SampleMainPanel() {
 }
 
 export function SampleAdminPage() {
-  return h("div.admin-page-main", [
-    h("div.left-panel", [h(SampleListComponent)]),
-    h("div.right-panel", [h(SampleMainPanel)]),
-  ]);
+  return h(AdminPage, {
+    ListComponent: h(SampleListComponent),
+    MainPageComponent: h(SampleMainPanel),
+  });
 }
