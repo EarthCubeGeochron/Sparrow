@@ -19,13 +19,5 @@ export function NoStateAdmin(props) {
 
   const title = `No ${name} page selected`;
 
-  return h("div.nostate", [
-    h("div", { style: { paddingBottom: "50px", paddingTop: "100px" } }, [
-      h(AnimatedArrow),
-    ]),
-    h("div", { style: { paddingTop: "50px", paddingBottom: "100px" } }, [
-      h(NonIdealState, { title, description }),
-    ]),
-    h("div", { stlye: { paddingTop: "50px" } }, [h(AnimatedArrow)]),
-  ]);
+  return h(NonIdealState, { title, description, icon: "hand-left" });
 }
