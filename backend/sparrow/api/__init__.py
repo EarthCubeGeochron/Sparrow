@@ -94,6 +94,7 @@ class APIv2(Starlette):
             self._add_model_route(iface)
 
         self.add_view_route("authority", schema="vocabulary")
+        self.add_view_route("metrics", schema="vocabulary")
 
         self.add_schema_route()
 
@@ -154,6 +155,6 @@ class APIv2(Starlette):
             route=endpoint,
             table=_tbl.name,
             schema=schema,
-            description="",
+            description="General Description",
         )
         self.route_descriptions[root_route].append(basic_info)

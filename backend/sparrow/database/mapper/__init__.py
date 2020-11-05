@@ -90,6 +90,8 @@ class MappedDatabaseMixin(object):
             autoload_with=self.engine,
             **kwargs,
         )
+    def reflect_view_table(self, tablename, *column_args, **kwargs):
+        pass
 
     def automap(self):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
