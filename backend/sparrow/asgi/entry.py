@@ -4,7 +4,7 @@ server such as Hypercorn or Uvicorn.
 """
 
 from ..logs import setup_stderr_logs
-from .base import construct_app
+from .base import Sparrow
 
 setup_stderr_logs()
-app = construct_app()
+app = Sparrow(debug=True)

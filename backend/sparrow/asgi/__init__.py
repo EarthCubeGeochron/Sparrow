@@ -1,11 +1,11 @@
-from .base import construct_app
+from .base import Sparrow
 from webargs_starlette import WebargsHTTPException
 from starlette.responses import JSONResponse
 
 # For some reason, adding logging in this file seems to kill logging in the entire
 # application
 
-app = construct_app()
+app = Sparrow(debug=True)
 
 
 # @app.exception_handler(WebargsHTTPException)

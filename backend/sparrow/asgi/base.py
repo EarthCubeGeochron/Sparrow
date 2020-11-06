@@ -49,8 +49,3 @@ class Sparrow(Starlette):
         super().__init__(routes=routes, *args, **kwargs)
         flask.run_hook("asgi-setup", self)
         self.flask = flask
-
-
-def construct_app():
-    app = Sparrow(debug=True)
-    return app
