@@ -13,6 +13,12 @@ from ..api import APIv2
 from ..app import App
 from ..logs import console_handler
 from ..context import _setup_context
+from webargs_starlette import WebargsHTTPException
+from starlette.responses import JSONResponse
+
+# For some reason, adding logging in this file seems to kill logging in the entire
+# application
+
 
 # Customize Sparrow's root logger so we don't get overridden by uvicorn
 # We may want to customize this further eventually
@@ -28,6 +34,10 @@ from ..context import _setup_context
 
 async def redirect(*args):
     return RedirectResponse("/api/v2/")
+
+
+async def http_exception(request, exc):
+    return JSONResponse(exc.messages, status_code=exc.status_code, headers=exc.headers)
 
 
 class Sparrow(Starlette):
@@ -49,3 +59,5 @@ class Sparrow(Starlette):
         super().__init__(routes=routes, *args, **kwargs)
         flask.run_hook("asgi-setup", self)
         self.flask = flask
+
+        self.add_exception_handler(WebargsHTTPException, http_exception)
