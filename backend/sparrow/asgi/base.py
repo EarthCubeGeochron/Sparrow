@@ -30,21 +30,27 @@ async def redirect(*args):
     return RedirectResponse("/api/v2/")
 
 
+class Sparrow(Starlette):
+    def __init__(self, *args, **kwargs):
+        flask = App(__name__)
+        flask.load()
+        flask.load_phase_2()
+
+        api_v2 = APIv2(flask)
+
+        _setup_context(flask)
+
+        routes = [
+            Route("/api/v2", endpoint=redirect),
+            Mount("/api/v2/", app=api_v2),
+            Mount("/", app=WsgiToAsgi(flask)),
+        ]
+
+        super().__init__(routes=routes, *args, **kwargs)
+        flask.run_hook("asgi-setup", self)
+        self.flask = flask
+
+
 def construct_app():
-    flask = App(__name__)
-    flask.load()
-    flask.load_phase_2()
-
-    api_v2 = APIv2(flask)
-
-    _setup_context(flask)
-
-    routes = [
-        Route("/api/v2", endpoint=redirect),
-        Mount("/api/v2/", app=api_v2),
-        Mount("/", app=WsgiToAsgi(flask)),
-    ]
-
-    app = Starlette(routes=routes, debug=True)
-    flask.run_hook("asgi-setup", app)
+    app = Sparrow(debug=True)
     return app
