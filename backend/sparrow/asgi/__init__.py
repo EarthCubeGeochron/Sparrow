@@ -5,8 +5,6 @@ from starlette.responses import JSONResponse
 # For some reason, adding logging in this file seems to kill logging in the entire
 # application
 
-app = Sparrow(debug=True)
-
 
 # @app.exception_handler(WebargsHTTPException)
 # async def http_exception(request, exc):
