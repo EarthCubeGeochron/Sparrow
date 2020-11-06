@@ -10,7 +10,7 @@ from starlette.applications import Starlette
 from starlette.routing import Mount, Route, RedirectResponse
 from asgiref.wsgi import WsgiToAsgi
 from ..api import APIv2
-from ..app import App
+from .flask import App
 from ..logs import console_handler
 from ..context import _setup_context
 from webargs_starlette import WebargsHTTPException

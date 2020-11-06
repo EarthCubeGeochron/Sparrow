@@ -2,7 +2,7 @@ from sparrow.app import App
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
 from starlette.testclient import TestClient
-from sparrow.asgi import Sparrow
+from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 
 app_ = Sparrow(debug=True)

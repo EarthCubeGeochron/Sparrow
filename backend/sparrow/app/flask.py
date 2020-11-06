@@ -3,15 +3,15 @@ from os import environ
 from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
 
-from .encoders import JSONEncoder
-from .api.v1 import APIv1
-from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
-from .interface import InterfacePlugin
-from .auth import AuthPlugin
+from ..encoders import JSONEncoder
+from ..api.v1 import APIv1
+from ..plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
+from ..interface import InterfacePlugin
+from ..auth import AuthPlugin
 
 # from .graph import GraphQLPlugin
-from .web import WebPlugin
-from .logs import get_logger
+from ..web import WebPlugin
+from ..logs import get_logger
 
 log = get_logger(__name__)
 
@@ -57,7 +57,7 @@ class App(Flask):
 
     def setup_database(self, db=None):
         # This bootstrapping order leaves much to be desired
-        from .database import Database
+        from ..database import Database
 
         self.load()
         if self.db is not None and self.database_ready:
@@ -140,7 +140,7 @@ class App(Flask):
             return True
         # Database setup is likely redundant, but moves any database-mapping
         # errors forward.
-        from .database import Database
+        from ..database import Database
 
         db = self.setup_database(Database(self))
 
