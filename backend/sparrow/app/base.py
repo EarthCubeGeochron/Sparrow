@@ -4,14 +4,11 @@ modern application server that translates our primary Sparrow app
 (Flask/WSGI) to starlette (ASGI). This is for forward compatibility
 with new async server architecture available in Python 3.6+.
 """
-import logging
-from contextvars import ContextVar
 from starlette.applications import Starlette
 from starlette.routing import Mount, Route, RedirectResponse
 from asgiref.wsgi import WsgiToAsgi
 from ..api import APIv2
 from .flask import App
-from ..logs import console_handler
 from ..context import _setup_context
 from webargs_starlette import WebargsHTTPException
 from starlette.responses import JSONResponse
@@ -60,4 +57,5 @@ class Sparrow(Starlette):
         flask.run_hook("asgi-setup", self)
         self.flask = flask
 
+        # This could maybe be added to the API...
         self.add_exception_handler(WebargsHTTPException, http_exception)

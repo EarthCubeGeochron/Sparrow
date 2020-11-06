@@ -35,7 +35,7 @@ class App(Flask):
         self.api_loaded = False
         self.verbose = verbose
 
-        self.config.from_object("sparrow.default_config")
+        self.config.from_object("sparrow.app.default_config")
         if cfg is None:
             cfg = environ.get("SPARROW_BACKEND_CONFIG", None)
         try:
