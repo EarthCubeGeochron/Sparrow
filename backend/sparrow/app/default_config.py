@@ -1,7 +1,4 @@
 from os import environ
-from datetime import timedelta
-import logging
-from .logs import console_handler
 
 LAB_NAME = environ.get("SPARROW_LAB_NAME", "Test lab")
 DATABASE = environ.get("SPARROW_DATABASE", "postgresql+psycopg2:///sparrow")
