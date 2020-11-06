@@ -6,6 +6,7 @@ from pathlib import Path
 from json import loads
 from .env import validate_environment
 from .exc import SparrowCommandError
+from json.decoder import JSONDecodeError
 
 
 def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
@@ -28,7 +29,7 @@ def compose(*args, **kwargs):
 
 
 def container_id(container):
-    res = compose("ps -q", container, capture_output=True).stdout.strip()
+    res = compose("ps -q", container, stdout=PIPE).stdout.strip()
     if res == "":
         return None
     return res.decode("utf-8")
@@ -67,11 +68,15 @@ def exec_or_run(
 
 def fail_without_docker():
     try:
-        res = cmd("docker info --format '{{json .ServerErrors}}'", capture_output=True)
+        res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
     except FileNotFoundError:
         raise SparrowCommandError(
             "Cannot find the docker command. Is docker installed?"
         )
-    errors = loads(str(res.stdout, "utf-8"))
+    try:
+        errors = loads(str(res.stdout, "utf-8"))
+    except JSONDecodeError:
+        print(res.stdout)
+        return
     if errors is not None and len(errors) > 0:
         raise SparrowCommandError(errors[0])

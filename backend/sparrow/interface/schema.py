@@ -6,6 +6,7 @@ from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError
 from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import inspect
 
 from .util import is_pk_defined, pk_values, prop_is_required
@@ -98,10 +99,30 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # Filter on properties that actually have a local column
         filters = {}
         related_models = {}
+
+        # Try to get filters for unique and pk columns first
+        for prop in self.opts.model.__mapper__.iterate_properties:
+            columns = getattr(prop, "columns", False)
+            if columns:
+                is_fully_defined = all(
+                    [any([c.primary_key, c.unique]) for c in columns]
+                )
+                # Shim for the fact that we don't correctly find Session.uuid as unique at the moment...
+                # TODO: fix this in general
+                if self.opts.model.__name__ == "Session" and prop.key == "uuid":
+                    is_fully_defined = True
+                if is_fully_defined:
+                    val = data.get(prop.key, None)
+                    if val is not None:
+                        filters[prop.key] = val
+        if filters:
+            return filters, related_models
+
         for prop in self.opts.model.__mapper__.iterate_properties:
             val = data.get(prop.key, None)
             if getattr(prop, "uselist", False):
                 continue
+
             if val is not None:
                 if hasattr(prop, "direction"):
                     # For relationships
@@ -125,11 +146,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         filters, related_models = self._build_filters(data)
 
+        msg = f"Finding instance of {self.opts.model.__name__}"
         # Try to get value from session
-        log.debug(f"Finding instance of {self.opts.model.__name__}")
-        log.debug(f"..filters: {filters}")
-        log.debug(f"..related models: {related_models}")
-        log.debug(f"..data: {data}")
+        # log.debug(msg)
+        #
+        # log.debug(f"..related models: {related_models}")
+        # log.debug(f"..data: {data}")
         instance = self._get_session_instance(filters)
 
         # Need to get relationship columns for primary keys!
@@ -137,15 +159,17 @@ class ModelSchema(SQLAlchemyAutoSchema):
             query = self.session.query(self.opts.model).filter_by(**filters)
             instance = query.first()
             if instance is None:
-                log.debug("..none found")
+                log.debug(msg + f"...none found\n...filters: {filters}")
             else:
-                log.debug("..success!")
+                log.debug(msg + f"...success!\n...filters: {filters}")
         if instance is None:
             instance = super().get_instance(data)
 
         if instance is not None:
             for k, v in data.items():
                 setattr(instance, k, v)
+            self.session.add(instance)
+            self.session.flush(objects=[instance])
 
         # Get rid of filters by value
         # if self.opts.model.__name__ == 'analysis':
@@ -176,6 +200,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         res = {}
         for col, val in zip(pk, val_list):
             res[col.key] = val
+
         return res
 
     @post_load
@@ -183,24 +208,19 @@ class ModelSchema(SQLAlchemyAutoSchema):
         with self.session.no_autoflush:
             instance = self._get_instance(data)
         if instance is None:
-            # if not is_model_ready(self.opts.model, data):
-            #     return None
             try:
                 # Begin a nested subtransaction
                 self.session.begin_nested()
                 instance = self.opts.model(**data)
-                # if not is_model_ready(self.opts.model, data):
-                #     self.session.rollback()
-                #     return instance
                 self.session.add(instance)
                 log.debug(f"Created instance {instance} with parameters {data}")
+
                 self.session.flush(objects=[instance])
                 self.session.commit()
                 log.debug("Successfully persisted to database")
             except IntegrityError as err:
                 self.session.rollback()
-                log.debug("Could not persist but will try again later")
-                # log.debug(err)
+                log.debug("Could not persist")
 
         return instance
 

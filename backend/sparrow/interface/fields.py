@@ -81,7 +81,12 @@ class SmartNested(Nested, Related):
         self, name, *, only=None, exclude=(), many=False, unknown=None, **field_kwargs
     ):
         super(Nested, self).__init__(
-            name, only=only, exclude=exclude, many=many, unknown=unknown, **field_kwargs
+            name,
+            only=only,
+            exclude=exclude,
+            many=many,
+            unknown=unknown,
+            **field_kwargs,
         )
         super(Related, self).__init__(**field_kwargs)
         self._many = many
