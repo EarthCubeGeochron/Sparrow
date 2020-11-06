@@ -3,15 +3,19 @@ This module houses a
 modern application server that translates our primary Sparrow app
 (Flask/WSGI) to starlette (ASGI). This is for forward compatibility
 with new async server architecture available in Python 3.6+.
+
+This server's technology stack is similar to that of FastAPI,
+but it uses the much more mature Marshmallow schema-generation
+package instead of FastAPI's Pydantic.
 """
 from starlette.applications import Starlette
 from starlette.routing import Mount, Route, RedirectResponse
+from starlette.responses import JSONResponse
+from webargs_starlette import WebargsHTTPException
 from asgiref.wsgi import WsgiToAsgi
-from ..api import APIv2
 from .flask import App
 from ..context import _setup_context
-from webargs_starlette import WebargsHTTPException
-from starlette.responses import JSONResponse
+from ..api import APIv2
 
 # For some reason, adding logging in this file seems to kill logging in the entire
 # application

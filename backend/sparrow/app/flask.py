@@ -25,6 +25,11 @@ def echo_error(message, obj=None, err=None):
 
 
 class App(Flask):
+    """
+    Sparrow's Flask app is in the process of being removed from the core of the
+    system in favor of a new application object based on Starlette.
+    """
+
     def __init__(self, *args, **kwargs):
         # Setup config as suggested in http://flask.pocoo.org/docs/1.0/config/
         cfg = kwargs.pop("config", None)
