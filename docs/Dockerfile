@@ -60,7 +60,7 @@ COPY docs/package.json /docs/package.json
 #COPY docs/package-lock.json /docs/package-lock.json
 
 # Install node modules
-RUN npm --unsafe-perm=true --allow-root install
+RUN npm --unsafe-perm=true --allow-root --loglevel=error install
 
 COPY docs/ /docs/
 
