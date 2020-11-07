@@ -50,7 +50,10 @@ def main(ctx, args):
     if _command is None:
         return exec_or_run("backend", "sparrow", *args)
     else:
-        return cmd(_command, *rest)
+        # Run a shell subcommand
+        res = cmd(_command, *rest)
+        # Exit with the proper return code so shell error handling works predictably
+        sys.exit(res.returncode)
 
 
 @cli.command(name="container-id")

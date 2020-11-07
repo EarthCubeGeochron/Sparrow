@@ -1,7 +1,6 @@
-#!/usr/bin/env bash -e
-
-set -e
+#!/bin/bash -e
 
 cd "$SPARROW_PATH"
 
 docker build -f docs/Dockerfile --tag sparrow_docs:latest .
+exit $?

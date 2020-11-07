@@ -1,4 +1,5 @@
 import click
+import sys
 from click import Group
 from .help import format_description
 from .base import SparrowConfig
@@ -15,4 +16,5 @@ class CommandGroup(Group):
         def command(ctx, args):
             obj = ctx.find_object(SparrowConfig)
             fn = find_subcommand(obj.bin_directories, k, prefix=prefix)
-            cmd(fn, *args)
+            res = cmd(fn, *args)
+            sys.exit(res.returncode)
