@@ -26,6 +26,9 @@ console = Console(highlight=True)
     context_settings=dict(
         ignore_unknown_options=True,
         help_option_names=[],
+        max_content_width=160,
+        # Doesn't appear to have landed in Click 7? Or some other reason we can't access...
+        # short_help_width=160,
     ),
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
@@ -33,6 +36,7 @@ console = Console(highlight=True)
 def main(ctx, args):
     cfg = ctx.find_object(SparrowConfig)
     rest = []
+
     try:
         (subcommand, *rest) = args
     except ValueError:
