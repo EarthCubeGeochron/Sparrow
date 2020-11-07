@@ -27,6 +27,8 @@ services:
     expose:
       - 5000
   gateway:
+    depends_on:
+      - backend
     build:
       context: server-config
       dockerfile: Dockerfile.dev

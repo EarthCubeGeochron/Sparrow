@@ -12,7 +12,6 @@ module.exports = {
   projectName: "Sparrow", // Usually your repo name.
   // We need to ignore broken links for now.
   onBrokenLinks: "ignore",
-  themes: ["@docusaurus/theme-live-codeblock"],
   themeConfig: {
     navbar: {
       title: "Sparrow",
@@ -22,9 +21,16 @@ module.exports = {
       },
       items: [
         {
+          to: "docs/getting-started",
+          activeBasePath: "Guides",
+          label: "Getting started",
+          position: "left",
+        },
+        {
           to: "docs/guides",
           activeBasePath: "Guides",
           label: "Guides",
+          position: "left",
         },
         /*{
           to: "docs/motivation-and-design",
@@ -32,12 +38,6 @@ module.exports = {
           label: "Motivation and design",
           position: "left",
         },*/
-        {
-          to: "docs/getting-started",
-          activeBasePath: "Guides",
-          label: "Getting started",
-          position: "left",
-        },
         {
           to: "docs/introduction",
           activeBasePath: "docs",
@@ -97,7 +97,9 @@ module.exports = {
     [
       "@docusaurus/preset-classic",
       {
+        debug: false,
         docs: {
+          routeBasePath: "/docs",
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           editUrl:
@@ -105,6 +107,7 @@ module.exports = {
         },
         blog: {
           showReadingTime: false,
+          routeBasePath: "/blog",
           // Please change this to your repo.
           editUrl:
             "https://github.com/EarthCubeGeochron/Sparrow/edit/master/docs/blog/",

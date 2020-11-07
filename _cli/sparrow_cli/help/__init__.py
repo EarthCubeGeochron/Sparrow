@@ -7,7 +7,7 @@ from os import environ, path
 from pathlib import Path
 from itertools import chain
 from rich.console import Console
-from ..util import cmd, fail_without_docker, compose
+from ..util import fail_without_docker, compose
 from .backend import get_backend_command_help
 from ..base import cli
 from ..exc import SparrowCommandError

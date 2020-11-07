@@ -1,8 +1,11 @@
 ---
-id: environment-vars
-title: Environment variables
-sidebar_label: Environment variables
+id: server-configuration
+title: Server configuration
+sidebar_label: Server configuration
 ---
+
+Sparrow is configured using environment variables. Here are a few of the most
+important ones:
 
 - `SPARROW_SECRET_KEY="very secret string"`: A secret key used for management
   of passwords. Set this in your **LOCAL** environment (it will be copied to
@@ -13,3 +16,8 @@ sidebar_label: Environment variables
 - The `SPARROW_ENV=<development,production>` environment variable defaults to
   `production`, which disable development-focused features such
   as live code reloading and sourcemaps for performance and security.
+
+:::note
+More detailed configurations can be set by directly
+using [docker-compose environment variables](https://docs.docker.com/compose/reference/envvars/).
+:::

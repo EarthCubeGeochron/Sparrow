@@ -26,6 +26,9 @@ console = Console(highlight=True)
     context_settings=dict(
         ignore_unknown_options=True,
         help_option_names=[],
+        max_content_width=160,
+        # Doesn't appear to have landed in Click 7? Or some other reason we can't access...
+        # short_help_width=160,
     ),
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
@@ -33,6 +36,7 @@ console = Console(highlight=True)
 def main(ctx, args):
     cfg = ctx.find_object(SparrowConfig)
     rest = []
+
     try:
         (subcommand, *rest) = args
     except ValueError:
@@ -50,7 +54,10 @@ def main(ctx, args):
     if _command is None:
         return exec_or_run("backend", "/app/sparrow/__main__.py", *args)
     else:
-        return cmd(_command, *rest)
+        # Run a shell subcommand
+        res = cmd(_command, *rest)
+        # Exit with the proper return code so shell error handling works predictably
+        sys.exit(res.returncode)
 
 
 @cli.command(name="container-id")
