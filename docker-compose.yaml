@@ -56,7 +56,7 @@ services:
         consistency: cached
       # Nested volume to keep built files
       # separate from those on our local system
-      - /app/sparrow.egg-info
+      #- /app/sparrow.egg-info
       # Share some configuration between backend
       # and frontend
       - ${SPARROW_INIT_SQL:-placeholder}:/init-sql/:ro

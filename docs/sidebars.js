@@ -1,26 +1,36 @@
 module.exports = {
   someSidebar: {
-    //CHECK_THIS_OUT: ["live-code"],
     Guides: [
-      "motivation-and-design",
+      "guides",
       "getting-started",
-      "server-configuration",
-      "sparrow-on-windows",
+      "motivation-and-design",
       "datascience/data-sci",
       "schema-imp",
+      "embargo",
     ],
+    Resources: ["presentations", "implementations"],
     Documentation: [
       "introduction",
-      "command-line-interface",
+      {
+        type: "category",
+        label: "Core application",
+        items: [
+          "command-line-interface",
+          "core/server-configuration",
+          "core/extensions",
+        ],
+      },
+      "schema",
       {
         type: "category",
         label: "Frontend",
         items: [
-          "frontend/local-dev",
           //"frontend/frames",
           "frontend/data-input-form",
         ],
       },
+      "sparrow-on-windows",
+      "local-development",
     ],
   },
 };
