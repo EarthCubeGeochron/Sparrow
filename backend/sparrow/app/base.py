@@ -17,6 +17,9 @@ from .flask import App
 from ..context import _setup_context
 from ..api import APIv2
 
+# Should restructure using Starlette's config management
+# https://www.starlette.io/config/
+
 # For some reason, adding logging in this file seems to kill logging in the entire
 # application
 
