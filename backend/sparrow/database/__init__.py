@@ -47,6 +47,8 @@ class Database(MappedDatabaseMixin):
         envvar = environ.get("SPARROW_DATABASE", None)
         if envvar is not None:
             db_conn = envvar
+        log.info(db_conn)
+
         self.engine = create_engine(db_conn, executemany_mode="batch")
         metadata.create_all(bind=self.engine)
         self.meta = metadata

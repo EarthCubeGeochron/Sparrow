@@ -1,7 +1,7 @@
 from sqlalchemy import inspect, sql
 from sparrow.plugins import SparrowCorePlugin
 from sparrow.util import relative_path
-from sparrow import App
+from sparrow import Sparrow
 import click
 from sparrow.database.util import run_sql
 
@@ -67,7 +67,7 @@ def drop_audit_trail():
     """
     Remove PGMemento audit trail
     """
-    db = App(__name__).database
+    db = Sparrow().database
     db.exec_sql(relative_path(__file__, "drop-audit.sql"))
     drop_audit_columns(db)
 

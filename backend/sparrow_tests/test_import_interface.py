@@ -1,4 +1,4 @@
-from sparrow.app import App
+from sparrow.app import Sparrow
 from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
@@ -16,7 +16,7 @@ log = get_logger(__name__)
 
 # This should be in the fixture function ideally but I can't figure out
 # how to cache it so it doesn't repeatedly regenerate.
-app = App(__name__)
+app = Sparrow()
 
 session = dict(sample_id="A-0", date=datetime.now())
 
@@ -299,8 +299,7 @@ class TestDeclarativeImporter:
         ensure_single(db, "datum", value=0.252)
 
     def test_datum_type_merging(self, db):
-        """Datum types should successfully find values already in the database.
-        """
+        """Datum types should successfully find values already in the database."""
         ensure_single(db, "datum_type", parameter="soil water content", unit="weight %")
 
     def test_load_existing_instance(self, db):

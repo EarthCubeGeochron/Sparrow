@@ -6,15 +6,15 @@ from json import dumps
 from click import pass_context
 from .util import with_database, with_app, with_full_app
 from ..util import working_directory
-from ..app import App
+from ..app import Sparrow
 from ..auth.create_user import create_user
 from ..database.migration import db_migration
 
 
 def _build_app_context(config):
-    app = App(__name__, config=config, verbose=False)
+    app = Sparrow(config=config, verbose=False)
     app.load()
-    return app
+    return app.flask
 
 
 class SparrowCLI(click.Group):

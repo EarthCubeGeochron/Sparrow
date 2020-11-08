@@ -1,4 +1,3 @@
-from sparrow.app import App
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
 from starlette.testclient import TestClient
@@ -25,7 +24,7 @@ def pytest_configure(config):
 
 @fixture(scope="session")
 def app():
-    return App(__name__)
+    return Sparrow()
 
 
 @fixture(scope="class")
