@@ -82,7 +82,7 @@ class MappedDatabaseMixin(object):
         """
         schema = kwargs.pop("schema", "public")
         meta = MetaData(schema=schema)
-        return Table(
+        Tables = Table(
             tablename,
             meta,
             *column_args,
@@ -90,8 +90,15 @@ class MappedDatabaseMixin(object):
             autoload_with=self.engine,
             **kwargs,
         )
-    def reflect_view_table(self, tablename, *column_args, **kwargs):
+        log.info([c.name for c in Tables.columns])
+        return Tables
+    def reflect_view(self, tablename, *column_args, **kwargs):
         pass
+        # schema = kwargs.pop("schema", "public")
+        # meta = MetaData(self.engine,schema=schema)
+        # ##meta.reflect(view=True)
+        # log.info(meta.tables)
+        # return meta.tables[tablename]
 
     def automap(self):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare

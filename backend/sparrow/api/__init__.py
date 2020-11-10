@@ -93,8 +93,8 @@ class APIv2(Starlette):
         for iface in db.interface:
             self._add_model_route(iface)
 
-        self.add_view_route("authority", schema="vocabulary")
-        self.add_view_route("metrics", schema="vocabulary")
+        self.add_view_route("authority", schema="vocabulary", description="Route to view authorities for technical descriptions")
+        self.add_view_route("metrics", schema="vocabulary", description="Data Metrics and Statistics")
 
         self.add_schema_route()
 
@@ -138,13 +138,13 @@ class APIv2(Starlette):
         )
         self.route_descriptions[root_route].append(basic_info)
 
-    def add_view_route(self, tablename, schema="core_view"):
+    def add_view_route(self, tablename, schema="core_view", description=""):
         _tbl = self._app.database.reflect_table(tablename, schema=schema)
 
         class Meta:
             table = _tbl
 
-        name = _tbl.name
+        name = Meta.table.name
         cls = type(name + "_route", (ViewAPIEndpoint,), {"Meta": Meta})
         root_route = schema
         endpoint = f"/{root_route}/{name}"
@@ -153,8 +153,8 @@ class APIv2(Starlette):
 
         basic_info = dict(
             route=endpoint,
-            table=_tbl.name,
+            table=name,
             schema=schema,
-            description="General Description",
+            description=description,
         )
         self.route_descriptions[root_route].append(basic_info)
