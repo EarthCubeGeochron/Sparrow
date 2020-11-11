@@ -4,7 +4,7 @@ title: Sparrow on Windows
 sidebar_label: Sparrow on Windows
 ---
 
-### Docker for Windows:
+### Docker for Windows
 
 Sparrow relies on [Docker](https://www.docker.com/) to install dependencies and to build an instance of sparrow on a local machine. Docker was designed for MacOS and Linux based operating systems but can now also work on a Windows based operating system.
 (_[Docker for Winodws](https://docs.docker.com/docker-for-windows/install/)_)

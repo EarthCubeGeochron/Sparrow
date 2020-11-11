@@ -64,4 +64,4 @@ export const Mapping = () => {
   );
 };
 
-export * from "./environment-variable-list"
+export * from "./environment-variable-list";
