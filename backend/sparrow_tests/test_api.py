@@ -23,6 +23,12 @@ class TestAPIV2:
         data = res.json()
         assert data["description"] is not None
 
+    @mark.parametrize("route", ["/api/v2/vocabulary/metrics"])
+    def test_api_metrics(self, client, route):
+        """Checks to See if the Metrics API endpoint is working"""
+        res = client.get(route)
+        assert res.status_code == 200
+
     def test_get_data(self, client, db):
         """Get some data for us to work with"""
         db.load_data("session", basic_data)

@@ -185,3 +185,6 @@ class ModelAPIEndpoint(HTTPEndpoint):
             raise ValidationError("Invalid page token.")
 
         return APIResponse(res, schema=schema, total_count=q.count())
+
+    async def put(self, request):
+        """Handler for all PUT requests"""

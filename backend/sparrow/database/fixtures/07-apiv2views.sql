@@ -14,4 +14,4 @@ i AS (SELECT COUNT(age.value) Number_of_Total_Fusion_Ages FROM core_view.age_con
 j AS (SELECT array_agg(DISTINCT a.technique) techniques FROM core_view.age_datum a),
 k AS (SELECT array_agg(DISTINCT a.target) targets FROM core_view.age_context a),
 l AS (SELECT COUNT(DISTINCT a.geo_entity_name) Number_Of_Formations_Connected FROM core_view.age_context a)
-SELECT * FROM a, b, c, d, e, f, g, h, i, j, k,l;
+SELECT * FROM a, b, c, d, e, f, g, h, i, j, k, l;
