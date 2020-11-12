@@ -1,3 +1,4 @@
+import json
 from pytest import mark
 from .fixtures import basic_data
 
@@ -28,6 +29,22 @@ class TestAPIV2:
         """Checks to See if the Metrics API endpoint is working"""
         res = client.get(route)
         assert res.status_code == 200
+
+    def test_api_datasheet(self, client):
+        '''
+        Test to go along with the datasheet editor api plugin.
+            1. Add the route
+            2. Create data
+            3. Send the data as a post and turn data in json by the dumps method
+            4. Assert that the response I get is the same as the original data
+            5. Check the status code to make sure it's 200 (Working Correctly)
+        '''
+        route = '/api/v2/edits/datasheet'
+        data = {"Status": "Success"}
+        res = client.post(route, data=json.dumps(data))
+        assert res.status_code == 200
+        assert res.json() == data
+
 
     def test_get_data(self, client, db):
         """Get some data for us to work with"""
