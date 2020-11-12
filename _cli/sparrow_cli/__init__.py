@@ -48,7 +48,7 @@ def main(ctx, args):
     _command = find_subcommand(cfg.bin_directories, subcommand)
 
     if _command is None:
-        return exec_or_run("backend", "sparrow", *args)
+        return exec_or_run("backend", "/app/sparrow/__main__.py", *args)
     else:
         return cmd(_command, *rest)
 

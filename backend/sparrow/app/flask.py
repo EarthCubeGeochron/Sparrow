@@ -3,15 +3,15 @@ from os import environ
 from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
 
-from .encoders import JSONEncoder
-from .api.v1 import APIv1
-from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
-from .interface import InterfacePlugin
-from .auth import AuthPlugin
+from ..encoders import JSONEncoder
+from ..api.v1 import APIv1
+from ..plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
+from ..interface import InterfacePlugin
+from ..auth import AuthPlugin
 
 # from .graph import GraphQLPlugin
-from .web import WebPlugin
-from .logs import get_logger
+from ..web import WebPlugin
+from ..logs import get_logger
 
 log = get_logger(__name__)
 
@@ -25,6 +25,11 @@ def echo_error(message, obj=None, err=None):
 
 
 class App(Flask):
+    """
+    Sparrow's Flask app is in the process of being removed from the core of the
+    system in favor of a new application object based on Starlette.
+    """
+
     def __init__(self, *args, **kwargs):
         # Setup config as suggested in http://flask.pocoo.org/docs/1.0/config/
         cfg = kwargs.pop("config", None)
@@ -35,7 +40,7 @@ class App(Flask):
         self.api_loaded = False
         self.verbose = verbose
 
-        self.config.from_object("sparrow.default_config")
+        self.config.from_object("sparrow.settings")
         if cfg is None:
             cfg = environ.get("SPARROW_BACKEND_CONFIG", None)
         try:
@@ -57,7 +62,7 @@ class App(Flask):
 
     def setup_database(self, db=None):
         # This bootstrapping order leaves much to be desired
-        from .database import Database
+        from ..database import Database
 
         self.load()
         if self.db is not None and self.database_ready:
@@ -140,7 +145,7 @@ class App(Flask):
             return True
         # Database setup is likely redundant, but moves any database-mapping
         # errors forward.
-        from .database import Database
+        from ..database import Database
 
         db = self.setup_database(Database(self))
 
