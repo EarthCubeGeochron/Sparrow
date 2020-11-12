@@ -8,6 +8,7 @@ from .api.v1 import APIv1
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .interface import InterfacePlugin
 from .auth import AuthPlugin
+from .editors import DatasheetEditPlugin
 
 # from .graph import GraphQLPlugin
 from .web import WebPlugin
@@ -79,6 +80,7 @@ class App(Flask):
         return self.db
 
     def register_plugin(self, plugin):
+        """Registers a plugin with Sparrow"""
         try:
             self.plugins.add(plugin)
         except Exception as err:
@@ -91,6 +93,7 @@ class App(Flask):
         self.plugins.finalize(self)
 
     def run_hook(self, hook_name, *args, **kwargs):
+        """Constructs a hook call from a passed string"""
         log.info("Running hook " + hook_name)
         method_name = "on_" + hook_name.replace("-", "_")
         for plugin in self.plugins:
@@ -101,6 +104,7 @@ class App(Flask):
             log.info("  plugin: " + plugin.name)
 
     def register_module_plugins(self, module):
+        """Registers a Module plugin hook to be run by run_hook"""
         for name, obj in module.__dict__.items():
             try:
                 assert issubclass(obj, SparrowPlugin)
@@ -117,6 +121,7 @@ class App(Flask):
             return
         import core_plugins
 
+        self.register_plugin(DatasheetEditPlugin)
         self.register_plugin(AuthPlugin)
         # GraphQL is disabled for now
         # self.register_plugin(GraphQLPlugin)
