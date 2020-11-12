@@ -165,7 +165,7 @@ class Database(MappedDatabaseMixin):
 
     def exec_query(self, *args):
         """Returns a Pandas DataFrame from a SQL query"""
-        return run_query(self.session, *args)
+        return run_query(self.engine, *args)
 
     @property
     def inspector(self):
