@@ -164,7 +164,7 @@ export function DataFilePage({ props }) {
   } = data;
 
   // Get uploaded date from first link
-  const { date_upload } = data_file_link[0];
+  const { date } = data_file_link[0];
 
   const sessions = data_file_link
     .map((d) => d.session)
@@ -175,7 +175,7 @@ export function DataFilePage({ props }) {
   //console.log(project);
   return h("div.data-page-container", [
     h("div.header", [
-      h(DetailPageHeader, { date_upload, basename, type, file_hash }),
+      h(DetailPageHeader, { date_upload: date, basename, type, file_hash }),
     ]),
     h(Divider),
     h("div.info-container", [
