@@ -13,6 +13,16 @@ class TestAPIV2:
     @mark.xfail(
         reason="This fails due to transaction isolation in the testing database."
     )
+
+    @mark.parametrize("route", ["/api/v2/models/sample", "/api/v2/models/sample/"])
+    def test_api_models_sample(self, client, route):
+        """Checks if models/sample is working"""
+
+        res = client.get(route)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["description"] is not None
+
     def test_get_data(self, client, db):
         """Get some data for us to work with"""
         db.load_data("session", basic_data)

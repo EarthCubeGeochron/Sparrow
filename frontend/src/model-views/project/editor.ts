@@ -156,9 +156,7 @@ const EditableProjectDetails = function(props) {
     },
     [
       h("div.project-editor", [
-        h("div", { style: { display: "flex", justifyContent: "center" } }, [
-          Edit ? h(EditNavBar, { header: "Manage Project" }) : null,
-        ]),
+        h("div", [Edit ? h(EditNavBar, { header: "Manage Project" }) : null]),
         h("div.project-editor-content", [
           h(ModelEditableText, { is: "h3", field: "name", multiline: true }),
           h(ModelEditableText, {
