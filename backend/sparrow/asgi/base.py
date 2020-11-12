@@ -32,10 +32,6 @@ from ..context import _setup_context
 async def redirect(*args):
     return RedirectResponse("/api/v2/")
 
-async def Datasheet_POST(request):
-   return JSONResponse({"This":"Working"})
-
-
 def construct_app():
     flask = App(__name__)
     flask.load()
@@ -47,7 +43,6 @@ def construct_app():
 
     routes = [
         Route("/api/v2", endpoint=redirect),
-        Route("/api/v2/posts/datasheet", endpoint=Datasheet_POST, methods=["POST"]),
         Mount("/api/v2/", app=api_v2),
         Mount("/", app=WsgiToAsgi(flask)),
     ]
