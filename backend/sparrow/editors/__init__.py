@@ -6,10 +6,8 @@ from ..auth.backend import JWTBackend
 
 ##app = construct_edit_app()
 
-class EditAPI(SparrowCorePlugin):
+class DatasheetEditPlugin(SparrowCorePlugin):
     name = 'edits'
 
-    backend = JWTBackend(environ.get("SPARROW_SECRET_KEY", ""))
-
-    def on_intialize_edit_api(self, api):
-        api.mount("/edits", EditAPI, name="edit_api")
+    def on_api_initialized_v2(self, api):
+        api.mount("/edits", EditApi, name="edit_api")
