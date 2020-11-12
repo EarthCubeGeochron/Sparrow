@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from click import secho
 from os import environ
+import pandas as pd
 
 from sqlalchemy import create_engine, inspect, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -163,7 +164,8 @@ class Database(MappedDatabaseMixin):
         run_sql_file(self.session, str(fn))
 
     def exec_query(self, *args):
-        run_query(self.session, *args)
+        """Returns a Pandas DataFrame from a SQL query"""
+        return run_query(self.session, *args)
 
     @property
     def inspector(self):

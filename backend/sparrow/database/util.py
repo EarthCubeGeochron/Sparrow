@@ -10,8 +10,8 @@ def run_query(db, filename_or_query, **kwargs):
     a SQLAlchemy database object) and turn it into a
     `Pandas` dataframe.
     """
-    from pandas import read_sql
-
+    from pandas import read_sql        
+    
     if "SELECT" in str(filename_or_query):
         # We are working with a query string instead of
         # an SQL file.
