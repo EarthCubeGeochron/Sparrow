@@ -112,11 +112,22 @@ export const Samples = (props) => {
   ]);
 };
 
+export function SessionInfo(props) {
+  const {
+    id,
+    technique,
+    target,
+    date,
+    //analysis,
+  } = props;
+  return h(SessionLinkCard, { session_id: id, target, technique, date });
+}
+
 /**
  *
  * @param props sessions
  */
-export const SessionInfo = (props) => {
+const SessionList = (props) => {
   const { sessions } = props;
   //const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
   return h("div.session-container", [
@@ -124,14 +135,7 @@ export const SessionInfo = (props) => {
     h(
       "div.sessions",
       sessions.map((d) => {
-        const {
-          id,
-          technique,
-          target,
-          date,
-          //analysis,
-        } = d;
-        return h(SessionLinkCard, { session_id: id, target, technique, date });
+        return h(SessionInfo, d);
       })
     ),
   ]);
@@ -181,7 +185,7 @@ export function DataFilePage({ props }) {
     h("div.info-container", [
       //h("div.projects", [h(ProjectLinks, { project })]),
       h(Samples, { samples }),
-      h(SessionInfo, { sessions }),
+      h(SessionList, { sessions }),
     ]),
   ]);
 }
