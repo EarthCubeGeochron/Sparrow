@@ -4,7 +4,7 @@ from click import secho
 from os import environ
 import pandas as pd
 
-from sqlalchemy import create_engine, inspect, MetaData
+from sqlalchemy import create_engine, inspect, MetaData, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
@@ -158,7 +158,16 @@ class Database(MappedDatabaseMixin):
         res = schema.load(filter_params, session=self.session, partial=True)
         return res
 
+    def exec_sql_text(self, statement):
+        '''Executes a sql command, in string on the database
+            Easy way to load data into a test database instance
+        '''
+        connection = self.engine.connect()
+        connection.execute(text(statement))
+
+
     def exec_sql(self, fn):
+        '''Executes SQL files passed'''
         # TODO: refactor this to exec_sql_file
         secho(Path(fn).name, fg="cyan", bold=True)
         run_sql_file(self.session, str(fn))

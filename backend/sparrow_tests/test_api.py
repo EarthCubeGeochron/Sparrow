@@ -1,6 +1,8 @@
 import json
 from pytest import mark
 from .fixtures import basic_data
+from .helpers import json_fixture
+
 
 
 class TestAPIV2:
@@ -30,27 +32,50 @@ class TestAPIV2:
         res = client.get(route)
         assert res.status_code == 200
 
-    # def test_api_datasheet(self, client):
-    #     '''
-    #     Test to go along with the datasheet editor api plugin.
-    #         1. Add the route
-    #         2. Create data
-    #         3. Send the data as a post and turn data in json by the dumps method
-    #         4. Assert that the response I get is the same as the original data
-    #         5. Check the status code to make sure it's 200 (Working Correctly)
-    #     '''
-    #     route = '/api/v2/edits/datasheet'
-    #     data = {"Status": "Success"}
-    #     res = client.post(route, data=json.dumps(data))
-    #     assert res.status_code == 200
-    #     assert res.json() == data
+
+    def test_load_sample(self, client, db):
+        sample_test_data = json_fixture("sample-simple-test.json")
+        db.load_data("sample", sample_test_data)
+
+        db.exec_sql_text("INSERT INTO sample (id, name) VALUES (18, 'M2C'),(19, 'Test_sample')")
+
+        res_test = client.get("/api/v2/models/sample?per_page=5")
+        test_sample_data = res_test.json()
+        assert res_test.status_code == 200
+
+
+    def test_api_datasheet(self, client, db):
+        """
+        Test to go along with the datasheet editor api plugin.
+        """
+        ## Attempt to load data from fixture into test database, does not work
+        sample_test_data = json_fixture("sample-simple-test.json")
+        db.load_data("sample", sample_test_data)
+
+        db.exec_sql_text("INSERT INTO sample (id, name) VALUES (18, 'M2C'),(19, 'Test_sample')")
+
+        res_test = client.get("/api/v2/models/sample?per_page=5")
+        test_sample_data = res_test.json()
+        assert res_test.status_code == 200
+
+        edited_sample_data = json.dumps({
+                "name": "M2C_add",
+                "id": 18})
+
+      
+
+        route = '/api/v2/edits/datasheet'
+        data = {"Status": "Success"}
+        res = client.post(route, json=edited_sample_data)
+        assert res.status_code == 200
+        assert res.text == "M2C"
 
 
     def test_get_data(self, client, db):
         """Get some data for us to work with"""
         db.load_data("session", basic_data)
 
-        res = client.get("/api/v2/session")
+        res = client.get("/api/v2/models/session?per_page=5")
         assert res.status_code == 200
         data = res.json()
         assert data["total_count"] == 1
