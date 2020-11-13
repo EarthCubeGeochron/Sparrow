@@ -24,7 +24,7 @@ test -f /build/schema.html
 
 ## Core docs
 
-FROM sparrowdata/backend AS core-docs
+FROM sparrowdata/backend:1.6 AS core-docs
 
 WORKDIR /docs
 
@@ -57,14 +57,14 @@ FROM docs-base AS docs-builder
 
 # Copy files needed for installation
 COPY docs/package.json /docs/package.json
-COPY docs/package-lock.json /docs/package-lock.json
+#COPY docs/package-lock.json /docs/package-lock.json
 
 # Install node modules
 RUN npm --unsafe-perm=true --allow-root install
 
 COPY docs/ /docs/
 
-RUN npm run build
+RUN node_modules/.bin/docusaurus clear && npm run build --no-minify
 
 FROM nginx:1.19 AS docs
 

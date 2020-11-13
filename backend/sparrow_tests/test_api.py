@@ -1,13 +1,5 @@
-from starlette.testclient import TestClient
-from sparrow.asgi import app
-from pytest import fixture, mark
+from pytest import mark
 from .fixtures import basic_data
-
-
-@fixture
-def client():
-    _client = TestClient(app)
-    yield _client
 
 
 class TestAPIV2:

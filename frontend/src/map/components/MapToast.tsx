@@ -19,68 +19,73 @@ import {
 } from "../../filter/components";
 
 /**
- * Button and Form that pops up from the Toaster component.
+ * Form that pops up from the Toaster component.
  * Has the ability to suggest Geologic Formations from macrostrat
  */
-function AddSampleAtLocalButton({ lng, lat, data }) {
-  const [open, toggleOpen] = useToggle(false);
+function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
   const [state, setState] = useState("");
 
   return (
-    <div>
-      <Button minimal={true} onClick={toggleOpen}>
-        Add Sample at Location
-      </Button>
-      <Dialog isOpen={open} title="Add Sample At Location" onClose={toggleOpen}>
-        <Card>
-          {/* <NoLocalSampleSelector /> */}
-          <MultipleSelectFilter
-            text="Connect to Sample without location: "
-            items={[
-              "84C207AB",
-              "90T112B",
-              "SMUB-13",
-              "86C471B",
-              "AT80-36",
-              "CH9-11",
-              "AT11",
-              "GR-11-103",
-              "NI-010813-7",
-            ]}
-            sendQuery={() => null}
-          />
-          <br></br>
+    <div style={{ position: "absolute", zIndex: 50 }}>
+      <div>
+        <Dialog
+          isOpen={open}
+          title="Add Sample At Location"
+          onClose={toggleOpen}
+        >
+          <Card>
+            {/* <NoLocalSampleSelector /> */}
+            <MultipleSelectFilter
+              text="Connect to Sample without location: "
+              items={[
+                "84C207AB",
+                "90T112B",
+                "SMUB-13",
+                "86C471B",
+                "AT80-36",
+                "CH9-11",
+                "AT11",
+                "GR-11-103",
+                "NI-010813-7",
+              ]}
+              sendQuery={() => null}
+            />
+            <br></br>
 
-          <p>Longitude: </p>
-          <NumericInput defaultValue={Number(lng).toFixed(5)}></NumericInput>
-          <br></br>
-          <p>Latitude</p>
-          <NumericInput defaultValue={Number(lat).toFixed(5)}></NumericInput>
-          <br></br>
+            <p>Longitude: </p>
+            <NumericInput defaultValue={Number(lng).toFixed(5)}></NumericInput>
+            <br></br>
+            <p>Latitude</p>
+            <NumericInput defaultValue={Number(lat).toFixed(5)}></NumericInput>
+            <br></br>
 
-          <p>Geologic Formation: </p>
-          <InputGroup
-            value={state}
-            onChange={(event) => setState(event.target.value)}
-          />
-          <h5>
-            <i>Nearby units suggested by MacroStrat: </i>
-          </h5>
-          {data !== null ? (
-            data.success.data.map((object) => {
-              return (
-                <div>
-                  <Button minimal={true} onClick={() => setState(object.name)}>
-                    {object.name}
-                  </Button>
-                </div>
-              );
-            })
-          ) : (
-            <Spinner size={50} />
-          )}
-        </Card>
-      </Dialog>
+            <p>Geologic Formation: </p>
+            <InputGroup
+              value={state}
+              onChange={(event) => setState(event.target.value)}
+            />
+            <h5>
+              <i>Nearby units suggested by MacroStrat: </i>
+            </h5>
+            {data !== null ? (
+              data.success.data.map((object) => {
+                return (
+                  <div key={object.name}>
+                    <Button
+                      minimal={true}
+                      onClick={() => setState(object.name)}
+                    >
+                      {object.name}
+                    </Button>
+                  </div>
+                );
+              })
+            ) : (
+              <Spinner size={50} />
+            )}
+          </Card>
+        </Dialog>
+      </div>
     </div>
   );
 }
@@ -96,6 +101,8 @@ function AddSampleAtLocalButton({ lng, lat, data }) {
  */
 
 export function MapToast({ lng, lat, mapstyle }) {
+  const [open, toggleOpen] = useToggle(false);
+
   // url to queary macrostrat
   const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
 
@@ -124,7 +131,6 @@ export function MapToast({ lng, lat, mapstyle }) {
           Nearby: <i>{rockdNearbyData}</i>
         </h5>
         <Divider />
-        <AddSampleAtLocalButton lng={lng} lat={lat} data={MacostratData} />
       </div>
     );
   };
@@ -144,7 +150,6 @@ export function MapToast({ lng, lat, mapstyle }) {
         )}
 
         <Divider />
-        <AddSampleAtLocalButton lng={lng} lat={lat} data={MacostratData} />
       </div>
     );
   };
@@ -179,27 +184,43 @@ export function MapToast({ lng, lat, mapstyle }) {
             })}
           </div>
         )}
-        <AddSampleAtLocalButton lng={lng} lat={lat} data={MacostratData} />
       </div>
     );
   };
   return (
     <div>
-      <h5>
-        <b>Longitude: </b>
-        <i>{Number(lng).toFixed(3) + " "}</i>
-        <b>Latitude: </b>
-        <i>{Number(lat).toFixed(3)}</i>
-      </h5>
-      <Divider />
-      {mapstyle == mapStyle ? (
-        <NearbyGeologicFormations />
-      ) : mapstyle ==
-        "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub" ? (
-        <ElevationToaster />
-      ) : (
-        <NearByCity />
-      )}
+      <div style={{ position: "relative", zIndex: 0 }}>
+        <div>
+          <h5>
+            <b>Longitude: </b>
+            <i>{Number(lng).toFixed(3) + " "}</i>
+            <b>Latitude: </b>
+            <i>{Number(lat).toFixed(3)}</i>
+          </h5>
+          <Divider />
+          {mapstyle == mapStyle ? (
+            <NearbyGeologicFormations />
+          ) : mapstyle ==
+            "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub" ? (
+            <ElevationToaster />
+          ) : (
+            <NearByCity />
+          )}
+        </div>
+        <Button minimal={true} onClick={toggleOpen}>
+          Add Sample at Location
+        </Button>
+      </div>
+
+      <div>
+        <AddSampleAtLocal
+          lng={lng}
+          lat={lat}
+          data={MacostratData}
+          open={open}
+          toggleOpen={toggleOpen}
+        />
+      </div>
     </div>
   );
 }

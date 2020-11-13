@@ -1,22 +1,8 @@
-from sparrow.app import App
 from sqlalchemy import and_
 from datetime import datetime
-from pytest import mark, fixture
-import logging
-from sparrow.logs import get_logger
+from pytest import mark
 from .fixtures import basic_data, basic_d18O_data
 from .helpers import json_fixture
-
-log = get_logger(__name__)
-
-
-@fixture
-def client():
-    app = App(__name__)
-    app.load()
-    app.load_phase_2()
-    with app.test_client() as client:
-        yield client
 
 
 class TestAPIImporter:
@@ -42,9 +28,6 @@ class TestAPIImporter:
         db.load_data("session", complex_data["data"])
 
     def test_complex_import(self, client, db):
-        # Too much output
-        logging.disable(logging.DEBUG)
-
         complex_data = json_fixture("large-test.json")
         db.load_data("session", complex_data["data"])
 
@@ -107,7 +90,7 @@ class TestAPIImporter:
             "/api/v1/import-data/session", json={"filename": None, "data": data}
         )
         assert res.status_code == 400
-        err = res.json["error"]
+        err = res.json()["error"]
 
         assert err["type"] == "marshmallow.exceptions.ValidationError"
         # It could be useful to have a function that "unnests" these errors

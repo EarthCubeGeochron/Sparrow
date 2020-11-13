@@ -1,37 +1,35 @@
-import h from "@macrostrat/hyper";
+import h, { C, compose } from "@macrostrat/hyper";
 import { useEffect } from "react";
 import { join } from "path";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { HomePage } from "./homepage";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
+import loadable from "@loadable/component";
 
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
+import { DarkModeManager, PageRoute, NoMatchPage } from "~/util";
 import { APIProvider } from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
-import { APIExplorerV2 } from "./api-v2";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
-import { Catalog } from "./admin";
-import { PageSkeleton, PageStyle } from "./components/page-skeleton";
-import { MapPage } from "./map";
-import NewSample from "./new-sample/new-sample";
+import { AdminRoute } from "./admin";
+import { PageStyle } from "~/components/page-skeleton";
+import HomePage from "./homepage";
+import Catalog from "./catalog";
 
-import DataSheet from "./data-sheet/app";
-import { MapSelector } from "./data-sheet/sheet-enter-components";
+//import { MapSelector } from "./data-sheet/sheet-enter-components";
 
-function PageRoute(props) {
-  /** A custom route to manage page header, footer, and style associated
-      with a specific route */
-  const { render, component: base, style, ...rest } = props;
-  const component = (p) => {
-    const children = base != null ? h(base, p) : render(p);
-    return h(PageSkeleton, { style, children });
-  };
-  return h(Route, { ...rest, component });
-}
+const APIExplorerV2 = loadable(async function () {
+  const module = await import("./api-v2");
+  return module.APIExplorerV2;
+});
 
-function AppMain(props) {
+const MapPage = loadable(async function () {
+  const module = await import("./map");
+  return module.MapPage;
+});
+
+function AppRouter(props) {
   // Handles routing for the application between pages
   const { baseURL } = props;
 
@@ -53,37 +51,21 @@ function AppMain(props) {
       }),
       h(PageRoute, {
         path: "/catalog",
-        pageStyle: PageStyle.WIDE,
-        render() {
-          return h(Catalog, { base: "/catalog" });
-        },
-      }),
-      h(PageRoute, {
-        path: "/new-sample",
-        style: PageStyle.WIDE,
-        component: NewSample,
-      }),
-      h(PageRoute, {
-        path: "/map-selector",
-        style: PageStyle.WIDE,
-        component: MapSelector,
+        render: () => h(Catalog, { base: "/catalog" }),
       }),
       h(PageRoute, {
         path: "/map",
         style: PageStyle.FULLSCREEN,
         component: MapPage,
       }),
-      h(PageRoute, {
-        path: "/data-sheet",
-        style: PageStyle.WIDE,
-        component: DataSheet,
-      }),
+      h(AdminRoute, { path: "/admin" }),
       h(PageRoute, {
         path: "/api-explorer",
         component: APIExplorerV2,
         exact: true,
       }),
       h(PageRoute, { path: "/api-explorer-v1", component: APIExplorer }),
+      h(PageRoute, { path: "*", component: NoMatchPage }),
     ])
   );
 }
@@ -98,20 +80,20 @@ const errorHandler = function (route, response) {
   return AppToaster.show({ message, intent: Intent.DANGER });
 };
 
-const App = function () {
+function App() {
   // Nest application in React context providers
   const baseURL = "/";
   const apiBaseURL = join(process.env.BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
 
   return h(
-    FrameProvider,
-    { overrides: siteContent },
-    h(
-      APIProvider,
-      { baseURL: apiBaseURL, onError: errorHandler },
-      h(AuthProvider, null, h(AppMain, { baseURL }))
+    compose(
+      C(FrameProvider, { overrides: siteContent }),
+      C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
+      AuthProvider,
+      DarkModeManager,
+      C(AppRouter, { baseURL })
     )
   );
-};
+}
 
-export { App };
+export default App;

@@ -26,14 +26,32 @@ SELECT EXISTS (
 HOST=0.0.0.0
 PORT=5000
 
-# exec gunicorn \
-#   --worker-tmp-dir /dev/shm \
-#   --reload --bind $HOST:$PORT \
-#   -w 1 -k uvicorn.workers.UvicornWorker \
-#   --log-level warning --log-file - "sparrow.asgi:app"
+if [ $SPARROW_ENV = 'development' ]; then
+  ## Could also try hypercorn for better reloading...
+  echo "Running in development mode"
+  exec hypercorn --config python:sparrow.asgi.config --reload --bind $HOST:$PORT "sparrow.asgi.entry:app"
+else
+  exec hypercorn --bind $HOST:$PORT \
+    -w 3 \
+    --log-file - \
+    --log-level warning \
+    "sparrow.asgi.entry:app"
+fi
+
+### Alternative Uvicorn config ###
+
 #uvicorn --debug --port 5000 --host 0.0.0.0 --access-log sparrow.asgi:app
 
-# As far as I can tell, passing a logging handler to
-exec uvicorn --reload \
-  --log-level debug \
-  --host $HOST --port $PORT "sparrow.asgi:app"
+# echo "Running in development mode"
+# exec uvicorn --reload \
+#   --reload-dir core_plugins \
+#   --reload-dir sparrow \
+#   --log-level debug \
+#   --host $HOST --port $PORT "sparrow.asgi:app"
+
+# Former Gunicorn worker
+# exec gunicorn \
+#   --worker-tmp-dir /dev/shm \
+#   --bind $HOST:$PORT \
+#   -w 1 -k uvicorn.workers.UvicornWorker \
+#   --log-level warning --log-file - "sparrow.asgi:app"

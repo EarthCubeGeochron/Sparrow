@@ -21,14 +21,25 @@ $primaryColor=#4fd2f1;
   --ifm-code-font-size: 95%;
   --ifm-font-family-base: 'Merriweather', serif;
   --ifm-font-family-header: 'Montserrat', sans-serif;
+  --ifm-font-size-base: 16px
 }
+
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--ifm-font-family-header);
 }
 
+.markdown
+  h1, h2, h3, h4, h5, h6
+    --ifm-h1-font-size: 2rem;
+    --ifm-h2-font-size: 1.5rem;
+    --ifm-h3-font-size: 1.25rem;
+    --ifm-h4-font-size: 0.875rem;
+    --ifm-h5-font-size: 0.85rem;
+    --ifm-h6-font-size: 0.825rem;
+
 article header h1 {
-  font-size 2em !important
+  font-size 1.8rem !important
   color: #f1587e
 }
 

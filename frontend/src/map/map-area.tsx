@@ -1,28 +1,22 @@
-/*
- * decaffeinate suggestions:
- * DS001: Remove Babel/TypeScript constructor workaround
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
-import MapGl, { Marker, FlyToInterpolator } from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import { useState, useRef, useEffect } from "react";
+import MapGl, { FlyToInterpolator, Marker } from "react-map-gl";
+//import "mapbox-gl/dist/mapbox-gl.css";
 import { mapStyles } from "../../plugins/MapStyle";
-import h, { compose } from "@macrostrat/hyper";
-import useSuperCluster from "use-supercluster";
-import { Button, Intent, Toaster, Position } from "@blueprintjs/core";
-import classNames from "classnames";
+import h from "@macrostrat/hyper";
+import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
-import { Link } from "react-router-dom";
-import { useAPIResult, useToggle } from "./components/APIResult";
+//import { Link } from "react-router-dom";
 import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
+import { useAPIResult } from "@macrostrat/ui-components";
+import { MapNav } from "./components/map-nav";
+import styles from "./module.styl";
+import { SiteTitle } from "app/components";
 
-const MapToaster = Toaster.create({
+export const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
   maxToasts: 1,
 });
@@ -46,10 +40,9 @@ export function MapPanel({
   latitude = 0,
   longitude = 0,
   zoom = 1,
-  mapstyle = "mapbox://styles/mapbox/outdoors-v9",
+  mapstyle,
 }: MapProps) {
   const initialState = {
-    //viewport: { latitude, longitude, zoom, width, height },
     MapStyle: mapstyle,
     showMarkers: true,
     clickPnt: { lng: 0, lat: 0 },
@@ -87,9 +80,16 @@ export function MapPanel({
       return {};
     }
     const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
-    console.log(zoom, latitude, longitude);
     setViewport({ ...viewport, zoom, latitude, longitude });
   }
+
+  useEffect(() => {
+    const onMap = window.location.pathname == "/map";
+    if (!onMap) {
+      MapToaster.clear();
+    }
+    console.log(onMap);
+  }, [window.location.pathname]);
 
   useEffect(() => {
     if (firstWindowHash !== "") {
@@ -100,11 +100,7 @@ export function MapPanel({
   const mapRef = useRef();
 
   const bounds = mapRef.current
-    ? mapRef.current
-        .getMap()
-        .getBounds()
-        .toArray()
-        .flat()
+    ? mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
   const toggleShowMarkers = () => {
@@ -150,18 +146,32 @@ export function MapPanel({
   return (
     <div className="map-container">
       <div className="layer-button">
-        <Link to="/">
-          <Button icon="home"></Button>
-        </Link>
-        <LayerMenu
-          hide={hide_filter}
-          MapStyle={state.MapStyle}
-          chooseMapStyle={chooseMapStyle}
-          mapstyles={mapStyles}
-          showMarkers={state.showMarkers}
-          toggleShowMarkers={toggleShowMarkers}
-        ></LayerMenu>
-        <FilterMenu hide={hide_filter} on_map={on_map}></FilterMenu>
+        {on_map && (
+          <Navbar className={styles["map-navbar"]}>
+            <Navbar.Group className={styles["map-navbar-inner"]}>
+              <Navbar.Heading>
+                <h1 className="site-title">
+                  <SiteTitle />
+                </h1>
+              </Navbar.Heading>
+              <Navbar.Divider />
+              <MapNav />
+              <LayerMenu
+                hide={hide_filter}
+                MapStyle={state.MapStyle}
+                chooseMapStyle={chooseMapStyle}
+                //mapstyles={mapStyles}
+                showMarkers={state.showMarkers}
+                toggleShowMarkers={toggleShowMarkers}
+              ></LayerMenu>
+              <FilterMenu
+                //className={styles["filter-menu"]}
+                hide={hide_filter}
+                on_map={on_map}
+              ></FilterMenu>
+            </Navbar.Group>
+          </Navbar>
+        )}
       </div>
       <div>
         <MapGl
@@ -178,6 +188,16 @@ export function MapPanel({
           }}
           ref={mapRef}
         >
+          {h.if(state.clickPnt.lng && on_map)(
+            Marker,
+            {
+              latitude: state.clickPnt.lat,
+              longitude: state.clickPnt.lng,
+              offsetLeft: -5,
+              offsetTop: -10,
+            },
+            h(Icon, { icon: "map-marker", color: "black" })
+          )}
           {state.showMarkers ? (
             <MarkerCluster
               data={initialData}

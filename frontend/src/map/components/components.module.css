@@ -1,0 +1,29 @@
+.markerButton {
+  display: block;
+  background-color: #ad99ff;
+  border: 1px solid #634dbf;
+  border-radius: 50%;
+  width: 0.75em;
+  height: 0.75em;
+}
+.markerButton:hover {
+  display: block;
+  background-color: #c9bef5;
+  border: 1px solid #927bee;
+  border-radius: 50%;
+  width: 0.75em;
+  height: 0.75em;
+}
+
+.markerButton:active {
+  display: block;
+  background-color: rgb(87, 43, 128);
+  border: 1px rgb(58, 30, 90);
+  border-radius: 50%;
+  width: 0.75em;
+  height: 0.75em;
+}
+
+button {
+  font-size: small;
+}

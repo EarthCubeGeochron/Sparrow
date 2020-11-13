@@ -3,6 +3,11 @@
 
 .app-navbar
   margin-top 0
+  display flex
+  flex-direction row
+
+.navbar-spacer
+  flex-grow 1
 
 .page-skeleton
   display: flex
@@ -16,7 +21,7 @@
       border-radius: 5px
       margin-top 2em
   &.wide
-    padding-top: 50px
+    //padding-top: 50px
     height: 100vh
     overflow-y hidden
     .app-navbar
@@ -34,23 +39,21 @@
 .expander
   flex-grow 1
 
-
 .minimal-navbar
   display: flex
   flex-direction: row
   align-items: baseline
+  :global(.navbar-spacer)
+    flex-grow 1
   minimal-navbar()
   h4
     margin: 0
     padding: 0.1em 1em 0.1em 0.4em
-    color: #5c7080
+    color: var(--text-color-muted)
     min-width: 5em
 
-.auth-right
-  position absolute
-  right 0.2em
 
 .navbar-button
   margin-right: 1em
-  &.active
-    background-color: #d8e1e8
+  &:global(.active)
+    background: var(--active-highlight) !important

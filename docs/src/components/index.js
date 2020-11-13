@@ -1,4 +1,4 @@
-import content from "/build/schema.html";
+//import content from "/build/schema.html";
 import content2 from "../../static/ColumnSplitting.html";
 import content3 from "../../static/RequestsAndUploads.html";
 import content4 from "../../static/CombiningAndExportingToExcel.html";
@@ -7,11 +7,11 @@ import content6 from "../../static/Exporting.html";
 import content7 from "../../static/MappingWithFolium.html";
 import React from "react";
 
-export const SchemaPage = () => {
-  return (
-    <div className="schema" dangerouslySetInnerHTML={{ __html: content }}></div>
-  );
-};
+// export const SchemaPage = () => {
+//   return (
+//     <div className="schema" dangerouslySetInnerHTML={{ __html: content }}></div>
+//   );
+// };
 
 export const ColumnSplitting = () => {
   return (
@@ -64,4 +64,4 @@ export const Mapping = () => {
   );
 };
 
-export * from "./environment-variable-list"
+export * from "./environment-variable-list";

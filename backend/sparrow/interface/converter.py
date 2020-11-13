@@ -4,7 +4,7 @@ from marshmallow_sqlalchemy import ModelConverter
 # of the 'Nested' field in order to pass along the SQLAlchemy session
 # to nested schemas.
 # See https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/67
-from marshmallow_sqlalchemy.fields import Related
+from marshmallow_sqlalchemy.fields import Related, RelatedList
 
 import geoalchemy2 as geo
 from sqlalchemy.orm import RelationshipProperty
@@ -19,7 +19,10 @@ from ..logs import get_logger
 
 log = get_logger(__name__)
 
-# Control how relationships can be resolved
+# Control how relationships can be resolved for import and serialization
+# TODO:
+# - we might want to slightly decouple the import and representation sides of this
+# - we also might want to move this to a configuration section so it can be modified
 allowed_collections = {
     "data_file": ["data_file_link"],
     "data_file_link": ["session", "sample", "analysis"],
@@ -34,8 +37,15 @@ allowed_collections = {
         "sample",
         "instrument",
         "target",
+        "method",
     ],
-    "analysis": ["datum", "attribute", "constant", "analysis_type", "material"],
+    "analysis": [
+        "datum",
+        "attribute",
+        "constant",
+        "analysis_type",
+        "material",
+    ],
     "attribute": ["parameter", "unit"],
     "project": ["researcher", "publication", "session"],
     "datum": ["datum_type"],
@@ -135,6 +145,13 @@ class SparrowConverter(ModelConverter):
             # corresponding local columns)
             return True
 
+        # if this_table.name == "datum_type" and other_table.name in [
+        #     "constant",
+        #     "datum",
+        # ]:
+        # Fields that are not allowed to be nested
+        #    return True
+
         return False
 
     def _get_field_kwargs_for_property(self, prop):
@@ -152,6 +169,9 @@ class SparrowConverter(ModelConverter):
                     kwargs["required"] = True
             if prop.uselist:
                 kwargs["required"] = False
+            # # Empty collections can be represented by null values
+            # if not kwargs["required"]:
+            #     kwargs["allow_none"] = True
 
             return kwargs
 
@@ -208,7 +228,10 @@ class SparrowConverter(ModelConverter):
         this_table = prop.parent.tables[0]
         if not allow_nest(this_table.name, prop.target.name):
             # Fields that are not allowed to be nested
-            return Related(**field_kwargs)
+            if prop.uselist:
+                return RelatedList(Related, **field_kwargs)
+            else:
+                return Related(**field_kwargs)
         if prop.target.schema == "enum":
             # special carve-out for enums represented as foreign keys
             # (these should be stored in the 'enum' schema):
