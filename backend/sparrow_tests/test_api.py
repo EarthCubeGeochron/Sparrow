@@ -47,10 +47,23 @@ class TestAPIV2:
     def test_api_datasheet(self, client, db):
         """
         Test to go along with the datasheet editor api plugin.
+
+        in the database, material has a foreign key constraint, vocabulary.material.id (which is the name, i.e basalt) 
+
+        some helpful session func:
+            session.new : shows pending objects in a session
+            session.dity : shows modifications to persistant objects
+            session.commit() : commits everything in session que
+            session.add/add_all: pass a class and values ex: Users(firstname='Casey')
+        
+        Remember that session doesn't connect to database until specified to do so.
+        on a query if you don't call a chain method (i.e .one(), .first(), .all()) you will
+        only have a query object.
+
         """
         ## Attempt to load data from fixture into test database, does not work
         sample_test_data = json_fixture("sample-simple-test.json")
-        db.load_data("sample", sample_test_data)
+        db.load_data("sample", sample_test_data) ## See What's going on inside load_data
 
         db.exec_sql_text("INSERT INTO sample (id, name) VALUES (18, 'M2C'),(19, 'Test_sample')")
 
@@ -78,5 +91,5 @@ class TestAPIV2:
         res = client.get("/api/v2/models/session?per_page=5")
         assert res.status_code == 200
         data = res.json()
-        assert data["total_count"] == 1
+        assert data["total_count"] == 1 ## it fails here because theres no data. db.load_data isn't working
         assert data["data"][0]["name"] == "Declarative import test"

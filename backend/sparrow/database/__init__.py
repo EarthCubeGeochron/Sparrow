@@ -6,6 +6,7 @@ import pandas as pd
 
 from sqlalchemy import create_engine, inspect, MetaData, text
 from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
@@ -159,7 +160,8 @@ class Database(MappedDatabaseMixin):
         return res
 
     def exec_sql_text(self, statement):
-        '''Executes a sql command, in string on the database
+        '''
+            Executes a sql command, in string on the database
             Easy way to load data into a test database instance
         '''
         connection = self.engine.connect()

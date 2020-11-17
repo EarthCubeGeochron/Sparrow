@@ -14,6 +14,7 @@ def pytest_addoption(parser):
         dest="slow",
         default=False,
         help="enable slow-decorated tests",
+        ## TODO: add option to remove isolated transaction
     )
 
 
@@ -27,7 +28,7 @@ def app():
     return App(__name__)
 
 
-@fixture(scope="class")
+@fixture(scope="class") ## run before sets of tests. Scopes === how often run, after a class
 def db(app):
     connection = app.database.session.connection()
     transaction = connection.begin()
@@ -37,6 +38,7 @@ def db(app):
     yield app.database
     app.database.session.close()
     transaction.rollback()
+    ## return app.database
 
 
 @fixture

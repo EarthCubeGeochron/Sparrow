@@ -16,11 +16,22 @@ def create_geo_from_coordinates(longitude, latitude):
 async def datasheet(request):
     """
     This will be the end route for the database editing. 
-    It will collect changes from the database and find where 
-    they belong in the database and then make the change
+
+    The way to do this is be able to load the Sample table as a Sqlalchemy 
+    class object and run update() on it.
 
     Current working on, takes in a change and sees if it can pull row out of the db and match it.
     If it works it will return a "Success" 
+
+    Use the automap_base() to create classes we can do sessions on
+    https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html
+
+    And then edit a class object directly by changing a specific value like here
+    https://docs.sqlalchemy.org/en/13/orm/tutorial.html#adding-and-updating-objects
+
+    Create a function that reflects database. Then queries to find row that has been changed. 
+    Then modify the value on that row, which is an automap object. Then commits it.
+
     """
     db = app_context().database ## This gives me access to the Database class
 
