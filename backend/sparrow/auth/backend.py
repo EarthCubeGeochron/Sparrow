@@ -24,7 +24,8 @@ from sparrow.logs import get_logger
 log = get_logger(__name__)
 
 hour = 60 * 60
-month = 30 * 24 * hour
+day = 24 * hour
+month = 30 * day
 
 
 class JWTBackend(AuthenticationBackend):
@@ -43,7 +44,8 @@ class JWTBackend(AuthenticationBackend):
     def set_cookie(self, response: Response, type, **data):
         """set a basic cookie on the response"""
         now = time.time()
-        max_age = data.pop("max_age", 60 * 60)
+        # Cookies last for a day by default
+        max_age = data.pop("max_age", day)
         name = type + "_token_cookie"
 
         payload = dict(iat=now, nbf=now, exp=now + max_age, type=type)
@@ -105,7 +107,7 @@ class JWTBackend(AuthenticationBackend):
         return response
 
     def set_access_cookie(self, response: Response, **data: Any) -> Response:
-        self.set_cookie(response, "access", max_age=hour, **data)
+        self.set_cookie(response, "access", max_age=day, **data)
         return response
 
     def logout(self, response: Response) -> Response:

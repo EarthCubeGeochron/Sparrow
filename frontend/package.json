@@ -16,7 +16,7 @@
     "@emotion/styled": "^10.0.7",
     "@loadable/component": "^5.10.2",
     "@macrostrat/hyper": "^1.2.11",
-    "@macrostrat/ui-components": "^0.4.2",
+    "@macrostrat/ui-components": "^0.4.3",
     "@turf/bbox": "^6.0.1",
     "@types/react": "^16.9.49",
     "@vx/axis": "0.0.183",

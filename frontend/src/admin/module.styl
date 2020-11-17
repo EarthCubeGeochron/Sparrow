@@ -93,12 +93,39 @@
   left 0
   right 0
   .left-panel
-    width 30em
+    z-index 1
+    width 28em
     overflow-y: scroll
     overflow-x hidden
-    padding 0 1em 0 3em
+    padding 0 1em 0 1em
+    transition .6s margin ease
+    &.hidden
+      margin 0 0 0 -29.5em
+      transition .6s margin ease
+
+      
 
   .right-panel
     flex 1
-    padding 0 3em 0 1em
+    padding 0 3em 0 2em
     overflow-y: scroll
+
+@keyframes leftArrow 
+  0%  {left: 500px}
+  100% {left: 0px}
+
+.animatedarrow
+  position relative
+  animation leftArrow 3s infinite
+
+.listcomponent
+  position webkit sticky 
+  position sticky
+  top 0px
+  padding-top 10px
+  background-color white
+
+.vertical
+  transform rotate(90deg)
+  float left 
+  

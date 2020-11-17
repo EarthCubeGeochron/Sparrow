@@ -1,4 +1,4 @@
-FROM node:11-alpine
+FROM node:11-alpine AS base
 
 RUN npm install -g webpack webpack-cli
 WORKDIR /app

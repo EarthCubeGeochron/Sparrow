@@ -20,7 +20,10 @@ VALUES
 
 INSERT INTO vocabulary.parameter(id, description, authority)
 VALUES
-  ('Detrital grain age', 'Formation age of a detrital mineral grain in sedimentary rock', 'Sparrow'),
+  ('Detrital grain age', 'Crystallization age of a detrital mineral grain in sedimentary rock', 'Sparrow'),
   ('Surface exposure age', 'Duration of surface exposure to present', 'Sparrow'),
   ('Burial age', 'Age of last surface exposure', 'Sparrow'),
-  ('Igneous crystallization age', 'Age of crystallization', 'Sparrow');
+  ('Igneous crystallization age', 'Crystallization age of a volcanic or igneous rock', 'Sparrow')
+ON CONFLICT (id) DO UPDATE SET
+  description = EXCLUDED.description,
+  authority = EXCLUDED.authority;

@@ -7,13 +7,16 @@ services:
     ports:
       - ${SPARROW_HTTP_PORT:-5002}:80
     volumes:
-      - ./nginx-config/locations:/etc/nginx/locations:ro
+      - ./nginx-config/locations/core.conf:/etc/nginx/locations/core.conf:ro
+      - ./nginx-config/locations/browser-sync.conf:/etc/nginx/locations/browser-sync.conf:ro
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend:
-    image: sparrowdata/backend
+    image: sparrowdata/backend:1.6
     build:
       context: backend
+      cache_from:
+        - sparrowdata/backend:1.6
       target: main
     command: /bin/run
     # Make sure we get colorized terminal output
@@ -53,7 +56,7 @@ services:
         consistency: cached
       # Nested volume to keep built files
       # separate from those on our local system
-      - /app/sparrow.egg-info
+      #- /app/sparrow.egg-info
       # Share some configuration between backend
       # and frontend
       - ${SPARROW_INIT_SQL:-placeholder}:/init-sql/:ro
@@ -86,7 +89,12 @@ services:
     volumes:
       - db_cluster:/var/lib/postgresql/data
   frontend:
-    build: frontend
+    image: sparrowdata/frontend:2.0-dev
+    build:
+      context: frontend
+      cache_from:
+        - sparrowdata/frontend:2.0-dev
+    command: webpack
     depends_on:
       - backend
     environment:
@@ -103,6 +111,7 @@ services:
       - SPARROW_ENV
     volumes:
       - ./frontend/src:/app/src
+      - ./frontend/plugins:/app/plugins
       - frontend_build:/app/_assets
       # Right now, we configure default site content
       # rather than allowing any customization

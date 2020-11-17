@@ -67,6 +67,8 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
           point_count: pointCount,
         } = cluster.properties;
 
+        const clusterSize = Math.sqrt(5 * pointCount);
+
         const clusterClass = classNames({
           "cluster-marker": pointCount < 50,
           "cluster-markerGreen": pointCount >= 50 && pointCount < 100,
@@ -85,8 +87,10 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
               <div
                 className={clusterClass}
                 style={{
-                  width: `${20 + (pointCount / markers.length) * 250}px`,
-                  height: `${20 + (pointCount / markers.length) * 250}px`,
+                  width: clusterSize,
+                  height: clusterSize,
+                  marginTop: -clusterSize / 2,
+                  marginRight: -clusterSize / 2,
                 }}
                 onDoubleClick={(e) => {
                   e.stopPropagation();
@@ -107,8 +111,6 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
             key={cluster.properties.id}
             latitude={latitude}
             longitude={longitude}
-            offsetLeft={-5}
-            offsetTop={-10}
             captureClick={true}
             captureDoubleClick={true}
           >

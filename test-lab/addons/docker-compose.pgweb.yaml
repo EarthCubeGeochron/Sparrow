@@ -1,0 +1,16 @@
+version: "3.4"
+services:
+  pgweb:
+    image: sosedoff/pgweb
+    expose:
+      - 8081
+    environment:
+      - DATABASE_URL=postgres://postgres@db:5432/sparrow?sslmode=disable
+    depends_on:
+      - db
+  gateway:
+    volumes:
+      - type: bind
+        source: ${SPARROW_CONFIG_DIR}/addons/pgweb.conf
+        target: /etc/nginx/locations/pgweb.conf
+        read_only: true

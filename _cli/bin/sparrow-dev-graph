@@ -1,0 +1,9 @@
+#!/bin/sh
+# Description: graph the git commit history of the Sparrow repository
+
+cd $SPARROW_PATH
+fmt='%Cred%h%Creset -%C(bold cyan)%d%Creset %s %Cgreen(%cr)%Creset [%C(blue)%an%Creset]'
+git log --color \
+  --graph --all \
+  --pretty=format:"$fmt" \
+  --abbrev-commit

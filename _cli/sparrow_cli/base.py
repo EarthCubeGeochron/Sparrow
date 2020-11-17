@@ -1,7 +1,7 @@
 import sys
 import click
 import typing
-from click import echo
+from click import echo, secho, style
 from click_default_group import DefaultGroup
 from os import environ, getcwd, chdir
 from dataclasses import dataclass
@@ -10,6 +10,23 @@ from typing import Optional
 from rich.console import Console
 from envbash import load_envbash
 from .env import prepare_docker_environment, setup_command_path
+from .exc import SparrowCommandError
+
+
+class SparrowDefaultCommand(DefaultGroup):
+    def __call__(self, *args, **kwargs):
+        try:
+            return self.main(*args, **kwargs)
+        except SparrowCommandError as exc:
+            prefix = str(type(exc).__name__) + ": "
+            echo(
+                "\n" + style(prefix, bold=True, fg="red") + style(str(exc), fg="red"),
+                err=True,
+            )
+            details = getattr(exc, "details", None)
+            if details is not None:
+                secho(details, dim=True)
+            raise exc
 
 
 def find_config_file(dir: Path) -> Optional[Path]:
@@ -36,7 +53,9 @@ class SparrowConfig:
     bin_directories: typing.List[Path]
 
 
-@click.group(name="sparrow", cls=DefaultGroup, default="main", default_if_no_args=True)
+@click.group(
+    name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True
+)
 @click.pass_context
 def cli(ctx):
     """Startup function that sets configuration environment variables. Much of the
@@ -53,7 +72,7 @@ def cli(ctx):
         sparrow_config = find_config_file(here)
 
     if sparrow_config is None:
-        echo("No configuration file found. Running using default values.", err=True)
+        # echo("No configuration file found. Running using default values.", err=True)
         environ["_SPARROW_CONFIG_UNSET"] = "1"
     else:
         environ["SPARROW_CONFIG"] = str(sparrow_config)
