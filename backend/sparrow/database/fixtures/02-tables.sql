@@ -240,12 +240,22 @@ CREATE TABLE IF NOT EXISTS sample (
   reference datum (e.g. `vocabulary.entity_reference`); perhaps we want to move towards
   this in the future.
   */
-  -- elevation above sea level in meters
+  -- elevation above sea level in meters, and atmospheric pressure in hPa
   elevation numeric,
+  atm_pressure numeric,
   -- borehole depth in meters
   depth numeric,
+  -- sample thickness in cm
+  thickness numeric,
+  -- name of the lab conducted the measurements, and the date of analysis
+  lab_name text,
+  lab_date timestamp,
+  --standard used in the measurements
+  lab_standard text,
+  -- date of collection
   embargo_date timestamp,
   CHECK ((name IS NOT null) OR (igsn IS NOT null))
+  --density and erosion rate are treated as analysis datum
 );
 /*
 
