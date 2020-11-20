@@ -92,7 +92,7 @@ async def datasheet(request):
     Recieved request data should be only the changes and the id.
 
     """
-    ## TODO: Need a way to handle long/lat changes. SRID 4346: POINT(long, lat)
+    ## TODO: Handle an incoming Project Change, That is a DIFFERENT TABLE, projects.
 
     db = app_context().database ## This gives me access to the Database class
 
@@ -110,11 +110,19 @@ async def datasheet(request):
     make_changes(table, request_dict, db.session)
 
     db.session.commit()
-    
     return JSONResponse({"Status": "Success"})
 
+async def Projects_editing(request):
+    """
+    A place for edits to be handled from the project page on the UI. 
+    Will edit the project page. Can fix all those doi problems on the U.I 
+    """
+    pass
+
+
 EditApi = Router([
-    Route("/datasheet", endpoint=datasheet, methods=["POST"])
+    Route("/datasheet", endpoint=datasheet, methods=["POST"]),
+    Route("/project", endpoint=Projects_editing, methods=["POST"])
 ])
 
 def construct_edit_app():
