@@ -30,15 +30,15 @@ def app():
 
 @fixture(scope="class") ## run before sets of tests. Scopes === how often run, after a class
 def db(app):
-    connection = app.database.session.connection()
-    transaction = connection.begin()
-    session_factory = sessionmaker(bind=connection)
-    app.database.session = scoped_session(session_factory)
-    _setup_context(app)
-    yield app.database
-    app.database.session.close()
-    transaction.rollback()
-    ## return app.database
+    # connection = app.database.session.connection()
+    # transaction = connection.begin()
+    # session_factory = sessionmaker(bind=connection)
+    # app.database.session = scoped_session(session_factory)
+    # _setup_context(app)
+    # yield app.database
+    # app.database.session.close()
+    # transaction.rollback()
+    return app.database
 
 
 @fixture

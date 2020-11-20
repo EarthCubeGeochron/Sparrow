@@ -123,8 +123,10 @@ class Database(MappedDatabaseMixin):
                 self.session.rollback()
                 log.debug(err)
 
+    ## Something in load_data doesn't fully work
     def load_data(self, model_name, data, session=None):
-        """Load data into the database using a schema-based importing tool"""
+        """Load data into the database using a schema-based importing tool
+        """
         if session is None:
             session = self.session
         # Do an end-around for lack of creating interfaces on app startup
