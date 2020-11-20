@@ -2,8 +2,17 @@ import json
 from pytest import mark
 from .fixtures import basic_data
 from .helpers import json_fixture
+from geoalchemy2.shape import from_shape, to_shape
+from shapely.geometry import mapping, Point
+import pdb
 
 
+def create_location_from_coordinates(longitude, latitude):
+    '''This function will create the json-like object 
+         in database from long & lat given in a post request
+    '''
+    location = from_shape(Point(longitude, latitude), srid=4346)
+    return location
 
 class TestAPIV2:
     @mark.parametrize("route", ["/api/v2", "/api/v2/"])
@@ -33,22 +42,12 @@ class TestAPIV2:
         assert res.status_code == 200
 
 
-    def test_load_sample(self, client, db):
-        sample_test_data = json_fixture("sample-simple-test.json")
-        db.load_data("sample", sample_test_data)
-
-        db.exec_sql_text("INSERT INTO sample (id, name) VALUES (18, 'M2C'),(19, 'Test_sample')")
-
-        res_test = client.get("/api/v2/models/sample?per_page=5")
-        test_sample_data = res_test.json()
-        assert res_test.status_code == 200
-
-
     def test_api_datasheet(self, client, db):
         """
         Test to go along with the datasheet editor api plugin.
 
-        in the database, material has a foreign key constraint, vocabulary.material.id (which is the name, i.e basalt) 
+        in the database, material has a foreign key constraint, vocabulary.material.id (which is the name, i.e basalt)
+        Polymorhpic subclass? 
 
         some helpful session func:
             session.new : shows pending objects in a session
@@ -61,27 +60,52 @@ class TestAPIV2:
         only have a query object.
 
         """
-        ## Attempt to load data from fixture into test database, does not work
-        sample_test_data = json_fixture("sample-simple-test.json")
-        db.load_data("sample", sample_test_data) ## See What's going on inside load_data
+        ## first load material data and then sample data so i can have material in the sample
+        Material =db.model.vocabulary_material
+        Sample = db.model.sample
 
-        db.exec_sql_text("INSERT INTO sample (id, name) VALUES (18, 'M2C'),(19, 'Test_sample')")
+        db.session.add_all([
+            Material(id='basalt'),
+            Material(id='dacite'),
+            Material(id='lava'),
+        ])
+
+        db.session.commit()
+
+        db.session.add_all([
+            Sample(id=18, name='M2C', material='basalt', location = create_location_from_coordinates(120,80)),
+            Sample(id=19, name='Test_sample', material='dacite', location = create_location_from_coordinates(60,30)),
+            Sample(id=20, name='Test_sample2', material='lava', location = create_location_from_coordinates(170,34)),
+        ])
+
+        db.session.commit()
 
         res_test = client.get("/api/v2/models/sample?per_page=5")
         test_sample_data = res_test.json()
         assert res_test.status_code == 200
 
-        edited_sample_data = json.dumps({
-                "name": "M2C_add",
-                "id": 18})
+        ## Check if data went through, both material and sample data would have to have gone through
+        assert len(test_sample_data['data']) == 3 
 
-      
+        edited_sample_data = json.dumps([{
+                "name": "M2C_add",
+                "material": "dacite",
+                "id":18
+                }, 
+                {
+                    "name":"Test_add", 
+                    "material": "This_doesn't_exist", 
+                    "id":19,
+                    "latitude": 32,
+                    "longitude": 120
+                    }
+                ])
 
         route = '/api/v2/edits/datasheet'
         data = {"Status": "Success"}
         res = client.post(route, json=edited_sample_data)
         assert res.status_code == 200
-        assert res.text == "M2C"
+        assert res.json() == data
 
 
     def test_get_data(self, client, db):

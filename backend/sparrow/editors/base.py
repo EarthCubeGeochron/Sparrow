@@ -7,11 +7,70 @@ from ..context import app_context
 from sqlalchemy import create_engine, MetaData, Table, Column
 import pandas as pd
 import json
+from geoalchemy2.shape import from_shape, to_shape
+from shapely.geometry import mapping, shape, Point
 
-def create_geo_from_coordinates(longitude, latitude):
+def create_location_from_coordinates(longitude, latitude):
     '''This function will create the json-like object in database from long & lat given in a post request'''
-    geo_object = {'type': 'Point', 'coordinates': [longitude, latitude]}
-    return geo_object
+    location = from_shape(Point(longitude, latitude), srid=4346)
+    return location
+
+def make_changes(tablename, changes, session):
+    """Function that takes in a list of dictionaries with changes to the database
+        
+       -tablename: name of table class, sqlalchemy object.
+       -changes: list of objects. with changes to be persisted
+       -session: current session on the engine.
+       
+       Creates pending changes, can be seen in the session.dirty
+    
+    """
+    ## TODO: Context manager for the function.. Error checking that would call a session.rollback()
+        
+    for ele in changes:
+
+        ## make sure the ID was passed
+        if 'id' not in ele:
+            raise Exception("You need to pass the row ID")
+
+        ## change the longitude and latitude values to location with the correct format
+        if 'longitude' and 'latitude' in ele:
+            ele['location'] = create_location_from_coordinates(ele['longitude'], ele['latitude'])
+            ele.pop('longitude')
+            ele.pop('latitude')
+
+        ## get the keys and the id
+        query_id = ele['id']
+        keys = list(ele.keys())
+        keys.remove('id')
+        
+        ## grab the row we are gonna change
+        row = session.query(tablename).filter_by(id=query_id).one()
+        
+        for item in keys:
+            setattr(row, item, ele[item]) ## Set the new value 
+
+def material_check(db, changes):
+    '''Checks if material exists in database.
+        If passed material is new, it is added to vocabulary.material before the sample is updated.
+    '''
+
+    for ele in changes:
+        if 'material' not in ele:
+            pass
+        else:
+            Material = db.model.vocabulary_material    
+            current_materials = db.session.query(Material).all()
+
+            current_material_list = []
+            for row in current_materials:
+                current_material_list.append(row.id)
+
+            if ele['material'] not in current_material_list: 
+                db.session.add(Material(id=ele['material']))
+                db.session.commit()
+
+
 
 async def datasheet(request):
     """
@@ -20,43 +79,39 @@ async def datasheet(request):
     The way to do this is be able to load the Sample table as a Sqlalchemy 
     class object and run update() on it.
 
-    Current working on, takes in a change and sees if it can pull row out of the db and match it.
-    If it works it will return a "Success" 
-
     Use the automap_base() to create classes we can do sessions on
     https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html
 
     And then edit a class object directly by changing a specific value like here
     https://docs.sqlalchemy.org/en/13/orm/tutorial.html#adding-and-updating-objects
 
-    Create a function that reflects database. Then queries to find row that has been changed. 
-    Then modify the value on that row, which is an automap object. Then commits it.
+    db.model: list of automap_base models
+    setattr(): a python function that will allow us to edit the automapped object
+        setattr(model_name, edit_field, new_value) where edit_field is a string and model_name is the query object
+
+    Recieved request data should be only the changes and the id.
 
     """
+    ## TODO: Need a way to handle long/lat changes. SRID 4346: POINT(long, lat)
+
     db = app_context().database ## This gives me access to the Database class
 
+    ## get the data from the post request and turn it into a dict.
     request_data = await request.json()
     request_dict = json.loads(request_data)
 
-    df = pd.DataFrame.from_dict([request_dict]); ## dataframe of incoming changes
+    ## grab the sample table from automap_base 
+    table = db.model.sample
+
+    ## function to make sure material passed is in vocab_material, if not add it.
+    material_check(db, request_dict)
+
+    ## Call my make_changes function
+    make_changes(table, request_dict, db.session)
+
+    db.session.commit()
     
-    query_id = request_dict['id']
-    query_string = f"SELECT * FROM core_view.sample s WHERE s.id = {query_id}"
-    
-    ## For some reason data is empty. All the dataframes in the tests are empty
-    data = db.exec_query(query_string) ## creates a pandas dataframe from sql
-
-    columns = data.columns.tolist()
-    ## Loops through dataframes and checks for differences. Maybe use a where statement to align at id
-    for i in columns:
-        for index, s in df.iterrows():
-            if data[i][index] != df[i][index]:
-                return df[i][index] 
-
-
-    response = data['name']
-    eror
-    return PlainTextResponse('response[0]')
+    return JSONResponse({"Status": "Success"})
 
 EditApi = Router([
     Route("/datasheet", endpoint=datasheet, methods=["POST"])
