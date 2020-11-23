@@ -1,4 +1,4 @@
-import h from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import {
   ProjectInfoLink, //@ts-ignore
 } from "~/model-views/project";
@@ -8,6 +8,9 @@ import { SessionLinkCard } from "../model-views/data-files/page";
 import { FilterBox } from "../components/filter-list";
 import { InfiniteAPIView } from "../components/infinite-scroll/infinite-api-view";
 import { APIV2Context } from "~/api-v2";
+import styles from "./module.styl";
+
+const h = hyperStyled(styles);
 
 // unwraps the data to be simpatico with the ProjectLink component, also gets the next page
 function unwrapProjectCardData(data) {
@@ -24,20 +27,8 @@ const ProjectListComponent = () => {
 
   /* List of projects for the catalog. Could potentially move there... */
   return h("div", { style: { position: "relative" } }, [
-    h(
-      "div",
-      {
-        style: {
-          position: "fixed",
-          paddingTop: "10px",
-          left: "49px",
-          width: "28%",
-          backgroundColor: "white",
-        },
-      },
-      [h(FilterBox, { filterFields })]
-    ),
-    h("div", { style: { paddingTop: "30px" } }, [
+    h("div.listcomponent", [h(FilterBox, { filterFields })]),
+    h("div", { style: { padding: "1px" } }, [
       h(InfiniteAPIView, {
         url: "/models/project",
         unwrapData: unwrapProjectCardData,
@@ -61,20 +52,8 @@ function SampleListComponent() {
   const filterFields = ["Name", "Material", "id"];
 
   return h("div", [
-    h(
-      "div",
-      {
-        style: {
-          position: "fixed",
-          paddingTop: "10px",
-          left: "41px",
-          width: "28%",
-          backgroundColor: "white",
-        },
-      },
-      [h(FilterBox, { filterFields })]
-    ),
-    h("div", { style: { paddingTop: "30px" } }, [
+    h("div.listcomponent", [h(FilterBox, { filterFields })]),
+    h("div", [
       h(InfiniteAPIView, {
         url: "/models/sample",
         unwrapData: unwrapSampleCardData,
@@ -104,20 +83,8 @@ function SessionListComponent() {
   const filterFields = ["Technique", "Date Precision", "Target", "Instrument"];
 
   return h("div", [
-    h(
-      "div",
-      {
-        style: {
-          position: "fixed",
-          paddingTop: "10px",
-          left: "41px",
-          width: "28%",
-          backgroundColor: "white",
-        },
-      },
-      [h(FilterBox, { filterFields })]
-    ),
-    h("div", { style: { paddingTop: "30px" } }, [
+    h("div.listcomponent", [h(FilterBox, { filterFields })]),
+    h("div", { style: { padding: "1px" } }, [
       h(InfiniteAPIView, {
         url: "/models/session",
         unwrapData: unwrapSessionCardData,
@@ -150,20 +117,8 @@ function DataFilesListComponent() {
   const filterFields = ["Type", "Basename", "Upload Date"];
 
   return h("div", [
-    h(
-      "div",
-      {
-        style: {
-          position: "fixed",
-          paddingTop: "10px",
-          left: "41px",
-          width: "28%",
-          backgroundColor: "white",
-        },
-      },
-      [h(FilterBox, { filterFields })]
-    ),
-    h("div", { style: { paddingTop: "30px" } }, [
+    h("div.listcomponent", [h(FilterBox, { filterFields })]),
+    h("div", { style: { padding: "1px" } }, [
       h(InfiniteAPIView, {
         url: "/models/data_file",
         unwrapData: unwrapDataFileCardData,
