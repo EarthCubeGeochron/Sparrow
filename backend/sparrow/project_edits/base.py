@@ -48,32 +48,8 @@ class ProjectEdits(HTTPEndpoint):
         
         return PlainTextResponse(f'Put Request, {project.name}')
 
-    async def get(self, request):
-        return PlainTextResponse("Get Request")
-    
-    @use_annotations(location='query')
-    async def delete(self, request, publication: int = None, sample: int = None):
-        '''
-            Delete endpoint for the project admin page, can use query args to get id of deleteable stuff
-            NOTE: This route is tested
-
-            There seems to be a strange way to access samples from project in APIv2
-                project -> session -> sample.
-
-            NOTE: These deletions should only delete the referenced relationships 
-            in the database, not the tracked data itself.
-        '''
-
-        db = app_context().database
-        connection = db.engine.connect()
-
-        edit_project_references(db, publication, "publication")
-
-        ##edit_project_references(db, sample, "sample") Not ready yet
-        return PlainTextResponse("Delete Method")
-
 Project_edits_api = Router([
-    Route("/edit/{id}", endpoint=ProjectEdits, methods=["PUT", "GET", "DELETE"]),
+    Route("/edit/{id}", endpoint=ProjectEdits, methods=["PUT"]),
 ])
 
 
