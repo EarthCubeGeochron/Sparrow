@@ -24,7 +24,7 @@ export function DataFilesMainPanel() {
 
 export function DataFileAdminPage() {
   return h(AdminPage, {
-    ListComponent: h(DataFilesListComponent),
-    MainPageComponent: h(DataFilesMainPanel),
+    listComponent: h(DataFilesListComponent),
+    mainPageComponent: h(DataFilesMainPanel),
   });
 }

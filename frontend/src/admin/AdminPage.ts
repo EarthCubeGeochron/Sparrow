@@ -6,7 +6,7 @@ import styles from "./module.styl";
 const h = hyperStyled(styles);
 
 export function AdminPage(props) {
-  const { ListComponent, MainPageComponent } = props;
+  const { listComponent, mainPageComponent } = props;
   const [hidden, setHidden] = useState(false);
 
   const classname = hidden ? "left-panel.hidden" : "left-panel";
@@ -40,7 +40,7 @@ export function AdminPage(props) {
   };
   return h("div.admin-page-main", [
     h(SidebarButton),
-    h(`div.${classname}`, null, [ListComponent]),
-    h("div.right-panel", null, [MainPageComponent]),
+    h(`div.${classname}`, null, [listComponent]),
+    h("div.right-panel", null, [mainPageComponent]),
   ]);
 }

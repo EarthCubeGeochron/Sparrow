@@ -26,7 +26,7 @@ export function SampleMainPanel() {
 
 export function SampleAdminPage() {
   return h(AdminPage, {
-    ListComponent: h(SampleListComponent),
-    MainPageComponent: h(SampleMainPanel),
+    listComponent: h(SampleListComponent),
+    mainPageComponent: h(SampleMainPanel),
   });
 }

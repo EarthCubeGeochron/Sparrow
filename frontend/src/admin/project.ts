@@ -27,49 +27,7 @@ export function ProjectMainPanel() {
 
 export function ProjectAdminPage() {
   return h(AdminPage, {
-    ListComponent: h(ProjectListComponent),
-    MainPageComponent: h(ProjectMainPanel),
+    listComponent: h(ProjectListComponent),
+    mainPageComponent: h(ProjectMainPanel),
   });
-  // const [hidden, setHidden] = useState(false);
-
-  // const classname = hidden ? "left-panel.hidden" : "left-panel";
-
-  // const SidebarButton = () => {
-  //   const iconname = hidden ? "arrow-right" : "arrow-left";
-
-  //   return h(
-  //     Button,
-  //     {
-  //       onClick: () => setHidden(!hidden),
-  //       minimal: true,
-  //       //rightIcon: iconname,
-  //     },
-  //     [
-  //       h("div", { style: { display: "flex", flexDirection: "column" } }, [
-  //         h(Icon, {
-  //           icon: iconname,
-  //           style: { paddingBottom: "150px", paddingTop: "100px" },
-  //         }),
-  //         h(Icon, {
-  //           icon: iconname,
-  //           style: { paddingBottom: "150px" },
-  //         }),
-  //         h(Icon, {
-  //           icon: iconname,
-  //           style: { paddingBottom: "150px" },
-  //         }),
-  //         h(Icon, {
-  //           icon: iconname,
-  //           style: { paddingBottom: "150px" },
-  //         }),
-  //       ]),
-  //     ]
-  //   );
-  // };
-
-  // return h("div.admin-page-main", [
-  //   h(SidebarButton),
-  //   h(`div.${classname}`, null, [h(ProjectListComponent)]),
-  //   h("div.right-panel", null, [h(ProjectMainPanel)]),
-  // ]);
 }

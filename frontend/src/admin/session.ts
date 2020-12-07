@@ -28,7 +28,7 @@ export function SessionMainPanel() {
 
 export function SessionAdminPage() {
   return h(AdminPage, {
-    ListComponent: h(SessionListComponent),
-    MainPageComponent: h(SessionMainPanel),
+    listComponent: h(SessionListComponent),
+    mainPageComponent: h(SessionMainPanel),
   });
 }
