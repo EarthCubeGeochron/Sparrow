@@ -17,15 +17,15 @@ class TestProjectEdits:
 
          First steps: make some changes to send to the put api
         '''
-        Publications = db.model.publication
-        pubs = db.session.query(Publications).all()
 
-        route =  '/api/v2/project/edits?id=1'
+        route =  '/api/v2/project/edit/1'
 
         changes = {"id":1, "description": "Testing to add stuff", "publications": [{'id': 2, 'doi': '10.1016/j.quageo.2012.12.005'}]}
         changeset = json.dumps(changes)
 
         response = client.put(route, json = changeset)
+
+        assert 0 == 1
 
     def test_delete_proj_pub_relationship(self, client, db):
         route = '/api/v2/project/edits?publication=6'

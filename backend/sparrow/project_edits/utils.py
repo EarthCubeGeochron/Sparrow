@@ -1,30 +1,34 @@
 from sqlalchemy import Table, delete
 
-
-def handle_publications(project, db):
+def create_publication_collection(publications, publication_collection):
     '''
-        Handles the publications array from project model. 
+    function to create a publication collection list from the incoming changeset.
 
-        project: full data model returned from request
-        db: database that can have query and session called upon (sqlalchemy)
+    - publications: the changeset list of publciations
+    - publication_collection: the publications from the existing model
+    - db: the database connection
     '''
-    if 'publications' not in project:
-        pass
+    # find what publcations are the same based on id.. then edit attributes.
+    # TODO: make this simpler?
 
-    ## will be a list of pub objects
-    pubs = project['publications']
+    collection = []
+    def grab_by_id(publication_collection, id):
+        for pub in publication_collection:
+            if pub.id == id:
+                return pub
 
-    model = db.model.publication
-
-    for ele in pubs:
-        ## need to add a check to see if pub is in database and add if not
-        pub = db.session.query(model).get(ele['id'])
+    for ele in publications:
+        model_pub = grab_by_id(publication_collection, ele['id'])
 
         for k in ele:
-            setattr(pub, k, ele[k])
+            setattr(model_pub, k, ele[k])
+
+        collection.append(model_pub)
+
+    return collection
+
+
     
-    project.pop('publications')
-    return project
 
 def edit_project_references(db, id_number:int, model: str):
     '''

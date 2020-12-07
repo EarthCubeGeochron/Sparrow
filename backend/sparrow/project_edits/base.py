@@ -19,8 +19,7 @@ from ..context import app_context
 # it just removes the foreign id reference. We'll have to just remove them with a quick algorithim or something
 
 class ProjectEdits(HTTPEndpoint):
-    @use_annotations(location='query')
-    async def put(self, request, id: int):  
+    async def put(self, request):  
         '''
             Put Endpoint for the project admin page
 
@@ -31,18 +30,22 @@ class ProjectEdits(HTTPEndpoint):
         '''
         db = app_context().database
 
-        model = db.model.project
+        id = request.path_params['id']
+
+        model = db.model.project ## there is a publication_collection in this model
         project = db.session.query(model).get(id)
 
         data = json.loads(await request.json())
 
-        new_data = handle_publications(data, db)
+        ## create a new field that matches the model collection
+        data['publication_collection'] = create_publication_collection(data['publications'], project.publication_collection)
+        data.pop('publications')
 
-        for k in new_data:
-            setattr(project, k, new_data[k])
+        for k in data:
+            setattr(project, k, data[k])
         
         db.session.commit()
-
+        
         return PlainTextResponse(f'Put Request, {project.name}')
 
     async def get(self, request):
@@ -67,11 +70,10 @@ class ProjectEdits(HTTPEndpoint):
         edit_project_references(db, publication, "publication")
 
         ##edit_project_references(db, sample, "sample") Not ready yet
-
         return PlainTextResponse("Delete Method")
 
 Project_edits_api = Router([
-    Route("/edits", endpoint=ProjectEdits, methods=["PUT", "GET", "DELETE"]),
+    Route("/edit/{id}", endpoint=ProjectEdits, methods=["PUT", "GET", "DELETE"]),
 ])
 
 
