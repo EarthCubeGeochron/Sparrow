@@ -70,7 +70,7 @@ class TestAPIV2:
             Material(id='lava'),
         ])
 
-        db.session.commit()
+        #db.session.commit()
 
         db.session.add_all([
             Sample(id=18, name='M2C', material='basalt', location = create_location_from_coordinates(120,80)),
@@ -101,11 +101,40 @@ class TestAPIV2:
                     }
                 ])
 
-        route = '/api/v2/edits/datasheet'
+        route = '/api/v2/datasheet/edits'
         data = {"Status": "Success"}
         res = client.post(route, json=edited_sample_data)
         assert res.status_code == 200
         assert res.json() == data
+
+
+    def test_api_datasheet_view(self,db, client):
+        ## first load material data and then sample data so i can have material in the sample
+        Material =db.model.vocabulary_material
+        Sample = db.model.sample
+
+        db.session.add_all([
+            Material(id='basalt'),
+            Material(id='dacite'),
+            Material(id='lava'),
+        ])
+
+        db.session.commit()
+
+        db.session.add_all([
+            Sample(id=18, name='M2C', material='basalt', location = create_location_from_coordinates(120,80)),
+            Sample(id=19, name='Test_sample', material='dacite', location = create_location_from_coordinates(60,30)),
+            Sample(id=20, name='Test_sample2', material='lava', location = create_location_from_coordinates(170,34)),
+            Sample(id=21, name='Test_sample3', material='lava'),
+        ])
+
+        db.session.commit()
+
+        route = 'api/v2/datasheet/view'
+        res = client.get(route)
+    
+        assert res.status_code == 200
+        ##assert 0 == 1
 
 
     def test_get_data(self, client, db):
