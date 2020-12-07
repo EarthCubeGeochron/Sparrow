@@ -10,7 +10,10 @@ export const AnimatedArrow = () => {
     h(Icon, { icon: "arrow-left", iconSize: 70 }),
   ]);
 };
-
+/**
+ * 
+ * @description Default page when nothing selected on left navigation
+ */
 export function NoStateAdmin(props) {
   const { name } = props;
 
