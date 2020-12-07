@@ -3,8 +3,11 @@ import { DataSheetSuggest } from "./datasheet-suggest";
 import { useAPIResult } from "@macrostrat/ui-components";
 import h from "@macrostrat/hyper";
 
+const crossref = "https://api.crossref.org/v1/works/10.1130/b31239.1";
+
 const doiURL = "https://xdd.wisc.edu/api/articles";
 
+//This needs to be reworked into something else. This will not work.
 export function DoiSuggest({
   defaultValue,
   onCellsChanged,
