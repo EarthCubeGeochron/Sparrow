@@ -11,7 +11,6 @@ export const AnimatedArrow = () => {
   ]);
 };
 /**
- * 
  * @description Default page when nothing selected on left navigation
  */
 export function NoStateAdmin(props) {
