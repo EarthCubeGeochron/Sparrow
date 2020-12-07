@@ -20,7 +20,10 @@ class TestProjectEdits:
 
         route =  '/api/v2/project/edit/1'
 
-        changes = {"id":1, "description": "Testing to add stuff", "publications": [{'id': 2, 'doi': '10.1016/j.quageo.2012.12.005'}]}
+        changes = {"id":1, "description": "Testing to add stuff", "publications": [
+            {'id': 2, 'doi': '10.1016/j.quageo.2012.12.005'},
+            {'doi': '10.1016/j.quageo.2012.12.012'}, ## added pub won't have an id associated. 
+            ]}
         changeset = json.dumps(changes)
 
         response = client.put(route, json = changeset)

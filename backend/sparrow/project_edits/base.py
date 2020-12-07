@@ -38,7 +38,7 @@ class ProjectEdits(HTTPEndpoint):
         data = json.loads(await request.json())
 
         ## create a new field that matches the model collection
-        data['publication_collection'] = create_publication_collection(data['publications'], project.publication_collection)
+        data['publication_collection'] = create_publication_collection(data['publications'], project.publication_collection, db)
         data.pop('publications')
 
         for k in data:
