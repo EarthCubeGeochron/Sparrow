@@ -8,8 +8,8 @@ from .api.v1 import APIv1
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .interface import InterfacePlugin
 from .auth import AuthPlugin
-from .editors import DatasheetEditPlugin
-
+from .datasheet import DatasheetPlugin
+from .project_edits import ProjectEdits
 # from .graph import GraphQLPlugin
 from .web import WebPlugin
 from .logs import get_logger
@@ -121,7 +121,8 @@ class App(Flask):
             return
         import core_plugins
 
-        self.register_plugin(DatasheetEditPlugin)
+        self.register_plugin(DatasheetPlugin)
+        self.register_plugin(ProjectEdits)
         self.register_plugin(AuthPlugin)
         # GraphQL is disabled for now
         # self.register_plugin(GraphQLPlugin)
