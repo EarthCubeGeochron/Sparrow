@@ -24,21 +24,21 @@ class ProjectEdits(HTTPEndpoint):
             Put Endpoint for the project admin page
 
             NOTE: This route is tested
-
-            Current functionality: Change things in the project model and publication model based on a Project Model JSON 
-            object from project admin page (frontend)
         '''
         db = app_context().database
 
         id = request.path_params['id']
 
-        model = db.model.project ## there is a publication_collection in this model
+        model = db.model.project
         project = db.session.query(model).get(id)
 
         data = json.loads(await request.json())
 
+        # create a publication_collection from the passed publication array of objects
+        collection = create_publication_collection(data['publications'], project.publication_collection, db)
+
         ## create a new field that matches the model collection
-        data['publication_collection'] = create_publication_collection(data['publications'], project.publication_collection, db)
+        data['publication_collection'] = collection
         data.pop('publications')
 
         for k in data:

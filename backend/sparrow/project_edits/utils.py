@@ -9,21 +9,17 @@ def create_publication_collection(publications, publication_collection, db):
     - db: the database connection
     '''
     # find what publcations are the same based on id.. then edit attributes.
-    # TODO: make this simpler? Make functionallity to create a new publication object
+    # TODO: make this simpler?
 
-    collection = []
-    def grab_by_id(publication_collection, id, db):
-        for pub in publication_collection:
-            if pub.id == id:
-                return pub
-
+    collection = [] 
     for ele in publications:
 
-        # if there is no id.. means it was added in
         if 'id' not in ele:
-            collection.append(create_publication_object(ele, db))
-        else:
 
+            #NOTE: assuming that if no id is in changeset, then the DOI was added on the frontend
+            collection.append(create_publication_object(ele, db))
+
+        else:
             model_pub = grab_by_id(publication_collection, ele['id'],db)
 
             for k in ele:
@@ -33,24 +29,43 @@ def create_publication_collection(publications, publication_collection, db):
 
     return collection
 
+def grab_by_id(publication_collection, id, db):
+    '''
+        Returns a publication model object from the collection in the project model
+    '''
+    for pub in publication_collection:
+        if pub.id == id:
+            return pub
+
 def create_publication_object(pub, db):
     '''
+     deals with additions of publications to the collection. 
+
      - Pub: the pub object that was added on the frontend, no associated id. 
 
      needs to check if doi exists in database, otherwise create a new publication object
     '''
+    # Publication model
     Publication = db.model.publication
 
+    # using the try and except is probably a bad way to do this..
     try:
+        # see if the doi exists in the database
         model_pub = db.session.query(Publication).filter(Publication.doi==pub['doi']).one()
-        
+
+        # if it does, set the attributes
         for k in pub:
             setattr(model_pub, k, pub[k])
-        
+
+        #add it to the collection
         return model_pub
     except: 
+        # if it does NOT, create a new publication model object
         model_pub = Publication()
 
+        # set the attributes
         for k in pub:
             setattr(model_pub, k, pub[k])
+
+        # add it to the collection
         return model_pub
