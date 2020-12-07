@@ -94,7 +94,7 @@ interface ProjectProps {
 
 const ProjectComponent = function(props: ProjectProps) {
   const { id, Edit } = props;
-  const data = useAPIResult("/project", { id });
+  const data = useAPIResult("/project", { id }); // change to v2 api
   if (id == null || data == null) {
     return null;
   }

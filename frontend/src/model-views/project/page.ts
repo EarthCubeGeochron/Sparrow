@@ -37,7 +37,7 @@ class Publication extends Component {
   }
 }
 
-const ProjectPublications = function({ data }) {
+export const ProjectPublications = function({ data }) {
   if (data == null) {
     data = [];
   }
@@ -121,7 +121,7 @@ const ProjectPage = function(props) {
     h("div.flex-row", [
       h("div.basic-info", [
         h(EditableProjectDetails, { project, Edit }),
-        h(ProjectPublications, { data: project.publications }),
+        //h(ProjectPublications, { data: project.publications }),
         h(ProjectResearchers, { data: project.researchers }),
         h(SampleMapComponent, { project, samples }),
       ]),
