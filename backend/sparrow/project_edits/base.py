@@ -32,21 +32,32 @@ class ProjectEdits(HTTPEndpoint):
         model = db.model.project
         project = db.session.query(model).get(id)
 
-        data = json.loads(await request.json())
+        data = await request.json()
+        #data = json.loads(data)
+        # need to check for publication field first.
+        if "publications" in data:
+            response = data.copy()
+            
+            #create a publication_collection from the passed publication array of objects
+            collection = create_publication_collection(data['publications'], project.publication_collection, db)
+            ## create a new field that matches the model collection
+            data['publication_collection'] = collection
+            data.pop('publications')
 
-        # create a publication_collection from the passed publication array of objects
-        collection = create_publication_collection(data['publications'], project.publication_collection, db)
-
-        ## create a new field that matches the model collection
-        data['publication_collection'] = collection
-        data.pop('publications')
+            for k in data:
+                setattr(project, k, data[k])
+        
+            db.session.commit()
+        
+            return JSONResponse(response)
+       
 
         for k in data:
             setattr(project, k, data[k])
         
         db.session.commit()
         
-        return PlainTextResponse(f'Put Request, {project.name}')
+        return JSONResponse(data)
 
 Project_edits_api = Router([
     Route("/edit/{id}", endpoint=ProjectEdits, methods=["PUT"]),
