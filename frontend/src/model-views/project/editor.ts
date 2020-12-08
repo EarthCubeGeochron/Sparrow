@@ -25,7 +25,8 @@ import { put } from "axios";
 import "../main.styl";
 import styles from "~/admin/module.styl";
 import { ProjectPublications } from "./page";
-import update from "immutability-helper";
+import { APIV2Context } from "../../api-v2";
+
 const h = hyperStyled(styles);
 
 const ModelEditableText = function(props) {
@@ -221,7 +222,10 @@ const EditNavBar = function(props) {
 const EditableProjectDetails = function(props) {
   const { project, Edit } = props;
   const { login } = useAuth(); // this appears to be a boolean
-  const { buildURL } = APIHelpers(useContext(APIContext));
+  const { buildURL } = APIHelpers(useContext(APIV2Context));
+
+  const route = buildURL("/project/edit", {});
+  console.log(route);
 
   return h(
     ModelEditor,
@@ -231,7 +235,10 @@ const EditableProjectDetails = function(props) {
       persistChanges: async (updatedModel, changeset) => {
         let rest;
         let { id } = updatedModel;
-        const response = await put(buildURL(`/edit/project/${id}`), changeset);
+        const response = await put(
+          buildURL(`/project/edit/${id}`, {}),
+          changeset
+        );
         const { data } = response;
         ({ id, ...rest } = data);
         return rest;
