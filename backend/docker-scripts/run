@@ -29,13 +29,13 @@ PORT=5000
 if [ $SPARROW_ENV = 'development' ]; then
   ## Could also try hypercorn for better reloading...
   echo "Running in development mode"
-  exec hypercorn --config python:sparrow.asgi.config --reload --bind $HOST:$PORT "sparrow.asgi.entry:app"
+  exec hypercorn --config python:sparrow.app.config --reload --bind $HOST:$PORT "sparrow.__entry__:app"
 else
   exec hypercorn --bind $HOST:$PORT \
     -w 3 \
     --log-file - \
     --log-level warning \
-    "sparrow.asgi.entry:app"
+    "sparrow.__entry__:app"
 fi
 
 ### Alternative Uvicorn config ###

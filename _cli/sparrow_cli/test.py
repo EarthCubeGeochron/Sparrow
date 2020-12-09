@@ -5,6 +5,53 @@ from rich import print
 from click_default_group import DefaultGroup
 from .util import cmd, container_is_running, exec_or_run, compose
 from .base import cli
+from textwrap import dedent
+
+
+class TestGroup(DefaultGroup):
+    """
+    Usage: sparrow test \[subcommand?] OPTIONS... PYTEST_OPTIONS...
+
+    [bold]Backend tests[/bold] (default)
+
+    Options:
+    --help                      Print this page and exit
+    --pytest-help               Print the PyTest help
+    --psql                      Provide a psql prompt when testing concludes
+    --teardown / --no-teardown  Shut down docker containers on exit
+    --quick                     Keep databases and Docker containers
+
+    All command line options specified at the end of the command are passed to
+    the [bold]pytest[/bold] test runner. Help for pytest's commands can be
+    printed using the [cyan]--pytest-help[/cyan] command.
+
+    Some common options:
+
+    - Stop on first test and don't capture stdout: [cyan]sparrow test --capture=no --maxfail=0[/cyan]
+    - Repeat a single test: [cyan]sparrow test --quick -k pychron[/cyan]
+    - Only PyChron tests: [cyan]sparrow test --quick -k pychron[/cyan]
+
+    [bold]Other subcommands[/bold]:
+
+    cli                         Run tests of the Sparrow CLI
+    dump-dz-database            Dump an instance of a Sparrow database
+                                with testing data, to test migrations
+    """
+
+    ignore_unknown_options = True
+
+    @classmethod
+    def echo_help(cls, ctx):
+        print(dedent(cls.__doc__))
+        ctx.exit()
+
+    def parse_args(self, ctx, args):
+        """Override to make sure we get subcommand help on base `sparrow help` invocation.
+        Solution found at https://github.com/click-contrib/click-default-group/issues/14
+        """
+        if (args in (["-h"], ["--help"])) and self.default_if_no_args:
+            TestGroup.echo_help(ctx)
+        return super(DefaultGroup, self).parse_args(ctx, args)
 
 
 def compose(*args, **kwargs):
@@ -23,7 +70,7 @@ def compose(*args, **kwargs):
 __ctx = dict(ignore_unknown_options=True, help_option_names=[])
 
 
-@cli.group(name="test", cls=DefaultGroup, default="app", default_if_no_args=True)
+@cli.group(name="test", cls=TestGroup, default="app", default_if_no_args=True)
 @click.pass_context
 def sparrow_test(ctx):
     """Test runner for the Sparrow application. The testing framework is based on
@@ -87,22 +134,10 @@ def sparrow_test_main(
     teardown=True,
     quick=False,
 ):
-    """Run the Sparrow's main application tests
-
-    - Only PyChron tests: `sparrow test --quick -k pychron --capture=no`
-    """
+    """Run the Sparrow's main application tests"""
     if help:
         # We override the help method so we can add extra information.
-        ctx = click.get_current_context()
-        click.echo(ctx.get_help())
-        print(
-            "\nAll other command line options are passed to the [bold]pytest[/bold] test runner."
-            "\npytest's commands can be printed using the [cyan]--pytest-help[/cyan] command."
-            "\nSome common options:"
-            "\n  [cyan]sparrow test --capture=no --maxfail=0[/cyan]"
-            "\n  Repeat a single test: [cyan]sparrow test --quick -k pychron[/cyan]"
-        )
-        ctx.exit()
+        TestGroup.echo_help(ctx)
 
     if pytest_help:
         cmd("pytest --help")
@@ -143,7 +178,8 @@ def indb(*args, **kwargs):
     return compose("exec db", *args, **kwargs)
 
 
-@sparrow_test.command("dump-database")
+@sparrow_test.command("dump-dz-database")
 def dump_database():
     """Dump a basic test database containing one detrital zircon sample to stdout"""
-    exec_or_run("backend", "sparrow_tests/scripts/dump-test-database.py", tty=False)
+    exec_or_run(
+        "backend", "sparrow_tests/scripts/dump-test-database.py", tty=False)

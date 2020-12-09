@@ -11,7 +11,7 @@ import { ProjectAdminPage } from "./project";
 
 import { SampleAdminPage } from "./sample";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
-import { DataModelLinks, AdminDataModelLinks } from "~/catalog";
+import { AdminDataModelLinks } from "~/catalog";
 import { NavButton } from "~/components";
 import { AdminNavLinks } from "~/catalog/nav";
 import styles from "./module.styl";
@@ -28,9 +28,13 @@ const AdminNavbar = (props) => {
   return h(AppNavbar, { ...rest, fullTitle: true, subtitle: "Admin" }, [
     h(AdminNavLinks, { base }),
     h(AppNavbar.Divider),
-    //h(NavButton, { to: base + "/data-sheet" }, "Sheet"),
+    h(NavButton, { to: base + "/data-sheet" }, "Metadata"),
     h(NavButton, { to: "/map" }, "Map"),
-    h(NavButton, { to: base + "/terms", icon: "data-lineage" }, "Terms"),
+    h(
+      NavButton,
+      { to: base + "/terms/parameter", icon: "data-lineage" },
+      "Terms"
+    ),
   ]);
 };
 

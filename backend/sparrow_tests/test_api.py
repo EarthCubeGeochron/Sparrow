@@ -22,10 +22,6 @@ class TestAPIV2:
         data = res.json()
         assert data["routes"] is not None
 
-    @mark.xfail(
-        reason="This fails due to transaction isolation in the testing database."
-    )
-
     @mark.parametrize("route", ["/api/v2/models/sample", "/api/v2/models/sample/"])
     def test_api_models_sample(self, client, route):
         """Checks if models/sample is working"""
