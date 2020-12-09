@@ -47,7 +47,7 @@ allowed_collections = {
         "material",
     ],
     "attribute": ["parameter", "unit"],
-    "project": ["researcher", "publication", "session"],
+    "project": ["researcher", "publication", "session", "sample"],
     "datum": ["datum_type"],
     "datum_type": ["parameter", "unit", "error_unit", "error_metric"],
 }
