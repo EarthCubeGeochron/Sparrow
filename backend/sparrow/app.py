@@ -3,6 +3,7 @@ from os import environ
 from flask import Flask, send_from_directory
 from sqlalchemy.engine.url import make_url
 
+from .encoders import JSONEncoder
 from .api.v1 import APIv1
 from .plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from .interface import InterfacePlugin
