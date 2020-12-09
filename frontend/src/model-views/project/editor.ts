@@ -142,15 +142,11 @@ function EditablePublications(props) {
   const onChangeHandler = (index, value) => {
     let newPublications = [...model.publications];
     newPublications[index] = { ...newPublications[index], doi: value };
-    console.log(newPublications);
-    return actions.updateState({
+    actions.updateState({
       model: { publications: { $set: newPublications } },
     });
   };
 
-  // probably call a http delete here
-  // but this call back will happen on an alert pop up as confirmation I think
-  // it'll be a little strange since these saves will be separate from the model persistChanges()
   const handleDeletePub = ({ index }) => {
     let newPublications = [...model.publications];
 
@@ -164,12 +160,29 @@ function EditablePublications(props) {
     });
   };
 
+  const handleAddPub = () => {
+    let newPublications = [...model.publications];
+    newPublications.push({ doi: "" });
+    actions.updateState({
+      model: { publications: { $set: newPublications } },
+    });
+  };
+
   const DeleteButton = (index) =>
     h(Button, {
       icon: "trash",
       intent: "danger",
       minimal: true,
       onClick: () => handleDeletePub(index),
+    });
+
+  //Need a plus button that will add an empty field where you can add a doi
+  const AddButton = () =>
+    h(Button, {
+      icon: "plus",
+      intent: "success",
+      minimal: true,
+      onClick: handleAddPub,
     });
 
   const doiList = model.publications.map(({ doi }) => doi);
@@ -200,10 +213,12 @@ function EditablePublications(props) {
                   onChange: (value) => onChangeHandler(index, value),
                   value: doi,
                   intent,
+                  placeholder: "Enter DOI",
                 }),
               ]
             );
           }),
+          h(AddButton),
         ]
       ),
     ]);
