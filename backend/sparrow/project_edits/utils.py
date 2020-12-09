@@ -17,11 +17,11 @@ def create_publication_collection(publications, publication_collection, db):
         if 'id' not in ele:
 
             #NOTE: assuming that if no id is in changeset, then the DOI was added on the frontend
-            #collection.append(create_publication_object(ele, db))
-            Publication = db.model.publication
-            model_pub = Publication.get_or_create(doi=ele['doi'])
+            collection.append(create_publication_object(ele, db))
+            #Publication = db.model.publication
+            #model_pub = Publication.get_or_create(doi=ele['doi'])
             
-            collection.append(model_pub)
+            #collection.append(model_pub)
 
         else:
             model_pub = grab_by_id(publication_collection, ele['id'],db)

@@ -37,7 +37,7 @@ class ProjectEdits(HTTPEndpoint):
         # need to check for publication field first.
         if "publications" in data:
             response = data.copy()
-            
+
             #create a publication_collection from the passed publication array of objects
             collection = create_publication_collection(data['publications'], project.publication_collection, db)
             ## create a new field that matches the model collection
@@ -46,12 +46,13 @@ class ProjectEdits(HTTPEndpoint):
 
             for k in data:
                 setattr(project, k, data[k])
-        
-            db.session.commit()
-        
-            return JSONResponse(response)
-       
 
+            
+            db.session.add(project)
+            #db.session.commit()
+        
+            return PlainTextResponse(f'{project.publication_collection}, {response}')
+       
         for k in data:
             setattr(project, k, data[k])
         
