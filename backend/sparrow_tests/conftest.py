@@ -2,10 +2,9 @@ from sparrow.app import App
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
 from starlette.testclient import TestClient
-from sparrow.app import Sparrow
+from sparrow.asgi import app as app_
 from sparrow.context import _setup_context
 
-app_ = Sparrow(debug=True)
 
 # Slow tests are opt-in
 def pytest_addoption(parser):

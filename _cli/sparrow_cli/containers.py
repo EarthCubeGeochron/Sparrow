@@ -6,7 +6,6 @@ from time import sleep
 
 from .env import validate_environment
 from .util import compose, container_id, cmd
-from .help.backend import get_backend_help_info
 
 
 @click.command()
@@ -30,9 +29,6 @@ def sparrow_up(container, force_recreate=False):
     p = Popen(["sparrow", "logs", container])
     print("[green]Following container logs[/green]")
     compose("start", container)
-    # While we're spinning up, repopulate command help in case it's changed
-    get_backend_help_info(cache=True)
-
     p.wait()
 
 

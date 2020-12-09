@@ -1,3 +1,19 @@
+from os import environ
+from datetime import timedelta
+import logging
+from .logs import console_handler
+
+LAB_NAME = environ.get("SPARROW_LAB_NAME", "Test lab")
+DATABASE = environ.get("SPARROW_DATABASE", "postgresql:///sparrow")
+BASE_URL = environ.get("SPARROW_BASE_URL", "/")
+
+# We want to check most of our config into version control,
+# but we should under no circumstances check in secret keys.
+# Instead, we store it as an environment variable.
+SECRET_KEY = environ.get("SPARROW_SECRET_KEY")
+if SECRET_KEY is None:
+    raise KeyError("Environment variable `SPARROW_SECRET_KEY` must be set")
+
 JWT_SECRET_KEY = SECRET_KEY
 # We store JWT tokens in cookies because it's more secure.
 # https://flask-jwt-extended.readthedocs.io/en/latest/tokens_in_cookies.html

@@ -22,7 +22,7 @@ function AppNavbar({ children, fullTitle, subtitle, ...rest }) {
         h("h1.site-title", null, [
           h(SiteTitle),
           h.if(subtitle != null)([
-            h("span", " "),
+            h("span", ":"),
             h("span.subtitle", subtitle),
           ]),
         ]),

@@ -49,7 +49,7 @@ class Database(MappedDatabaseMixin):
         envvar = environ.get("SPARROW_DATABASE", None)
         if envvar is not None:
             db_conn = envvar
-        self.engine = create_engine(db_conn, executemany_mode="batch")
+        self.engine = create_engine(db_conn)
         metadata.create_all(bind=self.engine)
         self.meta = metadata
 
@@ -110,17 +110,17 @@ class Database(MappedDatabaseMixin):
                 f"Could not find schema interface for model '{model_name}'"
             )
 
-    def _flush_nested_objects(self, session):
+    def _flush_nested_objects(self):
         """
         Flush objects remaining in a session (generally these are objects loaded
         during schema-based importing).
         """
-        for object in session:
+        for object in self.session:
             try:
-                session.flush(objects=[object])
+                self.session.flush(objects=[object])
                 log.debug(f"Successfully flushed instance {object}")
             except IntegrityError as err:
-                session.rollback()
+                self.session.rollback()
                 log.debug(err)
 
     ## Something in load_data doesn't fully work
@@ -137,10 +137,10 @@ class Database(MappedDatabaseMixin):
             )
         schema = model_interface(model, session)()
 
-        with on_conflict("do-nothing"):
+        with on_conflict("do-update"):
             try:
                 log.info(f"Initiating load of {model_name}")
-                res = schema.load(data, session=session, **kwargs)
+                res = schema.load(data, session=session)
                 log.info("Entering final commit phase of import")
                 log.info(f"Adding top-level object {res}")
                 session.add(res)
@@ -149,8 +149,6 @@ class Database(MappedDatabaseMixin):
                 return res
             except (IntegrityError, ValidationError) as err:
                 session.rollback()
-                # self._flush_nested_objects()
-                # session.add(res)
                 log.debug(err)
                 raise err
 

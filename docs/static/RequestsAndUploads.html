@@ -13775,15 +13775,12 @@ Adapted from GitHub theme
                 >
               </h2>
               <p>
-                The datasets that I used were from
-                <a href="https://sparrow-data.org/labs/wiscar/api/v1/"
-                  >Sparrow</a
-                >
-                and from a spreadsheet on my local computer. To fetch data from
-                the Sparrow API, in Python, I used the
+                The datasets that I used were from an API and from a spreadsheet
+                on my local computer. To fetch data from an API, in Python, I
+                used the
                 <a href="https://requests.readthedocs.io/en/master/"
                   >Requests library</a
-                >. The data is a JSON object.
+                >. The data from my API is a JSON object.
               </p>
             </div>
           </div>
@@ -13793,11 +13790,11 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="text_cell_render border-box-sizing rendered_html">
               <p>
-                First thing we need to do is import all of the libraries used in
-                this script. I'm using requests to fetch the JSON object, json
-                which is included with Python and doesn't require a external
-                download, and pandas. Pandas is used to handle large datasets in
-                easy to manipulate dataframes.
+                First thing we need to import all of the libraries used in this
+                script. I'm using requests to fetch the JSON object, json which
+                is included with Python and doesn't require a external download,
+                and pandas. Pandas is used to handle large datasets in easy to
+                manipulate dataframes.
                 <a href="https://pandas.pydata.org/">Pandas</a> is by far the
                 most used library in this collection of notebooks.
               </p>
@@ -13809,7 +13806,7 @@ Adapted from GitHub theme
             <div class="prompt input_prompt">In&nbsp;[1]:</div>
             <div class="inner_cell">
               <div class="input_area">
-                <div class=" highlight hl-ipython3">
+                <div class="highlight hl-ipython3">
                   <pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -13824,7 +13821,7 @@ Adapted from GitHub theme
             <div class="prompt input_prompt">In&nbsp;[2]:</div>
             <div class="inner_cell">
               <div class="input_area">
-                <div class=" highlight hl-ipython3">
+                <div class="highlight hl-ipython3">
                   <pre><span></span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;https://sparrow-data.org/labs/wiscar/api/v1/sample?all=1&#39;</span><span class="p">)</span>
 <span class="n">online_metadata</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 <span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">online_metadata</span><span class="p">)</span>
@@ -14082,25 +14079,23 @@ Adapted from GitHub theme
           <div class="prompt input_prompt"></div>
           <div class="inner_cell">
             <div class="text_cell_render border-box-sizing rendered_html">
-              <blockquote>
-                <p>
-                  <strong>IMPORTANT</strong>: Note that the columns of the
-                  DataFrame <em>df</em> are the keywords from the JSON object!
-                  And the populated cells are the values associated with each
-                  keyword for the specific sub-object. For my data each
-                  individual JSON object is a geologic sample. Also,
-                  <strong>Note</strong> there are 1819 rows to this dataframe,
-                  but we are only seeing 10 rows. This is because for very large
-                  dataframes pandas automatically shortens the dataframe you
-                  will see in the terminal. To see the entire dataframe simply
-                  add <code>pd.set_option('display.max_rows', None)</code> after
-                  you import the library. Also you can probably see that the
-                  <strong>Geometry</strong> column has in itself a JSON object.
-                  This is because in the API the geometry is a nested object. We
-                  will work on splitting that column into a
-                  <em>latitude</em> and <em>longitude</em> later.
-                </p>
-              </blockquote>
+              <p>
+                <strong>IMPORTANT</strong>: Note that the columns of the
+                DataFrame <em>df</em> are the keywords from the JSON object! And
+                the populated cells are the values associated with each keyword
+                for the specific sub-object. For my data each individual JSON
+                object is a geologic sample. Also, <strong>Note</strong> there
+                are 1819 rows to this dataframe, but we are only seeing 10 rows.
+                This is because for very large dataframes pandas automatically
+                shortens the dataframe you will see in the terminal. To see the
+                entire dataframe simply add
+                <code>pd.set_option('display.max_rows', None)</code> after you
+                import the library. Also you can probably see that the
+                <strong>Geometry</strong> column has in itself a JSON object.
+                This is because in the API the geometry is a nested object. We
+                will work on splitting that column into a <em>latitude</em> and
+                <em>longitude</em> later.
+              </p>
             </div>
           </div>
         </div>
@@ -14120,7 +14115,7 @@ Adapted from GitHub theme
             <div class="prompt input_prompt">In&nbsp;[3]:</div>
             <div class="inner_cell">
               <div class="input_area">
-                <div class=" highlight hl-ipython3">
+                <div class="highlight hl-ipython3">
                   <pre><span></span><span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;/Users/casey_idz/Documents/Coding/Python/WiscAr-Sparrow-Metadata/WiscAr_metadata(thisone).xlsx&#39;</span><span class="p">)</span> <span class="c1"># Metadata from Spreadsheet page 1</span>
 <span class="n">df3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;/Users/casey_idz/Documents/Coding/Python/WiscAr-Sparrow-Metadata/WiscAr_metadata(thisone).xlsx&#39;</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Additional&#39;</span><span class="p">)</span><span class="c1"># metadata from spreadsheet page 2</span>
 </pre>
@@ -14155,7 +14150,7 @@ Adapted from GitHub theme
             <div class="prompt input_prompt">In&nbsp;[4]:</div>
             <div class="inner_cell">
               <div class="input_area">
-                <div class=" highlight hl-ipython3">
+                <div class="highlight hl-ipython3">
                   <pre><span></span><span class="n">df2</span>
 </pre>
                 </div>
@@ -14501,7 +14496,7 @@ Adapted from GitHub theme
             <div class="prompt input_prompt">In&nbsp;[5]:</div>
             <div class="inner_cell">
               <div class="input_area">
-                <div class=" highlight hl-ipython3">
+                <div class="highlight hl-ipython3">
                   <pre><span></span><span class="n">df3</span>
 </pre>
                 </div>
@@ -14865,92 +14860,6 @@ Adapted from GitHub theme
                 We also learned how to import excel files and turn them into
                 pandas dataframes.
               </p>
-            </div>
-          </div>
-        </div>
-        <div class="cell border-box-sizing code_cell rendered">
-          <div class="input">
-            <div class="prompt input_prompt">In&nbsp;[6]:</div>
-            <div class="inner_cell">
-              <div class="input_area">
-                <div class=" highlight hl-ipython3">
-                  <pre><span></span><span class="o">%</span><span class="k">store</span> df1
-<span class="o">%</span><span class="k">store</span> df2
-<span class="o">%</span><span class="k">store</span> df3
-</pre>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="output_wrapper">
-            <div class="output">
-              <div class="output_area">
-                <div class="prompt"></div>
-
-                <div
-                  class="output_subarea output_stream output_stdout output_text"
-                >
-                  <pre>
-Stored &#39;df1&#39; (DataFrame)
-Stored &#39;df2&#39; (DataFrame)
-Stored &#39;df3&#39; (DataFrame)
-</pre
-                  >
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="cell border-box-sizing code_cell rendered">
-          <div class="input">
-            <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-            <div class="inner_cell">
-              <div class="input_area">
-                <div class=" highlight hl-ipython3">
-                  <pre><span></span> 
-</pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="cell border-box-sizing code_cell rendered">
-          <div class="input">
-            <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-            <div class="inner_cell">
-              <div class="input_area">
-                <div class=" highlight hl-ipython3">
-                  <pre><span></span> 
-</pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="cell border-box-sizing code_cell rendered">
-          <div class="input">
-            <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-            <div class="inner_cell">
-              <div class="input_area">
-                <div class=" highlight hl-ipython3">
-                  <pre><span></span> 
-</pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="cell border-box-sizing code_cell rendered">
-          <div class="input">
-            <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-            <div class="inner_cell">
-              <div class="input_area">
-                <div class=" highlight hl-ipython3">
-                  <pre><span></span> 
-</pre>
-                </div>
-              </div>
             </div>
           </div>
         </div>

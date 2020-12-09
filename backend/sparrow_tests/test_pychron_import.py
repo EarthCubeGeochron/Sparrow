@@ -32,7 +32,7 @@ class TestPyChronImport:
         res = db.load_data("session", data)
         check_age_units(res, "dimensionless")
 
-    @mark.xfail(reason="We don't handle updating data well at the moment.")
+    # @mark.xfail(reason="We don't handle updating data  well at the moment.")
     def test_pychron_import(self, db):
         ia = json_fixture("pychron-interpreted-age.json")
         assert ia is not None

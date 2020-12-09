@@ -12,7 +12,6 @@ module.exports = {
   projectName: "Sparrow", // Usually your repo name.
   // We need to ignore broken links for now.
   onBrokenLinks: "ignore",
-  themes: ["@docusaurus/theme-live-codeblock"],
   themeConfig: {
     navbar: {
       title: "Sparrow",
@@ -26,12 +25,12 @@ module.exports = {
           activeBasePath: "Guides",
           label: "Guides",
         },
-        /*{
+        {
           to: "docs/motivation-and-design",
           activeBasePath: "Guides",
           label: "Motivation and design",
           position: "left",
-        },*/
+        },
         {
           to: "docs/getting-started",
           activeBasePath: "Guides",

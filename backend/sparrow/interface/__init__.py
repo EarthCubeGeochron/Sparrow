@@ -16,16 +16,7 @@ def model_interface(model, session=None) -> ModelSchema:
     Create a Marshmallow interface to a SQLAlchemy model
     """
     # Create a meta class
-    metacls = type(
-        "Meta",
-        (BaseMeta,),
-        dict(
-            model=model,
-            sqla_session=session,
-            load_instance=True,
-            include_relationships=True,
-        ),
-    )
+    metacls = type("Meta", (BaseMeta,), dict(model=model, sqla_session=session))
 
     schema_name = to_schema_name(model.__name__)
     try:

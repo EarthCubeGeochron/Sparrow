@@ -3,20 +3,17 @@ SPARROW_INSTALL_PATH ?= $(INSTALL_PATH)
 
 all: install-hooks build
 
-build:
-	_cli/_scripts/build-local
+build: _cli/dist/sparrow
+
+# Bundle with PyInstaller and install (requires local Python 3)
+install: _cli/dist/sparrow install-hooks
+	_cli/_scripts/install
 
 # Install without building with PyInstaller
-install: build
+install-dev: install-hooks
+	_cli/_scripts/build-local
 	mkdir -p $(SPARROW_INSTALL_PATH)/bin
-	sudo ln -sf $(shell pwd)/_cli/sparrow-dev-shim $(SPARROW_INSTALL_PATH)/bin/sparrow
-
-install-dev: install
-
-## TODO: fix bugs with install-dist to make it more capable
-# Bundle with PyInstaller and install (requires local Python 3)
-install-dist: _cli/dist/sparrow install-hooks
-	_cli/_scripts/install
+	ln -sf $(shell pwd)/_cli/sparrow-dev-shim $(SPARROW_INSTALL_PATH)/bin/sparrow
 
 test:
 	_cli/_scripts/test-cli
@@ -36,7 +33,7 @@ _cli/dist/windows/sparrow:
 	docker run -v "$(shell pwd)/_cli:/src" cdrx/pyinstaller-windows:latest
 
 # Build locally for the current platform
-_cli/dist/sparrow:
+_cli/dist/sparrow: _cli/main.py
 	_cli/_scripts/build-dist
 
 _generate_buildspec:
@@ -49,6 +46,3 @@ install-hooks:
 	git config --local core.hooksPath .githooks
 	# Always git prune on config
 	git config --local remote.origin.prune true
-	# Initialize submodules if we haven't already
-	-[ ! -d .git/modules ] && git submodule update --init
-

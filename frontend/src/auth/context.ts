@@ -7,14 +7,20 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import h from "react-hyperscript";
-import { StatefulComponent, APIActions } from "@macrostrat/ui-components";
+import {
+  APIContext,
+  StatefulComponent,
+  APIActions,
+} from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { createContext, useContext } from "react";
 
 const AuthContext = createContext({});
 
 class AuthProvider extends StatefulComponent {
-  static contextType = APIV2Context;
+  static initClass() {
+    this.contextType = APIV2Context;
+  }
   constructor(props) {
     super(props);
     this.requestLoginForm = this.requestLoginForm.bind(this);
@@ -89,6 +95,7 @@ class AuthProvider extends StatefulComponent {
     return h(AuthContext.Provider, { value }, this.props.children);
   }
 }
+AuthProvider.initClass();
 
 const useAuth = () => useContext(AuthContext);
 

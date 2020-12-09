@@ -4,7 +4,6 @@ from pathlib import Path
 from hashlib import md5
 from ..util import compose
 from ..exc import SparrowCommandError
-from subprocess import PIPE
 
 
 def dirhash(path):
@@ -34,7 +33,7 @@ def get_backend_help_info(cache=True):
         "run --no-deps --rm -T",
         "backend",
         "cat /run/cli-info.json",
-        stdout=PIPE,
+        capture_output=True,
     )
     if out.returncode != 0:
         details = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"

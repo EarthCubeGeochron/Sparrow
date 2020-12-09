@@ -1,9 +1,12 @@
 from flask import (
     Blueprint,
+    make_response,
     Response,
+    render_template,
     current_app,
     abort,
 )
+from os.path import join
 from .plugins import SparrowCorePlugin
 
 web = Blueprint("frontend", __name__)
@@ -51,6 +54,28 @@ def get_csv(uuid):
         headers={"Content-disposition": f"attachment; 'filename={basename}.csv'"},
     )
     return res
+
+
+@web.route("/")
+# This route is a catch-all route for anything
+# beneath the / endpoint. Allows
+# the API explorer to function with client-side
+# routing with react-router...
+@web.route("/<path:path>")
+def index(path="/"):
+    v = current_app.config.get("LAB_NAME")
+    base_url = current_app.config.get("BASE_URL")
+    # Hack to make browserSync work
+    if base_url == "/":
+        base_url = ""
+
+    return render_template(
+        "page.html",
+        title=v,
+        id="index",
+        base_url=base_url,
+        asset_dir=join(base_url, "assets"),
+    )
 
 
 class WebPlugin(SparrowCorePlugin):

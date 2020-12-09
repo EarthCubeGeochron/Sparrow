@@ -1,6 +1,10 @@
 #!/bin/bash
 # Description: Graph database schema to `dot` format.
 
+if ! type "sadisplay" > /dev/null; then
+  pip install git+https://github.com/davenquinn/sadisplay.git
+fi
+
 output="$1"
 
 if [ -z $output ]; then
@@ -10,15 +14,13 @@ fi
 
 mkdir -p "$output"
 
-host=54321
-#$(sparrow compose port db 5432)
-dbname="postgresql://postgres@db:5432/sparrow"
+host=$(sparrow compose port db 5432)
+dbname="postgresql://postgres@$host/sparrow"
 
 graph="$output/erd-core.dot"
-sparrow compose run --rm -T backend sadisplay -u $dbname \
+sadisplay -u $dbname \
   -r dot \
   -e public.spatial_ref_sys > "$graph"
-
 cat "$graph" \
 | sed "s/NULLTYPE/GEOMETRY/g" \
 | sed 's/ WITH\(OUT\)\? TIME ZONE//g' \
@@ -26,11 +28,10 @@ cat "$graph" \
 > "$output/entity-relationship-diagram-core.png"
 
 graph="$output/erd.dot"
-sparrow compose run --rm -T backend sadisplay -u $dbname \
+sadisplay -u $dbname \
   -s public,vocabulary \
   -r dot \
   -e public.spatial_ref_sys > "$graph"
-
 cat "$graph" \
 | sed "s/NULLTYPE/GEOMETRY/g" \
 | sed 's/ WITH\(OUT\)\? TIME ZONE//g' \

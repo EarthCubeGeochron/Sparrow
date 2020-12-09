@@ -49,7 +49,7 @@ class TestAPIImporter:
 
     def test_missing_field(self, client, db):
         """Missing fields should produce a useful error message
-        and insert no data"""
+           and insert no data"""
         new_name = "Test error vvv"
         data = {
             "date": str(datetime.now()),
