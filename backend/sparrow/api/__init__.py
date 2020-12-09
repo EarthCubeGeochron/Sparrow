@@ -25,7 +25,7 @@ async def http_exception(request, exc):
     )
 
 
-exception_handlers = {HTTPException: http_exception}
+exception_handlers = {Exception: http_exception}
 
 
 class OpenAPIResponse(Response):
