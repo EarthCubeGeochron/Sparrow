@@ -1,0 +1,6 @@
+{
+  "publications": [
+    { "id": 2, "doi": "10.1016/j.quageo.2012.12.005" },
+    { "doi": " Fake DOI" }
+  ]
+}
