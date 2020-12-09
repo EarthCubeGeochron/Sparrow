@@ -5,6 +5,7 @@ from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError
+from sqlalchemy.orm.exc import FlushError
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import inspect
@@ -213,12 +214,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 self.session.begin_nested()
                 instance = self.opts.model(**data)
                 self.session.add(instance)
-                log.debug(f"Created instance {instance} with parameters {data}")
+                log.debug(
+                    f"Created instance {instance} with parameters {data}")
 
                 self.session.flush(objects=[instance])
                 self.session.commit()
                 log.debug("Successfully persisted to database")
-            except IntegrityError as err:
+            except (IntegrityError, FlushError) as err:
                 self.session.rollback()
                 log.debug("Could not persist")
 
