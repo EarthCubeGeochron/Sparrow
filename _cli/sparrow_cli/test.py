@@ -49,8 +49,10 @@ class TestGroup(DefaultGroup):
         """Override to make sure we get subcommand help on base `sparrow help` invocation.
         Solution found at https://github.com/click-contrib/click-default-group/issues/14
         """
-        if (args in (["-h"], ["--help"])) and self.default_if_no_args:
-            TestGroup.echo_help(ctx)
+        if args in (["-h"], ["--help"]) and self.default_if_no_args:
+            return TestGroup.echo_help(ctx)
+        if not args:
+            args.insert(0, self.default_cmd_name)
         return super(DefaultGroup, self).parse_args(ctx, args)
 
 
