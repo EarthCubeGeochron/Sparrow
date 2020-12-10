@@ -213,16 +213,17 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 # Begin a nested subtransaction
                 self.session.begin_nested()
                 instance = self.opts.model(**data)
-                self.session.add(instance)
                 log.debug(
                     f"Created instance {instance} with parameters {data}")
-
+                self.session.add(instance)
                 self.session.flush(objects=[instance])
                 self.session.commit()
-                log.debug("Successfully persisted to database")
+                log.debug("Successfully persisted {instance} to database")
+                #assert inspect(instance).persistent
             except (IntegrityError, FlushError) as err:
                 self.session.rollback()
                 log.debug("Could not persist")
+                log.exception(err)
 
         return instance
 
@@ -232,7 +233,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             data.pop("audit_id")
         return data
 
-    def to_json_schema(model):
+    def to_json_schema(self, model):
         return json_schema.dump(model)
 
     def _available_nests(self):
