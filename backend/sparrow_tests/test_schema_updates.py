@@ -12,7 +12,7 @@ class TestSchemaUpdates:
 
         test_sample = {
             "name": "4c1321a",
-            "material": granite,
+            "material": {"id": "Granite"},
             "location": {"coordinates": [-122, 43], "type": "Point"}
         }
 
