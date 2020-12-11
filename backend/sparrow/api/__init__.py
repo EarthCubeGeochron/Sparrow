@@ -3,7 +3,7 @@ import json
 from starlette.applications import Starlette
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse, Response
-from starlette.exceptions import HTTPException
+from starlette.exceptions import HTTPException, ExceptionMiddleware
 from sparrow.logs import get_logger
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -25,7 +25,7 @@ async def http_exception(request, exc):
     )
 
 
-exception_handlers = {Exception: http_exception}
+exception_handlers = {HTTPException: http_exception}
 
 
 class OpenAPIResponse(Response):
