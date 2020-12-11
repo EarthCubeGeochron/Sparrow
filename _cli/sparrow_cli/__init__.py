@@ -66,7 +66,7 @@ def shell(container):
     if container is not None:
         return exec_or_run(container, "sh")
     print("Running [bold]iPython[/bold] shell in application context.")
-    exec_or_run("backend", "sparrow shell")
+    exec_or_run("backend", "/app/sparrow/__main__.py shell")
 
 
 cli.add_command(sparrow_up, name="up")
