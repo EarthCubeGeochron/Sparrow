@@ -4,6 +4,7 @@ from .fixtures import basic_data
 from .helpers import json_fixture
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, Point
+import datetime
 import pdb
 
 
@@ -146,3 +147,24 @@ class TestAPIV2:
         data = res.json()
         assert data["total_count"] == 1 ## it fails here because theres no data. db.load_data isn't working
         assert data["data"][0]["name"] == "Declarative import test"
+
+    def test_date_filter(self, client, db):
+        """Testing the date_range filter on the api"""
+
+        Session = db.model.session
+
+        date = datetime.datetime(2013, 3, 12)
+        date1 = datetime.datetime(2013, 6, 1)
+        date2 = datetime.datetime(2014, 6, 3)
+
+        db.session.add_all([
+            Session(date=date),
+            Session(date=date1),
+            Session(date=date2),
+        ])
+        db.session.commit()
+
+        # %Y-%m-%d/%H:%M:%S
+        response = client.get("/api/v2/models/session?date_range=2012-01-12/00:00:00,2015-01-01/00:00:00")
+
+        assert len(response.json()['data']) == 3
