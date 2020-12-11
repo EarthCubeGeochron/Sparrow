@@ -16,6 +16,8 @@ from ..filters import (
     FieldExistsFilter,
     FieldNotExistsFilter,
     _schema_fields,
+    EmbargoFilter,
+    DateFilter
 )
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
@@ -82,6 +84,8 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self.register_filter(AuthorityFilter)
         self.register_filter(FieldExistsFilter)
         self.register_filter(FieldNotExistsFilter)
+        self.register_filter(EmbargoFilter)
+        self.register_filter(DateFilter)
 
     @property
     def model(self):
