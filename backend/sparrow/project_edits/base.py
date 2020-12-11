@@ -46,10 +46,13 @@ class ProjectEdits(HTTPEndpoint):
 
             for k in data:
                 setattr(project, k, data[k])
+
+            try:
+                db.session.commit()
+            except:
+                db.session.rollback()
         
-            db.session.commit()
-        
-            return JSONResponse(response)
+            return JSONResponse({"Response":response})
        
 
         for k in data:
