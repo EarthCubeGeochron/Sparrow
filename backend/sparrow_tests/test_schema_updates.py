@@ -1,6 +1,7 @@
 from pytest import mark
 from geoalchemy2.shape import from_shape
 from shapely.geometry import shape
+from sparrow.interface import model_interface
 
 test_sample = {
     "name": "4c1321a",
@@ -10,6 +11,7 @@ test_sample = {
 
 
 class TestSchemaUpdates:
+    @mark.skip
     def test_load_sample_imperative(self, db):
         """A simple test to make sure we can load a single sample with
         a linked material"""
@@ -21,14 +23,19 @@ class TestSchemaUpdates:
         mat = Material(id="Granitic rock")
         obj = Sample(name="3a24aba", location=loc)
         obj._material = mat
+        assert isinstance(obj._material, Material)
         db.session.add(obj)
         db.session.commit()
 
     def test_load_sample_direct(self, db):
         """Test a low-level load and commit of this database object"""
-        SampleSchema = db.interface.sample()
-        assert SampleSchema.opts.model is db.model.sample
+        SampleSchema = model_interface(db.model.sample, session=db.session)()
         res = SampleSchema.load(test_sample, session=db.session)
+        SampleSchema.fields["_material"].model = db.model.vocabulary_material
+        assert isinstance(res, db.model.sample)
+        assert SampleSchema.fields["_material"].related_model is db.model.vocabulary_material
+        assert isinstance(res._material, db.model.vocabulary_material)
+
         db.session.add(res)
         db.session.commit()
 

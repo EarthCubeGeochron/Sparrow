@@ -62,6 +62,7 @@ class Database(MappedDatabaseMixin):
         self.lazy_automap()
 
     def automap(self):
+        log.debug("Automapping")
         super().automap()
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
