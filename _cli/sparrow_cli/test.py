@@ -16,20 +16,30 @@ class TestGroup(DefaultGroup):
 
     Options:
     --help                      Print this page and exit
-    --pytest-help               Print the PyTest help
     --psql                      Provide a psql prompt when testing concludes
     --teardown / --no-teardown  Shut down docker containers on exit
     --quick                     Keep databases and Docker containers
 
-    All command line options specified at the end of the command are passed to
-    the [bold]pytest[/bold] test runner. Help for pytest's commands can be
-    printed using the [cyan]--pytest-help[/cyan] command.
+    All command line options specified at the end of the command are passed
+    to the [bold]pytest[/bold] test runner.
 
-    Some common options:
+    --pytest-help               Show help for the pytest runner
 
-    - Stop on first test and don't capture stdout: [cyan]sparrow test --capture=no --maxfail=0[/cyan]
-    - Repeat a single test: [cyan]sparrow test --quick -k pychron[/cyan]
-    - Only PyChron tests: [cyan]sparrow test --quick -k pychron[/cyan]
+    Custom additions to PYTEST_OPTIONS:
+
+    --include-slow              Include slow-running tests
+    --no-isolate                Disable transaction isolation between test
+                                classes
+
+
+    Motivating examples:
+
+    > Stop on first test and don't capture stdout:
+        [cyan]sparrow test --capture=no --maxfail=0[/cyan]
+    > Repeat a single test:
+        [cyan]sparrow test -k test_incomplete_import_excluded[/cyan]
+    > Only PyChron tests:
+        [cyan]sparrow test --quick -k pychron[/cyan]
 
     [bold]Other subcommands[/bold]:
 

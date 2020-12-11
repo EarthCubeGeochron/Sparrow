@@ -8,6 +8,8 @@ from sparrow.context import _setup_context
 app_ = Sparrow(debug=True)
 
 # Slow tests are opt-in
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--include-slow",
@@ -15,6 +17,14 @@ def pytest_addoption(parser):
         dest="slow",
         default=False,
         help="enable slow-decorated tests",
+    )
+
+    parser.addoption(
+        "--no-isolation",
+        action="store_false",
+        dest="use_isolation",
+        default=True,
+        help="Use database transaction isolation",
     )
 
 
@@ -29,15 +39,18 @@ def app():
 
 
 @fixture(scope="class")
-def db(app):
-    connection = app.database.session.connection()
-    transaction = connection.begin()
-    session_factory = sessionmaker(bind=connection)
-    app.database.session = scoped_session(session_factory)
-    _setup_context(app)
-    yield app.database
-    app.database.session.close()
-    transaction.rollback()
+def db(app, pytestconfig):
+    if pytestconfig.option.use_isolation:
+        connection = app.database.session.connection()
+        transaction = connection.begin()
+        session_factory = sessionmaker(bind=connection)
+        app.database.session = scoped_session(session_factory)
+        _setup_context(app)
+        yield app.database
+        app.database.session.close()
+        transaction.rollback()
+    else:
+        yield app.database
 
 
 @fixture

@@ -21,7 +21,7 @@ class TestSchemaUpdates:
         issue with the way we manage database sessions in the testing
         configuration
         """
-        test_sample.name = "a8fa3ac"
+        test_sample['name'] = "a8fa3ac"
         db.load_data("sample", test_sample)
 
     def test_retrieve_sample(self, db):
