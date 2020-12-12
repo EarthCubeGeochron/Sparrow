@@ -36,6 +36,7 @@ class TestDatabaseInitialization:
         "vocabulary_error_metric",
         "vocabulary_unit",
         "vocabulary_parameter",
+        "vocabulary_parameter_link",
         "analysis",
         "vocabulary_analysis_type",
         "constant",

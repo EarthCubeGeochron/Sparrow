@@ -83,18 +83,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _table(self):
         return self.opts.model.__table__
 
-    def _get_session_instance(self, filters):
-        sess = self.session
-        for inst in list(sess.new):
-            if not isinstance(inst, self.opts.model):
-                continue
-            for k, value in filters.items():
-                if value != getattr(inst, k):
-                    return None
-            log.debug(f"Found instance {inst} in session")
-            return inst
-        return None
-
     def _build_filters(self, data):
         # Filter on properties that actually have a local column
         filters = {}
@@ -147,21 +135,15 @@ class ModelSchema(SQLAlchemyAutoSchema):
         filters, related_models = self._build_filters(data)
 
         msg = f"Finding instance of {self.opts.model.__name__}"
-        # Try to get value from session
-        # log.debug(msg)
-        #
-        # log.debug(f"..related models: {related_models}")
-        # log.debug(f"..data: {data}")
-        instance = self._get_session_instance(filters)
 
         # Need to get relationship columns for primary keys!
+        query = self.session.query(self.opts.model).filter_by(**filters)
+        instance = query.first()
         if instance is None:
-            query = self.session.query(self.opts.model).filter_by(**filters)
-            instance = query.first()
-            if instance is None:
-                log.debug(msg + f"...none found\n...filters: {filters}")
-            else:
-                log.debug(msg + f"...success!\n...filters: {filters}")
+            log.debug(msg + f"...none found\n...filters: {filters}")
+        else:
+            log.debug(msg + f"...success!\n...filters: {filters}")
+
         if instance is None:
             instance = super().get_instance(data)
 
@@ -170,12 +152,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 setattr(instance, k, v)
             self.session.add(instance)
             self.session.flush(objects=[instance])
-
-        # Get rid of filters by value
-        # if self.opts.model.__name__ == 'analysis':
-        #     print(filters)
-        #     import pdb; pdb.set_trace()
-        # self.__instance_cache[__hash] = instance
 
         return instance
 
@@ -191,37 +167,36 @@ class ModelSchema(SQLAlchemyAutoSchema):
             return dict(**value)
         except TypeError:
             pass
-        val_list = ensure_list(value)
-        log.debug("Expanding keys " + str(val_list))
+        pk_vals = ensure_list(value)
+        log.debug("Expanding keys " + str(pk_vals))
 
         model = self.opts.model
         pk = get_primary_keys(model)
-        assert len(pk) == len(val_list)
-        res = {}
-        for col, val in zip(pk, val_list):
-            res[col.key] = val
-
-        return res
+        assert len(pk) == len(pk_vals)
+        return {col.key: val for col, val in zip(pk, pk_vals)}
 
     @post_load
     def make_instance(self, data, **kwargs):
         with self.session.no_autoflush:
             instance = self._get_instance(data)
-        if instance is None:
-            try:
-                # Begin a nested subtransaction
-                self.session.begin_nested()
-                instance = self.opts.model(**data)
-                log.debug(f"Created instance {instance} with parameters {data}")
-                self.session.add(instance)
-                self.session.flush(objects=[instance])
-                self.session.commit()
-                log.debug("Successfully persisted {instance} to database")
-                # assert inspect(instance).persistent
-            except (IntegrityError, FlushError) as err:
-                self.session.rollback()
-                log.debug("Could not persist")
-                log.exception(err)
+
+        if instance is not None:
+            return instance
+
+        try:
+            # Begin a nested subtransaction
+            self.session.begin_nested()
+            instance = self.opts.model(**data)
+            log.debug(f"Created instance {instance} with parameters {data}")
+            self.session.add(instance)
+            self.session.flush(objects=[instance])
+            self.session.commit()
+            log.debug("Successfully persisted {instance} to database")
+            # assert inspect(instance).persistent
+        except (IntegrityError, FlushError) as err:
+            self.session.rollback()
+            log.debug("Could not persist")
+            log.exception(err)
 
         return instance
 
