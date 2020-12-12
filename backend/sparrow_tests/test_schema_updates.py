@@ -2,6 +2,7 @@ from pytest import mark
 from geoalchemy2.shape import from_shape
 from shapely.geometry import shape
 from sparrow.interface import model_interface
+import logging
 
 test_sample = {
     "name": "4c1321a",
@@ -27,11 +28,11 @@ class TestSchemaUpdates:
         db.session.add(obj)
         db.session.commit()
 
-    def test_load_sample_direct(self, db):
+    def test_load_sample_direct(self, caplog, db):
         """Test a low-level load and commit of this database object"""
+        caplog.set_level(logging.DEBUG, logger="marshmallow")
         SampleSchema = model_interface(db.model.sample, session=db.session)()
         res = SampleSchema.load(test_sample, session=db.session)
-        SampleSchema.fields["_material"].model = db.model.vocabulary_material
         assert isinstance(res, db.model.sample)
         assert SampleSchema.fields["_material"].related_model is db.model.vocabulary_material
         assert isinstance(res._material, db.model.vocabulary_material)
@@ -50,4 +51,4 @@ class TestSchemaUpdates:
 
     def test_retrieve_sample(self, db):
         obj = db.session.query(db.model.sample).filter_by(name="4c1321a").one()
-        assert obj.material.id == "Granite"
+        assert obj._material.id == "Granite"
