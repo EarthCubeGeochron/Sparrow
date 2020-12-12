@@ -5,14 +5,12 @@ data from the Sparrow database.
 Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
 from marshmallow_sqlalchemy.fields import Related, Nested
-from marshmallow.fields import Field, Raw, Nested as BaseNested
+from marshmallow.fields import Field, Raw
 from marshmallow.exceptions import ValidationError
 from marshmallow.fields import UUID as _UUID
 from marshmallow.utils import is_collection
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
-from collections.abc import Iterable
-from .util import primary_key
 from ..logs import get_logger
 
 log = get_logger(__name__)
@@ -99,8 +97,7 @@ class SmartNested(Nested, Related):
             return value
         # Better error message for collections.
         if not is_collection(value) and self._many:
-            raise ValidationError(
-                "Provided a single object for a collection field")
+            raise ValidationError("Provided a single object for a collection field")
         if is_collection(value) and not self._many:
             raise ValidationError("Provided a collection for a instance field")
 

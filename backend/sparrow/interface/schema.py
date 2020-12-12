@@ -7,7 +7,6 @@ from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from sqlalchemy.orm import RelationshipProperty
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import inspect
 
 from .util import is_pk_defined, pk_values, prop_is_required
@@ -213,13 +212,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 # Begin a nested subtransaction
                 self.session.begin_nested()
                 instance = self.opts.model(**data)
-                log.debug(
-                    f"Created instance {instance} with parameters {data}")
+                log.debug(f"Created instance {instance} with parameters {data}")
                 self.session.add(instance)
                 self.session.flush(objects=[instance])
                 self.session.commit()
                 log.debug("Successfully persisted {instance} to database")
-                #assert inspect(instance).persistent
+                # assert inspect(instance).persistent
             except (IntegrityError, FlushError) as err:
                 self.session.rollback()
                 log.debug("Could not persist")
