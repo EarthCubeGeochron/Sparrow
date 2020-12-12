@@ -77,10 +77,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
         super().__init__(*args, **kwargs)
 
     def _ready_for_flush(self, instance):
-        if instance is None:
-            return False
-        if any([p is None for p in pk_values(instance)]):
-            return False
         for prop in self.opts.model.__mapper__.iterate_properties:
             is_required = prop_is_required(prop)
             if not is_required:
@@ -137,6 +133,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 filters[prop.key] = None
         return filters, related_models
 
+    def _get_session_instance(self, filters):
+        for obj in self.session.identity_map.values():
+            if isinstance(obj, self.opts.model) and matches(obj, filters):
+                log.debug(f"Found value in session for {filters}!")
+                return obj
+        return None
+
     def _get_instance(self, data):
         """Gets pre-existing instances if they are available."""
 
@@ -147,11 +150,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         msg = f"Finding instance of {self.opts.model.__name__}"
 
-        # Check in session
-        for obj in self.session.identity_map.values():
-            if isinstance(obj, self.opts.model) and matches(obj, filters):
-                log.debug("Found value in session!")
-                return obj
+        instance = self._get_session_instance(filters)
+        if instance is not None:
+            return instance
 
         # Need to get relationship columns for primary keys!
         query = self.session.query(self.opts.model).filter_by(**filters)
@@ -161,11 +162,10 @@ class ModelSchema(SQLAlchemyAutoSchema):
             log.debug(msg + f"...success!\n...filters: {filters}")
             for k, v in data.items():
                 setattr(instance, k, v)
+            return instance
         else:
             log.debug(msg + f"...none found\n...filters: {filters}")
-            instance = super().get_instance(data)
-
-        return instance
+        return super().get_instance(data)
 
     @pre_load
     def expand_primary_keys(self, value, **kwargs):
@@ -194,7 +194,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 log.debug(f"Created instance {instance} with parameters {data}")
                 self.session.add(instance)
                 self.session.flush(objects=[instance])
-                log.debug("Successfully persisted {instance} to database")
+                log.debug(f"Successfully persisted {instance} to database")
         except (IntegrityError, FlushError) as err:
             log.debug("Could not persist")
         return instance
