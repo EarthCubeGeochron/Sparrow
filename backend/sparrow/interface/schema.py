@@ -46,6 +46,16 @@ def is_model_ready(model, data):
     return True
 
 
+def matches(instance, filters):
+    for k, v in filters.items():
+        try:
+            if getattr(instance, k) != v:
+                return False
+        except AttributeError:
+            return False
+    return True
+
+
 class ModelSchema(SQLAlchemyAutoSchema):
     """
     :param: allowed_nests: List of strings or "all"
@@ -137,9 +147,16 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         msg = f"Finding instance of {self.opts.model.__name__}"
 
+        # Check in session
+        for obj in self.session.identity_map.values():
+            if isinstance(obj, self.opts.model) and matches(obj, filters):
+                log.debug("Found value in session!")
+                return obj
+
         # Need to get relationship columns for primary keys!
         query = self.session.query(self.opts.model).filter_by(**filters)
         instance = query.first()
+
         if instance is not None:
             log.debug(msg + f"...success!\n...filters: {filters}")
             for k, v in data.items():
@@ -172,18 +189,14 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         try:
             # Begin a nested subtransaction
-            self.session.begin_nested()
-            instance = self.opts.model(**data)
-            log.debug(f"Created instance {instance} with parameters {data}")
-            self.session.add(instance)
-            self.session.flush(objects=[instance])
-            self.session.commit()
-            log.debug("Successfully persisted {instance} to database")
-            # assert inspect(instance).persistent
+            with self.session.begin_nested():
+                instance = self.opts.model(**data)
+                log.debug(f"Created instance {instance} with parameters {data}")
+                self.session.add(instance)
+                self.session.flush(objects=[instance])
+                log.debug("Successfully persisted {instance} to database")
         except (IntegrityError, FlushError) as err:
-            self.session.rollback()
             log.debug("Could not persist")
-            log.exception(err)
         return instance
 
     @post_dump
