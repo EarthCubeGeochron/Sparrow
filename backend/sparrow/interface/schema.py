@@ -7,6 +7,7 @@ from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from sqlalchemy.orm import RelationshipProperty
+from collections.abc import Mapping
 from sqlalchemy import inspect
 
 from .util import is_pk_defined, pk_values, prop_is_required
@@ -139,46 +140,32 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # Need to get relationship columns for primary keys!
         query = self.session.query(self.opts.model).filter_by(**filters)
         instance = query.first()
-        if instance is None:
-            log.debug(msg + f"...none found\n...filters: {filters}")
-        else:
-            log.debug(msg + f"...success!\n...filters: {filters}")
-
-        if instance is None:
-            instance = super().get_instance(data)
-
         if instance is not None:
+            log.debug(msg + f"...success!\n...filters: {filters}")
             for k, v in data.items():
                 setattr(instance, k, v)
-            self.session.add(instance)
-            self.session.flush(objects=[instance])
+        else:
+            log.debug(msg + f"...none found\n...filters: {filters}")
+            instance = super().get_instance(data)
 
         return instance
 
     @pre_load
     def expand_primary_keys(self, value, **kwargs):
         # If we have a database model, leave it alone.
-        if isinstance(value, self.opts.model):
+        if isinstance(value, self.opts.model) or isinstance(value, Mapping):
             return value
-        # We might have a mapping of values
-        # TODO: a better way to do this might test for whether primary key
-        # columns are specifically present...
-        try:
-            return dict(**value)
-        except TypeError:
-            pass
+
         pk_vals = ensure_list(value)
         log.debug("Expanding keys " + str(pk_vals))
 
-        model = self.opts.model
-        pk = get_primary_keys(model)
+        pk = get_primary_keys(self.opts.model)
         assert len(pk) == len(pk_vals)
         return {col.key: val for col, val in zip(pk, pk_vals)}
 
     @post_load
     def make_instance(self, data, **kwargs):
-        with self.session.no_autoflush:
-            instance = self._get_instance(data)
+        instance = self._get_instance(data)
 
         if instance is not None:
             return instance
@@ -197,13 +184,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
             self.session.rollback()
             log.debug("Could not persist")
             log.exception(err)
-
         return instance
 
     @post_dump
     def remove_internal_fields(self, data, many, **kwargs):
         if not self._show_audit_id:
-            data.pop("audit_id")
+            data.pop("audit_id", None)
         return data
 
     def to_json_schema(self, model):
