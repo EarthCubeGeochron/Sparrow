@@ -40,7 +40,6 @@ class Project(BaseModel):
     def add_session(self, session):
         self.session_collection.append(session)
 
-
 class Session(BaseModel):
     __tablename__ = "session"
 
