@@ -1,9 +1,13 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
-import h from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIActions } from "@macrostrat/ui-components";
 import { Spinner } from "@blueprintjs/core";
+import { FilterBox } from "../filter-list";
+import styles from "./main.styl";
+
+const h = hyperStyled(styles);
 
 /**@description function to implement the infinite scroll component with certain API views
  *
@@ -28,15 +32,25 @@ import { Spinner } from "@blueprintjs/core";
     component: ProjectInfoLink,
   });
  */
-function InfiniteAPIView({ url, unwrapData, params, component, context }) {
+function InfiniteAPIView({
+  url,
+  unwrapData,
+  params,
+  component,
+  context,
+  filterParams,
+}) {
   const [data, setData] = useState([]);
   const [nextPage, setNextPage] = useState("");
+  const [filter, setFilters] = useState({});
+  const [changes, setChanges] = useState(0);
   const { get } = useAPIActions(context);
 
   async function getNextPageAPI(nextPage, url, params) {
     const constParams =
       nextPage == "" ? { per_page: 15 } : { per_page: 15, page: nextPage };
-    const newParams = { ...params, ...constParams };
+    const moreParams = { ...params, ...filterParams };
+    const newParams = { ...moreParams, ...constParams };
     try {
       const data = await get(url, newParams, {});
       return data;
@@ -46,24 +60,33 @@ function InfiniteAPIView({ url, unwrapData, params, component, context }) {
   }
 
   useEffect(() => {
+    dataFetch([]);
+  }, []);
+
+  const dataFetch = (data) => {
     const initData = getNextPageAPI("", url, params);
     initData.then((res) => {
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
-      setNextPage(res.next_page);
+      const next_page = res.next_page;
+      setNextPage(next_page);
       setData(newState);
     });
-  }, []);
+  };
+
+  console.log(filter);
+  console.log(filterParams);
+  useEffect(() => {
+    if (Object.values(filterParams).length > 0) {
+      setData([]);
+      dataFetch([]);
+      setFilters(filterParams);
+    }
+  }, [JSON.stringify(filterParams) !== JSON.stringify(filter)]);
 
   const fetchNewData = () => {
     if (!nextPage) return;
-    const newData = getNextPageAPI(nextPage, url, params);
-    newData.then((res) => {
-      const dataObj = unwrapData(res);
-      const newState = [...data, ...dataObj];
-      setNextPage(res.next_page);
-      setData(newState);
-    });
+    dataFetch(data);
   };
 
   return data.length > 0

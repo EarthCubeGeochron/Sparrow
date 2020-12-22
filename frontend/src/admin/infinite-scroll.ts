@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import {
   ProjectInfoLink, //@ts-ignore
@@ -9,6 +10,7 @@ import { FilterBox } from "../components/filter-list";
 import { InfiniteAPIView } from "../components/infinite-scroll/infinite-api-view";
 import { APIV2Context } from "~/api-v2";
 import styles from "./module.styl";
+import { AdminFilter } from "../filter";
 
 const h = hyperStyled(styles);
 
@@ -23,16 +25,23 @@ function unwrapProjectCardData(data) {
 }
 
 const ProjectListComponent = () => {
-  const filterFields = ["Name", "Samples"];
+  const [params, setParams] = useState({});
+
+  const createParams = (params) => {
+    setParams(params);
+  };
 
   /* List of projects for the catalog. Could potentially move there... */
   return h("div", { style: { position: "relative" } }, [
-    h("div.listcomponent", [h(FilterBox, { filterFields })]),
+    h("div.listcomponent", [
+      h(FilterBox, { content: h(AdminFilter, { createParams }) }),
+    ]),
     h("div", { style: { padding: "1px" } }, [
       h(InfiniteAPIView, {
         url: "/models/project",
         unwrapData: unwrapProjectCardData,
         params: { nest: "publication,session,samnple" },
+        filterParams: { ...params },
         component: ProjectInfoLink,
         context: APIV2Context,
       }),
@@ -58,6 +67,7 @@ function SampleListComponent() {
         url: "/models/sample",
         unwrapData: unwrapSampleCardData,
         params: {},
+        filterParams: {},
         component: SampleListCard,
         context: APIV2Context,
       }),
@@ -91,6 +101,7 @@ function SessionListComponent() {
         params: { nest: "instrument,project,sample" },
         component: SessionLinkCard,
         context: APIV2Context,
+        filterParams: {},
       }),
     ]),
   ]);
@@ -123,9 +134,10 @@ function DataFilesListComponent() {
         url: "/models/data_file",
         unwrapData: unwrapDataFileCardData,
         params: {
-          nest: "data_file_link,sample,session,project",
+          nest: "data_file_link,sample,session",
           has: "data_file_link",
         },
+        filterParams: {},
         component: DataFilesCard,
         context: APIV2Context,
       }),

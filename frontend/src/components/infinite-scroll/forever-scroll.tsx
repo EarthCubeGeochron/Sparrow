@@ -46,26 +46,29 @@ const perPage = 15;
  * @param {function} fetch A function that will call an API to fetch the next page of data when intersection is observed
  */
 function ForeverScroll({ initialData, component, fetch }) {
-  const [state, dispatch] = useReducer(reducer, {
+  const initialState = {
     loadingBottom: false,
     hasMoreAfter: true,
     data: [],
     after: 0,
-  });
+  };
+
+  const [state, dispatch] = useReducer(reducer, initialState);
   const [setBottom, visibleBottom] = useOnScreen();
 
   // List of Data that the application references for indexes
   const totalData = initialData;
-  //console.log(totalData);
 
   const loadBottom = () => {
     dispatch({ type: "startBottom" });
 
-    // api call to fetch more data
-
-    const newData = totalData.slice(after, after + perPage);
-
-    dispatch({ type: "loadedBottom", newData });
+    if (totalData.length < perPage) {
+      let newData = totalData;
+      dispatch({ type: "loadedBottom", newData });
+    } else {
+      let newData = [...totalData.slice(after, after + perPage)];
+      dispatch({ type: "loadedBottom", newData });
+    }
   };
 
   const { loadingBottom, data, after, hasMoreAfter } = state;

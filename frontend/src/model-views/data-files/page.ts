@@ -199,7 +199,7 @@ const DataFileComponent = function(props) {
   const dataFileURL = `/models/data_file/${file_hash}`;
 
   const initdata = useAPIv2Result(dataFileURL, {
-    nest: "data_file_link,session,sample,project",
+    nest: "data_file_link,session,sample",
   });
   if (file_hash == null || initdata == null) {
     return null;

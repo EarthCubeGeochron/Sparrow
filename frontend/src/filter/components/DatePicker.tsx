@@ -18,12 +18,22 @@ import h from "@macrostrat/hyper";
  * Different options for each
  *
  */
-export function DatePicker() {
+export function DatePicker(props) {
+  const { updateDateRange } = props;
+
+  const handleChange = (e) => {
+    if (e[0] != null && e[1] != null) {
+      const dates = e.map((date) => date.toISOString()); // This might throw an error on backend, idk we'll see
+      updateDateRange("date_range", dates);
+    }
+  };
+
   return h(Card, [
     h("h5", ["Session Date: "]),
     h(DateRangeInput, {
       formatDate: (date) => date.toLocaleString(),
       parseDate: (str) => new Date(str),
+      onChange: handleChange,
     }),
   ]);
 }
