@@ -5,8 +5,23 @@ from sqlalchemy import create_engine, MetaData, Table, Column, select
 import pandas as pd
 import json
 from geoalchemy2.shape import from_shape, to_shape
-from shapely.geometry import mapping, shape, Point
+from shapely.geometry import mapping, shape, Point, Polygon
 
+
+def create_bound_shape(pnts: [float], srid = 4326):
+    '''
+        Function to create a bounding polygon location filtering 
+
+        points: needs to be 4 numbers long, [minLong, minLat, maxLong, maxLat]
+    '''
+    #TODO: make it accept any number of points
+    points = [pnt for pnt in pnts] ## make sure all values are positive b/c of error
+    minLong, minLat, maxLong, maxLat = points
+
+    poly = Polygon([[minLong, minLat],[minLong, maxLat],[maxLong ,minLat], [maxLong, maxLat], [minLong, minLat] ])
+    bounding_poly = from_shape(poly, srid=srid)
+
+    return bounding_poly
 
 def get_proj_pub(db):
     '''
