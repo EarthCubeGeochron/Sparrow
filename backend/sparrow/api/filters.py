@@ -1,7 +1,14 @@
 from webargs.fields import DelimitedList, Str, Int, Boolean, DateTime
 from .exceptions import ValidationError
-from sqlalchemy import and_
+from sqlalchemy import and_, or_, func
+from sqlalchemy.orm import joinedload
+from shapely.geometry import box
+from geoalchemy2.shape import from_shape
 import datetime
+
+from sparrow.context import app_context
+from ..datasheet.utils import create_bound_shape
+
 
 def _schema_fields(schema):
     return {getattr(f, "data_key", k): f for k, f in schema.fields.items()}
@@ -112,9 +119,11 @@ class EmbargoFilter(BaseFilter):
         arg = args[self.key] ## either true, false or empty.
 
         if arg: 
-            return query.filter(self.model.embargo_date == None)
+            ## if arg is true, then public only
+            ## embargo date is the date at which a datum becomes public
+            return query.filter(or_(self.model.embargo_date < datetime.datetime.today(), self.model.embargo_date == None))
         else:
-            return query.filter(self.model.embargo_date != None)
+            return query.filter(self.model.embargo_date > datetime.datetime.today())
     
 class DateFilter(BaseFilter):
     '''
@@ -124,8 +133,11 @@ class DateFilter(BaseFilter):
                 return True
 
         for datetime formating we will assume, for now that frontend is passing:
-            2014-06-12/13:23:06 for format %Y-%m-%d/%H:%M:%S
+            2014-06-12 for format %Y-%m-%d
     '''
+
+    ## TODO: pass only year and will search of dates in that year, etc...
+
     key='date_range'
 
     @property
@@ -133,7 +145,7 @@ class DateFilter(BaseFilter):
         return{
             self.key : DelimitedList(
                 Str(), 
-                description="Filter by date or date range, ex: date_range=2013-03-23/14:23:03,2013-05-01/06:00:00 where the format is YYYY-MM-DD/H:M:S"
+                description="Filter by date or date range, ex: date_range=2013-03-23,2013-05-01 where the format is YYYY-MM-DD/H:M:S"
             )
         }
 
@@ -144,7 +156,7 @@ class DateFilter(BaseFilter):
         if self.key not in args:
             return query
 
-        format = "%Y-%m-%d/%H:%M:%S"
+        format = "%Y-%m-%d"
 
         start, end = args[self.key]
         start = datetime.datetime.strptime(start, format)
@@ -153,23 +165,94 @@ class DateFilter(BaseFilter):
         
         return query.filter(and_(self.model.date > start, self.model.date < end))
 
+class DOI_filter(BaseFilter):
+    key='doi_like'
 
+    @property
+    def params(self):
+        return{
+            self.key: Str(
+                description="Search for field by DOI string"
+            )
+        }
+
+    def should_apply(self):
+        answer = hasattr(self.model,"doi") or hasattr(self.model, "publication_collection")
+        return answer
+
+    def apply(self, args, query):
+        if self.key not in args:
+            return query
+
+        doi_string = args[self.key]
+
+        
+        if hasattr(self.model, "publication_collection"):
+
+            db = app_context().database
+
+            publication = db.model.publication
+
+            return query.join(self.model.publication_collection).filter(publication.doi.like(f'%{doi_string}%'))
+
+        ## this allows for fuzzy searching
+        return query.filter(self.model.doi.like(f'%{doi_string}%'))
+
+
+class Coordinate_filter(BaseFilter):
+    key = 'coordinates'
+
+    @property
+    def params(self):
+        return{
+            self.key: DelimitedList(
+                Str(),
+                description = 'Option to filter by coordinates, pass a bounding box, minLong, minLat, maxLong, maxLat'
+            )
+        }
+    def should_apply(self):
+        return hasattr(self.model, "location")
+    
+    
+    def apply(self, args, query):
+        if self.key not in args:
+            return query
+        
+        points = args['coordinates'] # should be an array [minLong, minLat, maxLong, maxLat]
+        pnts = [int(pnt) for pnt in points]
+        bounding_shape = create_bound_shape(pnts)
+
+        # Create issue about SRID (4326)
+        return query.filter(bounding_shape.ST_Contains(func.ST_Transform(self.model.location, 4326)))## add ST_Transform(geom, 4326)
+
+class Geometry_Filter(BaseFilter):
+    key = "geometry"
+
+    @property
+    def params(self):
+        return{
+            self.key: Str( description= "A string of Well Know Text for a Polygon, circle or box, will return all data located WITHIN the geometry provided. NOTE: do NOT add SRID, that is handled automatically")
+        }
+
+    def should_apply(self):
+        return hasattr(self.model, "location")
+
+    def apply(self, args, query):
+        if self.key not in args:
+            return query
+        
+        WKT_shape_text = args[self.key]
+        WKT_query = "SRID=4326;" + WKT_shape_text
+
+        
+        return query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(self.model.location, 4326)))
 '''
     Filters we want to add:
     - Fuzzy searches, as type for something, 
       i.e a material in an input, dropdown results are materials that closest match.
-      Or entering a sample, session, project, etc.. name on that search bar for the admin pages
-    - SQLAlchemy filtering (like, match)
-
-    Register Filter infrastructure:
-    - Location filter: Draw Box on map, or enter in 4 cooridnates
-    - Search by DOI on project page
-         - query.filter(self.model.like/match(search_str))
+      Or entering a sample, session, project, etc.. name on that search bar for the admin pages    
 
     Updating help pages on API
-
-    Issues: not having a should_apply function creates an error with line 184 in model.py
-
     
     Two Separate Filters:
         - Open ended searching through postgres.

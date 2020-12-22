@@ -17,7 +17,10 @@ from ..filters import (
     FieldNotExistsFilter,
     _schema_fields,
     EmbargoFilter,
-    DateFilter
+    DateFilter,
+    DOI_filter,
+    Coordinate_filter,
+    Geometry_Filter,
 )
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
@@ -86,6 +89,9 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self.register_filter(FieldNotExistsFilter)
         self.register_filter(EmbargoFilter)
         self.register_filter(DateFilter)
+        self.register_filter(DOI_filter)
+        self.register_filter(Coordinate_filter)
+        self.register_filter(Geometry_Filter)
 
     @property
     def model(self):
