@@ -26,6 +26,7 @@ function unwrapProjectCardData(data) {
 
 const ProjectListComponent = () => {
   const [params, setParams] = useState({});
+  const possibleFilters = ["embargo", "coordinates", "doi_like", "date_range"];
 
   const createParams = (params) => {
     setParams(params);
@@ -33,9 +34,7 @@ const ProjectListComponent = () => {
 
   /* List of projects for the catalog. Could potentially move there... */
   return h("div", { style: { position: "relative" } }, [
-    h("div.listcomponent", [
-      h(FilterBox, { content: h(AdminFilter, { createParams }) }),
-    ]),
+    h("div.listcomponent", [h(AdminFilter, { createParams, possibleFilters })]),
     h("div", { style: { padding: "1px" } }, [
       h(InfiniteAPIView, {
         url: "/models/project",
