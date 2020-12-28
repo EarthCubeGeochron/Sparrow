@@ -223,7 +223,7 @@ class Coordinate_filter(BaseFilter):
         bounding_shape = create_bound_shape(pnts)
 
         # Create issue about SRID (4326)
-        return query.filter(bounding_shape.ST_Contains(func.ST_Transform(self.model.location, 4326)))## add ST_Transform(geom, 4326)
+        return query.filter(bounding_shape.ST_Contains(func.ST_Transform(self.model.location, 4326)))
 
 class Geometry_Filter(BaseFilter):
     key = "geometry"
@@ -246,19 +246,4 @@ class Geometry_Filter(BaseFilter):
 
         
         return query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(self.model.location, 4326)))
-'''
-    Filters we want to add:
-    - Fuzzy searches, as type for something, 
-      i.e a material in an input, dropdown results are materials that closest match.
-      Or entering a sample, session, project, etc.. name on that search bar for the admin pages    
 
-    Updating help pages on API
-    
-    Two Separate Filters:
-        - Open ended searching through postgres.
-            - Search that isn't confined to specific model
-                - Database problem... postgres open search
-                - Join all info from table columns into 1 large searchable string
-
-        - Specific filtering capabilities similar to this page's classes.
-'''
