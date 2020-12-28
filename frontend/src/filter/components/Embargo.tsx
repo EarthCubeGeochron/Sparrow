@@ -29,13 +29,14 @@ export function EmabrgoSwitch(props) {
     }
   };
 
-  const Switcher = h(Switch, {
-    checked,
-    innerLabel: "Pubic Only",
-    innerLabelChecked: "Private Only",
-    onChange: handleChange,
-    disabled: !checkbox,
-  });
+  const Switcher = !checkbox
+    ? null
+    : h(Switch, {
+        checked,
+        innerLabel: "Pubic Only",
+        innerLabelChecked: "Private Only",
+        onChange: handleChange,
+      });
 
   return h("div", [
     h(Checkbox, {
