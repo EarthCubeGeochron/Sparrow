@@ -150,7 +150,8 @@ class DateFilter(BaseFilter):
         }
 
     def should_apply(self):
-        return hasattr(self.model, "date")
+        answer = hasattr(self.model, "date") or hasattr(self.model, "session_collection")
+        return answer
 
     def apply(self, args, query):
         if self.key not in args:
@@ -161,6 +162,12 @@ class DateFilter(BaseFilter):
         start, end = args[self.key]
         start = datetime.datetime.strptime(start, format)
         end = datetime.datetime.strptime(end, format)
+        
+        if hasattr(self.model, "session_collection"):
+            db = app_context().database
+            Session = db.model.session
+
+            return query.join(self.model.session_collection).filter(and_(Session.date > start, Session.date < end))
 
         
         return query.filter(and_(self.model.date > start, self.model.date < end))
