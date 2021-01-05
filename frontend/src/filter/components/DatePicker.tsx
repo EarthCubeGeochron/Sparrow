@@ -23,7 +23,7 @@ export function DatePicker(props) {
 
   const handleChange = (e) => {
     if (e[0] != null && e[1] != null) {
-      const dates = e.map((date) => date.toISOString().split("T")[0]); // This might throw an error on backend, idk we'll see
+      const dates = e.map((date) => date.toISOString().split("T")[0]);
       updateDateRange("date_range", dates);
     }
   };

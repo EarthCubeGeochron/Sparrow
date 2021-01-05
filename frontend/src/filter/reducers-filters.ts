@@ -31,7 +31,6 @@ export function reducer(state, action) {
     case "removeSingle":
       let param = action.payload.field;
       const newState = objectFilter(state, ([key, value]) => key != param);
-      console.log(state);
       return {
         ...newState,
       };

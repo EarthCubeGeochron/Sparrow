@@ -64,7 +64,7 @@ function SampleFilter({ on_map = false }: Filter) {
 
 const CollapseableEntity = (props) => {
   const [open, setOpen] = useState(false);
-  const { content, params, removeParam } = props;
+  const { content } = props;
 
   const clickChange = () => {
     setOpen(!open);
@@ -72,25 +72,27 @@ const CollapseableEntity = (props) => {
 
   return h("div", [
     h("div", { style: { display: "flex" } }, [
-      h(Button, { icon: "filter", onClick: clickChange, minimal: true }),
-      h(TagContainer, { params, removeParam }),
+      h(Popover, { content, position: "bottom", minimal: true }, [
+        h(Button, { icon: "filter", onClick: clickChange, minimal: true }),
+      ]),
     ]),
-    h(Collapse, { isOpen: open }, [content]),
+    //h(Collapse, { isOpen: open }, [content]),
   ]);
 };
 
 const TagContainer = (props) => {
   const [tags, setTags] = useState({});
-  const { params, removeParam } = props;
-  console.log(tags);
+  const { params, removeParam, createParams } = props;
 
-  //console.log(tags);
   useEffect(() => {
     setTags(params);
   }, [params]);
 
+  useEffect(() => {
+    createParams(tags);
+  }, [JSON.stringify(tags)]);
+
   function objectFilter(obj, predicate) {
-    //const { obj, predicate } = props;
     const newObject = Object.fromEntries(Object.entries(obj).filter(predicate));
     return newObject;
   }
@@ -101,7 +103,6 @@ const TagContainer = (props) => {
     setTags(newTags);
   };
 
-  console.log(Object.keys(tags).length);
   if (Object.keys(tags).length != 0) {
     return h("div", [
       Object.entries(tags).map((entry) => {
@@ -119,10 +120,6 @@ const TagContainer = (props) => {
  *
  * Component that will sit at the top of every admin page infinite scroll.
  *
- * It will have a set of filters to choose from and an Apply button
- *
- * Once Apply button is clicked, a params object will created from the values selected
- * and a new get request will be issues. At least thats the idea
  */
 function AdminFilter(props) {
   // need a prop that grabs set to create params
@@ -146,12 +143,11 @@ function AdminFilter(props) {
     dispatch({ type: "removeSingle", payload: { field: key } });
   };
 
+  const onSubmit = () => {
+    createParams(params);
+    setTags(params);
+  };
   const SumbitFilterButton = () => {
-    const onSubmit = () => {
-      createParams(params);
-      setTags(params);
-    };
-
     return h(
       Button,
       {
@@ -176,8 +172,12 @@ function AdminFilter(props) {
   ]);
 
   return h("div", [
-    h(SearchInput),
-    h(CollapseableEntity, { content: Content, params: tags, removeParam }),
+    h(SearchInput, {
+      rightElement: h(CollapseableEntity, {
+        content: Content,
+      }),
+    }),
+    h(TagContainer, { params: tags, removeParam, createParams }),
   ]);
 }
 

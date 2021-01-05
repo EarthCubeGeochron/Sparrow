@@ -74,15 +74,13 @@ function InfiniteAPIView({
     });
   };
 
-  console.log(filter);
-  console.log(filterParams);
   useEffect(() => {
-    if (Object.values(filterParams).length > 0) {
-      setData([]);
-      dataFetch([]);
-      setFilters(filterParams);
-    }
-  }, [JSON.stringify(filterParams) !== JSON.stringify(filter)]);
+    //if (Object.values(filterParams).length > 0) {
+    setData([]);
+    dataFetch([]);
+    setFilters(filterParams);
+    //}
+  }, [JSON.stringify(filterParams)]);
 
   const fetchNewData = () => {
     if (!nextPage) return;

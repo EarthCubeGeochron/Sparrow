@@ -29,6 +29,12 @@ const ProjectListComponent = () => {
   const possibleFilters = ["embargo", "coordinates", "doi_like", "date_range"];
 
   const createParams = (params) => {
+    // needs logic to drop k,v where v == null
+    for (let [key, value] of Object.entries(params)) {
+      if (value == null) {
+        delete params[key];
+      }
+    }
     setParams(params);
   };
 

@@ -3,6 +3,7 @@ import h from "@macrostrat/hyper";
 import { InputGroup } from "@blueprintjs/core";
 
 export function SearchInput(props) {
+  const { rightElement } = props;
   const [text, setText] = useState("");
 
   const handleChange = (e) => {
@@ -14,5 +15,6 @@ export function SearchInput(props) {
     placeholder: "Search for anything...",
     value: text,
     onChange: handleChange,
+    rightElement,
   });
 }
