@@ -4,6 +4,11 @@ models:
   researcher: "Names of Researchers associated with projects or publications"
   publication: "Publications associated with projects, samples or sessions"
   instrument: "Names of instruments used in Lab associated with Session"
+  vocabulary_material: "List of Materials associated with Samples"
 
-  vocabulary:
-    material: "List of Materials associated with Samples"
+examples:
+  sample:
+    [
+      "/api/v2/models/sample?nest=material,session&has=location&per_page=10",
+      "/api/v2/models/sample?has=location&geometry=POLYGON((0 0,180 90,180 0,0 90,0 0))",
+    ]

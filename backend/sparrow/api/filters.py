@@ -13,6 +13,9 @@ from ..datasheet.utils import create_bound_shape
 def _schema_fields(schema):
     return {getattr(f, "data_key", k): f for k, f in schema.fields.items()}
 
+def create_params(description, example):
+    '''create param description for api docs'''
+    return {"description": description, "example": example}
 
 class BaseFilter:
     params = None
@@ -52,9 +55,12 @@ class FieldExistsFilter(BaseFilter):
 
     @property
     def params(self):
+        d =  "filter by [field] existence, will return results where passed fields are not null"
+        e = ["?has=name","?has=name,location"]
+        des = create_params(d, e)
         return {
             self.key: DelimitedList(
-                Str(), missing=[], description="filter by [field] existence"
+                Str(), missing=[], description=des
             )
         }
 
@@ -86,6 +92,17 @@ class FieldExistsFilter(BaseFilter):
 class FieldNotExistsFilter(FieldExistsFilter):
     key = "not_has"
 
+    @property
+    def params(self):
+        d =  "filter by [field] existence, will return results where passed fields are null"
+        e = ["?not_has=name","?not_has=name,location"]
+        des = create_params(d, e)
+        return {
+            self.key: DelimitedList(
+                Str(), missing=[], description=des
+            )
+        }
+
     def _field_filter(self, field):
         orm_attr = getattr(self.model, field.name)
         if hasattr(field, "related_model"):
@@ -100,9 +117,12 @@ class EmbargoFilter(BaseFilter):
     
     @property
     def params(self):
+        d= "filter by embargoed or not, (false = private data, true = public data, empty = all data)"
+        e = ["?public=true", "?public=false"]
+        des = create_params(d,e)
         return {
             self.key: Boolean(
-                 description="filter by embargoed or not, (false = private data, true = public data, empty = all data)"
+                 description=des
             )
         }
     
@@ -142,10 +162,13 @@ class DateFilter(BaseFilter):
 
     @property
     def params(self):
+        d = "Filter by date or date range where the format is YYYY-MM-DD"
+        e = ["?date_range=2013-03-23,2013-05-01"]
+        des = create_params(d,e)
         return{
             self.key : DelimitedList(
                 Str(), 
-                description="Filter by date or date range, ex: date_range=2013-03-23,2013-05-01 where the format is YYYY-MM-DD/H:M:S"
+                description=des
             )
         }
 
@@ -177,9 +200,12 @@ class DOI_filter(BaseFilter):
 
     @property
     def params(self):
+        d = "Search for field by DOI string, can be whole string or anypart of doi"
+        e = ["?doi=10.10", "?doi=10.1130/B31239.1"]
+        des = create_params(d,e)
         return{
             self.key: Str(
-                description="Search for field by DOI string"
+                description=des
             )
         }
 
@@ -211,10 +237,13 @@ class Coordinate_filter(BaseFilter):
 
     @property
     def params(self):
+        d= 'Option to filter by coordinates, pass a bounding box, minLong, minLat, maxLong, maxLat'
+        e = ["?coordinates=0,0,180,90"]
+        des = create_params(d,e)
         return{
             self.key: DelimitedList(
                 Str(),
-                description = 'Option to filter by coordinates, pass a bounding box, minLong, minLat, maxLong, maxLat'
+                description = des
             )
         }
     def should_apply(self):
@@ -237,8 +266,11 @@ class Geometry_Filter(BaseFilter):
 
     @property
     def params(self):
+        d = "A string of Well Know Text for a Polygon, circle or box, will return all data located WITHIN the geometry provided. NOTE: do NOT add SRID, that is handled automatically"
+        e = ["?geometry=POLYGON((0 0,180 90,180 0,0 90,0 0))"]
+        des = create_params(d,e)
         return{
-            self.key: Str( description= "A string of Well Know Text for a Polygon, circle or box, will return all data located WITHIN the geometry provided. NOTE: do NOT add SRID, that is handled automatically")
+            self.key: Str( description= des)
         }
 
     def should_apply(self):
@@ -254,3 +286,5 @@ class Geometry_Filter(BaseFilter):
         
         return query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(self.model.location, 4326)))
 
+## TODO: Age range filter, generic parameter filter: pass field and value, Geologic formation filter
+## TODO: Define filter in plugin, i.e irradiation filter for WiscAr
