@@ -286,5 +286,23 @@ class Geometry_Filter(BaseFilter):
         
         return query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(self.model.location, 4326)))
 
+## TODO: Age range filter
+class Age_Range_Filter(BaseFilter):
+    key = "age"
+
+    @property
+    def params(self):
+        d= "Age of Geologic material, passed in thousand years (ka), can take either range or single number"
+        e = ["?age=1200-10000"]
+        des = create_params(d,e)
+        return{
+            self.key: Str(description=des)
+            }
+    def should_apply(self):
+        return hasattr(self.model, "age")
+    pass
+
+
+
 ## TODO: Age range filter, generic parameter filter: pass field and value, Geologic formation filter
 ## TODO: Define filter in plugin, i.e irradiation filter for WiscAr
