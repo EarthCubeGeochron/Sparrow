@@ -10,7 +10,7 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
-from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description
+from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, base_example
 
 log = get_logger(__name__)
 
@@ -49,7 +49,7 @@ class APIEntry(HTTPEndpoint):
         for k, v in request.app.route_descriptions.items():
             desc = {d["route"]: d["description"] for d in v}
             routes[k] = desc
-        return JSONResponse({"routes": routes})
+        return JSONResponse({"routes": routes, "examples": base_example()})
 
 
 def schema(request):
@@ -137,6 +137,8 @@ class APIv2(Starlette):
             description=str(desc),
         )
         self.route_descriptions[root_route].append(basic_info)
+        #self.route_descriptions[root_route].append({"test":"test"})
+
 
     def add_view_route(self, tablename, schema="core_view", description=""):
         _tbl = self._app.database.reflect_table(tablename, schema=schema)

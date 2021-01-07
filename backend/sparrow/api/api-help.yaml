@@ -6,9 +6,16 @@ models:
   instrument: "Names of instruments used in Lab associated with Session"
   vocabulary_material: "List of Materials associated with Samples"
 
+base: ["/api/v2/models/sample", "/api/v2/models/project?per_page=15"]
+
 examples:
   sample:
     [
       "/api/v2/models/sample?nest=material,session&has=location&per_page=10",
       "/api/v2/models/sample?has=location&geometry=POLYGON((0 0,180 90,180 0,0 90,0 0))",
+    ]
+  project:
+    [
+      "/api/v2/models/project?nest=sample,session&date_range=2000-03-23,2013-05-01&per_page=25",
+      "/api/v2/models/project",
     ]
