@@ -18,9 +18,11 @@ import {
   //MapSelector,
 } from "./components";
 import { useToggle, useAPIResult } from "../map/components/APIResult";
-import h from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import { EmabrgoSwitch } from "./components/Embargo";
-import { SettingsApplicationsSharp } from "@material-ui/icons";
+import styles from "./module.styl";
+
+const h = hyperStyled(styles);
 
 /**
  * This Functional Component is a filter template to be used on different
@@ -117,10 +119,11 @@ const TagContainer = (props) => {
 
 function AdminFilter(props) {
   // need a prop that grabs set to create params
-  const { createParams, possibleFilters } = props;
+  const { createParams, possibleFilters, listComponent } = props;
 
   const [params, dispatch] = useReducer(reducer, {});
   const [tags, setTags] = useState({});
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const updateParams = (field, data) => {
     if (field == "date_range") {
@@ -140,6 +143,7 @@ function AdminFilter(props) {
   const onSubmit = () => {
     createParams(params);
     setTags(params);
+    setFilterOpen(!filterOpen);
   };
   const SumbitFilterButton = () => {
     return h(
@@ -165,13 +169,18 @@ function AdminFilter(props) {
     h(SumbitFilterButton),
   ]);
 
-  return h("div", [
-    h(SearchInput, {
-      rightElement: h(CollapseableEntity, {
-        content: Content,
+  return h("div", { style: { position: "relative" } }, [
+    h("div.listcomponent", [
+      h(SearchInput, {
+        rightElement: h(Button, {
+          icon: "filter",
+          onClick: () => setFilterOpen(!filterOpen),
+          minimal: true,
+        }),
       }),
-    }),
-    h(TagContainer, { params: tags, removeParam, createParams }),
+      h(TagContainer, { params: tags, removeParam, createParams }),
+    ]),
+    filterOpen ? Content : listComponent,
   ]);
 }
 

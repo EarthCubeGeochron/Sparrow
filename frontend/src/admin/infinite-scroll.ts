@@ -10,7 +10,6 @@ import { FilterBox } from "../components/filter-list";
 import { InfiniteAPIView } from "../components/infinite-scroll/infinite-api-view";
 import { APIV2Context } from "~/api-v2";
 import styles from "./module.styl";
-import { AdminFilter } from "../filter";
 
 const h = hyperStyled(styles);
 
@@ -24,33 +23,17 @@ function unwrapProjectCardData(data) {
   return dataObj;
 }
 
-const ProjectListComponent = () => {
-  const [params, setParams] = useState({});
-  const possibleFilters = ["embargo", "coordinates", "doi_like", "date_range"];
-
-  const createParams = (params) => {
-    // needs logic to drop k,v where v == null
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-
+const ProjectListComponent = ({ params }) => {
   /* List of projects for the catalog. Could potentially move there... */
-  return h("div", { style: { position: "relative" } }, [
-    h("div.listcomponent", [h(AdminFilter, { createParams, possibleFilters })]),
-    h("div", { style: { padding: "1px" } }, [
-      h(InfiniteAPIView, {
-        url: "/models/project",
-        unwrapData: unwrapProjectCardData,
-        params: { nest: "publication,session,samnple" },
-        filterParams: { ...params },
-        component: ProjectInfoLink,
-        context: APIV2Context,
-      }),
-    ]),
+  return h("div", { style: { padding: "1px" } }, [
+    h(InfiniteAPIView, {
+      url: "/models/project",
+      unwrapData: unwrapProjectCardData,
+      params: { nest: "publication,session,samnple" },
+      filterParams: { ...params },
+      component: ProjectInfoLink,
+      context: APIV2Context,
+    }),
   ]);
 };
 

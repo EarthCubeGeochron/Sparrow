@@ -27,9 +27,23 @@ export function ProjectMainPanel() {
 }
 
 export function ProjectAdminPage() {
+  const [params, setParams] = useState({});
+  const possibleFilters = ["embargo", "coordinates", "doi_like", "date_range"];
 
+  const createParams = (params) => {
+    for (let [key, value] of Object.entries(params)) {
+      if (value == null) {
+        delete params[key];
+      }
+    }
+    setParams(params);
+  };
   return h(AdminPage, {
-    listComponent: h(ProjectListComponent),
+    listComponent: h(AdminFilter, {
+      listComponent: h(ProjectListComponent, { params }),
+      possibleFilters,
+      createParams,
+    }),
     mainPageComponent: h(ProjectMainPanel),
   });
 }
