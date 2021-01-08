@@ -42,8 +42,6 @@ function InfiniteAPIView({
 }) {
   const [data, setData] = useState([]);
   const [nextPage, setNextPage] = useState("");
-  const [filter, setFilters] = useState({});
-  const [changes, setChanges] = useState(0);
   const { get } = useAPIActions(context);
 
   async function getNextPageAPI(nextPage, url, params) {
@@ -60,11 +58,11 @@ function InfiniteAPIView({
   }
 
   useEffect(() => {
-    dataFetch([]);
+    dataFetch(data);
   }, []);
 
-  const dataFetch = (data) => {
-    const initData = getNextPageAPI("", url, params);
+  const dataFetch = (data, next = "") => {
+    const initData = getNextPageAPI(next, url, params);
     initData.then((res) => {
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
@@ -78,13 +76,12 @@ function InfiniteAPIView({
     //if (Object.values(filterParams).length > 0) {
     setData([]);
     dataFetch([]);
-    setFilters(filterParams);
     //}
   }, [JSON.stringify(filterParams)]);
 
   const fetchNewData = () => {
     if (!nextPage) return;
-    dataFetch(data);
+    dataFetch(data, nextPage);
   };
 
   return data.length > 0

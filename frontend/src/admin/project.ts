@@ -7,6 +7,7 @@ import { ProjectListComponent } from "./infinite-scroll";
 import styles from "./module.styl";
 import { NoStateAdmin } from "./baseview";
 import { AdminPage } from "./AdminPage";
+import { AdminFilter } from "../filter";
 
 const h = hyperStyled(styles);
 
@@ -26,6 +27,7 @@ export function ProjectMainPanel() {
 }
 
 export function ProjectAdminPage() {
+
   return h(AdminPage, {
     listComponent: h(ProjectListComponent),
     mainPageComponent: h(ProjectMainPanel),

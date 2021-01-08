@@ -76,7 +76,6 @@ const CollapseableEntity = (props) => {
         h(Button, { icon: "filter", onClick: clickChange, minimal: true }),
       ]),
     ]),
-    //h(Collapse, { isOpen: open }, [content]),
   ]);
 };
 
@@ -116,11 +115,6 @@ const TagContainer = (props) => {
   return null;
 };
 
-/**
- *
- * Component that will sit at the top of every admin page infinite scroll.
- *
- */
 function AdminFilter(props) {
   // need a prop that grabs set to create params
   const { createParams, possibleFilters } = props;
