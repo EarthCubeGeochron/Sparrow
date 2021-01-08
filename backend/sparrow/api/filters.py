@@ -266,7 +266,7 @@ class Geometry_Filter(BaseFilter):
 
     @property
     def params(self):
-        d = "A string of Well Know Text for a Polygon, circle or box, will return all data located WITHIN the geometry provided. NOTE: do NOT add SRID, that is handled automatically"
+        d = "A string of Well Know Text for a Polygon, circle or box, will return all data located WITHIN the geometry provided. NOTE: do NOT add SRID, assumed SRID of 4326, WGS84 Longitude/Latitude"
         e = ["?geometry=POLYGON((0 0,180 90,180 0,0 90,0 0))"]
         des = create_params(d,e)
         return{
@@ -306,3 +306,5 @@ class Age_Range_Filter(BaseFilter):
 
 ## TODO: Age range filter, generic parameter filter: pass field and value, Geologic formation filter
 ## TODO: Define filter in plugin, i.e irradiation filter for WiscAr
+## TODO: Filter based on nested models, /api/v2/datum?nest=project,datum_type&datum_type.unit=Ma&project=11
+
