@@ -103,3 +103,14 @@ class TestAPIV2:
         data = res.json()
         assert data["total_count"] == 1 ## it fails here because theres no data. db.load_data isn't working
         assert data["data"][0]["name"] == "Declarative import test"
+
+    def test_model_analysis(self,client,db):
+        """
+        Test to make sure models/analysis is working because it wasn't
+
+        Seems to work in test...
+        """
+
+        res = client.get("/api/v2/models/analysis")
+        assert res.status_code == 200
+        assert 1==2
