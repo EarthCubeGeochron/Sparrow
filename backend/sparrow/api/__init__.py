@@ -10,7 +10,7 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
-from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, base_example
+from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, root_example, root_info, meta_info
 
 log = get_logger(__name__)
 
@@ -49,7 +49,7 @@ class APIEntry(HTTPEndpoint):
         for k, v in request.app.route_descriptions.items():
             desc = {d["route"]: d["description"] for d in v}
             routes[k] = desc
-        return JSONResponse({"routes": routes, "examples": base_example()})
+        return JSONResponse({**root_info(),"routes": routes, "examples": root_example()})
         ## license, preamble etc. "CC-BY 4.0. More info at /meta" => macrostrat license
 
 
@@ -84,6 +84,9 @@ class APIv2(Starlette):
         # We will want to layer this back in eventually
         # self._schemas = APISpecSchemaGenerator(self.spec)
         self.add_route("/schema", schema, methods=["GET"], include_in_schema=False)
+    
+    def add_meta_route(self):
+        self.add_route("/meta", JSONResponse(meta_info()) , methods=["GET"], include_in_schema=False)
 
     def _add_routes(self):
 
@@ -98,6 +101,7 @@ class APIv2(Starlette):
         self.add_view_route("metrics", schema="vocabulary", description="Data Metrics and Statistics")
 
         self.add_schema_route()
+        self.add_meta_route()
 
     def _add_model_route(self, iface):
         class Meta:
