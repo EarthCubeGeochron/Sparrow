@@ -133,13 +133,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 filters[prop.key] = None
         return filters, related_models
 
-    def _get_session_instance(self, filters):
-        for obj in self.session.identity_map.values():
-            if isinstance(obj, self.opts.model) and matches(obj, filters):
-                log.debug(f"Found value in session for {filters}!")
-                return obj
-        return None
-
     def _get_instance(self, data):
         """Gets pre-existing instances if they are available."""
 
@@ -149,10 +142,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
         filters, related_models = self._build_filters(data)
 
         msg = f"Finding instance of {self.opts.model.__name__}"
-
-        instance = self._get_session_instance(filters)
-        if instance is not None:
-            return instance
 
         # Need to get relationship columns for primary keys!
         query = self.session.query(self.opts.model).filter_by(**filters)
