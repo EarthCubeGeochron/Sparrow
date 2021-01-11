@@ -134,7 +134,10 @@ def cli_tests(ctx, pytest_args):
     help="Shut down docker containers on exit",
 )
 @click.option(
-    "--quick", is_flag=True, default=False, help="Keep databases and Docker containers",
+    "--quick",
+    is_flag=True,
+    default=False,
+    help="Keep databases and Docker containers",
 )
 @click.pass_context
 def sparrow_test_main(
@@ -163,9 +166,14 @@ def sparrow_test_main(
         )
         return
 
-    print("Running sparrow tests")
+    print("Preparing [cyan]Sparrow[/cyan] application images")
 
-    compose("build --quiet")
+    res = compose("build")
+    if res.returncode != 0:
+        print("[red]ERROR[/red]: Could not run tests")
+        sys.exit(res.returncode)
+
+    print("Running sparrow tests")
 
     # Need to bring up database separately to ensure ports are mapped...
     # if not container_is_running("db"):
@@ -176,7 +184,10 @@ def sparrow_test_main(
     flags = "--psql" if psql else ""
     flags += " --keep-database" if quick else ""
     res = compose(
-        "run --rm --service-ports backend", "/bin/run-tests", *pytest_args, flags,
+        "run --rm --service-ports backend",
+        "/bin/run-tests",
+        *pytest_args,
+        flags,
     )
     # if "--keep-database" not in args:
     if quick:
@@ -193,5 +204,4 @@ def indb(*args, **kwargs):
 @sparrow_test.command("dump-dz-database")
 def dump_database():
     """Dump a basic test database containing one detrital zircon sample to stdout"""
-    exec_or_run(
-        "backend", "sparrow_tests/scripts/dump-test-database.py", tty=False)
+    exec_or_run("backend", "sparrow_tests/scripts/dump-test-database.py", tty=False)
