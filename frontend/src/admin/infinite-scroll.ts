@@ -45,21 +45,18 @@ function unwrapSampleCardData(data) {
   return dataObj;
 }
 
-function SampleListComponent() {
+function SampleListComponent({ params }) {
   const filterFields = ["Name", "Material", "id"];
 
   return h("div", [
-    h("div.listcomponent", [h(FilterBox, { filterFields })]),
-    h("div", [
-      h(InfiniteAPIView, {
-        url: "/models/sample",
-        unwrapData: unwrapSampleCardData,
-        params: {},
-        filterParams: {},
-        component: SampleListCard,
-        context: APIV2Context,
-      }),
-    ]),
+    h(InfiniteAPIView, {
+      url: "/models/sample",
+      unwrapData: unwrapSampleCardData,
+      params: {},
+      filterParams: { ...params },
+      component: SampleListCard,
+      context: APIV2Context,
+    }),
   ]);
 }
 
@@ -77,21 +74,16 @@ function unwrapSessionCardData(data) {
   return dataObj;
 }
 
-function SessionListComponent() {
-  const filterFields = ["Technique", "Date Precision", "Target", "Instrument"];
-
-  return h("div", [
-    h("div.listcomponent", [h(FilterBox, { filterFields })]),
-    h("div", { style: { padding: "1px" } }, [
-      h(InfiniteAPIView, {
-        url: "/models/session",
-        unwrapData: unwrapSessionCardData,
-        params: { nest: "instrument,project,sample" },
-        component: SessionLinkCard,
-        context: APIV2Context,
-        filterParams: {},
-      }),
-    ]),
+function SessionListComponent({ params }) {
+  return h("div", { style: { padding: "1px" } }, [
+    h(InfiniteAPIView, {
+      url: "/models/session",
+      unwrapData: unwrapSessionCardData,
+      params: { nest: "instrument,project,sample" },
+      filterParams: { ...params },
+      component: SessionLinkCard,
+      context: APIV2Context,
+    }),
   ]);
 }
 
@@ -112,24 +104,19 @@ function unwrapDataFileCardData(data) {
   return dataObj;
 }
 
-function DataFilesListComponent() {
-  const filterFields = ["Type", "Basename", "Upload Date"];
-
-  return h("div", [
-    h("div.listcomponent", [h(FilterBox, { filterFields })]),
-    h("div", { style: { padding: "1px" } }, [
-      h(InfiniteAPIView, {
-        url: "/models/data_file",
-        unwrapData: unwrapDataFileCardData,
-        params: {
-          nest: "data_file_link,sample,session",
-          has: "data_file_link",
-        },
-        filterParams: {},
-        component: DataFilesCard,
-        context: APIV2Context,
-      }),
-    ]),
+function DataFilesListComponent({ params }) {
+  return h("div", { style: { padding: "1px" } }, [
+    h(InfiniteAPIView, {
+      url: "/models/data_file",
+      unwrapData: unwrapDataFileCardData,
+      params: {
+        nest: "data_file_link,sample,session",
+        has: "data_file_link",
+      },
+      filterParams: { ...params },
+      component: DataFilesCard,
+      context: APIV2Context,
+    }),
   ]);
 }
 

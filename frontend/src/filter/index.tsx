@@ -15,7 +15,7 @@ import {
   DoiFilter,
   SearchInput,
   GeologicFormationSelector,
-  //MapSelector,
+  MapSelector,
 } from "./components";
 import { useToggle, useAPIResult } from "../map/components/APIResult";
 import { hyperStyled } from "@macrostrat/hyper";
@@ -166,6 +166,7 @@ function AdminFilter(props) {
     h.if(possibleFilters.includes("doi_like"))(DoiFilter, {
       updateDoi: updateParams,
     }),
+    h.if(possibleFilters.includes("coordinates"))(MapSelector),
     h(SumbitFilterButton),
   ]);
 
