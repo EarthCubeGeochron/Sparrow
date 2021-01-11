@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import FlushError
 from marshmallow.exceptions import ValidationError
 
 from .util import run_sql_file, run_query, get_or_create
@@ -63,6 +64,7 @@ class Database(MappedDatabaseMixin):
         self.lazy_automap()
 
     def automap(self):
+        log.debug("Automapping")
         super().automap()
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
@@ -75,7 +77,8 @@ class Database(MappedDatabaseMixin):
         cls = self.automap_view(
             "datum",
             Column("datum_id", Integer, primary_key=True),
-            Column("analysis_id", Integer, ForeignKey(self.table.analysis.c.id)),
+            Column("analysis_id", Integer, ForeignKey(
+                self.table.analysis.c.id)),
             Column("session_id", Integer, ForeignKey(self.table.session.c.id)),
             schema="core_view",
         )
@@ -145,7 +148,7 @@ class Database(MappedDatabaseMixin):
                 log.info("Committing entire transaction")
                 session.commit()
                 return res
-            except (IntegrityError, ValidationError) as err:
+            except (IntegrityError, ValidationError, FlushError) as err:
                 session.rollback()
                 # self._flush_nested_objects()
                 # session.add(res)

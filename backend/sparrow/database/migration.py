@@ -20,7 +20,7 @@ def temp_database(conn_string):
         drop_database(engine.url)
 
 
-def db_migration(db, safe=True):
+def db_migration(db, safe=True, apply=False):
     """Create a database migration against the idealized schema"""
     url = "postgres://postgres@db:5432/sparrow_temp_migration"
     with redirect_stdout(sys.stderr):
@@ -36,5 +36,10 @@ def db_migration(db, safe=True):
             m.set_safety(safe)
             # Not sure what this does
             m.add_all_changes()
+    print("===MIGRATION BELOW THIS LINE===", file=sys.stderr)
     for s in m.statements:
-        print(s, file=sys.stdout)
+        if apply:
+            print(s, file=sys.stderr)
+            db.session.execute(s)
+        else:
+            print(s, file=sys.stdout)

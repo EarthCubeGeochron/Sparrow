@@ -1,2 +1,9 @@
 models:
   sample: "Samples organized by the Sparrow data system"
+  session: "Sessions proccessed at Lab, organized by the Sparrow data system"
+  researcher: "Names of Researchers associated with projects or publications"
+  publication: "Publications associated with projects, samples or sessions"
+  instrument: "Names of instruments used in Lab associated with Session"
+
+  vocabulary:
+    material: "List of Materials associated with Samples"

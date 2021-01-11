@@ -36,6 +36,7 @@ class TestDatabaseInitialization:
         "vocabulary_error_metric",
         "vocabulary_unit",
         "vocabulary_parameter",
+        "vocabulary_parameter_link",
         "analysis",
         "vocabulary_analysis_type",
         "constant",
@@ -74,7 +75,7 @@ class TestDatabaseInitialization:
                 return
         assert False
 
-    @mark.skip(reason="This doesn't tend to work.")
+    # @mark.skip(reason="This doesn't tend to work.")
     def test_db_automap_constraints(self, db):
         session = db.model.session
         uuid = session.uuid.prop

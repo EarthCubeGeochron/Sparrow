@@ -24,6 +24,23 @@ from ..web import WebPlugin
 from ..logs import get_logger
 
 log = get_logger(__name__)
+# Should restructure using Starlette's config management
+# https://www.starlette.io/config/
+
+# For some reason, adding logging in this file seems to kill logging in the entire
+# application
+
+
+# Customize Sparrow's root logger so we don't get overridden by uvicorn
+# We may want to customize this further eventually
+# https://github.com/encode/uvicorn/issues/410
+# logger = logging.getLogger("sparrow")
+# if logger.hasHandlers():
+#     logger.handlers.clear()
+# logger.addHandler(console_handler)
+
+# Shim redirect for root path.
+# TODO: clean this up
 
 
 async def redirect(*args):

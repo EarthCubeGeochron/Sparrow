@@ -24,6 +24,6 @@ VALUES
   ('Surface exposure age', 'Duration of surface exposure to present', 'Sparrow'),
   ('Burial age', 'Age of last surface exposure', 'Sparrow'),
   ('Igneous crystallization age', 'Crystallization age of a volcanic or igneous rock', 'Sparrow')
-ON CONFLICT DO UPDATE SET
+ON CONFLICT (id) DO UPDATE SET
   description = EXCLUDED.description,
   authority = EXCLUDED.authority;

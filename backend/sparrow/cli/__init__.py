@@ -141,8 +141,10 @@ def plugins(app):
 
 @cli.command(name="db-migration")
 @with_database
-def _db_migration(db):
-    db_migration(db)
+@click.option("--safe", is_flag=True, default=True)
+@click.option("--apply", is_flag=True, default=False)
+def _db_migration(db, safe=True, apply=False):
+    db_migration(db, safe=safe, apply=apply)
 
 
 def command_info(ctx, cli):
