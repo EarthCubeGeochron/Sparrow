@@ -50,7 +50,6 @@ class APIEntry(HTTPEndpoint):
             desc = {d["route"]: d["description"] for d in v}
             routes[k] = desc
         return JSONResponse({**root_info(),"routes": routes, "examples": root_example()})
-        ## license, preamble etc. "CC-BY 4.0. More info at /meta" => macrostrat license
 
 
 def schema(request):
