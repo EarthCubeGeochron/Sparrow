@@ -104,8 +104,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 )
                 # Shim for the fact that we don't correctly find Session.uuid as unique at the moment...
                 # TODO: fix this in general
-                if self.opts.model.__name__ == "Session" and prop.key == "uuid":
-                    is_fully_defined = True
+                # if self.opts.model.__name__ == "Session" and prop.key == "uuid":
+                #    is_fully_defined = True
                 if is_fully_defined:
                     val = data.get(prop.key, None)
                     if val is not None:
