@@ -29,10 +29,6 @@ log = get_logger(__name__)
 # Should restructure using Starlette's config management
 # https://www.starlette.io/config/
 
-# For some reason, adding logging in this file seems to kill logging in the entire
-# application
-
-
 # Customize Sparrow's root logger so we don't get overridden by uvicorn
 # We may want to customize this further eventually
 # https://github.com/encode/uvicorn/issues/410
