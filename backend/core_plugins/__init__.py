@@ -8,4 +8,6 @@ from .destructive_operations import DestructiveOperationsPlugin
 from .versioning import VersioningPlugin
 from .import_data import ImportDataPlugin
 from .init_sql import InitSQLPlugin
-from sparrow.ext.pychron import PyChronImportPlugin
+
+# We get a "circular import" error doing this...
+# from sparrow.ext.pychron import PyChronImportPlugin

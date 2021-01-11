@@ -5,7 +5,7 @@ modern application server that translates our primary Sparrow app
 with new async server architecture available in Python 3.6+.
 
 This server's technology stack is similar to that of FastAPI,
-but it uses the much more mature Marshmallow schema-generation
+but it uses the more mature Marshmallow schema-generation
 package instead of FastAPI's Pydantic.
 """
 from starlette.applications import Starlette
@@ -20,6 +20,7 @@ from ..api.v1 import APIv1
 from ..plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
 from ..interface import InterfacePlugin
 from ..auth import AuthPlugin
+from ..ext.pychron import PyChronImportPlugin
 from ..web import WebPlugin
 from ..logs import get_logger
 
@@ -142,6 +143,7 @@ class Sparrow(Starlette):
         # self.register_plugin(GraphQLPlugin)
         self.register_plugin(WebPlugin)
         self.register_plugin(InterfacePlugin)
+        self.register_plugin(PyChronImportPlugin)
         self.register_module_plugins(core_plugins)
 
         # Try to import external plugins, but they might not be defined.
