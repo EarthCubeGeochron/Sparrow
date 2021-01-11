@@ -23,6 +23,7 @@ from ..auth import AuthPlugin
 from ..ext.pychron import PyChronImportPlugin
 from ..web import WebPlugin
 from ..logs import get_logger
+from ..encoders import JSONEncoder
 
 log = get_logger(__name__)
 # Should restructure using Starlette's config management
@@ -35,10 +36,6 @@ log = get_logger(__name__)
 # Customize Sparrow's root logger so we don't get overridden by uvicorn
 # We may want to customize this further eventually
 # https://github.com/encode/uvicorn/issues/410
-# logger = logging.getLogger("sparrow")
-# if logger.hasHandlers():
-#     logger.handlers.clear()
-# logger.addHandler(console_handler)
 
 # Shim redirect for root path.
 # TODO: clean this up
@@ -61,20 +58,31 @@ class Sparrow(Starlette):
     db = None
 
     def __init__(self, *args, **kwargs):
+        log.debug("Beginning app load")
         self.verbose = kwargs.pop("verbose", self.verbose)
+
+        self.plugins = SparrowPluginManager()
+
         flask = App(
             self, __name__, config=kwargs.pop("config", None), verbose=self.verbose
         )
         self.flask = flask
-
-        self.plugins = SparrowPluginManager()
-
         _setup_context(flask)
+
+        start = kwargs.pop("start", False)
 
         super().__init__(*args, **kwargs)
 
+        self.load()
+
         # This could maybe be added to the API...
         self.add_exception_handler(WebargsHTTPException, http_exception)
+
+        log.debug("Finished app initialization")
+
+        if start:
+            log.debug("Starting application")
+            self.load_phase_2()
 
     def setup_database(self, db=None):
         # This bootstrapping order leaves much to be desired
@@ -168,13 +176,14 @@ class Sparrow(Starlette):
             ]
         )
 
-        self.mount(router)
+        self.mount("/", router)
 
         self.run_hook("asgi-setup", self)
 
     def load_phase_2(self):
         if self.api_loaded:
             return True
+
         # Database setup is likely redundant, but moves any database-mapping
         # errors forward.
         from ..database import Database

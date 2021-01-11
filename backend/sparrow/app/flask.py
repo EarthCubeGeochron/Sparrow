@@ -33,6 +33,7 @@ class App(Flask):
         # Setup config as suggested in http://flask.pocoo.org/docs/1.0/config/
         cfg = kwargs.pop("config", None)
         verbose = kwargs.pop("verbose", True)
+        log.debug("Loading legacy application")
         super().__init__(*args, **kwargs)
         self.base_app = base_app
         self.verbose = verbose
@@ -44,6 +45,8 @@ class App(Flask):
             self.config.from_pyfile(cfg)
         except RuntimeError as err:
             log.info("No lab-specific configuration file found.")
+
+        log.debug("Loaded flask configuration")
 
         dburl = self.config.get("DATABASE")
         self.db_url = make_url(dburl)

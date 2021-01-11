@@ -4,7 +4,7 @@ from starlette.testclient import TestClient
 from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 
-app_ = Sparrow(debug=True)
+app_ = Sparrow(debug=True, start=True)
 
 # Slow tests are opt-in
 

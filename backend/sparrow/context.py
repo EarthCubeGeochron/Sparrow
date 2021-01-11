@@ -1,4 +1,7 @@
 from contextvars import ContextVar
+from .logs import get_logger
+
+log = get_logger(__name__)
 
 
 class SparrowContext:
@@ -25,6 +28,7 @@ _sparrow_context: ContextVar[SparrowContext] = ContextVar(
 
 
 def _setup_context(v1_app):
+    log.debug("Setting up application context")
     ctx = SparrowContext(v1_app)
     _sparrow_context.set(ctx)
 
