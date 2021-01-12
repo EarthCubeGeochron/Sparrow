@@ -1,5 +1,22 @@
+import sparrow
 from toposort import toposort_flatten
-from .base import SparrowPlugin, SparrowPluginError
+from packaging.specifiers import InvalidSpecifier, SpecifierSet
+from packaging.version import Version
+from .base import SparrowPlugin, SparrowCorePlugin, SparrowPluginError
+from ..logs import get_logger
+
+log = get_logger(__name__)
+
+
+def handle_compat_error(plugin):
+    _error = (
+        f"Plugin '{plugin.name}' is incompatible with Sparrow core "
+        f"version {sparrow.__version__} (expected {plugin.sparrow_version})"
+    )
+    if issubclass(plugin, SparrowCorePlugin):
+        raise SparrowPluginError(_error)
+    else:
+        log.error(_error)
 
 
 class SparrowPluginManager(object):
@@ -24,7 +41,24 @@ class SparrowPluginManager(object):
     def is_ready(self):
         return self.__store is not None
 
+    def _is_compatible(self, plugin):
+        if plugin.sparrow_version is None:
+            return True
+        try:
+            spec = SpecifierSet(plugin.sparrow_version)
+        except InvalidSpecifier:
+            raise SparrowPluginError(
+                f"Plugin '{plugin.name}' specifies an invalid Sparrow compatibility range '{plugin.sparrow_version}'"
+            )
+        return Version(sparrow.__version__) in spec
+
     def add(self, plugin):
+        if not plugin.should_enable(self):
+            return
+        if not self._is_compatible(plugin):
+            handle_compat_error(plugin)
+            return
+
         try:
             self.__init_store.append(plugin)
         except AttributeError:

@@ -14,13 +14,10 @@ from starlette.routing import Mount, Route, RedirectResponse, Router
 from starlette.responses import JSONResponse
 from webargs_starlette import WebargsHTTPException
 from asgiref.wsgi import WsgiToAsgi
-import sparrow
 from .flask import App
 from ..context import _setup_context
 from ..api import APIv2
 from ..api.v1 import APIv1
-from packaging.specifiers import InvalidSpecifier, SpecifierSet
-from packaging.version import Version
 from ..plugins import (
     SparrowPluginManager,
     SparrowPlugin,
@@ -113,26 +110,6 @@ class Sparrow(Starlette):
         return self.db
 
     def register_plugin(self, plugin):
-        if plugin.sparrow_version is not None:
-            try:
-                spec = SpecifierSet(plugin.sparrow_version)
-            except InvalidSpecifier:
-                raise SparrowPluginError(
-                    f"Plugin '{plugin.name}' specifies an invalid Sparrow compatibility range '{plugin.sparrow_version}'"
-                )
-            sparrow_version = Version(sparrow.__version__)
-            if not sparrow_version in spec:
-                _error = (
-                    f"Plugin '{plugin.name}' is incompatible with Sparrow core "
-                    f"version {sparrow_version} (expected {plugin.sparrow_version})"
-                )
-                if issubclass(plugin, SparrowCorePlugin):
-                    raise SparrowPluginError(_error)
-                else:
-                    log.error(_error)
-                return
-        if not plugin.should_enable(self):
-            return
         try:
             self.plugins.add(plugin)
         except Exception as err:
