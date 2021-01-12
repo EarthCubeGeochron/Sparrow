@@ -1,5 +1,4 @@
 import yaml
-import json
 from starlette.applications import Starlette
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse, Response
@@ -8,7 +7,6 @@ from sparrow.logs import get_logger
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from collections import defaultdict
-from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
 from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description
 

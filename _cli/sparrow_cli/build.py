@@ -4,7 +4,7 @@ from rich import print
 from pathlib import Path
 
 from .util import cmd
-from yaml import safe_load
+from json import load
 
 images_ = ["backend-base", "db-mysql-fdw", "backend", "frontend"]
 ORG = "sparrowdata"
@@ -16,8 +16,8 @@ def root():
 
 def get_image_info():
     # We should probably load version info from docker-compose files
-    fp = root() / "sparrow-version.yaml"
-    return safe_load(fp.open("r"))["docker_images"]
+    fp = root() / "sparrow-version.json"
+    return load(fp.open("r"))["docker_images"]
 
 
 @click.command(name="build")

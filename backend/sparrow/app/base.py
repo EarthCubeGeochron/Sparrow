@@ -12,18 +12,20 @@ from starlette.applications import Starlette
 from starlette.routing import Mount, Route, RedirectResponse, Router
 from starlette.responses import JSONResponse
 from webargs_starlette import WebargsHTTPException
-from asgiref.wsgi import WsgiToAsgi
-from .flask import App
+from sparrow import settings
 from ..context import _setup_context
 from ..api import APIv2
-from ..api.v1 import APIv1
-from ..plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
+from ..api.v1 import APIv1Plugin
+from ..plugins import (
+    SparrowPluginManager,
+    SparrowPlugin,
+    SparrowCorePlugin,
+)
 from ..interface import InterfacePlugin
 from ..auth import AuthPlugin
 from ..ext.pychron import PyChronImportPlugin
 from ..web import WebPlugin
 from ..logs import get_logger
-from ..encoders import JSONEncoder
 
 log = get_logger(__name__)
 # Should restructure using Starlette's config management
@@ -47,55 +49,46 @@ async def http_exception(request, exc):
 
 class Sparrow(Starlette):
     plugins: SparrowPluginManager
-    flask: App
     api_loaded: bool = False
     is_loaded: bool = False
     verbose: bool = False
     db = None
+    _routes = []
 
     def __init__(self, *args, **kwargs):
         log.debug("Beginning app load")
         self.verbose = kwargs.pop("verbose", self.verbose)
 
+        self.config = kwargs.pop("config", None)
         self.plugins = SparrowPluginManager()
 
-        flask = App(
-            self, __name__, config=kwargs.pop("config", None), verbose=self.verbose
-        )
-        self.flask = flask
-        _setup_context(flask)
+        _setup_context(self)
 
         start = kwargs.pop("start", False)
 
         super().__init__(*args, **kwargs)
 
-        self.load()
+        self.initialize_plugins()
 
         # This could maybe be added to the API...
         self.add_exception_handler(WebargsHTTPException, http_exception)
 
-        log.debug("Finished app initialization")
-
         if start:
             log.debug("Starting application")
-            self.load_phase_2()
+            self.setup_server()
 
-    def setup_database(self, db=None):
-        # This bootstrapping order leaves much to be desired
+    def setup_database(self):
         from ..database import Database
 
-        self.load()
-        if self.db is not None and self.database_ready:
-            return self.db
-        if db is None:
-            db = Database(self.flask)
-        self.db = db
-        self.run_hook("database-available", db)
+        # This bootstrapping order leaves much to be desired
+        self.initialize_plugins()
+        self.db = Database(settings.DATABASE, self)
+        self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
         if self.db.automap_base is not None:
-            self.run_hook("database-ready", db)
+            self.run_hook("database-ready", self.db)
             self.database_ready = True
-        return db
+        return self.db
 
     @property
     def database(self):
@@ -107,13 +100,7 @@ class Sparrow(Starlette):
         try:
             self.plugins.add(plugin)
         except Exception as err:
-            name = plugin.__class__.__name__
-            log.error("Could not register plugin", name, err)
-
-    def __loaded(self):
-        log.info("Initializing plugins")
-        self.is_loaded = True
-        self.plugins.finalize(self.flask)
+            log.error("Could not register plugin", plugin.name, err)
 
     def run_hook(self, hook_name, *args, **kwargs):
         log.info("Running hook " + hook_name)
@@ -122,8 +109,8 @@ class Sparrow(Starlette):
             method = getattr(plugin, method_name, None)
             if method is None:
                 continue
-            method(*args, **kwargs)
             log.info("  plugin: " + plugin.name)
+            method(*args, **kwargs)
 
     def register_module_plugins(self, module):
         for _, obj in module.__dict__.items():
@@ -137,7 +124,7 @@ class Sparrow(Starlette):
 
             self.register_plugin(obj)
 
-    def load(self):
+    def initialize_plugins(self):
         if self.is_loaded:
             return
         import core_plugins
@@ -145,6 +132,7 @@ class Sparrow(Starlette):
         self.register_plugin(AuthPlugin)
         # GraphQL is disabled for now
         # self.register_plugin(GraphQLPlugin)
+        self.register_plugin(APIv1Plugin)
         self.register_plugin(WebPlugin)
         self.register_plugin(InterfacePlugin)
         self.register_plugin(PyChronImportPlugin)
@@ -159,61 +147,26 @@ class Sparrow(Starlette):
             log.info("Could not find external Sparrow plugins.")
             log.info(err)
 
-        self.__loaded()
+        self.is_loaded = True
+        self.plugins.finalize(self)
+        log.info("Finished loading plugins")
 
-    def create_api(self):
-        api_v2 = APIv2(self.flask)
-
-        router = Router(
-            [
-                Route("/api/v2", endpoint=redirect),
-                Mount("/api/v2/", app=api_v2),
-                Mount("/", app=WsgiToAsgi(self.flask)),
-            ]
-        )
-
-        self.mount("/", router)
-
-        self.run_hook("asgi-setup", self)
-
-    def load_phase_2(self):
+    def setup_server(self):
         if self.api_loaded:
             return True
 
-        # Database setup is likely redundant, but moves any database-mapping
-        # errors forward.
-        from ..database import Database
+        db = self.setup_database()
 
-        db = self.setup_database(Database(self.flask))
+        api_v2 = APIv2(self)
 
-        # Setup API
-        api = APIv1(db)
+        route_table = [
+            Route("/api/v2", endpoint=redirect),
+            Mount("/api/v2/", app=api_v2),
+        ]
 
-        # Register all views in schema
-        for tbl in db.entity_names(schema="core_view"):
-            if tbl.endswith("_tree"):
-                continue
-            api.build_route(tbl, schema="core_view")
+        self.run_hook("add-routes", route_table)
 
-        for tbl in db.entity_names(schema="lab_view"):
-            api.build_route(tbl, schema="lab_view")
-
-        self.api = api
-        self.flask.register_blueprint(api.blueprint, url_prefix="/api/v1")
-        self.flask.config["RESTFUL_JSON"] = dict(cls=JSONEncoder)
-
-        self.run_hook("api-initialized", api)
+        self.mount("/", Router(route_table))
         self.run_hook("finalize-routes")
 
-        # If we want to just serve assets without a file server...
-        assets = self.flask.config.get("ASSETS_DIRECTORY", None)
-        if assets is not None:
-
-            @self.flask.route("/assets/<path:filename>")
-            def assets_route(filename):
-                return send_from_directory(assets, filename)
-
-        self.api_loaded = True
-        self.run_hook("load-complete")
-
-        self.create_api()
+        self.run_hook("asgi-setup", self)

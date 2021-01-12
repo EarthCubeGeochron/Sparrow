@@ -1,8 +1,7 @@
 from flask import current_app
 from flask_restful import Resource
 from sparrow import get_logger
-from sparrow.api.v1.base import APIResourceCollection
-from sparrow.api.v1 import ModelEditParser, get_jwt_identity
+from sparrow.api.v1 import APIResourceCollection, ModelEditParser, get_jwt_identity
 from sparrow.plugins import SparrowCorePlugin
 
 log = get_logger(__name__)
@@ -42,6 +41,7 @@ class ProjectEditResource(Resource):
 
 class ProjectEditPlugin(SparrowCorePlugin):
     name = "project-edit"
+    sparrow_version = ">=2.*"
 
-    def on_api_initialized(self, api):
+    def on_api_v1_initialized(self, api):
         api.add_resource(ProjectEditAPI, "/edit/project")

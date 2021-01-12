@@ -8,3 +8,4 @@ if not sys.warnoptions:
 from .logs import get_logger
 from .app import Sparrow
 from .database import Database
+from .meta import __version__

@@ -13,8 +13,8 @@ from ..database.migration import db_migration
 
 def _build_app_context(config):
     app = Sparrow(config=config, verbose=False)
-    app.load()
-    return app.flask
+    app.initialize_plugins()
+    return app
 
 
 class SparrowCLI(click.Group):
