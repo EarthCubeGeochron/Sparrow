@@ -1,4 +1,4 @@
-from click import group
+from click import group, secho
 from .group import CommandGroup
 from .util import compose
 from os import environ, path, chdir
@@ -38,6 +38,8 @@ def sync_version_info():
     info = json.load(open(version_file, "r"))
     if info["core"] == meta["__version__"]:
         return
+
+    secho("Updating version information", fg="green", err=True)
     info["core"] = meta["__version__"]
     json.dump(info, open(version_file, "w"), indent=2)
     run(["git", "add", "sparrow-version.json"])

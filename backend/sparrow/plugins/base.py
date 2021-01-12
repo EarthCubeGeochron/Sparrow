@@ -3,8 +3,13 @@ class SparrowPluginError(Exception):
 
 
 class SparrowPlugin(object):
+    """A base plugin for Sparrow
+
+    sparrow_version can be set to a specifier of valid versions of Sparrow. This may
+    become mandatory in a future release of Sparrow.
+    """
+
     dependencies = []
-    # A semantic versioning string
     sparrow_version = None
     name = None
 

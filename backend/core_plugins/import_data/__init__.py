@@ -58,7 +58,7 @@ class ImportDataResource(Resource):
 
 class ImportDataPlugin(SparrowCorePlugin):
     name = "import-data"
-    sparrow_version = ">=1"
+    sparrow_version = "~=1.0"
 
     def on_api_initialized(self, api):
         api.add_resource(ImportDataAPI, "/import-data")
