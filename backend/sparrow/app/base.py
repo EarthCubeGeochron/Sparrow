@@ -8,16 +8,24 @@ This server's technology stack is similar to that of FastAPI,
 but it uses the more mature Marshmallow schema-generation
 package instead of FastAPI's Pydantic.
 """
+import warnings
 from starlette.applications import Starlette
 from starlette.routing import Mount, Route, RedirectResponse, Router
 from starlette.responses import JSONResponse
 from webargs_starlette import WebargsHTTPException
 from asgiref.wsgi import WsgiToAsgi
+from semantic_version import SimpleSpec, Version
+import sparrow
 from .flask import App
 from ..context import _setup_context
 from ..api import APIv2
 from ..api.v1 import APIv1
-from ..plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
+from ..plugins import (
+    SparrowPluginManager,
+    SparrowPlugin,
+    SparrowCorePlugin,
+    SparrowPluginError,
+)
 from ..interface import InterfacePlugin
 from ..auth import AuthPlugin
 from ..ext.pychron import PyChronImportPlugin
@@ -104,11 +112,22 @@ class Sparrow(Starlette):
         return self.db
 
     def register_plugin(self, plugin):
+        if not plugin.should_enable(self):
+            return
+        if plugin.sparrow_version is not None:
+            spec = SimpleSpec(plugin.sparrow_version)
+            sparrow_version = Version(sparrow.__version__)
+            if not spec.match(sparrow_version):
+                log.error(
+                    f"Plugin '{plugin.name}' is incompatible with Sparrow backend version {sparrow_version}"
+                )
+                return
+        if not plugin.should_enable(self):
+            return
         try:
             self.plugins.add(plugin)
         except Exception as err:
-            name = plugin.__class__.__name__
-            log.error("Could not register plugin", name, err)
+            log.error("Could not register plugin", plugin.name, err)
 
     def __loaded(self):
         log.info("Initializing plugins")
@@ -204,14 +223,6 @@ class Sparrow(Starlette):
 
         self.run_hook("api-initialized", api)
         self.run_hook("finalize-routes")
-
-        # If we want to just serve assets without a file server...
-        assets = self.flask.config.get("ASSETS_DIRECTORY", None)
-        if assets is not None:
-
-            @self.flask.route("/assets/<path:filename>")
-            def assets_route(filename):
-                return send_from_directory(assets, filename)
 
         self.api_loaded = True
         self.run_hook("load-complete")

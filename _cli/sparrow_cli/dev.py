@@ -1,6 +1,9 @@
 from click import group
 from .group import CommandGroup
 from .util import compose
+from os import environ, path
+from runpy import run_path
+import json
 
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {
@@ -22,3 +25,15 @@ for k, v in shell_commands.items():
 def dev_reload():
     """Reload the web browser when the app is in development mode"""
     compose("exec frontend /app/node_modules/.bin/browser-sync reload")
+
+
+@sparrow_dev.command(name="sync-version-info")
+def sync_version_info():
+    root_dir = environ.get("SPARROW_PATH")
+    meta = run_path(path.join(root_dir, "backend", "sparrow", "meta.py"))
+
+    version_file = path.join(root_dir, "sparrow-version.json")
+    info = json.load(open(version_file, "r"))
+    if info["core"] != meta["__version__"]:
+        info["core"] = meta["__version__"]
+        json.dump(info, open(version_file, "w"), indent=2)
