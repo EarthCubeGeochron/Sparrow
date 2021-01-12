@@ -8,6 +8,10 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## [Unreleased] - 2021-01-11
+
+- Added Visual Studio Code language server support within Sparrow's backend Docker container.
+
 ## [Unreleased] - 2020-10-17
 
 ### Changed
