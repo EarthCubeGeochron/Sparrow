@@ -12,12 +12,10 @@ from starlette.applications import Starlette
 from starlette.routing import Mount, Route, RedirectResponse, Router
 from starlette.responses import JSONResponse
 from webargs_starlette import WebargsHTTPException
-from asgiref.wsgi import WsgiToAsgi
 from sparrow import settings
-from ._legacy import App
 from ..context import _setup_context
 from ..api import APIv2
-from ..api.v1 import APIv1
+from ..api.v1 import APIv1Plugin
 from ..plugins import (
     SparrowPluginManager,
     SparrowPlugin,
@@ -28,7 +26,6 @@ from ..auth import AuthPlugin
 from ..ext.pychron import PyChronImportPlugin
 from ..web import WebPlugin
 from ..logs import get_logger
-from ..encoders import JSONEncoder
 
 log = get_logger(__name__)
 # Should restructure using Starlette's config management
@@ -52,11 +49,11 @@ async def http_exception(request, exc):
 
 class Sparrow(Starlette):
     plugins: SparrowPluginManager
-    flask: App
     api_loaded: bool = False
     is_loaded: bool = False
     verbose: bool = False
     db = None
+    _routes = []
 
     def __init__(self, *args, **kwargs):
         log.debug("Beginning app load")
@@ -112,8 +109,8 @@ class Sparrow(Starlette):
             method = getattr(plugin, method_name, None)
             if method is None:
                 continue
-            method(*args, **kwargs)
             log.info("  plugin: " + plugin.name)
+            method(*args, **kwargs)
 
     def register_module_plugins(self, module):
         for _, obj in module.__dict__.items():
@@ -135,6 +132,7 @@ class Sparrow(Starlette):
         self.register_plugin(AuthPlugin)
         # GraphQL is disabled for now
         # self.register_plugin(GraphQLPlugin)
+        self.register_plugin(APIv1Plugin)
         self.register_plugin(WebPlugin)
         self.register_plugin(InterfacePlugin)
         self.register_plugin(PyChronImportPlugin)
@@ -159,40 +157,16 @@ class Sparrow(Starlette):
 
         db = self.setup_database()
 
-        # Setup API
-        api = APIv1(db)
-
-        # Register all views in schema
-        for tbl in db.entity_names(schema="core_view"):
-            if tbl.endswith("_tree"):
-                continue
-            api.build_route(tbl, schema="core_view")
-
-        for tbl in db.entity_names(schema="lab_view"):
-            api.build_route(tbl, schema="lab_view")
-
-        self.api = api
-
-        self.flask = App(self, __name__, verbose=self.verbose)
-        self.flask.register_blueprint(api.blueprint, url_prefix="")
-        self.flask.config["RESTFUL_JSON"] = dict(cls=JSONEncoder)
-
-        self.run_hook("api-v1-initialized", api)
-
-        self.api_loaded = True
-        self.run_hook("load-complete")
-
         api_v2 = APIv2(self)
 
-        router = Router(
-            [
-                Route("/api/v2", endpoint=redirect),
-                Mount("/api/v2/", app=api_v2),
-                Mount("/api/v1/", app=WsgiToAsgi(self.flask)),
-            ]
-        )
+        route_table = [
+            Route("/api/v2", endpoint=redirect),
+            Mount("/api/v2/", app=api_v2),
+        ]
 
-        self.mount("/", router)
+        self.run_hook("add-routes", route_table)
+
+        self.mount("/", Router(route_table))
         self.run_hook("finalize-routes")
 
         self.run_hook("asgi-setup", self)

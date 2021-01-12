@@ -1,11 +1,10 @@
-from click import echo, style
+from click import style
 from os import environ
 from flask import Flask
 from sqlalchemy.engine.url import make_url
-from ..encoders import JSONEncoder
 
 # from .graph import GraphQLPlugin
-from ..logs import get_logger
+from ...logs import get_logger
 
 log = get_logger(__name__)
 

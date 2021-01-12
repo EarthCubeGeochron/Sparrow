@@ -54,9 +54,6 @@ class WebPlugin(SparrowCorePlugin):
     name = "web"
     sparrow_version = ">=2.*"
 
-    # def should_enable(self):
-    #     return False
-
     def on_finalize_routes(self):
         app = Flask(__name__)
         app.register_blueprint(web, url_prefix="/")
