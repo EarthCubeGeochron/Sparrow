@@ -1,8 +1,9 @@
 from click import group
 from .group import CommandGroup
 from .util import compose
-from os import environ, path
+from os import environ, path, chdir
 from runpy import run_path
+from subprocess import run
 import json
 
 # Commands inherited from earlier shell version of CLI.
@@ -30,10 +31,13 @@ def dev_reload():
 @sparrow_dev.command(name="sync-version-info")
 def sync_version_info():
     root_dir = environ.get("SPARROW_PATH")
-    meta = run_path(path.join(root_dir, "backend", "sparrow", "meta.py"))
+    chdir(root_dir)
+    meta = run_path(path.join("backend", "sparrow", "meta.py"))
 
-    version_file = path.join(root_dir, "sparrow-version.json")
+    version_file = "sparrow-version.json"
     info = json.load(open(version_file, "r"))
-    if info["core"] != meta["__version__"]:
-        info["core"] = meta["__version__"]
-        json.dump(info, open(version_file, "w"), indent=2)
+    if info["core"] == meta["__version__"]:
+        return
+    info["core"] = meta["__version__"]
+    json.dump(info, open(version_file, "w"), indent=2)
+    run(["git", "add", "sparrow-version.json"])

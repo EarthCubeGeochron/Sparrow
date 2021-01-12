@@ -1,5 +1,5 @@
 {
-  "core": "1.6.0",
+  "core": "2.0.0.dev1",
   "frontend": "2.0-alpha",
   "schema": "1.0.1",
   "cli": "2.0-alpha",
