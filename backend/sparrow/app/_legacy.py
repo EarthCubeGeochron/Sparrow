@@ -1,15 +1,10 @@
 from click import echo, style
 from os import environ
-from flask import Flask, send_from_directory
+from flask import Flask
 from sqlalchemy.engine.url import make_url
 from ..encoders import JSONEncoder
-from ..api.v1 import APIv1
-from ..plugins import SparrowPluginManager, SparrowPlugin, SparrowCorePlugin
-from ..interface import InterfacePlugin
-from ..auth import AuthPlugin
 
 # from .graph import GraphQLPlugin
-from ..web import WebPlugin
 from ..logs import get_logger
 
 log = get_logger(__name__)

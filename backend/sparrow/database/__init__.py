@@ -1,7 +1,6 @@
 from contextlib import contextmanager
 from pathlib import Path
 from click import secho
-from os import environ
 
 from sqlalchemy import create_engine, inspect, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -26,33 +25,18 @@ log = get_logger(__name__)
 
 
 class Database(MappedDatabaseMixin):
-    def __init__(self, app=None):
+    def __init__(self, db_conn, app=None):
         """
         We can pass a connection string, a **Flask** application object
         with the appropriate configuration, or nothing, in which
         case we will try to infer the correct database from
         the SPARROW_BACKEND_CONFIG file, if available.
         """
-        self.config = None
-        if app is None:
-            from ..app import App
-
-            # Set config from environment variable
-            app = App(__name__)
-            # Load plugins
-        self.app = app
-
-        self.config = app.config
-        db_conn = self.config.get("DATABASE")
-        # Override with environment variable
-        envvar = environ.get("SPARROW_DATABASE", None)
-        if envvar is not None:
-            db_conn = envvar
-        log.info(db_conn)
-
+        log.info(f"Setting up database connection '{db_conn}'")
         self.engine = create_engine(db_conn, executemany_mode="batch")
         metadata.create_all(bind=self.engine)
         self.meta = metadata
+        self.app = app
 
         # Scoped session for database
         # https://docs.sqlalchemy.org/en/13/orm/contextual.html#unitofwork-contextual
@@ -77,8 +61,7 @@ class Database(MappedDatabaseMixin):
         cls = self.automap_view(
             "datum",
             Column("datum_id", Integer, primary_key=True),
-            Column("analysis_id", Integer, ForeignKey(
-                self.table.analysis.c.id)),
+            Column("analysis_id", Integer, ForeignKey(self.table.analysis.c.id)),
             Column("session_id", Integer, ForeignKey(self.table.session.c.id)),
             schema="core_view",
         )
