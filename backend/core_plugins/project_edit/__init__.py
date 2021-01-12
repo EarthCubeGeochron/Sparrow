@@ -42,6 +42,7 @@ class ProjectEditResource(Resource):
 
 class ProjectEditPlugin(SparrowCorePlugin):
     name = "project-edit"
+    sparrow_version = ">=2.*"
 
-    def on_api_initialized(self, api):
+    def on_api_v1_initialized(self, api):
         api.add_resource(ProjectEditAPI, "/edit/project")

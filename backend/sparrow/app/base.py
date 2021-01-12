@@ -207,7 +207,7 @@ class Sparrow(Starlette):
         self.flask.register_blueprint(api.blueprint, url_prefix="/api/v1")
         self.flask.config["RESTFUL_JSON"] = dict(cls=JSONEncoder)
 
-        self.run_hook("api-initialized", api)
+        self.run_hook("api-v1-initialized", api)
         self.run_hook("finalize-routes")
 
         self.api_loaded = True

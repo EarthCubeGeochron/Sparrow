@@ -42,10 +42,11 @@ class SparrowPluginManager(object):
         return self.__store is not None
 
     def _is_compatible(self, plugin):
+        """Assess package compatibility: https://packaging.pypa.io/en/latest/specifiers.html"""
         if plugin.sparrow_version is None:
             return True
         try:
-            spec = SpecifierSet(plugin.sparrow_version)
+            spec = SpecifierSet(plugin.sparrow_version, prereleases=True)
         except InvalidSpecifier:
             raise SparrowPluginError(
                 f"Plugin '{plugin.name}' specifies an invalid Sparrow compatibility range '{plugin.sparrow_version}'"
