@@ -3,8 +3,8 @@ from flask_restful import Resource, reqparse, inputs, abort
 from textwrap import dedent
 from datetime import datetime
 from sparrow.auth import get_backend, AuthenticationError
-from ...logs import get_logger
 from .util import API
+from ...logs import get_logger
 
 log = get_logger(__name__)
 

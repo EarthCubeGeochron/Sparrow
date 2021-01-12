@@ -80,11 +80,9 @@ class SparrowPluginManager(object):
         return {map[k] for k in res}
 
     def __load_plugin(self, plugin_class, app):
-        try:
-            assert issubclass(plugin_class, SparrowPlugin)
-        except AssertionError:
+        if not issubclass(plugin_class, SparrowPlugin):
             raise SparrowPluginError(
-                "Sparrow plugins must be a " "subclass of SparrowPlugin"
+                "Sparrow plugins must be a subclass of SparrowPlugin"
             )
         return plugin_class(app)
 

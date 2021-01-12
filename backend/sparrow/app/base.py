@@ -14,8 +14,8 @@ from starlette.responses import JSONResponse
 from webargs_starlette import WebargsHTTPException
 from sparrow import settings
 from ..context import _setup_context
-from ..api import APIv2
-from ..api.v1 import APIv1Plugin
+from ..api import APIv2Plugin
+from ..legacy.api_v1 import APIv1Plugin
 from ..plugins import (
     SparrowPluginManager,
     SparrowPlugin,
@@ -28,19 +28,6 @@ from ..web import WebPlugin
 from ..logs import get_logger
 
 log = get_logger(__name__)
-# Should restructure using Starlette's config management
-# https://www.starlette.io/config/
-
-# Customize Sparrow's root logger so we don't get overridden by uvicorn
-# We may want to customize this further eventually
-# https://github.com/encode/uvicorn/issues/410
-
-# Shim redirect for root path.
-# TODO: clean this up
-
-
-async def redirect(*args):
-    return RedirectResponse("/api/v2/")
 
 
 async def http_exception(request, exc):
@@ -53,7 +40,6 @@ class Sparrow(Starlette):
     is_loaded: bool = False
     verbose: bool = False
     db = None
-    _routes = []
 
     def __init__(self, *args, **kwargs):
         log.debug("Beginning app load")
@@ -80,8 +66,6 @@ class Sparrow(Starlette):
     def setup_database(self):
         from ..database import Database
 
-        # This bootstrapping order leaves much to be desired
-        self.initialize_plugins()
         self.db = Database(settings.DATABASE, self)
         self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
@@ -133,6 +117,7 @@ class Sparrow(Starlette):
         # GraphQL is disabled for now
         # self.register_plugin(GraphQLPlugin)
         self.register_plugin(APIv1Plugin)
+        self.register_plugin(APIv2Plugin)
         self.register_plugin(WebPlugin)
         self.register_plugin(InterfacePlugin)
         self.register_plugin(PyChronImportPlugin)
@@ -153,20 +138,12 @@ class Sparrow(Starlette):
 
     def setup_server(self):
         if self.api_loaded:
-            return True
-
-        db = self.setup_database()
-
-        api_v2 = APIv2(self)
-
-        route_table = [
-            Route("/api/v2", endpoint=redirect),
-            Mount("/api/v2/", app=api_v2),
-        ]
-
+            return
+        self.setup_database()
+        route_table = []
         self.run_hook("add-routes", route_table)
-
         self.mount("/", Router(route_table))
         self.run_hook("finalize-routes")
-
         self.run_hook("asgi-setup", self)
+        self.api_loaded = True
+        log.info("Finished setting up server")
