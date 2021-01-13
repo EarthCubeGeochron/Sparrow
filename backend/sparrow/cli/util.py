@@ -4,6 +4,7 @@ from os import devnull
 from click import style, echo
 from contextlib import redirect_stderr
 from functools import update_wrapper
+from sparrow.context import get_database
 import sys
 
 from ..app import Sparrow
@@ -14,6 +15,7 @@ def abort(err):
 
 
 def get_database(ctx, param, value):
+
     try:
         app = Sparrow(config=value)
         return app.database
@@ -36,6 +38,7 @@ with_app = click.make_pass_decorator(Sparrow)
 def with_database(cmd):
     @click.pass_context
     def new_cmd(ctx, *args, **kwargs):
+
         app = ctx.find_object(Sparrow)
         # This seems like it should find the application context
         # correctly, but we seem to be invoking it in a different

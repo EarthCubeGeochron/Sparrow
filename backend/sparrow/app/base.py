@@ -13,14 +13,10 @@ from starlette.routing import Router
 from starlette.responses import JSONResponse
 from webargs_starlette import WebargsHTTPException
 from sparrow import settings
-from ..api import APIv2Plugin
-from ..legacy.api_v1 import APIv1Plugin
-from ..plugins import SparrowPluginManager
-from ..interface import InterfacePlugin
-from ..auth import AuthPlugin
-from ..ext.pychron import PyChronImportPlugin
-from ..web import WebPlugin
 from ..logs import get_logger
+from .plugins import prepare_plugin_manager
+from ..plugins import SparrowPluginManager
+from ..startup import wait_for_database
 
 log = get_logger(__name__)
 
@@ -48,9 +44,10 @@ class Sparrow(Starlette):
 
         super().__init__(*args, **kwargs)
 
-        if start:
-            log.debug("Starting application")
-            self.setup_server()
+    def bootstrap(self):
+        wait_for_database(settings.DATABASE)
+        log.debug("Booting up application server")
+        self.setup_server()
 
     def setup_database(self):
         from ..database import Database
@@ -63,6 +60,9 @@ class Sparrow(Starlette):
             self.database_ready = True
         return self.db
 
+    def run_hook(self, *args, **kwargs):
+        return self.plugins.run_hook(*args, **kwargs)
+
     @property
     def database(self):
         if self.db is None:
@@ -72,44 +72,9 @@ class Sparrow(Starlette):
     def initialize_plugins(self):
         if self.is_loaded:
             return
-        import core_plugins
-
-        mgr = SparrowPluginManager()
-        mgr.add_all(
-            AuthPlugin,
-            APIv1Plugin,
-            APIv2Plugin,
-            WebPlugin,
-            InterfacePlugin,
-            PyChronImportPlugin,
-        )
-        # GraphQL is disabled for now
-        # self.plugins.add(GraphQLPlugin)
-        mgr.add_module(core_plugins)
-
-        # Try to import external plugins, but they might not be defined.
-        try:
-            import sparrow_plugins
-
-            mgr.add_module(sparrow_plugins)
-        except ModuleNotFoundError as err:
-            log.info("Could not load external Sparrow plugins.")
-            log.info(err)
-
-        mgr.finalize(self)
-        self.plugins = mgr
+        self.plugins = prepare_plugin_manager(self)
         self.is_loaded = True
         log.info("Finished loading plugins")
-
-    def run_hook(self, hook_name, *args, **kwargs):
-        log.info("Running hook " + hook_name)
-        method_name = "on_" + hook_name.replace("-", "_")
-        for plugin in self.plugins:
-            method = getattr(plugin, method_name, None)
-            if method is None:
-                continue
-            log.info("  plugin: " + plugin.name)
-            method(*args, **kwargs)
 
     def setup_server(self):
         # This could maybe be added to the API...
