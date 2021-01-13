@@ -6,13 +6,13 @@ from json import dumps
 from click import pass_context
 from .util import with_database, with_app, with_full_app
 from ..util import working_directory
-from ..app import Sparrow
+from ..context import get_sparrow_app
 from ..auth.create_user import create_user
 from ..database.migration import db_migration
 
 
 def _build_app_context(config):
-    app = Sparrow(config=config, verbose=False)
+    app = get_sparrow_app()
     app.initialize_plugins()
     return app
 

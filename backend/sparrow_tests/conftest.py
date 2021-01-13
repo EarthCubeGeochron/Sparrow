@@ -1,3 +1,4 @@
+from sparrow.context import get_sparrow_app
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
 from starlette.testclient import TestClient
@@ -34,7 +35,7 @@ def pytest_configure(config):
 
 @fixture(scope="session")
 def app():
-    return Sparrow()
+    return get_sparrow_app()
 
 
 @fixture(scope="class")
@@ -53,6 +54,6 @@ def db(app, pytestconfig):
 
 
 @fixture
-def client():
+def client(app):
     _client = TestClient(app_)
     yield _client

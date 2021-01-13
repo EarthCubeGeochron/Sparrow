@@ -9,18 +9,13 @@ but it uses the more mature Marshmallow schema-generation
 package instead of FastAPI's Pydantic.
 """
 from starlette.applications import Starlette
-from starlette.routing import Mount, Route, RedirectResponse, Router
+from starlette.routing import Router
 from starlette.responses import JSONResponse
 from webargs_starlette import WebargsHTTPException
 from sparrow import settings
-from ..context import _setup_context
 from ..api import APIv2Plugin
 from ..legacy.api_v1 import APIv1Plugin
-from ..plugins import (
-    SparrowPluginManager,
-    SparrowPlugin,
-    SparrowCorePlugin,
-)
+from ..plugins import SparrowPluginManager
 from ..interface import InterfacePlugin
 from ..auth import AuthPlugin
 from ..ext.pychron import PyChronImportPlugin
@@ -46,8 +41,6 @@ class Sparrow(Starlette):
         self.verbose = kwargs.pop("verbose", self.verbose)
 
         self.config = kwargs.pop("config", None)
-
-        _setup_context(self)
 
         self.initialize_plugins()
 

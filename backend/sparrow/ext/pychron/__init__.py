@@ -5,7 +5,7 @@ from os import path, environ
 from json import load
 from rich import print
 
-from sparrow.context import app_context
+from sparrow.context import get_database
 from .json_transformer import PyChronJSONImporter
 from .repo_crawler import PyChronRepoCrawler
 
@@ -41,7 +41,7 @@ class PyChronImporter(BaseImporter):
 @option("--redo", is_flag=True, default=False)
 def pychron_import_command(db, redo=False):
     """Import PyChron Interpreted Age files."""
-    db = app_context().database
+    db = get_database()
     importer = PyChronImporter(db, verbose=True)
     importer.import_all(redo=redo)
 

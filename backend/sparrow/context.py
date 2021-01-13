@@ -35,3 +35,18 @@ def _setup_context(app):
 
 def app_context() -> SparrowContext:
     return _sparrow_context.get()
+
+
+def get_sparrow_app():
+    from .app.base import Sparrow
+
+    val = _sparrow_context.get()
+    if val is None:
+        app = Sparrow()
+        _setup_context(app)
+        return app
+    return val.app
+
+
+def get_database():
+    return get_sparrow_app().database

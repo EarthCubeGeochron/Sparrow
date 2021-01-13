@@ -1,7 +1,7 @@
 from flask import Blueprint, Response, current_app, abort, Flask
 from asgiref.wsgi import WsgiToAsgi
 from .plugins import SparrowCorePlugin
-from .context import app_context
+from .context import get_sparrow_app
 from .settings import LAB_NAME
 
 web = Blueprint("frontend", __name__)
@@ -10,7 +10,7 @@ web = Blueprint("frontend", __name__)
 @web.route("/data-file/<string:uuid>")
 def stream_data(uuid):
     # Send the user to the "protected" data dir to get the file with NGINX
-    db = app_context().database
+    db = get_sparrow_app().database
     m = db.model.data_file
 
     datafile = db.session.query(m).get(uuid)
@@ -32,7 +32,7 @@ def stream_data(uuid):
 def get_csv(uuid):
     if LAB_NAME != "Arizona LaserChron Center":
         abort(404)
-    db = app_context().database
+    db = get_sparrow_app().database
     m = db.model.data_file
 
     datafile = db.session.query(m).get(uuid)
