@@ -19,6 +19,14 @@ def handle_compat_error(plugin):
         log.error(_error)
 
 
+def handle_load_error(plugin, err):
+    _error = f"Could not load plugin '{plugin.name}': {err}"
+    if issubclass(plugin, SparrowCorePlugin):
+        raise SparrowPluginError(_error)
+    else:
+        log.error(_error)
+
+
 class SparrowPluginManager(object):
     """
     Storage class for plugins. Currently, we enforce a single
@@ -66,6 +74,20 @@ class SparrowPluginManager(object):
             raise SparrowPluginError(
                 "Cannot add plugins after Sparrow is finished loading."
             )
+        except Exception as err:
+            handle_load_error(plugin, err)
+
+    def add_module(self, module):
+        for _, obj in module.__dict__.items():
+            try:
+                assert issubclass(obj, SparrowPlugin)
+            except (TypeError, AssertionError):
+                continue
+
+            if obj in [SparrowPlugin, SparrowCorePlugin]:
+                continue
+
+            self.add(obj)
 
     def order_plugins(self, store=None):
         store = store or self.__store

@@ -86,11 +86,10 @@ def shell(app):
     """
     from IPython import embed
 
-    with app.app_context():
-        db = app.database
-        # `using` is related to this issue:
-        # https://github.com/ipython/ipython/issues/11523
-        embed(using=False)
+    db = app.database
+    # `using` is related to this issue:
+    # https://github.com/ipython/ipython/issues/11523
+    embed(using=False)
 
 
 @cli.command(name="config")
@@ -134,9 +133,8 @@ def plugins(app):
     """
     Print a list of enabled plugins
     """
-    with app.app_context():
-        for p in app.plugins.order_plugins():
-            print(p.name)
+    for p in app.plugins.order_plugins():
+        print(p.name)
 
 
 @cli.command(name="db-migration")

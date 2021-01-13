@@ -9,17 +9,17 @@ class SparrowContext:
     and holds global objects and configuration.
     """
 
-    def __init__(self, flask_app, *args, **kwargs):
-        self.v1_app = flask_app
+    def __init__(self, app, *args, **kwargs):
+        self.app = app
         super().__init__(*args, **kwargs)
 
     @property
     def database(self):
-        return self.v1_app.database
+        return self.app.database
 
     @property
     def plugins(self):
-        return self.v1_app.plugins
+        return self.app.plugins
 
 
 _sparrow_context: ContextVar[SparrowContext] = ContextVar(
@@ -27,9 +27,9 @@ _sparrow_context: ContextVar[SparrowContext] = ContextVar(
 )
 
 
-def _setup_context(v1_app):
+def _setup_context(app):
     log.debug("Setting up application context")
-    ctx = SparrowContext(v1_app)
+    ctx = SparrowContext(app)
     _sparrow_context.set(ctx)
 
 

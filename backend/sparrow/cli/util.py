@@ -7,7 +7,6 @@ from functools import update_wrapper
 import sys
 
 from ..app import Sparrow
-from ..database import Database
 
 
 def abort(err):
@@ -17,7 +16,7 @@ def abort(err):
 def get_database(ctx, param, value):
     try:
         app = Sparrow(config=value)
-        return Database(app)
+        return app.database
     except ValueError:
         raise click.BadParameter("Invalid database specified")
     except OperationalError:
@@ -62,7 +61,7 @@ def with_full_app(cmd):
         # By recreating the app, we actually run constructors (wastefully)
         # twice on startup. We need to refactor the sparrow.app.construct_app
         # to mitigate this.
-        app.load_phase_2()
+        app.setup_server()
         return ctx.invoke(cmd, app, *args, **kwargs)
 
     return update_wrapper(new_cmd, cmd)

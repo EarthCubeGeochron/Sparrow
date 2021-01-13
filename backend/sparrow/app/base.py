@@ -35,29 +35,25 @@ async def http_exception(request, exc):
 
 
 class Sparrow(Starlette):
-    plugins: SparrowPluginManager
     api_loaded: bool = False
     is_loaded: bool = False
     verbose: bool = False
     db = None
+    plugins: SparrowPluginManager
 
     def __init__(self, *args, **kwargs):
         log.debug("Beginning app load")
         self.verbose = kwargs.pop("verbose", self.verbose)
 
         self.config = kwargs.pop("config", None)
-        self.plugins = SparrowPluginManager()
 
         _setup_context(self)
+
+        self.initialize_plugins()
 
         start = kwargs.pop("start", False)
 
         super().__init__(*args, **kwargs)
-
-        self.initialize_plugins()
-
-        # This could maybe be added to the API...
-        self.add_exception_handler(WebargsHTTPException, http_exception)
 
         if start:
             log.debug("Starting application")
@@ -80,11 +76,34 @@ class Sparrow(Starlette):
             self.setup_database()
         return self.db
 
-    def register_plugin(self, plugin):
+    def initialize_plugins(self):
+        if self.is_loaded:
+            return
+        import core_plugins
+
+        self.plugins = SparrowPluginManager()
+        self.plugins.add(AuthPlugin)
+        # GraphQL is disabled for now
+        # self.plugins.add(GraphQLPlugin)
+        self.plugins.add(APIv1Plugin)
+        self.plugins.add(APIv2Plugin)
+        self.plugins.add(WebPlugin)
+        self.plugins.add(InterfacePlugin)
+        self.plugins.add(PyChronImportPlugin)
+        self.plugins.add_module(core_plugins)
+
+        # Try to import external plugins, but they might not be defined.
         try:
-            self.plugins.add(plugin)
-        except Exception as err:
-            log.error("Could not register plugin", plugin.name, err)
+            import sparrow_plugins
+
+            self.plugins.add_module(sparrow_plugins)
+        except ModuleNotFoundError as err:
+            log.info("Could not load external Sparrow plugins.")
+            log.info(err)
+
+        self.is_loaded = True
+        self.plugins.finalize(self)
+        log.info("Finished loading plugins")
 
     def run_hook(self, hook_name, *args, **kwargs):
         log.info("Running hook " + hook_name)
@@ -96,47 +115,10 @@ class Sparrow(Starlette):
             log.info("  plugin: " + plugin.name)
             method(*args, **kwargs)
 
-    def register_module_plugins(self, module):
-        for _, obj in module.__dict__.items():
-            try:
-                assert issubclass(obj, SparrowPlugin)
-            except (TypeError, AssertionError):
-                continue
-
-            if obj in [SparrowPlugin, SparrowCorePlugin]:
-                continue
-
-            self.register_plugin(obj)
-
-    def initialize_plugins(self):
-        if self.is_loaded:
-            return
-        import core_plugins
-
-        self.register_plugin(AuthPlugin)
-        # GraphQL is disabled for now
-        # self.register_plugin(GraphQLPlugin)
-        self.register_plugin(APIv1Plugin)
-        self.register_plugin(APIv2Plugin)
-        self.register_plugin(WebPlugin)
-        self.register_plugin(InterfacePlugin)
-        self.register_plugin(PyChronImportPlugin)
-        self.register_module_plugins(core_plugins)
-
-        # Try to import external plugins, but they might not be defined.
-        try:
-            import sparrow_plugins
-
-            self.register_module_plugins(sparrow_plugins)
-        except ModuleNotFoundError as err:
-            log.info("Could not find external Sparrow plugins.")
-            log.info(err)
-
-        self.is_loaded = True
-        self.plugins.finalize(self)
-        log.info("Finished loading plugins")
-
     def setup_server(self):
+        # This could maybe be added to the API...
+        self.add_exception_handler(WebargsHTTPException, http_exception)
+
         if self.api_loaded:
             return
         self.setup_database()
