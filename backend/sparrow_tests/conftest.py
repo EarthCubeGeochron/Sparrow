@@ -4,10 +4,8 @@ from pytest import fixture
 from starlette.testclient import TestClient
 from sparrow.app import Sparrow
 from sparrow.context import _setup_context
-
-app = Sparrow(debug=True)
-app.bootstrap()
-_setup_context(app)
+from sparrow.startup import wait_for_database
+from .helpers.database import testing_database
 
 # Slow tests are opt-in
 
@@ -37,7 +35,12 @@ def pytest_configure(config):
 
 @fixture(scope="session")
 def app():
-    return get_sparrow_app()
+    wait_for_database("postgresql://postgres@db:5432/postgres")
+    with testing_database("postgresql://postgres@db:5432/sparrow_test"):
+        app = Sparrow(debug=True)
+        app.bootstrap()
+        _setup_context(app)
+        yield app
 
 
 @fixture(scope="class")
