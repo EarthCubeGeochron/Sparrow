@@ -24,7 +24,7 @@ ENV PIP_NO_CACHE_DIR=1
 
 # For graphing the database schema
 RUN git clone https://github.com/davenquinn/sadisplay.git /ext/sadisplay \
- && pip install -e /ext/sadisplay
+  && pip install -e /ext/sadisplay
 
 COPY ./docker-scripts/* /bin/
 RUN mkdir /app
@@ -37,7 +37,7 @@ RUN pip install -e .
 
 # Copy command-line options to a place where they can be easily accessed
 # by the wrapper CLI.
-RUN SPARROW_SECRET_KEY=test sparrow get-cli-info > /run/cli-info.json
+RUN SPARROW_SECRET_KEY=test /app/sparrow/__main__.py get-cli-info > /run/cli-info.json
 
 CMD ["/bin/run"]
 

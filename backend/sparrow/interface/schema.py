@@ -5,8 +5,9 @@ from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError
+from sqlalchemy.orm.exc import FlushError
 from sqlalchemy.orm import RelationshipProperty
-from sqlalchemy.dialects.postgresql import JSONB
+from collections.abc import Mapping
 from sqlalchemy import inspect
 
 from .util import is_pk_defined, pk_values, prop_is_required
@@ -45,6 +46,16 @@ def is_model_ready(model, data):
     return True
 
 
+def matches(instance, filters):
+    for k, v in filters.items():
+        try:
+            if getattr(instance, k) != v:
+                return False
+        except AttributeError:
+            return False
+    return True
+
+
 class ModelSchema(SQLAlchemyAutoSchema):
     """
     :param: allowed_nests: List of strings or "all"
@@ -66,10 +77,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
         super().__init__(*args, **kwargs)
 
     def _ready_for_flush(self, instance):
-        if instance is None:
-            return False
-        if any([p is None for p in pk_values(instance)]):
-            return False
         for prop in self.opts.model.__mapper__.iterate_properties:
             is_required = prop_is_required(prop)
             if not is_required:
@@ -82,18 +89,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
     @property
     def _table(self):
         return self.opts.model.__table__
-
-    def _get_session_instance(self, filters):
-        sess = self.session
-        for inst in list(sess.new):
-            if not isinstance(inst, self.opts.model):
-                continue
-            for k, value in filters.items():
-                if value != getattr(inst, k):
-                    return None
-            log.debug(f"Found instance {inst} in session")
-            return inst
-        return None
 
     def _build_filters(self, data):
         # Filter on properties that actually have a local column
@@ -109,8 +104,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 )
                 # Shim for the fact that we don't correctly find Session.uuid as unique at the moment...
                 # TODO: fix this in general
-                if self.opts.model.__name__ == "Session" and prop.key == "uuid":
-                    is_fully_defined = True
+                # if self.opts.model.__name__ == "Session" and prop.key == "uuid":
+                #    is_fully_defined = True
                 if is_fully_defined:
                     val = data.get(prop.key, None)
                     if val is not None:
@@ -147,90 +142,59 @@ class ModelSchema(SQLAlchemyAutoSchema):
         filters, related_models = self._build_filters(data)
 
         msg = f"Finding instance of {self.opts.model.__name__}"
-        # Try to get value from session
-        # log.debug(msg)
-        #
-        # log.debug(f"..related models: {related_models}")
-        # log.debug(f"..data: {data}")
-        instance = self._get_session_instance(filters)
 
         # Need to get relationship columns for primary keys!
-        if instance is None:
-            query = self.session.query(self.opts.model).filter_by(**filters)
-            instance = query.first()
-            if instance is None:
-                log.debug(msg + f"...none found\n...filters: {filters}")
-            else:
-                log.debug(msg + f"...success!\n...filters: {filters}")
-        if instance is None:
-            instance = super().get_instance(data)
+        query = self.session.query(self.opts.model).filter_by(**filters)
+        instance = query.first()
 
         if instance is not None:
+            log.debug(msg + f"...success!\n...filters: {filters}")
             for k, v in data.items():
                 setattr(instance, k, v)
-            self.session.add(instance)
-            self.session.flush(objects=[instance])
-
-        # Get rid of filters by value
-        # if self.opts.model.__name__ == 'analysis':
-        #     print(filters)
-        #     import pdb; pdb.set_trace()
-        # self.__instance_cache[__hash] = instance
-
-        return instance
+            return instance
+        else:
+            log.debug(msg + f"...none found\n...filters: {filters}")
+        return super().get_instance(data)
 
     @pre_load
     def expand_primary_keys(self, value, **kwargs):
         # If we have a database model, leave it alone.
-        if isinstance(value, self.opts.model):
+        if isinstance(value, self.opts.model) or isinstance(value, Mapping):
             return value
-        # We might have a mapping of values
-        # TODO: a better way to do this might test for whether primary key
-        # columns are specifically present...
-        try:
-            return dict(**value)
-        except TypeError:
-            pass
-        val_list = ensure_list(value)
-        log.debug("Expanding keys " + str(val_list))
 
-        model = self.opts.model
-        pk = get_primary_keys(model)
-        assert len(pk) == len(val_list)
-        res = {}
-        for col, val in zip(pk, val_list):
-            res[col.key] = val
+        pk_vals = ensure_list(value)
+        log.debug("Expanding keys " + str(pk_vals))
 
-        return res
+        pk = get_primary_keys(self.opts.model)
+        assert len(pk) == len(pk_vals)
+        return {col.key: val for col, val in zip(pk, pk_vals)}
 
     @post_load
     def make_instance(self, data, **kwargs):
-        with self.session.no_autoflush:
-            instance = self._get_instance(data)
-        if instance is None:
-            try:
-                # Begin a nested subtransaction
-                self.session.begin_nested()
+        instance = self._get_instance(data)
+
+        if instance is not None:
+            return instance
+
+        try:
+            # Begin a nested subtransaction
+            with self.session.begin_nested():
                 instance = self.opts.model(**data)
-                self.session.add(instance)
                 log.debug(f"Created instance {instance} with parameters {data}")
-
+                self.session.add(instance)
                 self.session.flush(objects=[instance])
-                self.session.commit()
-                log.debug("Successfully persisted to database")
-            except IntegrityError as err:
-                self.session.rollback()
-                log.debug("Could not persist")
-
+                log.debug(f"Successfully persisted {instance} to database")
+        except (IntegrityError, FlushError) as err:
+            log.debug("Could not persist")
         return instance
 
     @post_dump
     def remove_internal_fields(self, data, many, **kwargs):
         if not self._show_audit_id:
-            data.pop("audit_id")
+            data.pop("audit_id", None)
         return data
 
-    def to_json_schema(model):
+    def to_json_schema(self, model):
         return json_schema.dump(model)
 
     def _available_nests(self):

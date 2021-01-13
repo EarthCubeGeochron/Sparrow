@@ -6,14 +6,14 @@ from json import dumps
 from click import pass_context
 from .util import with_database, with_app, with_full_app
 from ..util import working_directory
-from ..app import App
+from ..context import get_sparrow_app
 from ..auth.create_user import create_user
 from ..database.migration import db_migration
 
 
 def _build_app_context(config):
-    app = App(__name__, config=config, verbose=False)
-    app.load()
+    app = get_sparrow_app()
+    app.initialize_plugins()
     return app
 
 
@@ -86,11 +86,10 @@ def shell(app):
     """
     from IPython import embed
 
-    with app.app_context():
-        db = app.database
-        # `using` is related to this issue:
-        # https://github.com/ipython/ipython/issues/11523
-        embed(using=False)
+    db = app.database
+    # `using` is related to this issue:
+    # https://github.com/ipython/ipython/issues/11523
+    embed(using=False)
 
 
 @cli.command(name="config")
@@ -134,15 +133,16 @@ def plugins(app):
     """
     Print a list of enabled plugins
     """
-    with app.app_context():
-        for p in app.plugins.order_plugins():
-            print(p.name)
+    for p in app.plugins.order_plugins():
+        print(p.name)
 
 
 @cli.command(name="db-migration")
 @with_database
-def _db_migration(db):
-    db_migration(db)
+@click.option("--safe", is_flag=True, default=True)
+@click.option("--apply", is_flag=True, default=False)
+def _db_migration(db, safe=True, apply=False):
+    db_migration(db, safe=safe, apply=apply)
 
 
 def command_info(ctx, cli):

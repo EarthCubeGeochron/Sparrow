@@ -1,5 +1,30 @@
+import sparrow
 from toposort import toposort_flatten
-from .base import SparrowPlugin, SparrowPluginError
+from packaging.specifiers import InvalidSpecifier, SpecifierSet
+from packaging.version import Version
+from .base import SparrowPlugin, SparrowCorePlugin, SparrowPluginError
+from ..logs import get_logger
+
+log = get_logger(__name__)
+
+
+def handle_compat_error(plugin):
+    _error = (
+        f"Plugin '{plugin.name}' is incompatible with Sparrow core "
+        f"version {sparrow.__version__} (expected {plugin.sparrow_version})"
+    )
+    if issubclass(plugin, SparrowCorePlugin):
+        raise SparrowPluginError(_error)
+    else:
+        log.error(_error)
+
+
+def handle_load_error(plugin, err):
+    _error = f"Could not load plugin '{plugin.name}': {err}"
+    if issubclass(plugin, SparrowCorePlugin):
+        raise SparrowPluginError(_error)
+    else:
+        log.error(_error)
 
 
 class SparrowPluginManager(object):
@@ -24,13 +49,45 @@ class SparrowPluginManager(object):
     def is_ready(self):
         return self.__store is not None
 
+    def _is_compatible(self, plugin):
+        """Assess package compatibility: https://packaging.pypa.io/en/latest/specifiers.html"""
+        if plugin.sparrow_version is None:
+            return True
+        try:
+            spec = SpecifierSet(plugin.sparrow_version, prereleases=True)
+        except InvalidSpecifier:
+            raise SparrowPluginError(
+                f"Plugin '{plugin.name}' specifies an invalid Sparrow compatibility range '{plugin.sparrow_version}'"
+            )
+        return Version(sparrow.__version__) in spec
+
     def add(self, plugin):
+        if not plugin.should_enable(self):
+            return
+        if not self._is_compatible(plugin):
+            handle_compat_error(plugin)
+            return
+
         try:
             self.__init_store.append(plugin)
         except AttributeError:
             raise SparrowPluginError(
                 "Cannot add plugins after Sparrow is finished loading."
             )
+        except Exception as err:
+            handle_load_error(plugin, err)
+
+    def add_module(self, module):
+        for _, obj in module.__dict__.items():
+            try:
+                assert issubclass(obj, SparrowPlugin)
+            except (TypeError, AssertionError):
+                continue
+
+            if obj in [SparrowPlugin, SparrowCorePlugin]:
+                continue
+
+            self.add(obj)
 
     def order_plugins(self, store=None):
         store = store or self.__store
@@ -45,11 +102,9 @@ class SparrowPluginManager(object):
         return {map[k] for k in res}
 
     def __load_plugin(self, plugin_class, app):
-        try:
-            assert issubclass(plugin_class, SparrowPlugin)
-        except AssertionError:
+        if not issubclass(plugin_class, SparrowPlugin):
             raise SparrowPluginError(
-                "Sparrow plugins must be a " "subclass of SparrowPlugin"
+                "Sparrow plugins must be a subclass of SparrowPlugin"
             )
         return plugin_class(app)
 

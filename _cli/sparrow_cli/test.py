@@ -16,20 +16,30 @@ class TestGroup(DefaultGroup):
 
     Options:
     --help                      Print this page and exit
-    --pytest-help               Print the PyTest help
     --psql                      Provide a psql prompt when testing concludes
     --teardown / --no-teardown  Shut down docker containers on exit
     --quick                     Keep databases and Docker containers
 
-    All command line options specified at the end of the command are passed to
-    the [bold]pytest[/bold] test runner. Help for pytest's commands can be
-    printed using the [cyan]--pytest-help[/cyan] command.
+    All command line options specified at the end of the command are passed
+    to the [bold]pytest[/bold] test runner.
 
-    Some common options:
+    --pytest-help               Show help for the pytest runner
 
-    - Stop on first test and don't capture stdout: [cyan]sparrow test --capture=no --maxfail=0[/cyan]
-    - Repeat a single test: [cyan]sparrow test --quick -k pychron[/cyan]
-    - Only PyChron tests: [cyan]sparrow test --quick -k pychron[/cyan]
+    Custom additions to PYTEST_OPTIONS:
+
+    --include-slow              Include slow-running tests
+    --no-isolate                Disable transaction isolation between test
+                                classes
+
+
+    Motivating examples:
+
+    > Stop on first test and don't capture stdout:
+        [cyan]sparrow test --capture=no --maxfail=0[/cyan]
+    > Repeat a single test:
+        [cyan]sparrow test -k test_incomplete_import_excluded[/cyan]
+    > Only PyChron tests:
+        [cyan]sparrow test --quick -k pychron[/cyan]
 
     [bold]Other subcommands[/bold]:
 
@@ -49,8 +59,10 @@ class TestGroup(DefaultGroup):
         """Override to make sure we get subcommand help on base `sparrow help` invocation.
         Solution found at https://github.com/click-contrib/click-default-group/issues/14
         """
-        if (not args or args in (["-h"], ["--help"])) and self.default_if_no_args:
-            TestGroup.echo_help(ctx)
+        if args in (["-h"], ["--help"]) and self.default_if_no_args:
+            return TestGroup.echo_help(ctx)
+        if not args:
+            args.insert(0, self.default_cmd_name)
         return super(DefaultGroup, self).parse_args(ctx, args)
 
 
@@ -122,7 +134,10 @@ def cli_tests(ctx, pytest_args):
     help="Shut down docker containers on exit",
 )
 @click.option(
-    "--quick", is_flag=True, default=False, help="Keep databases and Docker containers",
+    "--quick",
+    is_flag=True,
+    default=False,
+    help="Keep databases and Docker containers",
 )
 @click.pass_context
 def sparrow_test_main(
@@ -151,9 +166,14 @@ def sparrow_test_main(
         )
         return
 
-    print("Running sparrow tests")
+    print("Preparing [cyan]Sparrow[/cyan] application images")
 
-    compose("build --quiet")
+    res = compose("build")
+    if res.returncode != 0:
+        print("[red]ERROR[/red]: Could not run tests")
+        sys.exit(res.returncode)
+
+    print("Running sparrow tests")
 
     # Need to bring up database separately to ensure ports are mapped...
     # if not container_is_running("db"):
@@ -164,7 +184,10 @@ def sparrow_test_main(
     flags = "--psql" if psql else ""
     flags += " --keep-database" if quick else ""
     res = compose(
-        "run --rm --service-ports backend", "/bin/run-tests", *pytest_args, flags,
+        "run --rm --service-ports backend",
+        "/bin/run-tests",
+        *pytest_args,
+        flags,
     )
     # if "--keep-database" not in args:
     if quick:
@@ -181,5 +204,4 @@ def indb(*args, **kwargs):
 @sparrow_test.command("dump-dz-database")
 def dump_database():
     """Dump a basic test database containing one detrital zircon sample to stdout"""
-    exec_or_run(
-        "backend", "sparrow_tests/scripts/dump-test-database.py", tty=False)
+    exec_or_run("backend", "sparrow_tests/scripts/dump-test-database.py", tty=False)

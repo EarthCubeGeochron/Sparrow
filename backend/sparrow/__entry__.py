@@ -7,4 +7,4 @@ from .logs import setup_stderr_logs
 from .app import Sparrow
 
 setup_stderr_logs()
-app = Sparrow(debug=True)
+app = Sparrow(debug=True, start=True)

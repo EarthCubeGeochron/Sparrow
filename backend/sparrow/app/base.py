@@ -5,39 +5,24 @@ modern application server that translates our primary Sparrow app
 with new async server architecture available in Python 3.6+.
 
 This server's technology stack is similar to that of FastAPI,
-but it uses the much more mature Marshmallow schema-generation
+but it uses the more mature Marshmallow schema-generation
 package instead of FastAPI's Pydantic.
 """
 from starlette.applications import Starlette
-from starlette.routing import Mount, Route, RedirectResponse
+from starlette.routing import Router
 from starlette.responses import JSONResponse
 from webargs_starlette import WebargsHTTPException
-from asgiref.wsgi import WsgiToAsgi
-from .flask import App
-from ..context import _setup_context
-from ..api import APIv2
+from sparrow import settings
+from ..api import APIv2Plugin
+from ..legacy.api_v1 import APIv1Plugin
+from ..plugins import SparrowPluginManager
+from ..interface import InterfacePlugin
+from ..auth import AuthPlugin
+from ..ext.pychron import PyChronImportPlugin
+from ..web import WebPlugin
+from ..logs import get_logger
 
-# Should restructure using Starlette's config management
-# https://www.starlette.io/config/
-
-# For some reason, adding logging in this file seems to kill logging in the entire
-# application
-
-
-# Customize Sparrow's root logger so we don't get overridden by uvicorn
-# We may want to customize this further eventually
-# https://github.com/encode/uvicorn/issues/410
-# logger = logging.getLogger("sparrow")
-# if logger.hasHandlers():
-#     logger.handlers.clear()
-# logger.addHandler(console_handler)
-
-# Shim redirect for root path.
-# TODO: clean this up
-
-
-async def redirect(*args):
-    return RedirectResponse("/api/v2/")
+log = get_logger(__name__)
 
 
 async def http_exception(request, exc):
@@ -45,24 +30,95 @@ async def http_exception(request, exc):
 
 
 class Sparrow(Starlette):
+    api_loaded: bool = False
+    is_loaded: bool = False
+    verbose: bool = False
+    db = None
+    plugins: SparrowPluginManager
+
     def __init__(self, *args, **kwargs):
-        flask = App(__name__)
-        flask.load()
-        flask.load_phase_2()
+        log.debug("Beginning app load")
+        self.verbose = kwargs.pop("verbose", self.verbose)
 
-        api_v2 = APIv2(flask)
+        self.config = kwargs.pop("config", None)
 
-        _setup_context(flask)
+        self.initialize_plugins()
 
-        routes = [
-            Route("/api/v2", endpoint=redirect),
-            Mount("/api/v2/", app=api_v2),
-            Mount("/", app=WsgiToAsgi(flask)),
-        ]
+        start = kwargs.pop("start", False)
 
-        super().__init__(routes=routes, *args, **kwargs)
-        flask.run_hook("asgi-setup", self)
-        self.flask = flask
+        super().__init__(*args, **kwargs)
 
+        if start:
+            log.debug("Starting application")
+            self.setup_server()
+
+    def setup_database(self):
+        from ..database import Database
+
+        self.db = Database(settings.DATABASE, self)
+        self.run_hook("database-available", self.db)
+        # Database is only "ready" when it is mapped
+        if self.db.automap_base is not None:
+            self.run_hook("database-ready", self.db)
+            self.database_ready = True
+        return self.db
+
+    @property
+    def database(self):
+        if self.db is None:
+            self.setup_database()
+        return self.db
+
+    def initialize_plugins(self):
+        if self.is_loaded:
+            return
+        import core_plugins
+
+        self.plugins = SparrowPluginManager()
+        self.plugins.add(AuthPlugin)
+        # GraphQL is disabled for now
+        # self.plugins.add(GraphQLPlugin)
+        self.plugins.add(APIv1Plugin)
+        self.plugins.add(APIv2Plugin)
+        self.plugins.add(WebPlugin)
+        self.plugins.add(InterfacePlugin)
+        self.plugins.add(PyChronImportPlugin)
+        self.plugins.add_module(core_plugins)
+
+        # Try to import external plugins, but they might not be defined.
+        try:
+            import sparrow_plugins
+
+            self.plugins.add_module(sparrow_plugins)
+        except ModuleNotFoundError as err:
+            log.info("Could not load external Sparrow plugins.")
+            log.info(err)
+
+        self.is_loaded = True
+        self.plugins.finalize(self)
+        log.info("Finished loading plugins")
+
+    def run_hook(self, hook_name, *args, **kwargs):
+        log.info("Running hook " + hook_name)
+        method_name = "on_" + hook_name.replace("-", "_")
+        for plugin in self.plugins:
+            method = getattr(plugin, method_name, None)
+            if method is None:
+                continue
+            log.info("  plugin: " + plugin.name)
+            method(*args, **kwargs)
+
+    def setup_server(self):
         # This could maybe be added to the API...
         self.add_exception_handler(WebargsHTTPException, http_exception)
+
+        if self.api_loaded:
+            return
+        self.setup_database()
+        route_table = []
+        self.run_hook("add-routes", route_table)
+        self.mount("/", Router(route_table))
+        self.run_hook("finalize-routes")
+        self.run_hook("asgi-setup", self)
+        self.api_loaded = True
+        log.info("Finished setting up server")

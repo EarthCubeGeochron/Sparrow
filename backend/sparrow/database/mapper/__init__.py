@@ -29,6 +29,7 @@ def _gen_relationship(
 ):
     if local_cls.__table__.schema is None and referred_cls.__table__.schema is not None:
         kw["backref"] = None
+
     # make use of the built-in function to actually return
     # the result.
     return generate_relationship(

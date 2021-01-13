@@ -31,6 +31,9 @@ click==7.1.2
 click-plugins==1.1.1
 ipython==7.11.1
 
+# Static files
+aiofiles==0.6.0
+
 # Import file reading
 xlrd==1.2.0
 pyyaml==5.3

@@ -8,6 +8,21 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## [Unreleased] - 2021-01-11
+
+### Changed
+
+- Fully transitioned Sparrow's core to a [Starlette](https://www.starlette.io) server backend.
+  This is a fairly major breaking change that requires plugins that extend the API to be updated.
+- Sparrow plugins can now record compatible versions of Sparrow using the `sparrow_version` property.
+  If an incompatible plugin is loaded, an error (for core plugins) or a warning will be generated.
+- Added Visual Studio Code language server support within Sparrow's backend Docker container.
+
+#### Low-level changes
+
+- Transitioned hook `api-initialized` to `api-v1-initialized`.
+- Created hook `add-routes`.
+
 ## [Unreleased] - 2020-10-17
 
 ### Changed
