@@ -17,3 +17,12 @@ def wait_for_database(db_conn):
             immediate = False
             log.info("Waiting for database")
             sleep(1)
+
+
+def check_if_tables_exist(db_conn):
+    engine = create_engine(db_conn)
+    conn = engine.connect()
+    res = conn.execute(
+        "SELECT EXISTS (SELECT * FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'datum')"
+    )
+    print(res)

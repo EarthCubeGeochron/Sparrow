@@ -5,7 +5,9 @@ from starlette.testclient import TestClient
 from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 
-app_ = Sparrow(debug=True, start=True)
+app = Sparrow(debug=True)
+app.bootstrap()
+_setup_context(app)
 
 # Slow tests are opt-in
 
@@ -55,5 +57,5 @@ def db(app, pytestconfig):
 
 @fixture
 def client(app):
-    _client = TestClient(app_)
+    _client = TestClient(app)
     yield _client

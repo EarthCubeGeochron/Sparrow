@@ -14,9 +14,8 @@ from starlette.responses import JSONResponse
 from webargs_starlette import WebargsHTTPException
 from sparrow import settings
 from ..logs import get_logger
-from .plugins import prepare_plugin_manager
-from ..plugins import SparrowPluginManager
-from ..startup import wait_for_database
+from .plugins import prepare_plugin_manager, SparrowPluginManager
+from ..startup import wait_for_database, check_if_tables_exist
 
 log = get_logger(__name__)
 
@@ -46,6 +45,7 @@ class Sparrow(Starlette):
 
     def bootstrap(self):
         wait_for_database(settings.DATABASE)
+        check_if_tables_exist(settings.DATABASE)
         log.debug("Booting up application server")
         self.setup_server()
 
