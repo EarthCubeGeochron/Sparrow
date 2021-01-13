@@ -74,28 +74,31 @@ class Sparrow(Starlette):
             return
         import core_plugins
 
-        self.plugins = SparrowPluginManager()
-        self.plugins.add(AuthPlugin)
+        mgr = SparrowPluginManager()
+        mgr.add_all(
+            AuthPlugin,
+            APIv1Plugin,
+            APIv2Plugin,
+            WebPlugin,
+            InterfacePlugin,
+            PyChronImportPlugin,
+        )
         # GraphQL is disabled for now
         # self.plugins.add(GraphQLPlugin)
-        self.plugins.add(APIv1Plugin)
-        self.plugins.add(APIv2Plugin)
-        self.plugins.add(WebPlugin)
-        self.plugins.add(InterfacePlugin)
-        self.plugins.add(PyChronImportPlugin)
-        self.plugins.add_module(core_plugins)
+        mgr.add_module(core_plugins)
 
         # Try to import external plugins, but they might not be defined.
         try:
             import sparrow_plugins
 
-            self.plugins.add_module(sparrow_plugins)
+            mgr.add_module(sparrow_plugins)
         except ModuleNotFoundError as err:
             log.info("Could not load external Sparrow plugins.")
             log.info(err)
 
+        mgr.finalize(self)
+        self.plugins = mgr
         self.is_loaded = True
-        self.plugins.finalize(self)
         log.info("Finished loading plugins")
 
     def run_hook(self, hook_name, *args, **kwargs):

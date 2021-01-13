@@ -89,6 +89,10 @@ class SparrowPluginManager(object):
 
             self.add(obj)
 
+    def add_all(self, *plugins):
+        for plugin in plugins:
+            self.add(plugin)
+
     def order_plugins(self, store=None):
         store = store or self.__store
         for p in store:
