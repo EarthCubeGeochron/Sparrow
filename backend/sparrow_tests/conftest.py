@@ -5,9 +5,16 @@ from starlette.testclient import TestClient
 from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 from sparrow.startup import wait_for_database
-from .helpers.database import testing_database
+from sqlalchemy_utils import create_database, database_exists, drop_database
 
 # Slow tests are opt-in
+
+wait_for_database("postgresql://postgres@db:5432/postgres")
+create_database("postgresql://postgres@db:5432/sparrow_test")
+
+_app = Sparrow(debug=True)
+_app.bootstrap()
+_setup_context(_app)
 
 
 def pytest_addoption(parser):
@@ -35,12 +42,7 @@ def pytest_configure(config):
 
 @fixture(scope="session")
 def app():
-    wait_for_database("postgresql://postgres@db:5432/postgres")
-    with testing_database("postgresql://postgres@db:5432/sparrow_test"):
-        app = Sparrow(debug=True)
-        app.bootstrap()
-        _setup_context(app)
-        yield app
+    return _app
 
 
 @fixture(scope="class")

@@ -51,6 +51,4 @@ if psql:
     )
     run(["psql", *dbargs, "sparrow_test"])
 
-if not keep_database:
-    teardown_database()
 echo("Done!")
