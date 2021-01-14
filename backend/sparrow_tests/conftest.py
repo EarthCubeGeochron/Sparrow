@@ -10,8 +10,11 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 # Slow tests are opt-in
 
 wait_for_database("postgresql://postgres@db:5432/postgres")
-create_database("postgresql://postgres@db:5432/sparrow_test")
 
+# Right now, we run this setup code outside of a fixture so we
+# can see the setup output in real time.
+testing_db = "postgresql://postgres@db:5432/sparrow_test"
+create_database(testing_db)
 _app = Sparrow(debug=True)
 _app.bootstrap()
 _setup_context(_app)
@@ -42,7 +45,9 @@ def pytest_configure(config):
 
 @fixture(scope="session")
 def app():
-    return _app
+    yield _app
+    # We need to make sure this only happens if we tear down testing db
+    drop_database(testing_db)
 
 
 @fixture(scope="class")
