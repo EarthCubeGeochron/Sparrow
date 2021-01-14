@@ -4,10 +4,10 @@ set -e
 
 cd /app
 
-# while ! pg_isready -h db -p 5432 -U postgres ; do
-#   echo "Waiting for database..."
-#   sleep 1
-# done
+while ! pg_isready -h db -p 5432 -U postgres ; do
+  echo "Waiting for database..."
+  sleep 1
+done
 
 # We no longer import EarthChem vocabularies by default
 

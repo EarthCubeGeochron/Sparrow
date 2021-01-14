@@ -39,8 +39,6 @@ class Sparrow(Starlette):
 
         self.initialize_plugins()
 
-        start = kwargs.pop("start", False)
-
         super().__init__(*args, **kwargs)
 
     def bootstrap(self, init=True):
@@ -53,6 +51,7 @@ class Sparrow(Starlette):
             db.initialize()
         else:
             log.info("Application tables exist")
+        assert self.db is None
         log.info("Booting up application server")
         self.setup_server()
 
