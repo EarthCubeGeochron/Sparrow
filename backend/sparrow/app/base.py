@@ -49,19 +49,15 @@ class Sparrow(Starlette):
     def init_database(self, drop=False):
         from ..database import Database
 
-        log.info("Creating database tables")
-        db = Database(self.__db_url, self)
-        db.initialize(drop=drop)
-
-    def __bootstrap_temp(self):
         wait_for_database(self.__db_url)
         _exists = tables_exist(self.__db_url)
-        if init and not _exists:
+        if not _exists:
+            log.info("Creating database tables")
+            db = Database(self.__db_url, self)
+            db.initialize(drop=drop)
             self.init_database()
-        elif init and _exists:
+        elif _exists:
             log.info("Application tables exist")
-        elif not _exists:
-            log.warning("Database tables not found")
 
     def setup_database(self):
         from ..database import Database
@@ -69,6 +65,8 @@ class Sparrow(Starlette):
         self.db = Database(self.__db_url, self)
         self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
+        if self.db.automap_base is None:
+            self.database.automap()
         if self.db.automap_base is not None:
             self.run_hook("database-ready", self.db)
             self.database_ready = True
