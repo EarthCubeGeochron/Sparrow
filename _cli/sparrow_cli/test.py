@@ -193,7 +193,7 @@ def sparrow_test_main(
     if quick:
         teardown = False
     if teardown:
-        compose("down")
+        compose("down --remove-orphans")
     sys.exit(res.returncode)
 
 
