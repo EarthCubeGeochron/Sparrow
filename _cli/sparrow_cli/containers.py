@@ -22,7 +22,9 @@ def sparrow_up(container, force_recreate=False):
     if container is None:
         container = ""
     res = compose(
-        "up --build --no-start", "--force-recreate" if force_recreate else "", container
+        "up --build --no-start",
+        "--force-recreate" if force_recreate else "",
+        container,
     )
     if res.returncode != 0:
         print("[red]One or more containers did not build successfully, aborting.[/red]")

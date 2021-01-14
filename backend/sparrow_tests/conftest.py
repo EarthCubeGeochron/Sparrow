@@ -6,15 +6,17 @@ from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 from sparrow.startup import wait_for_database
 from sqlalchemy_utils import create_database, drop_database
+from os import environ
 
 # Slow tests are opt-in
 
-wait_for_database("postgresql://postgres@db:5432/postgres")
 
 # Right now, we run this setup code outside of a fixture so we
 # can see the setup output in real time.
 testing_db = "postgresql://postgres@db:5432/sparrow_test"
+wait_for_database("postgresql://postgres@db:5432/postgres")
 create_database(testing_db)
+environ["SPARROW_DATABASE"] = testing_db
 _app = Sparrow(debug=True)
 _app.bootstrap()
 _setup_context(_app)

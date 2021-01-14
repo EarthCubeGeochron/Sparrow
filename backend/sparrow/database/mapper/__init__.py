@@ -41,7 +41,13 @@ class AutomapError(Exception):
     pass
 
 
-class MappedDatabaseMixin(object):
+class MappedDatabaseMixin:
+    automap_base = None
+    __models__ = None
+    __tables__ = None
+    __inspector__ = None
+    automap_error = None
+
     def lazy_automap(self, **kwargs):
         for k in ["engine", "session"]:
             if not hasattr(self, k):
@@ -51,11 +57,7 @@ class MappedDatabaseMixin(object):
                 )
 
         # Automapping of database tables
-        self.automap_base = None
-        self.__models__ = None
-        self.__tables__ = None
-        self.__inspector__ = None
-        self.automap_error = None
+
         # We're having trouble lazily automapping
         try:
             self.automap()

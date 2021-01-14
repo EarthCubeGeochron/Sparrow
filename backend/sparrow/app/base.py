@@ -62,6 +62,8 @@ class Sparrow(Starlette):
         self.db = Database(settings.DATABASE, self)
         self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
+        if self.db.automap_base is None:
+            self.database.automap()
         if self.db.automap_base is not None:
             self.run_hook("database-ready", self.db)
             self.database_ready = True
