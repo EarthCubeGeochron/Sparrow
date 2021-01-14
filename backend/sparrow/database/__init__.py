@@ -44,11 +44,11 @@ class Database(MappedDatabaseMixin):
         self._session_factory = sessionmaker(bind=self.engine)
         self.session = scoped_session(self._session_factory)
         # Use the self.session_scope function to more explicitly manage sessions.
-
-        self.lazy_automap()
+        if self.app is not None:
+            self.lazy_automap()
 
     def automap(self):
-        log.debug("Automapping")
+        log.debug("Automapping the database")
         super().automap()
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
