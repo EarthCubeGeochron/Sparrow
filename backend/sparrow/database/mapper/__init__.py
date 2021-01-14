@@ -42,32 +42,11 @@ class AutomapError(Exception):
 
 
 class MappedDatabaseMixin(object):
-    def lazy_automap(self, **kwargs):
-        for k in ["engine", "session"]:
-            if not hasattr(self, k):
-                raise AttributeError(
-                    "Database mapper must subclass an object "
-                    "with engine and session defined. "
-                )
-
-        # Automapping of database tables
-        self.automap_base = None
-        self.__models__ = None
-        self.__tables__ = None
-        self.__inspector__ = None
-        self.automap_error = None
-        # We're having trouble lazily automapping
-        try:
-            self.automap()
-        except Exception as err:
-            # raise DatabaseMappingError(str(err))
-            log.exception(err)
-            # kw = dict(err=True, fg="red")
-            log.error("Could not automap at database initialization")
-            # secho(f"  {err}", **kw)
-            # TODO: We should raise this error, and find another way to
-            # test if we've initialized the database yet.
-            # self.automap_error = err
+    automap_base = None
+    automap_error = None
+    __models__ = None
+    __tables__ = None
+    __inspector__ = None
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """
