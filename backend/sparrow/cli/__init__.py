@@ -59,12 +59,12 @@ def abort(message, status=1):
 
 @cli.command(name="init")
 @click.option("--drop", is_flag=True, default=False)
-@with_database
-def init_database(db, drop=False):
+@with_app
+def init_database(app, drop=False):
     """
     Initialize database schema (non-destructive)
     """
-    db.initialize(drop=drop)
+    app.init_database(drop=drop)
 
 
 @cli.command(name="create-views")

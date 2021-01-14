@@ -6,6 +6,8 @@ from sys import argv
 from click import echo
 from subprocess import run
 from shlex import split
+from time import sleep
+from sqlalchemy import create_engine, exc
 
 args = argv[1:]
 
@@ -23,19 +25,40 @@ os.chdir("/app")
 
 dbargs = split("-U postgres -h db -p 5432")
 
+
+def db_ready():
+    c = run(["pg_isready", *dbargs])
+    return c.returncode == 0
+
+
+while not db_ready():
+    echo("Waiting for database...")
+    sleep(1)
+
 os.environ["SPARROW_DATABASE"] = "postgresql://postgres@db:5432/sparrow_test"
 
 
-# def teardown_database(message="Tearing down database..."):
-#     print(message)
-#     return run(["dropdb", *dbargs, "sparrow_test"])
+def teardown_database(message="Tearing down database..."):
+    print(message)
+    return run(["dropdb", *dbargs, "sparrow_test"])
 
 
-# if keep_database:
-#     echo("Using existing testing database")
-# elif not keep_database:
-#     teardown_database("Dropping existing testing database")
-# res = run(["createdb", *dbargs, "sparrow_test"])
+db_exists = False
+try:
+    engine = create_engine(os.environ["SPARROW_DATABASE"]).connect()
+    db_exists = True
+except exc.OperationalError:
+    db_exists = False
+
+if db_exists and keep_database:
+    echo("Using existing testing database")
+elif db_exists and not keep_database:
+    teardown_database("Dropping existing testing database")
+else:
+    c = run(["createdb", *dbargs, "sparrow_test"])
+    echo("Database is ready...")
+
+    run(["sparrow", "init"])
 
 # This prevents us from getting absolutely spammed by SAWarning
 # TODO: improve warning handling for database automapping
@@ -51,4 +74,6 @@ if psql:
     )
     run(["psql", *dbargs, "sparrow_test"])
 
+if not keep_database:
+    teardown_database()
 echo("Done!")

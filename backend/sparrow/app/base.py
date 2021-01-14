@@ -46,15 +46,20 @@ class Sparrow(Starlette):
         log.info("Booting up application server")
         self.setup_server()
 
+    def init_database(self, drop=False):
+        from ..database import Database
+
+        log.info("Creating database tables")
+        db = Database(self.__db_url, self)
+        db.initialize(drop=drop)
+
     def setup_database(self, init=True):
         from ..database import Database
 
         wait_for_database(self.__db_url)
         _exists = tables_exist(self.__db_url)
         if init and not _exists:
-            log.info("Creating database tables")
-            db = Database(self.__db_url, self)
-            db.initialize()
+            self.init_database()
         elif init and _exists:
             log.info("Application tables exist")
         elif not _exists:
