@@ -41,7 +41,7 @@ class Sparrow(Starlette):
 
         super().__init__(*args, **kwargs)
 
-    def bootstrap(self, init=True):
+    def bootstrap(self, init=False):
         if init:
             self.init_database()
         self.setup_database()

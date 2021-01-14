@@ -14,7 +14,7 @@ from sqlalchemy_utils import create_database, drop_database
 testing_db = "postgresql://postgres@db:5432/sparrow_test"
 
 _app = Sparrow(debug=True, database=testing_db)
-_app.bootstrap()
+_app.bootstrap(init=True)
 _setup_context(_app)
 
 
