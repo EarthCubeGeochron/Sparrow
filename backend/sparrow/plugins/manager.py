@@ -89,6 +89,10 @@ class SparrowPluginManager(object):
 
             self.add(obj)
 
+    def add_all(self, *plugins):
+        for plugin in plugins:
+            self.add(plugin)
+
     def order_plugins(self, store=None):
         store = store or self.__store
         for p in store:
@@ -123,3 +127,13 @@ class SparrowPluginManager(object):
             if plugin.name == name:
                 return plugin
         raise AttributeError(f"Plugin {name} not found")
+
+    def run_hook(self, hook_name, *args, **kwargs):
+        log.info("Running hook " + hook_name)
+        method_name = "on_" + hook_name.replace("-", "_")
+        for plugin in self.__store:
+            method = getattr(plugin, method_name, None)
+            if method is None:
+                continue
+            log.info("  plugin: " + plugin.name)
+            method(*args, **kwargs)
