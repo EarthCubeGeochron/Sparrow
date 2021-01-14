@@ -28,37 +28,39 @@ class Sparrow(Starlette):
     api_loaded: bool = False
     is_loaded: bool = False
     verbose: bool = False
+    __db_url: str
     db = None
     plugins: SparrowPluginManager
 
     def __init__(self, *args, **kwargs):
         log.debug("Beginning app load")
         self.verbose = kwargs.pop("verbose", self.verbose)
-
+        self.__db_url = kwargs.pop("database", settings.DATABASE)
         self.config = kwargs.pop("config", None)
-
         self.initialize_plugins()
 
         super().__init__(*args, **kwargs)
 
     def bootstrap(self, init=True):
-        from ..database import Database
-
-        wait_for_database(settings.DATABASE)
-        if not tables_exist(settings.DATABASE) and init:
-            log.info("Creating database tables")
-            db = Database(settings.DATABASE, self)
-            db.initialize()
-        else:
-            log.info("Application tables exist")
-        assert self.db is None
+        self.setup_database(init=init)
         log.info("Booting up application server")
         self.setup_server()
 
-    def setup_database(self):
+    def setup_database(self, init=True):
         from ..database import Database
 
-        self.db = Database(settings.DATABASE, self)
+        wait_for_database(self.__db_url)
+        _exists = tables_exist(self.__db_url)
+        if init and not _exists:
+            log.info("Creating database tables")
+            db = Database(self.__db_url, self)
+            db.initialize()
+        elif init and _exists:
+            log.info("Application tables exist")
+        elif not _exists:
+            log.warning("Database tables not found")
+
+        self.db = Database(self.__db_url, self)
         self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
         if self.db.automap_base is None:
@@ -74,7 +76,7 @@ class Sparrow(Starlette):
     @property
     def database(self):
         if self.db is None:
-            self.setup_database()
+            self.setup_database(init=False)
         return self.db
 
     def initialize_plugins(self):
@@ -90,7 +92,6 @@ class Sparrow(Starlette):
 
         if self.api_loaded:
             return
-        self.setup_database()
         route_table = []
         self.run_hook("add-routes", route_table)
         self.mount("/", Router(route_table))

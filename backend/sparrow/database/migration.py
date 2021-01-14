@@ -25,9 +25,8 @@ def db_migration(db, safe=True, apply=False):
     url = "postgres://postgres@db:5432/sparrow_temp_migration"
     with redirect_stdout(sys.stderr):
         with temp_database(url) as engine:
-            os.environ["SPARROW_DATABASE"] = url
-            app = Sparrow()
-            app.database.initialize()
+            app = Sparrow(database=url)
+            app.setup_database(init=True)
 
             # For some reason we need to patch this...
             engine.dialect.server_version_info = db.engine.dialect.server_version_info
