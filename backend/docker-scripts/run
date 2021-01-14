@@ -12,16 +12,16 @@ done
 # We no longer import EarthChem vocabularies by default
 
 # (non-foolproof) check for whether tables exist
-# res=$(psql -tA -h db -p 5432 -U postgres sparrow -c "
-# SELECT EXISTS (
-#   SELECT *
-#   FROM information_schema.tables
-#   WHERE table_schema = 'public'
-#     AND table_name = 'datum'
-# );")
+res=$(psql -tA -h db -p 5432 -U postgres sparrow -c "
+SELECT EXISTS (
+  SELECT *
+  FROM information_schema.tables
+  WHERE table_schema = 'public'
+    AND table_name = 'datum'
+);")
 
-# # Create tables if they don't exist
-# [ ! $res = 't' ] && python3 sparrow init
+# Create tables if they don't exist
+[ ! $res = 't' ] && python3 sparrow init
 
 HOST=0.0.0.0
 PORT=5000
