@@ -42,11 +42,14 @@ class Sparrow(Starlette):
         super().__init__(*args, **kwargs)
 
     def bootstrap(self, init=True):
+        if init:
+            self.init_database()
         self.setup_database()
         log.info("Booting up application server")
         self.setup_server()
 
     def init_database(self, drop=False):
+        # This breaks everything for some reason
         from ..database import Database
 
         wait_for_database(self.__db_url)
