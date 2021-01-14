@@ -39,7 +39,7 @@ def pytest_configure(config):
 
 @fixture(scope="session")
 def app():
-    wait_for_database("postgresql://postgres@db:5432/postgres")
+    # wait_for_database("postgresql://postgres@db:5432/postgres")
     # create_database(testing_db)
     _app = Sparrow(debug=True, database=testing_db)
     _app.bootstrap()
@@ -55,7 +55,7 @@ def db(app, pytestconfig):
         connection = app.database.session.connection()
         transaction = connection.begin()
         session_factory = sessionmaker(bind=connection)
-        app.database.session = scoped_session(session_factory)
+        app.db.session = scoped_session(session_factory)
         _setup_context(app)
         yield app.database
         app.database.session.close()

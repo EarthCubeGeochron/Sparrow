@@ -42,7 +42,7 @@ class Sparrow(Starlette):
         super().__init__(*args, **kwargs)
 
     def bootstrap(self, init=True):
-        self.setup_database(init=init)
+        self.setup_database()
         log.info("Booting up application server")
         self.setup_server()
 
@@ -53,9 +53,7 @@ class Sparrow(Starlette):
         db = Database(self.__db_url, self)
         db.initialize(drop=drop)
 
-    def setup_database(self, init=True):
-        from ..database import Database
-
+    def __bootstrap_temp(self):
         wait_for_database(self.__db_url)
         _exists = tables_exist(self.__db_url)
         if init and not _exists:
@@ -65,11 +63,14 @@ class Sparrow(Starlette):
         elif not _exists:
             log.warning("Database tables not found")
 
+    def setup_database(self):
+        from ..database import Database
+
         self.db = Database(self.__db_url, self)
         self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
-        if self.db.automap_base is None:
-            self.database.automap()
+        # if self.db.automap_base is None:
+        #     self.database.automap()
         if self.db.automap_base is not None:
             self.run_hook("database-ready", self.db)
             self.database_ready = True
@@ -81,7 +82,7 @@ class Sparrow(Starlette):
     @property
     def database(self):
         if self.db is None:
-            self.setup_database(init=False)
+            self.setup_database()
         return self.db
 
     def initialize_plugins(self):

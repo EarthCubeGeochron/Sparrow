@@ -4,7 +4,6 @@ from os import devnull
 from click import style, echo
 from contextlib import redirect_stderr
 from functools import update_wrapper
-from sparrow.context import get_database
 import sys
 
 from ..app import Sparrow
