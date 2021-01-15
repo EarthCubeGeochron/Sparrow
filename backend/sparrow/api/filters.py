@@ -274,7 +274,7 @@ class Geometry_Filter(BaseFilter):
         }
 
     def should_apply(self):
-        return hasattr(self.model, "location")
+        return hasattr(self.model, "location") or hasattr(self.model, "sample_collection")
 
     def apply(self, args, query):
         if self.key not in args:
@@ -283,7 +283,13 @@ class Geometry_Filter(BaseFilter):
         WKT_shape_text = args[self.key]
         WKT_query = "SRID=4326;" + WKT_shape_text
 
-        
+        if hasattr(self.model, "sample_collection"):
+
+            db = app_context().database
+            sample = db.model.sample
+
+            return query.join(self.model.sample_collection).filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(sample.location, 4326)))
+
         return query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(self.model.location, 4326)))
 
 ## TODO: Age range filter
