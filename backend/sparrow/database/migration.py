@@ -26,7 +26,7 @@ def db_migration(db, safe=True, apply=False):
     with redirect_stdout(sys.stderr):
         with temp_database(url) as engine:
             app = Sparrow(database=url)
-            app.setup_database(init=True)
+            app.init_database()
 
             # For some reason we need to patch this...
             engine.dialect.server_version_info = db.engine.dialect.server_version_info
