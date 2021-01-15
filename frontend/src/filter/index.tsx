@@ -15,12 +15,12 @@ import {
   DoiFilter,
   SearchInput,
   GeologicFormationSelector,
-  MapSelector,
 } from "./components";
 import { useToggle, useAPIResult } from "../map/components/APIResult";
 import { hyperStyled } from "@macrostrat/hyper";
 import { EmabrgoSwitch } from "./components/Embargo";
 import styles from "./module.styl";
+import { MapPolygon } from "./components/MapSelector";
 
 const h = hyperStyled(styles);
 
@@ -125,6 +125,8 @@ function AdminFilter(props) {
   const [tags, setTags] = useState({});
   const [filterOpen, setFilterOpen] = useState(false);
 
+  console.log(params);
+
   const updateParams = (field, data) => {
     if (field == "date_range") {
       dispatch({ type: "date_range", payload: { dates: data } });
@@ -134,6 +136,9 @@ function AdminFilter(props) {
     }
     if (field == "doi_like") {
       dispatch({ type: "doi_like", payload: { doi_like: data } });
+    }
+    if (field == "geometry") {
+      dispatch({ type: "geometry", payload: { geometry: data } });
     }
   };
   const removeParam = (key) => {
@@ -166,7 +171,9 @@ function AdminFilter(props) {
     h.if(possibleFilters.includes("doi_like"))(DoiFilter, {
       updateDoi: updateParams,
     }),
-    h.if(possibleFilters.includes("coordinates"))(MapSelector),
+    h.if(possibleFilters.includes("location"))(MapPolygon, {
+      updateParams,
+    }),
     h(SumbitFilterButton),
   ]);
 

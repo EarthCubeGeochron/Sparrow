@@ -28,6 +28,11 @@ export function reducer(state, action) {
         ...state,
         doi_like: action.payload.doi_like,
       };
+    case "geometry":
+      return {
+        ...state,
+        geometry: action.payload.geometry,
+      };
     case "removeSingle":
       let param = action.payload.field;
       const newState = objectFilter(state, ([key, value]) => key != param);
