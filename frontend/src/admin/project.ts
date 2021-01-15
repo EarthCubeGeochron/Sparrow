@@ -28,7 +28,7 @@ export function ProjectMainPanel() {
 
 export function ProjectAdminPage() {
   const [params, setParams] = useState({});
-  const possibleFilters = ["embargo", "coordinates", "doi_like", "date_range"];
+  const possibleFilters = ["embargo", "location", "doi_like", "date_range"];
 
   const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {

@@ -28,7 +28,7 @@ export function SampleMainPanel() {
 
 export function SampleAdminPage() {
   const [params, setParams] = useState({});
-  const possibleFilters = ["embargo", "coordinates", "date_range"]; //needs to work with "doi_like"
+  const possibleFilters = ["embargo", "location", "date_range"]; //needs to work with "doi_like"
 
   const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
