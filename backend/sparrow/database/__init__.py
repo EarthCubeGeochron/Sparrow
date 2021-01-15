@@ -44,11 +44,10 @@ class Database(MappedDatabaseMixin):
         self._session_factory = sessionmaker(bind=self.engine)
         self.session = scoped_session(self._session_factory)
         # Use the self.session_scope function to more explicitly manage sessions.
-
-        self.lazy_automap()
+        # if app is not None and automap:
 
     def automap(self):
-        log.debug("Automapping")
+        log.info("Automapping the database")
         super().automap()
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
@@ -67,29 +66,6 @@ class Database(MappedDatabaseMixin):
         )
         self.register_models(cls)
         self.app.run_hook("database-mapped")
-
-    def lazy_automap(self, **kwargs):
-        for k in ["engine", "session"]:
-            if not hasattr(self, k):
-                raise AttributeError(
-                    "Database mapper must subclass an object "
-                    "with engine and session defined. "
-                )
-
-        # Automapping of database tables
-
-        # We're having trouble lazily automapping
-        try:
-            self.automap()
-        except Exception as err:
-            # raise DatabaseMappingError(str(err))
-            log.exception(err)
-            # kw = dict(err=True, fg="red")
-            log.error("Could not automap at database initialization")
-            # secho(f"  {err}", **kw)
-            # TODO: We should raise this error, and find another way to
-            # test if we've initialized the database yet.
-            # self.automap_error = err
 
     @contextmanager
     def session_scope(self):

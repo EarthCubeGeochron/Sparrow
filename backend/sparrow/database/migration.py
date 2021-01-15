@@ -1,5 +1,5 @@
 import os
-from sparrow.context import get_sparrow_app
+from sparrow.app import Sparrow
 from sqlalchemy import create_engine
 from contextlib import contextmanager, redirect_stdout
 from sqlalchemy_utils import create_database, database_exists, drop_database
@@ -25,9 +25,8 @@ def db_migration(db, safe=True, apply=False):
     url = "postgres://postgres@db:5432/sparrow_temp_migration"
     with redirect_stdout(sys.stderr):
         with temp_database(url) as engine:
-            os.environ["SPARROW_DATABASE"] = url
-            app = get_sparrow_app()
-            app.database.initialize()
+            app = Sparrow(database=url)
+            app.init_database()
 
             # For some reason we need to patch this...
             engine.dialect.server_version_info = db.engine.dialect.server_version_info

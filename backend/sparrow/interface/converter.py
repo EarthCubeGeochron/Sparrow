@@ -219,7 +219,6 @@ class SparrowConverter(ModelConverter):
             return super().property2field(prop, **kwargs)
 
     def _property2relationship(self, prop, **kwargs):
-        log.debug(prop)
         # The "name" is actually the name of the related model, NOT the name
         # of field
         cls = self._related_entity(prop)

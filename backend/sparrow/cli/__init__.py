@@ -12,9 +12,7 @@ from ..database.migration import db_migration
 
 
 def _build_app_context(config):
-    app = get_sparrow_app()
-    app.initialize_plugins()
-    return app
+    return get_sparrow_app()
 
 
 class SparrowCLI(click.Group):
@@ -59,12 +57,12 @@ def abort(message, status=1):
 
 @cli.command(name="init")
 @click.option("--drop", is_flag=True, default=False)
-@with_database
-def init_database(db, drop=False):
+@with_app
+def init_database(app, drop=False):
     """
     Initialize database schema (non-destructive)
     """
-    db.initialize(drop=drop)
+    app.init_database(drop=drop, force=True)
 
 
 @cli.command(name="create-views")

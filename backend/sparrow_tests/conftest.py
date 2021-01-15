@@ -1,13 +1,21 @@
-from sparrow.context import get_sparrow_app
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
 from starlette.testclient import TestClient
 from sparrow.app import Sparrow
 from sparrow.context import _setup_context
-
-app_ = Sparrow(debug=True, start=True)
+from sparrow.startup import wait_for_database
+from sqlalchemy_utils import create_database, drop_database
 
 # Slow tests are opt-in
+
+
+# Right now, we run this setup code outside of a fixture so we
+# can see the setup output in real time.
+testing_db = "postgresql://postgres@db:5432/sparrow_test"
+
+_app = Sparrow(debug=True, database=testing_db)
+_app.bootstrap(init=True)
+_setup_context(_app)
 
 
 def pytest_addoption(parser):
@@ -35,7 +43,11 @@ def pytest_configure(config):
 
 @fixture(scope="session")
 def app():
-    return get_sparrow_app()
+    # wait_for_database("postgresql://postgres@db:5432/postgres")
+    # create_database(testing_db)
+    yield _app
+    # We need to make sure this only happens if we tear down testing db
+    # drop_database(testing_db)
 
 
 @fixture(scope="class")
@@ -55,5 +67,5 @@ def db(app, pytestconfig):
 
 @fixture
 def client(app):
-    _client = TestClient(app_)
+    _client = TestClient(app)
     yield _client

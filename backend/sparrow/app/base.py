@@ -15,6 +15,7 @@ from webargs_starlette import WebargsHTTPException
 from sparrow import settings
 from ..logs import get_logger
 from .plugins import prepare_plugin_manager, SparrowPluginManager
+from ..startup import wait_for_database, tables_exist
 
 log = get_logger(__name__)
 
@@ -27,31 +28,47 @@ class Sparrow(Starlette):
     api_loaded: bool = False
     is_loaded: bool = False
     verbose: bool = False
+    __db_url: str
     db = None
     plugins: SparrowPluginManager
 
     def __init__(self, *args, **kwargs):
         log.debug("Beginning app load")
         self.verbose = kwargs.pop("verbose", self.verbose)
-
+        self.__db_url = kwargs.pop("database", settings.DATABASE)
         self.config = kwargs.pop("config", None)
-
         self.initialize_plugins()
-
-        start = kwargs.pop("start", False)
 
         super().__init__(*args, **kwargs)
 
-        if start:
-            log.debug("Starting application")
-            self.setup_server()
+    def bootstrap(self, init=False):
+        if init:
+            self.init_database()
+        self.setup_database()
+        log.info("Booting up application server")
+        self.setup_server()
+
+    def init_database(self, drop=False, force=True):
+        # This breaks everything for some reason
+        from ..database import Database
+
+        wait_for_database(self.__db_url)
+        _exists = tables_exist(self.__db_url)
+        if not _exists or drop or force:
+            log.info("Creating database tables")
+            db = Database(self.__db_url, self)
+            db.initialize(drop=drop)
+        elif _exists:
+            log.info("Application tables exist")
 
     def setup_database(self):
         from ..database import Database
 
-        self.db = Database(settings.DATABASE, self)
+        self.db = Database(self.__db_url, self)
         self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
+        if self.db.automap_base is None:
+            self.database.automap()
         if self.db.automap_base is not None:
             self.run_hook("database-ready", self.db)
             self.database_ready = True
@@ -69,7 +86,6 @@ class Sparrow(Starlette):
     def initialize_plugins(self):
         if self.is_loaded:
             return
-
         self.plugins = prepare_plugin_manager(self)
         self.is_loaded = True
         log.info("Finished loading plugins")
