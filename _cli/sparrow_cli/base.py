@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 from rich.console import Console
-from envbash import load_envbash
+from .envbash import load_envbash
 from .env import prepare_docker_environment, setup_command_path
 from .exc import SparrowCommandError
 
@@ -84,7 +84,9 @@ def cli(ctx):
         chdir(environ["SPARROW_CONFIG_DIR"])
         # This requires bash to be available on the platform, which
         # might be a problem for Windows/WSL.
+        print(environ["SPARROW_CONFIG"])
         load_envbash(environ["SPARROW_CONFIG"])
+        print("Env vars loaded")
         # Change back to original working directory
         chdir(environ["SPARROW_WORKDIR"])
         environ["_SPARROW_CONFIG_SOURCED"] = "1"
@@ -97,6 +99,9 @@ def cli(ctx):
         if not is_frozen:
             pth = this_exe.parent.parent.parent
             environ["SPARROW_PATH"] = str(pth)
+        else:
+            print("Frozen script does not work yet.")
+            sys.exit(0)
 
     cfg = SparrowConfig(bin_directories=setup_command_path())
     ctx.obj = cfg
