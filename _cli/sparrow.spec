@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['main.py'],
+a = Analysis(['sparrow_cli/__main__.py'],
              pathex=['/src'],
              binaries=[],
              datas=[],

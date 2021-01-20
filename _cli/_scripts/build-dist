@@ -4,4 +4,4 @@
 _cli/_scripts/build-local
 pip3 install pyinstaller
 cd _cli
-pyinstaller --noconfirm --distpath dist sparrow.spec
+pyinstaller --onefile --noconfirm --distpath dist sparrow.spec

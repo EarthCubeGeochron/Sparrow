@@ -1,17 +1,23 @@
 INSTALL_PATH ?= /usr/local
 SPARROW_INSTALL_PATH ?= $(INSTALL_PATH)
 
-all: install-hooks build
+all: install-hooks build-dev
 
 build:
+	_cli/_scripts/build-dist
+
+# Install locally-built executable. There should be no links preserved to the source
+# code after that
+install: install-dist
+
+# Development installation
+build-dev:
 	_cli/_scripts/build-local
 
 # Install without building with PyInstaller
-install: build
+install-dev: build-dev
 	mkdir -p $(SPARROW_INSTALL_PATH)/bin
 	sudo ln -sf $(shell pwd)/_cli/sparrow-dev-shim $(SPARROW_INSTALL_PATH)/bin/sparrow
-
-install-dev: install
 
 ## TODO: fix bugs with install-dist to make it more capable
 # Bundle with PyInstaller and install (requires local Python 3)
