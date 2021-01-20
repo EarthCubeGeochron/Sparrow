@@ -4,6 +4,7 @@
 mkdir -p _cli/build
 venv=_cli/build/venv
 
+unset VIRTUAL_ENV
 if [ ! -f $venv/bin/activate ]; then
   python3 -m venv $venv
 fi
