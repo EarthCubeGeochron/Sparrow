@@ -21,6 +21,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { EmabrgoSwitch } from "./components/Embargo";
 import styles from "./module.styl";
 import { MapPolygon } from "./components/MapSelector";
+import { urlSearchFromParams } from "../components/infinite-scroll/infinite-api-view";
 
 const h = hyperStyled(styles);
 
@@ -102,6 +103,14 @@ const TagContainer = (props) => {
     removeParam(key);
     const newTags = objectFilter(tags, ([ke, value]) => ke != key);
     setTags(newTags);
+    urlSearchFromParams(newTags);
+  };
+
+  const natLang = {
+    geometry: "Map Location",
+    date_range: "Date Range",
+    doi_like: "doi",
+    public: "public",
   };
 
   if (Object.keys(tags).length != 0) {
@@ -109,7 +118,7 @@ const TagContainer = (props) => {
       Object.entries(tags).map((entry) => {
         const [key, value] = entry;
         return h(Tag, { onRemove: () => handleRemove(key) }, [
-          `${key}: ${value}`,
+          `${natLang[key]}`,
         ]);
       }),
     ]);
@@ -119,13 +128,11 @@ const TagContainer = (props) => {
 
 function AdminFilter(props) {
   // need a prop that grabs set to create params
-  const { createParams, possibleFilters, listComponent } = props;
+  const { createParams, possibleFilters, listComponent, initParams } = props;
 
-  const [params, dispatch] = useReducer(reducer, {});
-  const [tags, setTags] = useState({});
+  const [params, dispatch] = useReducer(reducer, initParams);
+  const [tags, setTags] = useState(params);
   const [filterOpen, setFilterOpen] = useState(false);
-
-  console.log(params);
 
   const updateParams = (field, data) => {
     if (field == "date_range") {
@@ -149,6 +156,7 @@ function AdminFilter(props) {
     createParams(params);
     setTags(params);
     setFilterOpen(!filterOpen);
+    urlSearchFromParams(params);
   };
   const SumbitFilterButton = () => {
     return h(
@@ -162,7 +170,7 @@ function AdminFilter(props) {
   };
 
   const Content = h("div", { style: { margin: "10px" } }, [
-    h.if(possibleFilters.includes("embargo"))(EmabrgoSwitch, {
+    h.if(possibleFilters.includes("public"))(EmabrgoSwitch, {
       updateEmbargoFilter: updateParams,
     }),
     h.if(possibleFilters.includes("date_range"))(DatePicker, {
@@ -171,7 +179,7 @@ function AdminFilter(props) {
     h.if(possibleFilters.includes("doi_like"))(DoiFilter, {
       updateDoi: updateParams,
     }),
-    h.if(possibleFilters.includes("location"))(MapPolygon, {
+    h.if(possibleFilters.includes("geometry"))(MapPolygon, {
       updateParams,
     }),
     h(SumbitFilterButton),
