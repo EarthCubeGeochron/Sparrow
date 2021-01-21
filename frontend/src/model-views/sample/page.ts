@@ -208,7 +208,7 @@ const LocationBlock = function(props) {
           text: "Set Latitude and Longitude",
           onClick: toggleOpen,
         }),
-        h(MapSelector, { open: open, toggle: toggleOpen }),
+        //h(MapSelector, { open: open, toggle: toggleOpen }),
       ]);
     }
     return null;
