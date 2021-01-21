@@ -91,7 +91,12 @@ class SparrowHelpFormatter(HelpFormatter):
         commands = get_backend_command_help()
         if commands is None:
             return
-        self.write_section("Backend", commands)
+        self.write_section(
+            "Core application",
+            commands,
+            # These should be managed by subcommands...
+            skip=["db-migration", "remove-analytical-data", "remove-audit-trail"],
+        )
 
     def write_section(self, title, commands, **kwargs):
         commands = {k: format_description(v) for k, v in commands.items()}
@@ -106,15 +111,16 @@ class SparrowHelpFormatter(HelpFormatter):
             },
         )
         self._write_section(
-            "Container management",
+            "Container orchestration",
             {k: v for k, v in commands},
             skip=[*self.key_commands.keys()],
         )
 
     def _write_section(self, title, commands, skip=[]):
+        key_size = max([len(k) for k in commands.keys()])
         with self.section(title):
             _items = [(k, v) for k, v in commands.items() if k not in skip]
-            self.write_dl(_items, col_spacing=10)
+            self.write_dl(_items, col_spacing=max([25 - key_size, 2]))
             self.write("\n")
         self.flush()
 
