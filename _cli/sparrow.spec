@@ -11,7 +11,7 @@ revfile = path.join(SPECPATH, "build", "GIT_REVISION")
 with open(revfile, "w") as f:
     # almost the same as `git rev-parse HEAD` but with `-dirty` suffix
     # https://stackoverflow.com/questions/21017300/git-command-to-get-head-sha1-with-dirty-suffix-if-workspace-is-not-clean
-    cmd("git describe --match=NOT-EVER-A-TAG --always --abbrev=40 --dirty", stdout=f)
+    cmd("git describe --match=NOT-EVER-A-TAG --always --abbrev --dirty", stdout=f)
 
 src_excludes = [
     "_cli",
