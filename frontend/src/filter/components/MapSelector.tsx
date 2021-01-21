@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import h from "@macrostrat/hyper";
 import MapGL from "@urbica/react-map-gl";
 import Draw from "@urbica/react-map-gl-draw";
+import { Button, Popover, Card } from "@blueprintjs/core";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 
@@ -48,16 +49,19 @@ export function MapPolygon(props) {
           "pk.eyJ1IjoiamN6YXBsZXdza2kiLCJhIjoiWnQxSC01USJ9.oleZzfREJUKAK1TMeCD0bg",
         latitude: 37.78,
         longitude: -122.41,
-        zoom: 1,
+        zoom: 0,
       },
       [
         h(Draw, {
-          //data: features,
           onChange: handleChange,
+          pointControl: false,
+          lineStringControl: false,
+          uncombineFeaturesControl: false,
+          combineFeaturesControl: false,
         }),
       ]
     ),
-    h("div", [JSON.stringify(toWKT(features.geometry.coordinates[0]))]),
+    h(MapHelpButton),
   ]);
 }
 
@@ -71,8 +75,29 @@ function toWKT(coords) {
   let text_coords = "";
   for (let x of coords) {
     // x[0] x[1]
-    text_coords += `${x[0]} ${x[1]},`;
+    const Lat = x[0].toFixed(3);
+    const Long = x[1].toFixed(3);
+    text_coords += `${Lat} ${Long},`;
   }
   text_coords = text_coords.slice(0, -1);
   return `POLYGON((${text_coords}))`;
+}
+
+/**
+ * component that has some help info for basic
+ * @param props
+ */
+function MapHelpButton(props) {
+  const content = h("div", [
+    h(Card, [
+      h("p", ["Zoom in: Double Click"]),
+      h("p", [
+        "Zoom-Out: Mac(Command+Shift+Doulb Click) PC (Control+Shift+Double Click)",
+      ]),
+    ]),
+  ]);
+
+  return h(Popover, { content, minimal: true }, [
+    h(Button, { minimal: true }, ["Map Help"]),
+  ]);
 }
