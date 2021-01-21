@@ -73,10 +73,8 @@ function InfiniteAPIView({
   };
 
   useEffect(() => {
-    //if (Object.values(filterParams).length > 0) {
     setData([]);
     dataFetch([]);
-    //}
   }, [JSON.stringify(filterParams)]);
 
   const fetchNewData = () => {
@@ -94,3 +92,22 @@ function InfiniteAPIView({
 }
 
 export { InfiniteAPIView };
+
+/**
+ * This can probably get replaced with something from U.I Components
+ * @param params {} key, value pairs of parameters
+ */
+export function urlSearchFromParams(params) {
+  let string = "";
+  for (const [key, value] of Object.entries(params)) {
+    const queryString = `${key}=${value}&`;
+    string += queryString;
+  }
+  let searchString = string.slice(0, -1);
+  console.log(searchString);
+  const url =
+    Object.entries(params).length > 0
+      ? window.location.origin + window.location.pathname + "?" + searchString
+      : window.location.origin + window.location.pathname;
+  history.pushState({}, "", url);
+}
