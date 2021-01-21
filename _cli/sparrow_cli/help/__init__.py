@@ -53,11 +53,17 @@ def command_dl(directories: Path, extra_commands={}):
             continue
         if name.startswith("sparrow-dev-"):
             continue
-        yield (name[len(prefix) :], get_description(f).strip())
+        key = name[len(prefix) :]
+        yield (key, get_description(f).strip())
 
 
 class SparrowHelpFormatter(HelpFormatter):
-    key_commands = ["up", "down", "info"]
+    key_commands = {
+        "up": "Start `sparrow` and follow logs",
+        "down": "Safely stop `sparrow`",
+        "info": "Show information about the installation",
+        "create-test-lab": "Create an example installation of Sparrow",
+    }
 
     def write_line(self, text=""):
         self.write(text + "\n")
@@ -87,10 +93,9 @@ class SparrowHelpFormatter(HelpFormatter):
             return
         self.write_section("Backend", commands)
 
-    def write_section(self, title, items, **kwargs):
-        skip = kwargs.pop("skip", [])
-        items = [(k, format_description(v)) for k, v in items.items() if k not in skip]
-        self._write_section(title, items, **kwargs)
+    def write_section(self, title, commands, **kwargs):
+        commands = {k: format_description(v) for k, v in commands.items()}
+        self._write_section(title, commands, **kwargs)
 
     def write_container_management(self, ctx, core_commands):
         commands = command_dl(
@@ -100,21 +105,19 @@ class SparrowHelpFormatter(HelpFormatter):
                 **{k: v for k, v in command_info(ctx, cli)},
             },
         )
-        self._write_section("Container management", commands)
+        self._write_section(
+            "Container management",
+            {k: v for k, v in commands},
+            skip=[*self.key_commands.keys()],
+        )
 
-    def _write_section(self, title, items):
+    def _write_section(self, title, commands, skip=[]):
         with self.section(title):
-            self.write_dl(items, col_spacing=10)
+            _items = [(k, v) for k, v in commands.items() if k not in skip]
+            self.write_dl(_items, col_spacing=10)
             self.write("\n")
         self.flush()
 
-
-key_commands = {
-    "up": "Start `sparrow` and follow logs",
-    "down": "Safely stop `sparrow`",
-    "info": "Show information about the installation",
-    "create-test-lab": "Create an example installation of Sparrow",
-}
 
 sections = {
     "db": "Manage the `sparrow` database",
@@ -140,7 +143,7 @@ def echo_help(ctx, core_commands=None, user_commands=None):
 
     fmt = SparrowHelpFormatter()
     fmt.write_frontmatter()
-    fmt.write_section("Key commands", key_commands)
+    fmt.write_section("Key commands", fmt.key_commands)
     fmt.write_section("Command groups", sections)
 
     fmt.backend_help()
