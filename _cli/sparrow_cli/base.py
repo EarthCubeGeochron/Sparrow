@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 from rich.console import Console
-from envbash import load_envbash
+from .config_loader import load_config
 from .env import prepare_docker_environment, setup_command_path
 from .exc import SparrowCommandError
 
@@ -84,16 +84,7 @@ def cli(ctx):
         chdir(environ["SPARROW_CONFIG_DIR"])
         # This requires bash to be available on the platform, which
         # might be a problem for Windows/WSL.
-        print(environ["SPARROW_CONFIG"])
-        # Envbash has problems with working under PyInstaller due
-        # to its use of subprocess.Popen code referencing the python interpreter
-        # with sys.executable:
-        # https://pyinstaller.readthedocs.io/en/stable/runtime-information.html#using-sys-executable-and-sys-argv-0
-        # We use a custom fork of envbash that allows us to set the python interpreter
-        # until this is resolved.
-
-        load_envbash(environ["SPARROW_CONFIG"])
-        print("Env vars loaded")
+        load_config(environ["SPARROW_CONFIG"])
         # Change back to original working directory
         chdir(environ["SPARROW_WORKDIR"])
         environ["_SPARROW_CONFIG_SOURCED"] = "1"

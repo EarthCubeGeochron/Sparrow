@@ -1,8 +1,9 @@
 import sys
 import os
+from envbash import load_envbash
 
 
-def load_envbash_init_hack():
+def envbash_init_hack():
     """
     This is a hack to support the "envbash" module, which allows
     reading environment variables from a bash script.
@@ -16,13 +17,11 @@ def load_envbash_init_hack():
     of trying to bootstrap.
 
     SOLUTION: Envbash internally executes a Python one-liner to dump environment variables.
-    We just execute this code block directly and then bail,
-    mimicking python invoked from the
-    command line.
-    The dump-environment command needs to be invoked before any
+    We execute this code block directly and then bail, mimicking python invoked from the
+    command line. The dump-environment command needs to be invoked before any
     further CLI initialization happens.
     NOTE: we could go further and make this a general way to execute Python code,
-    but this might be insecure.
+    but this might have security implications.
     """
     if (
         getattr(sys, "frozen", False)
@@ -32,3 +31,8 @@ def load_envbash_init_hack():
     ):
         print(repr(dict(os.environ)))
         sys.exit(0)
+
+
+def load_config(cfg):
+    envbash_init_hack()
+    return load_envbash(cfg)
