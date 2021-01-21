@@ -1,10 +1,10 @@
 from click import group, secho
-from .group import CommandGroup
-from .util import compose
 from os import environ, path, chdir
 from runpy import run_path
 from subprocess import run
 import json
+from ..group import CommandGroup
+from ..util import compose
 
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {

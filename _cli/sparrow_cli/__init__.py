@@ -7,17 +7,13 @@ import sys
 import click
 from rich.console import Console
 from rich import print
-from .base import cli, SparrowConfig
+from sparrow_utils.logs import get_logger
+from .base import cli
 from .help import echo_help
 from .util import cmd, compose, exec_or_run, find_subcommand, container_id
-from .test import sparrow_test  # noqa
-from .database import sparrow_db  # noqa
-from .docs import sparrow_docs  # noqa
-from .dev import sparrow_dev  # noqa
 from .containers import sparrow_up, sparrow_logs
-from .build import sparrow_build
-from .test_lab import sparrow_test_lab
-from sparrow_utils.logs import get_logger
+from .context import SparrowConfig
+from .commands import add_commands
 
 log = get_logger(__name__)
 
@@ -31,6 +27,7 @@ console = Console(highlight=True)
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
 def main(ctx, args):
+    log.debug(f"args: {args}")
     cfg = ctx.find_object(SparrowConfig)
     rest = []
     try:
@@ -71,6 +68,5 @@ def shell(container):
 
 cli.add_command(sparrow_up, name="up")
 cli.add_command(sparrow_logs, name="logs")
-cli.add_command(sparrow_build, name="build")
-cli.add_command(sparrow_dev, name="dev")
-cli.add_command(sparrow_test_lab, name="create-test-lab")
+
+add_commands(cli)

@@ -2,9 +2,9 @@ import click
 from os import environ, chdir
 from rich import print
 from pathlib import Path
-
-from .util import cmd
 from json import load
+
+from ..util import cmd
 
 images_ = ["backend-base", "db-mysql-fdw", "backend", "frontend"]
 ORG = "sparrowdata"

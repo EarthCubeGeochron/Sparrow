@@ -3,9 +3,8 @@ import sys
 from os import environ, path, chdir
 from rich import print
 from click_default_group import DefaultGroup
-from .util import cmd, container_is_running, exec_or_run, compose
-from .base import cli
 from textwrap import dedent
+from ..util import cmd, exec_or_run, compose
 
 
 class TestGroup(DefaultGroup):
@@ -82,7 +81,7 @@ def compose(*args, **kwargs):
 __ctx = dict(ignore_unknown_options=True, help_option_names=[])
 
 
-@cli.group(name="test", cls=TestGroup, default="app", default_if_no_args=True)
+@click.group(name="test", cls=TestGroup, default="app", default_if_no_args=True)
 @click.pass_context
 def sparrow_test(ctx):
     """Test runner for the Sparrow application. The testing framework is based on

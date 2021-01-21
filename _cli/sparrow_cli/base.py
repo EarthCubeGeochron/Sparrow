@@ -1,17 +1,16 @@
 import sys
 import click
-import typing
 from click import echo, secho, style
 from click_default_group import DefaultGroup
 from sparrow_utils.logs import setup_stderr_logs
-from os import environ, getcwd, chdir, path
-from dataclasses import dataclass
+from os import environ, getcwd, chdir
 from pathlib import Path
 from typing import Optional
 from rich.console import Console
 from .config_loader import load_config
 from .env import prepare_docker_environment, setup_command_path
 from .exc import SparrowCommandError
+from .context import SparrowConfig
 
 
 class SparrowDefaultCommand(DefaultGroup):
@@ -47,11 +46,6 @@ def get_config() -> Optional[Path]:
 
 
 console = Console(highlight=True)
-
-
-@dataclass
-class SparrowConfig:
-    bin_directories: typing.List[Path]
 
 
 @click.group(
@@ -94,17 +88,6 @@ def cli(ctx, verbose=False):
         chdir(environ["SPARROW_WORKDIR"])
         environ["_SPARROW_CONFIG_SOURCED"] = "1"
 
-    # Check if this script is part of a source
-    # installation. If so, set SPARROW_PATH accordingly
-    is_frozen = getattr(sys, "frozen", False)
-    if "SPARROW_PATH" not in environ:
-        if is_frozen:
-            pth = Path(sys._MEIPASS) / "srcroot"
-        else:
-            this_exe = Path(__file__).resolve()
-            pth = this_exe.parent.parent.parent
-        environ["SPARROW_PATH"] = str(pth)
-
-    cfg = SparrowConfig(bin_directories=setup_command_path())
-    ctx.obj = cfg
+    # First steps towards some much more object-oriented configuration
+    ctx.obj = SparrowConfig()
     prepare_docker_environment()
