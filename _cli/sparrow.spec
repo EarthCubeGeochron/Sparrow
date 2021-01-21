@@ -1,10 +1,18 @@
 # -*- mode: python ; coding: utf-8 -*-
 from os import path
+from sparrow_utils.shell import cmd
 
 block_cipher = None
 
 spec_path = path.abspath(SPECPATH)
 src_root = path.abspath(path.join(spec_path, ".."))
+
+revfile = path.join(SPECPATH, "build", "GIT_REVISION")
+with open(revfile, "w") as f:
+    # almost the same as `git rev-parse HEAD` but with `-dirty` suffix
+    # https://stackoverflow.com/questions/21017300/git-command-to-get-head-sha1-with-dirty-suffix-if-workspace-is-not-clean
+    cmd("git describe --match=NOT-EVER-A-TAG --always --abbrev=40 --dirty", stdout=f)
+
 src_excludes = [
     "_cli",
     ".pytest_cache",
@@ -15,12 +23,13 @@ src_excludes = [
     "frontend/node_modules",
 ]
 
+data_files = {revfile: "."}
 
 a = Analysis(
     ["sparrow_cli/__main__.py"],
     pathex=[spec_path],
     binaries=[],
-    datas=[],
+    datas=data_files.items(),
     hiddenimports=[],
     hookspath=[],
     runtime_hooks=[],
