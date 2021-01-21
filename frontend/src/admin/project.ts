@@ -6,7 +6,7 @@ import { ProjectMatch } from "~/model-views/project";
 import { ProjectListComponent } from "./infinite-scroll";
 import styles from "./module.styl";
 import { NoStateAdmin } from "./baseview";
-import { AdminPage } from "./AdminPage";
+import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
 
 const h = hyperStyled(styles);
@@ -27,8 +27,12 @@ export function ProjectMainPanel() {
 }
 
 export function ProjectAdminPage() {
-  const [params, setParams] = useState({});
-  const possibleFilters = ["embargo", "location", "doi_like", "date_range"];
+  const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
+
+  const initialState = createParamsFromURL(possibleFilters);
+  // const initialState = {};
+
+  const [params, setParams] = useState(initialState);
 
   const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
@@ -43,6 +47,7 @@ export function ProjectAdminPage() {
       listComponent: h(ProjectListComponent, { params }),
       possibleFilters,
       createParams,
+      initParams: params || {},
     }),
     mainPageComponent: h(ProjectMainPanel),
   });

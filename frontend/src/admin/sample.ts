@@ -4,7 +4,7 @@ import { Switch, Route } from "react-router-dom";
 import { NoStateAdmin } from "./baseview";
 import { SampleMatch } from "~/model-views/sample/list";
 import { SampleListComponent } from "./infinite-scroll";
-import { AdminPage } from "./AdminPage";
+import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
 import styles from "./module.styl";
 
@@ -27,8 +27,11 @@ export function SampleMainPanel() {
 }
 
 export function SampleAdminPage() {
-  const [params, setParams] = useState({});
-  const possibleFilters = ["embargo", "location", "date_range"]; //needs to work with "doi_like"
+  const possibleFilters = ["public", "geometry", "date_range"]; //needs to work with "doi_like"
+
+  const initialState = createParamsFromURL(possibleFilters);
+
+  const [params, setParams] = useState(initialState);
 
   const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
@@ -44,6 +47,7 @@ export function SampleAdminPage() {
       listComponent: h(SampleListComponent, { params }),
       possibleFilters,
       createParams,
+      initParams: params || {},
     }),
     mainPageComponent: h(SampleMainPanel),
   });

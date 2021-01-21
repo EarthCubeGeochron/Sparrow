@@ -5,7 +5,7 @@ import { NoStateAdmin } from "./baseview";
 import { ProjectMatch } from "~/model-views/project";
 import { SessionMatch } from "../model-views";
 import { SessionListComponent } from "./infinite-scroll";
-import { AdminPage } from "./AdminPage";
+import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
 import styles from "./module.styl";
 
@@ -29,8 +29,11 @@ export function SessionMainPanel() {
 }
 
 export function SessionAdminPage() {
-  const [params, setParams] = useState({});
-  const possibleFilters = ["embargo", "date_range"];
+  const possibleFilters = ["public", "date_range"];
+
+  const initialState = createParamsFromURL(possibleFilters);
+
+  const [params, setParams] = useState(initialState);
 
   const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
@@ -46,6 +49,7 @@ export function SessionAdminPage() {
       listComponent: h(SessionListComponent, { params }),
       possibleFilters,
       createParams,
+      initParams: params || {},
     }),
     mainPageComponent: h(SessionMainPanel),
   });
