@@ -8,6 +8,7 @@ from ..meta import __version__
 def sparrow_info(ctx):
     """Show information about this Sparrow installation"""
     cfg = ctx.find_object(SparrowConfig)
+    rev = cfg.git_revision()["revision"]
 
     print("Command-line app:")
     if cfg.is_frozen:
@@ -15,3 +16,4 @@ def sparrow_info(ctx):
     else:
         print(f"  Source installation: {cfg.SPARROW_PATH}")
     print(f"  Version: {__version__}")
+    print(f"  Git revision: {rev}")

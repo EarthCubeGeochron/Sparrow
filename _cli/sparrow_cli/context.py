@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from os import environ
 from .env import setup_command_path
+from sparrow_utils.shell import git_revision_info
 
 
 @dataclass
@@ -34,3 +35,12 @@ class SparrowConfig:
 
         # Setup path for subcommands
         self.bin_directories = setup_command_path()
+
+    def git_revision(self):
+        # Setup revision info
+        if self.is_frozen:
+            rev = (self.bundle_dir / "GIT_REVISION").open().read()
+        else:
+            rev = git_revision_info(capture_output=True, cwd=self.SPARROW_PATH).stdout
+        rev = rev.strip().decode("utf-8")
+        return dict(revision=rev, dirty=rev.endswith("-dirty"))

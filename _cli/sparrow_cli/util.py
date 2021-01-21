@@ -7,6 +7,7 @@ from json import loads
 from .exc import SparrowCommandError
 from json.decoder import JSONDecodeError
 from sparrow_utils.logs import get_logger
+from sparrow_utils.shell import cmd as cmd_
 
 log = get_logger(__name__)
 
@@ -21,9 +22,8 @@ def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
 
 
 def cmd(*v, **kwargs):
-    val = " ".join(v)
-    log.debug(val)
-    return run(split(val), **kwargs)
+    kwargs["logger"] = log
+    return cmd_(*v, **kwargs)
 
 
 def compose(*args, **kwargs):
