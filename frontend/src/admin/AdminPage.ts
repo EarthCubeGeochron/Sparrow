@@ -44,3 +44,24 @@ export function AdminPage(props) {
     h("div.right-panel", null, [mainPageComponent]),
   ]);
 }
+
+export function createParamsFromURL(possibleFilters) {
+  if (!window.location.search) return;
+  const text = decodeURIComponent(window.location.search); // needs the decode so there isn't double serialization
+  const tex = text.split("?");
+  const te = tex[1].split("&");
+  let paramList = {};
+  for (let param of te) {
+    let params = param.split("="); //params[0] is Key and params[1] is value
+    let key1 = params[0];
+    let value = params[1];
+    paramList[key1] = value;
+  }
+  for (let key of Object.keys(paramList)) {
+    if (!possibleFilters.includes(key)) {
+      delete paramList[key];
+    }
+  }
+
+  return paramList;
+}
