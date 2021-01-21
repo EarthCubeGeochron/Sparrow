@@ -33,7 +33,7 @@ export function EmabrgoSwitch(props) {
     ? null
     : h(Switch, {
         checked,
-        innerLabel: "Pubic Only",
+        innerLabel: "Public Only",
         innerLabelChecked: "Private Only",
         onChange: handleChange,
       });
