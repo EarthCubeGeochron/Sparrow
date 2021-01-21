@@ -27,6 +27,8 @@ install-dist: _cli/dist/sparrow install-hooks
 test:
 	_cli/_scripts/test-cli
 
+.PHONY: build install install-dev build-dev install-dist test
+
 # Docker CLI build instructions (for e.g. CI)
 # Some information on how to build can be found at https://github.com/docker/compose
 # Build the sparrow command-line application (for different platforms)
@@ -46,7 +48,9 @@ _cli/dist/sparrow:
 	_cli/_scripts/build-dist
 
 _generate_buildspec:
-	docker run -v "$(shell pwd)/_cli/:/src/" cdrx/pyinstaller-linux "pyinstaller main.py"
+	cd _cli && \
+	pyinstaller --noconfirm --distpath dist sparrow_cli/__main__.py
+	# docker run -v "$(shell pwd)/_cli/:/src/" cdrx/pyinstaller-linux "pyinstaller main.py"
 
 # Link git hooks
 # (handles automatic submodule updating etc.)
