@@ -14,6 +14,7 @@ from .util import cmd, compose, exec_or_run, find_subcommand, container_id
 from .containers import sparrow_up, sparrow_logs
 from .context import SparrowConfig
 from .commands import add_commands
+from .meta import __version__
 
 log = get_logger(__name__)
 

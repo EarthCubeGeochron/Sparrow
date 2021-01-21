@@ -1,5 +1,6 @@
 import click
 from ..context import SparrowConfig
+from ..meta import __version__
 
 
 @click.command("info")
@@ -13,3 +14,4 @@ def sparrow_info(ctx):
         print(f"frozen with PyInstaller to {cfg.cli_root}")
     else:
         print(f"source build at {cfg.SPARROW_PATH}")
+    print("  Version: {__version__}")
