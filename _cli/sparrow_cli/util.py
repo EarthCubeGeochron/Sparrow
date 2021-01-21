@@ -1,12 +1,14 @@
-from os import environ, chdir
+from os import environ
 from subprocess import run, PIPE, STDOUT
 from shlex import split
 from typing import List
 from pathlib import Path
 from json import loads
-from .env import validate_environment
 from .exc import SparrowCommandError
 from json.decoder import JSONDecodeError
+from sparrow_utils.logs import get_logger
+
+log = get_logger(__name__)
 
 
 def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
@@ -20,6 +22,7 @@ def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
 
 def cmd(*v, **kwargs):
     val = " ".join(v)
+    log.debug(val)
     return run(split(val), **kwargs)
 
 

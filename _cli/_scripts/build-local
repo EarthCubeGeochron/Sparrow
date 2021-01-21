@@ -10,3 +10,4 @@ if [ ! -f $venv/bin/activate ]; then
 fi
 source $venv/bin/activate
 pip3 install -r _cli/requirements.txt
+

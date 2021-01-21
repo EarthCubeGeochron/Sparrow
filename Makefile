@@ -8,7 +8,7 @@ build:
 
 # Install locally-built executable. There should be no links preserved to the source
 # code after that
-install: install-dist
+install: build install-dist
 
 # Development installation
 build-dev:
@@ -27,7 +27,10 @@ install-dist: _cli/dist/sparrow install-hooks
 test:
 	_cli/_scripts/test-cli
 
-.PHONY: build install install-dev build-dev install-dist test
+clean:
+	rm -rf _cli/build
+
+.PHONY: build install install-dev build-dev install-dist test clean
 
 # Docker CLI build instructions (for e.g. CI)
 # Some information on how to build can be found at https://github.com/docker/compose

@@ -3,6 +3,7 @@ import click
 import typing
 from click import echo, secho, style
 from click_default_group import DefaultGroup
+from sparrow_utils.logs import setup_stderr_logs
 from os import environ, getcwd, chdir, path
 from dataclasses import dataclass
 from pathlib import Path
@@ -56,12 +57,16 @@ class SparrowConfig:
 @click.group(
     name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True
 )
+@click.option("--verbose/--no-verbose", is_flag=True, default=False)
 @click.pass_context
-def cli(ctx):
+def cli(ctx, verbose=False):
     """Startup function that sets configuration environment variables. Much of the
     structure of this is inherited from when the application was bootstrapped by a
     `zsh` script.
     """
+    if verbose:
+        setup_stderr_logs("sparrow_cli")
+
     environ["SPARROW_WORKDIR"] = getcwd()
     here = Path(environ["SPARROW_WORKDIR"])
 
@@ -93,13 +98,12 @@ def cli(ctx):
     # installation. If so, set SPARROW_PATH accordingly
     is_frozen = getattr(sys, "frozen", False)
     if "SPARROW_PATH" not in environ:
-        this_exe = Path(__file__).resolve()
-        if not is_frozen:
-            pth = this_exe.parent.parent.parent
-            environ["SPARROW_PATH"] = str(pth)
+        if is_frozen:
+            pth = Path(sys._MEIPASS) / "srcroot"
         else:
-            print("Frozen script does not work yet.")
-            sys.exit(0)
+            this_exe = Path(__file__).resolve()
+            pth = this_exe.parent.parent.parent
+        environ["SPARROW_PATH"] = str(pth)
 
     cfg = SparrowConfig(bin_directories=setup_command_path())
     ctx.obj = cfg

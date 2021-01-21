@@ -33,7 +33,7 @@ WORKDIR /app
 ## Copy app core
 COPY ./ /app/
 
-RUN pip install -e .
+RUN pip install -e utils && pip install -e .
 
 # Copy command-line options to a place where they can be easily accessed
 # by the wrapper CLI.

@@ -17,16 +17,16 @@ from .dev import sparrow_dev  # noqa
 from .containers import sparrow_up, sparrow_logs
 from .build import sparrow_build
 from .test_lab import sparrow_test_lab
+from sparrow_utils.logs import get_logger
+
+log = get_logger(__name__)
 
 console = Console(highlight=True)
 
 
 @cli.command(
     "main",
-    context_settings=dict(
-        ignore_unknown_options=True,
-        help_option_names=[],
-    ),
+    context_settings=dict(ignore_unknown_options=True, help_option_names=[]),
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
