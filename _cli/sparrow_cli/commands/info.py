@@ -12,7 +12,7 @@ def sparrow_info(ctx):
 
     print("Command-line app:")
     if cfg.is_frozen:
-        print(f"  Frozen with PyInstaller: {cfg.cli_root}")
+        print(f"  Frozen with PyInstaller: {cfg.bundle_dir}")
     else:
         print(f"  Source installation: {cfg.SPARROW_PATH}")
     print(f"  Version: {__version__}")

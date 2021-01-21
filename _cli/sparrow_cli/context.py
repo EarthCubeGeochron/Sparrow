@@ -41,6 +41,8 @@ class SparrowConfig:
         if self.is_frozen:
             rev = (self.bundle_dir / "GIT_REVISION").open().read()
         else:
-            rev = git_revision_info(capture_output=True, cwd=self.SPARROW_PATH).stdout
-        rev = rev.strip().decode("utf-8")
+            rev = git_revision_info(
+                capture_output=True, cwd=self.SPARROW_PATH
+            ).stdout.decode("utf-8")
+        rev = rev.strip()
         return dict(revision=rev, dirty=rev.endswith("-dirty"))
