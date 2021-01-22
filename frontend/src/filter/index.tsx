@@ -1,14 +1,6 @@
 import { useState, useReducer, useEffect } from "react";
 import { reducer } from "./reducers-filters";
-import {
-  Button,
-  Tooltip,
-  Card,
-  Popover,
-  Icon,
-  Tag,
-  Collapse,
-} from "@blueprintjs/core";
+import { Button, Tooltip, Card, Popover, Icon, Tag } from "@blueprintjs/core";
 import {
   AgeSlideSelect,
   DatePicker,
@@ -22,6 +14,7 @@ import { EmabrgoSwitch } from "./components/Embargo";
 import styles from "./module.styl";
 import { MapPolygon } from "./components/MapSelector";
 import { urlSearchFromParams } from "../components/infinite-scroll/infinite-api-view";
+import { getNatLang } from "./components/utils";
 
 const h = hyperStyled(styles);
 
@@ -65,23 +58,6 @@ function SampleFilter({ on_map = false }: Filter) {
   ]);
 }
 
-const CollapseableEntity = (props) => {
-  const [open, setOpen] = useState(false);
-  const { content } = props;
-
-  const clickChange = () => {
-    setOpen(!open);
-  };
-
-  return h("div", [
-    h("div", { style: { display: "flex" } }, [
-      h(Popover, { content, position: "bottom", minimal: true }, [
-        h(Button, { icon: "filter", onClick: clickChange, minimal: true }),
-      ]),
-    ]),
-  ]);
-};
-
 const TagContainer = (props) => {
   const [tags, setTags] = useState({});
   const { params, removeParam, createParams } = props;
@@ -110,16 +86,19 @@ const TagContainer = (props) => {
     geometry: "Map Location",
     date_range: "Date Range",
     doi_like: "doi",
-    public: "public",
+    public: { true: "Public Only", false: "Private Only" },
   };
 
   if (Object.keys(tags).length != 0) {
-    return h("div", [
+    return h("div.tag-container", [
       Object.entries(tags).map((entry) => {
         const [key, value] = entry;
-        return h(Tag, { onRemove: () => handleRemove(key) }, [
-          `${natLang[key]}`,
-        ]);
+        const name = key == "public" ? natLang[key][value] : natLang[key];
+        return h(
+          Tag,
+          { onRemove: () => handleRemove(key), className: "tag-individ" },
+          [name]
+        );
       }),
     ]);
   }
@@ -168,22 +147,48 @@ function AdminFilter(props) {
       ["Apply Filters"]
     );
   };
+  const CancelFilterButton = () => {
+    return h(
+      Button,
+      {
+        intent: "danger",
+        onClick: () => setFilterOpen(!filterOpen),
+        style: { marginLeft: "10px" },
+      },
+      ["Cancel"]
+    );
+  };
 
-  const Content = h("div", { style: { margin: "10px" } }, [
-    h.if(possibleFilters.includes("public"))(EmabrgoSwitch, {
-      updateEmbargoFilter: updateParams,
-    }),
-    h.if(possibleFilters.includes("date_range"))(DatePicker, {
-      updateDateRange: updateParams,
-    }),
-    h.if(possibleFilters.includes("doi_like"))(DoiFilter, {
-      updateDoi: updateParams,
-    }),
-    h.if(possibleFilters.includes("geometry"))(MapPolygon, {
-      updateParams,
-    }),
-    h(SumbitFilterButton),
-  ]);
+  const Content = h(
+    "div",
+    {
+      style: {
+        marginTop: "15px",
+      },
+    },
+    [
+      h("div", [
+        h.if(possibleFilters.includes("public"))(EmabrgoSwitch, {
+          updateEmbargoFilter: updateParams,
+        }),
+        h("div", [
+          h.if(possibleFilters.includes("date_range"))(DatePicker, {
+            updateDateRange: updateParams,
+          }),
+        ]),
+        h.if(possibleFilters.includes("doi_like"))(DoiFilter, {
+          updateDoi: updateParams,
+        }),
+        h.if(possibleFilters.includes("geometry"))(MapPolygon, {
+          updateParams,
+        }),
+        h("div", { style: { margin: "10px", marginLeft: "0px" } }, [
+          h(SumbitFilterButton),
+          h(CancelFilterButton),
+        ]),
+      ]),
+    ]
+  );
 
   return h("div", { style: { position: "relative" } }, [
     h("div.listcomponent", [
