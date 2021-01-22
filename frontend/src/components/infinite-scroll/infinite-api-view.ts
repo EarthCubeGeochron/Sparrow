@@ -2,9 +2,9 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useAPIActions } from "@macrostrat/ui-components";
+import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
 import { Spinner } from "@blueprintjs/core";
-import { FilterBox } from "../filter-list";
+import { Expired, NoSearchResults } from "./utils";
 import styles from "./main.styl";
 
 const h = hyperStyled(styles);
@@ -82,13 +82,15 @@ function InfiniteAPIView({
     dataFetch(data, nextPage);
   };
 
+  const child = h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
+
   return data.length > 0
     ? h(ForeverScroll, {
         initialData: data,
         fetch: fetchNewData,
         component,
       })
-    : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
+    : h(Expired, { child, delay: 1000 });
 }
 
 export { InfiniteAPIView };
@@ -98,16 +100,17 @@ export { InfiniteAPIView };
  * @param params {} key, value pairs of parameters
  */
 export function urlSearchFromParams(params) {
-  let string = "";
-  for (const [key, value] of Object.entries(params)) {
-    const queryString = `${key}=${value}&`;
-    string += queryString;
-  }
-  let searchString = string.slice(0, -1);
-  console.log(searchString);
-  const url =
-    Object.entries(params).length > 0
-      ? window.location.origin + window.location.pathname + "?" + searchString
-      : window.location.origin + window.location.pathname;
-  history.pushState({}, "", url);
+  setQueryString(params);
+  // let string = "";
+  // for (const [key, value] of Object.entries(params)) {
+  //   const queryString = `${key}=${value}&`;
+  //   string += queryString;
+  // }
+  // let searchString = string.slice(0, -1);
+  // console.log(searchString);
+  // const url =
+  //   Object.entries(params).length > 0
+  //     ? window.location.origin + window.location.pathname + "?" + searchString
+  //     : window.location.origin + window.location.pathname;
+  // history.pushState({}, "", url);
 }
