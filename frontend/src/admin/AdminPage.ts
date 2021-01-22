@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Icon, Button } from "@blueprintjs/core";
+import { getQueryString } from "@macrostrat/ui-components";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -47,6 +48,7 @@ export function AdminPage(props) {
 
 export function createParamsFromURL(possibleFilters) {
   if (!window.location.search) return;
+  //console.log(getQueryString());
   const text = decodeURIComponent(window.location.search); // needs the decode so there isn't double serialization
   const tex = text.split("?");
   const te = tex[1].split("&");
