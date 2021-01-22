@@ -1,6 +1,9 @@
 import React from "react";
-import h from "@macrostrat/hyper";
-import { InputGroup } from "@blueprintjs/core";
+import { InputGroup, Card } from "@blueprintjs/core";
+import { hyperStyled } from "@macrostrat/hyper";
+import styles from "./module.styl";
+
+const h = hyperStyled(styles);
 
 export function DoiFilter(props) {
   const { updateDoi } = props;
@@ -9,8 +12,9 @@ export function DoiFilter(props) {
     updateDoi("doi_like", e.target.value);
   };
 
-  return h("div", [
-    "Search for DOI",
-    h(InputGroup, { onChange: handleChange }),
+  return h("div.filter-card", [
+    h(Card, [
+      h("div", ["Search for DOI:", h(InputGroup, { onChange: handleChange })]),
+    ]),
   ]);
 }

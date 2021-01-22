@@ -5,6 +5,7 @@ import Draw from "@urbica/react-map-gl-draw";
 import { Button, Popover, Card } from "@blueprintjs/core";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import { FilterAccordian } from "./utils";
 
 /**
  * This component is meant to be a location filter for data.
@@ -39,7 +40,7 @@ export function MapPolygon(props) {
     updateParams("geometry", polygon);
   };
 
-  return h("div", [
+  const content = h("div", { style: { position: "relative" } }, [
     h(
       MapGL,
       {
@@ -61,7 +62,11 @@ export function MapPolygon(props) {
         }),
       ]
     ),
-    h(MapHelpButton),
+    h("div", { style: { position: "absolute", top: "0" } }, [h(MapHelpButton)]),
+  ]);
+
+  return h(Card, [
+    h(FilterAccordian, { content, text: "Select a Location on the map" }),
   ]);
 }
 
@@ -92,12 +97,15 @@ function MapHelpButton(props) {
     h(Card, [
       h("p", ["Zoom in: Double Click"]),
       h("p", [
-        "Zoom-Out: Mac(Command+Shift+Doulb Click) PC (Control+Shift+Double Click)",
+        "Zoom-Out: ",
+        "Mac(Command+Shift+Doulbe Click), PC (Control+Shift+Double Click)",
       ]),
+      h("p", ["Exit Drawing: Enter"]),
+      h("p", ["Edit Existing Shape: Double Click Shape"]),
     ]),
   ]);
 
-  return h(Popover, { content, minimal: true }, [
-    h(Button, { minimal: true }, ["Map Help"]),
+  return h(Popover, { content, minimal: true, position: "bottom-right" }, [
+    h(Button, { minimal: true, intent: "danger" }, ["Help"]),
   ]);
 }

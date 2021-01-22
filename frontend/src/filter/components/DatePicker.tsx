@@ -1,10 +1,11 @@
 import * as React from "react";
 import { useState } from "react";
 import { DateRangeInput } from "@blueprintjs/datetime";
-import {
-  Card,
-} from "@blueprintjs/core";
-import h from "@macrostrat/hyper";
+import { Card } from "@blueprintjs/core";
+import { hyperStyled } from "@macrostrat/hyper";
+import styles from "./module.styl";
+
+const h = hyperStyled(styles);
 
 /**
  * Component to Pick Dates
@@ -24,12 +25,16 @@ export function DatePicker(props) {
     }
   };
 
-  return h(Card, [
-    h("h5", ["Session Date: "]),
-    h(DateRangeInput, {
-      formatDate: (date) => date.toLocaleString(),
-      parseDate: (str) => new Date(str),
-      onChange: handleChange,
-    }),
+  return h("div.filter-card", [
+    h(Card, [
+      h("div", ["Session Date: "]),
+      h(DateRangeInput, {
+        formatDate: (date) => date.toLocaleString(),
+        parseDate: (str) => new Date(str),
+        onChange: handleChange,
+        popoverProps: { position: "bottom-right" },
+        minDate: new Date(1950, 1, 1),
+      }),
+    ]),
   ]);
 }

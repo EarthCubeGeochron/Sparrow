@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { Switch, Checkbox } from "@blueprintjs/core";
-import h from "@macrostrat/hyper";
+import { Switch, Checkbox, Card, Button, ButtonGroup } from "@blueprintjs/core";
+import { hyperStyled } from "@macrostrat/hyper";
+import { FilterAccordian } from "./utils";
+import styles from "./module.styl";
 
+const h = hyperStyled(styles);
 /**
  *
  * @param props function to update state of parent component, build get request params
@@ -10,40 +13,71 @@ import h from "@macrostrat/hyper";
  */
 export function EmabrgoSwitch(props) {
   const { updateEmbargoFilter } = props;
-  const [checked, setChecked] = useState(false);
-  const [checkbox, setCheckBox] = useState(false);
+  const [clicked, setClicked] = useState("null");
 
-  const handleChange = () => {
-    setChecked(!checked);
-    updateEmbargoFilter("public", checked);
+  const handleClick = (state) => {
+    updateEmbargoFilter("public", state);
+    setClicked(JSON.stringify(state));
   };
 
-  const handleCheckBox = () => {
-    setCheckBox(!checkbox);
-    if (!checkbox) {
-      // the defualt switch is true, public only
-      updateEmbargoFilter("public", true);
-    } else {
-      // if it's unclicked need to clear params
-      updateEmbargoFilter("public", null);
+  const intentFinder = (state) => {
+    if (state == clicked) {
+      return "success";
     }
+    return null;
+  };
+  const iconFinder = (state) => {
+    if (state == clicked) {
+      return "tick";
+    }
+    return null;
   };
 
-  const Switcher = !checkbox
-    ? null
-    : h(Switch, {
-        checked,
-        innerLabel: "Public Only",
-        innerLabelChecked: "Private Only",
-        onChange: handleChange,
-      });
+  // Instead of switch three button group
+  const Buttons = h(ButtonGroup, { minimal: true }, [
+    h(
+      "div",
+      {
+        style: {
+          borderStyle: "solid",
+          borderColor: "grey",
+          borderRadius: "5px",
+          borderWidth: "1px",
+        },
+      },
+      [
+        h(
+          Button,
+          {
+            onClick: () => handleClick(null),
+            intent: intentFinder("null"),
+            rightIcon: iconFinder("null"),
+          },
+          ["Any"]
+        ),
+        h(
+          Button,
+          {
+            onClick: () => handleClick(true),
+            intent: intentFinder("true"),
+            rightIcon: iconFinder("true"),
+          },
+          ["Public Only"]
+        ),
+        h(
+          Button,
+          {
+            onClick: () => handleClick(false),
+            intent: intentFinder("false"),
+            rightIcon: iconFinder("false"),
+          },
+          ["Private Only"]
+        ),
+      ]
+    ),
+  ]);
 
-  return h("div", [
-    h(Checkbox, {
-      checked: checkbox,
-      onChange: handleCheckBox,
-      labelElement: "Filter by Embargo Status",
-    }),
-    Switcher,
+  return h("div.filter-card", [
+    h(Card, [h(FilterAccordian, { content: Buttons, text: "Embargo Status" })]),
   ]);
 }
