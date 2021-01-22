@@ -88,7 +88,7 @@ function ForeverScroll({ initialData, component, fetch }) {
 
       {hasMoreAfter && (
         <div ref={setBottom} style={{ marginTop: "50px" }}>
-          This is where it Refreshes
+          <Spinner />
         </div>
       )}
     </div>
