@@ -21,6 +21,7 @@ from ..filters import (
     DOI_filter,
     Coordinate_filter,
     Geometry_Filter,
+    TextSearchFilter,
 )
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
@@ -114,6 +115,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self.register_filter(DOI_filter)
         self.register_filter(Coordinate_filter)
         self.register_filter(Geometry_Filter)
+        self.register_filter(TextSearchFilter)
 
     @property
     def model(self):

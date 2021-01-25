@@ -308,9 +308,49 @@ class Age_Range_Filter(BaseFilter):
         return hasattr(self.model, "age")
     pass
 
+class TextSearchFilter(BaseFilter):
+    key = "like"
+
+    @property
+    def params(self):
+        d = "A string to match text field of the data model"
+        e= ["?like=basalt"]
+        des = create_params(d,e)
+        return{
+            self.key: Str(description=des)
+            }
+
+    def should_apply(self):
+        '''
+        Should apply to all models with text fields
+        '''
+        return len(text_fields(self.model)) > 0
+
+    def apply(self, args, query):
+
+        fields = text_fields(self.model)
+        search_string = args[self.key]
+        
+        ## TODO: make it non-case sensitive??
+        return query.filter(or_(*[n.like(f'%{search_string}%') for n in fields]))
 
 
 ## TODO: Age range filter, generic parameter filter: pass field and value, Geologic formation filter
 ## TODO: Define filter in plugin, i.e irradiation filter for WiscAr
 ## TODO: Filter based on nested models, /api/v2/datum?nest=project,datum_type&datum_type.unit=Ma&project=11
 
+def text_fields(model):
+    '''
+    Function to return the column model attributes for a sqlalchemy model
+    '''
+    fields = model.__table__.columns.keys()
+    text_fields = []
+    for c in fields:
+        if f'{getattr(model,c).type}' == "TEXT":
+            text_fields.append(c)
+    
+    atr = []
+    for c in text_fields:
+        atr.append(getattr(model, c))
+    
+    return atr
