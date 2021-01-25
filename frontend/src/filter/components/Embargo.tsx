@@ -26,12 +26,6 @@ export function EmabrgoSwitch(props) {
     }
     return null;
   };
-  const iconFinder = (state) => {
-    if (state == clicked) {
-      return "tick";
-    }
-    return null;
-  };
 
   // Instead of switch three button group
   const Buttons = h(ButtonGroup, { minimal: true }, [
@@ -51,7 +45,7 @@ export function EmabrgoSwitch(props) {
           {
             onClick: () => handleClick(null),
             intent: intentFinder("null"),
-            rightIcon: iconFinder("null"),
+            active: clicked == "null",
           },
           ["Any"]
         ),
@@ -60,7 +54,7 @@ export function EmabrgoSwitch(props) {
           {
             onClick: () => handleClick(true),
             intent: intentFinder("true"),
-            rightIcon: iconFinder("true"),
+            active: clicked == "true",
           },
           ["Public Only"]
         ),
@@ -69,7 +63,7 @@ export function EmabrgoSwitch(props) {
           {
             onClick: () => handleClick(false),
             intent: intentFinder("false"),
-            rightIcon: iconFinder("false"),
+            active: clicked == "false",
           },
           ["Private Only"]
         ),
