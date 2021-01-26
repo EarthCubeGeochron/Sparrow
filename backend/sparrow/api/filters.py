@@ -327,6 +327,8 @@ class TextSearchFilter(BaseFilter):
         return len(text_fields(self.model)) > 0
 
     def apply(self, args, query):
+        if self.key not in args:
+            return query
 
         fields = text_fields(self.model)
         search_string = args[self.key]
