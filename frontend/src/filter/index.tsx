@@ -93,7 +93,12 @@ const TagContainer = (props) => {
     return h("div.tag-container", [
       Object.entries(tags).map((entry) => {
         const [key, value] = entry;
-        const name = key == "public" ? natLang[key][value] : natLang[key];
+        const name =
+          key == "public"
+            ? natLang[key][value]
+            : key == "like"
+            ? value
+            : natLang[key];
         return h(
           Tag,
           { onRemove: () => handleRemove(key), className: "tag-individ" },
@@ -126,6 +131,9 @@ function AdminFilter(props) {
     if (field == "geometry") {
       dispatch({ type: "geometry", payload: { geometry: data } });
     }
+    if (field == "like") {
+      dispatch({ type: "like", payload: { like: data } });
+    }
   };
   const removeParam = (key) => {
     dispatch({ type: "removeSingle", payload: { field: key } });
@@ -135,6 +143,13 @@ function AdminFilter(props) {
     createParams(params);
     setTags(params);
     setFilterOpen(!filterOpen);
+    urlSearchFromParams(params);
+  };
+
+  const onSearch = (e) => {
+    e.preventDefault();
+    createParams(params);
+    setTags(params);
     urlSearchFromParams(params);
   };
   const SumbitFilterButton = () => {
@@ -193,11 +208,19 @@ function AdminFilter(props) {
   return h("div", { style: { position: "relative" } }, [
     h("div.listcomponent", [
       h(SearchInput, {
-        rightElement: h(Button, {
+        leftElement: h(Button, {
           icon: "filter",
           onClick: () => setFilterOpen(!filterOpen),
           minimal: true,
         }),
+        updateParams,
+        rightElement: h(Button, {
+          icon: "search",
+          onClick: onSearch,
+          minimal: true,
+          type: "submit",
+        }),
+        text: params.like || "",
       }),
       h(TagContainer, { params: tags, removeParam, createParams }),
     ]),
