@@ -49,7 +49,6 @@ const DetailPageHeader = (props) => {
  */
 export const SessionCardInfo = (props) => {
   const { session_id, target, date, technique } = props;
-  console.log(date);
   return h(
     "div",
     {
