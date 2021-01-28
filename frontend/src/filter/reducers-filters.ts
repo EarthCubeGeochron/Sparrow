@@ -44,8 +44,6 @@ export function reducer(state, action) {
       return {
         ...newState,
       };
-    // needs to be a remove dispatch, specific for a field
-    // needs to be a "clear" dispatch
     default:
       throw new Error("Don't understand action");
   }
