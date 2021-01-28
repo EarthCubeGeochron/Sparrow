@@ -4,6 +4,12 @@ import {
   ProjectInfoLink, //@ts-ignore
 } from "~/model-views/project";
 import { SampleListCard } from "../model-views/sample/list";
+import {
+  ProjectModelCard,
+  SampleModelCard,
+  SessionModelCard,
+  DataFileModelCard,
+} from "../model-views/list-cards/utils";
 import { DataFilesCard } from "../model-views/data-files";
 import { SessionLinkCard } from "../model-views/data-files/page";
 import { FilterBox } from "../components/filter-list";
@@ -29,9 +35,9 @@ const ProjectListComponent = ({ params }) => {
     h(InfiniteAPIView, {
       url: "/models/project",
       unwrapData: unwrapProjectCardData,
-      params: { nest: "publication,session,samnple" },
+      params: { nest: "publication,session,sample" },
       filterParams: { ...params },
-      component: ProjectInfoLink,
+      component: ProjectModelCard,
       context: APIV2Context,
     }),
   ]);
@@ -39,22 +45,20 @@ const ProjectListComponent = ({ params }) => {
 
 function unwrapSampleCardData(data) {
   const dataObj = data.data.map((obj) => {
-    const { id, name, material } = obj;
-    return { id, name, material };
+    const { id, name, material, location, session } = obj;
+    return { id, name, material, location, session };
   });
   return dataObj;
 }
 
 function SampleListComponent({ params }) {
-  const filterFields = ["Name", "Material", "id"];
-
   return h("div", [
     h(InfiniteAPIView, {
       url: "/models/sample",
       unwrapData: unwrapSampleCardData,
-      params: {},
+      params: { nest: "session,project" },
       filterParams: { ...params },
-      component: SampleListCard,
+      component: SampleModelCard,
       context: APIV2Context,
     }),
   ]);
@@ -63,12 +67,23 @@ function SampleListComponent({ params }) {
 // const { id, date, target, technique } = props;
 function unwrapSessionCardData(data) {
   const dataObj = data.data.map((obj) => {
-    const { id: session_id, technique, target, date } = obj;
+    const {
+      id: session_id,
+      technique,
+      target,
+      date,
+      instrument,
+      analysis,
+      sample,
+    } = obj;
     return {
       session_id,
       technique,
       target,
       date,
+      instrument,
+      analysis,
+      sample,
     };
   });
   return dataObj;
@@ -81,7 +96,7 @@ function SessionListComponent({ params }) {
       unwrapData: unwrapSessionCardData,
       params: { nest: "instrument,project,sample" },
       filterParams: { ...params },
-      component: SessionLinkCard,
+      component: SessionModelCard,
       context: APIV2Context,
     }),
   ]);
@@ -95,8 +110,9 @@ function unwrapDataFileCardData(data) {
         file_hash,
         type,
         data_file_link: [{ date }],
+        data_file_link,
       } = obj;
-      return { basename, file_hash, type, date };
+      return { basename, file_hash, type, date, data_file_link };
     }
     const { basename, file_hash, type } = obj;
     return { basename, file_hash, type };
@@ -114,7 +130,7 @@ function DataFilesListComponent({ params }) {
         has: "data_file_link",
       },
       filterParams: { ...params },
-      component: DataFilesCard,
+      component: DataFileModelCard,
       context: APIV2Context,
     }),
   ]);
