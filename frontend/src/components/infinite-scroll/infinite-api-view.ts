@@ -90,7 +90,7 @@ function InfiniteAPIView({
         fetch: fetchNewData,
         component,
       })
-    : h(Expired, { child, delay: 1000 });
+    : h(Expired, { child, delay: 3000 });
 }
 
 export { InfiniteAPIView };
