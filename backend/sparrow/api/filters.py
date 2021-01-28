@@ -343,7 +343,8 @@ class TextSearchFilter(BaseFilter):
 
 def text_fields(model):
     '''
-    Function to return the column model attributes for a sqlalchemy model
+    Function to return the column model attributes for a sqlalchemy model whose type is text
+    i.e sample.name
     '''
     fields = model.__table__.columns.keys()
     text_fields = []
