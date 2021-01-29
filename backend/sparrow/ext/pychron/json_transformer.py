@@ -1,6 +1,4 @@
-import subprocess
 from os import path
-from rich import print
 from datetime import datetime
 from sparrow.util import run
 
@@ -91,7 +89,6 @@ class PyChronJSONImporter:
             self.transform_analysis(a, index=i) for i, a in enumerate(data["analyses"])
         ]
         analyses.append(self.transform_ages(data["preferred"]["ages"]))
-        print(analyses)
 
         res = {"analysis": analyses}
 
