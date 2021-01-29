@@ -58,8 +58,6 @@ else:
     c = run(["createdb", *dbargs, "sparrow_test"])
     echo("Database is ready...")
 
-    run(["sparrow", "init"])
-
 # This prevents us from getting absolutely spammed by SAWarning
 # TODO: improve warning handling for database automapping
 args.append("--disable-warnings")
