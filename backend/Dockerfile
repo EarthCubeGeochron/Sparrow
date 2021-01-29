@@ -1,7 +1,11 @@
-FROM sparrowdata/backend-base:1.1 AS main
+FROM sparrowdata/backend-base:1.2 AS main
 # Multi-stage build of Sparrow backend.
 
+## Git is required for the PyChron importer
+RUN apk update && apk add git
+
 COPY ./requirements.txt /install/requirements.txt
+RUN pip install --no-cache "https://github.com/djrobstep/sqlakeyset/zipball/fec6936"
 RUN pip install --no-cache -r /install/requirements.txt
 
 COPY ./docker.cfg /config/docker.cfg
@@ -18,19 +22,26 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 # Disable caching to slim down image
 ENV PIP_NO_CACHE_DIR=1
 
+# For graphing the database schema
+RUN git clone https://github.com/davenquinn/sadisplay.git /ext/sadisplay \
+  && pip install -e /ext/sadisplay
+
 COPY ./docker-scripts/* /bin/
 RUN mkdir /app
 WORKDIR /app
 
 ## Copy app core
-COPY ./setup.py /app
-COPY ./sparrow /app/sparrow
-COPY ./core_plugins /app/core_plugins
+COPY ./ /app/
 
-RUN pip install -e .
+RUN pip install -e utils && pip install -e .
+
+# Copy command-line options to a place where they can be easily accessed
+# by the wrapper CLI.
+RUN SPARROW_SECRET_KEY=test /app/sparrow/__main__.py get-cli-info > /run/cli-info.json
 
 CMD ["/bin/run"]
 
 FROM main AS testing
 
-COPY ./tests /app/tests
+# For right now, the testing target is the same as the "main" target, but
+# we could grab or create additional artifacts or fixtures here.

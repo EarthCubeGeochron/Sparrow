@@ -1,0 +1,26 @@
+# Standalone docker-compose file for backend testing.
+# Only spins up backend and database, not frontend.
+version: "3.6"
+services:
+  backend:
+    build:
+      context: ./backend
+      target: testing
+    command: /bin/run-tests
+    # Make sure we get colorized terminal output
+    tty: true
+    depends_on:
+      - db
+    environment:
+      - SPARROW_SECRET_KEY=test_secret
+  db:
+    image: mdillon/postgis:11
+    ports:
+      # We could change this to port 54321 if we were cool with
+      # it conflicting with our default for Sparrow itself. This
+      # might make it harder to run tests, though.
+      - "54322:5432"
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_DB=sparrow

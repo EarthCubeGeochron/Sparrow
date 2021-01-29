@@ -3,8 +3,10 @@ from os import environ
 from pathlib import Path
 from click import secho
 
+
 class InitSQLPlugin(SparrowCorePlugin):
     name = "init-sql"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -15,11 +17,10 @@ class InitSQLPlugin(SparrowCorePlugin):
             p = Path(sql)
             assert p.exists()
             if p.is_dir():
-                files = p.glob('*.sql')
+                files = p.glob("*.sql")
             else:
                 files = [p]
             self.init_sql = [f for f in files if f.is_file()]
-
 
     def on_core_tables_initialized(self, db):
         if self.init_sql is None:

@@ -1,57 +1,49 @@
-/*
- * decaffeinate suggestions:
- * DS001: Remove Babel/TypeScript constructor workaround
- * DS102: Remove unnecessary code created because of implicit returns
- * DS206: Consider reworking classes to avoid initClass
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-import {hyperStyled} from '@macrostrat/hyper';
-import {Component} from 'react';
-import {StatefulComponent} from '@macrostrat/ui-components';
-import {AuthContext} from './context';
-import {Button, Dialog, Callout, Intent, Classes} from '@blueprintjs/core';
-import classNames from 'classnames';
-import styles from './module.styl';
+import { hyperStyled } from "@macrostrat/hyper";
+import { Component } from "react";
+import { StatefulComponent } from "@macrostrat/ui-components";
+import { AuthContext } from "./context";
+import { Button, Dialog, Callout, Intent, Classes } from "@blueprintjs/core";
+import classNames from "classnames";
+import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
 class LoginFormInner extends Component {
   render() {
     const className = classNames(Classes.INPUT, "bp3-large");
-    const {data, onChange, submitForm} = this.props;
-    const onKeyUp = function(e){
-      if (e.key !== 'Enter') { return; }
+    const { data, onChange, submitForm } = this.props;
+    const onKeyUp = function (e) {
+      if (e.key !== "Enter") {
+        return;
+      }
       return submitForm();
     };
 
-    return h('form.login-form', [
-      h('input', {
+    return h("form.login-form", [
+      h("input", {
         type: "text",
-        name: 'username',
+        name: "username",
         value: data.username,
         onChange,
         className,
         onKeyUp,
-        placeholder: "Username"
+        placeholder: "Username",
       }),
-      h('input', {
+      h("input", {
         type: "password",
-        name: 'password',
+        name: "password",
         value: data.password,
         onChange,
         className,
         onKeyUp,
-        placeholder: "Password"
-      })
+        placeholder: "Password",
+      }),
     ]);
   }
 }
 
 class LoginForm extends StatefulComponent {
-  static initClass() {
-    this.contextType = AuthContext;
-  }
+  static contextType = AuthContext;
   constructor() {
     super(...arguments);
     this.resetState = this.resetState.bind(this);
@@ -60,97 +52,132 @@ class LoginForm extends StatefulComponent {
   }
 
   resetState() {
-    return this.state = {
-      data: {username: "", password: ""}
-    };
+    return (this.state = {
+      data: { username: "", password: "" },
+    });
   }
 
   isValid() {
-    const {data} = this.state;
-    const {username, password} = data;
-    if (username == null) { return false; }
-    if (password == null) { return false; }
-    if (password.length < 4) { return false; }
-    if (username.length < 4) { return false; }
+    const { data } = this.state;
+    const { username, password } = data;
+    if (username == null) {
+      return false;
+    }
+    if (password == null) {
+      return false;
+    }
+    if (password.length < 4) {
+      return false;
+    }
+    if (username.length < 4) {
+      return false;
+    }
     return true;
   }
 
   renderCallout() {
-    const {invalidAttempt, login, username} = this.context;
+    const { invalidAttempt, login, username } = this.context;
     if (invalidAttempt) {
-      return h(Callout, {
-        className: 'login-info',
-        title: "Invalid credentials",
-        intent: Intent.DANGER
-      }, "Invalid credentials were provided");
+      return h(
+        Callout,
+        {
+          className: "login-info",
+          title: "Invalid credentials",
+          intent: Intent.DANGER,
+        },
+        "Invalid credentials were provided"
+      );
     }
   }
 
   renderLoginForm() {
-    const {doLogin, login, isLoggingIn: isOpen, requestLoginForm} = this.context;
-    const {data} = this.state;
+    const {
+      doLogin,
+      login,
+      isLoggingIn: isOpen,
+      requestLoginForm,
+    } = this.context;
+    const { data } = this.state;
 
     const submitForm = () => doLogin(data);
 
-    const onChange = e=> {
-      if (e.target == null) { return; }
-      return this.updateState({data: {[e.target.name]: { $set: e.target.value }}});
+    const onChange = (e) => {
+      if (e.target == null) {
+        return;
+      }
+      return this.updateState({
+        data: { [e.target.name]: { $set: e.target.value } },
+      });
     };
 
     return [
-      h('div.login-form-outer', {className: Classes.DIALOG_BODY}, [
+      h("div.login-form-outer", { className: Classes.DIALOG_BODY }, [
         this.renderCallout(),
-        h(LoginFormInner, {data, onChange, submitForm})
+        h(LoginFormInner, { data, onChange, submitForm }),
       ]),
-      h('div', {className: Classes.DIALOG_FOOTER}, [
-        h('div', {className: Classes.DIALOG_FOOTER_ACTIONS}, [
-          h(Button, {
-            intent: Intent.PRIMARY,
-            large: true,
-            onClick: submitForm,
-            disabled: !this.isValid()
-          }, 'Login')
-        ])
-      ])
+      h("div", { className: Classes.DIALOG_FOOTER }, [
+        h("div", { className: Classes.DIALOG_FOOTER_ACTIONS }, [
+          h(
+            Button,
+            {
+              intent: Intent.PRIMARY,
+              large: true,
+              onClick: submitForm,
+              disabled: !this.isValid(),
+            },
+            "Login"
+          ),
+        ]),
+      ]),
     ];
   }
 
   renderLogoutForm() {
-    const {doLogout, username} = this.context;
+    const { doLogout, username } = this.context;
     return [
-      h('div.login-form-outer', {className: Classes.DIALOG_BODY}, [
-        h(Callout, {
-          className: 'login-info',
-          title: username,
-          intent: Intent.SUCCESS,
-          icon: 'person'
-        }, (
-          h('p', [
-            "Logged in as user ",
-            h('em', username)
-          ])
-        )
-        )
+      h("div.login-form-outer", { className: Classes.DIALOG_BODY }, [
+        h(
+          Callout,
+          {
+            className: "login-info",
+            title: username,
+            intent: Intent.SUCCESS,
+            icon: "person",
+          },
+          h("p", ["Logged in as user ", h("em", username)])
+        ),
       ]),
-      h('div', {className: Classes.DIALOG_FOOTER}, [
-        h('div', {className: Classes.DIALOG_FOOTER_ACTIONS}, [
-          h(Button, {
-            large: true,
-            onClick: () => doLogout(),
-          }, 'Log out')
-        ])
-      ])
+      h("div", { className: Classes.DIALOG_FOOTER }, [
+        h("div", { className: Classes.DIALOG_FOOTER_ACTIONS }, [
+          h(
+            Button,
+            {
+              large: true,
+              onClick: () => doLogout(),
+            },
+            "Log out"
+          ),
+        ]),
+      ]),
     ];
   }
 
-
   render() {
-    const {doLogin, login, isLoggingIn: isOpen, requestLoginForm} = this.context;
-    const {data} = this.state;
+    const {
+      doLogin,
+      login,
+      isLoggingIn: isOpen,
+      requestLoginForm,
+    } = this.context;
+    const { data } = this.state;
 
-    const onChange = e=> {
-      if (e.target == null) { return; }
-      return this.updateState({data: {[e.target.name]: { $set: e.target.value }}});
+    const onChange = (e) => {
+      if (e.target == null) {
+        return;
+      }
+      return this.updateState({
+        data: { [e.target.name]: { $set: e.target.value } },
+      });
     };
 
     const onClose = () => {
@@ -159,12 +186,12 @@ class LoginForm extends StatefulComponent {
     };
 
     const title = "Credentials";
-    return h(Dialog, {isOpen, title, onClose, icon: 'key'}, (
+    return h(
+      Dialog,
+      { isOpen, title, onClose, icon: "key" },
       login ? this.renderLogoutForm() : this.renderLoginForm()
-    ));
+    );
   }
 }
-LoginForm.initClass();
 
-
-export {LoginForm};
+export { LoginForm };

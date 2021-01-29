@@ -6,8 +6,20 @@ Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
 from marshmallow_sqlalchemy.fields import Related, Nested
 from marshmallow.fields import Field, Raw
+from marshmallow.exceptions import ValidationError
+from marshmallow.fields import UUID as _UUID
+from marshmallow.utils import is_collection
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
+from ..logs import get_logger
+
+log = get_logger(__name__)
+
+
+class UUID(_UUID):
+    def _deserialize(self, value, attr, data, **kwargs):
+        """We need to deserialize to a string to make SQLAlchemy happy"""
+        return str(self._validated(value))
 
 
 class JSON(Raw):
@@ -44,8 +56,67 @@ class Enum(Related):
     pass
 
 
-class SmartNested(Nested):
+class NullableRelated(Related):
+    def __init__(self, *args, **kwargs):
+        kwargs["allow_none"] = True
+        super().__init__(*args, **kwargs)
+
+    def _deserialize(self, value, attr=None, data=None, **kwargs):
+        if value is None:
+            if self.many:
+                return []
+            return None
+        return super()._deserialize(value, attr, data, **kwargs)
+
+
+class SmartNested(Nested, Related):
+    """This field allows us to resolve relationships as either primary keys or nested models."""
+
+    # https://github.com/marshmallow-code/marshmallow/blob/dev/src/marshmallow/fields.py
+    # https://github.com/marshmallow-code/marshmallow-sqlalchemy/blob/dev/src/marshmallow_sqlalchemy/fields.py
+    # TODO: better conformance of this field to Marshmallow's OpenAPI schema generation
+    # https://apispec.readthedocs.io/en/latest/using_plugins.html
+    def __init__(
+        self, name, *, only=None, exclude=(), many=False, unknown=None, **field_kwargs
+    ):
+        super(Nested, self).__init__(
+            name,
+            only=only,
+            exclude=exclude,
+            many=many,
+            unknown=unknown,
+            **field_kwargs,
+        )
+        super(Related, self).__init__(**field_kwargs)
+        self._many = many
+        self._instances = set()
+        self.allow_none = True
+
     def _deserialize(self, value, attr=None, data=None, **kwargs):
         if isinstance(value, self.schema.opts.model):
             return value
-        return super()._deserialize(value, attr, data, **kwargs)
+        # Better error message for collections.
+        if not is_collection(value) and self._many:
+            raise ValidationError("Provided a single object for a collection field")
+        if is_collection(value) and not self._many:
+            raise ValidationError("Provided a collection for a instance field")
+
+        return Nested._deserialize(self, value, attr, data, **kwargs)
+
+    def _copy_config(self, key):
+        """Copy configuration from root model"""
+        if hasattr(self.root, key):
+            setattr(self.schema, key, getattr(self.root, key))
+
+    def _serialize(self, value, attr, obj):
+        # Pass through allowed_nests configuration to child schema
+        self._copy_config("allowed_nests")
+        self._copy_config("_show_audit_id")
+
+        other_name = self.related_model.__table__.name
+        _allowed = self.root.allowed_nests
+        if other_name in _allowed or _allowed == "all":
+            # Serialize as nested
+            return super(Nested, self)._serialize(value, attr, obj)
+        else:
+            return super(Related, self)._serialize(value, attr, obj)

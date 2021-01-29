@@ -15,6 +15,3 @@ services:
       - SPARROW_DOMAIN
     volumes:
       - ./nginx-config/certbot-ssl.conf:/etc/nginx/user.conf.d/site.conf:ro
-      - ./nginx-config/locations:/etc/nginx/locations:ro
-      - frontend_build:/frontend
-      - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
