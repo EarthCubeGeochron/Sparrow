@@ -1,10 +1,16 @@
 import click
 from ..context import SparrowConfig
 from ..meta import __version__
+from json import load
 
 
 def sparrow_core_version(cfg):
-    return "<= 1.6.0 (version information could not be assembled)"
+    try:
+        with (cfg.SPARROW_PATH / "sparrow-version.json").open() as f:
+            version_info = load(f)
+        return version_info["core"]
+    except Exception:
+        return "<= 1.6.0 (version information could not be assembled)"
 
 
 @click.command("info")
