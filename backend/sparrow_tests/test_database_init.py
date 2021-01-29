@@ -98,6 +98,10 @@ class TestDatabaseInitialization:
         for iface in db.interface:
             iface()
 
+    def test_relationship_model_identity(self, db):
+        remote_class = db.model.sample._material.mapper.class_
+        assert id(db.model.vocabulary_material) == id(remote_class)
+
 
 class TestGenericData(object):
     @mark.xfail(reason="'get_instance' has a poorly written API.")
