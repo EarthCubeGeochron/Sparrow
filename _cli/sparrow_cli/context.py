@@ -20,9 +20,12 @@ class SparrowConfig:
         if self.is_frozen:
             self.bundle_dir = Path(sys._MEIPASS)
 
-        # Check if this script is part of a source
-        # installation. If so, set SPARROW_PATH accordingly
-        if "SPARROW_PATH" not in environ:
+        if "SPARROW_PATH" in environ:
+            self.path_provided = True
+        else:
+            # Check if this script is part of a source
+            # installation. If so, set SPARROW_PATH to the matching
+            # source directory.
             if self.is_frozen:
                 pth = self.bundle_dir / "srcroot"
             else:
@@ -30,6 +33,7 @@ class SparrowConfig:
                 pth = this_exe.parent.parent.parent
             self.path_provided = False
             environ["SPARROW_PATH"] = str(pth)
+
         # Provide environment variable in a more Pythonic way as well
         self.SPARROW_PATH = Path(environ["SPARROW_PATH"])
 
