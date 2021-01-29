@@ -1,8 +1,7 @@
 import click
 from os import environ, path, chdir
 from pathlib import Path
-from .util import cmd
-from shutil import copytree
+from ..util import cmd
 
 # Ideally this would be a subcommand, not its own separate command
 @click.command("create-test-lab")

@@ -7,30 +7,28 @@ import sys
 import click
 from rich.console import Console
 from rich import print
-from .base import cli, SparrowConfig
+from sparrow_utils.logs import get_logger
+from .base import cli
 from .help import echo_help
 from .util import cmd, compose, exec_or_run, find_subcommand, container_id
-from .test import sparrow_test  # noqa
-from .database import sparrow_db  # noqa
-from .docs import sparrow_docs  # noqa
-from .dev import sparrow_dev  # noqa
 from .containers import sparrow_up, sparrow_logs
-from .build import sparrow_build
-from .test_lab import sparrow_test_lab
+from .context import SparrowConfig
+from .commands import add_commands
+from .meta import __version__
+
+log = get_logger(__name__)
 
 console = Console(highlight=True)
 
 
 @cli.command(
     "main",
-    context_settings=dict(
-        ignore_unknown_options=True,
-        help_option_names=[],
-    ),
+    context_settings=dict(ignore_unknown_options=True, help_option_names=[]),
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
 def main(ctx, args):
+    log.debug(f"args: {args}")
     cfg = ctx.find_object(SparrowConfig)
     rest = []
     try:
@@ -48,7 +46,7 @@ def main(ctx, args):
     _command = find_subcommand(cfg.bin_directories, subcommand)
 
     if _command is None:
-        return exec_or_run("backend", "sparrow", *args)
+        return exec_or_run("backend", "/app/sparrow/__main__.py", *args)
     else:
         return cmd(_command, *rest)
 
@@ -66,11 +64,10 @@ def shell(container):
     if container is not None:
         return exec_or_run(container, "sh")
     print("Running [bold]iPython[/bold] shell in application context.")
-    exec_or_run("backend", "sparrow shell")
+    exec_or_run("backend", "/app/sparrow/__main__.py shell")
 
 
 cli.add_command(sparrow_up, name="up")
 cli.add_command(sparrow_logs, name="logs")
-cli.add_command(sparrow_build, name="build")
-cli.add_command(sparrow_dev, name="dev")
-cli.add_command(sparrow_test_lab, name="create-test-lab")
+
+add_commands(cli)

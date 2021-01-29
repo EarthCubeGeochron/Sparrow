@@ -30,6 +30,7 @@ services:
       - SPARROW_SECRET_KEY
       - SPARROW_BASE_URL
       - SPARROW_LAB_NAME
+      - SPARROW_DATABASE=postgresql+psycopg2://postgres@db/sparrow
       # A cache for files that need to persist but can be rebuilt.
       - SPARROW_CACHE_DIR=/cache
       - SPARROW_INIT_SQL=/init-sql

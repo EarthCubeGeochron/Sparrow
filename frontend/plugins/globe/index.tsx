@@ -92,7 +92,7 @@ function MapComponent(props) {
                       strokeWidth: 3,
                       opacity: 0.9,
                     }}
-                    onClick={function () {
+                    onClick={function() {
                       history.push(`/catalog/sample/${marker.id}`);
                     }}
                   />

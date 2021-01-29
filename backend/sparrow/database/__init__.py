@@ -1,13 +1,13 @@
 from contextlib import contextmanager
 from pathlib import Path
 from click import secho
-from os import environ
 
 from sqlalchemy import create_engine, inspect, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import FlushError
 from marshmallow.exceptions import ValidationError
 
 from .util import run_sql_file, run_query, get_or_create
@@ -25,31 +25,18 @@ log = get_logger(__name__)
 
 
 class Database(MappedDatabaseMixin):
-    def __init__(self, app=None):
+    def __init__(self, db_conn, app=None):
         """
         We can pass a connection string, a **Flask** application object
         with the appropriate configuration, or nothing, in which
         case we will try to infer the correct database from
         the SPARROW_BACKEND_CONFIG file, if available.
         """
-        self.config = None
-        if app is None:
-            from ..app import App
-
-            # Set config from environment variable
-            app = App(__name__)
-            # Load plugins
-        self.app = app
-
-        self.config = app.config
-        db_conn = self.config.get("DATABASE")
-        # Override with environment variable
-        envvar = environ.get("SPARROW_DATABASE", None)
-        if envvar is not None:
-            db_conn = envvar
-        self.engine = create_engine(db_conn)
+        log.info(f"Setting up database connection '{db_conn}'")
+        self.engine = create_engine(db_conn, executemany_mode="batch")
         metadata.create_all(bind=self.engine)
         self.meta = metadata
+        self.app = app
 
         # Scoped session for database
         # https://docs.sqlalchemy.org/en/13/orm/contextual.html#unitofwork-contextual
@@ -57,10 +44,10 @@ class Database(MappedDatabaseMixin):
         self._session_factory = sessionmaker(bind=self.engine)
         self.session = scoped_session(self._session_factory)
         # Use the self.session_scope function to more explicitly manage sessions.
-
-        self.lazy_automap()
+        # if app is not None and automap:
 
     def automap(self):
+        log.info("Automapping the database")
         super().automap()
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
@@ -108,20 +95,20 @@ class Database(MappedDatabaseMixin):
                 f"Could not find schema interface for model '{model_name}'"
             )
 
-    def _flush_nested_objects(self):
+    def _flush_nested_objects(self, session):
         """
         Flush objects remaining in a session (generally these are objects loaded
         during schema-based importing).
         """
-        for object in self.session:
+        for object in session:
             try:
-                self.session.flush(objects=[object])
+                session.flush(objects=[object])
                 log.debug(f"Successfully flushed instance {object}")
             except IntegrityError as err:
-                self.session.rollback()
+                session.rollback()
                 log.debug(err)
 
-    def load_data(self, model_name, data, session=None):
+    def load_data(self, model_name, data, session=None, **kwargs):
         """Load data into the database using a schema-based importing tool"""
         if session is None:
             session = self.session
@@ -133,18 +120,20 @@ class Database(MappedDatabaseMixin):
             )
         schema = model_interface(model, session)()
 
-        with on_conflict("do-update"):
+        with on_conflict("do-nothing"):
             try:
                 log.info(f"Initiating load of {model_name}")
-                res = schema.load(data, session=session)
+                res = schema.load(data, session=session, **kwargs)
                 log.info("Entering final commit phase of import")
                 log.info(f"Adding top-level object {res}")
                 session.add(res)
                 log.info("Committing entire transaction")
                 session.commit()
                 return res
-            except (IntegrityError, ValidationError) as err:
+            except (IntegrityError, ValidationError, FlushError) as err:
                 session.rollback()
+                # self._flush_nested_objects()
+                # session.add(res)
                 log.debug(err)
                 raise err
 

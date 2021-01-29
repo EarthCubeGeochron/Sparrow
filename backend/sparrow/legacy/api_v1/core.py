@@ -1,21 +1,12 @@
 from flask import Blueprint, abort, request
 from flask_restful import Resource, reqparse, inputs, abort
-from sqlalchemy.schema import Table
-from sqlalchemy import MetaData
 from textwrap import dedent
 from datetime import datetime
 from sparrow.auth import get_backend, AuthenticationError
+from .util import API
 from ...logs import get_logger
 
-from .base import API, APIResourceCollection
-
 log = get_logger(__name__)
-
-# Maybe switch to https://fastapi.tiangolo.com/history-design-future/
-# which is a batteries-included solution for APIs
-
-# eventually should use **Marshmallow** or similar
-# for parsing incoming API requests
 
 
 def get_jwt_identity(required=True):
