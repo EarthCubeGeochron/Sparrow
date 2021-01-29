@@ -10,6 +10,15 @@ We hope to arrive at full conformance for milestone `2.0.0`.
 
 ## [Unreleased] - 2021-01-11
 
+### Command-line bundling
+
+- The application can now be bundled using PyInstaller for packaged installation without
+  pulling the Sparrow codebase. The CLI can be bundled using `make` and installed onto your
+  path using `make install`.
+- `make install` does not request elevated permissions within the script. You may have to run
+  `sudo make install` to properly link the executable, depending on the configuration of your
+  system.
+
 ### Changed
 
 - Fully transitioned Sparrow's core to a [Starlette](https://www.starlette.io) server backend.
