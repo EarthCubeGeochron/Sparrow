@@ -4,7 +4,7 @@ from webargs.fields import DelimitedList, Str, Int, Boolean
 from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 from yaml import safe_load
 
 from ..exceptions import ValidationError
@@ -26,6 +26,7 @@ from ..filters import (
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
 from ...util import relative_path
+from .utils import location_check, material_check, commit_changes, commit_edits 
 
 log = get_logger(__name__)
 
@@ -229,3 +230,62 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
     async def put(self, request):
         """Handler for all PUT requests"""
+
+        ## database
+        db = self.meta.database
+
+        ## Should be a json object
+        data = await request.json()
+
+        ## the data model
+        model = self.meta.schema.opts.model
+
+        ## data needs id since we are only editing in the PUT endpoint
+        _type = type(data)
+        if _type == list:
+            data = location_check(data)
+            material_check(db,data)
+            for ele in data:
+                if 'id' not in ele:
+                    return JSONResponse({"Error":"No ID was passed, if you are adding a new row please use the POST route"})
+                commit_edits(db, model, ele)
+        else:
+            data = location_check(data, array=False)
+            material_check(db, data, array=False)
+            if 'id' not in data:
+                return JSONResponse({"Error":"No ID was passed, if you are adding a new row please use the POST route"})
+            commit_edits(db,model,data)
+
+
+        return JSONResponse({"Status": f'success to {self._model_name}', "data": data})
+
+    async def post(self, request):
+        """
+        Handler for all POST requests. i.e, New rows for database
+
+        """
+        db = self.meta.database
+
+        ## the data model
+        model = self.meta.schema.opts.model
+
+        data = await request.json()
+
+        _type = type(data)
+        if _type == list:
+            ## Checks data for long and lat columns and either creates 
+            data = location_check(data)
+            ## Checks if material is in data and if it's in database, if not adds it
+            material_check(db, data)
+            for ele in data:
+                commit_changes(db,model,ele)
+        
+        else:
+            data = location_check(data, array=False)
+            material_check(db, data, array=False)
+            commit_changes(db, model, data)
+
+        
+        return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "data": data})
+
+
