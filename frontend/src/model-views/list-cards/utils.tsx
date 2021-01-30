@@ -33,7 +33,7 @@ const SampleModelCard = (props) => {
   const sessionDate = session.length > 0 ? session[0].date.split("T")[0] : null;
 
   const content = h("div.sample-content", [
-    h("div.header", [h("div", id), Location]),
+    h("div.card-header", [h("div", id), Location]),
     h("div.bod", [sampleName, Material, sessionDate]),
   ]);
 
@@ -98,7 +98,10 @@ const SessionModelCard = (props) => {
   const analysisCount = analysis.length + " " + analysisName;
 
   const content = h("div.session-card", [
-    h("div.header", [h("div", [format(date, "MMMM D, YYYY")]), sampleName]),
+    h("div.card-header", [
+      h("div", [format(date, "MMMM D, YYYY")]),
+      sampleName,
+    ]),
     h("div.bod", [
       h("div", [h("span", technique)]),
       h("div", ["Instrument: " + instruName]),
@@ -120,7 +123,10 @@ const DataFileModelCard = (props) => {
   }
 
   const content = h("div.session-card", [
-    h("div.header", [h("div", [format(date, "MMMM D, YYYY")]), sampleName]),
+    h("div.card-header", [
+      h("div", [format(date, "MMMM D, YYYY")]),
+      sampleName,
+    ]),
     h("div.bod", [h("div", [h("span", basename)]), h("div", [type])]),
   ]);
 
