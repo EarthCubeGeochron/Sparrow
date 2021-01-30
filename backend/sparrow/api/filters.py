@@ -309,6 +309,13 @@ class Age_Range_Filter(BaseFilter):
     pass
 
 class TextSearchFilter(BaseFilter):
+    '''
+        Filter to search through text fields and return those db rows.
+
+        TODO: extend to collections, geo_entity, macrostrat API
+        ex) search igneous, get all igneous rocks. same with Mafic, Felsic
+        ex) search for a geologic formation
+    '''
     key = "like"
 
     @property
