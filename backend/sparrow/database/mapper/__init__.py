@@ -1,8 +1,6 @@
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
-from sqlalchemy import interfaces
 from sqlalchemy.ext.automap import generate_relationship
-from click import secho
 from ...logs import get_logger
 from ...exceptions import DatabaseMappingError
 
@@ -29,6 +27,7 @@ def _gen_relationship(
 ):
     if local_cls.__table__.schema is None and referred_cls.__table__.schema is not None:
         kw["backref"] = None
+    kw["enable_typechecks"] = False
 
     # make use of the built-in function to actually return
     # the result.
@@ -87,8 +86,7 @@ class MappedDatabaseMixin(object):
             generate_relationship=_gen_relationship,
         )
 
-        BaseModel.prepare(self.engine, reflect=True, **reflection_kwargs)
-        for schema in ("vocabulary", "core_view"):
+        for schema in ("vocabulary", "core_view", "public"):
             # Reflect tables in schemas we care about
             # Note: this will not reflect views because they don't have
             # primary keys.
@@ -96,6 +94,7 @@ class MappedDatabaseMixin(object):
             BaseModel.metadata.reflect(
                 bind=self.engine, schema=schema, **reflection_kwargs
             )
+        BaseModel.prepare(self.engine, reflect=True, **reflection_kwargs)
 
         self.automap_base = BaseModel
 
