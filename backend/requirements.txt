@@ -20,7 +20,7 @@ Flask-RESTful==0.3.7
 MarkupSafe==1.1.1
 migra==1.0.1603010105
 Pygments==2.5.2
-SQLAlchemy==1.3.13
+SQLAlchemy==1.3.19
 sqlalchemy-utils==0.36.8
 sqlparse==0.3.0
 requests==2.22.0
@@ -30,6 +30,9 @@ toposort==1.5
 click==7.1.2
 click-plugins==1.1.1
 ipython==7.11.1
+
+# Static files
+aiofiles==0.6.0
 
 # Import file reading
 xlrd==1.2.0
@@ -46,9 +49,9 @@ traitlets==4.3.3
 werkzeug==0.16.0
 
 # Serialization/deserialization
-marshmallow==3.3.0
-marshmallow-sqlalchemy==0.22.2
-marshmallow-jsonschema==0.8.0
+marshmallow==3.8.0
+marshmallow-sqlalchemy==0.23.1
+marshmallow-jsonschema==0.10.0
 stringcase==1.2.0
 
 # (De)serialization of geographic data
@@ -70,7 +73,7 @@ starlette-apispec==1.0.3
 boto3==1.12.25
 
 # Testing and logging
-pytest==5.3.5
+pytest==5.4.0
 colorlog==4.2.1
 rich==6.0.0
 deepdiff[murmur]==5.0.2
@@ -86,3 +89,8 @@ asgiref==3.2.8
 
 # Plugin Dependencies
 crossrefapi==1.5.0
+
+# sparrow_utils
+# NOTE: we should probably organize these internal
+# packages better...
+# -e ./utils

@@ -1,22 +1,36 @@
 INSTALL_PATH ?= /usr/local
 SPARROW_INSTALL_PATH ?= $(INSTALL_PATH)
 
-all: install-hooks build
+all: install-hooks build-dev
 
-build: _cli/dist/sparrow
+build:
+	_cli/_scripts/build-dist
 
-# Bundle with PyInstaller and install (requires local Python 3)
-install: _cli/dist/sparrow install-hooks
-	_cli/_scripts/install
+# Install locally-built executable. There should be no links preserved to the source
+# code after that
+install: build install-dist
+
+# Development installation
+build-dev:
+	_cli/_scripts/build-local
 
 # Install without building with PyInstaller
-install-dev: install-hooks
-	_cli/_scripts/build-local
+install-dev: build-dev
 	mkdir -p $(SPARROW_INSTALL_PATH)/bin
 	ln -sf $(shell pwd)/_cli/sparrow-dev-shim $(SPARROW_INSTALL_PATH)/bin/sparrow
 
+## TODO: fix bugs with install-dist to make it more capable
+# Bundle with PyInstaller and install (requires local Python 3)
+install-dist: _cli/dist/sparrow install-hooks
+	_cli/_scripts/install
+
 test:
 	_cli/_scripts/test-cli
+
+clean:
+	rm -rf _cli/build
+
+.PHONY: build install install-dev build-dev install-dist test clean
 
 # Docker CLI build instructions (for e.g. CI)
 # Some information on how to build can be found at https://github.com/docker/compose
@@ -33,11 +47,13 @@ _cli/dist/windows/sparrow:
 	docker run -v "$(shell pwd)/_cli:/src" cdrx/pyinstaller-windows:latest
 
 # Build locally for the current platform
-_cli/dist/sparrow: _cli/main.py
+_cli/dist/sparrow:
 	_cli/_scripts/build-dist
 
 _generate_buildspec:
-	docker run -v "$(shell pwd)/_cli/:/src/" cdrx/pyinstaller-linux "pyinstaller main.py"
+	cd _cli && \
+	pyinstaller --noconfirm --distpath dist sparrow_cli/__main__.py
+	# docker run -v "$(shell pwd)/_cli/:/src/" cdrx/pyinstaller-linux "pyinstaller main.py"
 
 # Link git hooks
 # (handles automatic submodule updating etc.)
@@ -46,3 +62,6 @@ install-hooks:
 	git config --local core.hooksPath .githooks
 	# Always git prune on config
 	git config --local remote.origin.prune true
+	# Initialize submodules if we haven't already
+	-[ ! -d .git/modules ] && git submodule update --init
+

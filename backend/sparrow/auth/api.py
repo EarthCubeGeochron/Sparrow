@@ -3,15 +3,15 @@ from starlette.responses import JSONResponse
 from starlette.authentication import requires, AuthenticationError
 from webargs_starlette import use_annotations
 from sparrow.database.models import User
-from sparrow.context import app_context
+from sparrow.context import get_sparrow_app, get_database
 from sparrow.logs import get_logger
 
 log = get_logger(__name__)
 
 
 def get_backend():
-    ctx = app_context()
-    return ctx.plugins.get("auth").backend
+    app = get_sparrow_app()
+    return app.plugins.get("auth").backend
 
 
 def UnauthorizedResponse(**kwargs):
@@ -20,7 +20,7 @@ def UnauthorizedResponse(**kwargs):
 
 @use_annotations(location="json")
 async def login(request, username: str, password: str):
-    db = app_context().database
+    db = get_database()
     backend = get_backend()
 
     current_user = db.session.query(User).get(username)

@@ -24,7 +24,7 @@ test -f /build/schema.html
 
 ## Core docs
 
-FROM sparrowdata/backend AS core-docs
+FROM sparrowdata/backend:1.6 AS core-docs
 
 WORKDIR /docs
 

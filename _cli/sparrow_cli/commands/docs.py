@@ -1,7 +1,7 @@
+from click import group
 from os import environ, path
-from .base import cli
-from .group import CommandGroup
-from .util import compose
+from ..group import CommandGroup
+from ..util import compose
 
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {
@@ -12,7 +12,7 @@ shell_commands = {
 }
 
 
-@cli.group(name="docs", cls=CommandGroup)
+@group(name="docs", cls=CommandGroup)
 def sparrow_docs():
     pass
 

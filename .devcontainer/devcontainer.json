@@ -1,0 +1,15 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.134.0/containers/python-3
+{
+	"name": "Sparrow Backend – Python",
+	"build": {
+		"dockerfile": "../backend/Dockerfile",
+		"context": "../backend",
+	},
+	"postCreateCommand": "pip3 install black",
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-python.python",
+		"ms-python.vscode-pylance"
+	]
+}

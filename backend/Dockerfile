@@ -22,6 +22,10 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 # Disable caching to slim down image
 ENV PIP_NO_CACHE_DIR=1
 
+# For graphing the database schema
+RUN git clone https://github.com/davenquinn/sadisplay.git /ext/sadisplay \
+  && pip install -e /ext/sadisplay
+
 COPY ./docker-scripts/* /bin/
 RUN mkdir /app
 WORKDIR /app
@@ -29,11 +33,11 @@ WORKDIR /app
 ## Copy app core
 COPY ./ /app/
 
-RUN pip install -e .
+RUN pip install -e utils && pip install -e .
 
 # Copy command-line options to a place where they can be easily accessed
 # by the wrapper CLI.
-RUN SPARROW_SECRET_KEY=test sparrow get-cli-info > /run/cli-info.json
+RUN SPARROW_SECRET_KEY=test /app/sparrow/__main__.py get-cli-info > /run/cli-info.json
 
 CMD ["/bin/run"]
 
