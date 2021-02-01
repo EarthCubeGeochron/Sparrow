@@ -82,3 +82,7 @@ PyJWT==1.7.1
 starlette==0.13.4
 Hypercorn==0.11.1
 asgiref==3.2.8
+
+
+# Plugin Dependencies
+crossrefapi==1.5.0
