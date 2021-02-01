@@ -53,7 +53,6 @@ class Session(BaseModel):
         default=uuid4,
         server_default="uuid_generate_v4()",
     )
-
     def get_attribute(self, type):
         # There has got to be a better way to get self!
         att = self.db.model.attribute

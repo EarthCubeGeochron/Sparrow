@@ -1,11 +1,8 @@
 from contextlib import contextmanager
 from pathlib import Path
 from click import secho
-<<<<<<< HEAD
 from os import environ
 import pandas as pd
-=======
->>>>>>> 84e6027de5eb8f279d309d437093113c3275ef78
 
 from sqlalchemy import create_engine, inspect, MetaData, text
 from sqlalchemy.orm import sessionmaker, scoped_session

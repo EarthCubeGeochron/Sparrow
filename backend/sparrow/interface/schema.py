@@ -195,7 +195,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         return data
 
     def to_json_schema(self, model):
-        return json_schema.dump(model)
+      return json_schema.dump(model)
 
     def _available_nests(self):
         model = self.opts.model
