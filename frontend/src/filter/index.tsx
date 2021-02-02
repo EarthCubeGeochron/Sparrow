@@ -1,6 +1,15 @@
 import { useState, useReducer, useEffect } from "react";
 import { reducer } from "./reducers-filters";
-import { Button, Tooltip, Card, Popover, Icon, Tag } from "@blueprintjs/core";
+import {
+  Button,
+  Tooltip,
+  Card,
+  Popover,
+  Icon,
+  Tag,
+  Dialog,
+  Drawer,
+} from "@blueprintjs/core";
 import {
   AgeSlideSelect,
   DatePicker,
@@ -14,7 +23,6 @@ import { EmabrgoSwitch } from "./components/Embargo";
 import styles from "./module.styl";
 import { MapPolygon } from "./components/MapSelector";
 import { urlSearchFromParams } from "../components/infinite-scroll/infinite-api-view";
-import { getNatLang } from "./components/utils";
 
 const h = hyperStyled(styles);
 
@@ -35,7 +43,6 @@ function SampleFilter({ on_map = false }: Filter) {
       h(AgeSlideSelect),
       h(DatePicker, { updateDateRange: () => {} }),
       h(GeologicFormationSelector),
-      //h.if(!on_map)(MapSelector),
     ]);
   };
 
@@ -112,7 +119,13 @@ const TagContainer = (props) => {
 
 function AdminFilter(props) {
   // need a prop that grabs set to create params
-  const { createParams, possibleFilters, listComponent, initParams } = props;
+  const {
+    createParams,
+    possibleFilters,
+    listComponent,
+    initParams,
+    dropdown = false,
+  } = props;
 
   const [params, dispatch] = useReducer(reducer, initParams);
   const [tags, setTags] = useState(params);
@@ -204,6 +217,38 @@ function AdminFilter(props) {
       ]),
     ]
   );
+
+  const leftElement = () => {
+    const [open, setOpen] = useState(false);
+
+    const changeOpen = () => {
+      setOpen(!open);
+    };
+
+    return h("div", [
+      h(
+        Popover,
+        {
+          isOpen: open,
+          content: Content,
+          minimal: true,
+          position: "bottom",
+        },
+        [
+          h(Tooltip, { content: "Choose Multiple Filters" }, [
+            h(Button, { minimal: true, onClick: changeOpen }, [
+              h(Icon, { icon: "filter" }),
+            ]),
+          ]),
+        ]
+      ),
+    ]);
+  };
+
+  // Allow for filters to also be a dropdown menu
+  if (dropdown) {
+    return Content;
+  }
 
   return h("div", { style: { position: "relative" } }, [
     h("div.listcomponent", [
