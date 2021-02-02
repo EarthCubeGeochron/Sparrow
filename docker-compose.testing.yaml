@@ -13,6 +13,8 @@ services:
       - db
     environment:
       - SPARROW_SECRET_KEY=test_secret
+    volumes:
+      - pytest_cache:/run/.pytest_cache
   db:
     image: mdillon/postgis:11
     ports:
@@ -24,3 +26,5 @@ services:
       - 5432
     environment:
       - POSTGRES_DB=sparrow
+volumes:
+  pytest_cache:
