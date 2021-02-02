@@ -30,3 +30,7 @@ export function ModelCard(props) {
     h(`div.${classname}`, [content]),
   ]);
 }
+
+function EditableCollections(props) {
+  
+}
