@@ -5,6 +5,8 @@ from marshmallow.exceptions import ValidationError
 from datetime import datetime
 from pytest import mark
 from sparrow.logs import get_logger
+from sparrow.encoders import JSONEncoder
+from json import dumps
 
 from .fixtures import basic_data, incomplete_analysis, basic_project
 from .helpers import json_fixture, ensure_single
@@ -343,6 +345,18 @@ class TestDeclarativeImporter:
 
         assert isinstance(res, db.model.datum_type)
         assert res.id == dt.id
+
+    def test_serialize_instance(self, db):
+        """Make sure we can dump an instance to a JSON string"""
+        inst = db.session.query(db.model.sample).first()
+        SampleSchema = db.interface.sample()
+        res = SampleSchema.dump(inst)
+        dumps(res, cls=JSONEncoder)
+
+    def test_get_instance_api(self, client):
+        """Test that our API at least allows us to retrieve all of the data at once."""
+        res = client.get("/api/v2/models/datum_type", params={"all": True})
+        assert res.status_code == 200
 
     def test_incomplete_import_excluded(self, db):
         try:
