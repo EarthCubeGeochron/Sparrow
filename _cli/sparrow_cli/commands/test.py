@@ -39,6 +39,8 @@ class TestGroup(DefaultGroup):
         [cyan]sparrow test -k test_incomplete_import_excluded[/cyan]
     > Only PyChron tests:
         [cyan]sparrow test --quick -k pychron[/cyan]
+    > Run previously failed tests first:
+        [cyan]sparrow test --ff -x[/cyan]
 
     [bold]Other subcommands[/bold]:
 
