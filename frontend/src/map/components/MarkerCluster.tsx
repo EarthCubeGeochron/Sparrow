@@ -24,25 +24,22 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
   useEffect(() => {
     // Set the data back to the initial data
     if (data == null) return;
-    const markers = data
-      .filter((d) => d.geometry != null)
-      .map((markers) => ({
-        type: "Feature",
-        properties: {
-          cluster: false,
-          id: markers.id,
-          Sample_name: markers.name,
-          project_name: markers.project_name,
-          material: markers.material,
-        },
-        geometry: {
-          type: "Point",
-          coordinates: [
-            markers.geometry.coordinates[0],
-            markers.geometry.coordinates[1],
-          ],
-        },
-      }));
+    const markers = data.map((markers) => ({
+      type: "Feature",
+      properties: {
+        cluster: false,
+        id: markers.id,
+        Sample_name: markers.name,
+        material: markers.material,
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [
+          markers.location.coordinates[0],
+          markers.location.coordinates[1],
+        ],
+      },
+    }));
 
     setMarkers(markers);
   }, [data]);
