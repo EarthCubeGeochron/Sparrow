@@ -299,14 +299,28 @@ class Age_Range_Filter(BaseFilter):
     @property
     def params(self):
         d= "Age of Geologic material, passed in thousand years (ka), can take either range or single number"
-        e = ["?age=1200-10000"]
+        e = ["?age=1200"]
         des = create_params(d,e)
         return{
             self.key: Str(description=des)
             }
     def should_apply(self):
-        return hasattr(self.model, "age")
-    pass
+        return hasattr(self.model, "session_collection")
+    
+    def apply(self, args, query):
+        if self.key not in args:
+            return query
+        
+        db = app_context().database
+
+        age = float(args[self.key])
+
+        session = db.model.session
+        analysis = db.model.analysis
+        datum = db.model.datum
+
+        return query.join(self.model.session_collection).join(session.analysis_collection).join(analysis.datum_collection).filter(datum.value < age)
+
 
 class TextSearchFilter(BaseFilter):
     '''
@@ -344,7 +358,7 @@ class TextSearchFilter(BaseFilter):
         return query.filter(or_(*[n.like(f'%{search_string}%') for n in fields]))
 
 
-## TODO: Age range filter, generic parameter filter: pass field and value, Geologic formation filter
+## TODO: Age range filter
 ## TODO: Define filter in plugin, i.e irradiation filter for WiscAr
 ## TODO: Filter based on nested models, /api/v2/datum?nest=project,datum_type&datum_type.unit=Ma&project=11
 
