@@ -1,8 +1,6 @@
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
-from sqlalchemy import interfaces
 from sqlalchemy.ext.automap import generate_relationship
-from click import secho
 from ...logs import get_logger
 from ...exceptions import DatabaseMappingError
 
@@ -29,6 +27,8 @@ def _gen_relationship(
 ):
     if local_cls.__table__.schema is None and referred_cls.__table__.schema is not None:
         kw["backref"] = None
+    kw["enable_typechecks"] = False
+
     # make use of the built-in function to actually return
     # the result.
     return generate_relationship(
@@ -41,32 +41,11 @@ class AutomapError(Exception):
 
 
 class MappedDatabaseMixin(object):
-    def lazy_automap(self, **kwargs):
-        for k in ["engine", "session"]:
-            if not hasattr(self, k):
-                raise AttributeError(
-                    "Database mapper must subclass an object "
-                    "with engine and session defined. "
-                )
-
-        # Automapping of database tables
-        self.automap_base = None
-        self.__models__ = None
-        self.__tables__ = None
-        self.__inspector__ = None
-        self.automap_error = None
-        # We're having trouble lazily automapping
-        try:
-            self.automap()
-        except Exception as err:
-            # raise DatabaseMappingError(str(err))
-            log.exception(err)
-            # kw = dict(err=True, fg="red")
-            log.error("Could not automap at database initialization")
-            # secho(f"  {err}", **kw)
-            # TODO: We should raise this error, and find another way to
-            # test if we've initialized the database yet.
-            # self.automap_error = err
+    automap_base = None
+    automap_error = None
+    __models__ = None
+    __tables__ = None
+    __inspector__ = None
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """
@@ -116,8 +95,7 @@ class MappedDatabaseMixin(object):
             generate_relationship=_gen_relationship,
         )
 
-        BaseModel.prepare(self.engine, reflect=True, **reflection_kwargs)
-        for schema in ("vocabulary", "core_view"):
+        for schema in ("vocabulary", "core_view", "public"):
             # Reflect tables in schemas we care about
             # Note: this will not reflect views because they don't have
             # primary keys.
@@ -125,6 +103,7 @@ class MappedDatabaseMixin(object):
             BaseModel.metadata.reflect(
                 bind=self.engine, schema=schema, **reflection_kwargs
             )
+        BaseModel.prepare(self.engine, reflect=True, **reflection_kwargs)
 
         self.automap_base = BaseModel
 

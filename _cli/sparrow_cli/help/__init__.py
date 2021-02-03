@@ -7,10 +7,11 @@ from os import environ, path
 from pathlib import Path
 from itertools import chain
 from rich.console import Console
-from ..util import cmd, fail_without_docker
+from ..util import cmd, fail_without_docker, compose
 from .backend import get_backend_command_help
 from ..base import cli
 from ..exc import SparrowCommandError
+from .util import format_config_path
 
 console = Console()
 
@@ -52,16 +53,76 @@ def command_dl(directories: Path, extra_commands={}):
             continue
         if name.startswith("sparrow-dev-"):
             continue
-        yield (name[len(prefix) :], get_description(f).strip())
+        key = name[len(prefix) :]
+        yield (key, get_description(f).strip())
 
 
 class SparrowHelpFormatter(HelpFormatter):
+    key_commands = {
+        "up": "Start `sparrow` and follow logs",
+        "down": "Safely stop `sparrow`",
+        "info": "Show information about the installation",
+        "create-test-lab": "Create an example installation of Sparrow",
+    }
+
     def write_line(self, text=""):
         self.write(text + "\n")
 
     def flush(self, to=sys.stderr.write):
         to(self.getvalue())
         self.buffer = []
+
+    def write_frontmatter(self):
+        self.write_usage("sparrow", "[options] <command> [args]...")
+        self.write_line()
+        cfg = environ.get("SPARROW_CONFIG", None)
+        if cfg is None:
+            self.write_line(f"No configuration file found")
+        else:
+            d0 = format_config_path(cfg)
+            self.write_line("Config: " + style(d0, fg="cyan"))
+        d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
+        self.write_line(f"Lab: {d1}")
+        self.flush()
+        self.write("")
+
+    def backend_help(self):
+        # Grab commands file from backend
+        commands = get_backend_command_help()
+        if commands is None:
+            return
+        self.write_section(
+            "Core application",
+            commands,
+            # These should be managed by subcommands...
+            skip=["db-migration", "remove-analytical-data", "remove-audit-trail"],
+        )
+
+    def write_section(self, title, commands, **kwargs):
+        commands = {k: format_description(v) for k, v in commands.items()}
+        self._write_section(title, commands, **kwargs)
+
+    def write_container_management(self, ctx, core_commands):
+        commands = command_dl(
+            core_commands,
+            extra_commands={
+                "compose": "Alias to `docker-compose` that respects `sparrow` config",
+                **{k: v for k, v in command_info(ctx, cli)},
+            },
+        )
+        self._write_section(
+            "Container orchestration",
+            {k: v for k, v in commands},
+            skip=[*self.key_commands.keys()],
+        )
+
+    def _write_section(self, title, commands, skip=[]):
+        key_size = max([len(k) for k in commands.keys()])
+        with self.section(title):
+            _items = [(k, v) for k, v in commands.items() if k not in skip]
+            self.write_dl(_items, col_spacing=max([25 - key_size, 2]))
+            self.write("\n")
+        self.flush()
 
 
 sections = {
@@ -70,38 +131,6 @@ sections = {
     "docs": "Manage `sparrow`'s documentation",
     "dev": "Helper commands for development",
 }
-
-
-def format_config_path(cfg):
-    """A helper for pretty formatting a path,
-    eliding most of the directory tree.
-    """
-    home = path.expanduser("~")
-    if cfg.startswith(home):
-        cfg = cfg.replace(home, "~")
-    split_path = cfg.split("/")
-    tokens = []
-    for i, token in enumerate(split_path):
-        n_c = len(token)
-        if i < len(split_path) - 2:
-            tokens.append(token[0 : min(2, n_c)])
-        else:
-            tokens.append(token)
-    return path.join(*tokens)
-
-
-def backend_help(fmt):
-    # Grab commands file from backend
-    commands = get_backend_command_help()
-    if commands is None:
-        return
-    with fmt.section("Backend"):
-        fmt.write_dl(
-            [(k, format_description(v)) for k, v in commands.items()], col_spacing=2
-        )
-        fmt.write("\n")
-    fmt.flush()
-    return fmt
 
 
 def command_info(ctx, cli):
@@ -114,45 +143,19 @@ def command_info(ctx, cli):
 
 
 def echo_help(ctx, core_commands=None, user_commands=None):
-    fmt = SparrowHelpFormatter()
-
-    fmt.write_usage("sparrow", "[options] <command> [args]...")
-    fmt.write_line()
-    cfg = environ.get("SPARROW_CONFIG", None)
-    if cfg is None:
-        fmt.write_line(f"No configuration file found")
-    else:
-        d0 = format_config_path(cfg)
-        fmt.write_line("Config: " + style(d0, fg="cyan"))
-    d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
-    fmt.write_line(f"Lab: {d1}")
-    fmt.flush()
+    # We want to run `sparrow up` first so we don't get surprised by container errors later
     fail_without_docker()
-    fmt.write("")
+    compose("up --no-start --remove-orphans")
 
-    with fmt.section("Command groups"):
-        fmt.write_dl(
-            [(k, format_description(v)) for k, v in sections.items()], col_spacing=20
-        )
-        fmt.write("\n")
+    fmt = SparrowHelpFormatter()
+    fmt.write_frontmatter()
+    fmt.write_section("Key commands", fmt.key_commands)
+    fmt.write_section("Command groups", sections)
 
-    fmt.flush()
-
-    fmt = backend_help(fmt)
+    fmt.backend_help()
 
     if user_commands is not None:
         lab_name = environ.get("SPARROW_LAB_NAME", "Lab-specific")
         fmt.write("[underline]" + lab_name + "[/underline] commands", user_commands)
 
-    with fmt.section("Container management"):
-        fmt.write_dl(
-            command_dl(
-                core_commands,
-                extra_commands={
-                    "compose": "Alias to `docker-compose` that respects `sparrow` config",
-                    **{k: v for k, v in command_info(ctx, cli)},
-                },
-            ),
-            col_spacing=9,
-        )
-    fmt.flush()
+    fmt.write_container_management(ctx, core_commands)

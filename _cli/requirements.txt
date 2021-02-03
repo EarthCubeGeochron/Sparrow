@@ -5,3 +5,7 @@ pytest
 pyyaml
 docker-compose==1.26.0
 click-default-group==1.2.2
+
+# Utility functions (we would move this to a separate folder, ideally)
+colorlog==4.2.1
+-e ./backend/utils

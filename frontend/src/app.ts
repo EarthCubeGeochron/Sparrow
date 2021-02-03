@@ -59,12 +59,12 @@ function AppRouter(props) {
         component: MapPage,
       }),
       h(AdminRoute, { path: "/admin" }),
+      h(PageRoute, { path: "/api-explorer", component: APIExplorer }),
       h(PageRoute, {
-        path: "/api-explorer",
+        path: "/api-explorer/v2",
         component: APIExplorerV2,
         exact: true,
       }),
-      h(PageRoute, { path: "/api-explorer-v1", component: APIExplorer }),
       h(PageRoute, { path: "*", component: NoMatchPage }),
     ])
   );

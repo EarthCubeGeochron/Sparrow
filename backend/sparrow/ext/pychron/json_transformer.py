@@ -1,6 +1,4 @@
-import subprocess
 from os import path
-from rich import print
 from datetime import datetime
 from sparrow.util import run
 
@@ -32,15 +30,17 @@ class PyChronJSONImporter:
             "type": self.datum_type_for(key),
         }
 
-    def transform_analysis(self, analysis):
+    def transform_analysis(self, analysis, index=None):
         data = []
         for k in ["age", "kca", "kcl", "radiogenic_yield"]:
             data.append(self.transform_datum(analysis, k))
         # TODO: allow UUIDs to be created in Analysis model aswell.
         return {
+            "analysis_type": "Heating step",
             "analysis_name": analysis.pop("record_id"),
             "datum": data,
-            "analysis_type": "Heating step",
+            "in_plateau": analysis.pop("plateau_step"),
+            "session_index": index,
         }
 
     def transform_sample(self, sample):
@@ -85,9 +85,10 @@ class PyChronJSONImporter:
 
     def import_file(self, data, filename=None):
         """Build basic nested JSON representation of a PyChron IA file."""
-        analyses = [self.transform_analysis(a) for a in data["analyses"]]
+        analyses = [
+            self.transform_analysis(a, index=i) for i, a in enumerate(data["analyses"])
+        ]
         analyses.append(self.transform_ages(data["preferred"]["ages"]))
-        print(analyses)
 
         res = {"analysis": analyses}
 

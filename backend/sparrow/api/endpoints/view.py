@@ -1,19 +1,14 @@
 from starlette.endpoints import HTTPEndpoint
 from webargs_starlette import parser
-from webargs.fields import DelimitedList, Str, Int, Boolean
+from webargs.fields import Str, Int, Boolean
 from sqlakeyset import get_page
-from marshmallow_sqlalchemy.fields import get_primary_keys
-from sqlalchemy import desc
 from starlette.responses import JSONResponse
-from yaml import safe_load
 
 from ..exceptions import ValidationError
-from ..fields import NestedModelField
 from ..response import APIResponse
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
-from ...util import relative_path
-from ...context import app_context
+from ...context import get_database
 
 log = get_logger(__name__)
 
@@ -37,7 +32,7 @@ class ViewAPIEndpoint(HTTPEndpoint):
 
     async def get(self, request):
         """Handler for all GET requests"""
-        db = app_context().database
+        db = get_database()
 
         log.info(request.query_params)
         args = await parser.parse(self.args_schema, request, location="querystring")

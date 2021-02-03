@@ -38,6 +38,11 @@ while not db_ready():
 os.environ["SPARROW_DATABASE"] = "postgresql://postgres@db:5432/sparrow_test"
 
 
+def teardown_database(message="Tearing down database..."):
+    print(message)
+    return run(["dropdb", *dbargs, "sparrow_test"])
+
+
 db_exists = False
 try:
     engine = create_engine(os.environ["SPARROW_DATABASE"]).connect()
@@ -47,11 +52,11 @@ except exc.OperationalError:
 
 if db_exists and keep_database:
     echo("Using existing testing database")
+elif db_exists and not keep_database:
+    teardown_database("Dropping existing testing database")
 else:
     c = run(["createdb", *dbargs, "sparrow_test"])
     echo("Database is ready...")
-
-    run(["sparrow", "init"])
 
 # This prevents us from getting absolutely spammed by SAWarning
 # TODO: improve warning handling for database automapping
@@ -68,6 +73,5 @@ if psql:
     run(["psql", *dbargs, "sparrow_test"])
 
 if not keep_database:
-    print("Tearing down database...")
-    run(["dropdb", *dbargs, "sparrow_test"])
+    teardown_database()
 echo("Done!")

@@ -7,4 +7,7 @@ from .project_edit import ProjectEditPlugin
 from .versioning import VersioningPlugin
 from .import_data import ImportDataPlugin
 from .init_sql import InitSQLPlugin
-from sparrow.ext.pychron import PyChronImportPlugin
+from .assets_server import AssetsServerPlugin
+
+# We get a "circular import" error doing this...
+# from sparrow.ext.pychron import PyChronImportPlugin

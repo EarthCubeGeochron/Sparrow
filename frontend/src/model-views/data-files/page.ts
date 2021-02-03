@@ -1,6 +1,5 @@
-import * as React from "react";
-import h from "@macrostrat/hyper";
-import { useRouteMatch } from "react-router-dom";
+import { hyperStyled } from "@macrostrat/hyper";
+import { useParams } from "react-router-dom";
 import { useModelURL } from "~/util/router";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { SampleListCard } from "../sample/list";
@@ -11,6 +10,8 @@ import { parse, format } from "date-fns";
 import { LinkCard } from "@macrostrat/ui-components";
 import { SampleCard } from "../sample/detail-card";
 import { useAPIv2Result } from "~/api-v2";
+
+const h = hyperStyled(styles);
 
 /**
  * http://localhost:5002/api/v2/models/data_file?nest=data_file_link,sample,session
@@ -71,7 +72,7 @@ export const SessionCardInfo = (props) => {
   );
 };
 
-export const SessionLinkCard = function(props) {
+export const SessionLinkCard = function (props) {
   const { session_id } = props;
 
   const to = useModelURL(`/session/${session_id}`);
@@ -88,47 +89,54 @@ export const SessionLinkCard = function(props) {
 };
 
 export const Samples = (props) => {
-  const { name, sample_id, sample_material } = props;
-  //let content = [h("p", "No samples")];
-  if (props != null) {
-    h(SampleCard, {
-      name,
-      id: sample_id,
-      material: sample_material,
-      link: true,
-    });
-  }
-  return h("div.sample-area", [
+  const { samples } = props;
+
+  if (samples.length == 0) return h("p", "No samples");
+
+  return h("div.sample-container", [
     h("h4", "Samples"),
     h(
-      "div",
+      "div.samples",
       { style: { display: "flex", flexFlow: "row wrap", margin: "0 -5px" } },
-      h(SampleCard, {
-        name,
-        id: sample_id,
-        material: sample_material,
-        link: true,
+      samples.map((d) => {
+        const { name, sample_id, sample_material } = d;
+        return h(SampleCard, {
+          name,
+          id: sample_id,
+          material: sample_material,
+          link: true,
+        });
       })
     ),
   ]);
 };
 
-/**
- *
- * @param props session_id, technique, target, session_date, analysis
- */
-export const SessionInfo = (props) => {
+export function SessionInfo(props) {
   const {
-    session_id,
+    id,
     technique,
     target,
     date,
     //analysis,
   } = props;
+  return h(SessionLinkCard, { session_id: id, target, technique, date });
+}
+
+/**
+ *
+ * @param props sessions
+ */
+const SessionList = (props) => {
+  const { sessions } = props;
   //const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
-  return h("div", { className: styles.sessionContainer }, [
-    h("h4", ["Session "]),
-    h(SessionLinkCard, { session_id, target, technique, date }),
+  return h("div.session-container", [
+    h("h4", null, "Sessions"),
+    h(
+      "div.sessions",
+      sessions.map((d) => {
+        return h(SessionInfo, d);
+      })
+    ),
   ]);
 };
 
@@ -154,46 +162,34 @@ export function DataFilePage({ props }) {
   const {
     file_hash,
     type,
-    data_file_link: [
-      {
-        date: date_upload,
-        session: {
-          date,
-          technique,
-          target,
-          date_precision,
-          analysis,
-          id: session_id,
-          sample: { name, id: sample_id, material: sample_material },
-          project,
-        },
-      },
-    ],
+    data_file_link, // is an array
     basename,
   } = data;
-  console.log(project);
-  return h("div", { className: styles.data_page_container }, [
-    h("div", { className: styles.header }, [
-      h(DetailPageHeader, { date_upload, basename, type, file_hash }),
+
+  // Get uploaded date from first link
+  const { date } = data_file_link[0];
+
+  const sessions = data_file_link
+    .map((d) => d.session)
+    .filter((d) => d != null);
+
+  const samples = data_file_link.map((d) => d.sample).filter((d) => d != null);
+
+  //console.log(project);
+  return h("div.data-page-container", [
+    h("div.header", [
+      h(DetailPageHeader, { date_upload: date, basename, type, file_hash }),
     ]),
     h(Divider),
-    h("div", { className: styles.infoContainer }, [
-      h("div", { className: styles.projects }, [h(ProjectLinks, { project })]),
-      h("div", { className: styles.sampleContainer }, [
-        h(Samples, { name, sample_id, sample_material }),
-      ]),
-      h(SessionInfo, {
-        session_id,
-        target,
-        date,
-        technique,
-        analysis,
-      }),
+    h("div.info-container", [
+      //h("div.projects", [h(ProjectLinks, { project })]),
+      h(Samples, { samples }),
+      h(SessionList, { sessions }),
     ]),
   ]);
 }
 
-const DataFileComponent = function(props) {
+const DataFileComponent = function (props) {
   const { file_hash } = props;
   const dataFileURL = `/models/data_file/${file_hash}`;
 
@@ -208,8 +204,6 @@ const DataFileComponent = function(props) {
 };
 
 export function DataFileMatch() {
-  const {
-    params: { file_hash },
-  } = useRouteMatch();
+  const { file_hash } = useParams();
   return h(DataFileComponent, { file_hash });
 }
