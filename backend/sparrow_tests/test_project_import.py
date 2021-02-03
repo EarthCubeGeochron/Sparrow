@@ -34,6 +34,12 @@ class TestProjectImport:
         assert len(removed) > 0
         assert len(omit_key(removed, "in_plateau")) == 0
 
+    def test_project_api_retreival(self, client):
+        """Checks if models/sample is working"""
+        res = client.get("/api/v2/models/project", params={"per_page": 1})
+        assert res.status_code == 200
+        res.json()
+
     def test_make_private(self, db):
         proj = db.session.query(db.model.project).first()
         proj.embargo_date = datetime.max

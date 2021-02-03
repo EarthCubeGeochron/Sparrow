@@ -18,6 +18,7 @@ import {
   DoiProjectButton,
 } from "./sheet-enter-components/doi-button";
 import { DataEditor } from "react-datasheet/lib";
+import { APIV2Context } from "~/api-v2";
 
 interface ColumnData {
   name: string;

@@ -36,6 +36,14 @@ def pytest_addoption(parser):
         help="Use database transaction isolation",
     )
 
+    parser.addoption(
+        "--no-isolation",
+        action="store_false",
+        dest="use_isolation",
+        default=True,
+        help="Use database transaction isolation",
+    )
+
 
 def pytest_configure(config):
     if not config.option.slow:
@@ -49,7 +57,6 @@ def app():
     yield _app
     # We need to make sure this only happens if we tear down testing db
     # drop_database(testing_db)
-
 
 # @fixture(scope="class") ## run before sets of tests. Scopes === how often run, after a class
 # def db(app):

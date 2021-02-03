@@ -150,7 +150,7 @@ class APIv2(Starlette):
         class Meta:
             table = _tbl
 
-        name = Meta.table.name
+        name = _tbl.name
         cls = type(name + "_route", (ViewAPIEndpoint,), {"Meta": Meta})
         root_route = schema
         endpoint = f"/{root_route}/{name}"
@@ -159,8 +159,8 @@ class APIv2(Starlette):
 
         basic_info = dict(
             route=endpoint,
-            table=name,
+            table=_tbl.name,
             schema=schema,
-            description=description,
+            description="",
         )
         self.route_descriptions[root_route].append(basic_info)
