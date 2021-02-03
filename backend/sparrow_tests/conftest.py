@@ -36,13 +36,13 @@ def pytest_addoption(parser):
         help="Use database transaction isolation",
     )
 
-    parser.addoption(
-        "--no-isolation",
-        action="store_false",
-        dest="use_isolation",
-        default=True,
-        help="Use database transaction isolation",
-    )
+    # parser.addoption(
+    #     "--no-isolation",
+    #     action="store_false",
+    #     dest="use_isolation",
+    #     default=True,
+    #     help="Use database transaction isolation",
+    # )
 
 
 def pytest_configure(config):
@@ -58,31 +58,31 @@ def app():
     # We need to make sure this only happens if we tear down testing db
     # drop_database(testing_db)
 
-# @fixture(scope="class") ## run before sets of tests. Scopes === how often run, after a class
-# def db(app):
-#     # connection = app.database.session.connection()
-#     # transaction = connection.begin()
-#     # session_factory = sessionmaker(bind=connection)
-#     # app.database.session = scoped_session(session_factory)
-#     # _setup_context(app)
-#     # yield app.database
-#     # app.database.session.close()
-#     # transaction.rollback()
-#     return app.database
+@fixture(scope="class") ## run before sets of tests. Scopes === how often run, after a class
+def db(app):
+    # connection = app.database.session.connection()
+    # transaction = connection.begin()
+    # session_factory = sessionmaker(bind=connection)
+    # app.database.session = scoped_session(session_factory)
+    # _setup_context(app)
+    # yield app.database
+    # app.database.session.close()
+    # transaction.rollback()
+    return app.database
 
-@fixture(scope="class")
-def db(app, pytestconfig):
-    if pytestconfig.option.use_isolation:
-        connection = app.database.session.connection()
-        transaction = connection.begin()
-        session_factory = sessionmaker(bind=connection)
-        app.database.session = scoped_session(session_factory)
-        _setup_context(app)
-        yield app.database
-        app.database.session.close()
-        transaction.rollback()
-    else:
-        yield app.database
+# @fixture(scope="class")
+# def db(app, pytestconfig):
+#     if pytestconfig.option.use_isolation:
+#         connection = app.database.session.connection()
+#         transaction = connection.begin()
+#         session_factory = sessionmaker(bind=connection)
+#         app.database.session = scoped_session(session_factory)
+#         _setup_context(app)
+#         yield app.database
+#         app.database.session.close()
+#         transaction.rollback()
+#     else:
+#         yield app.database
 
 
 @fixture

@@ -6,5 +6,5 @@ from sparrow.plugins import SparrowCorePlugin
 class ProjectEdits(SparrowCorePlugin):
     name = 'Project-edits'
 
-    def on_api_initialized_v2(self, api):
+    def api_initialized_v2(self, api):
         api.mount("/project", Project_edits_api, name="Project-edits")
