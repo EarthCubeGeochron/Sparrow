@@ -234,17 +234,6 @@ CREATE TABLE IF NOT EXISTS sample (
   /* A representative named location */
   location_name text,
   location_name_autoset boolean,
-  location geometry,
-  /* NOTE: Elevation and depth are not normalized in the current schema!
-  Potentially, these columns should be recast as *references* to a specific
-  reference datum (e.g. `vocabulary.entity_reference`); perhaps we want to move towards
-  this in the future.
-  */
-  -- elevation above sea level in meters, and atmospheric pressure in hPa
-  elevation numeric,
-  atm_pressure numeric,
-  -- borehole depth in meters
-  depth numeric,
   -- sample thickness in cm
   thickness numeric,
   -- name of the lab conducted the measurements, and the date of analysis
@@ -252,6 +241,18 @@ CREATE TABLE IF NOT EXISTS sample (
   lab_date timestamp,
   --standard used in the measurements
   lab_standard text,
+  -- atmospheric pressure in hPa
+  atm_pressure numeric,
+  location geometry,
+  /* NOTE: Elevation and depth are not normalized in the current schema!
+  Potentially, these columns should be recast as *references* to a specific
+  reference datum (e.g. `vocabulary.entity_reference`); perhaps we want to move towards
+  this in the future..
+  */
+  -- elevation above sea level in meters
+  elevation numeric,
+  -- borehole depth in meters.
+  depth numeric,
   -- date of collection
   embargo_date timestamp,
   CHECK ((name IS NOT null) OR (igsn IS NOT null))
