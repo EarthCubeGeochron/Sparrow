@@ -4,10 +4,12 @@ from webargs.fields import DelimitedList, Str, Int, Boolean
 from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 from yaml import safe_load
+from typing import List
 
 from ...context import get_database
+from ...settings import ENV
 from ..exceptions import ValidationError
 from ..fields import NestedModelField
 from ..response import APIResponse
@@ -27,6 +29,7 @@ from ..filters import (
     IdListFilter,
 )
 from ...database.mapper.util import classname_for_table
+from ...database.util import stringify_query
 from ...logs import get_logger
 from ...util import relative_path
 from .utils import location_check, material_check, commit_changes, commit_edits, collection_handler
@@ -83,6 +86,8 @@ def meta_info():
 
 
 class ModelAPIEndpoint(HTTPEndpoint):
+    _filters: List[BaseFilter] = []
+
     class Meta:
         database = None
         schema = None
@@ -120,7 +125,9 @@ class ModelAPIEndpoint(HTTPEndpoint):
             all=Boolean(missing=False, description=des_all),
         )
 
-        self._filters = []
+        if ENV == "development":
+            self.args_schema["show_sql"] = Boolean(missing=False, description="print the underlying SQL query")
+
         self.register_filter(AuthorityFilter)
         self.register_filter(FieldExistsFilter)
         self.register_filter(FieldNotExistsFilter)
@@ -219,8 +226,12 @@ class ModelAPIEndpoint(HTTPEndpoint):
             return await self.api_docs(request, schema)
 
         q = self.query(schema)  # constructs query to send to database
+        # Apply filters
         for _filter in self._filters:
             q = _filter(q, args)
+
+        if ENV == "development" and args.get("show_sql", False):
+            return PlainTextResponse(stringify_query(q))
 
         if args["all"]:
             res = q.all()
