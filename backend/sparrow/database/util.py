@@ -2,14 +2,15 @@ from click import secho
 from sqlalchemy.exc import ProgrammingError, IntegrityError
 from sqlparse import split, format
 from sqlalchemy.sql import ClauseElement
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, event
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 from sqlalchemy_utils import create_database, database_exists, drop_database
 from sparrow_utils import cmd, get_logger
 from sqlalchemy.dialects import postgresql
-from time import sleep
+from time import sleep, perf_counter
 from click import echo
+from dataclasses import dataclass
 
 log = get_logger(__name__)
 
@@ -159,3 +160,44 @@ def wait_for_database(engine_or_url, quiet=False):
             echo(msg)
         log.info(msg)
         sleep(1)
+
+
+@dataclass
+class QueryInfo:
+    exc_time: float
+    statement: Statement
+
+
+class QueryLogger:
+    """Sets up handlers for two events that let us track the execution time of
+    queries.
+    Based on https://github.com/pallets/flask-sqlalchemy/blob/master/src/flask_sqlalchemy/__init__.py
+    """
+
+    def __init__(self, engine):
+        self.engine = engine
+        event.listen(self.engine, "before_cursor_execute", self.before_cursor_execute)
+        event.listen(self.engine, "after_cursor_execute", self.after_cursor_execute)
+
+    def before_cursor_execute(self, conn, cursor, statement, parameters, context, executemany):
+        if current_app:
+            context._query_start_time = perf_counter()
+
+    def after_cursor_execute(self, conn, cursor, statement, parameters, context, executemany):
+        if current_app:
+            try:
+                queries = _app_ctx_stack.top.sqlalchemy_queries
+            except AttributeError:
+                queries = _app_ctx_stack.top.sqlalchemy_queries = []
+
+            queries.append(
+                _DebugQueryTuple(
+                    (
+                        statement,
+                        parameters,
+                        context._query_start_time,
+                        perf_counter(),
+                        _calling_context(self.app_package),
+                    )
+                )
+            )
