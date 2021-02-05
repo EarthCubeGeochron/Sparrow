@@ -24,6 +24,7 @@ def join_path(start, end, allowed_collections= allowed_collections):
                     q.append(node)
 
     shortest_path = dist.get(end)
+    ## NOTE: throw error for no-path instead of returning False
     if shortest_path == None:
         return False
 
@@ -48,11 +49,11 @@ def join_loops(path, query, db, model):
     '''
 
 
-    model_col = [] # ['session_collection' , ....]
+    model_col = [] # ['session_collection'....]
     for i, ele in enumerate(path):
         if i+1 < len(path):
             # determines whether it will be a collection join or normal table
-            if hasattr(getattr(db.model, ele), path[i+1]+"_colletion"):
+            if hasattr(getattr(db.model, ele), path[i+1] + "_colletion"):
                 model_col.append(path[i+1] + "_collection")
             else:
                 model_col.append(path[i+1])
