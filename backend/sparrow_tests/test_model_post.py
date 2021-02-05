@@ -6,44 +6,41 @@ from .helpers import json_fixture
 import json
 
 
-def create_BibJSON(crossref_object):
+def create_BibJSON(crossref_object,doi):
     '''
         Function that returns a BibJSON Object
         Takes in a crossref object: i.e, pass the returned object from the crossref api
     '''
-    [title]= crossref_object['title']
+    try:
+        [title]= crossref_object['title']
+        if 'type' in crossref_object:
+            type_ = crossref_object['type']
+        else:
+            type_ = ""
+        year = crossref_object['created']['date-time'].split("-")[0]
+        journal = "" 
+        if len(crossref_object['short-container-title']) == 0:
+            pass
+        else:
+            [title] = crossref_object['short-container-title']
+            journal += title
+        url = crossref_object['URL']
+        ## I realize this line comprehension is stupid long
+        author = [{'name': n} for n in [" ".join(n) for n in [(n['given'], n['family']) for n in crossref_object['author']]]]   
+        
+        BibJSON = {
+            "title": title,
+            "author" : author,
+            "type" : type_,
+            "year": year,
+            "journal" : journal,
+            "link" : url,
+            "identifier": {"type":"doi", "id": doi}
+        }
+        return BibJSON
+    except:
+        return {"identifier": {"type":"doi", "id": doi}}
 
-    if 'DOI' in crossref_object:
-        doi = crossref_object['DOI']
-    elif 'items' in crossref_object:
-        doi = crossref_object['items'][0]['DOI']
-    else:
-        doi = ""
-    if 'type' in crossref_object:
-        type_ = crossref_object['type']
-    else:
-        type_ = ""
-    year = crossref_object['created']['date-time'].split("-")[0]
-    journal = "" 
-    if len(crossref_object['short-container-title']) == 0:
-        pass
-    else:
-        [title] = crossref_object['short-container-title']
-        journal += title
-    url = crossref_object['URL']
-    ## I realize this line comprehension is stupid long
-    author = [{'name': n} for n in [" ".join(n) for n in [(n['given'], n['family']) for n in crossref_object['author']]]]   
-    
-    BibJSON = {
-        "title": title,
-        "author" : author,
-        "type" : type_,
-        "year": year,
-        "journal" : journal,
-        "link" : url,
-        "identifier": {"type":"doi", "id": doi}
-    }
-    return BibJSON
     
 def doi_BibJSON_pipeline(dois):
     '''
@@ -53,7 +50,7 @@ def doi_BibJSON_pipeline(dois):
     BibJSON_list = []
     for doi in dois:
         crossref_obj = works.doi(doi)
-        BibJSON_list.append(json.dumps(create_BibJSON(crossref_obj)))
+        BibJSON_list.append(json.dumps(create_BibJSON(crossref_obj, doi)))
 
     return BibJSON_list
 
@@ -107,6 +104,7 @@ class TestModelPost:
 
         up_json = res.json()
         assert len(up_json['data']) > 0
+        assert 0 == 1
 
     def test_webscrape_publications_sims(self,db,client):
         '''
@@ -132,14 +130,52 @@ class TestModelPost:
             doi = pub.findAll('span', {'class':'doi'})[0].text
             doi_list.append(doi)
 
-        BibJSON_list = doi_BibJSON_pipeline(doi_list)
+        BibJSON_list = doi_BibJSON_pipeline(doi_list[:10])
 
         for_post = []
         for bib in BibJSON_list:
-            for_post.append({"doi": bib['identifier']['id'], "data": bib})
+            try:
+                for_post.append({"doi": json.loads(bib)['identifier']['id'], "data": bib})
+            except:
+                for_post.append({'doi': json.loads(bib)['identifier']['id']})
 
         res = client.post(route, json=for_post)
 
         assert 0 == 1
 
+    def test_webscrape_paperproject_app_sims(self,db, client):
+        '''
+            Test for the webscaper!
+        '''
+        route = "/api/v2/models/project"
+
+        sims_pub_url = "http://www.geology.wisc.edu/~wiscsims/publications.html"
+
+        page = uReq(sims_pub_url)
+        page_html = page.read()
+        page.close()
+
+        page_soup = soup(page_html, "html.parser")
+
+        content = page_soup.findAll('p', {'class' : 'item article'})
+
+        title_list = []
+        author_list = []
+        doi_list = []
+        proj_papers = []
+        for pub in content:
+            title = pub.findAll('span', {"class": "body"})[0].text
+            title_list.append(title)
+
+            doi = pub.findAll('span', {"class": "doi"})[0].text
+            doi_list.append(doi)
+
+            proj_papers.append({"name": title, "publication": [{"doi":doi, "title": title}]})
+
+        res = client.post(route, json= proj_papers)
+
+        up_json = res.json()
+
+        assert len(up_json['data']) > 0
+        assert 1 == 0
 
