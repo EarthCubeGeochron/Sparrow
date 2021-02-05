@@ -8,7 +8,7 @@ import datetime
 
 from sparrow.context import app_context
 from ..datasheet.utils import create_bound_shape
-
+from .utils import join_path, join_loops
 
 def _schema_fields(schema):
     return {getattr(f, "data_key", k): f for k, f in schema.fields.items()}
@@ -17,6 +17,21 @@ def create_params(description, example):
     '''create param description for api docs'''
     return {"description": description, "example": example}
 
+def create_model_name_string(model):
+    return f'{model}'.split(".")[-1].split("'")[0].lower()
+
+def join_path_logic(start,end):
+    '''
+    Function to be used in the Should_Apply for filters.
+    '''
+    path = join_path(start, end) 
+    # if path cannot be formed path will be False
+    # else it will be a list of at least 1 ele, if start and end are same.
+    if not path:
+        return False
+    else:
+        return True    
+    
 class BaseFilter:
     params = None
     help = None
@@ -210,23 +225,28 @@ class DOI_filter(BaseFilter):
         }
 
     def should_apply(self):
-        answer = hasattr(self.model,"doi") or hasattr(self.model, "publication_collection")
+        model_name = create_model_name_string(self.model)
+        answer = hasattr(self.model,"doi") or hasattr(self.model, "publication_collection") or join_path_logic(model_name, "publication")
         return answer
 
     def apply(self, args, query):
         if self.key not in args:
             return query
 
+        model_name = create_model_name_string(self.model)
         doi_string = args[self.key]
 
-        
+        db = app_context().database
+        publication = db.model.publication
+
         if hasattr(self.model, "publication_collection"):
-
-            db = app_context().database
-
-            publication = db.model.publication
-
             return query.join(self.model.publication_collection).filter(publication.doi.like(f'%{doi_string}%'))
+
+        if join_path_logic(model_name, "publication") and len(join_path(model_name, "publication")) > 1:
+            path = join_path(model_name, "publication")
+            db_query = join_loops(path, query, db, self.model)
+            
+            return db_query.filter(publication.doi.like(f'%{doi_string}%'))
 
         ## this allows for fuzzy searching
         return query.filter(self.model.doi.like(f'%{doi_string}%'))
