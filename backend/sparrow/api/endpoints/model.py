@@ -27,7 +27,9 @@ from ..filters import (
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
 from ...util import relative_path
-from .utils import location_check, material_check, commit_changes, commit_edits 
+from .utils import location_check, material_check, commit_changes, commit_edits, collection_handler 
+import json
+import copy
 
 log = get_logger(__name__)
 
@@ -238,28 +240,32 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
         ## Should be a json object
         data = await request.json()
+        return_data = copy.deepcopy(data)
 
         ## the data model
         model = self.meta.schema.opts.model
 
         ## data needs id since we are only editing in the PUT endpoint
+        # two cases, a list of edits are passed, i.e the datasheet. Other just one, admin page
         _type = type(data)
         if _type == list:
-            data = location_check(data)
-            material_check(db,data)
+            data = location_check(data) # reformats location column if need be
+            material_check(db,data) # adds material to db if need be
             for ele in data:
                 if 'id' not in ele:
                     return JSONResponse({"Error":"No ID was passed, if you are adding a new row please use the POST route"})
+                ele = collection_handler(db, ele) ## handles model collections
                 commit_edits(db, model, ele)
         else:
             data = location_check(data, array=False)
             material_check(db, data, array=False)
             if 'id' not in data:
                 return JSONResponse({"Error":"No ID was passed, if you are adding a new row please use the POST route"})
+            data = collection_handler(db,data)
             commit_edits(db,model,data)
 
 
-        return JSONResponse({"Status": f'success to {self._model_name}', "data": data})
+        return JSONResponse({"Status": f'success to {self._model_name}', "data": return_data})
 
     async def post(self, request):
         """
@@ -272,6 +278,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         model = self.meta.schema.opts.model
 
         data = await request.json()
+        return_data = copy.deepcopy(data)
 
         _type = type(data)
         if _type == list:
@@ -280,14 +287,15 @@ class ModelAPIEndpoint(HTTPEndpoint):
             ## Checks if material is in data and if it's in database, if not adds it
             material_check(db, data)
             for ele in data:
+                ele = collection_handler(db,ele)
                 commit_changes(db,model,ele)
-        
         else:
             data = location_check(data, array=False)
             material_check(db, data, array=False)
+            data = collection_handler(db,data)
             commit_changes(db, model, data)
 
         
-        return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "data": data})
+        return JSONResponse({"Status":f"Successfully submitted to {self._model_name}", 'data': return_data})
 
 
