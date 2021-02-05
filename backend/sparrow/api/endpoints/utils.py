@@ -139,12 +139,20 @@ def collection_handler(db, data):
                 ## The data probably doesn't exsist in the db
                 # get model that matches or create a new one. 
                 # NOTE: **ele spreads everything, so theres a chance we could be duplicating data...
-                new_model = db_model.get_or_create(**ele) 
-
+                ele =location_check(ele,array=False) ## this workds
+                material_check(db, ele, array=False)
+                new_model = db_model.get_or_create(**ele) ## doesn't set location for sample
+                if 'location' in ele:
+                    new_model.location = ele['location']
+                
                 collection.append(new_model)
             else:
                 # id is present in the object.
+                ele =location_check(ele,array=False)
+                material_check(db, ele, array=False)
                 existing_model = db_model.get_or_create(id=ele['id'])
+                if 'location' in ele:
+                    existing_model.location = ele['location']
 
                 for k in ele:
                     setattr(existing_model, k, ele[k])
