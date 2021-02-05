@@ -188,12 +188,17 @@ class DateFilter(BaseFilter):
         }
 
     def should_apply(self):
-        answer = hasattr(self.model, "date") or hasattr(self.model, "session_collection")
+        model_name = create_model_name_string(self.model)
+        answer = hasattr(self.model, "date") or hasattr(self.model, "session_collection") or join_path_logic(model_name, "session")
         return answer
 
     def apply(self, args, query):
         if self.key not in args:
             return query
+        
+        model_name = create_model_name_string(self.model)
+        db = app_context().database
+        Session = db.model.session
 
         format = "%Y-%m-%d"
 
@@ -202,11 +207,13 @@ class DateFilter(BaseFilter):
         end = datetime.datetime.strptime(end, format)
         
         if hasattr(self.model, "session_collection"):
-            db = app_context().database
-            Session = db.model.session
-
             return query.join(self.model.session_collection).filter(and_(Session.date > start, Session.date < end))
 
+        elif join_path_logic(model_name, "session") and len(join_path(model_name, "session")) > 1:
+            path = join_path(model_name, "session")
+            db_query = join_loops(path, query, db, self.model)
+
+            return db_query.filter(and_(Session.date > start, Session.date < end))
         
         return query.filter(and_(self.model.date > start, self.model.date < end))
 
@@ -267,16 +274,28 @@ class Coordinate_filter(BaseFilter):
             )
         }
     def should_apply(self):
-        return hasattr(self.model, "location")
+        model_name = create_model_name_string(self.model)
+        return hasattr(self.model, "location") or join_path_logic(model_name, "sample")
     
     
     def apply(self, args, query):
         if self.key not in args:
             return query
         
+        model_name = create_model_name_string(self.model)
+        db = app_context().database
+
         points = args['coordinates'] # should be an array [minLong, minLat, maxLong, maxLat]
         pnts = [int(pnt) for pnt in points]
         bounding_shape = create_bound_shape(pnts)
+
+        if join_path_logic(model_name, "sample") and len(join_path(model_name, "sample")) > 1:
+            path = join_path(model_name, "sample")
+            db_query = join_loops(path, query, db, self.model)
+            sample = db.model.sample
+
+            return db_query.filter(bounding_shape.ST_Contains(func.ST_Transform(sample.location, 4326)))
+
 
         # Create issue about SRID (4326)
         return query.filter(bounding_shape.ST_Contains(func.ST_Transform(self.model.location, 4326)))
@@ -294,7 +313,8 @@ class Geometry_Filter(BaseFilter):
         }
 
     def should_apply(self):
-        return hasattr(self.model, "location") or hasattr(self.model, "sample_collection")
+        model_name = create_model_name_string(self.model)
+        return hasattr(self.model, "location") or hasattr(self.model, "sample_collection") or join_path_logic(model_name, "sample")
 
     def apply(self, args, query):
         if self.key not in args:
@@ -303,18 +323,27 @@ class Geometry_Filter(BaseFilter):
         WKT_shape_text = args[self.key]
         WKT_query = "SRID=4326;" + WKT_shape_text
 
+        db = app_context().database
+        sample = db.model.sample
+        model_name = create_model_name_string(self.model)
+
+
         if hasattr(self.model, "sample_collection"):
-
-            db = app_context().database
-            sample = db.model.sample
-
             return query.join(self.model.sample_collection).filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(sample.location, 4326)))
+
+        elif join_path_logic(model_name, "sample") and len(join_path(model_name, "sample")) > 1:
+            path = join_path(model_name, "sample")
+            db_query = join_loops(path, query, db, self.model)
+
+            return db_query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(sample.location, 4326)))
+
 
         return query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(self.model.location, 4326)))
 
-## TODO: Age range filter
 class Age_Range_Filter(BaseFilter):
     key = "age"
+
+    ## TODO: Params should tell something about comparison with number, > < >= <=.
 
     @property
     def params(self):
@@ -325,22 +354,30 @@ class Age_Range_Filter(BaseFilter):
             self.key: Str(description=des)
             }
     def should_apply(self):
-        return hasattr(self.model, "session_collection")
+        model_name = create_model_name_string(self.model)
+        return model_name == "datum" or hasattr(self.model, "datum_collection") or join_path_logic(model_name, "datum")
+
     
     def apply(self, args, query):
         if self.key not in args:
             return query
         
+        model_name = create_model_name_string(self.model)
         db = app_context().database
 
         age = float(args[self.key])
 
-        ## TODO: META function to join models all the way to datum.
-        session = db.model.session
-        analysis = db.model.analysis
-        datum = db.model.datum
+        if hasattr(self.model, "datum_collection"):
+            datum = db.model.datum
+            return query.join(self.model.datum_collection).filter(datum.value<age)
+        elif join_path_logic(model_name, "datum") and len(join_path(model_name, "datum")) > 1:
+            path = join_path(model_name, "datum")
+            db_query = join_loops(path, query, db, self.model)
+            datum = db.model.datum
 
-        return query.join(self.model.session_collection).join(session.analysis_collection).join(analysis.datum_collection).filter(datum.value < age)
+            return db_query.filter(datum.value < age)
+
+        return query.filter(self.model.value < age)
 
 
 class TextSearchFilter(BaseFilter):
@@ -350,6 +387,7 @@ class TextSearchFilter(BaseFilter):
         TODO: extend to collections, geo_entity, macrostrat API
         ex) search igneous, get all igneous rocks. same with Mafic, Felsic
         ex) search for a geologic formation
+        Use the meta joiner to filter by all linked text fields
     '''
     key = "like"
 
@@ -379,7 +417,7 @@ class TextSearchFilter(BaseFilter):
         return query.filter(or_(*[n.like(f'%{search_string}%') for n in fields]))
 
 
-## TODO: Age range filter
+## TODO: Age range filter, open parameter i.e 'Plateua Ages', pass a number and operator?
 ## TODO: Define filter in plugin, i.e irradiation filter for WiscAr
 ## TODO: Filter based on nested models, /api/v2/datum?nest=project,datum_type&datum_type.unit=Ma&project=11
 
