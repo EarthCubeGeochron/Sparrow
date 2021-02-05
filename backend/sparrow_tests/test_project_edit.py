@@ -23,7 +23,6 @@ class TestProjectEdits:
 
         response = client.put(route, json = changeset)
 
-        assert 0 == 1
 
 
     
