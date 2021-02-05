@@ -94,3 +94,62 @@ def commit_edits(db, model, data):
         db.session.commit()
     except:
         db.session.rollback()
+
+
+def collection_handler(db, data):
+    '''
+    A function to handle creating new collections.
+
+    db: database connection
+    data: a python dictionary! Not list.
+
+    NOTE: Right now it replaces the old collection with whatever is passed. 
+
+    '''
+
+    names = [] # sample
+    col_names = [] # sample_collection
+    for ele in data:
+        if type(data[ele]) is list: # collections will be lists
+            # check if it's plural
+            # TODO: need to check for analysis pluralization
+            if ele[-1] == 's' and ele != 'analysis':
+                names.append(ele[:-1])
+                col_names.append(ele[:-1] + "_collection")
+            elif 'collection' in ele:
+                col_names.append(ele)
+                names.append(ele.replace("_collection", ""))
+            else:
+                names.append(ele)
+                col_names.append(ele + "_collection")
+
+    ## maybe there are no collections
+    if len(col_names) == 0 or len(names) == 0:
+        return data
+
+    ## Create a loop ability to go over the len of both name lists
+    # for each name and collection name we perform the same actions.
+    for i,val in enumerate(names):
+        db_model = getattr(db.model, val) ## the model for the collection.
+
+        ## will become a new column in data that says model_collection
+        collection = []
+        for ele in data[val]:
+            if 'id' not in ele: 
+                ## The data probably doesn't exsist in the db
+                # get model that matches or create a new one. 
+                # NOTE: **ele spreads everything, so theres a chance we could be duplicating data...
+                new_model = db_model.get_or_create(**ele) 
+
+                collection.append(new_model)
+            else:
+                # id is present in the object.
+                existing_model = db_model.get_or_create(id=ele['id'])
+
+                for k in ele:
+                    setattr(existing_model, k, ele[k])
+        
+        data[col_names[i]] = collection
+        data.pop(val)
+
+    return data
