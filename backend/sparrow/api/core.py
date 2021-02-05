@@ -161,6 +161,6 @@ class APIv2(Starlette):
             route=endpoint,
             table=_tbl.name,
             schema=schema,
-            description="",
+            description=description,
         )
         self.route_descriptions[root_route].append(basic_info)
