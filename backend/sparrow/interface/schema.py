@@ -175,17 +175,18 @@ class ModelSchema(SQLAlchemyAutoSchema):
             instance = self._get_instance(data)
             if instance is None:
                 instance = super().make_instance(data, **kwargs)
+                # self.session.add(instance)
                 if self._ready_for_flush(instance):
                     self.persist(instance)
         return instance
 
     def persist(self, instance):
-        with self.session.begin_nested():
-            try:
-                self.session.add(instance)
+        try:
+            with self.session.begin_nested():
                 self.session.flush(objects=[instance])
-            except Exception as err:
-                log.debug("Could not persist")
+        except Exception as err:
+            log.debug("Could not persist")
+            self.session.rollback()
 
     @post_dump
     def remove_internal_fields(self, data, many, **kwargs):
