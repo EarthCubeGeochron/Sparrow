@@ -4,7 +4,7 @@ from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
-from sqlalchemy.exc import StatementError, IntegrityError
+from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
 from sqlalchemy.orm.exc import FlushError
 from sqlalchemy.orm import RelationshipProperty
 from collections.abc import Mapping
@@ -181,8 +181,11 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     def persist(self, instance):
         with self.session.begin_nested():
-            self.session.add(instance)
-            self.session.flush(objects=[instance])
+            try:
+                self.session.add(instance)
+                self.session.flush(objects=[instance])
+            except Exception as err:
+                log.debug("Could not persist")
 
     @post_dump
     def remove_internal_fields(self, data, many, **kwargs):
