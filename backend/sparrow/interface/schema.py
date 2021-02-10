@@ -171,22 +171,18 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        instance = self._get_instance(data)
-
-        if instance is not None:
-            return instance
-
-        try:
-            # Begin a nested subtransaction
-            with self.session.begin_nested():
-                instance = self.opts.model(**data)
-                log.debug(f"Created instance {instance} with parameters {data}")
-                self.session.add(instance)
-                self.session.flush(objects=[instance])
-                log.debug(f"Successfully persisted {instance} to database")
-        except (IntegrityError, FlushError) as err:
-            log.debug("Could not persist")
+        with self.session.no_autoflush:
+            instance = self._get_instance(data)
+            if instance is None:
+                instance = super().make_instance(data, **kwargs)
+                if self._ready_for_flush(instance):
+                    self.persist(instance)
         return instance
+
+    def persist(self, instance):
+        with self.session.begin_nested():
+            self.session.add(instance)
+            self.session.flush(objects=[instance])
 
     @post_dump
     def remove_internal_fields(self, data, many, **kwargs):
