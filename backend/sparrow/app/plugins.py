@@ -4,6 +4,7 @@ from ..plugins import SparrowPluginManager
 from ..interface import InterfacePlugin
 from ..auth import AuthPlugin
 from ..ext.pychron import PyChronImportPlugin
+from ..ext.data_validation import DataValidationPlugin
 from ..web import WebPlugin
 from ..logs import get_logger
 
@@ -21,6 +22,7 @@ def prepare_plugin_manager(app):
         WebPlugin,
         InterfacePlugin,
         PyChronImportPlugin,
+        DataValidationPlugin,
     )
     # GraphQL is disabled for now
     # self.plugins.add(GraphQLPlugin)
