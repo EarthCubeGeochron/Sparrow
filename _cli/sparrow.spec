@@ -19,6 +19,8 @@ src_excludes = [
     ".git",
     ".githooks",
     ".github",
+    "_cli/build",
+    "_cli/dist",
     "frontend/node_modules",
 ]
 
