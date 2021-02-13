@@ -19,9 +19,9 @@ jobs:
           python-version: '3.8'
 
       # Bundling
-      - name: Bundle command-line application with PyInstaller
+      - name: Install software for local development 
         run: make && sudo make install-dev
 
-      - name: Run Sparrow tests for built application
+      - name: Run Sparrow core tests
         run: sparrow test
 

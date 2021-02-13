@@ -1,3 +1,5 @@
+# Note: see https://github.com/overhangio/tutor/releases for a well-developed release schedule
+# We could use a CHANGELOG generator to forward information about changes...
 name: Sparrow release generation 
 on:
   push:
@@ -5,11 +7,11 @@ on:
       - 'v*.*.*'
 jobs:
   build:
-    # Note: for deployment, we might need to move to an older version of Ubuntu
+    # Note: for deployment, we move to an older version of Ubuntu
     # https://pyinstaller.readthedocs.io/en/stable/usage.html
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-16.04
     outputs:
-      upload_url: ${{ steps.step1.outputs.upload_url }}
+      upload_url: ${{ steps.create_release.outputs.upload_url  }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -42,6 +44,9 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+          body: |
+            See the [Getting started documentation](https://sparrow-data.org/docs/getting-started)
+            for more information on how to set up Sparrow.
       - name: Upload Sparrow CLI for release
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
@@ -78,16 +83,13 @@ jobs:
       - name: Zip up command-line application
         run: tar -czvf ./_cli/dist/sparrow.tar.gz _cli/dist/sparrow
 
-      # Deployment (only runs for tagged commits on `master` or `develop`)
-      # Note: see https://github.com/overhangio/tutor/releases for a well-developed release schedule
-
       - name: Upload Sparrow CLI for release
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.build.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ needs.build.outputs.upload_url }} 
           asset_path: ./_cli/dist/sparrow.tar.gz
           asset_name: sparrow-Darwin-x86_64.tar.gz
           asset_content_type: application/tar+gzip
