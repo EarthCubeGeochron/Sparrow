@@ -31,7 +31,7 @@ jobs:
 
       - name: Zip up command-line application
         # For zipping, change directory to the dist directory.
-        run: tar -czv -f ./_cli/dist/sparrow.tar.gz -C _cli/dist sparrow
+        run: tar -czv -f ./_cli/dist/sparrow.tar.gz -C _cli/dist/sparrow .
       # We create the release only if tests pass
       # (but we don't make sure that things work on Darwin!)
       # Note: see https://github.com/overhangio/tutor/releases for a well-developed release schedule
@@ -82,7 +82,7 @@ jobs:
 
       # Cannot run tests on Mac because Docker doesn't run on MacOS in Github Actions
       - name: Zip up command-line application
-        run: tar -czv -f ./_cli/dist/sparrow.tar.gz -C _cli/dist sparrow
+        run: tar -czv -f ./_cli/dist/sparrow.tar.gz -C _cli/dist/sparrow .
 
       - name: Upload Sparrow CLI for release
         id: upload-release-asset 
