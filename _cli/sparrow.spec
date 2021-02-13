@@ -14,7 +14,6 @@ with open(revfile, "w") as f:
     git_revision_info(stdout=f)
 
 src_excludes = [
-    "_cli",
     ".pytest_cache",
     "docs",
     ".git",
