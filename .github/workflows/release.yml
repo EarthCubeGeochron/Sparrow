@@ -74,9 +74,7 @@ jobs:
       - name: Bundle command-line application with PyInstaller
         run: make build && sudo make install
 
-      - name: Run Sparrow tests for built application
-        run: sparrow test
-
+      # Cannot run tests on Mac because Docker doesn't run on MacOS in Github Actions
       - name: Zip up command-line application
         run: tar -czvf ./_cli/dist/sparrow.tar.gz _cli/dist/sparrow
 
