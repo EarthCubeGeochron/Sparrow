@@ -18,7 +18,7 @@ executable=$dist_dir/sparrow
 rm -r $dist_dir
 mkdir -p $dist_dir
 
-version=$(get_latest_release $repo_name)
+version=${1:-$(get_latest_release $repo_name)}
 
 echo "Downloading Sparrow CLI $version"
 curl -L -s https://github.com/$repo_name/releases/download/$version/sparrow-$platform-x86_64.tar.gz \
