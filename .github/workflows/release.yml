@@ -26,6 +26,7 @@ jobs:
         # Bundling
       - name: Bundle command-line application with PyInstaller
         run: make build && sudo make install
+
       - name: Run Sparrow tests for built application
         run: sparrow test
 
@@ -42,10 +43,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: Sparrow ${{ github.ref }}
           draft: false
           prerelease: false
           body: |
+            The latest release of Sparrow can be installed using the following command:
+            ```
+            curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh | bash -s -
+            ```
+
+            If you want to install this release specifically, you can add it to the above command,
+            like so: `... | bash -s - ${{ github.ref }}`.
+
             See the [Getting started documentation](https://sparrow-data.org/docs/getting-started)
             for more information on how to set up Sparrow.
       - name: Upload Sparrow CLI for release
