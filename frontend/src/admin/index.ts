@@ -11,7 +11,7 @@ import { ProjectAdminPage } from "./project";
 
 import { SampleAdminPage } from "./sample";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
-import { DataModelLinks, AdminDataModelLinks } from "~/catalog";
+import { AdminDataModelLinks } from "~/catalog";
 import { NavButton } from "~/components";
 import { AdminNavLinks } from "~/catalog/nav";
 import styles from "./module.styl";

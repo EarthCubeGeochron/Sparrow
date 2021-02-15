@@ -11,7 +11,6 @@ from marshmallow.fields import UUID as _UUID
 from marshmallow.utils import is_collection
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
-from collections.abc import Iterable
 from .util import primary_key
 from ..logs import get_logger
 
@@ -75,6 +74,7 @@ class SmartNested(Nested, Related):
     """This field allows us to resolve relationships as either primary keys or nested models."""
 
     # https://github.com/marshmallow-code/marshmallow/blob/dev/src/marshmallow/fields.py
+    # https://github.com/marshmallow-code/marshmallow-sqlalchemy/blob/dev/src/marshmallow_sqlalchemy/fields.py
     # TODO: better conformance of this field to Marshmallow's OpenAPI schema generation
     # https://apispec.readthedocs.io/en/latest/using_plugins.html
     def __init__(
@@ -102,7 +102,12 @@ class SmartNested(Nested, Related):
         if is_collection(value) and not self._many:
             raise ValidationError("Provided a collection for a instance field")
 
-        return super()._deserialize(value, attr, data, **kwargs)
+        return Nested._deserialize(self, value, attr, data, **kwargs)
+
+    def _copy_config(self, key):
+        """Copy configuration from root model"""
+        if hasattr(self.root, key):
+            setattr(self.schema, key, getattr(self.root, key))
 
     def _serialize_related_key(self, value):
         """Serialize the primary key for a related model. In the (common) special
@@ -119,16 +124,7 @@ class SmartNested(Nested, Related):
         self._instances.add(value)
         return self._serialize_related_key(value)
 
-    def _copy_config(self, key):
-        """Copy configuration from root model"""
-        if hasattr(self.root, key):
-            setattr(self.schema, key, getattr(self.root, key))
-
     def _serialize(self, value, attr, obj):
-        # return ret if len(ret) > 1 else list(ret)[0]
-        # return super(Nested, self)._serialize(value, attr, obj)
-        # Don't allow nesting for now...
-
         # Pass through allowed_nests configuration to child schema
         self._copy_config("allowed_nests")
         self._copy_config("_show_audit_id")
@@ -138,7 +134,6 @@ class SmartNested(Nested, Related):
         if other_name in _allowed or _allowed == "all":
             # Serialize as nested
             return super(Nested, self)._serialize(value, attr, obj)
-
         # If we don't want to nest
         if self._many:
             return [self._serialize_instance(v) for v in value]

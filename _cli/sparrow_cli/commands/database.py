@@ -1,7 +1,6 @@
 import click
-from .base import cli
-from .group import CommandGroup
-from .util import container_id, container_is_running, run, compose
+from ..group import CommandGroup
+from ..util import container_id, container_is_running, run, compose
 
 
 def dump_database(dbname, out_file):
@@ -38,7 +37,7 @@ shell_commands = {
 }
 
 
-@cli.group(name="db", cls=CommandGroup)
+@click.group(name="db", cls=CommandGroup)
 @click.pass_context
 def sparrow_db(ctx):
     pass
@@ -48,6 +47,14 @@ def sparrow_db(ctx):
 def migration():
     """Generate a changeset against the optimal database schema"""
     compose("run --rm", "-T", "backend", "/app/sparrow/__main__.py db-migration")
+
+
+@sparrow_db.command(name="migrate")
+def migrate():
+    """Migrate the database to a newer version"""
+    compose(
+        "run --rm", "-T", "backend", "/app/sparrow/__main__.py db-migration", "--apply"
+    )
 
 
 for k, v in shell_commands.items():

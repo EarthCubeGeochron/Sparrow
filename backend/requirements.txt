@@ -31,6 +31,9 @@ click==7.1.2
 click-plugins==1.1.1
 ipython==7.11.1
 
+# Static files
+aiofiles==0.6.0
+
 # Import file reading
 xlrd==1.2.0
 pyyaml==5.3
@@ -70,7 +73,7 @@ starlette-apispec==1.0.3
 boto3==1.12.25
 
 # Testing and logging
-pytest==5.3.5
+pytest==5.4.0
 colorlog==4.2.1
 rich==6.0.0
 deepdiff[murmur]==5.0.2
@@ -82,3 +85,8 @@ PyJWT==1.7.1
 starlette==0.13.4
 Hypercorn==0.11.1
 asgiref==3.2.8
+
+# sparrow_utils
+# NOTE: we should probably organize these internal
+# packages better...
+# -e ./utils

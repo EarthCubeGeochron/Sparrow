@@ -8,6 +8,52 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## [Unreleased] - 2021-02-14
+
+### Auto-building releases
+
+GitHub Actions workflows for building command line application binaries are now active.
+The application is bundled into a single executable with no dependencies (except for the
+Docker engine) using PyInstaller. This workflow is run each time a tag is generated with
+a name matching the pattern `v*.*.*` (a typical semantic versioning string, with optional
+suffix). The output is binary files for both MacOS and Linux. The appropriate version
+can be installed with the following one-line command:
+
+```
+curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh | bash -s -
+```
+
+- This removes the need to download the Sparrow code repository, install submodules,
+  etc. in order to install the software
+- It paves the way for lighter-weight, integrated implementations of the system.
+- There are still some problems to be solved, like marking pre-releases appropriately
+  and figuring out how exactly we are managing versioning through different parts of
+  the application.
+
+## [Unreleased] - 2021-01-11
+
+### Command-line bundling
+
+- The application can now be bundled using PyInstaller for packaged installation without
+  pulling the Sparrow codebase. The CLI can be bundled using `make` and installed onto your
+  path using `make install`.
+- `make install` does not request elevated permissions within the script. You may have to run
+  `sudo make install` to properly link the executable, depending on the configuration of your
+  system.
+
+### Changed
+
+- Fully transitioned Sparrow's core to a [Starlette](https://www.starlette.io) server backend.
+  This is a fairly major breaking change that requires plugins that extend the API to be updated.
+- Sparrow plugins can now record compatible versions of Sparrow using the `sparrow_version` property.
+  If an incompatible plugin is loaded, an error (for core plugins) or a warning will be generated.
+- Added Visual Studio Code language server support within Sparrow's backend Docker container.
+
+#### Low-level changes
+
+- Transitioned hook `api-initialized` to `api-v1-initialized`.
+- Created hook `add-routes`.
+
 ## [Unreleased] - 2020-10-17
 
 ### Changed

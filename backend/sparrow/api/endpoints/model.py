@@ -166,7 +166,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         if not len(request.query_params.keys()):
             return await self.api_docs(request, schema)
 
-        q = self.query(schema)
+        q = self.query(schema) #constructs query to send to database
         for _filter in self._filters:
             q = _filter(q, args)
 

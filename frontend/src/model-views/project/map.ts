@@ -5,16 +5,18 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import h from "@macrostrat/hyper";
+import { useState } from "react";
 import { ContextMap, StaticMarker } from "app/components";
 import bbox from "@turf/bbox";
 import WebMercatorViewport from "viewport-mercator-project";
 import { MapLink } from "~/map";
 
-const ProjectMap = function (props) {
-  let { width, height, samples, padding, minExtent } = props;
+const ProjectMap = function(props) {
+  let { width, height, samples, padding, minExtent, hoverID } = props;
   if (samples == null) {
     return null;
   }
+  console.log(samples);
   const locatedSamples = samples.filter((d) => d.geometry != null);
   if (!(locatedSamples.length > 0)) {
     return null;
@@ -61,10 +63,10 @@ const ProjectMap = function (props) {
         width,
         height,
       },
-      locatedSamples.map(function (d) {
+      locatedSamples.map(function(d) {
+        const { id } = d;
         [longitude, latitude] = d.geometry.coordinates;
-        console.log(longitude, latitude);
-        return h(StaticMarker, { latitude, longitude });
+        return h(StaticMarker, { latitude, longitude, id, hoverID });
       })
     ),
   ]);

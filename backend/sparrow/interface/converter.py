@@ -158,7 +158,6 @@ class SparrowConverter(ModelConverter):
         # Somewhat ugly method, mostly to decide if field is dump_only or required
         kwargs = super()._get_field_kwargs_for_property(prop)
         kwargs["data_key"] = self._get_key(prop)
-
         kwargs["allow_nan"] = True
 
         if isinstance(prop, RelationshipProperty):  # Relationship property
@@ -214,9 +213,12 @@ class SparrowConverter(ModelConverter):
 
     def property2field(self, prop, **kwargs):
         """This override improves our handling of relationships"""
-        if not isinstance(prop, RelationshipProperty):
+        if isinstance(prop, RelationshipProperty):
+            return self._property2relationship(prop, **kwargs)
+        else:
             return super().property2field(prop, **kwargs)
 
+    def _property2relationship(self, prop, **kwargs):
         # The "name" is actually the name of the related model, NOT the name
         # of field
         cls = self._related_entity(prop)
