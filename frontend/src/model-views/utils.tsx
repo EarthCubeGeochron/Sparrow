@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import hyper from "@macrostrat/hyper";
 import styles from "./main.styl";
@@ -7,7 +7,7 @@ import { useModelURL } from "~/util";
 const h = hyper.styled(styles);
 
 export function ModelCard(props) {
-  const { content, id, model } = props;
+  const { content, id, model, link = true, onClick = () => {} } = props;
 
   const [clicked, setClicked] = useState();
 
@@ -25,12 +25,19 @@ export function ModelCard(props) {
       ? "model-card.clicked"
       : "model-card"
     : "model-card";
-
-  return h(Link, { to, style: { textDecoration: "none" } }, [
-    h(`div.${classname}`, [content]),
-  ]);
-}
-
-function EditableCollections(props) {
-  
+  if (link) {
+    return h(Link, { to, style: { textDecoration: "none" } }, [
+      h(`div.${classname}`, [content]),
+    ]);
+  } else {
+    return h("div", [
+      h(
+        `div.${classname}`,
+        {
+          onClick,
+        },
+        [content]
+      ),
+    ]);
+  }
 }
