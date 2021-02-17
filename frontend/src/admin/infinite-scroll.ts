@@ -9,6 +9,8 @@ import {
   SampleModelCard,
   SessionModelCard,
   DataFileModelCard,
+  PublicationModelCard,
+  ResearcherModelCard,
 } from "../model-views/list-cards/utils";
 import { DataFilesCard } from "../model-views/data-files";
 import { SessionLinkCard } from "../model-views/data-files/page";
@@ -136,9 +138,70 @@ function DataFilesListComponent({ params }) {
   ]);
 }
 
+function SampleAddList({ params, componentProps }) {
+  return h("div", [
+    h(InfiniteAPIView, {
+      url: "/models/sample",
+      unwrapData: unwrapSampleCardData,
+      params: { nest: "session,project" },
+      filterParams: { ...params },
+      component: SampleModelCard,
+      componentProps,
+      context: APIV2Context,
+    }),
+  ]);
+}
+
+const unwrapPubs = (data) => {
+  const dataObj = data.data.map((obj) => {
+    const { year, id, title, doi, author, journal } = obj;
+    return { year, id, title, doi, author, journal };
+  });
+  return dataObj;
+};
+
+function PublicationAddList({ params, componentProps }) {
+  return h("div", [
+    h(InfiniteAPIView, {
+      url: "/models/publication",
+      unwrapData: unwrapPubs,
+      params: {},
+      filterParams: { ...params },
+      component: PublicationModelCard,
+      componentProps,
+      context: APIV2Context,
+    }),
+  ]);
+}
+
+const unwrapResearchers = (data) => {
+  const dataObj = data.data.map((obj) => {
+    const { id, name } = obj;
+    return { id, name };
+  });
+  return dataObj;
+};
+
+function ResearcherAddList({ params, componentProps }) {
+  return h("div", [
+    h(InfiniteAPIView, {
+      url: "/models/researcher",
+      unwrapData: unwrapResearchers,
+      params: {},
+      filterParams: { ...params },
+      component: ResearcherModelCard,
+      componentProps,
+      context: APIV2Context,
+    }),
+  ]);
+}
+
 export {
   ProjectListComponent,
   SampleListComponent,
   SessionListComponent,
   DataFilesListComponent,
+  SampleAddList,
+  PublicationAddList,
+  ResearcherAddList,
 };
