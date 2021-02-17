@@ -37,6 +37,7 @@ function InfiniteAPIView({
   unwrapData,
   params,
   component,
+  componentProps = {},
   context,
   filterParams,
 }) {
@@ -89,6 +90,7 @@ function InfiniteAPIView({
         initialData: data,
         fetch: fetchNewData,
         component,
+        componentProps,
       })
     : h(Expired, { child, delay: 3000 });
 }
