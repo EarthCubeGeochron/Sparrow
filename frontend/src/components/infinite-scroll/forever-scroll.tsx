@@ -45,7 +45,7 @@ const perPage = 15;
  * @param component: A component that can take in the mapped data and format it into what the user wants to display
  * @param {function} fetch A function that will call an API to fetch the next page of data when intersection is observed
  */
-function ForeverScroll({ initialData, component, fetch }) {
+function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
   const initialState = {
     loadingBottom: false,
     hasMoreAfter: true,
@@ -82,7 +82,7 @@ function ForeverScroll({ initialData, component, fetch }) {
 
   return (
     <div className="ForeverScroll" style={{ marginTop: "20px" }}>
-      {data.map((d) => h(component, d))}
+      {data.map((d) => h(component, { ...componentProps, ...d }))}
 
       {loadingBottom && h(Spinner)}
 
