@@ -3,16 +3,23 @@ import { hyperStyled } from "@macrostrat/hyper";
 import styled from "@emotion/styled";
 import { ProjectMap } from "./map";
 import { EditableProjectDetails, EditNavBar } from "./editor";
-import { SampleCard, AddSampleCard } from "../sample/detail-card";
+import {
+  SampleCard,
+  AddSampleCard,
+  SampleEditCard,
+  PubEditCard,
+  ResearcherEditCard,
+} from "../sample/detail-card";
 import { SampleSelectDialog } from "./sample-select";
 import "../main.styl";
 import styles from "~/admin/module.styl";
 
 const h = hyperStyled(styles);
 
-class Publication extends Component {
-  renderMain() {
-    const { doi, title } = this.props;
+export function Publication(props) {
+  const { doi, title } = props;
+
+  const interior = () => {
     let doiAddendum = [];
     if (doi != null) {
       doiAddendum = [
@@ -24,38 +31,72 @@ class Publication extends Component {
       ];
     }
     return h("div.publication", [h("span.title", title), ...doiAddendum]);
-  }
+  };
 
-  render() {
-    const interior = this.renderMain();
-    const { doi } = this.props;
-    if (doi == null) {
-      return interior;
-    }
+  if (doi == null) {
+    return h(interior);
+  } else {
     const href = `https://dx.doi.org/${doi}`;
-    return h("a.publication", { href, target: "_blank" }, interior);
+    return h("a.publication", { href, target: "_blank" }, h(interior));
   }
 }
 
-export const ProjectPublications = function({ data }) {
+export const ProjectPublications = function({
+  data,
+  isEditing = false,
+  onClick,
+  rightElement,
+}) {
   if (data == null) {
     data = [];
+  }
+  if (isEditing) {
+    return h("div.publications", [
+      h("div", { style: { display: "flex", alignItems: "baseline" } }, [
+        h("h4", "Publications"),
+        rightElement,
+      ]),
+      data.length > 0
+        ? data.map((pub) => {
+            const { id, title, doi } = pub;
+            return h(PubEditCard, {
+              id,
+              content: h(Publication, { doi, title }),
+              onClick,
+            });
+          })
+        : null,
+    ]);
   }
   return h([
     h.if(data.length)("div.publications", [
       h("h4", "Publications"),
-      (data || []).map((d, i) => h(Publication, { key: i, ...d })),
+      (data || []).map((d, i) =>
+        h(Publication, { key: i, doi: d.doi, title: d.title })
+      ),
     ]),
     h.if(data == null)("div.publications", "No publications"),
   ]);
 };
 
-const ProjectResearchers = function({ data }) {
+export const ProjectResearchers = function({ data, isEditing, onClick }) {
   let content = [h("p", "No researchers")];
   if (data != null) {
     content = data.map((d) => h("div.researcher", d.name));
   }
-  return h("div.researchers", [h("h4", "Researchers"), ...content]);
+  if (isEditing) {
+    return h("div.researchers", [
+      h("h4", "Researchers"),
+      data.length > 0
+        ? data.map((res) => {
+            const { id, name } = res;
+            return h(ResearcherEditCard, { id, name, onClick });
+          })
+        : null,
+    ]);
+  } else {
+    return h("div.researchers", [h("h4", "Researchers"), ...content]);
+  }
 };
 
 const SampleContainer = styled.div`\
@@ -64,7 +105,7 @@ flex-flow: row wrap;
 margin: 0 -5px;\
 `;
 
-function AddSampleControls() {
+export function AddSampleControls() {
   const [isOpen, setIsOpen] = useState(false);
 
   const onClick = () => {
@@ -81,19 +122,52 @@ function AddSampleControls() {
   ]);
 }
 
-export const ProjectSamples = function({ data, setID }) {
+export const ProjectSamples = function({
+  data,
+  isEditing,
+  setID = () => {},
+  link = true,
+  onClick,
+  rightElement,
+}) {
   let content = [h("p", "No samples")];
   if (data != null) {
-    content = data.map((d) => {
-      const { material, id, name, location_name } = d;
-      return h(SampleCard, { material, id, name, location_name, setID });
-    });
+    if (!isEditing) {
+      return h("div.sample-area", [
+        h("h4", "Samples"),
+        h(SampleContainer, [
+          data.map((d) => {
+            const { material, id, name, location_name } = d;
+            return h(SampleCard, {
+              material,
+              id,
+              name,
+              location_name,
+              setID,
+              link,
+            });
+          }),
+        ]),
+      ]);
+    } else {
+      return h("div.sample-area", [
+        h("div", { style: { display: "flex", alignItems: "baseline" } }, [
+          h("h4", "Samples"),
+          rightElement,
+        ]),
+        h(SampleContainer, [
+          data.map((d) => {
+            const { id, name } = d;
+            return h(SampleEditCard, {
+              id,
+              name,
+              onClick,
+            });
+          }),
+        ]),
+      ]);
+    }
   }
-  return h("div.sample-area", [
-    h("h4", "Samples"),
-    h(SampleContainer, content),
-    h(AddSampleControls),
-  ]);
 };
 
 function SampleMapComponent(props) {
@@ -122,8 +196,8 @@ const ProjectPage = function(props) {
       h("div.basic-info", [
         h(EditableProjectDetails, { project, Edit }),
         //h(ProjectPublications, { data: project.publications }),
-        h(ProjectResearchers, { data: project.researchers }),
-        h(SampleMapComponent, { project, samples }),
+        //h(ProjectResearchers, { data: project.researchers }),
+        //h(SampleMapComponent, { project, samples }),
       ]),
     ]),
   ]);
