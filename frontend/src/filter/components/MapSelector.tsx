@@ -46,8 +46,7 @@ export function MapPolygon(props) {
       {
         style: { width: "100%", height: "400px" },
         mapStyle: "mapbox://styles/mapbox/light-v9",
-        accessToken:
-          "pk.eyJ1IjoiamN6YXBsZXdza2kiLCJhIjoiWnQxSC01USJ9.oleZzfREJUKAK1TMeCD0bg",
+        accessToken: process.env.MAPBOX_API_TOKEN,
         latitude: 37.78,
         longitude: -122.41,
         zoom: 0,
