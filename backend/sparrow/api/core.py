@@ -98,6 +98,7 @@ class APIv2(Starlette):
 
         self.add_view_route("authority", schema="vocabulary", description="Route to view authorities for technical descriptions")
         self.add_view_route("metrics", schema="vocabulary", description="Data Metrics and Statistics")
+        self.add_view_route("age_context", description="Ages directly connected to geologic context")
 
         self.add_schema_route()
         self.add_meta_route()
@@ -141,7 +142,6 @@ class APIv2(Starlette):
             description=str(desc),
         )
         self.route_descriptions[root_route].append(basic_info)
-        #self.route_descriptions[root_route].append({"test":"test"})
 
 
     def add_view_route(self, tablename, schema="core_view", description=""):
