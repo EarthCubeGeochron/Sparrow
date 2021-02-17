@@ -19,6 +19,8 @@ import { SessionAdminPage } from "./session";
 import { DataFileAdminPage } from "./data-file";
 import { VocabularyPage } from "./vocabulary";
 
+import { NewProjectForm } from "../model-views/project/new-project";
+
 const DataSheet = loadable(() => import("./data-sheet"));
 
 const h = hyperStyled(styles);
@@ -57,6 +59,10 @@ const AdminRouter = ({ base }) =>
     h(Route, {
       path: base + "/project",
       render: () => h(ProjectAdminPage),
+    }),
+    h(Route, {
+      path: base + "/new-project",
+      render: () => h(NewProjectForm),
     }),
     h(Route, {
       path: base + "/sample",
