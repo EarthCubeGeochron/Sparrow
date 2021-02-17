@@ -259,10 +259,11 @@ class ModelAPIEndpoint(HTTPEndpoint):
         else:
             data = location_check(data, array=False)
             material_check(db, data, array=False)
-            if 'id' not in data:
+            id_ = request.path_params['id']
+            if id_ is None:
                 return JSONResponse({"Error":"No ID was passed, if you are adding a new row please use the POST route"})
             data = collection_handler(db,data)
-            commit_edits(db,model,data)
+            commit_edits(db,model,data, id_)
 
 
         return JSONResponse({"Status": f'success to {self._model_name}', "data": return_data})

@@ -75,14 +75,18 @@ def commit_changes(db, model, data):
     except:
         db.session.rollback()
 
-def commit_edits(db, model, data):
+def commit_edits(db, model, data, id_ = None):
     '''
     function to put edits into a row of the database
     '''
 
-    query_id = data['id']
-    keys = list(data.keys())
-    keys.remove('id')
+    if id_ == None:
+        query_id = data['id']
+        keys = list(data.keys())
+        keys.remove('id')
+    else:
+        query_id = id_
+        keys = list(data.keys())
         
     ## grab the row we are gonna change
     row = db.session.query(model).filter_by(id=query_id).one()
@@ -109,6 +113,7 @@ def collection_handler(db, data):
 
     names = [] # sample
     col_names = [] # sample_collection
+    plural_names = []
     for ele in data:
         if type(data[ele]) is list: # collections will be lists
             # check if it's plural
@@ -116,6 +121,7 @@ def collection_handler(db, data):
             if ele[-1] == 's' and ele != 'analysis':
                 names.append(ele[:-1])
                 col_names.append(ele[:-1] + "_collection")
+                plural_names.append(ele)
             elif 'collection' in ele:
                 col_names.append(ele)
                 names.append(ele.replace("_collection", ""))
@@ -127,6 +133,14 @@ def collection_handler(db, data):
     if len(col_names) == 0 or len(names) == 0:
         return data
 
+    # need to rename the key for plural keys
+    for name in plural_names:
+        data[name[:-1]] = data[name]
+        data.pop(name)
+    for i, name in enumerate(names):
+        data[col_names[i]] = data[name]
+        data.pop(name)
+
     ## Create a loop ability to go over the len of both name lists
     # for each name and collection name we perform the same actions.
     for i,val in enumerate(names):
@@ -134,7 +148,7 @@ def collection_handler(db, data):
 
         ## will become a new column in data that says model_collection
         collection = []
-        for ele in data[val]:
+        for ele in data[col_names[i]]:
             if 'id' not in ele: 
                 ## The data probably doesn't exsist in the db
                 # get model that matches or create a new one. 
@@ -154,10 +168,11 @@ def collection_handler(db, data):
                 if 'location' in ele:
                     existing_model.location = ele['location']
 
-                for k in ele:
-                    setattr(existing_model, k, ele[k])
+                # for k in ele:
+                #     setattr(existing_model, k, ele[k])
+                collection.append(existing_model)
         
         data[col_names[i]] = collection
-        data.pop(val)
+        
 
     return data
