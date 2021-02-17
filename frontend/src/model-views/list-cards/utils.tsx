@@ -1,4 +1,5 @@
 import { ModelCard } from "../utils";
+import { useContext } from "react";
 import hyper from "@macrostrat/hyper";
 import { ContentArea, pluralize } from "../project/index";
 import { parse, format } from "date-fns";
@@ -6,9 +7,8 @@ import styles from "./card.styl";
 
 const h = hyper.styled(styles);
 
-const SampleModelCard = (props) => {
+export const sampleContent = (props) => {
   const { material, id, name, location, session } = props;
-
   const Location =
     location != null
       ? h("div", [
@@ -32,12 +32,82 @@ const SampleModelCard = (props) => {
 
   const sessionDate = session.length > 0 ? session[0].date.split("T")[0] : null;
 
-  const content = h("div.sample-content", [
+  return h("div.sample-content", [
     h("div.card-header", [h("div", id), Location]),
     h("div.bod", [sampleName, Material, sessionDate]),
   ]);
+};
 
-  return h(ModelCard, { id, content, model: "sample" });
+const SampleModelCard = (props) => {
+  const {
+    material,
+    id,
+    name,
+    location,
+    session,
+    link = true,
+    context = null,
+  } = props;
+
+  const content = h(sampleContent, { material, id, name, location, session });
+  if (context == null) {
+    return h(ModelCard, { id, content, model: "sample", link });
+  }
+  const { dispatch } = useContext(context);
+
+  const onClick = () => {
+    dispatch({
+      type: "add_sample",
+      payload: { sample_collection: [{ id, name }] },
+    });
+  };
+
+  return h(ModelCard, { id, content, model: "sample", link, onClick });
+};
+
+const PublicationModelCard = (props) => {
+  const { year, id, title, doi, author, journal, context, link } = props;
+
+  const { dispatch } = useContext(context);
+
+  const onClick = () => {
+    dispatch({
+      type: "add_pub",
+      payload: {
+        publication_collection: [{ id, title, doi }],
+      },
+    });
+  };
+
+  return h(ModelCard, {
+    id,
+    content: h("div", [title]),
+    model: "publication",
+    link,
+    onClick,
+  });
+};
+
+export const ResearcherModelCard = (props) => {
+  const { id, name, context, link } = props;
+
+  const { dispatch } = useContext(context);
+
+  const onClick = () => {
+    dispatch({
+      type: "add_researcher",
+      payload: {
+        researcher_collection: [{ id, name }],
+      },
+    });
+  };
+  return h(ModelCard, {
+    id,
+    content: h("div", [name]),
+    model: "researcher",
+    link,
+    onClick,
+  });
 };
 
 const ProjectModelCard = (props) => {
@@ -150,4 +220,5 @@ export {
   ProjectModelCard,
   SessionModelCard,
   DataFileModelCard,
+  PublicationModelCard,
 };
