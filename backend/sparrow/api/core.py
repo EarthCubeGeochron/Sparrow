@@ -14,8 +14,6 @@ from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, roo
 
 log = get_logger(__name__)
 
-#Hello From VIIIIMMMMMMMMMM
-
 async def http_exception(request, exc):
     log.error(f"{exc.status_code} {exc.detail}")
     # if exc.detail == "Internal Server Error":
