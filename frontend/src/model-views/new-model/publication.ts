@@ -1,10 +1,17 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useReducer, useState, useContext } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
-import { Button, Popover, InputGroup, Divider } from "@blueprintjs/core";
+import {
+  Button,
+  Tooltip,
+  InputGroup,
+  Divider,
+  PanelStack,
+  IPanelProps,
+} from "@blueprintjs/core";
 import { Publication } from "../project/page";
 import { ModelEditableText } from "../project/editor";
-import { FormSlider } from "./utils";
+import { FormSlider, isTitle } from "./utils";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -14,33 +21,79 @@ export function PublicationXDDInput(props) {
   const [pubs, setPubs] = useState([]);
   const [total, setTotal] = useState(0);
   //const [doi, setDoi] = useState("");
-
-  console.log(pubs, total);
-
   const { context, type, payload_name } = props;
+  console.log(total);
 
   const { dispatch } = useContext(context);
 
   //xdd route for
-  //const doiRoute = "https://xdd.wisc.edu/api/articles";
+  const doiRoute = "https://xdd.wisc.edu/api/articles";
+  const response = isTitle(search)
+    ? useAPIResult(doiRoute, { title_like: search, max: 50 })
+    : useAPIResult(doiRoute, { doi: search, max: 20 });
 
   //crossref
   const crossrefRoute = "https://api.crossref.org/works";
 
-  //const response = useAPIResult(doiRoute, { doi: search, max: 1 });
-  const crossrefRes = useAPIResult(crossrefRoute, {
-    query: search,
-    select: "DOI,title",
-    rows: 5,
-  });
+  const crossrefRes = isTitle(search)
+    ? useAPIResult(crossrefRoute, {
+        query: search,
+        select: "DOI,title",
+        rows: 5,
+      })
+    : search.length > 6
+    ? useAPIResult(crossrefRoute, {
+        filter: `doi:${search}`,
+        select: "DOI,title",
+        rows: 5,
+      })
+    : useAPIResult(crossrefRoute, {
+        query: search,
+        select: "DOI,title",
+        rows: 5,
+      });
 
   const onSearch = () => {
-    if (crossrefRes != null) {
-      const { items, total } = crossrefRes.message;
-      setPubs(items);
-      setTotal(total);
+    // first check the xDD route
+    if (response != null) {
+      const { data } = response.success;
+      if (data) {
+        const unData = data.map((ele) => unwrapPubData(ele));
+        if (unData.length > 0) {
+          setPubs(unData.slice(0, 4)); // first 5
+          setTotal(unData.length); // can be at max 20
+        }
+        //Move onto crossref
+      } else if (crossrefRes != null) {
+        console.log(crossrefRes);
+        const { items, "total-results": total } = crossrefRes.message;
+        const nItems = items.map((ele) => {
+          const { DOI: doi, title } = ele;
+          return { doi, title };
+        });
+        setPubs(nItems);
+        setTotal(total);
+      }
+    } else {
     }
   };
+
+  const message =
+    total <= 5
+      ? "Only 5 or less results!"
+      : total > 5 && total <= 10
+      ? "More results than are shown, try to narrow your search"
+      : "Ouufff, looks like you have a lot of results. Try to narrow your search";
+
+  const intent =
+    total <= 5 ? "success" : total > 5 && total <= 10 ? "warning" : "danger";
+
+  const leftElement =
+    pubs.length > 0
+      ? h(Tooltip, { content: message, intent }, [
+          h(Button, { intent }, [total]),
+        ])
+      : null;
 
   const rightElement = h(Button, {
     icon: "search",
@@ -50,12 +103,15 @@ export function PublicationXDDInput(props) {
 
   const unwrapPubData = (data) => {
     const title = data.title;
-    const doi = data.identifier.map((ele) => {
-      if (ele.type == "doi") {
-        return ele.id;
-      }
-    });
-    return { doi: doi[0], title };
+    const { identifier } = data;
+    if (identifier) {
+      const doi = identifier.map((ele) => {
+        if (ele.type == "doi") {
+          return ele.id;
+        }
+      });
+      return { doi: doi[0], title };
+    }
   };
 
   const addToModel = (i) => {
@@ -72,16 +128,19 @@ export function PublicationXDDInput(props) {
 
   const SubmitButton = (props) => {
     const { disabled = false, i } = props;
-    return h(
-      Button,
-      { onClick: () => addToModel(i), intent: "success", disabled },
-      ["Add to Project"]
-    );
+    return h(Button, {
+      onClick: () => addToModel(i),
+      intent: "success",
+      minimal: true,
+      disabled,
+      icon: "plus",
+    });
   };
   const disabled = pubs.length == 0 ? true : false;
 
   return h("div", [
     h(InputGroup, {
+      leftElement,
       rightElement,
       onChange: (e) => {
         setSearch(e.target.value);
@@ -90,7 +149,7 @@ export function PublicationXDDInput(props) {
     h("div", [
       pubs.length > 0
         ? pubs.map((pub, i) => {
-            const { DOI: doi, title } = pub;
+            const { doi, title } = pub;
             return h("div.pub-edit-card", { key: doi }, [
               h(Publication, { doi, title }),
               h(SubmitButton, { disabled, i }),
@@ -155,6 +214,38 @@ export function PublicationInputs(props) {
   ]);
 }
 
+/**
+ * 
+ * function Menubar(props: MenubarProps) {
+  const [panels, setPanels] = useState<(IPanel<MenubarProps>| IPanel)[]>([ // it works
+    {
+      component: Settings,
+      props,
+      title: "Settings",
+    },
+  ]);
+
+  return (
+    <PanelStack
+      className="Menubar"
+      initialPanel={panels[0]}
+      onOpen={(new_) => setPanels([new_, ...panels])}
+      onClose={() => setPanels(panels.slice(1))}
+    />
+  );
+}
+ */
+function Stack({ context }) {
+  const [panels, setPanels] = useState<IPanelProps[]>([
+    { component: h(PublicationXDDInput, { context }), title: "Test" },
+  ]);
+  return h(PanelStack, {
+    initialPanel: panels[0],
+    onOpen: (new_) => setPanels([new_, ...panels]),
+    onClose: () => setPanels(panels.slice(1)),
+  });
+}
+
 function DrawerContent(props) {
   const { context } = props;
 
@@ -163,7 +254,9 @@ function DrawerContent(props) {
     h("div.top-header", [
       h("h3", [topHeader]),
       h("h5", [
-        "Powered by the ",
+        "Powered by ",
+        h("a", { href: "https://xdd.wisc.edu/" }, "xDD"),
+        " and the ",
         h(
           "a",
           { href: "https://github.com/CrossRef/rest-api-doc" },

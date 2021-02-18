@@ -39,3 +39,25 @@ export function FormSlider(props) {
     ),
   ]);
 }
+
+function isLetter(char) {
+  if (char.toUpperCase() != char.toLowerCase()) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export const isTitle = (search) => {
+  let i = 0;
+  for (let char of search) {
+    if (isLetter(char)) {
+      i += 1;
+    }
+  }
+  if (i / search.length > 0.7) {
+    return true;
+  } else {
+    return false;
+  }
+};
