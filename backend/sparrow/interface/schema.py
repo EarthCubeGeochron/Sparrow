@@ -83,7 +83,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 continue
             if getattr(instance, prop.key, None) is None:
                 return False
-
+        log.debug(f"Model {instance} is ready to flush.")
         return True
 
     @property
@@ -113,6 +113,11 @@ class ModelSchema(SQLAlchemyAutoSchema):
         if filters:
             return filters, related_models
 
+        # Right now, we always try to find existing models.
+        find_existing = True
+        if not find_existing:
+            return None, None
+
         for prop in self.opts.model.__mapper__.iterate_properties:
             val = data.get(prop.key, None)
             if getattr(prop, "uselist", False):
@@ -141,19 +146,21 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         filters, related_models = self._build_filters(data)
 
-        msg = f"Finding instance of {self.opts.model.__name__}"
+        if filters is not None:
 
-        # Need to get relationship columns for primary keys!
-        query = self.session.query(self.opts.model).filter_by(**filters)
-        instance = query.first()
+            msg = f"Finding instance of {self.opts.model.__name__}"
 
-        if instance is not None:
-            log.debug(msg + f"...success!\n...filters: {filters}")
-            for k, v in data.items():
-                setattr(instance, k, v)
-            return instance
-        else:
-            log.debug(msg + f"...none found\n...filters: {filters}")
+            # Need to get relationship columns for primary keys!
+            query = self.session.query(self.opts.model).filter_by(**filters)
+            instance = query.first()
+
+            if instance is not None:
+                log.debug(msg + f"...success!\n...filters: {filters}")
+                for k, v in data.items():
+                    setattr(instance, k, v)
+                return instance
+            else:
+                log.debug(msg + f"...none found\n...filters: {filters}")
         return super().get_instance(data)
 
     @pre_load
@@ -163,7 +170,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             return value
 
         pk_vals = ensure_list(value)
-        log.debug("Expanding keys " + str(pk_vals))
+        # log.debug("Expanding keys " + str(pk_vals))
 
         pk = get_primary_keys(self.opts.model)
         assert len(pk) == len(pk_vals)
@@ -184,6 +191,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         try:
             with self.session.begin_nested():
                 self.session.flush(objects=[instance])
+            log.debug(f"Persisted object {instance}")
         except Exception as err:
             log.debug("Could not persist")
             self.session.rollback()
