@@ -8,6 +8,28 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## [Unreleased] - 2021-02-14
+
+### Auto-building releases
+
+GitHub Actions workflows for building command line application binaries are now active.
+The application is bundled into a single executable with no dependencies (except for the
+Docker engine) using PyInstaller. This workflow is run each time a tag is generated with
+a name matching the pattern `v*.*.*` (a typical semantic versioning string, with optional
+suffix). The output is binary files for both MacOS and Linux. The appropriate version
+can be installed with the following one-line command:
+
+```
+curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh | bash -s -
+```
+
+- This removes the need to download the Sparrow code repository, install submodules,
+  etc. in order to install the software
+- It paves the way for lighter-weight, integrated implementations of the system.
+- There are still some problems to be solved, like marking pre-releases appropriately
+  and figuring out how exactly we are managing versioning through different parts of
+  the application.
+
 ## [Unreleased] - 2021-01-11
 
 ### Command-line bundling
