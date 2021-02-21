@@ -141,6 +141,14 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         filters, related_models = self._build_filters(data)
 
+        if self.opts.model.__name__ == "datum":
+            if filters.get("_analysis") is None:
+                return None
+
+        if self.opts.model.__name__ == "analysis":
+            if filters.get("_session") is None:
+                return None
+
         msg = f"Finding instance of {self.opts.model.__name__}"
 
         # Need to get relationship columns for primary keys!
@@ -180,6 +188,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
             # Begin a nested subtransaction
             with self.session.begin_nested():
                 instance = self.opts.model(**data)
+                if self.opts.model.__name__ == "datum":
+                    if instance._analysis is None:
+                        return instance
+                if self.opts.model.__name__ == "analysis":
+                    if instance._session is None:
+                        return instance
+
                 log.debug(f"Created instance {instance} with parameters {data}")
                 self.session.add(instance)
                 self.session.flush(objects=[instance])
