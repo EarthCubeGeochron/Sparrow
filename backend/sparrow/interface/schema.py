@@ -133,6 +133,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 filters[prop.key] = None
         return filters, related_models
 
+    def load(self, data, **kwargs):
+        if self.session is None:
+            return super().load(data, **kwargs)
+        with self.session.no_autoflush:
+            return super().load(data, **kwargs)
+
     def _get_instance(self, data):
         """Gets pre-existing instances if they are available."""
 
@@ -141,6 +147,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         filters, related_models = self._build_filters(data)
 
+        # Create "fast paths" to make sure we don't grab data and analysis
         if self.opts.model.__name__ == "datum":
             if filters.get("_analysis") is None:
                 return None
@@ -151,9 +158,10 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         msg = f"Finding instance of {self.opts.model.__name__}"
 
-        # Need to get relationship columns for primary keys!
-        query = self.session.query(self.opts.model).filter_by(**filters)
-        instance = query.first()
+        with self.session.no_autoflush:
+            # Need to get relationship columns for primary keys!
+            query = self.session.query(self.opts.model).filter_by(**filters)
+            instance = query.first()
 
         if instance is not None:
             log.debug(msg + f"...success!\n...filters: {filters}")
@@ -181,7 +189,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def make_instance(self, data, **kwargs):
         # Find instance in cache
         cache_key = None
-        # if self.opts.model.__name__ not in ["datum", "analysis"]:
         try:
             cache_key = hash(frozenset(data.items()))
             match_ = self.__instance_cache.get(cache_key, None)
