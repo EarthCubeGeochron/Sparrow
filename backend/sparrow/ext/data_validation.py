@@ -22,7 +22,7 @@ def validate_data(model_name):
     # NOTE: this is likely a bad assumption in many cases, probably
     schema = getattr(db.interface, model_name)()
     t0 = time()
-    with on_conflict("do-nothing"), db.session.no_autoflush:
+    with on_conflict("do-nothing"):
         res = schema.load(data, session=db.session)
         db.session.add(res)
     t_delta = time() - t0

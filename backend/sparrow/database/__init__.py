@@ -119,7 +119,7 @@ class Database(MappedDatabaseMixin):
             )
         schema = model_interface(model, session)()
 
-        with on_conflict("do-nothing"), self.session.no_autoflush:
+        with on_conflict("do-nothing"):
             try:
                 log.info(f"Initiating load of {model_name}")
                 res = schema.load(data, session=session, **kwargs)
@@ -131,8 +131,6 @@ class Database(MappedDatabaseMixin):
                 return res
             except (IntegrityError, ValidationError, FlushError) as err:
                 session.rollback()
-                # self._flush_nested_objects()
-                # session.add(res)
                 log.debug(err)
                 raise err
 
