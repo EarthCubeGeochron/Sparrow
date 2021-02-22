@@ -29,6 +29,7 @@ if [ -e $symlink ]; then
   [[ $REPLY =~ ^[Yy]$ ]] && rm -rf $symlink
 fi
 
+mkdir -p "$dist_dir"
 mkdir -p "$(dirname "$symlink")"
 # Copy all files and dependencies to a centralized location
 rm -rf "$dist_dir"

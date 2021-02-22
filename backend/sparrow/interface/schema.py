@@ -141,6 +141,14 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         filters, related_models = self._build_filters(data)
 
+        if self.opts.model.__name__ == "datum":
+            if filters.get("_analysis") is None:
+                return None
+
+        if self.opts.model.__name__ == "analysis":
+            if filters.get("_session") is None:
+                return None
+
         msg = f"Finding instance of {self.opts.model.__name__}"
 
         # Need to get relationship columns for primary keys!
@@ -171,21 +179,26 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        instance = self._get_instance(data)
-
-        if instance is not None:
-            return instance
-
+        # Find instance in cache
+        cache_key = None
+        # if self.opts.model.__name__ not in ["datum", "analysis"]:
         try:
-            # Begin a nested subtransaction
-            with self.session.begin_nested():
-                instance = self.opts.model(**data)
-                log.debug(f"Created instance {instance} with parameters {data}")
-                self.session.add(instance)
-                self.session.flush(objects=[instance])
-                log.debug(f"Successfully persisted {instance} to database")
-        except (IntegrityError, FlushError) as err:
-            log.debug("Could not persist")
+            cache_key = hash(frozenset(data.items()))
+            match_ = self.__instance_cache.get(cache_key, None)
+            if match_ is not None:
+                log.debug(
+                    f"Found {match_} in session cache for {data} (key: {cache_key})"
+                )
+                return match_
+        except TypeError:
+            pass
+
+        instance = self._get_instance(data)
+        if instance is None:
+            instance = self.opts.model(**data)
+            self.session.add(instance)
+        if cache_key is not None:
+            self.__instance_cache[cache_key] = instance
         return instance
 
     @post_dump

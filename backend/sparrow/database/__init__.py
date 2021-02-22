@@ -119,7 +119,7 @@ class Database(MappedDatabaseMixin):
             )
         schema = model_interface(model, session)()
 
-        with on_conflict("do-nothing"):
+        with on_conflict("do-nothing"), self.session.no_autoflush:
             try:
                 log.info(f"Initiating load of {model_name}")
                 res = schema.load(data, session=session, **kwargs)
