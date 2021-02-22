@@ -148,6 +148,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
         filters, related_models = self._build_filters(data)
 
         # Create "fast paths" to make sure we don't grab data and analysis
+        # if they aren't properly linked. NOTE: we can probably solve this
+        # in general by requiring nullable foreign keys to be specified
         if self.opts.model.__name__ == "datum":
             if filters.get("_analysis") is None:
                 return None
