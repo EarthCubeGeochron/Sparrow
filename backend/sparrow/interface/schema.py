@@ -72,7 +72,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             )
 
         self._show_audit_id = kwargs.pop("audit_id", False)
-        self.__instance_cache = set()
+        self.__instance_cache = {}
 
         super().__init__(*args, **kwargs)
 
@@ -180,19 +180,21 @@ class ModelSchema(SQLAlchemyAutoSchema):
     @post_load
     def make_instance(self, data, **kwargs):
         # Find instance in cache
-        match_ = next(
-            (obj for obj in self.__instance_cache if matches(obj, data)), None
-        )
-        if match_ is not None:
-            log.debug(f"Found {match_} in session cache")
-            return match_
+        cache_key = None
+        try:
+            cache_key = hash(frozenset(data.items()))
+            match_ = self.__instance_cache.get(cache_key, None)
+            if match_ is not None:
+                log.debug(f"Found {match_} in session cache")
+                return match_
+        except TypeError:
+            pass
 
         instance = self._get_instance(data)
         if instance is None:
-            return instance
-
-        instance = self.opts.model(**data)
-        self.__instance_cache.add(instance)
+            instance = self.opts.model(**data)
+        if cache_key is not None:
+            self.__instance_cache[cache_key] = instance
         return instance
 
     @post_dump
