@@ -5,7 +5,7 @@ import json
 
 
 class TestSIMSImport:
-    @mark.skip(reason="This hangs indefinitely")
+    @mark.slow
     def test_large_sims_dataset(self, db):
         fn = relative_path(__file__, "fixtures", "2_20140602_d18O_KennyBefus.json.gz")
         with gzip.open(fn, "rb") as zipfile:
