@@ -8,6 +8,13 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## [Unreleased] - 2021-02-22
+
+### A much quicker importer
+
+Greatly sped up schema-based importer by bundling all changes together and saving database
+transactions to the end of a schema unit of work.
+
 ## [Unreleased] - 2021-02-14
 
 ### Auto-building releases
