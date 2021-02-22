@@ -72,7 +72,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             )
 
         self._show_audit_id = kwargs.pop("audit_id", False)
-        self.__instance_cache = {}
+        self.__instance_cache = set()
 
         super().__init__(*args, **kwargs)
 
@@ -179,28 +179,20 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        instance = self._get_instance(data)
+        # Find instance in cache
+        match_ = next(
+            (obj for obj in self.__instance_cache if matches(obj, data)), None
+        )
+        if match_ is not None:
+            log.debug(f"Found {match_} in session cache")
+            return match_
 
-        if instance is not None:
+        instance = self._get_instance(data)
+        if instance is None:
             return instance
 
-        try:
-            # Begin a nested subtransaction
-            with self.session.begin_nested():
-                instance = self.opts.model(**data)
-                if self.opts.model.__name__ == "datum":
-                    if instance._analysis is None:
-                        return instance
-                if self.opts.model.__name__ == "analysis":
-                    if instance._session is None:
-                        return instance
-
-                log.debug(f"Created instance {instance} with parameters {data}")
-                self.session.add(instance)
-                self.session.flush(objects=[instance])
-                log.debug(f"Successfully persisted {instance} to database")
-        except (IntegrityError, FlushError) as err:
-            log.debug("Could not persist")
+        instance = self.opts.model(**data)
+        self.__instance_cache.add(instance)
         return instance
 
     @post_dump

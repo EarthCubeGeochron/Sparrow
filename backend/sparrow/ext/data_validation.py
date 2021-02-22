@@ -15,13 +15,14 @@ def validate_data(model_name):
     Pipe JSON into this command's stdin to see if the import will be successful.
     """
     setup_stderr_logs()
+    setup_stderr_logs("sqlalchemy.engine")
     db = get_database()
     data = load(stdin)
     # In some cases, we might have data in the "data" key
     # NOTE: this is likely a bad assumption in many cases, probably
     schema = getattr(db.interface, model_name)()
     t0 = time()
-    with on_conflict("do-nothing"):
+    with on_conflict("do-nothing"), db.session.no_autoflush:
         res = schema.load(data, session=db.session)
         db.session.add(res)
     t_delta = time() - t0
