@@ -181,11 +181,14 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def make_instance(self, data, **kwargs):
         # Find instance in cache
         cache_key = None
+        # if self.opts.model.__name__ not in ["datum", "analysis"]:
         try:
             cache_key = hash(frozenset(data.items()))
             match_ = self.__instance_cache.get(cache_key, None)
             if match_ is not None:
-                log.debug(f"Found {match_} in session cache")
+                log.debug(
+                    f"Found {match_} in session cache for {data} (key: {cache_key})"
+                )
                 return match_
         except TypeError:
             pass
@@ -193,6 +196,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         instance = self._get_instance(data)
         if instance is None:
             instance = self.opts.model(**data)
+            self.session.add(instance)
         if cache_key is not None:
             self.__instance_cache[cache_key] = instance
         return instance

@@ -150,7 +150,8 @@ class TestSchema:
 
     def test_more_complex_import(self, db):
         schema = db.interface.session()
-        inst = schema.load(basic_data, session=db.session, transient=True)
+        with db.session.no_autoflush:
+            inst = schema.load(basic_data, session=db.session, transient=True)
         res = schema.dump(inst)
         assert res["name"] == basic_data["name"]
         assert len(res["analysis"]) == 1

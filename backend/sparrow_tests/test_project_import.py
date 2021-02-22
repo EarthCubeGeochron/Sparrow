@@ -24,6 +24,8 @@ class TestProjectImport:
         out = loads(dumps(schema.dump(res), allow_nan=False, cls=JSONEncoder))
         assert len(out["session"]) == len(data["session"])
 
+        assert out["session"][0]["uuid"] == data["session"][0]["uuid"]
+
         dd = DeepDiff(data, out)
         non_pk_changes = omit_key(dd["values_changed"], "id")
         assert len(non_pk_changes) == 0
