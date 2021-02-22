@@ -4,7 +4,7 @@ from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
-from sqlalchemy.exc import StatementError, IntegrityError
+from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
 from sqlalchemy.orm.exc import FlushError
 from sqlalchemy.orm import RelationshipProperty
 from collections.abc import Mapping
@@ -76,16 +76,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         super().__init__(*args, **kwargs)
 
-    def _ready_for_flush(self, instance):
-        for prop in self.opts.model.__mapper__.iterate_properties:
-            is_required = prop_is_required(prop)
-            if not is_required:
-                continue
-            if getattr(instance, prop.key, None) is None:
-                return False
-
-        return True
-
     @property
     def _table(self):
         return self.opts.model.__table__
@@ -93,7 +83,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _build_filters(self, data):
         # Filter on properties that actually have a local column
         filters = {}
-        related_models = {}
 
         # Try to get filters for unique and pk columns first
         for prop in self.opts.model.__mapper__.iterate_properties:
@@ -111,7 +100,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
                     if val is not None:
                         filters[prop.key] = val
         if filters:
-            return filters, related_models
+            return filters
 
         for prop in self.opts.model.__mapper__.iterate_properties:
             val = data.get(prop.key, None)
@@ -123,15 +112,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
                     # For relationships
                     if is_pk_defined(val):
                         filters[prop.key] = val
-                    else:
-                        related_models[prop.key] = val
                 else:
                     filters[prop.key] = val
             elif hasattr(prop, "direction"):
                 # This is unsatisfying, as we can't filter on pre-existing
                 # related fields
                 filters[prop.key] = None
-        return filters, related_models
+        return filters
 
     def load(self, data, **kwargs):
         if self.session is None:
@@ -145,7 +132,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         if isinstance(data, self.opts.model):
             return data
 
-        filters, related_models = self._build_filters(data)
+        filters = self._build_filters(data)
 
         # Create "fast paths" to make sure we don't grab data and analysis
         # if they aren't properly linked. NOTE: we can probably solve this
@@ -165,13 +152,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
             query = self.session.query(self.opts.model).filter_by(**filters)
             instance = query.first()
 
-        if instance is not None:
-            log.debug(msg + f"...success!\n...filters: {filters}")
-            for k, v in data.items():
-                setattr(instance, k, v)
-            return instance
-        else:
-            log.debug(msg + f"...none found\n...filters: {filters}")
+            if instance is not None:
+                log.debug(msg + f"...success!\n...filters: {filters}")
+                for k, v in data.items():
+                    setattr(instance, k, v)
+                return instance
+            else:
+                log.debug(msg + f"...none found\n...filters: {filters}")
         return super().get_instance(data)
 
     @pre_load
@@ -181,7 +168,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             return value
 
         pk_vals = ensure_list(value)
-        log.debug("Expanding keys " + str(pk_vals))
+        # log.debug("Expanding keys " + str(pk_vals))
 
         pk = get_primary_keys(self.opts.model)
         assert len(pk) == len(pk_vals)
