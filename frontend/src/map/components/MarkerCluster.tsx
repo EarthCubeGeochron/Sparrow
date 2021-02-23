@@ -1,21 +1,15 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { useAPIResult } from "./APIResult";
 import useSuperCluster from "use-supercluster";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 import "../cluster.css";
 import {
-  Tooltip,
   Popover,
-  Button,
-  Intent,
-  Icon,
   Card,
 } from "@blueprintjs/core";
 import { Marker, FlyToInterpolator } from "react-map-gl";
 import styles from "./components.module.css";
-import { SampleCard } from "../../admin/sample/detail-card";
 
 // This component controls the State and the UI for the markers and the markercluster
 
