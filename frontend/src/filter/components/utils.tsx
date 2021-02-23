@@ -3,7 +3,7 @@ import { Collapse, Button, Icon } from "@blueprintjs/core";
 import h from "@macrostrat/hyper";
 
 export function FilterAccordian(props) {
-  const { content, text, onOpen } = props;
+  const { content, text } = props;
 
   const [open, setOpen] = useState(false);
 
