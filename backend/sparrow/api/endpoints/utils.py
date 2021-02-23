@@ -144,6 +144,8 @@ def collection_handler(db, data):
     ## Create a loop ability to go over the len of both name lists
     # for each name and collection name we perform the same actions.
     for i,val in enumerate(names):
+        if type(data[col_names[i]]) is list:
+            data = collection_handler(db, data[col_names[i]])
         db_model = getattr(db.model, val) ## the model for the collection.
 
         ## will become a new column in data that says model_collection
