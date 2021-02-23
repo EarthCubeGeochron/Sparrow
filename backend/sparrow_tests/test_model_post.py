@@ -163,8 +163,14 @@ class TestModelPost:
         assert len(up_json['data']) > 0
         assert 0 ==1
 
+    def test_sims_session(self, client, db):
+        data = json_fixture("sims-sess.json")
+        route = "/api/v2/models/session"
 
-    
+        res = client.post(route, json=data)
+        res.json()
+
+        assert 0 == 1
 
     # def test_webscrape_publications_sims(self,db,client):
     #     '''
