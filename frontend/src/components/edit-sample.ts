@@ -135,6 +135,9 @@ export function MyNumericInput(props: MyInputNum) {
           intent,
           leftIcon: props.leftIcon,
           rightElement: props.rightElement,
+          allowNumericCharactersOnly: false,
+          clampValueOnBlur: true,
+          ...props,
         }),
       ]
     ),
