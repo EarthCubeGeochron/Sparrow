@@ -1,7 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
-import { useState } from "react";
-import { Button, Icon, NonIdealState } from "@blueprintjs/core";
+import { useState, createContext } from "react";
 import { ProjectMatch } from "~/model-views/project";
 import { ProjectListComponent } from "./infinite-scroll";
 import styles from "./module.styl";
@@ -26,11 +25,16 @@ export function ProjectMainPanel() {
   ]);
 }
 
+export const ProjectAdminContext = createContext({});
+
+
+
 export function ProjectAdminPage() {
   const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
 
+  const [listName, setListName] = useState("list");
+
   const initialState = createParamsFromURL(possibleFilters);
-  // const initialState = {};
 
   const [params, setParams] = useState(initialState);
 
