@@ -31,7 +31,7 @@ import {
 } from "@blueprintjs/core";
 import {
   MapSelector,
-  MaterialSuggest,
+  DataSheetMaterialSuggest,
 } from "../../admin/data-sheet/sheet-enter-components";
 import { useToggle } from "../../map/components/APIResult";
 import { MultipleSelectFilter } from "../../filter/components";
@@ -232,7 +232,10 @@ const Material = function(props) {
     ModelEditorContext
   );
   if (onEdit || isEditing) {
-    return h("div", [h("h4.subtitle", ["Add Material"]), h(MaterialSuggest)]);
+    return h("div", [
+      h("h4.subtitle", ["Add Material"]),
+      h(DataSheetMaterialSuggest),
+    ]);
   }
   if (!onEdit || !isEditing) {
     if (material == null) return null;
