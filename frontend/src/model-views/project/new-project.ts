@@ -17,9 +17,13 @@ import {
   ProjectResearchers,
 } from "./page";
 import {
-  AddNewPubToModel,
-  NewSampleToModel,
-  AddResearcherDrawer,
+  NewProjectNewPub,
+  NewProjNewSample,
+  NewProjNewResearcher,
+  AddCard,
+  SampleAdd,
+  PubAdd,
+  ResearcherAdd,
 } from "../new-model";
 import { MinimalNavbar } from "~/components";
 import { APIV2Context } from "../../api-v2";
@@ -31,15 +35,6 @@ import styles from "./project-form.styl";
 const h = hyperStyled(styles);
 
 export const ProjectFormContext = createContext({});
-
-const AddCard = (props) => {
-  const { onClick, model } = props;
-  return h(
-    Tooltip,
-    { content: `Select from exisitng ${model}s` },
-    h(AddSampleCard, { onClick, icon_name: "plus" })
-  );
-};
 
 function objectFilter(obj, predicate) {
   //const { obj, predicate } = props;
@@ -196,79 +191,58 @@ export function NewProjectFormMain() {
     ]);
   };
 
-  const SampleAdd = () => {
+  const SampleAddProj = () => {
     const onClickDelete = (id) => {
       console.log(id);
       dispatch({ type: "remove_sample", payload: { sample_id: id } });
     };
+    const onClickList = () => {
+      dispatch({
+        type: "filter-list",
+        payload: { filter_list: "sample" },
+      });
+    };
 
-    return h("div", [
-      h("div", [
-        h(ProjectSamples, {
-          data: project.sample_collection,
-          link: false,
-          isEditing: true,
-          onClick: onClickDelete,
-          rightElement: h(NewSampleToModel),
-        }),
-        h(AddCard, {
-          model: "sample",
-          onClick: () => {
-            dispatch({
-              type: "filter-list",
-              payload: { filter_list: "sample" },
-            });
-          },
-        }),
-      ]),
-    ]);
+    return h(SampleAdd, {
+      onClickDelete,
+      onClickList,
+      data: project.sample_collection,
+      rightElement: h(NewProjNewSample),
+    });
   };
 
   // this should look like normal project page
-  const PubAdd = () => {
-    const onClick = (id) => {
+  const PubAddProj = () => {
+    const onClickDelete = (id) => {
       dispatch({ type: "remove_pub", payload: { pub_id: id } });
       console.log("Remove", id);
     };
-    return h("div", [
-      h("div", [
-        h(ProjectPublications, {
-          data: project.publication_collection,
-          isEditing: true,
-          onClick,
-          rightElement: h(AddNewPubToModel, {
-            context: ProjectFormContext,
-          }),
-        }),
-        h(AddCard, {
-          model: "publication",
-          onClick: () => {
-            dispatch({ type: "filter-list", payload: { filter_list: "pub" } });
-          },
-        }),
-      ]),
-    ]);
+    const onClickList = () => {
+      dispatch({ type: "filter-list", payload: { filter_list: "pub" } });
+    };
+
+    return h(PubAdd, {
+      data: project.publication_collection,
+      onClickDelete,
+      onClickList,
+      rightElement: h(NewProjectNewPub),
+    });
   };
 
-  const ResearcherAdd = () => {
-    const onClick = (id) => {
+  const ResearcherAddProj = () => {
+    const onClickDelete = (id) => {
       dispatch({ type: "remove_res", payload: { res_id: id } });
-      console.log("Remove", id);
+      console.log(id);
     };
-    return h("div", [
-      h(ProjectResearchers, {
-        onClick,
-        data: project.researcher_collection,
-        isEditing: true,
-        rightElement: h(AddResearcherDrawer),
-      }),
-      h(AddCard, {
-        model: "researcher",
-        onClick: () => {
-          dispatch({ type: "filter-list", payload: { filter_list: "res" } });
-        },
-      }),
-    ]);
+    const onClickList = () => {
+      dispatch({ type: "filter-list", payload: { filter_list: "res" } });
+    };
+    return h(ResearcherAdd, {
+      onClickDelete,
+      onClickList,
+      data: project.researcher_collection,
+      rightElement: h(NewProjNewResearcher),
+    });
   };
 
   const EmbargoDate = () => {
@@ -341,9 +315,9 @@ export function NewProjectFormMain() {
   return h("div", [
     h(NewProjectNavBar, { header: "Create New Project" }),
     h("div", [h(ProjectName), h(ProjectDescription)]),
-    h(ResearcherAdd),
-    h(PubAdd),
-    h(SampleAdd),
+    h(ResearcherAddProj),
+    h(PubAddProj),
+    h(SampleAddProj),
     h(SubmitButton),
   ]);
 }

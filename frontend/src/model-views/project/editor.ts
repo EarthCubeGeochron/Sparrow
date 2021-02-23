@@ -3,8 +3,6 @@ import { hyperStyled } from "@macrostrat/hyper";
 import {
   EditableText,
   Intent,
-  Switch,
-  Alignment,
   Button,
   Popover,
   ButtonGroup,
@@ -25,14 +23,16 @@ import { put } from "axios";
 import "../main.styl";
 import styles from "~/admin/module.styl";
 import {
-  AddSampleControls,
-  ProjectPublications,
-  ProjectResearchers,
-} from "./page";
+  ResearcherAdd,
+  EditProjNewResearcher,
+  PubAdd,
+  EditProjNewPub,
+  SampleAdd,
+  EditProjNewSample,
+} from "../new-model";
 import { DatePicker } from "@blueprintjs/datetime";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
-import { ProjectSamples } from "./page";
 
 const h = hyperStyled(styles);
 
@@ -160,83 +160,27 @@ const EditStatusButtons = function() {
 function EditResearchers(props) {
   const { isEditing, model, actions } = useModelEditor();
 
-  // update reasearcher by index of collection
-  const onChangeHandler = (index, value) => {
-    console.log(index);
+  const onClickDelete = (id) => {
     const researchers = model.researchers == null ? [] : [...model.researchers];
     let newResearchers = [...researchers];
-    newResearchers[index] = { ...newResearchers[index], name: value };
+    const updatedRes = newResearchers.filter((ele) => ele.id != id);
     actions.updateState({
-      model: { researchers: { $set: newResearchers } },
+      model: { researchers: { $set: updatedRes } },
     });
   };
-
-  const handleDelete = ({ index }) => {
-    const researchers = model.researchers == null ? [] : [...model.researchers];
-    let newResearchers = [...researchers];
-    newResearchers.splice(index, 1);
-    return actions.updateState({
-      model: { researchers: { $set: newResearchers } },
-    });
-  };
-
-  const handleAdd = () => {
-    const researchers = model.researchers == null ? [] : [...model.researchers];
-    let newResearchers = [...researchers];
-    newResearchers.push({ name: "" });
-    actions.updateState({
-      model: { researchers: { $set: newResearchers } },
-    });
-  };
-
-  const DeleteButton = (index) =>
-    h(Button, {
-      icon: "trash",
-      intent: "danger",
-      minimal: true,
-      onClick: () => handleDelete(index),
-    });
-
-  const AddButton = () =>
-    h(Button, {
-      icon: "plus",
-      intent: "success",
-      minimal: true,
-      onClick: handleAdd,
-    });
 
   const researchers = model.researchers == null ? [] : [...model.researchers];
   const names = researchers.map(({ name }) => name);
   console.log(names);
 
-  // if (isEditing) {
-  //   return h("div", [
-  //     h("h4", ["Project Researchers"]),
-  //     names.length > 0
-  //       ? h("div", [
-  //           names.map((name, index) => {
-  //             return h("div", [
-  //               h(DeleteButton),
-  //               h(EditableText, {
-  //                 mulitline: false,
-  //                 onChange: (value) => onChangeHandler(index, value),
-  //                 value: name,
-  //                 intent: "success",
-  //                 placeholder: "Enter Researcher Name",
-  //               }),
-  //             ]);
-  //           }),
-  //           h(AddButton),
-  //         ])
-  //       : h(AddButton),
-  //   ]);
-  // }
-  return h(ProjectResearchers, {
+  return h(ResearcherAdd, {
     data: researchers,
-    isEditing,
-    onClick: (id) => {
-      console.log("Remove", id);
+    onClickDelete,
+    onClickList: () => {
+      console.log("researchers");
     },
+    isEditing,
+    rightElement: h(EditProjNewResearcher),
   });
 }
 
@@ -248,99 +192,24 @@ function EditablePublications(props) {
   const { isEditing, model, actions } = useModelEditor();
   console.log(model);
 
-  // use the index returned to locate the object in publications and update it.
-  // replace the old publcations with a new array in the model
-  const onChangeHandler = (index, value) => {
-    let newPublications = [...model.publications];
-    newPublications[index] = { ...newPublications[index], doi: value };
-    actions.updateState({
-      model: { publications: { $set: newPublications } },
-    });
-  };
-
-  const handleDeletePub = ({ index }) => {
-    let newPublications = [...model.publications];
-
-    // this just gives the look
-    newPublications.splice(index, 1);
-    return actions.updateState({
-      model: { publications: { $set: newPublications } },
-    });
-  };
-
-  const handleAddPub = () => {
-    let newPublications = [...model.publications];
-    newPublications.push({ doi: "" });
-    actions.updateState({
-      model: { publications: { $set: newPublications } },
-    });
-  };
-
-  const DeleteButton = (index) =>
-    h(Button, {
-      icon: "trash",
-      intent: "danger",
-      minimal: true,
-      onClick: () => handleDeletePub(index),
-    });
-
-  //Need a plus button that will add an empty field where you can add a doi
-  const AddButton = () =>
-    h(Button, {
-      icon: "plus",
-      intent: "success",
-      minimal: true,
-      onClick: handleAddPub,
-    });
-
-  if (model.publications == null) {
+  if (model.publications == null && !isEditing) {
     return h("h4", ["No Publications"]);
   }
-  const doiList = model.publications.map(({ doi }) => doi);
-  const intent = actions.hasChanges("publications") ? Intent.SUCCESS : null;
 
-  // if (isEditing) {
-  //   return h("div", [
-  //     h("h4", ["Publication DOI's"]),
-  //     h(
-  //       "div",
-  //       {
-  //         style: {
-  //           display: "flex",
-  //           flexDirection: "column",
-  //         },
-  //       },
-  //       [
-  //         doiList.map((doi, index) => {
-  //           return h(
-  //             "div",
-  //             {
-  //               display: "flex",
-  //               alignItems: "flex-start",
-  //             },
-  //             [
-  //               h(DeleteButton, { index }),
-  //               h(EditableText, {
-  //                 mulitline: false,
-  //                 onChange: (value) => onChangeHandler(index, value),
-  //                 value: doi,
-  //                 intent,
-  //                 placeholder: "Enter DOI",
-  //               }),
-  //             ]
-  //           );
-  //         }),
-  //         h(AddButton),
-  //       ]
-  //     ),
-  //   ]);
-  // }
-  return h(ProjectPublications, {
-    data: model.publications,
-    isEditing,
-    onClick: (id) => {
-      console.log("Remove", id);
+  const data = model.publications;
+
+  const onClickDelete = (id) => {
+    console.log(id);
+  };
+
+  return h(PubAdd, {
+    data,
+    onClickDelete,
+    onClickList: () => {
+      console.log("publications");
     },
+    isEditing,
+    rightElement: h(EditProjNewPub),
   });
 }
 
@@ -360,7 +229,7 @@ function SampleMapComponent() {
   ]);
 }
 
-function EditableSamples(props) {
+export function EditableSamples(props) {
   const { setID } = props;
   const { model, actions, isEditing } = useModelEditor();
 
@@ -377,25 +246,21 @@ function EditableSamples(props) {
       model: { publications: { $set: newSamples } },
     });
   };
+  const onClickDelete = (id) => {
+    console.log(id);
+  };
+  const onClickList = () => {
+    console.log("samples");
+  };
 
-  if (isEditing) {
-    return h("div", [
-      h(ProjectSamples, {
-        data: model.samples,
-        setID,
-        isEditing,
-        onClick: () => {},
-      }),
-      h(AddSampleControls),
-    ]);
-  } else {
-    return h(ProjectSamples, {
-      data: model.samples,
-      setID,
-      isEditing: false,
-      onClick: () => {},
-    });
-  }
+  return h(SampleAdd, {
+    data: model.samples,
+    setID,
+    isEditing,
+    onClickDelete,
+    onClickList,
+    rightElement: h(EditProjNewSample),
+  });
 }
 
 const EditNavBar = function(props) {
