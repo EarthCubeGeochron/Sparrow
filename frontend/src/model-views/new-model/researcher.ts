@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react";
+import { useModelEditor } from "@macrostrat/ui-components";
 import { Button } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import { ProjectFormContext } from "../project/new-project";
@@ -15,18 +16,11 @@ const h = hyperStyled(styles);
  * Both text
  */
 function ResearcherForm(props) {
+  const { onSubmit } = props;
   const [researcher, setResearcher] = useState({
     name: "",
     orcid_id: "",
   });
-  const { dispatch } = useContext(ProjectFormContext);
-
-  const onSubmit = () => {
-    dispatch({
-      type: "add_researcher",
-      payload: { researcher_collection: [researcher] },
-    });
-  };
 
   const onChangeName = (value) => {
     setResearcher((prevRes) => {
@@ -64,15 +58,43 @@ function ResearcherForm(props) {
       value: researcher.orcid_id,
       multiline: true,
     }),
-    h(Button, { onClick: onSubmit, intent: "success" }, [
+    h(Button, { onClick: () => onSubmit(researcher), intent: "success" }, [
       "Create new researcher",
     ]),
   ]);
 }
 
 export function AddResearcherDrawer(props) {
+  const { onSubmit } = props;
   return h(FormSlider, {
-    content: h(ResearcherForm),
+    content: h(ResearcherForm, { onSubmit }),
     model: "researcher",
   });
+}
+
+export function NewProjNewResearcher() {
+  const { dispatch } = useContext(ProjectFormContext);
+
+  const onSubmit = (researcher) => {
+    dispatch({
+      type: "add_researcher",
+      payload: { researcher_collection: [researcher] },
+    });
+  };
+  return h(AddResearcherDrawer, { onSubmit });
+}
+
+export function EditProjNewResearcher() {
+  const { model, actions } = useModelEditor();
+
+  const onSubmit = (researcher) => {
+    const researchers = model.researchers == null ? [] : [...model.researchers];
+    const newResearcher = new Array(researcher);
+    let newResearchers = [...researchers, ...newResearcher];
+    actions.updateState({
+      model: { researchers: { $set: newResearchers } },
+    });
+  };
+
+  return h(AddResearcherDrawer, { onSubmit });
 }
