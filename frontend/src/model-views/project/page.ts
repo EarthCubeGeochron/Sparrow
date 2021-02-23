@@ -79,14 +79,22 @@ export const ProjectPublications = function({
   ]);
 };
 
-export const ProjectResearchers = function({ data, isEditing, onClick }) {
+export const ProjectResearchers = function({
+  data,
+  isEditing,
+  onClick,
+  rightElement,
+}) {
   let content = [h("p", "No researchers")];
   if (data != null) {
     content = data.map((d) => h("div.researcher", d.name));
   }
   if (isEditing) {
     return h("div.researchers", [
-      h("h4", "Researchers"),
+      h("h4", { style: { display: "flex", alignItems: "baseline" } }, [
+        "Researchers",
+        rightElement,
+      ]),
       data.length > 0
         ? data.map((res) => {
             const { id, name } = res;
@@ -167,6 +175,8 @@ export const ProjectSamples = function({
         ]),
       ]);
     }
+  } else {
+    return h("h4", "No Samples");
   }
 };
 
