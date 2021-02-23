@@ -1,4 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
+import { useModelEditor } from "@macrostrat/ui-components";
 import { useState, useContext, useEffect } from "react";
 import MapGL from "@urbica/react-map-gl";
 import Draw from "@urbica/react-map-gl-draw";
@@ -324,7 +325,7 @@ const SampleName = (props) => {
  * data_file_links?
  *
  */
-function NewSampleForm(props) {
+function NewSampleForm({ onSubmit }) {
   const [sample, setSample] = useState({
     name: "",
     depth: 0,
@@ -334,12 +335,6 @@ function NewSampleForm(props) {
     material: "",
     sample_geo_entity: "",
   });
-
-  const { dispatch } = useContext(ProjectFormContext);
-
-  const onSubmit = () => {
-    dispatch({ type: "add_sample", payload: { sample_collection: [sample] } });
-  };
 
   console.log(sample);
   const changeCoordinates = (coords) => {
@@ -398,7 +393,7 @@ function NewSampleForm(props) {
   };
 
   const SubmitButton = () => {
-    return h(Button, { onClick: onSubmit, intent: "success" }, [
+    return h(Button, { onClick: () => onSubmit(sample), intent: "success" }, [
       "Creat New Sample",
     ]);
   };
@@ -421,13 +416,36 @@ function NewSampleForm(props) {
   ]);
 }
 
-function NewSampleToModel(props) {
+export function NewSampleToModel({ onSubmit }) {
   return h("div", [
     h(FormSlider, {
-      content: h(NewSampleForm),
+      content: h(NewSampleForm, { onSubmit }),
       model: "sample",
     }),
   ]);
 }
 
-export { NewSampleToModel };
+export function NewProjNewSample() {
+  const { dispatch } = useContext(ProjectFormContext);
+
+  const onSubmit = (sample) => {
+    dispatch({ type: "add_sample", payload: { sample_collection: [sample] } });
+  };
+
+  return h(NewSampleToModel, { onSubmit });
+}
+
+export function EditProjNewSample() {
+  const { model, actions } = useModelEditor();
+
+  const onSubmit = (sample) => {
+    const samples = model.samples == null ? [] : [...model.samples];
+    const newSample = new Array(sample);
+    let newSamples = [...samples, ...newSample];
+    actions.updateState({
+      model: { samples: { $set: newSamples } },
+    });
+  };
+
+  return h(NewSampleToModel, { onSubmit });
+}
