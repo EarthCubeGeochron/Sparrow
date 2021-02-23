@@ -1,5 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useReducer, useState, useContext } from "react";
+import { useReducer, useState, useContext, useEffect } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
 import {
   Button,
@@ -12,6 +12,9 @@ import {
 import { Publication } from "../project/page";
 import { ModelEditableText } from "../project/editor";
 import { FormSlider, isTitle } from "./utils";
+import { useAPIActions } from "@macrostrat/ui-components";
+import { APIV2Context } from "~/api-v2";
+import { FilterAccordian } from "../../filter/components/utils";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -20,67 +23,54 @@ export function PublicationXDDInput(props) {
   const [search, setSearch] = useState("");
   const [pubs, setPubs] = useState([]);
   const [total, setTotal] = useState(0);
-  //const [doi, setDoi] = useState("");
   const { context, type, payload_name } = props;
-  console.log(total);
+
+  const { get } = useAPIActions(APIV2Context);
 
   const { dispatch } = useContext(context);
 
   //xdd route for
   const doiRoute = "https://xdd.wisc.edu/api/articles";
-  const response = isTitle(search)
-    ? useAPIResult(doiRoute, { title_like: search, max: 50 })
-    : useAPIResult(doiRoute, { doi: search, max: 20 });
+  const xDDParams = isTitle(search)
+    ? { title_like: search, max: 50 }
+    : { doi: search, max: 20 };
 
   //crossref
   const crossrefRoute = "https://api.crossref.org/works";
-
-  const crossrefRes = isTitle(search)
-    ? useAPIResult(crossrefRoute, {
-        query: search,
-        select: "DOI,title",
-        rows: 5,
-      })
+  const crossRefParams = isTitle(search)
+    ? { query: search, select: "DOI,title", rows: 5 }
     : search.length > 6
-    ? useAPIResult(crossrefRoute, {
-        filter: `doi:${search}`,
-        select: "DOI,title",
-        rows: 5,
-      })
-    : useAPIResult(crossrefRoute, {
-        query: search,
-        select: "DOI,title",
-        rows: 5,
-      });
+    ? { filter: `doi:${search}`, select: "DOI,title", rows: 5 }
+    : { query: search, select: "DOI,title", rows: 5 };
 
   const onSearch = () => {
-    // first check the xDD route
-    if (response != null) {
-      const { data } = response.success;
+    const data = get(doiRoute, { ...xDDParams }, {});
+    data.then((res) => {
+      const { data } = res.success;
       if (data) {
         const unData = data.map((ele) => unwrapPubData(ele));
         if (unData.length > 0) {
           setPubs(unData.slice(0, 4)); // first 5
           setTotal(unData.length); // can be at max 20
+        } else {
+          const data = get(crossrefRoute, { ...crossRefParams }, {});
+          data.then((res) => {
+            const { items, "total-results": total } = res.message;
+            const nItems = items.map((ele) => {
+              const { DOI: doi, title } = ele;
+              return { doi, title };
+            });
+            setPubs(nItems);
+            setTotal(total);
+          });
         }
-        //Move onto crossref
-      } else if (crossrefRes != null) {
-        console.log(crossrefRes);
-        const { items, "total-results": total } = crossrefRes.message;
-        const nItems = items.map((ele) => {
-          const { DOI: doi, title } = ele;
-          return { doi, title };
-        });
-        setPubs(nItems);
-        setTotal(total);
       }
-    } else {
-    }
+    });
   };
 
   const message =
     total <= 5
-      ? "Only 5 or less results!"
+      ? h("div", "Only 5 or less results!")
       : total > 5 && total <= 10
       ? "More results than are shown, try to narrow your search"
       : "Ouufff, looks like you have a lot of results. Try to narrow your search";
@@ -88,11 +78,25 @@ export function PublicationXDDInput(props) {
   const intent =
     total <= 5 ? "success" : total > 5 && total <= 10 ? "warning" : "danger";
 
+  const totalNumber = total < 20 ? total : "20+";
+
   const leftElement =
     pubs.length > 0
-      ? h(Tooltip, { content: message, intent }, [
-          h(Button, { intent }, [total]),
-        ])
+      ? h(
+          Tooltip,
+          {
+            className: "tooltip-pub",
+            content: message,
+            intent,
+            position: "top",
+            modifiers: {
+              preventOverflow: { enabled: false },
+              flip: { enabled: true },
+              hide: { enabled: false },
+            },
+          },
+          [h(Button, { intent }, [totalNumber])]
+        )
       : null;
 
   const rightElement = h(Button, {
@@ -117,7 +121,6 @@ export function PublicationXDDInput(props) {
   const addToModel = (i) => {
     const { doi, title } = pubs[i];
     const data = new Array({ doi, title });
-    console.log(data);
     dispatch({
       type: "add_pub",
       payload: {
@@ -249,7 +252,7 @@ function Stack({ context }) {
 function DrawerContent(props) {
   const { context } = props;
 
-  const topHeader = "Search for Publication by DOI";
+  const topHeader = "Search for Publication";
   return h("div.drawer-body", [
     h("div.top-header", [
       h("h3", [topHeader]),
@@ -266,8 +269,13 @@ function DrawerContent(props) {
     ]),
     h(PublicationXDDInput, { context }),
     h("div.divi", [h(Divider)]),
-    h("h3", ["Or enter in a Title and DOI"]),
-    h(PublicationInputs, { context }),
+    h(FilterAccordian, {
+      content: h("div", [
+        h("h3", ["Enter in a Title and DOI"]),
+        h(PublicationInputs, { context }),
+      ]),
+      text: "Can't find your paper, or don't have a doi?",
+    }),
   ]);
 }
 
