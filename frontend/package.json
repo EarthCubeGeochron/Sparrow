@@ -7,10 +7,10 @@
     "doc": "docs"
   },
   "dependencies": {
-    "@blueprintjs/core": "^3.10.0",
-    "@blueprintjs/datetime": "^3.9.1",
-    "@blueprintjs/select": "^3.13.7",
-    "@blueprintjs/table": "^3.3.0",
+    "@blueprintjs/core": "^3.39.0",
+    "@blueprintjs/datetime": "^3.20.5",
+    "@blueprintjs/select": "^3.15.5",
+    "@blueprintjs/table": "^3.8.23",
     "@data-ui/histogram": "0.0.75",
     "@emotion/core": "^10.0.7",
     "@emotion/styled": "^10.0.7",
