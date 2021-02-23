@@ -1,20 +1,14 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useReducer, useState, useContext, useEffect } from "react";
-import { useAPIResult } from "@macrostrat/ui-components";
-import {
-  Button,
-  Tooltip,
-  InputGroup,
-  Divider,
-  PanelStack,
-  IPanelProps,
-} from "@blueprintjs/core";
+import { useModelEditor } from "@macrostrat/ui-components";
+import { Button, Tooltip, InputGroup, Divider } from "@blueprintjs/core";
 import { Publication } from "../project/page";
 import { ModelEditableText } from "../project/editor";
 import { FormSlider, isTitle } from "./utils";
 import { useAPIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { FilterAccordian } from "../../filter/components/utils";
+import { ProjectFormContext } from "../project/new-project";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -23,11 +17,9 @@ export function PublicationXDDInput(props) {
   const [search, setSearch] = useState("");
   const [pubs, setPubs] = useState([]);
   const [total, setTotal] = useState(0);
-  const { context, type, payload_name } = props;
+  const { onSubmit } = props;
 
   const { get } = useAPIActions(APIV2Context);
-
-  const { dispatch } = useContext(context);
 
   //xdd route for
   const doiRoute = "https://xdd.wisc.edu/api/articles";
@@ -121,12 +113,13 @@ export function PublicationXDDInput(props) {
   const addToModel = (i) => {
     const { doi, title } = pubs[i];
     const data = new Array({ doi, title });
-    dispatch({
-      type: "add_pub",
-      payload: {
-        publication_collection: [{ title, doi }],
-      },
-    });
+    onSubmit(data);
+    // dispatch({
+    //   type: "add_pub",
+    //   payload: {
+    //     publication_collection: [{ title, doi }],
+    //   },
+    // });
   };
 
   const SubmitButton = (props) => {
@@ -165,13 +158,12 @@ export function PublicationXDDInput(props) {
 
 export function PublicationInputs(props) {
   const [pub, setPub] = useState({ doi: "", title: "" });
-  const { context } = props;
-
-  const { dispatch } = useContext(context);
+  const { onSubmit } = props;
 
   const addToModel = () => {
     const data = new Array(pub);
-    dispatch({ type: "add_pub", payload: { publication_collection: data } });
+    onSubmit(data);
+    //dispatch({ type: "add_pub", payload: { publication_collection: data } });
   };
 
   const SubmitButton = ({ disabled }) => {
@@ -217,40 +209,8 @@ export function PublicationInputs(props) {
   ]);
 }
 
-/**
- * 
- * function Menubar(props: MenubarProps) {
-  const [panels, setPanels] = useState<(IPanel<MenubarProps>| IPanel)[]>([ // it works
-    {
-      component: Settings,
-      props,
-      title: "Settings",
-    },
-  ]);
-
-  return (
-    <PanelStack
-      className="Menubar"
-      initialPanel={panels[0]}
-      onOpen={(new_) => setPanels([new_, ...panels])}
-      onClose={() => setPanels(panels.slice(1))}
-    />
-  );
-}
- */
-function Stack({ context }) {
-  const [panels, setPanels] = useState<IPanelProps[]>([
-    { component: h(PublicationXDDInput, { context }), title: "Test" },
-  ]);
-  return h(PanelStack, {
-    initialPanel: panels[0],
-    onOpen: (new_) => setPanels([new_, ...panels]),
-    onClose: () => setPanels(panels.slice(1)),
-  });
-}
-
 function DrawerContent(props) {
-  const { context } = props;
+  const { onSubmit } = props;
 
   const topHeader = "Search for Publication";
   return h("div.drawer-body", [
@@ -267,12 +227,12 @@ function DrawerContent(props) {
         ),
       ]),
     ]),
-    h(PublicationXDDInput, { context }),
+    h(PublicationXDDInput, { onSubmit }),
     h("div.divi", [h(Divider)]),
     h(FilterAccordian, {
       content: h("div", [
         h("h3", ["Enter in a Title and DOI"]),
-        h(PublicationInputs, { context }),
+        h(PublicationInputs, { onSubmit }),
       ]),
       text: "Can't find your paper, or don't have a doi?",
     }),
@@ -280,12 +240,36 @@ function DrawerContent(props) {
 }
 
 export function AddNewPubToModel(props) {
-  const { context, type } = props;
+  const { onSubmit } = props;
 
   return h("div", [
     h(FormSlider, {
-      content: h(DrawerContent, { context }),
+      content: h(DrawerContent, { onSubmit }),
       model: "Publication",
     }),
   ]);
+}
+
+export function NewProjectNewPub() {
+  const { dispatch } = useContext(ProjectFormContext);
+
+  const onSubmit = (data) => {
+    dispatch({ type: "add_pub", payload: { publication_collection: data } });
+  };
+
+  return h(AddNewPubToModel, { onSubmit });
+}
+
+export function EditProjNewPub() {
+  const { model, actions } = useModelEditor();
+
+  const onSubmit = (data) => {
+    const publication =
+      model.publications == null ? [] : [...model.publications];
+    let newPubs = [...publication, ...data];
+    actions.updateState({
+      model: { publications: { $set: newPubs } },
+    });
+  };
+  return h(AddNewPubToModel, { onSubmit });
 }
