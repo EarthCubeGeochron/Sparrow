@@ -1,0 +1,5 @@
+.my-suggest {
+  max-height: 200px;
+  max-width: 180px;
+  overflow-y: scroll;
+}
