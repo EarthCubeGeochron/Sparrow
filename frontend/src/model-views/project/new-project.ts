@@ -16,7 +16,11 @@ import {
   ProjectPublications,
   ProjectResearchers,
 } from "./page";
-import { AddNewPubToModel, NewSampleToModel } from "../new-model";
+import {
+  AddNewPubToModel,
+  NewSampleToModel,
+  AddResearcherDrawer,
+} from "../new-model";
 import { MinimalNavbar } from "~/components";
 import { APIV2Context } from "../../api-v2";
 import { Link } from "react-router-dom";
@@ -205,7 +209,7 @@ export function NewProjectFormMain() {
           link: false,
           isEditing: true,
           onClick: onClickDelete,
-          rightElement: h(NewSampleToModel, { context: ProjectFormContext }),
+          rightElement: h(NewSampleToModel),
         }),
         h(AddCard, {
           model: "sample",
@@ -256,6 +260,7 @@ export function NewProjectFormMain() {
         onClick,
         data: project.researcher_collection,
         isEditing: true,
+        rightElement: h(AddResearcherDrawer),
       }),
       h(AddCard, {
         model: "researcher",
