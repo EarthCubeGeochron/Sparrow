@@ -8,8 +8,15 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
-## [Unreleased] - 2021-02-22
+## [Unreleased] - 2021-02-23
 
+Sparrow can now be locked to a version or git commit. The
+command-line applicaton now tests `SPARROW_VERSION` environment variable against either
+a version specifier matching the [PEP 440](https://www.python.org/dev/peps/pep-0440/#version-specifiers)
+specification, or a [git commit hash, tag, or other "commit-ish" revision](https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection).
+For an unrestricted version, use `SPARROW_VERSION=HEAD` or don't set.
+
+## [Unreleased] - 2021-02-22
 ### A much quicker importer
 
 Greatly sped up schema-based importer by bundling all changes together and saving database
