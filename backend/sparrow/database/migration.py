@@ -1,4 +1,3 @@
-import os
 from sparrow.app import Sparrow
 from sqlalchemy import create_engine
 from contextlib import contextmanager, redirect_stdout
@@ -52,3 +51,11 @@ def db_migration(db, safe=True, apply=False):
             db.session.execute(s)
         else:
             print(s, file=sys.stdout)
+
+
+class SparrowMigration:
+    def should_apply(self, db):
+        return False
+
+    def apply(self, db):
+        pass
