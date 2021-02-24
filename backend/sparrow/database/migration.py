@@ -4,6 +4,7 @@ from contextlib import contextmanager, redirect_stdout
 from sqlalchemy_utils import create_database, database_exists, drop_database
 from migra import Migration
 import sys
+from .util import run_sql
 
 
 @contextmanager
@@ -47,8 +48,7 @@ def db_migration(db, safe=True, apply=False):
     print("===MIGRATION BELOW THIS LINE===", file=sys.stderr)
     for s in m.statements:
         if apply:
-            print(s, file=sys.stderr)
-            db.session.execute(s)
+            run_sql(db.session, s)
         else:
             print(s, file=sys.stdout)
 

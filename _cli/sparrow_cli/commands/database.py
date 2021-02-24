@@ -1,6 +1,6 @@
 import click
 from ..group import CommandGroup
-from ..util import container_id, container_is_running, run, compose
+from ..util import container_id, container_is_running, run, compose, exec_or_run
 
 
 def dump_database(dbname, out_file):
@@ -46,15 +46,13 @@ def sparrow_db(ctx):
 @sparrow_db.command(name="migration")
 def migration():
     """Generate a changeset against the optimal database schema"""
-    compose("run --rm", "-T", "backend", "/app/sparrow/__main__.py db-migration")
+    exec_or_run("backend", "/app/sparrow/__main__.py", "db-migration")
 
 
 @sparrow_db.command(name="migrate")
 def migrate():
     """Migrate the database to a newer version"""
-    compose(
-        "run --rm", "-T", "backend", "/app/sparrow/__main__.py db-migration", "--apply"
-    )
+    exec_or_run("backend", "/app/sparrow/__main__.py", "db-migration", "--apply")
 
 
 for k, v in shell_commands.items():
