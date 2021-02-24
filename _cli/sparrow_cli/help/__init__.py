@@ -11,6 +11,7 @@ from ..util import cmd, fail_without_docker, compose
 from .backend import get_backend_command_help
 from ..base import cli
 from ..exc import SparrowCommandError
+from ..context import SparrowConfig
 from .util import format_config_path
 
 console = Console()
@@ -72,10 +73,11 @@ class SparrowHelpFormatter(HelpFormatter):
         to(self.getvalue())
         self.buffer = []
 
-    def write_frontmatter(self):
+    def write_frontmatter(self, ctx):
         self.write_usage("sparrow", "[options] <command> [args]...")
         self.write_line()
         cfg = environ.get("SPARROW_CONFIG", None)
+
         if cfg is None:
             self.write_line(f"No configuration file found")
         else:
@@ -83,6 +85,19 @@ class SparrowHelpFormatter(HelpFormatter):
             self.write_line("Config: " + style(d0, fg="cyan"))
         d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
         self.write_line(f"Lab: {d1}")
+
+        if ver := ctx.version_info:
+            msg2 = " "
+            msg2 += "matches" if ver.is_match else "does not match"
+            msg2 += " target "
+            msg2 += style(ver.desired, underline=True)
+            color = "green" if ver.is_match else "red"
+            msg = "Revision" if ver.uses_git else "Version"
+            msg += " "
+            msg += style(ver.available, underline=True)
+            msg += style(msg2, fg=color)
+            self.write_line(style(msg, fg=color))
+
         self.flush()
         self.write("")
 
@@ -148,7 +163,7 @@ def echo_help(ctx, core_commands=None, user_commands=None):
     compose("up --no-start --remove-orphans")
 
     fmt = SparrowHelpFormatter()
-    fmt.write_frontmatter()
+    fmt.write_frontmatter(ctx.find_object(SparrowConfig))
     fmt.write_section("Key commands", fmt.key_commands)
     fmt.write_section("Command groups", sections)
 

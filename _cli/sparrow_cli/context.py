@@ -3,11 +3,19 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 from os import environ
-from .env import setup_command_path
-from .exc import SparrowCommandError
 from sparrow_utils.shell import git_revision_info, cmd
 from packaging.specifiers import SpecifierSet, InvalidSpecifier
 from packaging.version import Version
+from .env import setup_command_path
+from .exc import SparrowCommandError
+
+
+@dataclass
+class SparrowVersionMatch:
+    is_match: bool
+    desired: str
+    available: str
+    uses_git: bool
 
 
 def get_commit(cfg, match="HEAD"):
@@ -20,7 +28,24 @@ def get_commit(cfg, match="HEAD"):
     return rev.stdout.decode("utf-8").strip()
 
 
-def test_version(cfg):
+def test_git_version(cfg, required_version) -> typing.Union[SparrowVersionMatch, None]:
+    # Fall back to git-based version string parsing...
+    if cfg.is_frozen and not cfg.path_provided:
+        rev = cfg.git_revision()["revision"].removesuffix("-dirty")
+    else:
+        rev = get_commit(cfg, "HEAD")
+
+    match_rev = get_commit(cfg, required_version)
+    # Could print a cautionary note if we are using a branch name or HEAD...
+    return SparrowVersionMatch(
+        is_match=rev == match_rev,
+        desired=required_version,
+        available=rev,
+        uses_git=True,
+    )
+
+
+def test_version(cfg) -> typing.Union[SparrowVersionMatch, None]:
     # Test version string against requested version of SPARROW
     # https://www.python.org/dev/peps/pep-0440/
     # https://www.python.org/dev/peps/pep-0440/#version-specifiers
@@ -34,30 +59,18 @@ def test_version(cfg):
 
     try:
         spec = SpecifierSet(required_version, prereleases=True)
-        actual_version = Version(cfg.find_sparrow_version())
-        if actual_version in spec:
-            return
-        else:
-            raise SparrowCommandError(
-                f"Sparrow version {actual_version} is not in {spec}"
-            )
     except InvalidSpecifier:
-        pass
+        # We fall back to testing git commit versions
+        return test_git_version(cfg, required_version)
 
-    # Fall back to git-based version string parsing...
-    if cfg.is_frozen and not cfg.path_provided:
-        rev = cfg.git_revision()["revision"].removesuffix("-dirty")
-    else:
-        rev = get_commit(cfg, "HEAD")
+    actual_version = Version(cfg.find_sparrow_version())
 
-    match_rev = get_commit(cfg, required_version)
-    try:
-        assert rev == match_rev
-        # print(f"Git revision {rev} matches specifier {required_version}")
-    except AssertionError:
-        raise SparrowCommandError(
-            f"Sparrow version {rev} does not match {required_version} (with hash {match_rev})"
-        )
+    return SparrowVersionMatch(
+        is_match=actual_version in spec,
+        desired=str(spec),
+        available=str(actual_version),
+        uses_git=False,
+    )
 
 
 @dataclass
@@ -67,6 +80,7 @@ class SparrowConfig:
     bundle_dir: Path
     path_provided: bool
     is_frozen: bool
+    version_info: typing.Optional[SparrowVersionMatch] = None
 
     def __init__(self):
         self.is_frozen = getattr(sys, "frozen", False)
@@ -90,7 +104,7 @@ class SparrowConfig:
         # Provide environment variable in a more Pythonic way as well
         self.SPARROW_PATH = Path(environ["SPARROW_PATH"])
 
-        test_version(self)
+        self.version_info = test_version(self)
 
         # Setup path for subcommands
         self.bin_directories = setup_command_path()
