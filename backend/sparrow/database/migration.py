@@ -20,21 +20,24 @@ def temp_database(conn_string):
         drop_database(engine.url)
 
 
-def create_migration(db, safe=True):
-    url = "postgres://postgres@db:5432/sparrow_temp_migration"
+def _create_migration(db_engine, target, safe=True):
     with redirect_stdout(sys.stderr):
-        with temp_database(url) as engine:
-            app = Sparrow(database=url)
-            app.init_database()
+        # For some reason we need to patch this...
+        target.dialect.server_version_info = db_engine.dialect.server_version_info
 
-            # For some reason we need to patch this...
-            engine.dialect.server_version_info = db.engine.dialect.server_version_info
+        m = Migration(db_engine, target)
+        m.set_safety(safe)
+        # Not sure what this does
+        m.add_all_changes()
+        return m
 
-            m = Migration(db.engine, engine)
-            m.set_safety(safe)
-            # Not sure what this does
-            m.add_all_changes()
-    return m
+
+def create_migration(db, safe=True, target=None):
+    url = "postgres://postgres@db:5432/sparrow_temp_migration"
+    with temp_database(url) as engine:
+        app = Sparrow(database=url)
+        app.init_database()
+        return _create_migration(db.engine, engine)
 
 
 def needs_migration(db):
