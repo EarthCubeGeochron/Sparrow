@@ -11,6 +11,8 @@ from .config_loader import load_config
 from .env import prepare_docker_environment, setup_command_path
 from .exc import SparrowCommandError
 from .context import SparrowConfig
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 
 
 class SparrowDefaultCommand(DefaultGroup):
@@ -26,6 +28,7 @@ class SparrowDefaultCommand(DefaultGroup):
             details = getattr(exc, "details", None)
             if details is not None:
                 secho(details, dim=True)
+            # Maybe we should reraise only if debug is set?
             raise exc
 
 
@@ -90,4 +93,17 @@ def cli(ctx, verbose=False):
 
     # First steps towards some much more object-oriented configuration
     ctx.obj = SparrowConfig()
+
+    # Test version string against requested version of SPARROW
+    # https://www.python.org/dev/peps/pep-0440/
+    # We should make this handle git commits and tags as well...
+    required_version = environ.get("SPARROW_VERSION", None)
+    if required_version is not None:
+        spec = SpecifierSet(required_version, prereleases=True)
+        actual_version = Version(ctx.obj.find_sparrow_version())
+        if not actual_version in spec:
+            raise SparrowCommandError(
+                f"Sparrow version {actual_version} is not in {spec}"
+            )
+
     prepare_docker_environment()

@@ -50,3 +50,10 @@ class SparrowConfig:
             ).stdout.decode("utf-8")
         rev = rev.strip()
         return dict(revision=rev, dirty=rev.endswith("-dirty"))
+
+    def find_sparrow_version(self):
+        # Get the sparrow version from the command path...
+        version = {}
+        with (self.SPARROW_PATH / "backend" / "sparrow" / "meta.py").open() as f:
+            exec(f.read(), version)
+        return version["__version__"]
