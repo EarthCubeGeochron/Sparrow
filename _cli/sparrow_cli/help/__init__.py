@@ -92,7 +92,8 @@ class SparrowHelpFormatter(HelpFormatter):
             msg2 += " target "
             msg2 += style(ver.desired, underline=True)
             color = "green" if ver.is_match else "red"
-            msg = "Revision" if ver.uses_git else "Version"
+            msg = "Sparrow "
+            msg += "revision" if ver.uses_git else "version"
             msg += " "
             msg += style(ver.available, underline=True)
             msg += style(msg2, fg=color)
