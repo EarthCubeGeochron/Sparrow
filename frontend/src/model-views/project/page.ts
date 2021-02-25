@@ -59,6 +59,7 @@ export const ProjectPublications = function({
             const { id, title, doi } = pub;
             return h(PubEditCard, {
               id,
+              title,
               content: h(Publication, { doi, title }),
               onClick,
             });
@@ -119,7 +120,6 @@ export const ProjectSamples = function({
   onClick,
   rightElement,
 }) {
-  console.log(isEditing);
   let content = [h("p", "No samples")];
   if (data != null) {
     if (!isEditing) {
