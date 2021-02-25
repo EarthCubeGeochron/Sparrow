@@ -72,7 +72,9 @@ const SampleComponent = function(props: SampleProps) {
 
   const url = `/models/sample/${id}`;
 
-  const data = useAPIv2Result(url, { nest: "session,project" });
+  const data = useAPIv2Result(url, {
+    nest: "session,project,sample_geo_entity,geo_entity",
+  });
   if (id == null || data == null) {
     return null;
   }
