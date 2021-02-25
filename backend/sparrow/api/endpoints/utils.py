@@ -1,6 +1,6 @@
 from shapely.geometry import mapping, shape, Point, Polygon
 from geoalchemy2.shape import from_shape, to_shape
-
+import logging
 
 def create_location_from_coordinates(longitude, latitude):
     '''This function will create the json-like object in database from long & lat given in a post request'''
@@ -144,8 +144,8 @@ def collection_handler(db, data):
     ## Create a loop ability to go over the len of both name lists
     # for each name and collection name we perform the same actions.
     for i,val in enumerate(names):
-        if type(data[col_names[i]]) is list:
-            data = collection_handler(db, data[col_names[i]])
+        # if type(data[col_names[i]]) is list:
+        #     data = collection_handler(db, data[col_names[i]])
         db_model = getattr(db.model, val) ## the model for the collection.
 
         ## will become a new column in data that says model_collection
@@ -173,7 +173,8 @@ def collection_handler(db, data):
                 # for k in ele:
                 #     setattr(existing_model, k, ele[k])
                 collection.append(existing_model)
-        
+        logging.info(collection)
+        print(collection)
         data[col_names[i]] = collection
         
 
