@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useCallback, useEffect } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import {
   EditableText,
@@ -33,6 +33,7 @@ import {
 import { DatePicker } from "@blueprintjs/datetime";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
+import { ProjectAdminContext } from "~/admin/project";
 
 const h = hyperStyled(styles);
 
@@ -117,7 +118,7 @@ export const EmbargoDatePick = (props) => {
   ]);
 };
 
-const EmbargoEditor = function(props) {
+export const EmbargoEditor = function(props) {
   const { model, actions, isEditing } = useContext(ModelEditorContext);
   const onChange = (date) => {
     actions.updateState({
@@ -129,8 +130,9 @@ const EmbargoEditor = function(props) {
   return h(EmbargoDatePick, { onChange, embargo_date, active: isEditing });
 };
 
-const EditStatusButtons = function() {
-  const { isEditing, hasChanges, actions } = useModelEditor();
+export const EditStatusButtons = function(props) {
+  const { hasChanges, isEditing, onClickCancel, onClickSubmit } = props;
+
   const changed = hasChanges();
   return h("div.edit-status-controls", [
     h.if(!isEditing)(ModelEditButton, { minimal: true }, "Edit"),
@@ -139,9 +141,7 @@ const EditStatusButtons = function() {
         SaveButton,
         {
           disabled: !changed,
-          onClick() {
-            return actions.persistChanges();
-          },
+          onClick: onClickSubmit,
         },
         "Save"
       ),
@@ -149,7 +149,7 @@ const EditStatusButtons = function() {
         CancelButton,
         {
           intent: changed ? "warning" : "none",
-          onClick: actions.toggleEditing,
+          onClick: onClickCancel,
         },
         "Done"
       ),
@@ -157,27 +157,61 @@ const EditStatusButtons = function() {
   ]);
 };
 
+function EditStatusButtonsProj() {
+  const { isEditing, hasChanges, actions } = useModelEditor();
+  const { setListName } = useContext(ProjectAdminContext);
+
+  const onClickCancel = () => {
+    setListName("main");
+    actions.toggleEditing();
+  };
+
+  const onClickSubmit = () => {
+    setListName("main");
+    return actions.persistChanges();
+  };
+
+  return h(EditStatusButtons, {
+    onClickCancel,
+    onClickSubmit,
+    hasChanges,
+    isEditing,
+  });
+}
+
 function EditResearchers(props) {
   const { isEditing, model, actions } = useModelEditor();
+  const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
-  const onClickDelete = (id) => {
-    const researchers = model.researchers == null ? [] : [...model.researchers];
-    let newResearchers = [...researchers];
-    const updatedRes = newResearchers.filter((ele) => ele.id != id);
+  const researchers = model.researchers == null ? [] : [...model.researchers];
+
+  const onClickDelete = ({ id, name }) => {
+    const updatedRes = researchers.filter((ele) => ele.name != name);
     actions.updateState({
       model: { researchers: { $set: updatedRes } },
     });
   };
 
-  const researchers = model.researchers == null ? [] : [...model.researchers];
+  const onSubmit = (researcher) => {
+    const newResearcher = new Array(researcher);
+    let newResearchers = [...researchers, ...newResearcher];
+    actions.updateState({
+      model: { researchers: { $set: newResearchers } },
+    });
+  };
+
+  useEffect(() => {
+    changeFunction(onSubmit);
+  }, [model.researchers]);
+
   const names = researchers.map(({ name }) => name);
-  console.log(names);
 
   return h(ResearcherAdd, {
     data: researchers,
     onClickDelete,
     onClickList: () => {
-      console.log("researchers");
+      changeFunction(onSubmit);
+      setListName("researcher");
     },
     isEditing,
     rightElement: h(EditProjNewResearcher),
@@ -190,23 +224,41 @@ function EditResearchers(props) {
  */
 function EditablePublications(props) {
   const { isEditing, model, actions } = useModelEditor();
-  console.log(model);
 
   if (model.publications == null && !isEditing) {
     return h("h4", ["No Publications"]);
   }
+  const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
-  const data = model.publications;
+  const data = model.publications == null ? [] : [...model.publications];
 
-  const onClickDelete = (id) => {
-    console.log(id);
+  const onClickDelete = ({ id, title }) => {
+    const newPubs = data.filter((ele) => ele.title != title);
+    actions.updateState({
+      model: { publications: { $set: newPubs } },
+    });
   };
+
+  const onSubmit = (id, title, doi) => {
+    const data = new Array({ id, title, doi });
+    const publication =
+      model.publications == null ? [] : [...model.publications];
+    let newPubs = [...publication, ...data];
+    actions.updateState({
+      model: { publications: { $set: newPubs } },
+    });
+  };
+
+  useEffect(() => {
+    changeFunction(onSubmit);
+  }, [model.publications]);
 
   return h(PubAdd, {
     data,
     onClickDelete,
     onClickList: () => {
-      console.log("publications");
+      changeFunction(onSubmit);
+      setListName("publication");
     },
     isEditing,
     rightElement: h(EditProjNewPub),
@@ -232,25 +284,34 @@ function SampleMapComponent() {
 export function EditableSamples(props) {
   const { setID } = props;
   const { model, actions, isEditing } = useModelEditor();
+  const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
-  const handleDelete = ({ index }) => {
-    let newSamples = [...model.samples];
-    newSamples.splice(index, 1);
+  const samples =
+    model.samples == null || model.sample == [] ? [] : [...model.samples];
+
+  const onClickDelete = ({ id, name }) => {
+    const newSamples = samples.filter((ele) => ele.name != name);
     return actions.updateState({
       model: { samples: { $set: newSamples } },
     });
   };
-  const handleAdd = (samples) => {
-    let newSamples = [...model.samples, ...samples];
-    actions.updateState({
-      model: { publications: { $set: newSamples } },
+
+  const sampleOnClick = (id, name) => {
+    console.log(samples);
+    const newSample = new Array({ id, name });
+    let newSamples = [...samples, ...newSample];
+    return actions.updateState({
+      model: { samples: { $set: newSamples } },
     });
   };
-  const onClickDelete = (id) => {
-    console.log(id);
-  };
+
+  useEffect(() => {
+    changeFunction(sampleOnClick);
+  }, [model.samples]);
+
   const onClickList = () => {
-    console.log("samples");
+    changeFunction(sampleOnClick);
+    setListName("sample");
   };
 
   return h(SampleAdd, {
@@ -264,11 +325,20 @@ export function EditableSamples(props) {
 }
 
 const EditNavBar = function(props) {
+  const { editButtons, embargoEditor, header } = props;
   return h(MinimalNavbar, { className: "project-editor-navbar" }, [
-    h("h4", props.header),
-    h(EditStatusButtons),
-    h(EmbargoEditor),
+    h("h4", header),
+    editButtons,
+    embargoEditor,
   ]);
+};
+
+const ProjEditNavBar = ({ header }) => {
+  return h(EditNavBar, {
+    header,
+    editButtons: h(EditStatusButtonsProj),
+    embargoEditor: h(EmbargoEditor),
+  });
 };
 
 const EditableProjectDetails = function(props) {
@@ -295,7 +365,9 @@ const EditableProjectDetails = function(props) {
     },
     [
       h("div.project-editor", [
-        h("div", [Edit ? h(EditNavBar, { header: "Manage Project" }) : null]),
+        h("div", [
+          Edit ? h(ProjEditNavBar, { header: "Manage Project" }) : null,
+        ]),
         h("div.project-editor-content", [
           h(ModelEditableText, { is: "h3", field: "name", multiline: true }),
           h(ModelEditableText, {
