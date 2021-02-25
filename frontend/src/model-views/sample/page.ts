@@ -4,8 +4,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import * as React from "react";
-import { useState, ReactNode } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useAuth } from "~/auth";
 import hyper from "@macrostrat/hyper";
 import {
@@ -13,116 +12,74 @@ import {
   ModelEditorContext,
   LinkCard,
   useAPIResult,
+  APIHelpers,
+  ModelEditor,
   useModelEditor,
 } from "@macrostrat/ui-components";
-import { Link } from "react-router-dom";
+import { APIV2Context } from "~/api-v2";
+import { put } from "axios";
 import { SampleContextMap } from "app/components";
-import { GeoDeepDiveCard, GDDDrawer } from "./gdd-card";
-import styles from "./module.styl";
+import { GeoDeepDiveCard, GDDDrawer } from "./gdd-card"; // Want to use this in publications..
 import { MapLink } from "app/map";
-import { MapToaster } from "../../map/map-area";
-import {
-  Button,
-  Icon,
-  ControlGroup,
-  InputGroup,
-  Dialog,
-  EditableText,
-} from "@blueprintjs/core";
-import {
-  MapSelector,
-  DataSheetMaterialSuggest,
-} from "../../admin/data-sheet/sheet-enter-components";
-import { useToggle } from "../../map/components/APIResult";
-import { MultipleSelectFilter } from "../../filter/components";
+import { Button } from "@blueprintjs/core";
 import { useModelURL } from "~/util/router";
-import { GeologicFormationSelector } from "../../filter/components/MultiSelect";
-import { ModelEditor, ModelEditButton } from "@macrostrat/ui-components";
-import { EditNavBar, ModelEditableText } from "../project/editor";
-import { SessionInfo } from "../data-files/page";
+import {
+  EditNavBar,
+  EditStatusButtons,
+  EmbargoEditor,
+  ModelEditableText,
+} from "../project/editor";
+import { ProjectModelCard, SessionModelCard } from "../list-cards/utils";
+import {
+  NewSampleMap,
+  SampleLocation,
+  SampleDepth,
+  SampleElevation,
+  SampleGeoEntity,
+  SampleMaterial,
+  ProjectAdd,
+  SessionAdd,
+} from "../new-model";
+import { ProjectEditCard, SessionEditCard } from "./detail-card";
+import { SampleAdminContext } from "~/admin/sample";
+import styles from "./module.styl";
 
 const h = hyper.styled(styles);
 
-export const DOIPaperAdd = (props) => {
-  const { isEditing, hasChanges, actions } = React.useContext(
-    ModelEditorContext
-  );
-  const { setPubs } = props;
-  const [search, setSearch] = React.useState<string | "">();
-  const [click, setClick] = React.useState(false);
-  console.log("search: ", search);
+const EditNavBarSample = () => {
+  const { hasChanges, actions, isEditing, model } = useModelEditor();
+  const { setListName } = useContext(SampleAdminContext);
 
-  const url = "https://xdd.wisc.edu/api/articles";
-
-  const publication = useAPIResult(url, { doi: search });
-  console.log(publication);
-
-  React.useEffect(() => {
-    if (click && search.length > 0) {
-      try {
-        const title = publication.success.data.map((pub) => {
-          return { title: pub.title, doi: search };
-        });
-        setPubs(title);
-      } catch (error) {}
-    }
-  }, [click]);
-
-  // we want to send an API call to the DOI API
-  const onClick = () => {
-    setClick(true);
+  const onClickCancel = () => {
+    setListName("main");
+    actions.toggleEditing();
+  };
+  const onClickSubmit = () => {
+    setListName("main");
+    return actions.persistChanges();
   };
 
-  const onChange = (e) => {
-    setSearch(e.target.value);
+  const onChange = (date) => {
+    actions.updateState({
+      model: { embargo_date: { $set: date } },
+    });
   };
+  const embargo_date = model.embargo_date;
 
-  return h(ControlGroup, [
-    h(InputGroup, { onChange, placeholder: "Enter DOI..." }),
-    h(Button, { minimal: true, icon: "search", onClick }),
-  ]);
-};
-
-const Publications = (props) => {
-  const { isEditing, hasChanges, actions } = React.useContext(
-    ModelEditorContext
-  );
-  const { publication, onEdit, changeEdit } = props;
-  const [pubs, setPubs] = React.useState([]);
-
-  React.useEffect(() => {
-    if (publication) {
-      const titles = publication.map((pub) => {
-        const { title, doi } = pub;
-        return { title, doi };
-      });
-      setPubs(titles);
-    }
-  }, []);
-
-  const addPubs = (newPubs) => {
-    setPubs([...pubs, ...newPubs]);
-  };
-
-  if ((!onEdit && pubs.length > 0) || (!isEditing && pubs.length > 0)) {
-    return h("div", [
-      h("h4.subtitle", ["Publications"]),
-      pubs.map((pub) => {
-        return h("div", { key: pub.doi }, [
-          h("h4", [
-            h("a", { href: `https://dx.doi.org/${pub.doi}` }, [pub.title]),
-          ]),
-        ]);
-      }),
-    ]);
-  }
-  if (isEditing) {
-    return h("div", [
-      h("h4.subtitle", ["Add Publications Publications"]),
-      h(DOIPaperAdd, { setPubs: addPubs }),
-    ]);
-  }
-  return null;
+  return h(EditNavBar, {
+    header: "Manage Sample",
+    editButtons: h(EditStatusButtons, {
+      onClickCancel,
+      onClickSubmit,
+      hasChanges,
+      isEditing,
+    }),
+    embargoEditor: h(EmbargoEditor, {
+      onChange,
+      embargo_date,
+      active: isEditing,
+    }),
+  });
 };
 
 const Parameter = ({ name, value, ...rest }) => {
@@ -135,8 +92,8 @@ const Parameter = ({ name, value, ...rest }) => {
 };
 
 const ProjectLink = function({ d }) {
-  const project = d.data.session.map((obj) => {
-    if (obj.project !== null) {
+  const project = d.session.map((obj) => {
+    if ("project" in obj) {
       const { name: project_name, id: project_id } = obj.project;
       return { project_name, project_id };
     }
@@ -144,78 +101,49 @@ const ProjectLink = function({ d }) {
   });
 
   const [test] = project;
-  if (test == null) {
-    return h(Button, { minimal: true }, ["No Projects"]);
-  }
+  if (test == null) return null;
 
-  const [{ project_name, project_id }] = project;
-
-  const to = useModelURL(`/project/${project_id}`);
-
-  return h(
-    LinkCard,
-    {
-      to,
-    },
-    project_name
-  );
+  return project.map((ele) => {
+    if (!ele) return null;
+    const { project_name, project_id, description } = ele;
+    return h(ProjectModelCard, {
+      id: project_id,
+      name: project_name,
+      description,
+      link: true,
+    });
+  });
 };
 
-const ProjectInfo = ({ sample: d }) => {
-  const { isEditing, hasChanges, actions } = React.useContext(
-    ModelEditorContext
-  );
-  const project = d.data.session.map((obj) => {
-    if (obj.project !== null) {
-      const { name: project_name, id: project_id } = obj.project;
-      return { project_name, project_id };
-    }
-    return null;
-  });
-
-  const [test] = project;
-  if (test == null) {
-    if (isEditing) {
-      return h("div.parameter", [
-        h("h4.subtitle", "Project"),
-        h("p.value", [
-          h(Button, { minimal: true, rightIcon: "plus" }, ["Add Projects"]),
-        ]),
-      ]);
-    }
-    return null;
+export const SampleProjects = ({ data, isEditing, onClick }) => {
+  console.log(data);
+  if (isEditing) {
+    return h("div.parameter", [
+      h("h4.subtitle", "Project"),
+      h("p.value", [h(ProjectEditCard, { d: data, onClick })]),
+    ]);
   }
   return h("div.parameter", [
     h("h4.subtitle", "Project"),
-    h("p.value", [h(ProjectLink, { d })]),
+    h("p.value", [h(ProjectLink, { d: data })]),
   ]);
 };
 
 const LocationBlock = function(props) {
-  const { isEditing, hasChanges, actions } = React.useContext(
-    ModelEditorContext
-  );
-  const [open, toggleOpen] = useToggle(false);
+  const { isEditing, hasChanges, actions, model } = useModelEditor();
 
-  const { location, location_name } = props;
+  const { location, location_name } = model;
 
+  if (isEditing) {
+    return h(SampleLocationEleDepthEditor);
+  }
   if (location == null) {
-    if (isEditing) {
-      return h("div", [
-        ///h("h4.subtitle", ["Set Latitude and Longitude"]),
-        h(Button, {
-          rightIcon: "map-create",
-          text: "Set Latitude and Longitude",
-          onClick: toggleOpen,
-        }),
-        //h(MapSelector, { open: open, toggle: toggleOpen }),
-      ]);
-    }
     return null;
   }
   const zoom = 8;
   const [longitude, latitude] = location.coordinates;
   return h("div.location", [
+    h("h5.lon-lat", `[${longitude} , ${latitude}]`),
     h(MapLink, { zoom, latitude, longitude }, [
       h(SampleContextMap, {
         center: location.coordinates,
@@ -227,25 +155,15 @@ const LocationBlock = function(props) {
 };
 
 const Material = function(props) {
-  const { material, changeEdit, onEdit } = props;
-  const { isEditing, hasChanges, actions } = React.useContext(
-    ModelEditorContext
-  );
-  if (onEdit || isEditing) {
-    return h("div", [
-      h("h4.subtitle", ["Add Material"]),
-      h(DataSheetMaterialSuggest),
-    ]);
+  const { isEditing, hasChanges, actions, model } = useModelEditor();
+  if (isEditing) {
+    return h(SampleMaterial, { changeMaterial: () => {}, sample: model }); //material component from sample page
   }
-  if (!onEdit || !isEditing) {
-    if (material == null) return null;
+  if (!isEditing) {
+    if (model.material == null) return null;
     return h(Parameter, {
       name: "Material",
-      value:
-        material ||
-        h(Button, { minimal: true, rightIcon: "plus", onClick: changeEdit }, [
-          "Add Material",
-        ]),
+      value: model.material,
     });
   }
 };
@@ -262,161 +180,216 @@ function DataSheetButton() {
   ]);
 }
 
-function SampleTags() {
-  const [onEdit, setOnEdit] = useState(false);
-  const { isEditing, hasChanges, actions } = React.useContext(
-    ModelEditorContext
-  );
+export function Sessions(props) {
+  const { isEditing, session, onClick } = props;
 
-  const tags = [
-    "Needs Work",
-    "Check Location",
-    "Link to Publication",
-    "Link to Project",
-    "Add material",
-  ];
-
-  if (onEdit || isEditing) {
-    return h("div", [
-      h("h4.subtitle", ["Sample Tags"]),
-      h(MultipleSelectFilter, {
-        items: tags,
-        sendQuery: () => null,
-      }),
-    ]);
-  }
-  if (!onEdit || !isEditing) {
-    return h("div", [
-      h("h4.subtitle", ["Sample Tags"]),
-      h(
-        Button,
-        { minimal: true, rightIcon: "plus", onClick: () => setOnEdit(true) },
-        ["Add Tags"]
-      ),
-    ]);
-  }
-}
-
-function Sessions(props) {
-  const { isEditing } = useModelEditor();
-
-  const { session } = props;
-  if (session.length == 0) {
-    if (isEditing) {
-      return h("div.parameter", [
-        h("h4.subtitle", "Session"),
-        h("p.value", [
-          h(Button, { minimal: true, rightIcon: "plus" }, ["Add Sessions"]),
-        ]),
-      ]);
-    }
-    return null;
-  }
+  if (session.length == 0 && !isEditing) return null;
   return h("div.parameter", [
-    // h("h4.subtitle", "Session"),
+    h("h4.subtitle", "Session"),
     h("p.value", [
       session.map((obj) => {
-        const { id: session_id, technique, target, date } = obj;
-        return h(SessionInfo, { session_id, technique, target, date });
+        const { id: session_id, technique, target, date, analysis } = obj;
+        if (isEditing) {
+          return h(SessionEditCard, {
+            session_id,
+            technique,
+            target,
+            date,
+            onClick,
+          });
+        } else {
+          return h(SessionModelCard, {
+            session_id,
+            technique,
+            target,
+            date,
+            analysis,
+          });
+        }
       }),
     ]),
   ]);
 }
 
-function MetadataHelpers(props) {
-  const { isEditing } = useModelEditor();
-  const { name } = props;
-  if (!isEditing) {
-    return null;
-  }
-  if (isEditing) {
-    return h("div", { style: { paddingTop: "30px" } }, [
-      "Metadata Helpers:",
-      //  h(GeoDeepDiveCard, { name }),
-      h(GeologicFormationSelector),
-    ]);
-  }
-}
+const DepthElevation = (props) => {
+  const { isEditing, model } = useModelEditor();
 
-const SamplePage = function(props) {
+  const { depth, elevation } = model;
+
+  return !isEditing
+    ? h.if(elevation != null || depth != null)("div.depth-elevation", [
+        h.if(depth != null)("div.parameter", [
+          h("h4.subtitle", "Depth"),
+          h("p.value", [depth]),
+        ]),
+        h.if(elevation != null)("div.parameter", [
+          h("h4.subtitle", "Elevation"),
+          h("p.value", [elevation]),
+        ]),
+      ])
+    : null;
+};
+
+const GeoEntity = (props) => {
+  const { isEditing, model } = useModelEditor();
+
+  const { sample_geo_entity } = model; // going to be an array..
+
+  if (!isEditing) {
+    if (sample_geo_entity.length != 0) {
+      return h("div.parameter", [
+        h("h4.subtitle", "Geo Entity"),
+        sample_geo_entity.map((ele) => {
+          const { type, name } = ele.geo_entity;
+          return h("p.value", [name + " " + type]);
+        }),
+      ]);
+    } else {
+      return null;
+    }
+  } else {
+    return h(SampleGeoEntity, { geoEntity: "", changeGeoEntity: () => {} });
+  }
+};
+
+const SampleProjectAdd = () => {
+  const { model, actions, isEditing } = useModelEditor();
+  const { setListName, changeFunction } = useContext(SampleAdminContext);
+
+  const onClickDelete = ({ id, name }) => {
+    console.log(id, name);
+  };
+
+  const addProject = (id, name) => {
+    // replaces project
+    const proj = { id, name };
+    actions.updateState({
+      model: { session: { project: { $set: proj } } },
+    });
+  };
+
+  const onClickList = () => {
+    setListName("project");
+    changeFunction(addProject);
+  };
+
+  return h(ProjectAdd, { data: model, isEditing, onClickDelete, onClickList });
+};
+
+const SampleSessionAdd = () => {
+  const { model, actions, isEditing } = useModelEditor();
+  const { setListName, changeFunction } = useContext(SampleAdminContext);
+
+  const addSession = (session_id, date, target, technique) => {
+    const currentSessions = [...model.session];
+    const newSess = new Array({ session_id, date, target, technique });
+    const newSessions = [...currentSessions, ...newSess];
+    actions.updateState({
+      model: { session: { $set: newSessions } },
+    });
+  };
+
+  const onClickDelete = ({ session_id: id, date }) => {
+    console.log(id, date);
+  };
+  const onClickList = () => {
+    setListName("session");
+    changeFunction(addSession);
+  };
+
+  return h(SessionAdd, {
+    data: model.session,
+    isEditing,
+    onClickList,
+    onClickDelete,
+  });
+};
+
+const SampleLocationEleDepthEditor = () => {
+  const { model, actions, isEditing } = useModelEditor();
+
+  const loc = model.location ? model.location : { coordinates: [0, 0] };
+  const [longitude, latitude] = loc.coordinates;
+
+  const sample = { ...model, longitude, latitude };
+
+  console.log(longitude, latitude);
+
+  const changeCoordinates = () => {
+    console.log("change");
+  };
+  const changeDepth = () => {
+    console.log("change");
+  };
+  const changeElevation = () => {
+    console.log("change");
+  };
+
+  return h("div", { style: { justifyContent: "flex-end" } }, [
+    h("div.sample-map", { style: { maxWidth: "455px" } }, [
+      h(NewSampleMap, { changeCoordinates, sample }),
+    ]),
+    h("div", { style: { display: "flex" } }, [
+      h(SampleLocation, { changeCoordinates, sample: { longitude, latitude } }),
+      h("div", [
+        h(SampleDepth, { sample, changeDepth }),
+        h(SampleElevation, { sample, changeElevation }),
+      ]),
+    ]),
+  ]);
+};
+
+function SamplePage(props) {
   const { data: sample, Edit } = props;
 
-  const [edit, setEdit] = React.useState(false);
   const { login } = useAuth();
+  const { buildURL } = APIHelpers(useContext(APIV2Context));
 
-  const { isEditing, hasChanges, actions } = React.useContext(
-    ModelEditorContext
-  );
-  const changed = hasChanges;
-
-  const changeEdit = () => {
-    setEdit(!edit);
-  };
   /*
   Render sample page based on ID provided in URL through react router
   */
-  React.useEffect(() => {
-    const onMap = window.location.pathname == "/map";
-    if (!onMap) {
-      MapToaster.clear();
-    }
-  }, [window.location.pathname]);
 
-  const { name, material, session, location, location_name } = sample.data;
-  console.log(sample);
+  console.log(sample.data);
 
   return h(
     ModelEditor,
     {
       model: sample.data,
       canEdit: login || Edit,
-      persistChanges: () => null,
+      persistChanges: async (updatedModel, changeset) => {
+        let rest;
+        let { id } = updatedModel;
+        const response = await put(
+          buildURL(`/models/sample/${id}`, {}),
+          changeset
+        );
+        const { data } = response;
+        ({ id, ...rest } = data);
+        return rest;
+      },
     },
     [
       h("div.sample", [
-        h(
-          "div.page-type",
-          // { style: { display: "flex", justifyContent: "center" } },
-          [Edit ? h(EditNavBar, { header: "Manage Sample" }) : null]
-        ),
+        h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
+        h(ModelEditableText, {
+          is: "h3",
+          field: "name",
+          multiline: true,
+        }),
         h("div.flex-row", [
           h("div.info-block", [
-            h(ModelEditableText, {
-              is: "h3",
-              field: "name",
-              multiline: true,
-            }),
             Edit ? h(DataSheetButton) : null,
-            h(GDDDrawer, { name }),
 
-            h("div.basic-info", [
-              h(ProjectInfo, { sample }),
-              h(Material, { material, changeEdit, onEdit: edit }),
-              h(Sessions, {
-                session,
-              }),
-              h(Publications, { publication: [], onEdit: edit, changeEdit }),
-              Edit ? h(SampleTags, { onEdit: edit, changeEdit }) : null,
-            ]),
+            h(GeoEntity),
+            h(Material),
+            h(DepthElevation),
+            h("div.basic-info", [h(SampleProjectAdd), h(SampleSessionAdd)]),
           ]),
-          h(
-            "div",
-            {
-              style: {
-                display: "flex",
-                flexDirection: "column",
-                paddingTop: "30px",
-              },
-            },
-            [
-              h(LocationBlock, { location, location_name }),
-              h(MetadataHelpers, { sample_name: name }),
-            ]
-          ),
+          h("div", [h(LocationBlock)]),
         ]),
       ]),
     ]
   );
-};
+}
 
 export { SamplePage };
