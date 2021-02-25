@@ -46,67 +46,44 @@ const SampleModelCard = (props) => {
     location,
     session,
     link = true,
-    context = null,
+    onClick = null,
   } = props;
 
   const content = h(sampleContent, { material, id, name, location, session });
-  if (context == null) {
+  if (onClick == null) {
     return h(ModelCard, { id, content, model: "sample", link });
   }
-  const { dispatch } = useContext(context);
 
-  const onClick = () => {
-    dispatch({
-      type: "add_sample",
-      payload: { sample_collection: [{ id, name }] },
-    });
-  };
-
-  return h(ModelCard, { id, content, model: "sample", link, onClick });
+  return h(ModelCard, {
+    id,
+    content,
+    model: "sample",
+    link,
+    onClick: () => onClick(id, name),
+  });
 };
 
 const PublicationModelCard = (props) => {
-  const { year, id, title, doi, author, journal, context, link } = props;
-
-  const { dispatch } = useContext(context);
-
-  const onClick = () => {
-    dispatch({
-      type: "add_pub",
-      payload: {
-        publication_collection: [{ id, title, doi }],
-      },
-    });
-  };
+  const { year, id, title, doi, author, journal, onClick, link } = props;
 
   return h(ModelCard, {
     id,
     content: h("div", [title]),
     model: "publication",
     link,
-    onClick,
+    onClick: () => onClick(id, title, doi),
   });
 };
 
 export const ResearcherModelCard = (props) => {
-  const { id, name, context, link } = props;
+  const { id, name, onClick, link } = props;
 
-  const { dispatch } = useContext(context);
-
-  const onClick = () => {
-    dispatch({
-      type: "add_researcher",
-      payload: {
-        researcher_collection: [{ id, name }],
-      },
-    });
-  };
   return h(ModelCard, {
     id,
     content: h("div", [name]),
     model: "researcher",
     link,
-    onClick,
+    onClick: () => onClick(id, name),
   });
 };
 
@@ -117,6 +94,8 @@ const ProjectModelCard = (props) => {
     description,
     samples = [],
     publication = [],
+    link,
+    onClick,
     minimal = false,
   } = props;
 
@@ -130,7 +109,7 @@ const ProjectModelCard = (props) => {
   const content = h("div.project-card", [
     h("h3", name),
     h("p.description", description),
-    samples
+    samples.length > 0
       ? h(ContentOverFlow, {
           className: "samples",
           data: samples.map((d) => d.name),
@@ -147,7 +126,13 @@ const ProjectModelCard = (props) => {
     ]),
   ]);
 
-  return h(ModelCard, { id, content, model: "project" });
+  return h(ModelCard, {
+    id,
+    content,
+    model: "project",
+    link,
+    onClick: () => onClick(id, name),
+  });
 };
 
 const SessionModelCard = (props) => {
@@ -159,10 +144,12 @@ const SessionModelCard = (props) => {
     instrument,
     analysis,
     sample,
+    link,
+    onClick,
   } = props;
 
-  const instruName = instrument.name;
-  const sampleName = sample.name;
+  const instruName = instrument ? instrument.name : "";
+  const sampleName = sample ? sample.name : "";
 
   const analysisName = analysis.length > 1 ? "Analyses" : "Analysis";
   const analysisCount = analysis.length + " " + analysisName;
@@ -179,7 +166,13 @@ const SessionModelCard = (props) => {
     h("div.footer", [h("div", analysisCount), h("div", ["Target: " + target])]),
   ]);
 
-  return h(ModelCard, { id: session_id, content, model: "session" });
+  return h(ModelCard, {
+    id: session_id,
+    content,
+    model: "session",
+    link,
+    onClick: () => onClick(session_id, date, target, technique),
+  });
 };
 
 const DataFileModelCard = (props) => {
