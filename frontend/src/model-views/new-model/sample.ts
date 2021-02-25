@@ -14,7 +14,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-function NewSampleMap(props) {
+export function NewSampleMap(props) {
   const { changeCoordinates, sample } = props;
   const { longitude, latitude } = sample;
 
@@ -72,7 +72,7 @@ function NewSampleMap(props) {
   );
 }
 
-const SampleLocation = (props) => {
+export const SampleLocation = (props) => {
   const { sample, changeCoordinates } = props;
   const { longitude, latitude } = sample;
   const [loc, setLoc] = useState({
@@ -129,22 +129,25 @@ const SampleLocation = (props) => {
   ]);
 };
 
-const SampleDepth = (props) => {
+export const SampleDepth = (props) => {
   const { sample, changeDepth } = props;
   const { depth } = sample;
 
-  return h(MyNumericInput, {
-    label: "Depth (m)",
-    value: depth,
-    onChange: changeDepth,
-  });
+  return h("div", [
+    h(MyNumericInput, {
+      label: "Depth (m)",
+      value: depth,
+      onChange: changeDepth,
+    }),
+  ]);
 };
 
 const unwrapElevation = (obj) => {
   const { success } = obj;
   return success.data.elevation;
 };
-const SampleElevation = (props) => {
+
+export const SampleElevation = (props) => {
   const { sample, changeElevation } = props;
   const { elevation } = sample;
 
@@ -165,16 +168,18 @@ const SampleElevation = (props) => {
     }
   }, [elev]);
 
-  return h(MyNumericInput, {
-    label: "Elevation (m)",
-    value: elevation,
-    onChange: changeElevation,
-  });
+  return h("div", [
+    h(MyNumericInput, {
+      label: "Elevation (m)",
+      value: elevation,
+      onChange: changeElevation,
+    }),
+  ]);
 };
 
 const unwrapMacroStratNames = (obj) => {
   const { success } = obj;
-  const StratNames = success.data.map((ele) => ele.strat_name);
+  const StratNames = success.data.map((ele) => ele.strat_name_long);
   return StratNames.slice(0, 20);
 };
 
@@ -184,8 +189,8 @@ const unwrapSparrowGeoEntites = (obj) => {
   return entities;
 };
 
-const SampleGeoEntity = (props) => {
-  const { sample, changeGeoEntity } = props;
+export const SampleGeoEntity = (props) => {
+  const { geoEntity, changeGeoEntity } = props;
   const [query, setQuery] = useState("");
   const [entities, setEntities] = useState([]);
 
@@ -243,7 +248,7 @@ const unwrapMacroMaterials = (obj) => {
  * Will use materials from sparrow and macrostrat
  *
  */
-const SampleMaterial = (props) => {
+export const SampleMaterial = (props) => {
   const { sample, changeMaterial } = props;
   const [query, setQuery] = useState("");
   const initMaterials = useAPIv2Result(
@@ -269,13 +274,6 @@ const SampleMaterial = (props) => {
     }
   }, [initMaterials, macrostratMat]);
 
-  const content = h("h5", [
-    "Powered by ",
-    h("a", { href: "https://macrostrat.org/" }, ["Macrostrat"]),
-    " and ",
-    h("a", { href: "https://macrostrat.org/" }, ["Sparrow"]),
-  ]);
-
   return h("div", [
     h(FormGroup, { label: "Material" }, [
       h(MySuggest, {
@@ -286,8 +284,18 @@ const SampleMaterial = (props) => {
         },
       }),
     ]),
-    h(Tooltip, { content }, [h(Icon, { icon: "info-sign" })]),
   ]);
+};
+
+const PoweredByMacroSparrow = () => {
+  const content = h("h5", [
+    "Powered by ",
+    h("a", { href: "https://macrostrat.org/" }, ["Macrostrat"]),
+    " and ",
+    h("a", { href: "https://macrostrat.org/" }, ["Sparrow"]),
+  ]);
+
+  return h(Tooltip, { content }, [h(Icon, { icon: "info-sign" })]);
 };
 
 const SampleName = (props) => {
@@ -394,7 +402,7 @@ function NewSampleForm({ onSubmit }) {
 
   const SubmitButton = () => {
     return h(Button, { onClick: () => onSubmit(sample), intent: "success" }, [
-      "Creat New Sample",
+      "Create New Sample",
     ]);
   };
 
@@ -411,6 +419,7 @@ function NewSampleForm({ onSubmit }) {
     h("div.metadata-body", [
       h(SampleMaterial, { changeMaterial, sample }),
       h(SampleGeoEntity, { sample, changeGeoEntity }),
+      h(PoweredByMacroSparrow),
     ]),
     h(SubmitButton),
   ]);
