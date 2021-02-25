@@ -3,6 +3,7 @@ import { Card, Icon, Button, ButtonGroup } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
 import style from "./card.module.css";
 import styles from "./module.styl";
+import { parse, format } from "date-fns";
 import { useModelURL } from "~/util/router";
 
 const h = hyperStyled(styles);
@@ -61,16 +62,17 @@ const SampleEditCard = (props) => {
   return h("div.sample-edit-card", [
     h("h4.name", name),
     h(Button, {
+      key: name,
       minimal: true,
       icon: "trash",
       intent: "danger",
-      onClick: () => onClick(id),
+      onClick: () => onClick({ id, name }),
     }),
   ]);
 };
 
 const PubEditCard = (props) => {
-  let { id, content, onClick } = props;
+  let { id, title, content, onClick } = props;
 
   return h("div.pub-edit-card", [
     content,
@@ -78,7 +80,7 @@ const PubEditCard = (props) => {
       minimal: true,
       icon: "trash",
       intent: "danger",
-      onClick: () => onClick(id),
+      onClick: () => onClick({ id, title }),
     }),
   ]);
 };
@@ -89,10 +91,54 @@ const ResearcherEditCard = (props) => {
   return h("div.sample-edit-card", [
     h("h4.name", name),
     h(Button, {
+      id: id,
       minimal: true,
       icon: "trash",
       intent: "danger",
-      onClick: () => onClick(id),
+      onClick: () => onClick({ id, name }),
+    }),
+  ]);
+};
+
+export const ProjectEditCard = (props) => {
+  const { d, onClick } = props;
+  const project = d.session.map((obj) => {
+    if ("project" in obj) {
+      const { name, id } = obj.project;
+      return { name, id };
+    }
+    return null;
+  });
+  console.log(project);
+
+  return h("div", [
+    project.map((obj) => {
+      if (!obj) return null;
+      const { name, id } = obj;
+      return h("div.sample-edit-card", [
+        h("h4.name", name),
+        h(Button, {
+          id: id,
+          minimal: true,
+          icon: "trash",
+          intent: "danger",
+          onClick: () => onClick({ id, name }),
+        }),
+      ]);
+    }),
+  ]);
+};
+
+export const SessionEditCard = (props) => {
+  const { onClick, session_id, target, date, technique } = props;
+  return h("div.sample-edit-card", [
+    h("h4.name", [target, format(date, "MMMM D, YYYY"), technique]),
+    h(Button, {
+      id: session_id,
+      minimal: true,
+      icon: "trash",
+      intent: "danger",
+      onClick: () => onClick({ session_id, date }),
     }),
   ]);
 };
