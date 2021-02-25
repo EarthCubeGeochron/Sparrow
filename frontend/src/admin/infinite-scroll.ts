@@ -31,7 +31,7 @@ function unwrapProjectCardData(data) {
   return dataObj;
 }
 
-const ProjectListComponent = ({ params }) => {
+const ProjectListComponent = ({ params, componentProps = {} }) => {
   /* List of projects for the catalog. Could potentially move there... */
   return h("div", { style: { padding: "1px" } }, [
     h(InfiniteAPIView, {
@@ -40,6 +40,7 @@ const ProjectListComponent = ({ params }) => {
       params: { nest: "publication,session,sample" },
       filterParams: { ...params },
       component: ProjectModelCard,
+      componentProps,
       context: APIV2Context,
     }),
   ]);
@@ -91,7 +92,7 @@ function unwrapSessionCardData(data) {
   return dataObj;
 }
 
-function SessionListComponent({ params }) {
+function SessionListComponent({ params, componentProps = {} }) {
   return h("div", { style: { padding: "1px" } }, [
     h(InfiniteAPIView, {
       url: "/models/session",
@@ -99,6 +100,7 @@ function SessionListComponent({ params }) {
       params: { nest: "instrument,project,sample" },
       filterParams: { ...params },
       component: SessionModelCard,
+      componentProps,
       context: APIV2Context,
     }),
   ]);
