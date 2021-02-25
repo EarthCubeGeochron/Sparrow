@@ -3,8 +3,33 @@ from sqlalchemy import create_engine
 from contextlib import contextmanager, redirect_stdout
 from sqlalchemy_utils import create_database, database_exists, drop_database
 from migra import Migration
+from migra.statements import check_for_drop
 import sys
 from .util import run_sql
+
+
+class AutoMigration(Migration):
+    def changes_omitting_view_drops(self):
+        nsel_drops = self.changes.non_table_selectable_drops()
+        for stmt in self.statements:
+            if stmt in nsel_drops:
+                continue
+            yield stmt
+
+    @property
+    def is_safe(self):
+        """We have a looser definition of safety than core Migra; ours
+        involves not destroying data.
+        Dropping 'non-table' items (such as views) is OK to do without checking with
+        the user. Usually, these views are just dropped and recreated anyway when dependent
+        tables change."""
+        # We could try to apply 'non-table-selectable drops' first and then check again...
+        unsafe = any(check_for_drop(s) for s in self.changes_omitting_view_drops())
+        return not unsafe
+
+    def print_changes(self):
+        statements = "\n".join(self.statements)
+        print(statements, file=sys.stderr)
 
 
 @contextmanager
@@ -25,14 +50,14 @@ def _create_migration(db_engine, target, safe=True):
         # For some reason we need to patch this...
         target.dialect.server_version_info = db_engine.dialect.server_version_info
 
-        m = Migration(db_engine, target)
+        m = AutoMigration(db_engine, target)  # , exclude_schema="core_view")
         m.set_safety(safe)
         # Not sure what this does
         m.add_all_changes()
         return m
 
 
-def create_migration(db, safe=True, target=None):
+def create_migration(db, safe=True):
     url = "postgres://postgres@db:5432/sparrow_temp_migration"
     with temp_database(url) as engine:
         app = Sparrow(database=url)
@@ -56,9 +81,9 @@ def db_migration(db, safe=True, apply=False):
             print(s, file=sys.stdout)
 
 
-class SparrowMigration:
-    def should_apply(self, db):
-        return False
+# class SparrowMigration:
+#     def should_apply(self, db):
+#         return False
 
-    def apply(self, db):
-        pass
+#     def apply(self, db):
+#         pass
