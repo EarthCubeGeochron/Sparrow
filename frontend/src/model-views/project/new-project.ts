@@ -1,29 +1,21 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useReducer, useState, createContext, useContext } from "react";
 import { Button, Dialog, Tooltip } from "@blueprintjs/core";
-import { AddSampleCard } from "../sample/detail-card";
 import { AdminPage } from "../../admin/AdminPage";
-import { AdminFilter } from "../../filter";
-import {
-  SampleAddList,
-  PublicationAddList,
-  ResearcherAddList,
-} from "../../admin/infinite-scroll";
 import { APIHelpers } from "@macrostrat/ui-components";
 import { ModelEditableText, EmbargoDatePick } from "./editor";
-import {
-  ProjectSamples,
-  ProjectPublications,
-  ProjectResearchers,
-} from "./page";
 import {
   NewProjectNewPub,
   NewProjNewSample,
   NewProjNewResearcher,
-  AddCard,
   SampleAdd,
   PubAdd,
   ResearcherAdd,
+} from "../new-model";
+import {
+  PublicationFilterList,
+  ResearcherFilterList,
+  SampleFilterList,
 } from "../new-model";
 import { MinimalNavbar } from "~/components";
 import { APIV2Context } from "../../api-v2";
@@ -73,8 +65,9 @@ const projectReducer = (state, action) => {
       };
     case "remove_sample":
       const currentSa = [...state.sample_collection];
-      const remove_id = action.payload.sample_id;
-      const samples = currentSa.filter((el) => el.id != remove_id);
+      const remove = action.payload.sample;
+      const samples = currentSa.filter((ele) => ele.name != remove.name);
+      console.log(samples);
       return {
         ...state,
         sample_collection: samples,
@@ -88,8 +81,8 @@ const projectReducer = (state, action) => {
       };
     case "remove_pub":
       const currentPu = [...state.publication_collection];
-      const removeP_id = action.payload.pub_id;
-      const pubs = currentPu.filter((el) => el.id != removeP_id);
+      const removeP_title = action.payload.pub_title;
+      const pubs = currentPu.filter((el) => el.title != removeP_title);
       return {
         ...state,
         publication_collection: pubs,
@@ -103,8 +96,8 @@ const projectReducer = (state, action) => {
       };
     case "remove_res":
       const currentRes = [...state.researcher_collection];
-      const removeRes_id = action.payload.res_id;
-      const researchers = currentRes.filter((el) => el.id != removeRes_id);
+      const removeRes_name = action.payload.res_name;
+      const researchers = currentRes.filter((el) => el.name != removeRes_name);
       return {
         ...state,
         researcher_collection: researchers,
@@ -135,7 +128,6 @@ const projectReducer = (state, action) => {
  * @param props
  */
 export function NewProjectFormMain() {
-  const [edit, setEdit] = useState(false);
   const { project, dispatch } = useContext(ProjectFormContext);
   console.log(project);
   const { buildURL } = APIHelpers(useContext(APIV2Context));
@@ -147,9 +139,9 @@ export function NewProjectFormMain() {
       {
         name: project.name,
         description: project.description,
-        sample: project.sample_collection,
-        publication: project.publication_collection,
-        researcher: project.researcher_collection,
+        samples: project.sample_collection,
+        publications: project.publication_collection,
+        researchers: project.researcher_collection,
       },
     ];
     console.log(route);
@@ -192,9 +184,14 @@ export function NewProjectFormMain() {
   };
 
   const SampleAddProj = () => {
-    const onClickDelete = (id) => {
-      console.log(id);
-      dispatch({ type: "remove_sample", payload: { sample_id: id } });
+    const onClickDelete = ({ id, name }) => {
+      let sample;
+      if (id) {
+        sample = { id, name };
+      } else {
+        sample = { name };
+      }
+      dispatch({ type: "remove_sample", payload: { sample: sample } });
     };
     const onClickList = () => {
       dispatch({
@@ -213,9 +210,9 @@ export function NewProjectFormMain() {
 
   // this should look like normal project page
   const PubAddProj = () => {
-    const onClickDelete = (id) => {
-      dispatch({ type: "remove_pub", payload: { pub_id: id } });
-      console.log("Remove", id);
+    const onClickDelete = ({ id, title }) => {
+      dispatch({ type: "remove_pub", payload: { pub_title: title } });
+      console.log("Remove", title);
     };
     const onClickList = () => {
       dispatch({ type: "filter-list", payload: { filter_list: "pub" } });
@@ -230,8 +227,8 @@ export function NewProjectFormMain() {
   };
 
   const ResearcherAddProj = () => {
-    const onClickDelete = (id) => {
-      dispatch({ type: "remove_res", payload: { res_id: id } });
+    const onClickDelete = ({ id, name }) => {
+      dispatch({ type: "remove_res", payload: { res_name: name } });
       console.log(id);
     };
     const onClickList = () => {
@@ -258,11 +255,11 @@ export function NewProjectFormMain() {
 
     const url = useModelURL(`/project`);
     return h(Dialog, { isOpen: open }, [
-      h(Link, { to: url }, [
-        h(Button, { intent: "success", onClick: goToProject }, [
-          "Create New Project",
-        ]),
+      //h(Link, { to: url }, [
+      h(Button, { intent: "success", onClick: goToProject }, [
+        "Create New Project",
       ]),
+      // ]),
       h(Button, { intent: "danger", onClick: changeOpen }, ["Cancel"]),
     ]);
   };
@@ -322,94 +319,44 @@ export function NewProjectFormMain() {
   ]);
 }
 
-export function SampleFilterList(props) {
-  const possibleFilters = ["public", "geometry", "date_range"]; //needs to work with "doi_like"
-
-  const [params, setParams] = useState({});
-
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-
-  return h(AdminFilter, {
-    listComponent: h(SampleAddList, {
-      params,
-      componentProps: {
-        link: false,
-        context: ProjectFormContext,
-      },
-    }),
-    createParams,
-    possibleFilters,
-    initParams: params || {},
-  });
-}
-
-function PublicationFilterList(props) {
-  const possibleFilters = ["date_range", "doi_like"];
-
-  const [params, setParams] = useState({});
-
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-  return h(AdminFilter, {
-    listComponent: h(PublicationAddList, {
-      params,
-      componentProps: {
-        link: false,
-        context: ProjectFormContext,
-      },
-    }),
-    createParams,
-    possibleFilters,
-    initParams: params || {},
-  });
-}
-
-function ResearcherFilterList(props) {
-  const possibleFilters = [];
-  const [params, setParams] = useState({});
-
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-  return h(AdminFilter, {
-    listComponent: h(ResearcherAddList, {
-      params,
-      componentProps: {
-        link: false,
-        context: ProjectFormContext,
-      },
-    }),
-    createParams,
-    possibleFilters,
-    initParams: params || {},
-  });
-}
-
 const ProjectEditListComponent = () => {
   const { project, dispatch } = useContext(ProjectFormContext);
 
+  const onClickRes = (id, name) => {
+    dispatch({
+      type: "add_researcher",
+      payload: {
+        researcher_collection: [{ id, name }],
+      },
+    });
+  };
+
+  const onClickPub = (id, title, doi) => {
+    dispatch({
+      type: "add_pub",
+      payload: {
+        publication_collection: [{ id, title, doi }],
+      },
+    });
+  };
+
+  const onClickSam = (id, name) => {
+    dispatch({
+      type: "add_sample",
+      payload: { sample_collection: [{ id, name }] },
+    });
+  };
+
   return h("div", [
-    h.if(project.filter_list == "sample")(SampleFilterList),
-    h.if(project.filter_list == "pub")(PublicationFilterList),
-    h.if(project.filter_list == "res")(ResearcherFilterList),
+    h.if(project.filter_list == "sample")(SampleFilterList, {
+      onClick: onClickSam,
+    }),
+    h.if(project.filter_list == "pub")(PublicationFilterList, {
+      onClick: onClickPub,
+    }),
+    h.if(project.filter_list == "res")(ResearcherFilterList, {
+      onClick: onClickRes,
+    }),
   ]);
 };
 
