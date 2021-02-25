@@ -5,6 +5,8 @@ import {
   ProjectPublications,
   ProjectResearchers,
 } from "../project/page";
+import { SampleProjects, Sessions } from "../sample/page";
+import { MultipleSelectFilter } from "../../filter/components";
 import { hyperStyled } from "@macrostrat/hyper";
 import styles from "./module.styl";
 
@@ -37,7 +39,6 @@ export const SampleAdd = (props) => {
     h("div", [
       h(ProjectSamples, {
         data,
-        link: false,
         isEditing,
         onClick: onClickDelete,
         setID,
@@ -97,3 +98,58 @@ export const ResearcherAdd = (props) => {
     }),
   ]);
 };
+
+export const ProjectAdd = (props) => {
+  const { onClickDelete, onClickList, data, isEditing } = props;
+
+  return h("div", [
+    h(SampleProjects, {
+      onClick: onClickDelete,
+      isEditing,
+      data,
+    }),
+    h.if(isEditing)(AddCard, {
+      model: "project",
+      onClick: onClickList,
+    }),
+  ]);
+};
+
+export const SessionAdd = (props) => {
+  const { onClickDelete, onClickList, data, isEditing } = props;
+
+  return h("div", [
+    h(Sessions, {
+      session: data,
+      onClick: onClickDelete,
+      isEditing,
+    }),
+    h.if(isEditing)(AddCard, {
+      model: "session",
+      onClick: onClickList,
+    }),
+  ]);
+};
+
+function ModelTags({ isEditing }) {
+  const tags = [
+    "Needs Work",
+    "Check Location",
+    "Link to Publication",
+    "Link to Project",
+    "Add material",
+  ];
+
+  if (isEditing) {
+    return h("div", [
+      h("h4.subtitle", ["Sample Tags"]),
+      h(MultipleSelectFilter, {
+        items: tags,
+        sendQuery: () => null,
+      }),
+    ]);
+  }
+  if (!isEditing) {
+    return h("div", [h("h4.subtitle", ["Sample Tags"])]);
+  }
+}
