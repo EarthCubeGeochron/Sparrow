@@ -1,11 +1,16 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
-import { useState, createContext } from "react";
+import { useState, createContext, useContext } from "react";
 import { ProjectMatch } from "~/model-views/project";
 import { ProjectListComponent } from "./infinite-scroll";
 import styles from "./module.styl";
 import { NoStateAdmin } from "./baseview";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
+import {
+  SampleFilterList,
+  PublicationFilterList,
+  ResearcherFilterList,
+} from "~/model-views/new-model";
 import { AdminFilter } from "../filter";
 
 const h = hyperStyled(styles);
@@ -27,12 +32,8 @@ export function ProjectMainPanel() {
 
 export const ProjectAdminContext = createContext({});
 
-
-
-export function ProjectAdminPage() {
+const mainFilterList = (props) => {
   const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
-
-  const [listName, setListName] = useState("list");
 
   const initialState = createParamsFromURL(possibleFilters);
 
@@ -46,13 +47,51 @@ export function ProjectAdminPage() {
     }
     setParams(params);
   };
-  return h(AdminPage, {
-    listComponent: h(AdminFilter, {
-      listComponent: h(ProjectListComponent, { params }),
-      possibleFilters,
-      createParams,
-      initParams: params || {},
-    }),
-    mainPageComponent: h(ProjectMainPanel),
+
+  return h(AdminFilter, {
+    listComponent: h(ProjectListComponent, { params }),
+    possibleFilters,
+    createParams,
+    initParams: params || {},
   });
+};
+
+const ProjectAdminList = (props) => {
+  const { listName, updateFunction } = useContext(ProjectAdminContext);
+
+  return h("div", [
+    h.if(listName == "main")(mainFilterList),
+    h.if(listName == "sample")(SampleFilterList, {
+      onClick: updateFunction,
+    }),
+    h.if(listName == "publication")(PublicationFilterList, {
+      onClick: updateFunction,
+    }),
+    h.if(listName == "researcher")(ResearcherFilterList, {
+      onClick: updateFunction,
+    }),
+  ]);
+};
+
+export function ProjectAdminPage() {
+  const [listName, setListName] = useState("main");
+
+  const [updateFunction, setUpdateFunction] = useState(() =>
+    console.log("add")
+  );
+
+  const changeFunction = (func) => {
+    setUpdateFunction(() => func);
+  };
+
+  return h(
+    ProjectAdminContext.Provider,
+    { value: { setListName, updateFunction, listName, changeFunction } },
+    [
+      h(AdminPage, {
+        listComponent: h(ProjectAdminList),
+        mainPageComponent: h(ProjectMainPanel),
+      }),
+    ]
+  );
 }
