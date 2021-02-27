@@ -7,6 +7,9 @@ from migra import Migration
 from migra.statements import check_for_drop
 import sys
 from .util import _exec_raw_sql
+from sparrow_utils import get_logger
+
+log = get_logger(__name__)
 
 
 class AutoMigration(Migration):
@@ -61,7 +64,6 @@ def _create_migration(db_engine, target, safe=True):
     with redirect_stdout(sys.stderr):
         # For some reason we need to patch this...
         target.dialect.server_version_info = db_engine.dialect.server_version_info
-
         m = AutoMigration(db_engine, target)  # , exclude_schema="core_view")
         m.set_safety(safe)
         # Not sure what this does
@@ -69,12 +71,18 @@ def _create_migration(db_engine, target, safe=True):
         return m
 
 
-def create_migration(db, safe=True):
-    url = "postgres://postgres@db:5432/sparrow_temp_migration"
+@contextmanager
+def _target_db(url):
     with temp_database(url) as engine:
         app = Sparrow(database=url)
         app.init_database()
-        return _create_migration(db.engine, engine)
+        yield engine
+
+
+def create_migration(db, safe=True):
+    url = "postgres://postgres@db:5432/sparrow_temp_migration"
+    with _target_db(url) as target:
+        return _create_migration(db.engine, target)
 
 
 def needs_migration(db):
@@ -94,18 +102,58 @@ def db_migration(db, safe=True, apply=False):
 
 
 @contextmanager
-def create_schema_clone(db, db_url="postgres://postgres@db:5432/sparrow_schema_clone"):
-    with temp_database(db_url) as engine:
-        engine.dialect.server_version_info = db.engine.dialect.server_version_info
-        m = _create_migration(engine, db.engine)
+def create_schema_clone(
+    engine, db_url="postgres://postgres@db:5432/sparrow_schema_clone"
+):
+    with temp_database(db_url) as clone_engine:
+        clone_engine.dialect.server_version_info = engine.dialect.server_version_info
+        m = _create_migration(clone_engine, engine)
         m.apply()
-        yield engine
+        yield clone_engine
 
 
 class SparrowDatabaseMigrator:
+    target_url = "postgres://postgres@db:5432/sparrow_temp_migration"
+    dry_run_url = "postgres://postgres@db:5432/sparrow_schema_clone"
+
     def __init__(self, db):
         self.db = db
 
     def create_database_clone(self):
         """Clone the current database to create a schema-identical database"""
         pass
+
+    def apply_migrations(self, db):
+        """This is the magic function where an ordered changeset gets
+        generated and applied"""
+        pass
+
+    def _run_migration(self, engine, target, check=False):
+        m = _create_migration(engine, target)
+        if len(m.statements) == 0:
+            log.info("No migration necessary")
+            return
+
+        if m.is_safe:
+            m.apply()
+
+        self.apply_migrations()
+
+        # Migrating to the new version should now be "safe"
+        m = _create_migration(engine, target)
+        assert m.is_safe
+
+        m.apply()
+        # Re-add changes
+        m.add_all_changes()
+
+        assert len(m.statements) == 0
+
+    def dry_run_migration(self, target):
+        with create_schema_clone(self.db.engine, db_url=self.dry_run_url) as src:
+            self._run_migration(src, target)
+
+    def run_migration(self, dry_run=True):
+        with _target_db(self.target_url) as target:
+            self.dry_run_migration(target)
+            self._run_migration(self.db.engine, target)
