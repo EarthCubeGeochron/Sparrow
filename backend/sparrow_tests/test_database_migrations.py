@@ -1,3 +1,4 @@
+from sparrow.database.migration import create_schema_clone
 from sparrow.app import Sparrow
 from sparrow_utils import relative_path, cmd
 from sparrow.database.migration import create_migration, _create_migration
@@ -40,8 +41,18 @@ class TestDatabaseMigrations:
         m = _create_migration(test_app.database.engine, db.engine)
         assert m.is_safe
 
+        m.apply()
+        # Re-add changes
+        m.add_all_changes()
+
+        assert len(m.statements) == 0
+
     # def test_forced_migration(self, db):
     #     """Forcibly degrade the database and then
     #     see if we can get it back to normal state."""
     #     db.engine.execute("ALTER TABLE session ADD COLUMN fake_column text UNIQUE")
     #     m = create_migration(db)
+
+    def test_schema_clone(self, db):
+        with create_schema_clone(db) as engine:
+            conn = engine.connect()

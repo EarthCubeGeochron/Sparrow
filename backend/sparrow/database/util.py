@@ -2,6 +2,7 @@ from click import secho
 from sqlalchemy.exc import ProgrammingError, IntegrityError
 from sqlparse import split, format
 from sqlalchemy.sql import ClauseElement
+from sqlalchemy import text
 
 
 def run_query(db, filename_or_query, **kwargs):
@@ -41,16 +42,32 @@ def run_sql(session, sql, params=None):
             continue
         try:
             session.execute(sql, params=params)
-            session.commit()
+            if hasattr(session, "commit"):
+                session.commit()
             pretty_print(sql, dim=True)
         except (ProgrammingError, IntegrityError) as err:
             err = str(err.orig).strip()
             dim = "already exists" in err
-            session.rollback()
+            if hasattr(session, "rollback"):
+                session.rollback()
             pretty_print(sql, fg=None if dim else "red", dim=True)
             if dim:
                 err = "  " + err
             secho(err, fg="red", dim=dim)
+
+
+def _exec_raw_sql(engine, sql):
+    """Execute SQL unsafely on an sqlalchemy Engine"""
+    try:
+        engine.execute(text(sql))
+        pretty_print(sql, dim=True)
+    except (ProgrammingError, IntegrityError) as err:
+        err = str(err.orig).strip()
+        dim = "already exists" in err
+        pretty_print(sql, fg=None if dim else "red", dim=True)
+        if dim:
+            err = "  " + err
+        secho(err, fg="red", dim=dim)
 
 
 def run_sql_file(session, sql_file):

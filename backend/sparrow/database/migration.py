@@ -2,10 +2,11 @@ from sparrow.app import Sparrow
 from sqlalchemy import create_engine
 from contextlib import contextmanager, redirect_stdout
 from sqlalchemy_utils import create_database, database_exists, drop_database
+from schemainspect import get_inspector
 from migra import Migration
 from migra.statements import check_for_drop
 import sys
-from .util import run_sql
+from .util import _exec_raw_sql
 
 
 class AutoMigration(Migration):
@@ -16,10 +17,21 @@ class AutoMigration(Migration):
                 continue
             yield stmt
 
+    def apply(self):
+        for stmt in self.statements:
+            _exec_raw_sql(self.s_from, stmt)
+        self.changes.i_from = get_inspector(
+            self.s_from, schema=self.schema, exclude_schema=self.exclude_schema
+        )
+
+        safety_on = self.statements.safe
+        self.clear()
+        self.set_safety(safety_on)
+
     @property
     def is_safe(self):
-        """We have a looser definition of safety than core Migra; ours
-        involves not destroying data.
+        """We have a looser definition of safety than core Migra; ours involves not
+        destroying data.
         Dropping 'non-table' items (such as views) is OK to do without checking with
         the user. Usually, these views are just dropped and recreated anyway when dependent
         tables change."""
@@ -81,9 +93,19 @@ def db_migration(db, safe=True, apply=False):
             print(s, file=sys.stdout)
 
 
-# class SparrowMigration:
-#     def should_apply(self, db):
-#         return False
+@contextmanager
+def create_schema_clone(db, db_url="postgres://postgres@db:5432/sparrow_schema_clone"):
+    with temp_database(db_url) as engine:
+        engine.dialect.server_version_info = db.engine.dialect.server_version_info
+        m = _create_migration(engine, db.engine)
+        m.apply()
+        yield engine
 
-#     def apply(self, db):
-#         pass
+
+class SparrowDatabaseMigrator:
+    def __init__(self, db):
+        self.db = db
+
+    def create_database_clone(self):
+        """Clone the current database to create a schema-identical database"""
+        pass
