@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from contextlib import contextmanager, redirect_stdout
 from sqlalchemy_utils import create_database, database_exists, drop_database
+from sqlalchemy.exc import ProgrammingError, IntegrityError
 from schemainspect import get_inspector
 from schemainspect.misc import quoted_identifier
 from migra import Migration
@@ -21,14 +22,20 @@ class AutoMigration(Migration):
                 continue
             yield stmt
 
+    def _exec(self, sql, quiet=False):
+        """Execute SQL unsafely on an sqlalchemy Engine"""
+        if not quiet:
+            return _exec_raw_sql(self.s_from, sql)
+        try:
+            self.s_from.execute(text(sql))
+        except (ProgrammingError, IntegrityError) as err:
+            log.debug(err)
+
     def apply(self, quiet=False):
         n = len(self.statements)
         log.debug(f"Applying migration with {n} operations")
         for stmt in self.statements:
-            if quiet:
-                self.s_from.execute(text(stmt))
-            else:
-                _exec_raw_sql(self.s_from, stmt)
+            self._exec(stmt, quiet=quiet)
         self.changes.i_from = get_inspector(
             self.s_from, schema=self.schema, exclude_schema=self.exclude_schema
         )
@@ -56,14 +63,12 @@ class AutoMigration(Migration):
 @contextmanager
 def temp_database(conn_string):
     """Create a temporary database and tear it down after tests."""
-    engine = create_engine(conn_string)
-
-    if not database_exists(engine.url):
-        create_database(engine.url)
+    if not database_exists(conn_string):
+        create_database(conn_string)
     try:
-        yield engine
+        yield create_engine(conn_string)
     finally:
-        drop_database(engine.url)
+        drop_database(conn_string)
 
 
 def _create_migration(db_engine, target, safe=True):
@@ -200,7 +205,7 @@ class SparrowDatabaseMigrator:
 
         if m.is_safe:
             log.info("Applying automatic migration")
-            m.apply()
+            m.apply(quiet=True)
             return
 
         self.apply_migrations(engine)

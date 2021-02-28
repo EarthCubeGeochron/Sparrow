@@ -8,6 +8,7 @@ from subprocess import run
 from shlex import split
 from time import sleep
 from sqlalchemy import create_engine, exc
+from sqlalchemy_utils import drop_database, create_database, database_exists
 
 args = argv[1:]
 
@@ -35,28 +36,15 @@ while not db_ready():
     echo("Waiting for database...")
     sleep(1)
 
-os.environ["SPARROW_DATABASE"] = "postgresql://postgres@db:5432/sparrow_test"
+db_conn = "postgresql://postgres@db:5432/sparrow_test"
+os.environ["SPARROW_DATABASE"] = db_conn
 
+# For now, we drop databases before every test
+if database_exists(db_conn):
+    drop_database(db_conn)
+assert not database_exists(db_conn)
+create_database(db_conn)
 
-def teardown_database(message="Tearing down database..."):
-    print(message)
-    return run(["dropdb", *dbargs, "sparrow_test"])
-
-
-db_exists = False
-try:
-    engine = create_engine(os.environ["SPARROW_DATABASE"]).connect()
-    db_exists = True
-except exc.OperationalError:
-    db_exists = False
-
-if db_exists and keep_database:
-    echo("Using existing testing database")
-elif db_exists and not keep_database:
-    teardown_database("Dropping existing testing database")
-else:
-    c = run(["createdb", *dbargs, "sparrow_test"])
-    echo("Database is ready...")
 
 # This prevents us from getting absolutely spammed by SAWarning
 # TODO: improve warning handling for database automapping
@@ -73,5 +61,5 @@ if psql:
     run(["psql", *dbargs, "sparrow_test"])
 
 if not keep_database:
-    teardown_database()
+    drop_database(db_conn)
 echo("Done!")
