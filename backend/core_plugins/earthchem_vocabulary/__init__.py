@@ -8,4 +8,5 @@ class EarthChemVocabularyPlugin(SparrowPlugin):
     def on_setup_cli(self, cli):
         from .cli import import_earthchem
 
+        import_earthchem.plugin = self.name
         cli.add_command(import_earthchem)

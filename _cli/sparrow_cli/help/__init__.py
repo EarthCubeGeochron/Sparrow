@@ -1,6 +1,7 @@
 import sys
 import re
 import json
+from typing import get_args
 from click import style, secho
 from click.formatting import HelpFormatter
 from os import environ, path
@@ -58,6 +59,23 @@ def command_dl(directories: Path, extra_commands={}):
         yield (key, get_description(f).strip())
 
 
+def format_help(val, show_plugin=False):
+    if isinstance(val, str):
+        return val
+    prefix = ""
+    val.get("plugin")
+    if show_plugin and plugin is not None:
+        prefix = f"[{plugin}] "
+
+    return prefix + val["help"]
+
+
+def is_plugin_command(val):
+    if isinstance(val, str):
+        return False
+    return val.get("plugin") is not None
+
+
 class SparrowHelpFormatter(HelpFormatter):
     key_commands = {
         "up": "Start `sparrow` and follow logs",
@@ -107,11 +125,24 @@ class SparrowHelpFormatter(HelpFormatter):
         commands = get_backend_command_help()
         if commands is None:
             return
+        core_commands = {
+            k: format_help(v) for k, v in commands.items() if not is_plugin_command(v)
+        }
+        plugin_commands = {
+            k: format_help(v) for k, v in commands.items() if is_plugin_command(v)
+        }
         self.write_section(
             "Core application",
-            commands,
+            core_commands,
             # These should be managed by subcommands...
             skip=["db-migration", "remove-analytical-data", "remove-audit-trail"],
+        )
+        if len(plugin_commands) == 0:
+            return
+        self.write_section(
+            "Plugins",
+            plugin_commands,
+            # These should be managed by subcommands...
         )
 
     def write_section(self, title, commands, **kwargs):
@@ -123,7 +154,7 @@ class SparrowHelpFormatter(HelpFormatter):
             core_commands,
             extra_commands={
                 "compose": "Alias to `docker-compose` that respects `sparrow` config",
-                **{k: v for k, v in command_info(ctx, cli)},
+                **{k: format_help(v) for k, v in command_info(ctx, cli)},
             },
         )
         self._write_section(
@@ -155,7 +186,7 @@ def command_info(ctx, cli):
         if any([cmd.hidden, name in sections.keys(), name == "main"]):
             continue
         help = cmd.get_short_help_str()
-        yield name, help
+        yield name, {"help": help, "plugin": None}
 
 
 def echo_help(ctx, core_commands=None, user_commands=None):

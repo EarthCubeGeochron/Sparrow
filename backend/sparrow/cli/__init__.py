@@ -159,7 +159,7 @@ def command_info(ctx, cli):
         if cmd.hidden:
             continue
         help = cmd.get_short_help_str()
-        yield name, help
+        yield name, {"help": help, "plugin": getattr(cmd, "plugin", None)}
 
 
 @cli.command(name="get-cli-info", hidden=True)

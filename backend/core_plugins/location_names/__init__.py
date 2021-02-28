@@ -34,6 +34,8 @@ class LocationNamesPlugin(SparrowPlugin):
             """
             self.update_location_names(*args, **kwargs)
 
+        cmd.plugin = self.name
+
         cli.add_command(cmd)
 
     def update_location_names(self, overwrite=False):
