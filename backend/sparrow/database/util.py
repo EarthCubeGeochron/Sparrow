@@ -3,6 +3,12 @@ from sqlalchemy.exc import ProgrammingError, IntegrityError
 from sqlparse import split, format
 from sqlalchemy.sql import ClauseElement
 from sqlalchemy import text
+from sqlalchemy.orm import sessionmaker
+
+
+def db_session(engine):
+    factory = sessionmaker(bind=engine)
+    return factory()
 
 
 def run_query(db, filename_or_query, **kwargs):
@@ -41,7 +47,7 @@ def run_sql(session, sql, params=None):
         if sql == "":
             continue
         try:
-            session.execute(sql, params=params)
+            session.execute(text(sql), params=params)
             if hasattr(session, "commit"):
                 session.commit()
             pretty_print(sql, dim=True)

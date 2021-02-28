@@ -6,8 +6,9 @@ from schemainspect.misc import quoted_identifier
 from migra import Migration
 from migra.statements import check_for_drop
 import sys
-from .util import _exec_raw_sql
-from sparrow_utils import get_logger
+from .util import _exec_raw_sql, run_sql
+from sparrow_utils import get_logger, cmd
+from sqlalchemy import text
 
 log = get_logger(__name__)
 
@@ -20,9 +21,14 @@ class AutoMigration(Migration):
                 continue
             yield stmt
 
-    def apply(self):
+    def apply(self, quiet=False):
+        n = len(self.statements)
+        log.debug(f"Applying migration with {n} operations")
         for stmt in self.statements:
-            _exec_raw_sql(self.s_from, stmt)
+            if quiet:
+                self.s_from.execute(text(stmt))
+            else:
+                _exec_raw_sql(self.s_from, stmt)
         self.changes.i_from = get_inspector(
             self.s_from, schema=self.schema, exclude_schema=self.exclude_schema
         )
@@ -61,14 +67,13 @@ def temp_database(conn_string):
 
 
 def _create_migration(db_engine, target, safe=True):
-    with redirect_stdout(sys.stderr):
-        # For some reason we need to patch this...
-        target.dialect.server_version_info = db_engine.dialect.server_version_info
-        m = AutoMigration(db_engine, target)  # , exclude_schema="core_view")
-        m.set_safety(safe)
-        # Not sure what this does
-        m.add_all_changes()
-        return m
+    # For some reason we need to patch this...
+    target.dialect.server_version_info = db_engine.dialect.server_version_info
+    m = AutoMigration(db_engine, target)  # , exclude_schema="core_view")
+    m.set_safety(safe)
+    # Not sure what this does
+    m.add_all_changes()
+    return m
 
 
 @contextmanager
@@ -83,7 +88,7 @@ def _target_db(url):
 
 def create_migration(db, safe=True):
     url = "postgres://postgres@db:5432/sparrow_temp_migration"
-    with _target_db(url) as target:
+    with _target_db(url) as target, redirect_stdout(sys.stderr):
         return _create_migration(db.engine, target)
 
 
@@ -103,14 +108,31 @@ def db_migration(db, safe=True, apply=False):
             print(s, file=sys.stdout)
 
 
+def dump_schema(engine):
+    conn_flags = f"-h {engine.url.host} -p {engine.url.port} -U {engine.url.username}"
+    if password := engine.url.password:
+        conn_flags += f" -P {password}"
+
+    res = cmd(
+        "pg_dump",
+        "--schema-only",
+        conn_flags,
+        engine.url.database,
+        capture_output=True,
+    )
+    return res.stdout
+
+
 @contextmanager
 def create_schema_clone(
     engine, db_url="postgres://postgres@db:5432/sparrow_schema_clone"
 ):
+    schema = dump_schema(engine)
     with temp_database(db_url) as clone_engine:
-        clone_engine.dialect.server_version_info = engine.dialect.server_version_info
+        run_sql(clone_engine, schema)
+        # Sometimes, we still have some differences, annoyingly
         m = _create_migration(clone_engine, engine)
-        m.apply()
+        m.apply(quiet=True)
         yield clone_engine
 
 
@@ -187,11 +209,10 @@ class SparrowDatabaseMigrator:
         m = _create_migration(engine, target)
         assert m.is_safe
 
-        m.apply()
-        # Re-add changes
-        m.add_all_changes()
-
-        assert len(m.statements) == 0
+        m.apply(quiet=True)
+        # Re-add changes (this is time-consuming)
+        # m.add_all_changes()
+        # assert len(m.statements) == 0
 
     def dry_run_migration(self, target):
         log.info("Running dry-run migration")

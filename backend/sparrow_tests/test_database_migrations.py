@@ -2,6 +2,7 @@ from sparrow.database.migration import create_schema_clone
 from sparrow.app import Sparrow
 from sparrow_utils import relative_path, cmd
 from sparrow.database.migration import create_migration, _create_migration
+from pytest import mark
 
 target_db = "postgresql://postgres@db:5432/sparrow_test"
 testing_db = "postgresql://postgres@db:5432/sparrow_migration_base"
@@ -47,6 +48,12 @@ class TestDatabaseMigrations:
 
         assert len(m.statements) == 0
 
+    def test_migration_built_in(self, db):
+        db.update_schema()
+
+    @mark.slow
     def test_schema_clone(self, db):
         with create_schema_clone(db.engine) as engine:
-            conn = engine.connect()
+            m = _create_migration(engine, db.engine)
+            # Schemas should now be the same...
+            assert len(m.statements) == 0
