@@ -47,12 +47,6 @@ class TestDatabaseMigrations:
 
         assert len(m.statements) == 0
 
-    # def test_forced_migration(self, db):
-    #     """Forcibly degrade the database and then
-    #     see if we can get it back to normal state."""
-    #     db.engine.execute("ALTER TABLE session ADD COLUMN fake_column text UNIQUE")
-    #     m = create_migration(db)
-
     def test_schema_clone(self, db):
-        with create_schema_clone(db) as engine:
+        with create_schema_clone(db.engine) as engine:
             conn = engine.connect()

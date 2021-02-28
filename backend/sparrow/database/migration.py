@@ -1,8 +1,8 @@
-from sparrow.app import Sparrow
 from sqlalchemy import create_engine
 from contextlib import contextmanager, redirect_stdout
 from sqlalchemy_utils import create_database, database_exists, drop_database
 from schemainspect import get_inspector
+from schemainspect.misc import quoted_identifier
 from migra import Migration
 from migra.statements import check_for_drop
 import sys
@@ -73,6 +73,8 @@ def _create_migration(db_engine, target, safe=True):
 
 @contextmanager
 def _target_db(url):
+    from sparrow.app import Sparrow
+
     with temp_database(url) as engine:
         app = Sparrow(database=url)
         app.init_database()
@@ -112,21 +114,59 @@ def create_schema_clone(
         yield clone_engine
 
 
+def has_column(engine, table, column):
+    insp = get_inspector(engine)
+    tbl = insp.tables[table]
+    for col in tbl.columns:
+        if col.name == column:
+            return True
+    return False
+
+
+class SparrowMigration:
+    name = None
+
+    def should_apply(self, engine, target, migrator):
+        return False
+
+    def apply(self, engine):
+        pass
+
+
 class SparrowDatabaseMigrator:
     target_url = "postgres://postgres@db:5432/sparrow_temp_migration"
     dry_run_url = "postgres://postgres@db:5432/sparrow_schema_clone"
 
-    def __init__(self, db):
+    def __init__(self, db, migrations=[]):
         self.db = db
+        self._migrations = migrations
 
-    def create_database_clone(self):
-        """Clone the current database to create a schema-identical database"""
-        pass
+    def add_migration(self, migration):
+        assert issubclass(migration, SparrowMigration)
+        self._migrations.append(migration)
 
-    def apply_migrations(self, db):
+    def add_module(self, module):
+        for _, obj in module.__dict__.items():
+            try:
+                assert issubclass(obj, SparrowMigration)
+            except (TypeError, AssertionError):
+                continue
+            if obj is SparrowMigration:
+                continue
+            self.add_migration(obj)
+
+    def apply_migrations(self, engine):
         """This is the magic function where an ordered changeset gets
         generated and applied"""
-        pass
+        migrations = [m for m in self._migrations if m.should_apply(engine)]
+        log.info("Applying manual migrations")
+        while len(migrations) > 0:
+            n = len(migrations)
+            log.info(f"Found {n} migrations to apply")
+            for m in migrations:
+                log.info(f"Applying migration {m.name}")
+                m.apply(engine)
+            migrations = [m for m in migrations if m.should_apply(engine)]
 
     def _run_migration(self, engine, target, check=False):
         m = _create_migration(engine, target)
@@ -135,9 +175,11 @@ class SparrowDatabaseMigrator:
             return
 
         if m.is_safe:
+            log.info("Applying automatic migration")
             m.apply()
+            return
 
-        self.apply_migrations()
+        self.apply_migrations(engine)
 
         # Migrating to the new version should now be "safe"
         m = _create_migration(engine, target)
@@ -155,5 +197,6 @@ class SparrowDatabaseMigrator:
 
     def run_migration(self, dry_run=True):
         with _target_db(self.target_url) as target:
-            self.dry_run_migration(target)
+            if dry_run:
+                self.dry_run_migration(target)
             self._run_migration(self.db.engine, target)

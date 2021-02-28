@@ -9,6 +9,7 @@ from ..util import working_directory
 from ..context import get_sparrow_app
 from ..auth.create_user import create_user
 from ..database.migration import db_migration
+from sparrow_utils.logs import setup_stderr_logs
 
 
 def _build_app_context(config):
@@ -140,7 +141,15 @@ def plugins(app):
 @click.option("--safe", is_flag=True, default=True)
 @click.option("--apply", is_flag=True, default=False)
 def _db_migration(db, safe=True, apply=False):
+    """Command to generate a basic migration."""
+    setup_stderr_logs()
     db_migration(db, safe=safe, apply=apply)
+
+
+@cli.command(name="db-update")
+@with_database
+def db_update(db):
+    db.update_schema()
 
 
 def command_info(ctx, cli):
