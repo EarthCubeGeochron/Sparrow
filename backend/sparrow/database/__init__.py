@@ -18,6 +18,7 @@ from ..util import relative_path
 from ..interface import ModelSchema, model_interface
 from ..exceptions import DatabaseMappingError
 from .postgresql import on_conflict
+from .migration import SparrowDatabaseMigrator
 
 metadata = MetaData()
 
@@ -179,7 +180,7 @@ class Database(MappedDatabaseMixin):
             model = getattr(self.model, model)
         return get_or_create(self.session, model, **kwargs)
 
-    def initialize(self, drop=False):
+    def initialize(self, drop=False, quiet=False):
         secho("Creating core schema...", bold=True)
 
         if drop:
@@ -198,3 +199,12 @@ class Database(MappedDatabaseMixin):
         except AttributeError as err:
             secho("Could not load plugins", fg="red", dim=True)
             secho(str(err))
+
+    def update_schema(self, dry_run=True):
+        # Might be worth creating an interactive upgrader
+        from sparrow import migrations
+
+        migrator = SparrowDatabaseMigrator(self)
+        migrator.add_module(migrations)
+        self.app.run_hook("prepare-database-upgrade", migrator)
+        migrator.run_migration(dry_run=dry_run)
