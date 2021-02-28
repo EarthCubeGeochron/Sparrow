@@ -91,6 +91,10 @@ class SparrowHelpFormatter(HelpFormatter):
         to(self.getvalue())
         self.buffer = []
 
+    def write_heading(self, heading):
+        """Writes a heading into the buffer."""
+        self.write(style(f"{'':>{self.current_indent}}{heading}", bold=True) + ":\n")
+
     def write_frontmatter(self, ctx):
         self.write_usage("sparrow", "[options] <command> [args]...")
         self.write_line()
@@ -169,10 +173,10 @@ class SparrowHelpFormatter(HelpFormatter):
         )
 
     def _write_section(self, title, commands, skip=[]):
-        key_size = max([len(k) for k in commands.keys()])
+        _commands = {k: v for k, v in commands.items() if k not in skip}
+        key_size = max([len(k) for k in _commands.keys()])
         with self.section(title):
-            _items = [(k, v) for k, v in commands.items() if k not in skip]
-            self.write_dl(_items, col_spacing=max([25 - key_size, 2]))
+            self.write_dl(_commands.items(), col_spacing=max([25 - key_size, 2]))
             self.write("\n")
         self.flush()
 
