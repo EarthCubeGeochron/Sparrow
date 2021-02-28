@@ -1,4 +1,5 @@
 import json
+from json.decoder import JSONDecodeError
 import os
 from pathlib import Path
 from hashlib import md5
@@ -44,10 +45,16 @@ def get_backend_help_info(cache=True):
         )
 
     data = out.stdout.decode("utf-8").strip()
-    if cache:
-        cachefile = cli_cache_file()
-        cachefile.open("w").write(data)
-    return json.loads(data)
+    try:
+        _decoded = json.loads(data)
+        if cache:
+            cachefile = cli_cache_file()
+            cachefile.open("w").write(data)
+        return _decoded
+    except JSONDecodeError as err:
+        raise SparrowCommandError(
+            "Could not decode JSON response from backend", details=data
+        )
 
 
 def get_backend_command_help():

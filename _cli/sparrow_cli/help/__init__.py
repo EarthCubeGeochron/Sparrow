@@ -132,15 +132,20 @@ class SparrowHelpFormatter(HelpFormatter):
             k: format_help(v) for k, v in commands.items() if is_plugin_command(v)
         }
         self.write_section(
-            "Core application",
+            "Core commands",
             core_commands,
             # These should be managed by subcommands...
-            skip=["db-migration", "remove-analytical-data", "remove-audit-trail"],
+            skip=[
+                "db-migration",
+                "remove-analytical-data",
+                "remove-audit-trail",
+                "db-update",
+            ],
         )
         if len(plugin_commands) == 0:
             return
         self.write_section(
-            "Plugins",
+            "Plugin commands",
             plugin_commands,
             # These should be managed by subcommands...
         )
