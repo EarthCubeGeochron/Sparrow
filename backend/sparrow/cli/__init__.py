@@ -10,6 +10,7 @@ from ..context import get_sparrow_app
 from ..auth.create_user import create_user
 from ..database.migration import db_migration
 from sparrow_utils.logs import setup_stderr_logs
+from logging import INFO
 
 
 def _build_app_context(config):
@@ -148,8 +149,8 @@ def _db_migration(db, safe=True, apply=False):
 @cli.command(name="db-update")
 @with_database
 def db_update(db):
-    setup_stderr_logs()
-    db.update_schema()
+    setup_stderr_logs(level=INFO)
+    db.update_schema(dry_run=True)
 
 
 def command_info(ctx, cli):

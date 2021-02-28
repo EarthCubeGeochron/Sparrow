@@ -41,6 +41,7 @@ os.environ["SPARROW_DATABASE"] = db_conn
 
 # For now, we drop databases before every test
 if database_exists(db_conn):
+    echo("Dropping existing testing database")
     drop_database(db_conn)
 assert not database_exists(db_conn)
 create_database(db_conn)

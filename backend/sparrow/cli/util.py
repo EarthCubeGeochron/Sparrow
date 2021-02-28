@@ -44,6 +44,7 @@ def with_database(cmd):
         # context during testing...
         if app is None:
             app = Sparrow()
+        app.setup_database()
         return ctx.invoke(cmd, app.database, *args, **kwargs)
 
     return update_wrapper(new_cmd, cmd)

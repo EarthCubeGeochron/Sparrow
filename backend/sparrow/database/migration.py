@@ -10,6 +10,7 @@ import sys
 from .util import _exec_raw_sql, run_sql
 from sparrow_utils import get_logger, cmd
 from sqlalchemy import text
+import os
 
 log = get_logger(__name__)
 
@@ -85,14 +86,16 @@ def _create_migration(db_engine, target, safe=True):
 def _target_db(url):
     from sparrow.app import Sparrow
 
+    log.debug("Creating migration target")
     with temp_database(url) as engine:
         app = Sparrow(database=url)
-        app.init_database()
+        with redirect_stdout(open(os.devnull, "w")):
+            app.init_database()
         yield engine
 
 
 def create_migration(db, safe=True):
-    url = "postgres://postgres@db:5432/sparrow_temp_migration"
+    url = "postgresql://postgres@db:5432/sparrow_temp_migration"
     with _target_db(url) as target, redirect_stdout(sys.stderr):
         return _create_migration(db.engine, target)
 
@@ -130,10 +133,12 @@ def dump_schema(engine):
 
 @contextmanager
 def create_schema_clone(
-    engine, db_url="postgres://postgres@db:5432/sparrow_schema_clone"
+    engine, db_url="postgresql://postgres@db:5432/sparrow_schema_clone"
 ):
     schema = dump_schema(engine)
     with temp_database(db_url) as clone_engine:
+        # Not sure why we have to mess with this, but we do
+        clone_engine.dialect.server_version_info = engine.dialect.server_version_info
         run_sql(clone_engine, schema)
         # Sometimes, we still have some differences, annoyingly
         m = _create_migration(clone_engine, engine)
@@ -161,8 +166,8 @@ class SparrowMigration:
 
 
 class SparrowDatabaseMigrator:
-    target_url = "postgres://postgres@db:5432/sparrow_temp_migration"
-    dry_run_url = "postgres://postgres@db:5432/sparrow_schema_clone"
+    target_url = "postgresql://postgres@db:5432/sparrow_temp_migration"
+    dry_run_url = "postgresql://postgres@db:5432/sparrow_schema_clone"
 
     def __init__(self, db, migrations=[]):
         self.db = db
