@@ -142,13 +142,13 @@ def plugins(app):
 @click.option("--apply", is_flag=True, default=False)
 def _db_migration(db, safe=True, apply=False):
     """Command to generate a basic migration."""
-    setup_stderr_logs()
     db_migration(db, safe=safe, apply=apply)
 
 
 @cli.command(name="db-update")
 @with_database
 def db_update(db):
+    setup_stderr_logs()
     db.update_schema()
 
 

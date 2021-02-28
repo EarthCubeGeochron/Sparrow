@@ -160,6 +160,8 @@ class SparrowDatabaseMigrator:
         generated and applied"""
         migrations = [m for m in self._migrations if m.should_apply(engine)]
         log.info("Applying manual migrations")
+        if len(migrations) == 0:
+            log.info(f"Found no migrations to apply")
         while len(migrations) > 0:
             n = len(migrations)
             log.info(f"Found {n} migrations to apply")
@@ -171,7 +173,7 @@ class SparrowDatabaseMigrator:
     def _run_migration(self, engine, target, check=False):
         m = _create_migration(engine, target)
         if len(m.statements) == 0:
-            log.info("No migration necessary")
+            log.info("No automatic migration necessary")
             return
 
         if m.is_safe:
@@ -192,11 +194,15 @@ class SparrowDatabaseMigrator:
         assert len(m.statements) == 0
 
     def dry_run_migration(self, target):
+        log.info("Running dry-run migration")
         with create_schema_clone(self.db.engine, db_url=self.dry_run_url) as src:
             self._run_migration(src, target)
+        log.info("Migration dry run successful")
 
     def run_migration(self, dry_run=True):
         with _target_db(self.target_url) as target:
             if dry_run:
                 self.dry_run_migration(target)
+            log.info("Running migration")
             self._run_migration(self.db.engine, target)
+            log.info("Finished running migration")
