@@ -43,3 +43,11 @@ def sync_version_info():
     info["core"] = meta["__version__"]
     json.dump(info, open(version_file, "w"), indent=2)
     run(["git", "add", "sparrow-version.json"])
+
+
+@sparrow_dev.command(name="clear-cache")
+def clear_cache():
+    """Clear caches used by the command-line application"""
+    from ..help.backend import cli_cache_file
+
+    cli_cache_file().unlink()

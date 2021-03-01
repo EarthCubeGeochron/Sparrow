@@ -1,8 +1,9 @@
 import json
+from json.decoder import JSONDecodeError
 import os
 from pathlib import Path
 from hashlib import md5
-from ..util import compose
+from ..util import compose, exec_sparrow
 from ..exc import SparrowCommandError
 from subprocess import PIPE
 
@@ -33,7 +34,8 @@ def get_backend_help_info(cache=True):
     out = compose(
         "run --no-deps --rm -T",
         "backend",
-        "cat /run/cli-info.json",
+        "/app/sparrow/__main__.py",
+        "get-cli-info",
         stdout=PIPE,
     )
     if out.returncode != 0:
@@ -42,11 +44,17 @@ def get_backend_help_info(cache=True):
             "Could not access help text for sparrow backend", details=details
         )
 
-    data = str(out.stdout, "utf-8")
-    if cache:
-        cachefile = cli_cache_file()
-        cachefile.open("w").write(data)
-    return json.loads(data)
+    data = out.stdout.decode("utf-8").strip()
+    try:
+        _decoded = json.loads(data)
+        if cache:
+            cachefile = cli_cache_file()
+            cachefile.open("w").write(data)
+        return _decoded
+    except JSONDecodeError as err:
+        raise SparrowCommandError(
+            "Could not decode JSON response from backend", details=data
+        )
 
 
 def get_backend_command_help():
