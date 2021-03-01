@@ -31,12 +31,15 @@ def cli_cache_file():
 
 
 def get_backend_help_info(cache=True):
+    env = dict(**os.environ)
+    env["SPARROW_SECRET_KEY"] = env.get("SPARROW_SECRET_KEY", "Test")
     out = compose(
         "run --no-deps --rm -T",
         "backend",
         "/app/sparrow/__main__.py",
         "get-cli-info",
         stdout=PIPE,
+        env=env,
     )
     if out.returncode != 0:
         details = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"
