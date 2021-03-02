@@ -8,7 +8,30 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
-## [Unreleased] - 2021-02-23
+## `[2.0.0.beta1]` - 2021-03-01
+
+This is the first release in the beta series for **Sparrow** version `2.0.0`.
+The intent of the version 2 release series is to provide full support for
+metadata management by labs — the focus of new features will then shift to
+supporting integrations with community-level data systems and features.
+
+### Database migrations
+
+Sparrow now contains a database migrator that should ease future database
+updates while maintaining flexibility. The migration process is multiphase:
+first a diff between the current and ideal schema is created using
+[Migra](https://databaseci.com/docs/migra). If no destructive changes will
+occur, this migration is applied transparently; otherwise, manual migrations
+are applied to manage destructive changes. A "dry run" is attempted on an
+empty clone before applying changes to the real database.
+
+In the future the migrator will ensure that
+databases are properly backed up and gain better
+tools for managing complex database changes and
+migrations of Sparrow plugins, which can maintain
+their own database schema extensions.
+
+### Versioning
 
 Sparrow can now be locked to a version or git commit. The
 command-line applicaton now tests `SPARROW_VERSION` environment variable against either
@@ -16,13 +39,16 @@ a version specifier matching the [PEP 440](https://www.python.org/dev/peps/pep-0
 specification, or a [git commit hash, tag, or other "commit-ish" revision](https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection).
 For an unrestricted version, use `SPARROW_VERSION=HEAD` or don't set.
 
-## [Unreleased] - 2021-02-22
 ### A much quicker importer
 
-Greatly sped up schema-based importer by bundling all changes together and saving database
-transactions to the end of a schema unit of work.
+The schema-based importer has been greatly sped up by bundling all changes
+together and saving database transactions to the end of a schema unit of
+work.
 
-## [Unreleased] - 2021-02-14
+> Note:
+There is still a significant work to do on repeated imports of the same data, which
+should ideally be [*idempotent*](https://en.wikipedia.org/wiki/Idempotence) when data files have not changed. This will be addressed in future releases of the `2.0.0` beta series.
+
 
 ### Auto-building releases
 
@@ -37,14 +63,17 @@ can be installed with the following one-line command:
 curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh | bash -s -
 ```
 
-- This removes the need to download the Sparrow code repository, install submodules,
-  etc. in order to install the software
-- It paves the way for lighter-weight, integrated implementations of the system.
-- There are still some problems to be solved, like marking pre-releases appropriately
-  and figuring out how exactly we are managing versioning through different parts of
-  the application.
+Downloadable releases are a **major deal** for 
+Sparrow's inter-lab usability. They remove
+the need to download the Sparrow code repository,
+install submodules, etc. in order to install the software. They pave the way for lighter-weight, integrated implementations of the system.
 
-## [Unreleased] - 2021-01-11
+> Note:
+There are still some problems to be solved, 
+like marking pre-releases appropriately and
+figuring out how a single application
+version works with how we manage versioning
+through different parts of the application.
 
 ### Command-line bundling
 
@@ -55,7 +84,23 @@ curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-
   `sudo make install` to properly link the executable, depending on the configuration of your
   system.
 
-### Changed
+### Other command-line enhancements
+
+- Numerous command-line user-interface enhancements,
+  including better organization of commands on the
+  basic help page (`sparrow` called with no options)
+- More consistent parsing of backend and 
+  container-orchestration commands.
+- Improved division of commands into sections
+- Refactored command-line application to a simpler
+  Python-based framework for loading environment variables.
+
+### Testing enhancements
+
+Sparrow's test suite (runnable with `sparrow test`)
+now includes 72 tests that check all aspects of the
+application's core including data import and export
+### Backend application changes
 
 - Fully transitioned Sparrow's core to a [Starlette](https://www.starlette.io) server backend.
   This is a fairly major breaking change that requires plugins that extend the API to be updated.
@@ -63,50 +108,31 @@ curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-
   If an incompatible plugin is loaded, an error (for core plugins) or a warning will be generated.
 - Added Visual Studio Code language server support within Sparrow's backend Docker container.
 
-#### Low-level changes
+#### Internal API changes
 
 - Transitioned hook `api-initialized` to `api-v1-initialized`.
-- Created hook `add-routes`.
+- Created `add-routes` hook.
+- Moved from `uvicorn` (dev) + `gunicorn` (production) to `hypercorn` for ASGI serving.
 
-## [Unreleased] - 2020-10-17
-
-### Changed
+#### Authentication backend
 
 - Replaced `/api/v1/auth` authentication API based on `flask_jwt_extended` with a more
   flexible `/api/v2/auth` endpoint utilizing [Starlette's `AuthenticationMiddleware`](https://www.starlette.io/authentication/)
 - Added a suite of tests for the new authentication backend
 
-## [Unreleased] - 2020-09-28
+### Frontend
 
-- Moved from `uvicorn` (dev) + `gunicorn` (production) to `hypercorn` for ASGI serving.
-
-## [Unreleased] - 2020-07-31
-
-### Changed
-
-- Excel-like data sheet with drag copy and paste features (not yet wired up to backend).
-- # Highlights on Select (blue), during editing (red), recently changed cells (green)
-
-## [Unreleased] - 2020-08-31
-
-- Refactored command-line application to a simpler python-based framework.
-
-## [Unreleased] - 2020-07-24
-
-### Changed
-
-### User interface fixes
-
+- Excel-like data sheet with drag copy and paste
+  features, for use when editing sample metadata.
 - Map now has interactive markers with tooltips and popovers
 - Sample's popovers contain links to the respective sample page
 - Map has superclusters to increase loading performance
 
-### Backend
+> Note: more frontend changes to enable editing
+features are coming in later versions in the
+`2.0.0` series.
 
-- More robust testing framework, including transaction isolation between
-  test classes.
-
-## [1.6.0] - 2020-09-10
+## `[1.6.0]` - 2020-09-10
 
 - Moved database migration scripts to Python and created a test fixture to
   centralize data management.
@@ -120,9 +146,7 @@ curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-
 - Preliminary implementation of Sparrow's API v2, including autogenerated
   model-based routes, nested recall, and basic filtering.
 
-## [1.5.0] - 2020-07-22
-
-### Changed
+## `[1.5.0]` - 2020-07-22
 
 - Build in SSL (https) termination with Certbot certificate generation.
 - Improved loading of environment variables on application startup
@@ -138,18 +162,14 @@ curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-
 [1]: https://github.com/UW-Macrostrat/ui-components
 [2]: https://docs.docker.com/compose/reference/envvars/#compose_file
 
-## [1.4.0] - 2020-06-12
-
-### Changed
+## `[1.4.0]` - 2020-06-12
 
 - Added basic command-line tests to `sparrow test` command.
 - `SPARROW_PATH` is now explicitly required in `sparrow-config.sh` for source builds.
 - Bundle `docker-compose` version `1.26.0` into the `sparrow` wrapper command
   to solve version issues on Ubuntu and other platforms.
 
-## [1.3.0] - 2020-06-07
-
-### Changes
+## `[1.3.0]` - 2020-06-07
 
 - Added GitHub Actions continuous integration for Sparrow tests
 - Added continuous integration and deployment of documentation website to sparrow-data.org
@@ -158,9 +178,7 @@ curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-
 - "Decaffeinate" frontend application from Coffeescript to Typescript.
 - Command-line interface is now based on Python instead of shell scripts.
 
-## [1.2.0] - 2020-06-02
-
-### Changes
+## `[1.2.0]` - 2020-06-02
 
 - Add a plugin for cloud data import
 - A new interface for calling plugin functions from elsewhere in the application
@@ -169,11 +187,11 @@ curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-
   of this change is the `geo_entity` table and `sample_geo_entity` linking table.
 - Bugfixes for import interface
 
-## [1.1.0] - 2020-05-07
+## `[1.1.0]` - 2020-05-07
 
-## [1.0.0] - 2019-09-19
+## `[1.0.0]` - 2019-09-19
 
-## [0.2.0] - May 2019
+## `[0.2.0]` - May 2019
 
 - Initial data management views
 - The configuration stack was changed in to be more straightforward.
