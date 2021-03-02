@@ -86,91 +86,89 @@ class TestModelPost:
 
         data = res.json()
 
-        assert 0 == 1
-
     def test_edit_researcher_in_project(self,db,client):
         route = "/api/v2/models/project/1" ## editing the first researcher
 
-        edits = {"researchers": [{"name": "casey"}]}
+        edits = {"researcher": [{"name": "casey", "orcid": None}]}
         res_put = client.put(route, json = edits)
+
         assert res_put.status_code == 200
-
     
-    def test_verylarge_import(self, client):
+    # def test_verylarge_import(self, client):
 
-        import_size = 1e7
-        i = 0
-        analysis = []
-        size = sys.getsizeof(analysis)
-        for i in range(0,2):
-            item = {
-                            "analysis_type": "Stable isotope analysis",
-                            "session_index": i,
-                            "datum": [
-                                {
-                                    "value": 0.2,
-                                    "error": 0.035,
-                                    "type": {"parameter": "delta 13C", "unit": "permille"},
-                                }
-                            ],
-                        }
-            analysis.append(item)
+    #     import_size = 1e7
+    #     i = 0
+    #     analysis = []
+    #     size = sys.getsizeof(analysis)
+    #     for i in range(0,2):
+    #         item = {
+    #                         "analysis_type": "Stable isotope analysis",
+    #                         "session_index": i,
+    #                         "datum": [
+    #                             {
+    #                                 "value": 0.2,
+    #                                 "error": 0.035,
+    #                                 "type": {"parameter": "delta 13C", "unit": "permille"},
+    #                             }
+    #                         ],
+    #                     }
+    #         analysis.append(item)
         
-        data = {
-                    "date": str(datetime.now()),
-                    "name": "Session with existing instances",
-                    "sample": {"name": "LargeImport"},
-                    "analysis": analysis
-        }
-        res = client.put("/api/v1/import-data/session", json=json.dumps(data))
+    #     data = {
+    #                 "date": str(datetime.now()),
+    #                 "name": "Session with existing instances",
+    #                 "sample": {"name": "LargeImport"},
+    #                 "analysis": analysis
+    #     }
+    #     res = client.put("/api/v1/import-data/session", json=json.dumps(data))
 
-        assert 0 == 1
-        assert res.status_code == 201
-
-
-    def test_webscrape_app_sims(self,db, client):
-        '''
-            Test for the webscaper! 
-        '''
-        route = "/api/v2/models/project"
-
-        sims_pub_url = "http://www.geology.wisc.edu/~wiscsims/publications.html"
-
-        page = uReq(sims_pub_url)
-        page_html = page.read()
-        page.close()
-
-        page_soup = soup(page_html, "html.parser")
-
-        content = page_soup.findAll('p', {'class' : 'item article'})
-        title_list = []
-        doi_list = []
-        for pub in content:
-            title = pub.findAll('span', {"class": "body"})[0].text
-            title_list.append(title)
-
-            doi = pub.findAll('span', {"class": "doi"})[0].text
-            doi_list.append(doi)
-
-        proj_titles = []
-        for i, title in enumerate(title_list):
-            proj_titles.append({"name":title, "publications" :[{"title":title, "doi": doi_list[i]}]})
+    #     assert 0 == 1
+    #     assert res.status_code == 201
 
 
-        res = client.post(route, json= proj_titles)
+    # def test_webscrape_app_sims(self,db, client):
+    #     '''
+    #         Test for the webscaper! 
+    #     '''
+    #     route = "/api/v2/models/project"
 
-        up_json = res.json()
-        assert len(up_json['data']) > 0
-        assert 0 ==1
+    #     sims_pub_url = "http://www.geology.wisc.edu/~wiscsims/publications.html"
 
-    def test_sims_session(self, client, db):
-        data = json_fixture("sims-sess.json")
-        route = "/api/v2/models/session"
+    #     page = uReq(sims_pub_url)
+    #     page_html = page.read()
+    #     page.close()
 
-        res = client.post(route, json=data)
-        res.json()
+    #     page_soup = soup(page_html, "html.parser")
 
-        assert 0 == 1
+    #     content = page_soup.findAll('p', {'class' : 'item article'})
+    #     title_list = []
+    #     doi_list = []
+    #     for pub in content:
+    #         title = pub.findAll('span', {"class": "body"})[0].text
+    #         title_list.append(title)
+
+    #         doi = pub.findAll('span', {"class": "doi"})[0].text
+    #         doi_list.append(doi)
+
+    #     proj_titles = []
+    #     for i, title in enumerate(title_list):
+    #         proj_titles.append({"name":title, "publications" :[{"title":title, "doi": doi_list[i]}]})
+
+
+    #     res = client.post(route, json= proj_titles)
+
+    #     up_json = res.json()
+    #     assert len(up_json['data']) > 0
+    #     assert 0 ==1
+
+    # def test_sims_session(self, client, db):
+    #     data = json_fixture("sims-sess.json")
+    #     route = "/api/v2/models/session"
+
+    #     res = client.post(route, json=data)
+    #     res.json()
+
+    #     assert 0 == 1
 
     # def test_webscrape_publications_sims(self,db,client):
     #     '''
