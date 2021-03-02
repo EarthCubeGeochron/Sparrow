@@ -4,6 +4,9 @@ import pandas as pd
 import json
 from webargs import fields
 from webargs_starlette import use_annotations
+from ..util import relative_path
+from pathlib import Path
+
 
 user_args = {
     "groupby": fields.String(missing='Project')
@@ -31,32 +34,9 @@ async def datasheet_view(request):
     
     db = app_context().database
 
-    ## This query does all that crazy pandas stuff that I would have had to done.
-    ## A lot less code
-    query = '''WITH A AS(
-SELECT
-  s.id,
-  s.name,
-  s.material,
-  ST_AsGeoJSON(s.location)::jsonb geometry,
-  array_agg(DISTINCT p.id) AS project_id,
-  array_agg(DISTINCT p.name) AS project_name,
-  array_agg(DISTINCT pub.id) AS publication_id,
-  array_agg(DISTINCT pub.doi) AS doi
-FROM sample s
-LEFT JOIN session ss
-  ON s.id = ss.sample_id
-LEFT JOIN project p
-  ON ss.project_id = p.id
-LEFT JOIN project_publication proj_pub
-  on p.id = proj_pub.project_id
-LEFT JOIN publication pub
-  ON proj_pub.publication_id = pub.id
-GROUP BY s.id)
-  SELECT DISTINCT * 
-  FROM A
-  ORDER BY A.id;
-'''
+    p = Path(relative_path(__file__, "queries.sql"))
+    sqlfile = open(p, "r")
+    query = sqlfile.read()
 
     test = pd.read_sql(query, db.engine.connect())
     
