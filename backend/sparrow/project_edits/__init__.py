@@ -1,4 +1,3 @@
-from os import environ
 from .base import Project_edits_api
 from sparrow.plugins import SparrowCorePlugin
 

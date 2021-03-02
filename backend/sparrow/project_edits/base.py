@@ -1,15 +1,9 @@
-from starlette.applications import Starlette
 from starlette.endpoints import HTTPEndpoint
-from starlette.requests import Request
 from starlette.routing import Route, Router
-from starlette.responses import PlainTextResponse, JSONResponse, Response
-from webargs_starlette import use_annotations
-from webargs import fields
+from starlette.responses import JSONResponse
 import json
 
-from sqlalchemy import Table, text, select, delete
-
-from .utils import *
+from .utils import create_publication_collection
 from ..context import app_context
  
 ## TODO: way to delete publications from this route

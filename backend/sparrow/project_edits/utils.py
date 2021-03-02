@@ -1,5 +1,3 @@
-from sqlalchemy import Table, delete
-
 def create_publication_collection(publications, publication_collection, db):
     '''
     function to create a publication collection list from the incoming changeset.
