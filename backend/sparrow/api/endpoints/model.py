@@ -4,7 +4,7 @@ from webargs.fields import DelimitedList, Str, Int, Boolean
 from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
-from starlette.responses import JSONResponse, PlainTextResponse
+from starlette.responses import JSONResponse
 from yaml import safe_load
 
 from ..exceptions import ValidationError

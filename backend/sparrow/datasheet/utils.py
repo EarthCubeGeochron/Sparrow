@@ -1,11 +1,7 @@
-from starlette.applications import Starlette
-from starlette.endpoints import HTTPEndpoint
 from ..context import app_context
-from sqlalchemy import create_engine, MetaData, Table, Column, select
-import pandas as pd
-import json
 from geoalchemy2.shape import from_shape, to_shape
-from shapely.geometry import mapping, shape, Point, Polygon
+from shapely.geometry import mapping, Polygon
+from sparrow.api.endpoints.utils import create_location_from_coordinates
 
 
 def create_bound_shape(pnts: [float], srid = 4326):
@@ -23,49 +19,6 @@ def create_bound_shape(pnts: [float], srid = 4326):
 
     return bounding_poly
 
-def get_proj_pub(db):
-    '''
-    Creates a dataframe that joins publications on projects and contains sample_id to
-    merge onto main dataframe in view. 
-    '''
-    connection = db.engine.connect()
-
-    ## Tables getting mapped using expressional language
-    project_pub = Table('project_publication', db.meta, autoload=True, autoload_with=db.engine)
-    project_sample = Table('project_sample', db.meta, autoload=True, autoload_with=db.engine)
-
-    ## Select Statments
-    project_pub = connection.execute(select([project_pub]))
-    project_sample = connection.execute(select([project_sample]))
-
-    ## Turn into pd.DataFrames
-    project_pub = pd.DataFrame(project_pub, columns=project_pub.keys())
-    project_sample = pd.DataFrame(project_sample, columns=project_sample.keys())
-
-    df = pd.merge(project_sample,project_pub, on='project_id')
-
-    df.drop(['audit_id_x', 'audit_id_y'], axis=1,inplace=True)
-
-    ## Create a Projects dataframe with id and name
-    Project = Table('project', db.meta, autoload=True,autoload_with=db.engine)
-    Project = connection.execute(select([Project]))
-    Projects = pd.DataFrame(Project, columns=Project.keys())
-    Projects = Projects[['id','name']]
-    Projects.rename(columns={'id':'project_id', 'name':'proj_name'},inplace=True)
-
-    ## Create a Pub dataframe with id and doi
-    Pubs = Table('publication', db.meta, autoload=True,autoload_with=db.engine)
-    Pubs = connection.execute(select([Pubs]))
-    Pubs = pd.DataFrame(Pubs, columns=Pubs.keys())
-    Pubs = Pubs[['id','doi']]
-    Pubs.rename(columns={'id':'publication_id'}, inplace=True)
-
-    # Merge all together so I have a dataframe with all ids
-    df = pd.merge(df,Projects, on='project_id')
-    df = pd.merge(df,Pubs,on='publication_id')
-
-    return df
-
 def create_coordinates_from_location(location):
     '''
         Takes location column from database (SIRD:4346;POINT(long,lat)) 
@@ -74,11 +27,6 @@ def create_coordinates_from_location(location):
     if location is None:
         return None
     return mapping(to_shape(location))
-
-def create_location_from_coordinates(longitude, latitude):
-    '''This function will create the json-like object in database from long & lat given in a post request'''
-    location = from_shape(Point(longitude, latitude), srid=4326)
-    return location
 
 def make_changes(tablename, changes, session):
     """Function that takes in a list of dictionaries with changes to the database
