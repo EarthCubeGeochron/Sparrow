@@ -130,20 +130,12 @@ class TestModelPost:
     #     assert 0 == 1
     #     assert res.status_code == 201
 
-<<<<<<< HEAD
-    def test_webscrape_app_sims(self, db, client):
-        """
-        Test for the webscaper!
-        """
-        route = "/api/v2/models/project"
-=======
 
     # def test_webscrape_app_sims(self,db, client):
     #     '''
     #         Test for the webscaper! 
     #     '''
     #     route = "/api/v2/models/project"
->>>>>>> backend-to-frontend
 
     #     sims_pub_url = "http://www.geology.wisc.edu/~wiscsims/publications.html"
 
@@ -153,29 +145,6 @@ class TestModelPost:
 
     #     page_soup = soup(page_html, "html.parser")
 
-<<<<<<< HEAD
-        content = page_soup.findAll("p", {"class": "item article"})
-        title_list = []
-        doi_list = []
-        for pub in content:
-            title = pub.findAll("span", {"class": "body"})[0].text
-            title_list.append(title)
-
-            doi = pub.findAll("span", {"class": "doi"})[0].text
-            doi_list.append(doi)
-
-        proj_titles = []
-        for i, title in enumerate(title_list):
-            proj_titles.append(
-                {"name": title, "publications": [{"title": title, "doi": doi_list[i]}]}
-            )
-
-        res = client.post(route, json=proj_titles)
-
-        up_json = res.json()
-        assert len(up_json["data"]) > 0
-        assert 0 == 1
-=======
     #     content = page_soup.findAll('p', {'class' : 'item article'})
     #     title_list = []
     #     doi_list = []
@@ -196,7 +165,6 @@ class TestModelPost:
     #     up_json = res.json()
     #     assert len(up_json['data']) > 0
     #     assert 0 ==1
->>>>>>> backend-to-frontend
 
     # def test_sims_session(self, client, db):
     #     data = json_fixture("sims-sess.json")
