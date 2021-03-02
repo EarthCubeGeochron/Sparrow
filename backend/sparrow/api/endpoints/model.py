@@ -22,7 +22,8 @@ from ..filters import (
     Coordinate_filter,
     Geometry_Filter,
     TextSearchFilter,
-    Age_Range_Filter
+    Age_Range_Filter,
+    IdListFilter
 )
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
@@ -121,6 +122,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self.register_filter(Geometry_Filter)
         self.register_filter(TextSearchFilter)
         self.register_filter(Age_Range_Filter)
+        self.register_filter(IdListFilter)
 
     @property
     def model(self):

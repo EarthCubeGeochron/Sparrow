@@ -416,6 +416,35 @@ class TextSearchFilter(BaseFilter):
         ## TODO: make it non-case sensitive??
         return query.filter(or_(*[n.like(f'%{search_string}%') for n in fields]))
 
+class IdListFilter(BaseFilter):
+    '''
+    Function to return models with ID's corresponding those passed.
+    '''
+    key = "ids"
+
+    @property
+    def params(self):
+        d = "A list of model id's to grab from db."
+        e = ["?ids=213,221,423"]
+        des = create_params(d,e)
+        return{
+            self.key: DelimitedList(Int(), description=des)
+        }
+    
+    def should_apply(self):
+        return True
+    
+    def apply(self, args, query):
+        if self.key not in args:
+            return query
+        
+        ids = args[self.key]
+
+        return query.filter(self.model.id.in_(ids))
+
+
+
+
 
 ## TODO: Age range filter, open parameter i.e 'Plateua Ages', pass a number and operator?
 ## TODO: Define filter in plugin, i.e irradiation filter for WiscAr
