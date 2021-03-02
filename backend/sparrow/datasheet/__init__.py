@@ -1,11 +1,10 @@
-from os import environ
-from .base import Datasheet_Api
+from .base import DatasheetAPI
 from sparrow.plugins import SparrowCorePlugin
-from ..auth.backend import JWTBackend
 
 
 class DatasheetPlugin(SparrowCorePlugin):
     name = 'datasheet'
 
     def on_api_initialized_v2(self, api):
-        api.mount("/datasheet", Datasheet_Api, name="datasheet_api")
+        # TODO: lock this down to authorized users
+        api.mount("/datasheet", DatasheetAPI, name="datasheet_api")
