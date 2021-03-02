@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import h from "@macrostrat/hyper";
 import MapGL from "@urbica/react-map-gl";
 import Draw from "@urbica/react-map-gl-draw";
-import { Button, Popover, Card } from "@blueprintjs/core";
+import { Card } from "@blueprintjs/core";
+import { HelpButton } from "~/components";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { FilterAccordian } from "./utils";
@@ -104,7 +105,5 @@ function MapHelpButton(props) {
     ]),
   ]);
 
-  return h(Popover, { content, minimal: true, position: "bottom-right" }, [
-    h(Button, { minimal: true, intent: "danger" }, ["Help"]),
-  ]);
+  return h(HelpButton, { content });
 }
