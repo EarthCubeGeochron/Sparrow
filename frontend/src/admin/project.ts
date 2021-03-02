@@ -10,6 +10,7 @@ import {
   SampleFilterList,
   PublicationFilterList,
   ResearcherFilterList,
+  SessionFilterList,
 } from "~/model-views/new-model";
 import { AdminFilter } from "../filter";
 
@@ -68,6 +69,9 @@ const ProjectAdminList = (props) => {
       onClick: updateFunction,
     }),
     h.if(listName == "researcher")(ResearcherFilterList, {
+      onClick: updateFunction,
+    }),
+    h.if(listName == "session")(SessionFilterList, {
       onClick: updateFunction,
     }),
   ]);

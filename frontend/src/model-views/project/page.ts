@@ -1,14 +1,13 @@
-import { useState, Component } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import styled from "@emotion/styled";
-import { ProjectMap } from "./map";
-import { EditableProjectDetails, EditableSamples } from "./editor";
+import { EditableProjectDetails } from "./editor";
 import {
   SampleCard,
   SampleEditCard,
   PubEditCard,
   ResearcherEditCard,
 } from "../sample/detail-card";
+import { DndChild } from "~/components";
 import "../main.styl";
 import styles from "~/admin/module.styl";
 
@@ -119,6 +118,7 @@ export const ProjectSamples = function({
   link = true,
   onClick,
   rightElement,
+  draggable = true,
 }) {
   let content = [h("p", "No samples")];
   if (data != null) {
@@ -148,11 +148,28 @@ export const ProjectSamples = function({
         h(SampleContainer, [
           data.map((d) => {
             const { id, name } = d;
-            return h(SampleEditCard, {
-              id,
-              name,
-              onClick,
-            });
+            return h(
+              DndChild,
+              {
+                id,
+                data: d,
+                draggable,
+                childern: h(SampleEditCard, {
+                  id,
+                  name,
+                  setID,
+                  onClick,
+                }),
+              },
+              [
+                h(SampleEditCard, {
+                  id,
+                  name,
+                  setID,
+                  onClick,
+                }),
+              ]
+            );
           }),
         ]),
       ]);

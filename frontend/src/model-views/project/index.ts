@@ -1,6 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useRouteMatch } from "react-router-dom";
 import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
+import { useAPIv2Result } from "~/api-v2";
 import { ProjectPage } from "./page";
 import { useModelURL } from "~/util/router";
 import "../main.styl";
@@ -98,12 +99,19 @@ interface ProjectProps {
 
 const ProjectComponent = function(props: ProjectProps) {
   const { id, Edit } = props;
-  const data = useAPIResult("/project", { id }); // change to v2 api
+  const data = useAPIv2Result(
+    `/models/project/${id}`,
+    {
+      nest: "publication,session,sample,researcher",
+    },
+    {}
+  );
+
   if (id == null || data == null) {
     return null;
   }
 
-  const project = data[0];
+  const project = data;
   return h("div.data-view.project", null, h(ProjectPage, { project, Edit }));
 };
 

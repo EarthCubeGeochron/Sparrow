@@ -116,12 +116,21 @@ export const ProjectAdd = (props) => {
 };
 
 export const SessionAdd = (props) => {
-  const { onClickDelete, onClickList, data, isEditing } = props;
+  const {
+    onClickDelete,
+    onClickList,
+    data,
+    isEditing,
+    sampleHoverID = null,
+    onDrop = () => {},
+  } = props;
 
   return h("div", [
     h(Sessions, {
       session: data,
       onClick: onClickDelete,
+      sampleHoverID,
+      onDrop,
       isEditing,
     }),
     h.if(isEditing)(AddCard, {

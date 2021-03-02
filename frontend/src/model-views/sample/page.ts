@@ -42,6 +42,7 @@ import {
 } from "../new-model";
 import { ProjectEditCard, SessionEditCard } from "./detail-card";
 import { SampleAdminContext } from "~/admin/sample";
+import { DndContainer } from "~/components";
 import styles from "./module.styl";
 
 const h = hyper.styled(styles);
@@ -93,7 +94,7 @@ const Parameter = ({ name, value, ...rest }) => {
 
 const ProjectLink = function({ d }) {
   const project = d.session.map((obj) => {
-    if ("project" in obj) {
+    if (obj.project) {
       const { name: project_name, id: project_id } = obj.project;
       return { project_name, project_id };
     }
@@ -181,29 +182,59 @@ function DataSheetButton() {
 }
 
 export function Sessions(props) {
-  const { isEditing, session, onClick } = props;
+  const {
+    isEditing,
+    session,
+    onClick,
+    sampleHoverID,
+    onDrop = () => {},
+  } = props;
 
-  if (session.length == 0 && !isEditing) return null;
+  if (session == null && !isEditing) return null;
+  if (session == null && isEditing) {
+    return h("div.parameter", [h("h4.subtitle", "Sessions")]);
+  }
   return h("div.parameter", [
-    h("h4.subtitle", "Session"),
+    h("h4.subtitle", "Sessions"),
     h("p.value", [
       session.map((obj) => {
-        const { id: session_id, technique, target, date, analysis } = obj;
+        const {
+          id: session_id,
+          technique,
+          target,
+          date,
+          analysis,
+          data,
+          sample,
+        } = obj;
+        const onHover = sample.id == sampleHoverID;
         if (isEditing) {
-          return h(SessionEditCard, {
-            session_id,
-            technique,
-            target,
-            date,
-            onClick,
-          });
+          return h(
+            DndContainer,
+            {
+              id: session_id,
+              onDrop,
+            },
+            [
+              h(SessionEditCard, {
+                session_id,
+                technique,
+                target,
+                date,
+                onClick,
+                onHover,
+              }),
+            ]
+          );
         } else {
           return h(SessionModelCard, {
             session_id,
             technique,
             target,
             date,
+            data,
             analysis,
+            onHover,
           });
         }
       }),

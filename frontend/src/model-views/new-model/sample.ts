@@ -9,6 +9,7 @@ import { ProjectFormContext } from "../project/new-project";
 import { useAPIv2Result } from "~/api-v2";
 import { MySuggest } from "../../components/blueprint.select";
 import { FormGroup, Button, Icon, Tooltip } from "@blueprintjs/core";
+import { HelpButton } from "~/components";
 import { MyNumericInput } from "../../components/edit-sample";
 import styles from "./module.styl";
 
@@ -149,13 +150,13 @@ const unwrapElevation = (obj) => {
 
 export const SampleElevation = (props) => {
   const { sample, changeElevation } = props;
-  const { elevation } = sample;
+  const { elevation, longitude, latitude } = sample;
 
   const elev = useAPIv2Result(
     "https://macrostrat.org/api/v2/mobile/map_query_v2",
     {
-      lng: sample.longitude,
-      lat: sample.latitude,
+      lng: longitude || 0,
+      lat: latitude || 0,
       z: 3,
     },
     {
@@ -164,7 +165,9 @@ export const SampleElevation = (props) => {
   );
   useEffect(() => {
     if (elev) {
-      changeElevation(elev);
+      if (longitude && latitude) {
+        changeElevation(elev);
+      }
     }
   }, [elev]);
 
@@ -221,8 +224,7 @@ export const SampleGeoEntity = (props) => {
   return h(
     FormGroup,
     {
-      label: "Geologic Entity",
-      helperText: "Formation, member, unit, etc...",
+      label: "Geologic Entity Name",
     },
     [
       h(MySuggest, {
@@ -233,6 +235,97 @@ export const SampleGeoEntity = (props) => {
     ]
   );
 };
+
+export function EntityType(props) {
+  const onChange = (entity) => {
+    console.log(entity);
+  };
+
+  return h(FormGroup, { label: "Entity Type" }, [
+    h(MySuggest, {
+      items: [
+        "Formation",
+        "Memeber",
+        "Unit",
+        "Lake",
+        "Glacier",
+        "Volcano",
+        "Ashbed",
+      ],
+      onChange,
+    }),
+  ]);
+}
+
+export function GeoSpatialRef(props) {
+  const { distance, onDistanceChange } = props;
+  const onChange = (ref) => {
+    console.log(ref);
+  };
+  return h("div", [
+    h(FormGroup, { label: "Spatial Reference" }, [
+      h(MySuggest, { items: ["top", "bottom"], onChange }),
+    ]),
+    h(MyNumericInput, {
+      label: "Distance from reference (m)",
+      value: distance,
+      onChange: onDistanceChange,
+    }),
+  ]);
+}
+
+/**
+ * Component for placing sample in geologic context
+ *  Pick GeoEntity, name of entity from macrostrat
+ *  Entity Type: "formation, member, unit, glacier, lake, etc.."
+ *  GeoSpatial Reference:
+ *      Ref datum :"Top, Bottom",
+ *      Ref Distance: Number, meters from ref datum
+ *  Examples for what possible choices are....
+ */
+export function GeoContext(props) {
+  const [distance, setDistance] = useState(null);
+  const { sample, changeGeoEntity } = props;
+
+  const helpContent = h("div.help-geo-entity", [
+    h("div", [
+      h("b", "Spatial Reference"),
+      ": Reference point on geo-entity, from which measurement was taken.",
+    ]),
+    h("div", [
+      h("b", "Distance from reference"),
+      ": A measured distance in meters from the spatial reference point.",
+    ]),
+    h("div", [
+      h("b", "Example"),
+      ": A ",
+      h("b", "Spatial Reference"),
+      " of ",
+      h("b", "top"),
+      " and a ",
+      h("b", "Distance"),
+      " of ",
+      h("b", "0.2"),
+      " means that the sample was taken ",
+      h("b", "0.2 meters"),
+      " from the top of the geo entity.",
+    ]),
+  ]);
+
+  const content = h("div.geo-entity-drop", [
+    h("div.entity", [
+      h(SampleGeoEntity, { sample, changeGeoEntity }),
+      h(EntityType),
+    ]),
+    h(GeoSpatialRef, { distance, onDistanceChange: setDistance }),
+  ]);
+
+  return h("div", [
+    "Geologic Context",
+    h(HelpButton, { content: helpContent, position: "top" }),
+    content,
+  ]);
+}
 
 const unwrapMaterialDataSp = (obj) => {
   const { data } = obj;
@@ -263,6 +356,7 @@ export const SampleMaterial = (props) => {
     { all: true },
     { unwrapResponse: unwrapMacroMaterials }
   );
+
   const [materials, setMaterials] = useState([]);
 
   useEffect(() => {
@@ -275,7 +369,7 @@ export const SampleMaterial = (props) => {
   }, [initMaterials, macrostratMat]);
 
   return h("div", [
-    h(FormGroup, { label: "Material" }, [
+    h(FormGroup, { label: "Material", helperText: "Lithologies" }, [
       h(MySuggest, {
         items: materials,
         onChange: changeMaterial,
@@ -416,9 +510,9 @@ function NewSampleForm({ onSubmit }) {
       ]),
       h("div.sample-map", [h(NewSampleMap, { changeCoordinates, sample })]),
     ]),
+    h(SampleMaterial, { changeMaterial, sample }),
     h("div.metadata-body", [
-      h(SampleMaterial, { changeMaterial, sample }),
-      h(SampleGeoEntity, { sample, changeGeoEntity }),
+      h(GeoContext, { sample, changeGeoEntity }),
       h(PoweredByMacroSparrow),
     ]),
     h(SubmitButton),
@@ -448,11 +542,11 @@ export function EditProjNewSample() {
   const { model, actions } = useModelEditor();
 
   const onSubmit = (sample) => {
-    const samples = model.samples == null ? [] : [...model.samples];
+    const samples = model.sample == null ? [] : [...model.sample];
     const newSample = new Array(sample);
     let newSamples = [...samples, ...newSample];
     actions.updateState({
-      model: { samples: { $set: newSamples } },
+      model: { sample: { $set: newSamples } },
     });
   };
 

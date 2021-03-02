@@ -144,24 +144,33 @@ const SessionModelCard = (props) => {
     instrument,
     analysis,
     sample,
+    data,
     link,
     onClick,
+    onHover = false,
   } = props;
 
   const instruName = instrument ? instrument.name : "";
   const sampleName = sample ? sample.name : "";
 
+  const Irradiation = data.Irradiation ? data.Irradiation : null;
+  const FCS = data.FCS ? data.FCS : null;
+
   const analysisName = analysis.length > 1 ? "Analyses" : "Analysis";
   const analysisCount = analysis.length + " " + analysisName;
 
-  const content = h("div.session-card", [
+  const classname = onHover ? "session-card-hover" : "session-card";
+
+  const content = h(`div.${classname}`, [
     h("div.card-header", [
       h("div", [format(date, "MMMM D, YYYY")]),
       sampleName,
     ]),
     h("div.bod", [
+      h.if(FCS)("div", [FCS]),
       h("div", [h("span", technique)]),
       h("div", ["Instrument: " + instruName]),
+      h.if(Irradiation)("div", [Irradiation]),
     ]),
     h("div.footer", [h("div", analysisCount), h("div", ["Target: " + target])]),
   ]);
