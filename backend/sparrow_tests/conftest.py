@@ -58,6 +58,7 @@ def app():
     # We need to make sure this only happens if we tear down testing db
     # drop_database(testing_db)
 
+
 @fixture(scope="class")
 def db(app, pytestconfig):
     if pytestconfig.option.use_isolation:

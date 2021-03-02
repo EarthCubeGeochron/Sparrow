@@ -9,8 +9,9 @@ from .edits import datasheet_edits
 from .view import datasheet_view
 
 
-
-Datasheet_Api = Router([
-    Route("/edits", endpoint=datasheet_edits, methods=["POST"]),
-    Route("/view", endpoint=datasheet_view, methods=["GET"]),
-])
+DatasheetApi = Router(
+    [
+        Route("/edits", endpoint=datasheet_edits, methods=["POST"]),
+        Route("/view", endpoint=datasheet_view, methods=["GET"]),
+    ]
+)
