@@ -1,14 +1,14 @@
 module.exports = {
   someSidebar: {
-    //CHECK_THIS_OUT: ["live-code"],
     Guides: [
-      "motivation-and-design",
+      "guides",
       "getting-started",
+      "motivation-and-design",
       "datascience/data-sci",
       "schema-imp",
-      "embargo-mgmt",
+      "embargo",
     ],
-    Resources: ["presentations"],
+    Resources: ["presentations", "implementations"],
     Documentation: [
       "introduction",
       {
@@ -16,20 +16,21 @@ module.exports = {
         label: "Core application",
         items: [
           "command-line-interface",
-          "sparrow-on-windows",
-          "backend/server-configuration",
-          "backend/environment-vars",
+          "core/server-configuration",
+          "core/extensions",
         ],
       },
+      "schema",
       {
         type: "category",
         label: "Frontend",
         items: [
-          "frontend/local-dev",
           //"frontend/frames",
           "frontend/data-input-form",
         ],
       },
+      "sparrow-on-windows",
+      "local-development",
     ],
   },
 };

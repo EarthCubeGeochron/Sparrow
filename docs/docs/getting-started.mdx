@@ -53,7 +53,7 @@ Lab-specific subcommands (e.g. for import scripts) can be included in this
 interface.
 
 To install the command-line application, run the setup command within the
-`Sparrow` repository directory:
+`Sparrow` repository directory (you will be asked for a password).
 
 ```
 make install
@@ -62,7 +62,7 @@ make install
 This will build a development version of the
 `sparrow` command-line runner.
 
-:::caution
+:::note
 `make install` requests **`sudo`** privilege elevation so that it can
 install `sparrow` to `/usr/local/bin`, which allows the command to be
 run without a path prefix on most systems. If you want to install to a different location, you can
@@ -106,7 +106,8 @@ this value is kept consistent through the lifetime of the application.
 
 **Sparrow** is configured using a shell script that exports environment
 variables to customize the **Sparrow** installation. An example of this script
-is shown in [`sparrow-config.sh.example`](). While not _required_ (environment
+is shown in [`sparrow-config.sh.example`](https://github.com/EarthCubeGeochron/Sparrow/blob/master/sparrow-config.sh.example).
+While not _required_ (environment
 variables can be set externally), this approach is strongly preferred.
 
 At runtime, the `sparrow` application finds a configuration file by searching
@@ -121,7 +122,7 @@ basic lab with a few plugins and a small test dataset, based on the configuratio
 [in this directory](https://github.com/EarthCubeGeochron/Sparrow/tree/master/test-lab).
 
 Managing lab implementations of Sparrow as Git repositories is a good idea, as it
-allows plugins and site content to be versioned and pinned (using [Git submodules]())
+allows plugins and site content to be versioned and pinned (using [Git submodules](https://git-scm.com/docs/git-submodule))
 to a specific version of Sparrow. This has the added benefit of allowing configurations
 and lab-specific code to be publicly available to guide future implementations. This approach
 is taken by the [UW Cosmogenic Nuclide lab](https://github.com/EarthCubeGeochron/sparrow-uw-cosmo),
@@ -151,64 +152,5 @@ Several `sparrow` subcommands allow inspection of the running
 
 ## Appendix
 
-### Local development
-
-In certain situations, development on your local machine can be easier than
-working with a containerized version of the application. However, configuration
-bugs will be more likely, as this setup is not tested.
-
-You must have several dependencies installed:
-
-- PostgreSQL v11/PostGIS (the database system)
-- Python >= 3.7
-- Node.js~> 11
-
-Working in a Python virtual environment is recommended.
-
-When developing locally, the `sparrow-config.sh` file is not used, and the
-frontend and backend must be configured directly. Orchestration and database
-management commands from the `sparrow` command-line interface
-are also unavailable; these could be implemented separately from the
-Docker versions of the commands if there is demand.
-
-### Environment variables index
-
-- `SPARROW_SECRET_KEY="very secret string"`: A secret key used for management
-  of passwords. Set this in your **LOCAL** environment (it will be copied to
-  the Docker runtime as needed). It is the only variable required to run a basic test application.
-- `SPARROW_BACKEND_CONFIG="<path>"`: Location of `.cfg` files containing data.
-- The frontend is confugured using the variables `SPARROW_SITE_CONTENT`
-  and `SPARROW_BASE_URL`. These values replace the former function of the `SPARROW_CONFIG_JSON` file.
-- The `SPARROW_ENV=<development,production>` environment variable defaults to
-  `production`, which disable development-focused features such
-  as live code reloading and sourcemaps for performance and security.
-
-### Extensions
-
-The `base-images/db-mysql-fdw` image is provided to build a
-Sparrow-compatible PostGIS image with the MySQL foreign data wrapper extension (for connecting with external MySQL databases).
-This functionality is not enabled by default because it adds ~700 Mb
-to the installed size of Sparrow and will not be necessary for most
-setups. However, it can be enabled with two steps: first, build the
-appropriate Docker image with `sparrow build db-mysql-fdw`. Then
-override the `db` portion of the `docker-compose.yaml` file with the
-new image definition: 1., create an overrides file (e.g. `docker-compose.overrides.yaml` with the following contents:
-
-```
-version: "3.4"
-services:
-  db:
-    image: sparrowdata/db-mysql-fdw:1.0
-```
-
-2. reference this overrides file with the `SPARROW_COMPOSE_OVERRIDES` environment variable in your config file, e.g.
-
-```
-SPARROW_COMPOSE_OVERRIDES=(<path>/<to>/docker-compose-overrides.yaml)
-```
-
-This will update the Sparrow configuration transparently to use the
-new image in place of the default.
-
-Once the image builds, you can run `CREATE EXTENSION mysql_fdw` in the
-sparrow database, or add this command to your `SPARROW_INIT_SQL` file.
+- [Local development](/docs/local-development)
+- [Core extensions](/docs/core/extensions)

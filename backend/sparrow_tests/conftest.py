@@ -4,7 +4,7 @@ from starlette.testclient import TestClient
 from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 from sparrow.startup import wait_for_database
-from sqlalchemy_utils import create_database, drop_database
+from sqlalchemy_utils import create_database, drop_database, database_exists
 
 # Slow tests are opt-in
 

@@ -26,6 +26,7 @@ class SparrowDefaultCommand(DefaultGroup):
             details = getattr(exc, "details", None)
             if details is not None:
                 secho(details, dim=True)
+            # Maybe we should reraise only if debug is set?
             raise exc
 
 
@@ -90,4 +91,5 @@ def cli(ctx, verbose=False):
 
     # First steps towards some much more object-oriented configuration
     ctx.obj = SparrowConfig()
+
     prepare_docker_environment()
