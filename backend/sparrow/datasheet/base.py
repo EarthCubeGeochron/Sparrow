@@ -1,6 +1,5 @@
 from starlette.routing import Route, Router
 
-from .utils import *
 from .edits import datasheet_edits
 from .view import datasheet_view
 

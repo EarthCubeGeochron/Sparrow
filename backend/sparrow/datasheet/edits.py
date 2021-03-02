@@ -10,7 +10,7 @@ import json
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape, Point
 
-from .utils import *
+from .utils import material_check, make_changes
 
 async def datasheet_edits(request):
     """

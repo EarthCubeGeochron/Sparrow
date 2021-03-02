@@ -13,8 +13,6 @@ from webargs import fields
 from webargs_starlette import use_annotations
 import pandas as pd
 
-from .utils import *
-
 user_args = {
     "groupby": fields.String(missing='Project')
 }
