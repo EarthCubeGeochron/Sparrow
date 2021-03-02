@@ -4,41 +4,42 @@ title: React Component Example
 sidebar_label: React Component
 ---
 
-import {testJson, ageJson} from '../../static/testdata.js
-'
+import { testJson, ageJson } from "../../static/testdata.js";
+
 ```jsx live
 export function SampleCardExample() {
   const [age, setAge] = useState(false);
   console.log(age);
-    const sampleURL = "https://sparrow-data.org/labs/wiscar/api/v1/sample?id=20";
-    const ageURL =
+  const sampleURL = "https://sparrow-data.org/labs/wiscar/api/v1/sample?id=20";
+  const ageURL =
     "https://sparrow-data.org/labs/wiscar/api/v1/age_context?sample_id=20";
-    const data = age ? ageJson : testJson;
-    const url = age ? ageURL : sampleURL;
-    const AgeContext = (data) => {
+  const data = age ? ageJson : testJson;
+  const url = age ? ageURL : sampleURL;
+  const AgeContext = (data) => {
     const {
-        data: { value, error },
+      data: { value, error },
     } = data;
-return (
-<div>
-  {"Age: " +
-    Number(value).toFixed(3) +
-    " ± " +
-    Number(error).toFixed(3) +
-    " Ma"}
-</div>
-);
-};
-return (
-<div>
-<div
-style={{
+    return (
+      <div>
+        {"Age: " +
+          Number(value).toFixed(3) +
+          " ± " +
+          Number(error).toFixed(3) +
+          " Ma"}
+      </div>
+    );
+  };
+  return (
+    <div>
+      <div
+        style={{
           display: "flex",
           justifyContent: "center",
           paddingTop: "300px",
-        }} >
-<div>
-<div>{"API route that data is being fetched from: " + url}</div>
+        }}
+      >
+        <div>
+          <div>{"API route that data is being fetched from: " + url}</div>
           <div
             style={{
               display: "flex",
@@ -75,9 +76,10 @@ style={{
         </div>
       </div>
     </div>
-);
+  );
 }
 ```
+
 ```
 
 ```

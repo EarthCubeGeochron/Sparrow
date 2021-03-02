@@ -1,5 +1,5 @@
 ---
-id: 2020-oct-workshop
+slug: 2020-oct-workshop
 title: Announcing the 2020 EarthCube Geochronology workshop!
 author: Daven Quinn
 author_title: Sparrow project scientist

@@ -1,0 +1,27 @@
+---
+id: implementations
+title: Lab implementations
+sidebar_label: Lab implementations
+---
+
+A development version of **Sparrow** has been implemented in several labs. Large
+portions of the analytical archive of each lab have been ingested, and work is
+progressing on building metadata management functionality.
+
+## Active installations
+
+These instances are managed by laboratory workers.
+
+- [Arizona LaserChron Center](http://sparrow.laserchron.org)
+- [WiscAr](https://wiscar-sparrow.geoscience.wisc.edu)
+- [WiscSIMS](https://wiscsims-sparrow.geoscience.wisc.edu)
+- [Cosmogenic nuclides lab](https://sparrow-cosmo.geoscience.wisc.edu)
+- [Desert Research Institute luminescence lab](https://sparrow.dri.edu)
+- [Boise State Isotope Geology Laboratory](http://sparrow.boisestate.edu)
+
+## Demo instances
+
+These instances are run internally without direct management by laboratories.
+
+- [Thermochronology test](https://sparrow-data.org/thermochron-demo)
+- [Basic test](https://sparrow-data.org/labs/basic-test)
