@@ -8,7 +8,7 @@ import styles from "./module.styl";
 const h = hyperStyled(styles);
 
 export function MySuggest(props) {
-  const { items, onChange, onFilter } = props;
+  const { items, onChange, onFilter = () => {} } = props;
   const [selectedItem, setSelectedItem] = useState("");
 
   const itemz = [...items];
