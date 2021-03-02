@@ -16,8 +16,7 @@ const ProjectMap = function(props) {
   if (samples == null) {
     return null;
   }
-  console.log(samples);
-  const locatedSamples = samples.filter((d) => d.geometry != null);
+  const locatedSamples = samples.filter((d) => d.location != null);
   if (!(locatedSamples.length > 0)) {
     return null;
   }
@@ -35,7 +34,7 @@ const ProjectMap = function(props) {
   }
   const vp = new WebMercatorViewport({ width, height });
   ({ samples } = props);
-  const coordinates = locatedSamples.map((d) => d.geometry.coordinates);
+  const coordinates = locatedSamples.map((d) => d.location.coordinates);
   if (!coordinates.length) {
     return null;
   }
@@ -48,7 +47,6 @@ const ProjectMap = function(props) {
   };
   const box = bbox(feature);
   const bounds = [box.slice(0, 2), box.slice(2, 4)];
-  console.log(bounds);
   const res = vp.fitBounds(bounds, { padding, minExtent });
   let { latitude, longitude, zoom } = res;
   const center = [longitude, latitude];
@@ -65,7 +63,7 @@ const ProjectMap = function(props) {
       },
       locatedSamples.map(function(d) {
         const { id } = d;
-        [longitude, latitude] = d.geometry.coordinates;
+        [longitude, latitude] = d.location.coordinates;
         return h(StaticMarker, { latitude, longitude, id, hoverID });
       })
     ),

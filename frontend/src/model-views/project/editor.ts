@@ -1,4 +1,4 @@
-import { useContext, useState, useCallback, useEffect } from "react";
+import { useContext, useState, useEffect, createContext } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import {
   EditableText,
@@ -28,6 +28,7 @@ import {
   PubAdd,
   EditProjNewPub,
   SampleAdd,
+  SessionAdd,
   EditProjNewSample,
 } from "../new-model";
 import { DatePicker } from "@blueprintjs/datetime";
@@ -179,16 +180,74 @@ function EditStatusButtonsProj() {
   });
 }
 
+function EditSessions(props) {
+  const { isEditing, model, actions } = useModelEditor();
+  const { setListName, changeFunction } = useContext(ProjectAdminContext);
+  const { sampleHoverID } = useContext(SampleHoverIDContext);
+  console.log(model);
+
+  const addSession = (session_id, date, target, technique) => {
+    const currentSessions = [...model.session];
+    const newSess = new Array({ session_id, date, target, technique });
+    const newSessions = [...currentSessions, ...newSess];
+    actions.updateState({
+      model: { session: { $set: newSessions } },
+    });
+  };
+
+  const onClickDelete = ({ session_id: id, date }) => {
+    console.log(id, date);
+  };
+  const onClickList = () => {
+    setListName("session");
+    changeFunction(addSession);
+  };
+
+  const onDrop = (sample, session_id) => {
+    // function that handles a sample drop into session container.
+    // We want to replace the sample_id on the container session.
+    // And then add the session to the sample
+    const sess = [...model.session];
+    const samp = [...model.sample];
+    const { id: sample_id } = sample;
+    console.log(sample_id, session_id); // this works
+    const dropSession = sess.filter((ss) => ss.id == session_id);
+    const otherSessions = sess.filter((ss) => ss.id != session_id);
+    dropSession[0].sample = { id: sample_id };
+    const newSess = [...dropSession, ...otherSessions];
+    actions.updateState({
+      model: { session: { $set: newSess } },
+    });
+
+    // const dragSample = samp.filter((sa) => (sa.id = sample_id));
+    // const otherSamples = samp.filter((sa) => sa.id != sample_id);
+    // dragSample[0].session.push({ id: session_id });
+    // const newSamples = [...dragSample, ...otherSamples];
+    // actions.updateState({
+    //   model: { sample: { $set: newSamples } },
+    // });
+  };
+
+  return h(SessionAdd, {
+    data: model.session,
+    sampleHoverID,
+    isEditing,
+    onClickList,
+    onClickDelete,
+    onDrop,
+  });
+}
+
 function EditResearchers(props) {
   const { isEditing, model, actions } = useModelEditor();
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
-  const researchers = model.researchers == null ? [] : [...model.researchers];
+  const researchers = model.researcher == null ? [] : [...model.researcher];
 
   const onClickDelete = ({ id, name }) => {
     const updatedRes = researchers.filter((ele) => ele.name != name);
     actions.updateState({
-      model: { researchers: { $set: updatedRes } },
+      model: { researcher: { $set: updatedRes } },
     });
   };
 
@@ -196,13 +255,13 @@ function EditResearchers(props) {
     const newResearcher = new Array(researcher);
     let newResearchers = [...researchers, ...newResearcher];
     actions.updateState({
-      model: { researchers: { $set: newResearchers } },
+      model: { researcher: { $set: newResearchers } },
     });
   };
 
   useEffect(() => {
     changeFunction(onSubmit);
-  }, [model.researchers]);
+  }, [model.researcher]);
 
   const names = researchers.map(({ name }) => name);
 
@@ -225,33 +284,32 @@ function EditResearchers(props) {
 function EditablePublications(props) {
   const { isEditing, model, actions } = useModelEditor();
 
-  if (model.publications == null && !isEditing) {
+  if (model.publication == null && !isEditing) {
     return h("h4", ["No Publications"]);
   }
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
-  const data = model.publications == null ? [] : [...model.publications];
+  const data = model.publication == null ? [] : [...model.publication];
 
   const onClickDelete = ({ id, title }) => {
     const newPubs = data.filter((ele) => ele.title != title);
     actions.updateState({
-      model: { publications: { $set: newPubs } },
+      model: { publication: { $set: newPubs } },
     });
   };
 
   const onSubmit = (id, title, doi) => {
     const data = new Array({ id, title, doi });
-    const publication =
-      model.publications == null ? [] : [...model.publications];
+    const publication = model.publication == null ? [] : [...model.publication];
     let newPubs = [...publication, ...data];
     actions.updateState({
-      model: { publications: { $set: newPubs } },
+      model: { publication: { $set: newPubs } },
     });
   };
 
   useEffect(() => {
     changeFunction(onSubmit);
-  }, [model.publications]);
+  }, [model.publication]);
 
   return h(PubAdd, {
     data,
@@ -267,41 +325,39 @@ function EditablePublications(props) {
 
 function SampleMapComponent() {
   const { model, actions, isEditing } = useModelEditor();
-
-  const [hoverID, setHoverID] = useState();
+  const { sampleHoverID } = useContext(SampleHoverIDContext);
 
   return h("div", [
     h("div", { style: { display: "flex", flexDirection: "row" } }, [
       h("div", { style: { paddingRight: "10px" } }, [
         h("h4", "Location"),
-        h(ProjectMap, { samples: model.samples, hoverID }),
+        h(ProjectMap, { samples: model.sample, hoverID: sampleHoverID }),
       ]),
-      h(EditableSamples, { setID: setHoverID }),
+      h(EditableSamples),
     ]),
   ]);
 }
 
-export function EditableSamples(props) {
-  const { setID } = props;
+export function EditableSamples() {
+  const { setHoverID } = useContext(SampleHoverIDContext);
   const { model, actions, isEditing } = useModelEditor();
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
   const samples =
-    model.samples == null || model.sample == [] ? [] : [...model.samples];
+    model.sample == null || model.sample == [] ? [] : [...model.sample];
 
   const onClickDelete = ({ id, name }) => {
     const newSamples = samples.filter((ele) => ele.name != name);
     return actions.updateState({
-      model: { samples: { $set: newSamples } },
+      model: { sample: { $set: newSamples } },
     });
   };
 
   const sampleOnClick = (id, name) => {
-    console.log(samples);
     const newSample = new Array({ id, name });
     let newSamples = [...samples, ...newSample];
     return actions.updateState({
-      model: { samples: { $set: newSamples } },
+      model: { sample: { $set: newSamples } },
     });
   };
 
@@ -315,8 +371,8 @@ export function EditableSamples(props) {
   };
 
   return h(SampleAdd, {
-    data: model.samples,
-    setID,
+    data: model.sample,
+    setID: setHoverID,
     isEditing,
     onClickDelete,
     onClickList,
@@ -341,17 +397,26 @@ const ProjEditNavBar = ({ header }) => {
   });
 };
 
+const SampleHoverIDContext = createContext({});
+
 const EditableProjectDetails = function(props) {
   const { project, Edit } = props;
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
 
+  const [sampleHoverID, setSampleHoverID] = useState();
+
+  const setHoverID = (id) => {
+    setSampleHoverID(id);
+  };
+
   return h(
     ModelEditor,
     {
-      model: project,
+      model: project.data,
       canEdit: login || Edit,
       persistChanges: async (updatedModel, changeset) => {
+        console.log(changeset);
         let rest;
         let { id } = updatedModel;
         const response = await put(
@@ -364,22 +429,33 @@ const EditableProjectDetails = function(props) {
       },
     },
     [
-      h("div.project-editor", [
-        h("div", [
-          Edit ? h(ProjEditNavBar, { header: "Manage Project" }) : null,
-        ]),
-        h("div.project-editor-content", [
-          h(ModelEditableText, { is: "h3", field: "name", multiline: true }),
-          h(ModelEditableText, {
-            is: "p",
-            field: "description",
-            multiline: true,
-          }),
-          h(EditablePublications),
-          h(EditResearchers),
-          h(SampleMapComponent),
-        ]),
-      ]),
+      h(
+        SampleHoverIDContext.Provider,
+        { value: { sampleHoverID, setHoverID } },
+        [
+          h("div.project-editor", [
+            h("div", [
+              Edit ? h(ProjEditNavBar, { header: "Manage Project" }) : null,
+            ]),
+            h("div.project-editor-content", [
+              h(ModelEditableText, {
+                is: "h3",
+                field: "name",
+                multiline: true,
+              }),
+              h(ModelEditableText, {
+                is: "p",
+                field: "description",
+                multiline: true,
+              }),
+              h(EditablePublications),
+              h(EditResearchers),
+              h(EditSessions),
+              h(SampleMapComponent),
+            ]),
+          ]),
+        ]
+      ),
     ]
   );
 };

@@ -18,8 +18,8 @@ const h = hyperStyled(styles);
 function ResearcherForm(props) {
   const { onSubmit } = props;
   const [researcher, setResearcher] = useState({
-    name: "",
-    orcid_id: "",
+    name: null,
+    orcid: null,
   });
 
   const onChangeName = (value) => {
@@ -34,7 +34,7 @@ function ResearcherForm(props) {
     setResearcher((prevRes) => {
       return {
         ...prevRes,
-        orcid_id: value,
+        orcid: value,
       };
     });
   };
@@ -52,10 +52,10 @@ function ResearcherForm(props) {
     h(ModelEditableText, {
       is: "h3",
       field: "orcid_id",
-      placeholder: "Add an Orcid_id",
+      placeholder: "Add an Orcid id",
       editOn: true,
       onChange: onChangeOrcid,
-      value: researcher.orcid_id,
+      value: researcher.orcid,
       multiline: true,
     }),
     h(Button, { onClick: () => onSubmit(researcher), intent: "success" }, [
@@ -88,11 +88,11 @@ export function EditProjNewResearcher() {
   const { model, actions } = useModelEditor();
 
   const onSubmit = (researcher) => {
-    const researchers = model.researchers == null ? [] : [...model.researchers];
+    const researchers = model.researcher == null ? [] : [...model.researcher];
     const newResearcher = new Array(researcher);
     let newResearchers = [...researchers, ...newResearcher];
     actions.updateState({
-      model: { researchers: { $set: newResearchers } },
+      model: { researcher: { $set: newResearchers } },
     });
   };
 

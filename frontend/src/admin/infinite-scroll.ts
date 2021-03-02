@@ -24,8 +24,8 @@ const h = hyperStyled(styles);
 // unwraps the data to be simpatico with the ProjectLink component, also gets the next page
 function unwrapProjectCardData(data) {
   const dataObj = data.data.map((obj) => {
-    const { id, name, description, publication, session } = obj;
-    const samples = session.map((ob) => ob.sample);
+    const { id, name, description, publication, sample } = obj;
+    const samples = sample.map((ob) => ob);
     return { id, name, description, publication, samples };
   });
   return dataObj;
@@ -76,6 +76,7 @@ function unwrapSessionCardData(data) {
       target,
       date,
       instrument,
+      data,
       analysis,
       sample,
     } = obj;
@@ -84,6 +85,7 @@ function unwrapSessionCardData(data) {
       technique,
       target,
       date,
+      data,
       instrument,
       analysis,
       sample,

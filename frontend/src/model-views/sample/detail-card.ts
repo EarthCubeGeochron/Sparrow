@@ -57,18 +57,22 @@ const SampleCard = function(props: SampleCardProps) {
  * @param props
  */
 const SampleEditCard = (props) => {
-  let { id, name, onClick } = props;
+  let { id, name, onClick, setID = () => {} } = props;
 
-  return h("div.sample-edit-card", [
-    h("h4.name", name),
-    h(Button, {
-      key: name,
-      minimal: true,
-      icon: "trash",
-      intent: "danger",
-      onClick: () => onClick({ id, name }),
-    }),
-  ]);
+  return h(
+    "div.sample-edit-card",
+    { onMouseEnter: () => setID(id), onMouseLeave: () => setID(null) },
+    [
+      h("h4.name", name),
+      h(Button, {
+        key: name,
+        minimal: true,
+        icon: "trash",
+        intent: "danger",
+        onClick: () => onClick({ id, name }),
+      }),
+    ]
+  );
 };
 
 const PubEditCard = (props) => {
@@ -103,7 +107,7 @@ const ResearcherEditCard = (props) => {
 export const ProjectEditCard = (props) => {
   const { d, onClick } = props;
   const project = d.session.map((obj) => {
-    if ("project" in obj) {
+    if (obj.project) {
       const { name, id } = obj.project;
       return { name, id };
     }
@@ -130,9 +134,23 @@ export const ProjectEditCard = (props) => {
 };
 
 export const SessionEditCard = (props) => {
-  const { onClick, session_id, target, date, technique } = props;
-  return h("div.sample-edit-card", [
-    h("h4.name", [target, format(date, "MMMM D, YYYY"), technique]),
+  const {
+    onClick,
+    session_id,
+    target,
+    date,
+    technique,
+    onHover = false,
+  } = props;
+
+  const classname = onHover ? "sample-edit-card-samhover" : "sample-edit-card";
+
+  return h(`div.${classname}`, [
+    h("div.session-info", [
+      h("div", ["Target: ", target]),
+      h("div", format(date, "MMMM D, YYYY")),
+      h("div", technique),
+    ]),
     h(Button, {
       id: session_id,
       minimal: true,
