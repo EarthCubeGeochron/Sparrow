@@ -18,11 +18,11 @@ from ..filters import (
     _schema_fields,
     EmbargoFilter,
     DateFilter,
-    DOI_filter,
-    Coordinate_filter,
-    Geometry_Filter,
+    DOIFilter,
+    CoordinateFilter,
+    GeometryFilter,
     TextSearchFilter,
-    Age_Range_Filter,
+    AgeRangeFilter,
     IdListFilter
 )
 from ...database.mapper.util import classname_for_table
@@ -117,11 +117,11 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self.register_filter(FieldNotExistsFilter)
         self.register_filter(EmbargoFilter)
         self.register_filter(DateFilter)
-        self.register_filter(DOI_filter)
-        self.register_filter(Coordinate_filter)
-        self.register_filter(Geometry_Filter)
+        self.register_filter(DOIFilter)
+        self.register_filter(CoordinateFilter)
+        self.register_filter(GeometryFilter)
         self.register_filter(TextSearchFilter)
-        self.register_filter(Age_Range_Filter)
+        self.register_filter(AgeRangeFilter)
         self.register_filter(IdListFilter)
 
     @property

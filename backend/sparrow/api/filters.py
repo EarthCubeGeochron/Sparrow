@@ -217,7 +217,7 @@ class DateFilter(BaseFilter):
         
         return query.filter(and_(self.model.date > start, self.model.date < end))
 
-class DOI_filter(BaseFilter):
+class DOIFilter(BaseFilter):
     key='doi_like'
 
     @property
@@ -259,7 +259,7 @@ class DOI_filter(BaseFilter):
         return query.filter(self.model.doi.like(f'%{doi_string}%'))
 
 
-class Coordinate_filter(BaseFilter):
+class CoordinateFilter(BaseFilter):
     key = 'coordinates'
 
     @property
@@ -300,7 +300,7 @@ class Coordinate_filter(BaseFilter):
         # Create issue about SRID (4326)
         return query.filter(bounding_shape.ST_Contains(func.ST_Transform(self.model.location, 4326)))
 
-class Geometry_Filter(BaseFilter):
+class GeometryFilter(BaseFilter):
     key = "geometry"
 
     @property
@@ -340,7 +340,7 @@ class Geometry_Filter(BaseFilter):
 
         return query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(self.model.location, 4326)))
 
-class Age_Range_Filter(BaseFilter):
+class AgeRangeFilter(BaseFilter):
     key = "age"
 
     ## TODO: Params should tell something about comparison with number, > < >= <=.
