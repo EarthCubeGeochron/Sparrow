@@ -9,7 +9,8 @@ import pdb
 
 
 def create_location_from_coordinates(longitude, latitude):
-    """This function will create the json-like object
+    """
+    This function will create the json-like object
     in database from long & lat given in a post request
     """
     location = from_shape(Point(longitude, latitude), srid=4326)
