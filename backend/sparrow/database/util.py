@@ -101,3 +101,6 @@ def get_or_create(session, model, defaults=None, **kwargs):
         session.add(instance)
         instance._created = True
         return instance
+
+def get_db_model(db, model_name: str):
+    return getattr(db.model, model_name)
