@@ -271,6 +271,13 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
 
+    def test_datum_type_accuracy(self, db):
+        DatumType = db.model.datum_type
+        res = db.session.query(DatumType).filter_by(parameter="soil water content", unit="weight %").all()
+        assert len(res) == 1
+        dt = res[0]
+        assert dt.error_unit is None
+
     def test_session_merging(self, db):
         data = {
             "date": str(datetime.now()),
@@ -299,6 +306,14 @@ class TestDeclarativeImporter:
         db.load_data("session", data)
         ensure_single(db, "session", name="Session merging test")
         ensure_single(db, "datum", value=0.252)
+
+    def test_datum_type_no_error_unit(self, db):
+        """We haven't specified an error unit, so one should not be in the database"""
+        DatumType = db.model.datum_type
+        res = db.session.query(DatumType).filter_by(parameter="soil water content", unit="weight %").all()
+        assert len(res) == 1
+        dt = res[0]
+        assert dt.error_unit is None
 
     def test_datum_type_merging(self, db):
         """Datum types should successfully find values already in the database."""
