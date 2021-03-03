@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup as soup
 from sparrow.util import relative_path
 from pathlib import Path
 
@@ -48,10 +49,9 @@ class TestModelPost:
             This test webscrapes an html page, taken from online.
 
                 # sims_pub_url = "http://www.geology.wisc.edu/~wiscsims/publications.html"
-                
+
             This can also be achieved by accessing the html through a network connection directly.
 
-                # from bs4 import BeautifulSoup as soup
                 # from urllib.request import urlopen as uReqfrom 
                 #
                 # page = uReq(sims_pub_url)
