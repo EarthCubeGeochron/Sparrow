@@ -1,12 +1,7 @@
 import json
-from pytest import mark
-from .fixtures import basic_data
 from .helpers import json_fixture
 from sparrow.api.endpoints.utils import create_location_from_coordinates
-from geoalchemy2.shape import from_shape, to_shape
-from shapely.geometry import mapping, Point
 import datetime
-import pdb
 
 class TestAPIV2_filters:
     def test_load_data(self, client, db):
