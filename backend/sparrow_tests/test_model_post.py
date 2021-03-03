@@ -1,5 +1,5 @@
-from bs4 import BeautifulSoup as soup
-from urllib.request import urlopen as uReq
+from sparrow.util import relative_path
+from pathlib import Path
 
 from .helpers import json_fixture
 import json
@@ -45,15 +45,28 @@ class TestModelPost:
 
     def test_webscrape_app_sims(self,db, client):
         '''
-            Test for the webscaper! 
+            This test webscrapes an html page, taken from online.
+
+                # sims_pub_url = "http://www.geology.wisc.edu/~wiscsims/publications.html"
+                
+            This can also be achieved by accessing the html through a network connection directly.
+
+                # from bs4 import BeautifulSoup as soup
+                # from urllib.request import urlopen as uReqfrom 
+                #
+                # page = uReq(sims_pub_url)
+                # page_html = page.read()
+                # page.close()
+                
         '''
         route = "/api/v2/models/project"
 
-        sims_pub_url = "http://www.geology.wisc.edu/~wiscsims/publications.html"
 
-        page = uReq(sims_pub_url)
-        page_html = page.read()
-        page.close()
+         
+        page = Path(relative_path(__file__, "fixtures/wiscsims_publications.html"))
+        page_open = open(page, "r")
+        page_html = page_open.read()
+        page_open.close()
 
         page_soup = soup(page_html, "html.parser")
 
@@ -75,4 +88,4 @@ class TestModelPost:
         res = client.post(route, json= proj_titles)
 
         up_json = res.json()
-        #assert len(up_json['data']) > 0
+        assert len(up_json['data']) > 0
