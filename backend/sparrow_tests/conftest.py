@@ -75,6 +75,6 @@ def db(app, pytestconfig):
 
 
 @fixture
-def client(app):
+def client(app, db):
     _client = TestClient(app)
     yield _client

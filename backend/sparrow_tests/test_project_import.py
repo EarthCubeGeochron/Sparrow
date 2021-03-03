@@ -4,6 +4,7 @@ from json import dumps, loads
 from sparrow.encoders import JSONEncoder
 from datetime import datetime
 from pytest import mark
+import logging
 
 
 def omit_key(changeset, key):
@@ -11,9 +12,11 @@ def omit_key(changeset, key):
 
 
 class TestProjectImport:
-    def test_import_dumpfile(self, db):
+    def test_import_dumpfile(self, db, caplog):
         data = json_fixture("project-dump.json")
-        db.load_data("project", data["data"])
+        with caplog.at_level(logging.INFO, logger="sparrow.interface.schema"):
+            # So we don't get spammed with output
+            db.load_data("project", data["data"])
 
     def test_retrieve_dumpfile(self, db):
         data = json_fixture("project-dump.json")["data"]
@@ -21,7 +24,8 @@ class TestProjectImport:
         schema = db.interface.project(many=False, allowed_nests="all")
         res = db.session.query(schema.opts.model).filter_by(name=data["name"]).first()
         assert res is not None
-        out = loads(dumps(schema.dump(res), allow_nan=False, cls=JSONEncoder))
+        with caplog.at_level(logging.INFO, logger="sparrow.interface.schema"):
+            out = loads(dumps(schema.dump(res), allow_nan=False, cls=JSONEncoder))
         assert len(out["session"]) == len(data["session"])
 
         assert out["session"][0]["uuid"] == data["session"][0]["uuid"]
