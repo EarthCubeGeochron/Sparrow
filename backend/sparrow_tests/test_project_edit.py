@@ -15,9 +15,11 @@ class TestProjectEdits:
 
     https://marshmallow-sqlalchemy.readthedocs.io/en/latest/api_reference.html#marshmallow_sqlalchemy.SQLAlchemyAutoSchema
     https://stackoverflow.com/questions/31891676/update-row-sqlalchemy-with-data-from-marshmallow
+
+    https://github.com/realpython/materials/blob/master/flask-connexion-rest-part-2/version_1/people.py
     """
 
-    def test_import_dumpfile(self, db):
+    def test_project_edits(self, db):
         data = json_fixture("project-edits.json")
 
         load_data_loop("publication", data['publication'], db)
@@ -28,9 +30,18 @@ class TestProjectEdits:
         res = db.load_data("project", data["og-project"])
 
         # need a function like load_data but for edits..
-        # can use interface stuff and use the make_instance. Does edits!
         project_schema = db.interface.project()
+        project = db.model.project
         proj_id = data['edit-project']['id']
 
-        res = project_schema.load(data['edit-project'], session=db.session, instance = project_schema._get_instance(data['edit-project']))
-        #db.load_data("project", data["edit-project"])
+        existing_project = project.query.get(proj_id)
+        
+        data['edit-project'].pop('id')
+        updates = data['edit-project']
+
+        new_proj = project_schema.load(updates, session=db.session, instance=existing_project)
+        new_proj.id = existing_project.id
+
+        db.session.rollback()
+        res = db.session.merge(new_proj)
+        db.session.commit()
