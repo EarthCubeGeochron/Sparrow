@@ -30,18 +30,29 @@ class TestProjectEdits:
         res = db.load_data("project", data["og-project"])
 
         # need a function like load_data but for edits..
+        ## get interface and db model
         project_schema = db.interface.project()
         project = db.model.project
-        proj_id = data['edit-project']['id']
 
+        # grab existing id and project
+        proj_id = data['edit-project']['id']
         existing_project = project.query.get(proj_id)
         
+        # get updates
         data['edit-project'].pop('id')
         updates = data['edit-project']
 
+        # load updates into the project_schema and assign the same id as the existing
         new_proj = project_schema.load(updates, session=db.session, instance=existing_project)
         new_proj.id = existing_project.id
 
+        # NOTE: for some reason, i need to rollbakc before the merge.
+        #       online examples don't need to do this
+        # Merge the new_proj with the existing one in the session.
         db.session.rollback()
         res = db.session.merge(new_proj)
+
+        # commit changes
+        # seems to work well except for its creating an extra duplicate session. 
+        # it doesn't duplicate any other collection though.
         db.session.commit()
