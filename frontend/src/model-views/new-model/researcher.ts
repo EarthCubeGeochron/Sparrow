@@ -17,10 +17,7 @@ const h = hyperStyled(styles);
  */
 function ResearcherForm(props) {
   const { onSubmit } = props;
-  const [researcher, setResearcher] = useState({
-    name: null,
-    orcid: null,
-  });
+  const [researcher, setResearcher] = useState({});
 
   const onChangeName = (value) => {
     setResearcher((prevRes) => {
@@ -38,6 +35,7 @@ function ResearcherForm(props) {
       };
     });
   };
+  const disabled = researcher.name ? false : true;
 
   return h("div.drawer-body", [
     h(ModelEditableText, {
@@ -58,9 +56,11 @@ function ResearcherForm(props) {
       value: researcher.orcid,
       multiline: true,
     }),
-    h(Button, { onClick: () => onSubmit(researcher), intent: "success" }, [
-      "Create new researcher",
-    ]),
+    h(
+      Button,
+      { onClick: () => onSubmit(researcher), intent: "success", disabled },
+      ["Create new researcher"]
+    ),
   ]);
 }
 
