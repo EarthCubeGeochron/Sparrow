@@ -4,14 +4,10 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import { useContext, useState, useEffect } from "react";
+import { useContext } from "react";
 import { useAuth } from "~/auth";
 import hyper from "@macrostrat/hyper";
 import {
-  APIResultView,
-  ModelEditorContext,
-  LinkCard,
-  useAPIResult,
   APIHelpers,
   ModelEditor,
   useModelEditor,
@@ -19,10 +15,8 @@ import {
 import { APIV2Context } from "~/api-v2";
 import { put } from "axios";
 import { SampleContextMap } from "app/components";
-import { GeoDeepDiveCard, GDDDrawer } from "./gdd-card"; // Want to use this in publications..
 import { MapLink } from "app/map";
 import { Button } from "@blueprintjs/core";
-import { useModelURL } from "~/util/router";
 import {
   EditNavBar,
   EditStatusButtons,
@@ -186,7 +180,7 @@ export function Sessions(props) {
     isEditing,
     session,
     onClick,
-    sampleHoverID,
+    sampleHoverID = null,
     onDrop = () => {},
   } = props;
 
@@ -196,7 +190,7 @@ export function Sessions(props) {
   }
   return h("div.parameter", [
     h("h4.subtitle", "Sessions"),
-    h("p.value", [
+    h("div.session-container", [
       session.map((obj) => {
         const {
           id: session_id,
@@ -207,7 +201,8 @@ export function Sessions(props) {
           data,
           sample,
         } = obj;
-        const onHover = sample.id == sampleHoverID;
+        const onHover =
+          sampleHoverID && sample ? sample.id == sampleHoverID : false;
         if (isEditing) {
           return h(
             DndContainer,
@@ -218,6 +213,7 @@ export function Sessions(props) {
             [
               h(SessionEditCard, {
                 session_id,
+                sample,
                 technique,
                 target,
                 date,
@@ -234,6 +230,7 @@ export function Sessions(props) {
             date,
             data,
             analysis,
+            sample,
             onHover,
           });
         }
