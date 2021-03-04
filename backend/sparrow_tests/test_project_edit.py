@@ -1,26 +1,36 @@
 from .helpers import json_fixture
 import json
 
+def load_data_loop(model: str, data,db):
+    for ele in data:
+        db.load_data(model, ele)
 
 class TestProjectEdits:
     """
     Testing suite for the Project's edit API
+    Being re-factored to handle the project-admin page edits
+
+    I need to load a bunch of data into the db. 
+    Then try sending edits to the project generated in the first step.
+
+    https://marshmallow-sqlalchemy.readthedocs.io/en/latest/api_reference.html#marshmallow_sqlalchemy.SQLAlchemyAutoSchema
+    https://stackoverflow.com/questions/31891676/update-row-sqlalchemy-with-data-from-marshmallow
     """
 
     def test_import_dumpfile(self, db):
-        data = json_fixture("project-doi-fixes.json")
-        db.load_data("project", data["data"])
+        data = json_fixture("project-edits.json")
 
-    def test_fix_doi(self, client, db):
-        """
-        Try Deleting some of the bad DOI's
+        load_data_loop("publication", data['publication'], db)
+        load_data_loop("researcher", data['researcher'], db)
+        load_data_loop("sample", data['sample'], db)
+        load_data_loop("session", data['session'], db)
 
-        How do I delete DOI's??
+        res = db.load_data("project", data["og-project"])
 
-        First steps: make some changes to send to the put api
-        """
+        # need a function like load_data but for edits..
+        # can use interface stuff and use the make_instance. Does edits!
+        project_schema = db.interface.project()
+        proj_id = data['edit-project']['id']
 
-        route = "/api/v2/project/edit/1"
-        changeset = json_fixture("project-edits.json")
-
-        response = client.put(route, json=changeset)
+        res = project_schema.load(data['edit-project'], session=db.session, instance = project_schema._get_instance(data['edit-project']))
+        #db.load_data("project", data["edit-project"])
