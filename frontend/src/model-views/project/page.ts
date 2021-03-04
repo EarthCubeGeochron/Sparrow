@@ -127,9 +127,10 @@ export const ProjectSamples = function({
         h("h4", "Samples"),
         h(SampleContainer, [
           data.map((d) => {
-            const { material, id, name, location_name } = d;
+            const { material, id, name, location_name, session } = d;
             return h(SampleCard, {
               material,
+              session,
               id,
               name,
               location_name,
@@ -147,7 +148,7 @@ export const ProjectSamples = function({
         ]),
         h(SampleContainer, [
           data.map((d) => {
-            const { id, name } = d;
+            const { id, name, session } = d;
             return h(
               DndChild,
               {
@@ -157,6 +158,7 @@ export const ProjectSamples = function({
                 childern: h(SampleEditCard, {
                   id,
                   name,
+                  session,
                   setID,
                   onClick,
                 }),
