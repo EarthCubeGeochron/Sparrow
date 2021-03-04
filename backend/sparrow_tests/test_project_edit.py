@@ -56,3 +56,7 @@ class TestProjectEdits:
         # seems to work well except for its creating an extra duplicate session. 
         # it doesn't duplicate any other collection though.
         db.session.commit()
+
+        # the updates will have lengthened the publication collection
+        project_test = project.query.get(proj_id)
+        assert len(project_test.publication_collection) == 3
