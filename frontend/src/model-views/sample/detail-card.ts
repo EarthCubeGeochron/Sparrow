@@ -13,6 +13,7 @@ interface SampleCardProps {
   id: number;
   link: boolean;
   material: string;
+  session: any;
   location_name?: string;
   setID?: (any) => {};
   onClick?: (any) => {};
@@ -22,7 +23,15 @@ interface SampleCardProps {
  * @param props : name (string), id (number), link (boolean), material (string), location_name? (string)
  */
 const SampleCard = function(props: SampleCardProps) {
-  let { material, id, name, location_name, link = true, setID } = props;
+  let {
+    material,
+    id,
+    name,
+    location_name,
+    link = true,
+    setID,
+    session,
+  } = props;
 
   const onHover = () => {
     //set id to state so marker is highlighted
@@ -33,6 +42,16 @@ const SampleCard = function(props: SampleCardProps) {
     //Clear state so marker isn't highlighted
     setID(null);
   };
+
+  const sessionContent = h.if(session.length > 0)("div", [
+    session.map((ele) => {
+      return h.if(ele.date)("div", [
+        ele.date.split("T")[0],
+        ",     ",
+        ele.target,
+      ]);
+    }),
+  ]);
 
   const component = link ? LinkCard : Card;
   const to = useModelURL(`/sample/${id}`);
@@ -48,6 +67,7 @@ const SampleCard = function(props: SampleCardProps) {
       h("h4.name", name),
       h("div.location-name", location_name),
       h.if(material != null)("div.material", material),
+      sessionContent,
     ]
   );
 };
@@ -57,13 +77,23 @@ const SampleCard = function(props: SampleCardProps) {
  * @param props
  */
 const SampleEditCard = (props) => {
-  let { id, name, onClick, setID = () => {} } = props;
+  const { id, name, onClick, session = [], setID = () => {} } = props;
+
+  const sessionContent = h.if(session.length > 0)("div", [
+    session.map((ele) => {
+      return h.if(ele.date)("div", [
+        ele.date.split("T")[0],
+        ",     ",
+        ele.target,
+      ]);
+    }),
+  ]);
 
   return h(
     "div.sample-edit-card",
     { onMouseEnter: () => setID(id), onMouseLeave: () => setID(null) },
     [
-      h("h4.name", name),
+      h("div", [h("h4.name", name), sessionContent]),
       h(Button, {
         key: name,
         minimal: true,
@@ -140,16 +170,19 @@ export const SessionEditCard = (props) => {
     target,
     date,
     technique,
+    sample = null,
     onHover = false,
   } = props;
 
   const classname = onHover ? "sample-edit-card-samhover" : "sample-edit-card";
 
+  const sampleName = sample ? sample.name : "";
+
   return h(`div.${classname}`, [
     h("div.session-info", [
-      h("div", ["Target: ", target]),
-      h("div", format(date, "MMMM D, YYYY")),
+      h("div", [date.split("T")[0], ",     ", target]),
       h("div", technique),
+      h.if(sample)("div", [h("i", `Linked through ${sampleName}`)]),
     ]),
     h(Button, {
       id: session_id,
