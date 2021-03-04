@@ -1,17 +1,13 @@
-import json
-from pytest import mark
-from .fixtures import basic_data
 from .helpers import json_fixture
 from sparrow.api.endpoints.utils import create_location_from_coordinates
-from geoalchemy2.shape import from_shape, to_shape
-from shapely.geometry import mapping, Point
+from sparrow.database.util import get_db_model
 import datetime
-import pdb
+import json
 
 class TestAPIV2_filters:
     def test_load_data(self, client, db):
-        Material = db.model.vocabulary_material
-        Sample = db.model.sample
+        Material = get_db_model(db, "vocabulary_material")
+        Sample = get_db_model(db, "sample")
 
         db.session.add_all(
             [
@@ -52,7 +48,7 @@ class TestAPIV2_filters:
     def test_date_filter(self, client, db):
         """Testing the date_range filter on the api"""
 
-        Session = db.model.session
+        Session = get_db_model(db, "session")
 
         date = datetime.datetime(2013, 3, 12)
         date1 = datetime.datetime(2013, 6, 1)

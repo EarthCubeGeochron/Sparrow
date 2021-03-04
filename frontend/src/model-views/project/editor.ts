@@ -184,11 +184,10 @@ function EditSessions(props) {
   const { isEditing, model, actions } = useModelEditor();
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
   const { sampleHoverID } = useContext(SampleHoverIDContext);
-  console.log(model);
 
   const addSession = (session_id, date, target, technique) => {
     const currentSessions = [...model.session];
-    const newSess = new Array({ session_id, date, target, technique });
+    const newSess = new Array({ id: session_id, date, target, technique });
     const newSessions = [...currentSessions, ...newSess];
     actions.updateState({
       model: { session: { $set: newSessions } },
@@ -197,35 +196,45 @@ function EditSessions(props) {
 
   const onClickDelete = ({ session_id: id, date }) => {
     console.log(id, date);
+    const ss = [...model.session];
+    const newSs = ss.filter((ele) => ele.id != id);
+    actions.updateState({
+      model: { session: { $set: newSs } },
+    });
   };
   const onClickList = () => {
     setListName("session");
     changeFunction(addSession);
   };
 
+  useEffect(() => {
+    changeFunction(addSession);
+  }, [model.session]);
+
   const onDrop = (sample, session_id) => {
     // function that handles a sample drop into session container.
-    // We want to replace the sample_id on the container session.
+    // We want to add or replace the sample on the container session.
     // And then add the session to the sample
     const sess = [...model.session];
     const samp = [...model.sample];
-    const { id: sample_id } = sample;
-    console.log(sample_id, session_id); // this works
+    const { id: sample_id, name } = sample;
+    console.log(sample_id, name); // this works
     const dropSession = sess.filter((ss) => ss.id == session_id);
     const otherSessions = sess.filter((ss) => ss.id != session_id);
-    dropSession[0].sample = { id: sample_id };
+    dropSession[0].sample = { id: sample_id, name };
     const newSess = [...dropSession, ...otherSessions];
     actions.updateState({
       model: { session: { $set: newSess } },
     });
 
-    // const dragSample = samp.filter((sa) => (sa.id = sample_id));
-    // const otherSamples = samp.filter((sa) => sa.id != sample_id);
-    // dragSample[0].session.push({ id: session_id });
-    // const newSamples = [...dragSample, ...otherSamples];
-    // actions.updateState({
-    //   model: { sample: { $set: newSamples } },
-    // });
+    const [ss] = dropSession;
+    const dragSample = samp.filter((sa) => sa.id == sample_id);
+    const otherSamples = samp.filter((sa) => sa.id != sample_id);
+    dragSample[0].session.push(ss);
+    const newSamples = [...dragSample, ...otherSamples];
+    actions.updateState({
+      model: { sample: { $set: newSamples } },
+    });
   };
 
   return h(SessionAdd, {
@@ -251,8 +260,8 @@ function EditResearchers(props) {
     });
   };
 
-  const onSubmit = (researcher) => {
-    const newResearcher = new Array(researcher);
+  const onSubmit = (id, name) => {
+    const newResearcher = new Array({ id, name });
     let newResearchers = [...researchers, ...newResearcher];
     actions.updateState({
       model: { researcher: { $set: newResearchers } },
@@ -347,7 +356,9 @@ export function EditableSamples() {
     model.sample == null || model.sample == [] ? [] : [...model.sample];
 
   const onClickDelete = ({ id, name }) => {
-    const newSamples = samples.filter((ele) => ele.name != name);
+    const newSamples = id
+      ? samples.filter((ele) => ele.id != id)
+      : samples.filter((ele) => ele.name != name);
     return actions.updateState({
       model: { sample: { $set: newSamples } },
     });
@@ -363,7 +374,7 @@ export function EditableSamples() {
 
   useEffect(() => {
     changeFunction(sampleOnClick);
-  }, [model.samples]);
+  }, [model.sample]);
 
   const onClickList = () => {
     changeFunction(sampleOnClick);
@@ -417,15 +428,16 @@ const EditableProjectDetails = function(props) {
       canEdit: login || Edit,
       persistChanges: async (updatedModel, changeset) => {
         console.log(changeset);
-        let rest;
-        let { id } = updatedModel;
-        const response = await put(
-          buildURL(`/models/project/${id}`, {}),
-          changeset
-        );
-        const { data } = response;
-        ({ id, ...rest } = data);
-        return rest;
+        console.log(updatedModel);
+        // let rest;
+        // let { id } = updatedModel;
+        // const response = await put(
+        //   buildURL(`/models/project/${id}`, {}),
+        //   changeset
+        // );
+        // const { data } = response;
+        // ({ id, ...rest } = data);
+        // return rest;
       },
     },
     [

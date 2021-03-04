@@ -1,8 +1,7 @@
 import { ModelCard } from "../utils";
-import { useContext } from "react";
 import hyper from "@macrostrat/hyper";
-import { ContentArea, pluralize } from "../project/index";
-import { parse, format } from "date-fns";
+import { pluralize } from "../project/index";
+import { format } from "date-fns";
 import styles from "./card.styl";
 
 const h = hyper.styled(styles);
@@ -30,11 +29,24 @@ export const sampleContent = (props) => {
       ? h("div", { style: { marginBottom: "5px" } }, ["Material: ", material])
       : h("div", { style: { marginBottom: "5px" } }, "No material");
 
-  const sessionDate = session.length > 0 ? session[0].date.split("T")[0] : null;
+  const sessionDate =
+    session.length > 0
+      ? session.map((ss) => {
+          return ss.date.split("T")[0];
+        })
+      : null;
 
   return h("div.sample-content", [
     h("div.card-header", [h("div", id), Location]),
-    h("div.bod", [sampleName, Material, sessionDate]),
+    h("div.bod", [
+      sampleName,
+      Material,
+      sessionDate
+        ? sessionDate.map((date) => {
+            return h("div", date);
+          })
+        : null,
+    ]),
   ]);
 };
 
@@ -151,7 +163,7 @@ const SessionModelCard = (props) => {
   } = props;
 
   const instruName = instrument ? instrument.name : "";
-  const sampleName = sample ? sample.name : "";
+  const sampleName = sample ? `Linked through ${sample.name}` : "";
 
   const Irradiation = data.Irradiation ? data.Irradiation : null;
   const FCS = data.FCS ? data.FCS : null;
@@ -160,12 +172,10 @@ const SessionModelCard = (props) => {
   const analysisCount = analysis.length + " " + analysisName;
 
   const classname = onHover ? "session-card-hover" : "session-card";
+  const textColor = onHover ? "yellow" : "black";
 
   const content = h(`div.${classname}`, [
-    h("div.card-header", [
-      h("div", [format(date, "MMMM D, YYYY")]),
-      sampleName,
-    ]),
+    h("div.card-header", [h("div", date.split("T")[0]), h("div", sampleName)]),
     h("div.bod", [
       h.if(FCS)("div", [FCS]),
       h("div", [h("span", technique)]),

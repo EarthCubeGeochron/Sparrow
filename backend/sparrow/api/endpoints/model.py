@@ -275,6 +275,11 @@ class ModelAPIEndpoint(HTTPEndpoint):
         """
         Handler for all POST requests. i.e, New rows for database
 
+        https://marshmallow-sqlalchemy.readthedocs.io/en/latest/#de-serialize-your-data
+        to return data, need to get the schemas by db.interface.model
+        the instaniate it, sample_schema = schema()
+        then can call sample_schema.dump(sampleModel) deserializes data
+
         """
         db = self.meta.database
 
