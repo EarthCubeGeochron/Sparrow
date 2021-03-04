@@ -17,7 +17,7 @@ const h = hyperStyled(styles);
 
 export function NewSampleMap(props) {
   const { changeCoordinates, sample } = props;
-  const { longitude, latitude } = sample;
+  const { longitude = 0, latitude = 0 } = sample;
 
   const [point, setPoint] = useState({
     type: "FeatureCollection",
@@ -428,15 +428,7 @@ const SampleName = (props) => {
  *
  */
 function NewSampleForm({ onSubmit }) {
-  const [sample, setSample] = useState({
-    name: "",
-    depth: 0,
-    elevation: 0,
-    latitude: 0,
-    longitude: 0,
-    material: "",
-    sample_geo_entity: "",
-  });
+  const [sample, setSample] = useState({});
 
   console.log(sample);
   const changeCoordinates = (coords) => {
