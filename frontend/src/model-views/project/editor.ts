@@ -98,23 +98,24 @@ const ToInfinityDate = (date) => {
 export const EmbargoDatePick = (props) => {
   const { onChange, embargo_date, active = true } = props;
   // need to add an un-embargo if data is embargoed. And an infinite embargo
+  const embargoDate = embargo_date ? new Date(embargo_date) : null;
 
   let today = new Date();
 
-  const embargoed = embargo_date && +embargo_date >= +today ? true : false;
+  const embargoed = embargoDate && +embargoDate >= +today ? true : false;
 
   const infinite =
-    embargo_date && embargo_date.getFullYear() === today.getFullYear() + 3000
+    embargoDate && embargoDate.getFullYear() === today.getFullYear() + 3000
       ? true
       : false;
 
   const text =
-    embargo_date != null
+    embargoDate != null
       ? infinite
         ? "Embargoed Forever"
-        : `Embargoed Until: ${embargo_date.toISOString().split("T")[0]}`
+        : `Embargoed Until: ${embargoDate.toISOString().split("T")[0]}`
       : "Public";
-  const icon = embargo_date != null ? "lock" : "unlock";
+  const icon = embargoDate != null ? "lock" : "unlock";
 
   console.log(embargoed);
   console.log(infinite);
@@ -459,6 +460,8 @@ const EditableProjectDetails = function(props) {
     setSampleHoverID(id);
   };
 
+  console.log(project.data);
+
   return h(
     ModelEditor,
     {
@@ -474,8 +477,9 @@ const EditableProjectDetails = function(props) {
           updatedModel
         );
         const { data } = response;
-        ({ id, ...rest } = data);
-        return rest;
+        console.log(data);
+        // (({ id, ...rest } = data));
+        //return rest;
       },
     },
     [
