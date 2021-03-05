@@ -1,7 +1,7 @@
 import { Suggest } from "@blueprintjs/select";
 import { MenuItem, Icon } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useState, useContext, useEffect } from "react";
+import { useState } from "react";
 import "./test.css";
 import styles from "./module.styl";
 
