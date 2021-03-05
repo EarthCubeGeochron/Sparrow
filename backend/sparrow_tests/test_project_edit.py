@@ -61,5 +61,4 @@ class TestProjectEdits:
 
         # the updates will have lengthened the publication collection
         project_test = project.query.get(proj_id)
-        assert 0 == 1
         assert len(project_test.publication_collection) == 3
