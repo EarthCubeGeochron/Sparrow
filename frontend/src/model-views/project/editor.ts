@@ -429,15 +429,15 @@ const EditableProjectDetails = function(props) {
       persistChanges: async (updatedModel, changeset) => {
         console.log(changeset);
         console.log(updatedModel);
-        // let rest;
-        // let { id } = updatedModel;
-        // const response = await put(
-        //   buildURL(`/models/project/${id}`, {}),
-        //   changeset
-        // );
-        // const { data } = response;
-        // ({ id, ...rest } = data);
-        // return rest;
+        let rest;
+        let { id } = updatedModel;
+        const response = await put(
+          buildURL(`/project/edit/${id}`, {}),
+          updatedModel
+        );
+        const { data } = response;
+        ({ id, ...rest } = data);
+        return rest;
       },
     },
     [
