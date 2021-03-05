@@ -6,6 +6,7 @@ import {
   Button,
   Popover,
   ButtonGroup,
+  Card,
 } from "@blueprintjs/core";
 import { useAuth } from "~/auth";
 import {
@@ -18,7 +19,7 @@ import {
   APIContext,
   APIHelpers,
 } from "@macrostrat/ui-components";
-import { MinimalNavbar } from "~/components";
+import { MinimalNavbar, MySwitch } from "~/components";
 import { put } from "axios";
 import "../main.styl";
 import styles from "~/admin/module.styl";
@@ -87,22 +88,59 @@ const ModelEditableText = function(props) {
   ]);
 };
 
+const ToInfinityDate = (date) => {
+  const newYear = date.getFullYear() + 3000;
+  const month = date.getMonth();
+  const day = date.getDay();
+  return new Date(newYear, month, day);
+};
+
 export const EmbargoDatePick = (props) => {
   const { onChange, embargo_date, active = true } = props;
+  // need to add an un-embargo if data is embargoed. And an infinite embargo
+
+  let today = new Date();
+
+  const embargoed = embargo_date && +embargo_date >= +today ? true : false;
+
+  const infinite =
+    embargo_date && embargo_date.getFullYear() === today.getFullYear() + 3000
+      ? true
+      : false;
 
   const text =
-    embargo_date != null ? `Embargoed Until: ${embargo_date}` : "Public";
+    embargo_date != null
+      ? infinite
+        ? "Embargoed Forever"
+        : `Embargoed Until: ${embargo_date.toISOString().split("T")[0]}`
+      : "Public";
   const icon = embargo_date != null ? "lock" : "unlock";
 
+  console.log(embargoed);
+  console.log(infinite);
+
   const Content = () => {
-    return h(DatePicker, {
-      minDate: new Date(),
-      maxDate: new Date(2050, 1, 1),
-      onChange: (e) => {
-        let date = e.toISOString().split("T")[0];
-        onChange(date);
-      },
-    });
+    return h(Card, [
+      h(DatePicker, {
+        minDate: new Date(),
+        maxDate: new Date(2050, 1, 1),
+        onChange: (e) => {
+          let date = e.toISOString().split("T")[0];
+          onChange(e);
+        },
+      }),
+      h("div", [
+        "Emargo Forever: ",
+        h(MySwitch, {
+          checked: infinite,
+          onChange: () => onChange(ToInfinityDate(today)),
+        }),
+      ]),
+      h.if(embargoed)("div", [
+        "Make Data Public",
+        h(MySwitch, { checked: !embargoed, onChange: () => onChange(null) }),
+      ]),
+    ]);
   };
 
   return h("div.embargo-editor", [
