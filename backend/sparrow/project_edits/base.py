@@ -3,61 +3,54 @@ from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
 import json
 
-from .utils import create_publication_collection
 from ..context import app_context
- 
+
 ## TODO: way to delete publications from this route
 # maybe have an actions field for query, one would be delete, if that was there it would call a function
-# that handles removing that relationship from project. 
+# that handles removing that relationship from project.
 # PROBLEM: This solution won't remove the publication completely, as it shouldn't in a real world senario.
 # it just removes the foreign id reference. We'll have to just remove them with a quick algorithim or something
 
+
 class ProjectEdits(HTTPEndpoint):
-    async def put(self, request):  
-        '''
-            Put Endpoint for the project admin page
+    async def put(self, request):
+        """
+        Improved endpoint for Admin Projects page. Using Schemas
 
-            NOTE: This route is tested
-        '''
+        Things that need to be done. Check for collection changes.
+            Researcher
+            Publication
+            Samples**
+            Sessions**
+        **: need to handle internal changes to model, i.e session's sample can be changed on project adim
+
+        all need to support adding new instances except sessions.
+        db.model_schema
+        """
         db = app_context().database
+        project_schema = db.interface.project()
+        project = db.model.project
 
-        id = request.path_params['id']
+        proj_id = request.path_params["id"]
+        existing_project = project.query.get(proj_id)
 
-        model = db.model.project
-        project = db.session.query(model).get(id)
+        updates = await request.json()
+        updates.pop("id")
 
-        data = await request.json()
-        #data = json.loads(data)
-        # need to check for publication field first.
-        if "publications" in data:
-            response = data.copy()
-            
-            #create a publication_collection from the passed publication array of objects
-            collection = create_publication_collection(data['publications'], project.publication_collection, db)
-            ## create a new field that matches the model collection
-            data['publication_collection'] = collection
-            data.pop('publications')
+        new_proj = project_schema.load(updates, session=db.session)
+        new_proj.id = existing_project.id
 
-            for k in data:
-                setattr(project, k, data[k])
-
-            try:
-                db.session.commit()
-            except:
-                db.session.rollback()
-        
-            return JSONResponse({"Response":response})
-       
-
-        for k in data:
-            setattr(project, k, data[k])
-        
+        db.session.rollback()
+        res = db.session.merge(new_proj)
         db.session.commit()
-        
-        return JSONResponse(data)
 
-Project_edits_api = Router([
-    Route("/edit/{id}", endpoint=ProjectEdits, methods=["PUT"]),
-])
+        proj_final = project_schema.dump(res)
+
+        return JSONResponse({"Status": "Success", "data": proj_final})
 
 
+Project_edits_api = Router(
+    [
+        Route("/edit/{id}", endpoint=ProjectEdits, methods=["PUT"]),
+    ]
+)

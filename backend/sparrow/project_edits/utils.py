@@ -1,74 +1,34 @@
-def create_publication_collection(publications, publication_collection, db):
-    '''
-    function to create a publication collection list from the incoming changeset.
+def schema_collection(db, model, data):
+    schema = db.model_schema(model)
+    data_model = getattr(db.model, model)
 
-    - publications: the changeset list of publciations
-    - publication_collection: the publications from the existing model
-    - db: the database connection
-    '''
-    # find what publcations are the same based on id.. then edit attributes.
-    # TODO: make this simpler?
+    model_list = []
+    if isinstance(data, list):
+        # data is an array
+        for ele in data:
+            if "id" in ele:
+                # id as been passed, instance exists
+                existing = data_model.query.get(ele["id"])
+                new = schema.load(ele, session=db.session, instance=existing)
+                new.id = existing.id
+                db.session.rollback()
+                res = db.session.merge(new)
+                db.session.commit()
+                model_list.append(res)
+            else:  # assume its a new model
+                new = schema.load(ele, session=db.session)
+                db.session.add(new)
+                db.session.commit()
+                model_list.append(new)
+    return model_list
 
-    collection = [] 
-    for ele in publications:
 
-        if 'id' not in ele:
+def schema_collection_hanlder(db, model, data):
+    schema = db.model_schema(model)
+    collections = schema._available_nests()  ## list of collections for a schema
 
-            #NOTE: assuming that if no id is in changeset, then the DOI was added on the frontend
-            #collection.append(create_publication_object(ele, db))
-            Publication = db.model.publication
-            model_pub = Publication.get_or_create(doi=ele['doi'])
-            
-            collection.append(model_pub)
+    for coll in collections:
+        if coll in data:
+            new_col = schema_collection(db, coll, data[coll])
 
-        else:
-            model_pub = grab_by_id(publication_collection, ele['id'],db)
-
-            for k in ele:
-              setattr(model_pub, k, ele[k])
-
-            collection.append(model_pub)
-
-    return collection
-
-def grab_by_id(publication_collection, id, db):
-    '''
-        Returns a publication model object from the collection in the project model
-    '''
-    for pub in publication_collection:
-        if pub.id == id:
-            return pub
-
-## try using get_or_create instead
-def create_publication_object(pub, db):
-    '''
-     deals with additions of publications to the collection. 
-
-     - Pub: the pub object that was added on the frontend, no associated id. 
-
-     needs to check if doi exists in database, otherwise create a new publication object
-    '''
-    # Publication model
-    Publication = db.model.publication
-
-    # using the try and except is probably a bad way to do this..
-    try:
-        # see if the doi exists in the database
-        model_pub = db.session.query(Publication).filter(Publication.doi==pub['doi']).one()
-
-        # if it does, set the attributes
-        for k in pub:
-            setattr(model_pub, k, pub[k])
-
-        #add it to the collection
-        return model_pub
-    except: 
-        # if it does NOT, create a new publication model object
-        model_pub = Publication()
-
-        # set the attributes
-        for k in pub:
-            setattr(model_pub, k, pub[k])
-
-        # add it to the collection
-        return model_pub
+    pass
