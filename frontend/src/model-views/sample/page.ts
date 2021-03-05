@@ -4,7 +4,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useAuth } from "~/auth";
 import hyper from "@macrostrat/hyper";
 import {
@@ -87,9 +87,9 @@ const Parameter = ({ name, value, ...rest }) => {
 };
 
 const ProjectLink = function({ d }) {
-  const project = d.session.map((obj) => {
-    if (obj.project) {
-      const { name: project_name, id: project_id } = obj.project;
+  const project = d.project.map((obj) => {
+    if (obj) {
+      const { name: project_name, id: project_id } = obj;
       return { project_name, project_id };
     }
     return null;
@@ -111,7 +111,7 @@ const ProjectLink = function({ d }) {
 };
 
 export const SampleProjects = ({ data, isEditing, onClick }) => {
-  console.log(data);
+  //console.log(data);
   if (isEditing) {
     return h("div.parameter", [
       h("h4.subtitle", "Project"),
@@ -151,8 +151,14 @@ const LocationBlock = function(props) {
 
 const Material = function(props) {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
+
+  const changeMaterial = (material) => {
+    actions.updateState({
+      model: { material: { $set: material } },
+    });
+  };
   if (isEditing) {
-    return h(SampleMaterial, { changeMaterial: () => {}, sample: model }); //material component from sample page
+    return h(SampleMaterial, { changeMaterial, sample: model }); //material component from sample page
   }
   if (!isEditing) {
     if (model.material == null) return null;
@@ -285,16 +291,25 @@ const SampleProjectAdd = () => {
   const { setListName, changeFunction } = useContext(SampleAdminContext);
 
   const onClickDelete = ({ id, name }) => {
-    console.log(id, name);
+    const ps = [...model.project];
+    const newPs = ps.filter((ele) => ele.id != id);
+    actions.updateState({
+      model: { project: { $set: newPs } },
+    });
   };
 
   const addProject = (id, name) => {
-    // replaces project
-    const proj = { id, name };
+    const projects = model.project ? [...model.project] : [];
+    const proj = new Array({ id, name });
+    const newProjs = [...projects, ...proj];
     actions.updateState({
-      model: { session: { project: { $set: proj } } },
+      model: { project: { $set: newProjs } },
     });
   };
+
+  useEffect(() => {
+    changeFunction(addProject);
+  }, [model.project]);
 
   const onClickList = () => {
     setListName("project");
@@ -308,9 +323,9 @@ const SampleSessionAdd = () => {
   const { model, actions, isEditing } = useModelEditor();
   const { setListName, changeFunction } = useContext(SampleAdminContext);
 
-  const addSession = (session_id, date, target, technique) => {
+  const addSession = (id, date, target, technique) => {
     const currentSessions = [...model.session];
-    const newSess = new Array({ session_id, date, target, technique });
+    const newSess = new Array({ id, date, target, technique });
     const newSessions = [...currentSessions, ...newSess];
     actions.updateState({
       model: { session: { $set: newSessions } },
@@ -318,8 +333,13 @@ const SampleSessionAdd = () => {
   };
 
   const onClickDelete = ({ session_id: id, date }) => {
-    console.log(id, date);
+    const ss = [...model.session];
+    const newSs = ss.filter((ele) => ele.id != id);
+    actions.updateState({
+      model: { session: { $set: newSs } },
+    });
   };
+
   const onClickList = () => {
     setListName("session");
     changeFunction(addSession);
@@ -341,30 +361,49 @@ const SampleLocationEleDepthEditor = () => {
 
   const sample = { ...model, longitude, latitude };
 
-  console.log(longitude, latitude);
+  //console.log(longitude, latitude);
 
-  const changeCoordinates = () => {
-    console.log("change");
-  };
-  const changeDepth = () => {
-    console.log("change");
-  };
-  const changeElevation = () => {
-    console.log("change");
+  const changeCoordinates = (coords) => {
+    const { lat, lon } = coords;
+    const newLoc = {
+      tpye: "Point",
+      coordinates: [lon, lat],
+    };
+    actions.updateState({
+      model: { location: { $set: newLoc } },
+    });
   };
 
-  return h("div", { style: { justifyContent: "flex-end" } }, [
-    h("div.sample-map", { style: { maxWidth: "455px" } }, [
-      h(NewSampleMap, { changeCoordinates, sample }),
-    ]),
-    h("div", { style: { display: "flex" } }, [
-      h(SampleLocation, { changeCoordinates, sample: { longitude, latitude } }),
-      h("div", [
-        h(SampleDepth, { sample, changeDepth }),
-        h(SampleElevation, { sample, changeElevation }),
+  const changeDepth = (depth) => {
+    actions.updateState({
+      model: { depth: { $set: depth } },
+    });
+  };
+
+  const changeElevation = (elev) => {
+    actions.updateState({
+      model: { elevation: { $set: elev } },
+    });
+  };
+
+  return h(
+    "div",
+    { style: { justifyContent: "flex-end", minWidth: "405px" } },
+    [
+      h("div.sample-map", { style: { maxWidth: "455px" } }, [
+        h(NewSampleMap, { changeCoordinates, sample: { longitude, latitude } }),
       ]),
-    ]),
-  ]);
+      h(SampleLocation, {
+        changeCoordinates,
+        sample: { longitude, latitude },
+        stacked: false,
+      }),
+      h("div", [
+        h(SampleElevation, { sample, changeElevation }),
+        h(SampleDepth, { sample, changeDepth }),
+      ]),
+    ]
+  );
 };
 
 function SamplePage(props) {
@@ -377,23 +416,23 @@ function SamplePage(props) {
   Render sample page based on ID provided in URL through react router
   */
 
-  console.log(sample.data);
-
   return h(
     ModelEditor,
     {
       model: sample.data,
       canEdit: login || Edit,
       persistChanges: async (updatedModel, changeset) => {
-        let rest;
-        let { id } = updatedModel;
-        const response = await put(
-          buildURL(`/models/sample/${id}`, {}),
-          changeset
-        );
-        const { data } = response;
-        ({ id, ...rest } = data);
-        return rest;
+        console.log(changeset);
+        console.log(updatedModel);
+        // let rest;
+        // let { id } = updatedModel;
+        // const response = await put(
+        //   buildURL(`/models/sample/${id}`, {}),
+        //   changeset
+        // );
+        // const { data } = response;
+        // ({ id, ...rest } = data);
+        // return rest;
       },
     },
     [
