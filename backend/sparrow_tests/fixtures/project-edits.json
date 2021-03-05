@@ -34,6 +34,7 @@
     ],
     "session": [
       {
+        "id": 2,
         "date": "2014-10-29 13:47:16",
         "data": { "Irradiation": "UW114" },
         "sample": { "name": "fake2", "material": "basalt" }
@@ -56,11 +57,13 @@
     ],
     "session": [
       {
+        "id": 2,
         "date": "2014-10-29 13:47:16",
         "data": { "Irradiation": "UW114" },
         "sample": { "name": "fake2", "material": "basalt" }
       },
       {
+        "id": 1,
         "date": "2015-10-29 13:47:16",
         "data": { "Irradiation": "UW114" },
         "sample": { "name": "fake1", "material": "basalt" }
