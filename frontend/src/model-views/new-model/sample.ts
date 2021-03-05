@@ -9,7 +9,7 @@ import { ProjectFormContext } from "../project/new-project";
 import { useAPIv2Result } from "~/api-v2";
 import { MySuggest } from "../../components/blueprint.select";
 import { FormGroup, Button, Icon, Tooltip } from "@blueprintjs/core";
-import { HelpButton } from "~/components";
+import { HelpButton, MySwitch } from "~/components";
 import { MyNumericInput } from "../../components/edit-sample";
 import styles from "./module.styl";
 
@@ -74,12 +74,14 @@ export function NewSampleMap(props) {
 }
 
 export const SampleLocation = (props) => {
-  const { sample, changeCoordinates } = props;
+  const { sample, changeCoordinates, stacked = true } = props;
   const { longitude, latitude } = sample;
   const [loc, setLoc] = useState({
     longitude: longitude,
     latitude: latitude,
   });
+
+  const classname = stacked ? "sample-loc-inputs" : "sample-loc-inputs-long";
 
   useEffect(() => {
     setLoc({
@@ -108,12 +110,12 @@ export const SampleLocation = (props) => {
     changeCoordinates({ lon: value, lat: loc.latitude });
   };
 
-  return h("div.sample-loc-inputs", [
+  return h(`div.${classname}`, [
     h(MyNumericInput, {
       label: "Latitude",
       value: loc.latitude,
       onChange: onChangeLat,
-      helperText: "between -90 and 90",
+      helperText: "-90 to 90",
       placeholder: "Enter latitude",
       min: -90,
       max: 90,
@@ -122,7 +124,7 @@ export const SampleLocation = (props) => {
       label: "Longitude",
       value: loc.longitude,
       onChange: onChangeLon,
-      helperText: "between -180 and 180",
+      helperText: "-180 to 180",
       placeholder: "Enter longitude",
       min: -180,
       max: 180,
@@ -131,12 +133,25 @@ export const SampleLocation = (props) => {
 };
 
 export const SampleDepth = (props) => {
+  const [disabled, setDisabled] = useState(true);
   const { sample, changeDepth } = props;
   const { depth } = sample;
 
+  useEffect(() => {
+    if (disabled) {
+      changeDepth(null);
+    }
+  }, [disabled]);
+
   return h("div", [
-    h(MyNumericInput, {
-      label: "Depth (m)",
+    h("div", { style: { display: "flex" } }, [
+      "Depth (m): ",
+      h(MySwitch, {
+        checked: !disabled,
+        onChange: () => setDisabled(!disabled),
+      }),
+    ]),
+    h.if(!disabled)(MyNumericInput, {
       value: depth,
       onChange: changeDepth,
     }),
@@ -149,6 +164,7 @@ const unwrapElevation = (obj) => {
 };
 
 export const SampleElevation = (props) => {
+  const [disabled, setDisabled] = useState(true);
   const { sample, changeElevation } = props;
   const { elevation, longitude, latitude } = sample;
 
@@ -165,17 +181,30 @@ export const SampleElevation = (props) => {
   );
   useEffect(() => {
     if (elev) {
-      if (longitude && latitude) {
+      if (longitude && latitude && !disabled) {
         changeElevation(elev);
       }
     }
   }, [elev]);
 
+  useEffect(() => {
+    if (disabled) {
+      changeElevation(null);
+    }
+  }, [disabled]);
+
   return h("div", [
     h(MyNumericInput, {
-      label: "Elevation (m)",
+      label: h("div", { style: { display: "flex", alignItems: "baseline" } }, [
+        "Elevation (m): ",
+        h(MySwitch, {
+          checked: !disabled,
+          onChange: () => setDisabled(!disabled),
+        }),
+      ]),
       value: elevation,
       onChange: changeElevation,
+      disabled,
     }),
   ]);
 };
@@ -343,6 +372,7 @@ const unwrapMacroMaterials = (obj) => {
  */
 export const SampleMaterial = (props) => {
   const { sample, changeMaterial } = props;
+  const { material } = sample;
   const [query, setQuery] = useState("");
   const initMaterials = useAPIv2Result(
     "/vocabulary/material",
@@ -369,7 +399,7 @@ export const SampleMaterial = (props) => {
   }, [initMaterials, macrostratMat]);
 
   return h("div", [
-    h(FormGroup, { label: "Material", helperText: "Lithologies" }, [
+    h(FormGroup, { label: h("h4", "Material"), helperText: "Lithologies" }, [
       h(MySuggest, {
         items: materials,
         onChange: changeMaterial,
@@ -378,6 +408,7 @@ export const SampleMaterial = (props) => {
         },
       }),
     ]),
+    h("h4", ["Currently: ", material ? material : "No Material"]),
   ]);
 };
 
