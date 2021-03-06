@@ -36,6 +36,7 @@ import { DatePicker } from "@blueprintjs/datetime";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
 import { ProjectAdminContext } from "~/admin/project";
+import { ExpandLessSharp } from "@material-ui/icons";
 
 const h = hyperStyled(styles);
 
@@ -101,8 +102,10 @@ export const EmbargoDatePick = (props) => {
   const embargoDate = embargo_date ? new Date(embargo_date) : null;
 
   let today = new Date();
+  let tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
 
-  const embargoed = embargoDate && +embargoDate >= +today ? true : false;
+  const embargoed = embargoDate ? true : false;
 
   const infinite =
     embargoDate && embargoDate.getFullYear() === today.getFullYear() + 3000
@@ -112,13 +115,23 @@ export const EmbargoDatePick = (props) => {
   const text =
     embargoDate != null
       ? infinite
-        ? "Embargoed Forever"
+        ? "Embargoed Indefinitely"
         : `Embargoed Until: ${embargoDate.toISOString().split("T")[0]}`
       : "Public";
   const icon = embargoDate != null ? "lock" : "unlock";
 
   console.log(embargoed);
   console.log(infinite);
+
+  const switchChange = () => {
+    if (infinite) {
+      onChange(null);
+    } else {
+      onChange(ToInfinityDate(today));
+    }
+  };
+
+  console.log(tomorrow);
 
   const Content = () => {
     return h(Card, [
@@ -134,13 +147,18 @@ export const EmbargoDatePick = (props) => {
         "Emargo Forever: ",
         h(MySwitch, {
           checked: infinite,
-          onChange: () => onChange(ToInfinityDate(today)),
+          onChange: switchChange,
         }),
       ]),
-      h.if(embargoed)("div", [
-        "Make Data Public",
-        h(MySwitch, { checked: !embargoed, onChange: () => onChange(null) }),
-      ]),
+      h(
+        Button,
+        {
+          disabled: !embargoed,
+          onClick: () => onChange(null),
+          minimal: true,
+        },
+        ["Make Public"]
+      ),
     ]);
   };
 
