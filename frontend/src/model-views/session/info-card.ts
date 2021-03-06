@@ -20,13 +20,15 @@ const Sample = (props) => {
   ]);
 };
 
-const Instrument = function({ instrument_name }) {
-  if (instrument_name == null) {
-    return null;
-  }
+const Instrument = function(props) {
+  const { instrument } = props;
+  if (!instrument) return null;
+
+  const { name, id } = instrument;
+
   return h("div.instrument", [
     h("h5.small-info", "Instrument"),
-    h("div", instrument_name),
+    h("div", name),
   ]);
 };
 
@@ -50,20 +52,29 @@ const Technique = function({ technique }) {
 //   ]);
 // };
 
+const SessionProjects = (props) => {
+  const { project } = props;
+  console.log(project);
+
+  if (!project) return null;
+
+  const { name, id } = project;
+  const projectTo = useModelURL(`/project/${id}`);
+
+  return h("div.project", [
+    h("h5.info", "Project"),
+    h("div", null, [h("a", { href: projectTo }, name) || "—"]),
+  ]);
+};
+
 const SessionInfoComponent = function(props) {
   // add some links to Project, sample, etc
-  const {
-    id,
-    sample_id,
-    sample_name,
-    target,
-    project_name,
-    project_id,
-  } = props;
-  const date = parse(props.date);
+  const { id, sample, target, project, date: sdate } = props;
+  const date = parse(sdate);
   console.log(props);
 
-  const projectTo = useModelURL(`/project/${project_id}`);
+  const sampleId = sample ? sample.id : null;
+  const sampleName = sample ? sample.name : null;
 
   return h([
     h("div.top", [
@@ -71,11 +82,8 @@ const SessionInfoComponent = function(props) {
       h("div.expander"),
     ]),
     h("div.session-info", [
-      h(Sample, { id: sample_id, name: sample_name, target }),
-      h("div.project", [
-        h("h5.info", "Project"),
-        h("div", null, [h("a", { href: projectTo }, project_name) || "—"]),
-      ]),
+      h(Sample, { id: sampleId, name: sampleName, target }),
+      h(SessionProjects, { project }),
       h(Instrument, props),
       h(Technique, props),
       //h(MeasurementGroup, props),
