@@ -36,7 +36,6 @@ import { DatePicker } from "@blueprintjs/datetime";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
 import { ProjectAdminContext } from "~/admin/project";
-import { ExpandLessSharp } from "@material-ui/icons";
 
 const h = hyperStyled(styles);
 
