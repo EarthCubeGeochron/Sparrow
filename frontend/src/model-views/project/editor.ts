@@ -502,8 +502,8 @@ const EditableProjectDetails = function(props) {
         );
         const { data } = response;
         console.log(data);
-        // (({ id, ...rest } = data));
-        //return rest;
+        ({ data } = data);
+        return data;
       },
     },
     [
