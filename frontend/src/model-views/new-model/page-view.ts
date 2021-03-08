@@ -1,5 +1,5 @@
 import { AddSampleCard } from "../sample/detail-card";
-import { Button, Dialog, Tooltip } from "@blueprintjs/core";
+import { Tooltip } from "@blueprintjs/core";
 import {
   ProjectSamples,
   ProjectPublications,
