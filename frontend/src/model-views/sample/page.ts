@@ -308,7 +308,9 @@ const SampleProjectAdd = () => {
   };
 
   useEffect(() => {
-    changeFunction(addProject);
+    if (isEditing) {
+      changeFunction(addProject);
+    }
   }, [model.project]);
 
   const onClickList = () => {

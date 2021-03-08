@@ -263,7 +263,9 @@ function EditSessions(props) {
   };
 
   useEffect(() => {
-    changeFunction(addSession);
+    if (isEditing) {
+      changeFunction(addSession);
+    }
   }, [model.session]);
 
   const onDrop = (sample, session_id) => {
@@ -324,7 +326,9 @@ function EditResearchers(props) {
   };
 
   useEffect(() => {
-    changeFunction(onSubmit);
+    if (isEditing) {
+      changeFunction(onSubmit);
+    }
   }, [model.researcher]);
 
   const names = researchers.map(({ name }) => name);
@@ -372,7 +376,9 @@ function EditablePublications(props) {
   };
 
   useEffect(() => {
-    changeFunction(onSubmit);
+    if (isEditing) {
+      changeFunction(onSubmit);
+    }
   }, [model.publication]);
 
   return h(PubAdd, {
@@ -428,7 +434,9 @@ export function EditableSamples() {
   };
 
   useEffect(() => {
-    changeFunction(sampleOnClick);
+    if (isEditing) {
+      changeFunction(sampleOnClick);
+    }
   }, [model.sample]);
 
   const onClickList = () => {
