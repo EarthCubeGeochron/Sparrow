@@ -30,7 +30,7 @@ const SampleCard = function(props: SampleCardProps) {
     location_name,
     link = true,
     setID,
-    session,
+    session = [],
   } = props;
 
   const onHover = () => {

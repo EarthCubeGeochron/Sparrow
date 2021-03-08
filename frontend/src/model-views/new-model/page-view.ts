@@ -60,6 +60,9 @@ export const PubAdd = (props) => {
     rightElement,
     isEditing = true,
   } = props;
+  if (!isEditing && data == null) {
+    return null;
+  }
   return h("div", [
     h("div", [
       h(ProjectPublications, {
