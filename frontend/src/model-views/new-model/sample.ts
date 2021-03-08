@@ -575,3 +575,15 @@ export function EditProjNewSample() {
 
   return h(NewSampleToModel, { onSubmit });
 }
+
+export function EditSessNewSample() {
+  const { model, actions } = useModelEditor();
+
+  const onSubmit = (sample) => {
+    actions.updateState({
+      model: { sample: { $set: sample } },
+    });
+  };
+
+  return h(NewSampleToModel, { onSubmit });
+}
