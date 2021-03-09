@@ -5,6 +5,7 @@ from pytest import mark
 import datetime
 import json
 
+
 class TestAPIV2_filters:
     def test_load_data(self, client, db):
         Material = get_db_model(db, "vocabulary_material")
@@ -78,17 +79,14 @@ class TestAPIV2_filters:
         coord_data = coord_response.json()
         assert coord_data["total_count"] != 0
 
-        geometry_response = client.get(
-            "/api/v2/models/sample?geometry=POLYGON((0 0 ,180 90, 0 90, 180 0, 0 0))"
-        )
+        geometry_response = client.get("/api/v2/models/sample?geometry=POLYGON((0 0 ,180 90, 0 90, 180 0, 0 0))")
         geom_data = geometry_response.json()
 
         assert geom_data["total_count"] != 0
 
-    @mark.xfail(reason="Can't find fixture")
     def test_doi_filter(self, client, db):
-        data = json_fixture("project-doi-fixes.json")
-        db.load_data("project", data["data"])
+        data = json_fixture("projects-post.json")
+        db.load_data("project", data[0])
 
         pub_res = client.get("/api/v2/models/publication?doi_like=10.10")
         pub_json = pub_res.json()
