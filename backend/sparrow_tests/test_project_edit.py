@@ -1,4 +1,5 @@
 from .helpers import json_fixture
+from pytest import mark
 import json
 
 
@@ -21,6 +22,7 @@ class TestProjectEdits:
     https://github.com/realpython/materials/blob/master/flask-connexion-rest-part-2/version_1/people.py
     """
 
+    @mark.xfail(reason="This is experimental")
     def test_project_edits(self, db):
         data = json_fixture("project-edits.json")
 

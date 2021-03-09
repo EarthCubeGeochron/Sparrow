@@ -25,8 +25,9 @@ class TestModelPost:
 
         res_json = res.json()
 
-        assert 0 == 1
-        # assert len(res_json["data"]) > 0
+        #maybe need to do something here?
+
+        assert len(res_json["data"]) > 0
 
     def test_add_project_from_existing(self, db, client):
         route = "/api/v2/models/project"
