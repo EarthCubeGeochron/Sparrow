@@ -6,6 +6,7 @@ import {
   Button,
   Popover,
   ButtonGroup,
+  Card,
 } from "@blueprintjs/core";
 import { useAuth } from "~/auth";
 import {
@@ -15,10 +16,9 @@ import {
   CancelButton,
   SaveButton,
   useModelEditor,
-  APIContext,
   APIHelpers,
 } from "@macrostrat/ui-components";
-import { MinimalNavbar } from "~/components";
+import { MinimalNavbar, MySwitch } from "~/components";
 import { put } from "axios";
 import "../main.styl";
 import styles from "~/admin/module.styl";
@@ -87,22 +87,77 @@ const ModelEditableText = function(props) {
   ]);
 };
 
+const ToInfinityDate = (date) => {
+  const newYear = date.getFullYear() + 3000;
+  const month = date.getMonth();
+  const day = date.getDay();
+  return new Date(newYear, month, day);
+};
+
 export const EmbargoDatePick = (props) => {
   const { onChange, embargo_date, active = true } = props;
+  // need to add an un-embargo if data is embargoed. And an infinite embargo
+  const embargoDate = embargo_date ? new Date(embargo_date) : null;
+
+  let today = new Date();
+  let tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+
+  const embargoed = embargoDate ? true : false;
+
+  const infinite =
+    embargoDate && embargoDate.getFullYear() === today.getFullYear() + 3000
+      ? true
+      : false;
 
   const text =
-    embargo_date != null ? `Embargoed Until: ${embargo_date}` : "Public";
-  const icon = embargo_date != null ? "lock" : "unlock";
+    embargoDate != null
+      ? infinite
+        ? "Embargoed Indefinitely"
+        : `Embargoed Until: ${embargoDate.toISOString().split("T")[0]}`
+      : "Public";
+  const icon = embargoDate != null ? "lock" : "unlock";
+
+  console.log(embargoed);
+  console.log(infinite);
+
+  const switchChange = () => {
+    if (infinite) {
+      onChange(null);
+    } else {
+      onChange(ToInfinityDate(today));
+    }
+  };
+
+  console.log(tomorrow);
 
   const Content = () => {
-    return h(DatePicker, {
-      minDate: new Date(),
-      maxDate: new Date(2050, 1, 1),
-      onChange: (e) => {
-        let date = e.toISOString().split("T")[0];
-        onChange(date);
-      },
-    });
+    return h(Card, [
+      h(DatePicker, {
+        minDate: new Date(),
+        maxDate: new Date(2050, 1, 1),
+        onChange: (e) => {
+          let date = e.toISOString().split("T")[0];
+          onChange(e);
+        },
+      }),
+      h("div", [
+        "Emargo Forever: ",
+        h(MySwitch, {
+          checked: infinite,
+          onChange: switchChange,
+        }),
+      ]),
+      h(
+        Button,
+        {
+          disabled: !embargoed,
+          onClick: () => onChange(null),
+          minimal: true,
+        },
+        ["Make Public"]
+      ),
+    ]);
   };
 
   return h("div.embargo-editor", [
@@ -208,7 +263,9 @@ function EditSessions(props) {
   };
 
   useEffect(() => {
-    changeFunction(addSession);
+    if (isEditing) {
+      changeFunction(addSession);
+    }
   }, [model.session]);
 
   const onDrop = (sample, session_id) => {
@@ -269,7 +326,9 @@ function EditResearchers(props) {
   };
 
   useEffect(() => {
-    changeFunction(onSubmit);
+    if (isEditing) {
+      changeFunction(onSubmit);
+    }
   }, [model.researcher]);
 
   const names = researchers.map(({ name }) => name);
@@ -317,7 +376,9 @@ function EditablePublications(props) {
   };
 
   useEffect(() => {
-    changeFunction(onSubmit);
+    if (isEditing) {
+      changeFunction(onSubmit);
+    }
   }, [model.publication]);
 
   return h(PubAdd, {
@@ -373,7 +434,9 @@ export function EditableSamples() {
   };
 
   useEffect(() => {
-    changeFunction(sampleOnClick);
+    if (isEditing) {
+      changeFunction(sampleOnClick);
+    }
   }, [model.sample]);
 
   const onClickList = () => {
@@ -421,6 +484,8 @@ const EditableProjectDetails = function(props) {
     setSampleHoverID(id);
   };
 
+  console.log(project.data);
+
   return h(
     ModelEditor,
     {
@@ -429,15 +494,16 @@ const EditableProjectDetails = function(props) {
       persistChanges: async (updatedModel, changeset) => {
         console.log(changeset);
         console.log(updatedModel);
-        // let rest;
-        // let { id } = updatedModel;
-        // const response = await put(
-        //   buildURL(`/models/project/${id}`, {}),
-        //   changeset
-        // );
-        // const { data } = response;
-        // ({ id, ...rest } = data);
-        // return rest;
+        let rest;
+        let { id } = updatedModel;
+        const response = await put(
+          buildURL(`/project/edit/${id}`, {}),
+          updatedModel
+        );
+        const { data } = response;
+        console.log(data);
+        ({ data } = data);
+        return data;
       },
     },
     [

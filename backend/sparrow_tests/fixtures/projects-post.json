@@ -6,8 +6,7 @@
       {
         "name": "test_sample_1",
         "material": "basalt",
-        "longitude": 104,
-        "latitude": 45
+        "location": { "type": "POINT", "coordinates": [104, 45] }
       },
       {
         "name": "test_sample_2",

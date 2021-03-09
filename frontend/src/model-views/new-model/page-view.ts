@@ -1,5 +1,5 @@
 import { AddSampleCard } from "../sample/detail-card";
-import { Button, Dialog, Tooltip } from "@blueprintjs/core";
+import { Tooltip } from "@blueprintjs/core";
 import {
   ProjectSamples,
   ProjectPublications,
@@ -60,6 +60,9 @@ export const PubAdd = (props) => {
     rightElement,
     isEditing = true,
   } = props;
+  if (!isEditing && data == null) {
+    return null;
+  }
   return h("div", [
     h("div", [
       h(ProjectPublications, {

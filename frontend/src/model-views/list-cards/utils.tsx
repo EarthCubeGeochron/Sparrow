@@ -165,8 +165,8 @@ const SessionModelCard = (props) => {
   const instruName = instrument ? instrument.name : "";
   const sampleName = sample ? `Linked through ${sample.name}` : "";
 
-  const Irradiation = data.Irradiation ? data.Irradiation : null;
-  const FCS = data.FCS ? data.FCS : null;
+  const Irradiation = data && data.Irradiation ? data.Irradiation : null;
+  const FCS = data && data.FCS ? data.FCS : null;
 
   const analysisName = analysis.length > 1 ? "Analyses" : "Analysis";
   const analysisCount = analysis.length + " " + analysisName;

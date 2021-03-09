@@ -30,7 +30,7 @@ const SampleCard = function(props: SampleCardProps) {
     location_name,
     link = true,
     setID,
-    session,
+    session = [],
   } = props;
 
   const onHover = () => {
@@ -136,14 +136,13 @@ const ResearcherEditCard = (props) => {
 
 export const ProjectEditCard = (props) => {
   const { d, onClick } = props;
-  const project = d.session.map((obj) => {
-    if (obj.project) {
-      const { name, id } = obj.project;
+  const project = d.project.map((obj) => {
+    if (obj) {
+      const { name, id } = obj;
       return { name, id };
     }
     return null;
   });
-  console.log(project);
 
   return h("div", [
     project.map((obj) => {

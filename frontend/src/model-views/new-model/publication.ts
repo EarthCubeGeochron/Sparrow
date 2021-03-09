@@ -266,3 +266,14 @@ export function EditProjNewPub() {
   };
   return h(AddNewPubToModel, { onSubmit });
 }
+
+export function EditSessNewPub() {
+  const { model, actions } = useModelEditor();
+
+  const onSubmit = (data) => {
+    actions.updateState({
+      model: { publication: { $set: data[0] } },
+    });
+  };
+  return h(AddNewPubToModel, { onSubmit });
+}

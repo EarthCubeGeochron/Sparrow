@@ -2,7 +2,7 @@ import h from "@macrostrat/hyper";
 import { useLocation, Route } from "react-router-dom";
 import { PageSkeleton, InsetText } from "~/components";
 
-export const NoMatchPage = function () {
+export const NoMatchPage = function() {
   let location = useLocation();
   return h(InsetText, [
     h("h2", "404"),
@@ -26,4 +26,13 @@ export function useModelURL(tail) {
   const { pathname } = useLocation();
   const base = pathname.startsWith("/admin") ? "/admin" : "/catalog";
   return base + tail;
+}
+
+/**
+ * returns true if on admin page
+ */
+export function useModelURLBool() {
+  const { pathname } = useLocation();
+  const onAdmin = pathname.startsWith("/admin");
+  return onAdmin;
 }

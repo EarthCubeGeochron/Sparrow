@@ -8,6 +8,7 @@ import {
   InputGroup,
   NumericInput,
 } from "@blueprintjs/core";
+import { MySwitch } from "./misscel";
 import { useToggle } from "../map/components/APIResult";
 
 /** Form for Editing an Existing Sample */
@@ -95,11 +96,12 @@ interface MyInputNum {
   max?: number;
   helperText?: string;
   placeholder?: string;
-  label?: string;
+  label?: any;
   onChange: any;
   value: any;
   rightElement?: any;
   leftIcon?: any;
+  disabled?: boolean;
 }
 
 /** Numeric Input that has intent validation
@@ -127,7 +129,7 @@ export function MyNumericInput(props: MyInputNum) {
         labelFor: props.label + "-input",
       },
       [
-        h(NumericInput, {
+        h.if(!props.disabled)(NumericInput, {
           id: props.label + "-input",
           placeholder: props.placeholder,
           value: props.value,

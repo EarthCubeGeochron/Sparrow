@@ -1,6 +1,5 @@
-import { Popover, Button } from "@blueprintjs/core";
+import { Popover, Button, Switch } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { DataFileAdminPage } from "~/admin/data-file";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -65,4 +64,9 @@ export function DndChild(props) {
     { id, onDragStart: dragStart, onDragOver: dragOver, draggable },
     [childern]
   );
+}
+
+export function MySwitch(props) {
+  const { checked, onChange } = props;
+  return h(Switch, { checked, onChange });
 }
