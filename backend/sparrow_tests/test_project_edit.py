@@ -45,14 +45,17 @@ class TestProjectEdits:
         updates = data["edit-project"]
 
         # load updates into the project_schema and assign the same id as the existing
-        new_proj = project_schema.load(updates, session=db.session)
+        new_proj = project_schema.load(
+            updates, session=db.session, instance=project.query.get(1), partial=True, transient=True
+        )
         new_proj.id = existing_project.id
 
         # NOTE: for some reason, i need to rollbakc before the merge.
         #       online examples don't need to do this
         # Merge the new_proj with the existing one in the session.
         db.session.rollback()
-        res = db.session.add(new_proj)
+
+        res = db.session.merge(new_proj)
 
         # commit changes
         # seems to work well except for its creating an extra duplicate session.
