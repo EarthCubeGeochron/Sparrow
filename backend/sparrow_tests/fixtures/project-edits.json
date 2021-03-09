@@ -53,8 +53,7 @@
     "sample": [
       { "name": "fake1", "material": "basalt" },
       { "name": "fake3", "material": "granite" },
-      { "name": "fake2", "material": "basalt" },
-      { "name": "Casey's FAKE SAMPLE", "material": "Lies", "id": 4 }
+      { "name": "fake2", "material": "basalt" }
     ],
     "session": [
       {
