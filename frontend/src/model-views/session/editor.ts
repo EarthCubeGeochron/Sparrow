@@ -1,9 +1,14 @@
 import { useContext } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import { ModelEditor, useModelEditor } from "@macrostrat/ui-components";
+import {
+  ModelEditor,
+  useModelEditor,
+  APIHelpers,
+} from "@macrostrat/ui-components";
 import { parse, format } from "date-fns";
-import { useAPIv2Result } from "~/api-v2";
+import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { useAuth } from "~/auth";
+import { put } from "axios";
 import {
   EmbargoDatePick,
   EditStatusButtons,
@@ -189,6 +194,7 @@ export function EditableSessionDetails(props) {
   console.log(res);
 
   const { login } = useAuth();
+  const { buildURL } = APIHelpers(useContext(APIV2Context));
 
   const to = useModelURL("/session");
   const breadCrumbs = [
@@ -204,6 +210,15 @@ export function EditableSessionDetails(props) {
       persistChanges: async (updatedModel, changeset) => {
         console.log(updatedModel);
         console.log(changeset);
+        let rest;
+        let { id } = updatedModel;
+        const response = await put(
+          buildURL(`/models/session/${id}`, {}),
+          changeset
+        );
+        const { data } = response;
+        ({ id, ...rest } = data);
+        return rest;
       },
     },
     [
