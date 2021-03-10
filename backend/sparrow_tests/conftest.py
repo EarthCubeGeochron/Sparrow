@@ -5,6 +5,8 @@ from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 from sparrow.startup import wait_for_database
 from sqlalchemy_utils import create_database, drop_database, database_exists
+from sqlalchemy import event
+from sqlalchemy.orm import Session
 
 # Slow tests are opt-in
 
@@ -12,10 +14,6 @@ from sqlalchemy_utils import create_database, drop_database, database_exists
 # Right now, we run this setup code outside of a fixture so we
 # can see the setup output in real time.
 testing_db = "postgresql://postgres@db:5432/sparrow_test"
-
-_app = Sparrow(debug=True, database=testing_db)
-_app.bootstrap(init=True)
-_setup_context(_app)
 
 
 def pytest_addoption(parser):
@@ -52,6 +50,9 @@ def pytest_configure(config):
 
 @fixture(scope="session")
 def app():
+    _app = Sparrow(debug=True, database=testing_db)
+    _app.bootstrap(init=True)
+    _setup_context(_app)
     # wait_for_database("postgresql://postgres@db:5432/postgres")
     # create_database(testing_db)
     yield _app
@@ -62,19 +63,19 @@ def app():
 @fixture(scope="class")
 def db(app, pytestconfig):
     if pytestconfig.option.use_isolation:
-        connection = app.database.session.connection()
+        connection = app.database.engine.connect()
         transaction = connection.begin()
-        session_factory = sessionmaker(bind=connection)
-        app.database.session = scoped_session(session_factory)
+        session = Session(bind=connection)
+        app.database.session = session
         _setup_context(app)
         yield app.database
         app.database.session.close()
         transaction.rollback()
+        connection.close()
     else:
         yield app.database
 
-
-@fixture
-def client(app):
+@fixture(scope="class")
+def client(app, db):
     _client = TestClient(app)
     yield _client

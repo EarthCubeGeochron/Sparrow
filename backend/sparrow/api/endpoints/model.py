@@ -7,6 +7,7 @@ from sqlalchemy import desc
 from starlette.responses import JSONResponse
 from yaml import safe_load
 
+from ...context import get_database
 from ..exceptions import ValidationError
 from ..fields import NestedModelField
 from ..response import APIResponse
@@ -147,7 +148,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self._filters.append(f)
 
     def query(self, schema):
-        db = self.meta.database
+        db = get_database()
         return db.session.query(schema.opts.model)
 
     @property

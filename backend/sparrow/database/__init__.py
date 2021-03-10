@@ -1,8 +1,6 @@
 from contextlib import contextmanager
 from pathlib import Path
 from click import secho
-from os import environ
-import pandas as pd
 
 from sqlalchemy import create_engine, inspect, MetaData, text
 from sqlalchemy.orm import sessionmaker, scoped_session
