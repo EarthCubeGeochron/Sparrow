@@ -39,7 +39,7 @@ class TestAPIV2:
         res = client.get(route)
         assert res.status_code == 200
 
-    @mark.skip(reason="May break other tests")
+    @mark.skip(reason="For some reason, this breaks project_import tests later in the sequence")
     def test_load_data(self, client, db):
         Material = db.model.vocabulary_material
         Sample = db.model.sample

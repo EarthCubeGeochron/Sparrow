@@ -7,7 +7,7 @@ import json
 
 
 class TestAPIV2_filters:
-    @mark.skip(reason="May break other tests")
+    @mark.skip(reason="For some reason, this breaks project_import tests later in the sequence")
     def test_load_data(self, client, db):
         Material = get_db_model(db, "vocabulary_material")
         Sample = get_db_model(db, "sample")
