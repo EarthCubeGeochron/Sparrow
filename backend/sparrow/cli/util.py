@@ -6,8 +6,7 @@ from contextlib import redirect_stderr
 from functools import update_wrapper
 import sys
 
-from ..app import App
-from ..database import Database
+from ..app import Sparrow
 
 
 def abort(err):
@@ -15,9 +14,10 @@ def abort(err):
 
 
 def get_database(ctx, param, value):
+
     try:
-        app = App(__name__, config=value)
-        return Database(app)
+        app = Sparrow(config=value)
+        return app.database
     except ValueError:
         raise click.BadParameter("Invalid database specified")
     except OperationalError:
@@ -31,18 +31,20 @@ def get_database(ctx, param, value):
         sys.exit(0)
 
 
-with_app = click.make_pass_decorator(App)
+with_app = click.make_pass_decorator(Sparrow)
 
 
 def with_database(cmd):
     @click.pass_context
     def new_cmd(ctx, *args, **kwargs):
-        app = ctx.find_object(App)
+
+        app = ctx.find_object(Sparrow)
         # This seems like it should find the application context
         # correctly, but we seem to be invoking it in a different
         # context during testing...
         if app is None:
-            app = App(__name__)
+            app = Sparrow()
+        app.setup_database()
         return ctx.invoke(cmd, app.database, *args, **kwargs)
 
     return update_wrapper(new_cmd, cmd)
@@ -58,11 +60,11 @@ def with_full_app(cmd):
     @click.pass_context
     def new_cmd(ctx, *args, **kwargs):
         # We should ideally be able to pass a configuration from context...
-        app = ctx.find_object(App)
+        app = ctx.find_object(Sparrow)
         # By recreating the app, we actually run constructors (wastefully)
         # twice on startup. We need to refactor the sparrow.app.construct_app
         # to mitigate this.
-        app.load_phase_2()
+        app.setup_server()
         return ctx.invoke(cmd, app, *args, **kwargs)
 
     return update_wrapper(new_cmd, cmd)

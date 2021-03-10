@@ -1,10 +1,12 @@
-from sparrow.app import App
+from sparrow.app import Sparrow
 from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from datetime import datetime
 from pytest import mark
 from sparrow.logs import get_logger
+from sparrow.encoders import JSONEncoder
+from json import dumps
 
 from .fixtures import basic_data, incomplete_analysis, basic_project
 from .helpers import json_fixture, ensure_single
@@ -16,7 +18,7 @@ log = get_logger(__name__)
 
 # This should be in the fixture function ideally but I can't figure out
 # how to cache it so it doesn't repeatedly regenerate.
-app = App(__name__)
+app = Sparrow()
 
 session = dict(sample_id="A-0", date=datetime.now())
 
@@ -299,8 +301,7 @@ class TestDeclarativeImporter:
         ensure_single(db, "datum", value=0.252)
 
     def test_datum_type_merging(self, db):
-        """Datum types should successfully find values already in the database.
-        """
+        """Datum types should successfully find values already in the database."""
         ensure_single(db, "datum_type", parameter="soil water content", unit="weight %")
 
     def test_load_existing_instance(self, db):
@@ -344,6 +345,18 @@ class TestDeclarativeImporter:
 
         assert isinstance(res, db.model.datum_type)
         assert res.id == dt.id
+
+    def test_serialize_instance(self, db):
+        """Make sure we can dump an instance to a JSON string"""
+        inst = db.session.query(db.model.sample).first()
+        SampleSchema = db.interface.sample()
+        res = SampleSchema.dump(inst)
+        dumps(res, cls=JSONEncoder)
+
+    def test_get_instance_api(self, client):
+        """Test that our API at least allows us to retrieve all of the data at once."""
+        res = client.get("/api/v2/models/datum_type", params={"all": True})
+        assert res.status_code == 200
 
     def test_incomplete_import_excluded(self, db):
         try:

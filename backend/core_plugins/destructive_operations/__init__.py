@@ -12,6 +12,7 @@ from sparrow.util import relative_path
 @command(name="remove-analytical-data")
 @with_database
 def remove_analytical_data(db):
+    """Remove all analytical data from the Sparrow database"""
     qfile = relative_path(__file__, "remove-analytical-data.sql")
     db.exec_sql(qfile)
 

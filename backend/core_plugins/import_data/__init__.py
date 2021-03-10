@@ -1,10 +1,9 @@
-from flask import current_app, jsonify, request
-from flask_restful import Resource, reqparse
+from flask import current_app, request
+from flask_restful import Resource
 
 from sparrow import get_logger
-from sparrow.api.v1 import APIResourceCollection, ModelEditParser
+from sparrow.legacy.api_v1 import APIResourceCollection
 from sparrow.plugins import SparrowCorePlugin
-from marshmallow.exceptions import ValidationError
 from sparrow.util import get_qualified_name
 
 log = get_logger(__name__)
@@ -58,6 +57,7 @@ class ImportDataResource(Resource):
 
 class ImportDataPlugin(SparrowCorePlugin):
     name = "import-data"
+    sparrow_version = ">=2.*"
 
-    def on_api_initialized(self, api):
+    def on_api_v1_initialized(self, api):
         api.add_resource(ImportDataAPI, "/import-data")

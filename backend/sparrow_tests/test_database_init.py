@@ -2,6 +2,7 @@ from datetime import datetime
 from pytest import mark
 from sparrow.logs import get_logger
 from sqlalchemy.engine.reflection import Inspector
+from os import environ
 import numpy as N
 
 log = get_logger(__name__)
@@ -36,6 +37,7 @@ class TestDatabaseInitialization:
         "vocabulary_error_metric",
         "vocabulary_unit",
         "vocabulary_parameter",
+        "vocabulary_parameter_link",
         "analysis",
         "vocabulary_analysis_type",
         "constant",
@@ -56,6 +58,9 @@ class TestDatabaseInitialization:
         "core_view_datum",
     ]
 
+    def test_correct_db(self, db):
+        assert str(db.engine.url) == environ.get("SPARROW_DATABASE")
+
     def test_db_automap(self, db):
         """
         Make sure that all core tables are automapped by the
@@ -74,7 +79,7 @@ class TestDatabaseInitialization:
                 return
         assert False
 
-    @mark.skip(reason="This doesn't tend to work.")
+    # @mark.skip(reason="This doesn't tend to work.")
     def test_db_automap_constraints(self, db):
         session = db.model.session
         uuid = session.uuid.prop
@@ -92,6 +97,10 @@ class TestDatabaseInitialization:
     def test_interface_ready(self, db):
         for iface in db.interface:
             iface()
+
+    def test_relationship_model_identity(self, db):
+        remote_class = db.model.sample._material.mapper.class_
+        assert id(db.model.vocabulary_material) == id(remote_class)
 
 
 class TestGenericData(object):

@@ -1,12 +1,15 @@
-from os import environ, chdir
+from os import environ
 from subprocess import run, PIPE, STDOUT
 from shlex import split
 from typing import List
 from pathlib import Path
 from json import loads
-from .env import validate_environment
 from .exc import SparrowCommandError
 from json.decoder import JSONDecodeError
+from sparrow_utils.logs import get_logger
+from sparrow_utils.shell import cmd as cmd_
+
+log = get_logger(__name__)
 
 
 def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
@@ -19,8 +22,8 @@ def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
 
 
 def cmd(*v, **kwargs):
-    val = " ".join(v)
-    return run(split(val), **kwargs)
+    kwargs["logger"] = log
+    return cmd_(*v, **kwargs)
 
 
 def compose(*args, **kwargs):
@@ -64,6 +67,10 @@ def exec_or_run(
         return compose(
             *compose_args, "run", *tty_args, *run_args, container, *args, **popen_kwargs
         )
+
+
+def exec_sparrow(*args, **kwargs):
+    return exec_or_run("backend", "/app/sparrow/__main__.py", *args, **kwargs)
 
 
 def fail_without_docker():

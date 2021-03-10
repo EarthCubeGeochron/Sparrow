@@ -1,0 +1,24 @@
+{
+  "core": "2.0.0.beta1",
+  "frontend": "2.0-alpha",
+  "schema": "1.1.0",
+  "cli": "2.0-beta",
+  "docker_images": {
+    "backend-base": {
+      "context": "./base-images/backend",
+      "version": "1.2"
+    },
+    "db-mysql-fdw": {
+      "context": "./base-images/db-mysql-fdw",
+      "version": "1.0"
+    },
+    "frontend": {
+      "version": "2.0-dev",
+      "context": "./frontend"
+    },
+    "backend": {
+      "version": "1.6",
+      "context": "./backend"
+    }
+  }
+}

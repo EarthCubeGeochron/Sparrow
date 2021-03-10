@@ -9,7 +9,7 @@ once a stable plugin system is created.
 """
 
 import pandas as P
-from sparrow import App
+from sparrow.database import Database
 from sparrow.database.util import run_sql
 from os.path import join, realpath, dirname
 from click import command, option
@@ -58,7 +58,7 @@ def import_earthchem(download=False):
     """
     Import EarthChem vocabulary files
     """
-    db = App(__name__).database
+    db = Database()
     conn = db.engine
 
     run_sql(db.session, "CREATE SCHEMA IF NOT EXISTS earthchem_vocabulary")
