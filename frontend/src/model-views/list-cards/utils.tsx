@@ -61,6 +61,8 @@ const SampleModelCard = (props) => {
     onClick = null,
   } = props;
 
+  const sample = { material, id, name, location, session };
+
   const content = h(sampleContent, { material, id, name, location, session });
   if (onClick == null) {
     return h(ModelCard, { id, content, model: "sample", link });
@@ -71,7 +73,7 @@ const SampleModelCard = (props) => {
     content,
     model: "sample",
     link,
-    onClick: () => onClick(id, name),
+    onClick: () => onClick(sample),
   });
 };
 
