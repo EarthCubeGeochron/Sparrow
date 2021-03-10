@@ -1,13 +1,10 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useReducer, useState, createContext, useContext } from "react";
-import { Button, Dialog, Tooltip } from "@blueprintjs/core";
+import { Button, Dialog } from "@blueprintjs/core";
 import { AdminPage } from "../../admin/AdminPage";
 import { APIHelpers } from "@macrostrat/ui-components";
 import { ModelEditableText, EmbargoDatePick } from "./editor";
 import {
-  NewProjectNewPub,
-  NewProjNewSample,
-  NewProjNewResearcher,
   SampleAdd,
   PubAdd,
   ResearcherAdd,
@@ -19,7 +16,6 @@ import {
 } from "../new-model";
 import { MinimalNavbar } from "~/components";
 import { APIV2Context } from "../../api-v2";
-import { Link } from "react-router-dom";
 import { useModelURL } from "~/util/router";
 import axios from "axios";
 import styles from "./project-form.styl";
@@ -204,7 +200,6 @@ export function NewProjectFormMain() {
       onClickDelete,
       onClickList,
       data: project.sample_collection,
-      rightElement: h(NewProjNewSample),
     });
   };
 
@@ -222,7 +217,6 @@ export function NewProjectFormMain() {
       data: project.publication_collection,
       onClickDelete,
       onClickList,
-      rightElement: h(NewProjectNewPub),
     });
   };
 
@@ -238,7 +232,6 @@ export function NewProjectFormMain() {
       onClickDelete,
       onClickList,
       data: project.researcher_collection,
-      rightElement: h(NewProjNewResearcher),
     });
   };
 
@@ -340,10 +333,10 @@ const ProjectEditListComponent = () => {
     });
   };
 
-  const onClickSam = (id, name) => {
+  const onClickSam = (sample) => {
     dispatch({
       type: "add_sample",
-      payload: { sample_collection: [{ id, name }] },
+      payload: { sample_collection: [sample] },
     });
   };
 
