@@ -561,29 +561,6 @@ export function NewProjNewSample() {
   return h(NewSampleToModel, { onSubmit });
 }
 
-export function EditProjNewSample() {
-  const { model, actions } = useModelEditor();
-
-  const onSubmit = (sample) => {
-    const samples = model.sample == null ? [] : [...model.sample];
-    const newSample = new Array(sample);
-    let newSamples = [...samples, ...newSample];
-    actions.updateState({
-      model: { sample: { $set: newSamples } },
-    });
-  };
-
-  return h(NewSampleToModel, { onSubmit });
-}
-
-export function EditSessNewSample() {
-  const { model, actions } = useModelEditor();
-
-  const onSubmit = (sample) => {
-    actions.updateState({
-      model: { sample: { $set: sample } },
-    });
-  };
-
+export function EditProjNewSample({ onSubmit }) {
   return h(NewSampleToModel, { onSubmit });
 }
