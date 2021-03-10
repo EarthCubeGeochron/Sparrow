@@ -67,5 +67,6 @@ class Session(BaseModel):
 
 class DatumType(BaseModel):
     __tablename__ = "datum_type"
+    # We need to override foreign keys
     _error_unit = relationship("vocabulary_unit", foreign_keys="DatumType.error_unit")
     _unit = relationship("vocabulary_unit", foreign_keys="DatumType.unit")

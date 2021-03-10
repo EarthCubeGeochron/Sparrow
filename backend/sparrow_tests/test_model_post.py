@@ -34,5 +34,4 @@ class TestModelPost:
         id = test_projects[0]["id"]
         edits = {"researcher": [{"name": "casey", "orcid": None}]}
         client.put(f"{self.route}/{id}", json=edits)
-
-    # assert res_put.status_code == 200
+        # assert res_put.status_code == 200

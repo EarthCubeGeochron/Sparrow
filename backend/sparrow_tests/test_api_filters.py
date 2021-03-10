@@ -7,6 +7,7 @@ import json
 
 
 class TestAPIV2_filters:
+    @mark.skip(reason="May break other tests")
     def test_load_data(self, client, db):
         Material = get_db_model(db, "vocabulary_material")
         Sample = get_db_model(db, "sample")
@@ -70,6 +71,7 @@ class TestAPIV2_filters:
 
         assert len(response.json()["data"]) == 3
 
+    @mark.skip(reason="Needs previous test results to function")
     def test_location_filters(self, client, db):
         """
         Testing the coordinate filter and the WKT geometry Filter

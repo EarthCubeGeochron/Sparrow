@@ -1,9 +1,11 @@
 from sparrow.util import relative_path
 import gzip
 import json
+from pytest import mark
 from bs4 import BeautifulSoup as soup
 from pathlib import Path
 class TestSIMSImport:
+    @mark.slow
     def test_large_sims_dataset(self, db):
         fn = relative_path(__file__, "fixtures", "2_20140602_d18O_KennyBefus.json.gz")
         with gzip.open(fn, "rb") as zipfile:

@@ -39,6 +39,7 @@ class TestAPIV2:
         res = client.get(route)
         assert res.status_code == 200
 
+    @mark.skip(reason="May break other tests")
     def test_load_data(self, client, db):
         Material = db.model.vocabulary_material
         Sample = db.model.sample
@@ -80,6 +81,7 @@ class TestAPIV2:
         db.session.commit()
         pass
 
+    @mark.skip(reason="Needs previous test results to function")
     def test_api_datasheet(self, client, db):
         """
         Test to go along with the datasheet editor api plugin.
