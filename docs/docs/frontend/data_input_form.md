@@ -4,7 +4,13 @@ title: Data input form
 sidebar_label: Data input form
 ---
 
-The data input form is for submitting individual data to the database.
+:::note
+This article was written by Shan Ye about functionality specific to the UW Madison
+cosmogenic nuclides lab. However, this type of form to drive lab processes could
+be useful across labs. The source code for this example can be found in the [**Sparrow Cosmo**](https://github.com/EarthCubeGeochron/sparrow-uw-cosmo) repository.
+:::
+
+At the UW Cosmogenic Nuclide lab, we have created an input form for submitting individual data to the database.
 
 It has three components. The interactive map is for locating the sample and get its geographic coordinates. Once clicked, a marker will be added to the map, and fields for latitude and longitude will be automatically filled. Multiple markers can be added to the form, but the coordinates for the last marker will be filled into corresponding fields. The user can also directly fill latitudes and longitudes into corresponding fields without using the map.
 

@@ -39,7 +39,7 @@ class PyChronImporter(BaseImporter):
 
 @command(name="import-pychron")
 @option("--redo", is_flag=True, default=False)
-def pychron_import_command(db, redo=False):
+def pychron_import_command(redo=False):
     """Import PyChron Interpreted Age files."""
     db = get_database()
     importer = PyChronImporter(db, verbose=True)

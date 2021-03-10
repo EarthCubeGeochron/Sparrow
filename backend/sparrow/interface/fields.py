@@ -11,6 +11,7 @@ from marshmallow.fields import UUID as _UUID
 from marshmallow.utils import is_collection
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
+from .util import primary_key
 from ..logs import get_logger
 
 log = get_logger(__name__)
@@ -93,6 +94,7 @@ class SmartNested(Nested, Related):
         self.allow_none = True
 
     def _deserialize(self, value, attr=None, data=None, **kwargs):
+        log.debug(f"Deserializing {value}")
         if isinstance(value, self.schema.opts.model):
             return value
         # Better error message for collections.
@@ -108,6 +110,21 @@ class SmartNested(Nested, Related):
         if hasattr(self.root, key):
             setattr(self.schema, key, getattr(self.root, key))
 
+    def _serialize_related_key(self, value):
+        """Serialize the primary key for a related model. In the (common) special
+        case of a 1-column primary key, return just the value of that column; otherwise,
+        return a map of {column_name: value}"""
+        key = primary_key(value)
+        if len(key.keys()) == 1:
+            return list(key.values())[0]
+        return key
+
+    def _serialize_instance(self, value):
+        if value is None:
+            return None
+        self._instances.add(value)
+        return self._serialize_related_key(value)
+
     def _serialize(self, value, attr, obj):
         # Pass through allowed_nests configuration to child schema
         self._copy_config("allowed_nests")
@@ -118,5 +135,7 @@ class SmartNested(Nested, Related):
         if other_name in _allowed or _allowed == "all":
             # Serialize as nested
             return super(Nested, self)._serialize(value, attr, obj)
-        else:
-            return super(Related, self)._serialize(value, attr, obj)
+        # If we don't want to nest
+        if self._many:
+            return [self._serialize_instance(v) for v in value]
+        return self._serialize_instance(value)

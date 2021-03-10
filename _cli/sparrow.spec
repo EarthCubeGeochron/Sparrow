@@ -13,16 +13,6 @@ with open(revfile, "w") as f:
     # https://stackoverflow.com/questions/21017300/git-command-to-get-head-sha1-with-dirty-suffix-if-workspace-is-not-clean
     git_revision_info(stdout=f)
 
-src_excludes = [
-    "_cli",
-    ".pytest_cache",
-    "docs",
-    ".git",
-    ".githooks",
-    ".github",
-    "frontend/node_modules",
-]
-
 data_files = {revfile: "."}
 
 a = Analysis(
@@ -61,7 +51,29 @@ coll = COLLECT(
     # for easy correspondence with the source build.
     # Eventually, we will rely more on pre-compiled Docker
     # images, and we will have less need to carry around the source code.
-    Tree(src_root, prefix="srcroot", excludes=src_excludes),
+    Tree(
+        src_root,
+        prefix="srcroot",
+        excludes=[
+            ".pytest_cache",
+            "docs",
+            ".git",
+            ".githooks",
+            ".github",
+            "_cli",
+            "frontend",
+        ],
+    ),
+    # We have to include subfolders as separate trees, apparently, to allow
+    # excluding of certain files.
+    Tree(
+        path.join(src_root, "frontend"),
+        prefix="srcroot/frontend",
+        excludes=["node_modules"],
+    ),
+    Tree(
+        path.join(src_root, "_cli"), prefix="srcroot/_cli", excludes=["build", "dist"]
+    ),
     strip=False,
     upx=True,
     upx_exclude=[],

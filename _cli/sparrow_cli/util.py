@@ -69,6 +69,10 @@ def exec_or_run(
         )
 
 
+def exec_sparrow(*args, **kwargs):
+    return exec_or_run("backend", "/app/sparrow/__main__.py", *args, **kwargs)
+
+
 def fail_without_docker():
     try:
         res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)

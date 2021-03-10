@@ -6,9 +6,7 @@ from json import load
 
 def sparrow_core_version(cfg):
     try:
-        with (cfg.SPARROW_PATH / "sparrow-version.json").open() as f:
-            version_info = load(f)
-        return version_info["core"]
+        return cfg.find_sparrow_version()
     except Exception:
         return "<= 1.6.0 (version information could not be assembled)"
 

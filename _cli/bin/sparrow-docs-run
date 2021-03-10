@@ -1,8 +1,7 @@
-#!/usr/bin/env bash
-
-set -e
+#!/bin/bash -e
 
 cd "$SPARROW_PATH"
 
-sparrow docs-build
+sparrow docs build
+echo $?
 docker run -p 3000:80 sparrow_docs:latest

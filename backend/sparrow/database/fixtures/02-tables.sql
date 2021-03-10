@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS geo_entity (
 
 ## Sample
 
-An object to be measured
+A physical object to be measured
 */
 CREATE TABLE IF NOT EXISTS sample (
   id serial PRIMARY KEY,
@@ -276,6 +276,16 @@ CREATE TABLE IF NOT EXISTS sample_geo_entity (
     + (ref_unit IS NOT NULL)::int
     + (ref_distance IS NOT NULL)::int IN (0,3)
   )
+);
+
+/*
+## Standard samples
+*/
+CREATE TABLE IF NOT EXISTS standard_sample (
+  name text PRIMARY KEY,
+  description text,
+  authority text,
+  sample_id integer REFERENCES sample(id)
 );
 
 
@@ -357,6 +367,8 @@ CREATE TABLE IF NOT EXISTS analysis (
   /* Not really sure that "material" is the best parameterization
      of this concept... */
   is_standard boolean,
+  -- Allows us to track "running standards". Added in v2.0.0.beta1
+  standard_sample text REFERENCES standard_sample(name),
   /*
   If set, this means that this is an "accepted" value
   among several related measurements.
@@ -381,7 +393,14 @@ CREATE TABLE IF NOT EXISTS analysis (
   - a calculated plateau age for a stepped-heating Ar-Ar experiment. */
   is_interpreted boolean,
   data jsonb,
-  UNIQUE (session_id, session_index, analysis_name)
+  UNIQUE (session_id, session_index, analysis_name),
+  /*
+  If we have a 'standard sample' defined, this must be flagged as a standard analysis.
+  We could remove this constraint if we needed to track "affinity" with standards, e.g.
+  which standard from a set is used to calibrate this specific analysis. But that might
+  be a better case for using attributes or sessions to track analytical conditions.
+  */
+  CHECK ((standard_sample IS NULL) OR is_standard)
 );
 
 

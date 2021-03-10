@@ -24,6 +24,8 @@ class TestProjectImport:
         out = loads(dumps(schema.dump(res), allow_nan=False, cls=JSONEncoder))
         assert len(out["session"]) == len(data["session"])
 
+        assert out["session"][0]["uuid"] == data["session"][0]["uuid"]
+
         dd = DeepDiff(data, out)
         non_pk_changes = omit_key(dd["values_changed"], "id")
         assert len(non_pk_changes) == 0
@@ -33,6 +35,12 @@ class TestProjectImport:
         removed = dd["dictionary_item_removed"]
         assert len(removed) > 0
         assert len(omit_key(removed, "in_plateau")) == 0
+
+    def test_project_api_retreival(self, client):
+        """Checks if models/sample is working"""
+        res = client.get("/api/v2/models/project", params={"per_page": 1})
+        assert res.status_code == 200
+        res.json()
 
     def test_make_private(self, db):
         proj = db.session.query(db.model.project).first()

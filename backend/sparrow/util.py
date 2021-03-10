@@ -4,12 +4,7 @@ from pathlib import Path
 from contextlib import contextmanager
 from subprocess import run as _run
 from shlex import split
-
-
-def relative_path(base, *parts):
-    if not path.isdir(base):
-        base = path.dirname(base)
-    return path.join(base, *parts)
+from sparrow_utils import relative_path
 
 
 @contextmanager

@@ -14,11 +14,13 @@ numpy
 pandas
 uvloop
 
-# Core application
+# Legacy application
 Flask==1.1.1
 Flask-RESTful==0.3.7
-MarkupSafe==1.1.1
-migra==1.0.1603010105
+
+# Core application
+migra==3.0.1612089247
+sqlakeyset==1.0.1611286921 
 Pygments==2.5.2
 SQLAlchemy==1.3.19
 sqlalchemy-utils==0.36.8
@@ -65,7 +67,6 @@ graphene_sqlalchemy==2.2.2
 
 # API version 2
 webargs-starlette==2.0.0
-sqlakeyset
 apispec==3.3.1
 starlette-apispec==1.0.3
 

@@ -28,6 +28,7 @@ class Sparrow(Starlette):
     api_loaded: bool = False
     is_loaded: bool = False
     verbose: bool = False
+    database_ready: bool = False
     __db_url: str
     db = None
     plugins: SparrowPluginManager
@@ -62,6 +63,11 @@ class Sparrow(Starlette):
             log.info("Application tables exist")
 
     def setup_database(self):
+        # If we set up the database twice, bad things will happen
+        # with overriding of models, etc. We must make sure we only
+        # set up the database once.
+        if self.database_ready:
+            return self.db
         from ..database import Database
 
         self.db = Database(self.__db_url, self)
