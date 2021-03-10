@@ -203,7 +203,8 @@ class TestDeclarativeImporter:
 
         db.load_data("datum_type", data)
         # We should be able to import this idempotently
-        db.load_data("datum_type", data)
+        res = db.load_data("datum_type", data)
+        assert res._error_unit is None
 
     def test_basic_import(self, db):
         db.load_data("session", basic_data)
@@ -419,6 +420,7 @@ class TestDeclarativeImporter:
         db.load_data("session", data)
 
     def test_expand_id(self, caplog, db):
+        # Intermittently fails
         # caplog.set_level(logging.INFO, "sqlalchemy.engine")
 
         data = {"parameter": "test param", "unit": "test unit"}

@@ -13,10 +13,6 @@ from sqlalchemy_utils import create_database, drop_database, database_exists
 # can see the setup output in real time.
 testing_db = "postgresql://postgres@db:5432/sparrow_test"
 
-_app = Sparrow(debug=True, database=testing_db)
-_app.bootstrap(init=True)
-_setup_context(_app)
-
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -52,6 +48,9 @@ def pytest_configure(config):
 
 @fixture(scope="session")
 def app():
+    _app = Sparrow(debug=True, database=testing_db)
+    _app.bootstrap(init=True)
+    _setup_context(_app)
     # wait_for_database("postgresql://postgres@db:5432/postgres")
     # create_database(testing_db)
     yield _app
@@ -74,7 +73,7 @@ def db(app, pytestconfig):
         yield app.database
 
 
-@fixture
+@fixture(scope="class")
 def client(app, db):
     _client = TestClient(app)
     yield _client
