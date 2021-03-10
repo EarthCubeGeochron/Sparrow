@@ -9,6 +9,11 @@ import {
   ProjectListComponent,
   SessionListComponent,
 } from "../../admin/infinite-scroll";
+import {
+  EditProjNewPub,
+  EditProjNewResearcher,
+  EditProjNewSample,
+} from "./index";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -28,6 +33,9 @@ export function SampleFilterList({ onClick }) {
   };
 
   return h(AdminFilter, {
+    addModelButton: h("div.add-button-top", [
+      h(EditProjNewSample, { onSubmit: onClick }),
+    ]),
     listComponent: h(SampleAddList, {
       params,
       componentProps: {
@@ -55,6 +63,10 @@ export function PublicationFilterList({ onClick }) {
     setParams(params);
   };
   return h(AdminFilter, {
+    addModelButton: h("div.add-button-top", [
+      h(EditProjNewPub, { onSubmit: onClick }),
+    ]),
+
     listComponent: h(PublicationAddList, {
       params,
       componentProps: {
@@ -81,6 +93,9 @@ export function ResearcherFilterList({ onClick }) {
     setParams(params);
   };
   return h(AdminFilter, {
+    addModelButton: h("div.add-button-top", [
+      h(EditProjNewResearcher, { onSubmit: onClick }),
+    ]),
     listComponent: h(ResearcherAddList, {
       params,
       componentProps: {
