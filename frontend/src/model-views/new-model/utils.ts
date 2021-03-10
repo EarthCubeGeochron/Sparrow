@@ -1,6 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useReducer, useState, useContext } from "react";
-import { Button, Drawer, Tooltip } from "@blueprintjs/core";
+import { Button, Drawer, Card } from "@blueprintjs/core";
 import { useAPIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import styles from "./module.styl";
@@ -31,13 +31,17 @@ export function FormSlider(props) {
   };
 
   return h("div", [
-    h(Tooltip, { content: `Create new ${model}` }, [
-      h(Button, {
-        onClick: changeOpen,
-        minimal: true,
-        icon: "plus",
-        intent: "success",
-      }),
+    h(Card, [
+      h(
+        Button,
+        {
+          onClick: changeOpen,
+          minimal: true,
+          icon: "plus",
+          intent: "success",
+        },
+        [`Create a New ${model}`]
+      ),
     ]),
     h(
       Drawer,
