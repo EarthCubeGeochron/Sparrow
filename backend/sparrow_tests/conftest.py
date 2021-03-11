@@ -1,12 +1,9 @@
-from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
 from os import environ
 from starlette.testclient import TestClient
 from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 from sparrow.database.util import wait_for_database
-from sqlalchemy_utils import create_database, drop_database, database_exists
-from sqlalchemy import event
 from sqlalchemy.orm import Session
 from .helpers.database import testing_database
 
@@ -52,6 +49,7 @@ def pytest_configure(config):
 
 @fixture(scope="session")
 def app(pytestconfig):
+    wait_for_database(testing_db)
     with testing_database(testing_db, drop=pytestconfig.option.teardown) as engine:
         _app = Sparrow(debug=True, database=testing_db)
         _app.bootstrap(init=True)

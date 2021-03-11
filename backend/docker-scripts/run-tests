@@ -5,11 +5,6 @@ import os
 from sys import argv
 from click import echo
 from subprocess import run
-from shlex import split
-from time import sleep
-from sqlalchemy import create_engine, exc
-from sqlalchemy_utils import drop_database, create_database, database_exists
-from sparrow.database.util import wait_for_database
 
 args = argv[1:]
 
@@ -19,15 +14,6 @@ if "--psql" in args:
     args.remove("--psql")
 
 os.chdir("/app")
-
-db_conn = "postgresql://postgres@db:5432/sparrow_test"
-os.environ["SPARROW_DATABASE"] = db_conn
-
-wait_for_database(db_conn)
-
-# This prevents us from getting absolutely spammed by SAWarning
-# TODO: improve warning handling for database automapping
-args.append("--disable-warnings")
 
 print("Running tests")
 run(["pytest", "/app/sparrow_tests", *args])
