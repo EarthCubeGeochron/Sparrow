@@ -9,6 +9,7 @@ from shlex import split
 from time import sleep
 from sqlalchemy import create_engine, exc
 from sqlalchemy_utils import drop_database, create_database, database_exists
+from sparrow.database.util import wait_for_database
 
 args = argv[1:]
 
@@ -17,35 +18,12 @@ if "--psql" in args:
     psql = True
     args.remove("--psql")
 
-keep_database = False
-if "--keep-database" in args:
-    keep_database = True
-    args.remove("--keep-database")
-
 os.chdir("/app")
-
-dbargs = split("-U postgres -h db -p 5432")
-
-
-def db_ready():
-    c = run(["pg_isready", *dbargs])
-    return c.returncode == 0
-
-
-while not db_ready():
-    echo("Waiting for database...")
-    sleep(1)
 
 db_conn = "postgresql://postgres@db:5432/sparrow_test"
 os.environ["SPARROW_DATABASE"] = db_conn
 
-# For now, we drop databases before every test
-if database_exists(db_conn):
-    echo("Dropping existing testing database")
-    drop_database(db_conn)
-assert not database_exists(db_conn)
-create_database(db_conn)
-
+wait_for_database(db_conn)
 
 # This prevents us from getting absolutely spammed by SAWarning
 # TODO: improve warning handling for database automapping
@@ -60,7 +38,3 @@ if psql:
         "The database is also available on localhost port 54322"
     )
     run(["psql", *dbargs, "sparrow_test"])
-
-if not keep_database:
-    drop_database(db_conn)
-echo("Done!")

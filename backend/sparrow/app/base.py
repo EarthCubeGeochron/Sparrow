@@ -15,7 +15,8 @@ from webargs_starlette import WebargsHTTPException
 from sparrow import settings
 from ..logs import get_logger
 from .plugins import prepare_plugin_manager, SparrowPluginManager
-from ..startup import wait_for_database, tables_exist
+from ..database.util import wait_for_database
+from ..startup import tables_exist
 
 log = get_logger(__name__)
 

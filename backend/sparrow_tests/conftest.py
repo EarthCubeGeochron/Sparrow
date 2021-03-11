@@ -1,12 +1,14 @@
 from sqlalchemy.orm import sessionmaker, scoped_session
 from pytest import fixture
+from os import environ
 from starlette.testclient import TestClient
 from sparrow.app import Sparrow
 from sparrow.context import _setup_context
-from sparrow.startup import wait_for_database
+from sparrow.database.util import wait_for_database
 from sqlalchemy_utils import create_database, drop_database, database_exists
 from sqlalchemy import event
 from sqlalchemy.orm import Session
+from .helpers.database import testing_database
 
 # Slow tests are opt-in
 
@@ -14,6 +16,7 @@ from sqlalchemy.orm import Session
 # Right now, we run this setup code outside of a fixture so we
 # can see the setup output in real time.
 testing_db = "postgresql://postgres@db:5432/sparrow_test"
+environ["SPARROW_DATABASE"] = testing_db
 
 
 def pytest_addoption(parser):
@@ -34,14 +37,13 @@ def pytest_addoption(parser):
         help="Use database transaction isolation",
     )
 
-    # parser.addoption(
-    #     "--no-isolation",
-    #     action="store_false",
-    #     dest="use_isolation",
-    #     default=True,
-    #     help="Use database transaction isolation",
-    # )
-
+    parser.addoption(
+        "--teardown",
+        action="store_true",
+        dest="teardown",
+        default=True,
+        help="Tear down database after tests run",
+    )
 
 def pytest_configure(config):
     if not config.option.slow:
@@ -49,15 +51,12 @@ def pytest_configure(config):
 
 
 @fixture(scope="session")
-def app():
-    _app = Sparrow(debug=True, database=testing_db)
-    _app.bootstrap(init=True)
-    _setup_context(_app)
-    # wait_for_database("postgresql://postgres@db:5432/postgres")
-    # create_database(testing_db)
-    yield _app
-    # We need to make sure this only happens if we tear down testing db
-    # drop_database(testing_db)
+def app(pytestconfig):
+    with testing_database(testing_db, drop=pytestconfig.option.teardown) as engine:
+        _app = Sparrow(debug=True, database=testing_db)
+        _app.bootstrap(init=True)
+        _setup_context(_app)
+        yield _app
 
 
 @fixture(scope="class")
