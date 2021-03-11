@@ -21,6 +21,8 @@ from .mapper import BaseModel
 
 class User(BaseModel):
     __tablename__ = "user"
+    __table_args__ = {'extend_existing': True}
+
     # Columns are automagically mapped from database
     # *NEVER* directly set the password column.
 
@@ -36,6 +38,7 @@ class User(BaseModel):
 
 class Project(BaseModel):
     __tablename__ = "project"
+    __table_args__ = {'extend_existing': True}
 
     def add_researcher(self, researcher):
         self.researcher_collection.append(researcher)
@@ -45,6 +48,7 @@ class Project(BaseModel):
 
 class Session(BaseModel):
     __tablename__ = "session"
+    __table_args__ = {'extend_existing': True}
     # Define UUID column so it is caught as unique
     uuid = Column(
         UUID(as_uuid=True),
@@ -67,6 +71,8 @@ class Session(BaseModel):
 
 class DatumType(BaseModel):
     __tablename__ = "datum_type"
+    __table_args__ = {'extend_existing': True}
+
     # We need to override foreign keys
     _error_unit = relationship("vocabulary_unit", foreign_keys="DatumType.error_unit")
     _unit = relationship("vocabulary_unit", foreign_keys="DatumType.unit")

@@ -144,7 +144,7 @@ class APIv2(Starlette):
 
 
     def add_view_route(self, tablename, schema="core_view", description=""):
-        _tbl = self._app.database.reflect_table(tablename, schema=schema)
+        _tbl = self._app.database.mapper.reflect_table(tablename, schema=schema)
 
         class Meta:
             table = _tbl
