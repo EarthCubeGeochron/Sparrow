@@ -78,6 +78,7 @@ pytest==5.4.0
 colorlog==4.2.1
 rich==6.0.0
 deepdiff[murmur]==5.0.2
+pytest-order==0.9.5
 
 # Authentication
 PyJWT==1.7.1
