@@ -2,16 +2,10 @@ from sqlalchemy.ext.automap import automap_base
 from ...interface.util import primary_key
 
 
-class ModelHelperMixins(object):
+class ModelHelperMixins:
     """
     Standard mixins for database models
     """
-
-    @classmethod
-    def get_or_create(cls, **kwargs):
-        defaults = kwargs.pop("defaults", None)
-        return cls.db.get_or_create(cls, defaults=defaults, **kwargs)
-
     def to_dict(self):
         res = {}
         for k, v in self.__table__.c.items():

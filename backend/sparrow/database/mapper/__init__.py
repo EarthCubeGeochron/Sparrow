@@ -53,9 +53,6 @@ class SparrowDatabaseMapper:
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
         self.db = db
 
-        BaseModel.query = self.db.session.query_property()
-        BaseModel.db = db
-
         # This stuff should be placed outside of core (one likely extension point).
         reflection_kwargs = dict(
             name_for_scalar_relationship=name_for_scalar_relationship,
@@ -64,14 +61,14 @@ class SparrowDatabaseMapper:
             generate_relationship=_gen_relationship,
         )
 
-        for schema in ("vocabulary", "core_view", None):
+        for schema in ("vocabulary", "core_view"):
             # Reflect tables in schemas we care about
             # Note: this will not reflect views because they don't have
             # primary keys.
-            if schema is not None:
-                log.info("Reflecting schema " + schema)
-            else:
-                log.info("Reflecting core tables")
+            _schema = schema
+            if schema is None:
+                _schema = "public"
+            log.info(f"Reflecting schema {_schema}")
             BaseModel.metadata.reflect(
                 bind=self.db.engine, schema=schema, **reflection_kwargs
             )
