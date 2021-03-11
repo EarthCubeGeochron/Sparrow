@@ -141,7 +141,7 @@ class APIv1(API):
     def build_route(self, tablename, **kwargs):
         schema = kwargs.pop("schema", None)
         db = self.db
-        table = db.reflect_table(tablename, schema=schema)
+        table = db.mapper.reflect_table(tablename, schema=schema)
 
         schema_qualified_tablename = tablename
         if schema is not None:
