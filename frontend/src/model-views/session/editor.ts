@@ -24,7 +24,6 @@ import {
   SessionInfoCard,
 } from "./info-card";
 import { SampleAdd, ProjectAdd, PubAdd } from "../new-model";
-import { EditSessNewSample, EditSessNewPub } from "../new-model";
 import { SessionAdminContext } from "~/admin/session";
 import styles from "./module.styl";
 
@@ -107,7 +106,6 @@ function SessionPublication(props) {
     isEditing,
     onClickDelete,
     onClickList,
-    rightElement: h(EditSessNewPub),
   });
 }
 
@@ -135,13 +133,13 @@ function EditableSessionInfoComponent(props) {
     changeFunction(onProjectClick);
   };
 
-  const onSampleClick = (id, name) => {
+  const onSampleClick = (sample) => {
     actions.updateState({
-      model: { sample: { $set: { id, name } } },
+      model: { sample: { $set: sample } },
     });
   };
 
-  const onSampleClickDelete = ({ id, name }) => {
+  const onSampleClickDelete = (sample) => {
     actions.updateState({
       model: { sample: { $set: null } },
     });
@@ -165,7 +163,6 @@ function EditableSessionInfoComponent(props) {
         isEditing,
         onClickList: sampleListClick,
         onClickDelete: onSampleClickDelete,
-        rightElement: h(EditSessNewSample),
       }),
       h.if(isEditing)(ProjectAdd, {
         isEditing,

@@ -8,7 +8,6 @@ import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
 import {
   ProjectFilterList,
-  SessionFilterList,
   PublicationFilterList,
   SampleFilterList,
 } from "../model-views/new-model";

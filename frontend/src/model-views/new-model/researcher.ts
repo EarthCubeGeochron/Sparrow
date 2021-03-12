@@ -17,7 +17,7 @@ const h = hyperStyled(styles);
  */
 function ResearcherForm(props) {
   const { onSubmit } = props;
-  const [researcher, setResearcher] = useState({});
+  const [researcher, setResearcher] = useState({ name: null, orcid: null });
 
   const onChangeName = (value) => {
     setResearcher((prevRes) => {
@@ -58,7 +58,11 @@ function ResearcherForm(props) {
     }),
     h(
       Button,
-      { onClick: () => onSubmit(researcher), intent: "success", disabled },
+      {
+        onClick: () => onSubmit(null, researcher.name, researcher.orcid),
+        intent: "success",
+        disabled,
+      },
       ["Create new researcher"]
     ),
   ]);
@@ -84,17 +88,6 @@ export function NewProjNewResearcher() {
   return h(AddResearcherDrawer, { onSubmit });
 }
 
-export function EditProjNewResearcher() {
-  const { model, actions } = useModelEditor();
-
-  const onSubmit = (researcher) => {
-    const researchers = model.researcher == null ? [] : [...model.researcher];
-    const newResearcher = new Array(researcher);
-    let newResearchers = [...researchers, ...newResearcher];
-    actions.updateState({
-      model: { researcher: { $set: newResearchers } },
-    });
-  };
-
+export function EditProjNewResearcher({ onSubmit }) {
   return h(AddResearcherDrawer, { onSubmit });
 }
