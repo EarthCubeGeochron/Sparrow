@@ -181,8 +181,7 @@ function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
     h(SampleMaterial, { changeMaterial, sample }),
     h("div.metadata-body", [
       h(GeoContext, {
-        sample_geo_entity:
-          sample_geo_entity == null ? null : sample_geo_entity[0],
+        sample_geo_entity: sample_geo_entity == null ? null : sample_geo_entity,
         changeGeoEntity,
       }),
     ]),

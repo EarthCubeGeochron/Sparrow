@@ -1,4 +1,4 @@
-import { sample_reducer, sampleState } from "./types";
+import { sample_reducer } from "./types";
 
 const sampleReducer = (state, action) => {
   switch (action.type) {
