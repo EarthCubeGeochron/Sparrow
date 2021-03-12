@@ -125,8 +125,6 @@ function DataSheet() {
    * And at the end I can grab the whole row and send it to the backend.
    */
 
-  console.log(edits);
-
   const initialData = useAPIResult(
     "http://localhost:5002/api/v2/datasheet/view",
     {},
@@ -160,7 +158,8 @@ function DataSheet() {
   );
 
   useEffect(() => {
-    //console.log(size);
+    // If we don't have this we'll get an infinite loop
+    if (initialData == null || initialData.length == 0) return
     const col = apportionWidth(initialData, columnSpec, size.width);
     setColumns(col);
   }, [initialData, size]);
