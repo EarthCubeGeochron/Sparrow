@@ -12,6 +12,8 @@ import { FormGroup, Button, Icon, Tooltip } from "@blueprintjs/core";
 import { HelpButton, MySwitch } from "~/components";
 import { MyNumericInput } from "../../components/edit-sample";
 import styles from "./module.styl";
+import { sample_geo_entity } from "../sample/new-sample/types";
+import React from "react";
 
 const h = hyperStyled(styles);
 
@@ -266,8 +268,10 @@ export const SampleGeoEntity = (props) => {
 };
 
 export function EntityType(props) {
+  const { onEntityTypeChange } = props;
   const onChange = (entity) => {
     console.log(entity);
+    onEntityTypeChange(entity);
   };
 
   return h(FormGroup, { label: "Entity Type" }, [
@@ -287,9 +291,19 @@ export function EntityType(props) {
 }
 
 export function GeoSpatialRef(props) {
-  const { distance, onDistanceChange } = props;
+  const {
+    geoEntity,
+    changeDistance = () => {},
+    changeDatum = () => {},
+    changeUnit = () => {},
+  } = props;
+
+  const { ref_distance } = geoEntity;
+
   const onChange = (ref) => {
     console.log(ref);
+    changeDatum(ref);
+    changeUnit("meters");
   };
   return h("div", [
     h(FormGroup, { label: "Spatial Reference" }, [
@@ -297,8 +311,8 @@ export function GeoSpatialRef(props) {
     ]),
     h(MyNumericInput, {
       label: "Distance from reference (m)",
-      value: distance,
-      onChange: onDistanceChange,
+      value: ref_distance,
+      onChange: changeDistance,
     }),
   ]);
 }
@@ -311,10 +325,71 @@ export function GeoSpatialRef(props) {
  *      Ref datum :"Top, Bottom",
  *      Ref Distance: Number, meters from ref datum
  *  Examples for what possible choices are....
+ * TODO: Have output section, editable like other collections, reads it human like
  */
 export function GeoContext(props) {
-  const [distance, setDistance] = useState(null);
-  const { sample, changeGeoEntity } = props;
+  const {
+    sample_geo_entity,
+    changeGeoEntity,
+  }: {
+    sample_geo_entity: sample_geo_entity;
+    changeGeoEntity: (g) => void;
+  } = props;
+  const defaultState: sample_geo_entity = sample_geo_entity
+    ? sample_geo_entity
+    : {
+        ref_datum: null,
+        ref_distance: null,
+        ref_unit: null,
+        geo_entity: { type: null, name: null },
+      };
+  const [geoEntity, setGeoEntity] = useState<sample_geo_entity>(defaultState);
+  console.log(geoEntity);
+
+  const changeDatum = (datum: string) => {
+    setGeoEntity((prevEntity) => {
+      return {
+        ...prevEntity,
+        ref_datum: datum,
+      };
+    });
+  };
+
+  const changeDistance = (distance: number) => {
+    setGeoEntity((prevEntity) => {
+      return {
+        ...prevEntity,
+        ref_distance: distance,
+      };
+    });
+  };
+
+  const changeUnit = (unit: string) => {
+    setGeoEntity((prevEntity) => {
+      return {
+        ...prevEntity,
+        ref_unit: unit,
+      };
+    });
+  };
+  const changeGeoType = (type: string) => {
+    setGeoEntity((prevEntity) => {
+      const { name } = prevEntity.geo_entity;
+      return {
+        ...prevEntity,
+        geo_entity: { type, name },
+      };
+    });
+  };
+  const changeGeoName = (name: string) => {
+    setGeoEntity((prevEntity) => {
+      const { type } = prevEntity.geo_entity;
+      return {
+        ...prevEntity,
+        geo_entity: { name, type },
+      };
+    });
+  };
 
   const helpContent = h("div.help-geo-entity", [
     h("div", [
@@ -341,12 +416,20 @@ export function GeoContext(props) {
     ]),
   ]);
 
+  const { geo_entity } = geoEntity;
+  const { type, name } = geo_entity;
+
   const content = h("div.geo-entity-drop", [
     h("div.entity", [
-      h(SampleGeoEntity, { sample, changeGeoEntity }),
-      h(EntityType),
+      h(SampleGeoEntity, { name, changeGeoEntity: changeGeoName }),
+      h(EntityType, { type, onEntityTypeChange: changeGeoType }),
     ]),
-    h(GeoSpatialRef, { distance, onDistanceChange: setDistance }),
+    h(GeoSpatialRef, { geoEntity, changeDistance, changeDatum, changeUnit }),
+    h(
+      Button,
+      { intent: "success", onClick: () => changeGeoEntity(geoEntity) },
+      ["Submit"]
+    ),
   ]);
 
   return h("div", [
@@ -423,7 +506,7 @@ const PoweredByMacroSparrow = () => {
   return h(Tooltip, { content }, [h(Icon, { icon: "info-sign" })]);
 };
 
-const SampleName = (props) => {
+export const SampleName = (props) => {
   const [name, setName] = useState("");
   const { changeName } = props;
 
@@ -443,6 +526,8 @@ const SampleName = (props) => {
   });
 };
 
+type onSubmit = { onSubmit: (object) => void };
+
 /**
  * Things Needed on a Sample Form
  * depth
@@ -458,7 +543,7 @@ const SampleName = (props) => {
  * data_file_links?
  *
  */
-function NewSampleForm({ onSubmit }) {
+export function NewSampleForm({ onSubmit }: onSubmit): React.ReactElement {
   const [sample, setSample] = useState({});
 
   console.log(sample);
