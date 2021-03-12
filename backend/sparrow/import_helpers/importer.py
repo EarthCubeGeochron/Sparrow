@@ -6,6 +6,7 @@ from os import environ
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import inspect
+from IPython import embed
 
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
@@ -102,7 +103,6 @@ class BaseImporter(ImperativeImportHelperMixin):
         if needed.
         """
         for fn in file_sequence:
-            secho(str(fn), dim=True)
             self.__import_datafile(fn, None, **kwargs)
 
     def iter_records(self, seq, **kwargs):
@@ -125,8 +125,9 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         # Get the path location (this must be unique)
         infile = Path(fn)
+        rel_path = infile
         if self.basedir is not None:
-            infile = infile.relative_to(self.basedir)
+            rel_path = infile.relative_to(self.basedir)
         file_path = str(infile)
 
         # Get file hash
@@ -159,6 +160,7 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         :param fix_errors  Fix errors that have previously been ignored
         """
+        secho(str(fn), dim=True)
         redo = kwargs.pop("redo", False)
         added = False
         if rec is None:
@@ -271,7 +273,7 @@ class BaseImporter(ImperativeImportHelperMixin):
                 "can be tracked independently on import."
             )
 
-        return self.m.data_file_link.get_or_create(**params)
+        return self.db.get_or_create(self.m.data_file_link, **params)
 
 
 class CloudImporter(BaseImporter):

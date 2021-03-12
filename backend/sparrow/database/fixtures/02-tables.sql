@@ -225,6 +225,7 @@ CREATE TABLE IF NOT EXISTS sample (
   name text,
   igsn text UNIQUE,
   material text REFERENCES vocabulary.material(id),
+  member_of integer REFERENCES sample(id),
   /* #### Location fields
   These might be best moved to an external model.
 
