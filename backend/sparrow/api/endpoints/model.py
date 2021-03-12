@@ -261,7 +261,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
                     return JSONResponse(
                         {"Error": "No ID was passed, if you are adding a new row please use the POST route"}
                     )
-                existing = model.query.get(ele["id"])
+                existing = db.session.query(model).get(ele["id"])
                 updates = schema.load(ele, instance=existing, session=db.session, partial=True)
                 updates.id = existing.id
                 db.session.rollback()
@@ -277,7 +277,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
                 return JSONResponse(
                     {"Error": "No ID was passed, if you are adding a new row please use the POST route"}
                 )
-            existing = model.query.get(id_)
+            existing = db.session.query(model).get(id_)
             updates = schema.load(data, instance=existing, session=db.session, partial=True)
             updates.id = existing.id
             db.session.rollback()
