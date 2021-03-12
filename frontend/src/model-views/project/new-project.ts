@@ -1,14 +1,10 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useReducer, useState, createContext, useContext } from "react";
 import { Button, Dialog } from "@blueprintjs/core";
-import { AdminPage } from "../../admin/AdminPage";
+import { AdminPage } from "~/admin/AdminPage";
 import { APIHelpers } from "@macrostrat/ui-components";
 import { ModelEditableText, EmbargoDatePick } from "./editor";
-import {
-  SampleAdd,
-  PubAdd,
-  ResearcherAdd,
-} from "../new-model";
+import { SampleAdd, PubAdd, ResearcherAdd, SubmitButton } from "../new-model";
 import {
   PublicationFilterList,
   ResearcherFilterList,
@@ -18,6 +14,7 @@ import { MinimalNavbar } from "~/components";
 import { APIV2Context } from "../../api-v2";
 import { useModelURL } from "~/util/router";
 import axios from "axios";
+//@ts-ignore
 import styles from "./project-form.styl";
 
 const h = hyperStyled(styles);
@@ -140,8 +137,6 @@ export function NewProjectFormMain() {
         researchers: project.researcher_collection,
       },
     ];
-    console.log(route);
-    console.log(projectPost);
 
     const response = await axios.post(route, projectPost).then((response) => {
       return response;
@@ -243,44 +238,6 @@ export function NewProjectFormMain() {
     return h("div", [h(EmbargoDatePick, { onChange, embargo_date })]);
   };
 
-  const SubmitDialog = (props) => {
-    const { open, changeOpen, goToProject } = props;
-
-    const url = useModelURL(`/project`);
-    return h(Dialog, { isOpen: open }, [
-      //h(Link, { to: url }, [
-      h(Button, { intent: "success", onClick: goToProject }, [
-        "Create New Project",
-      ]),
-      // ]),
-      h(Button, { intent: "danger", onClick: changeOpen }, ["Cancel"]),
-    ]);
-  };
-
-  const SubmitButton = () => {
-    const [open, setOpen] = useState(false);
-
-    const changeOpen = () => {
-      setOpen(!open);
-    };
-
-    const goToProject = () => {
-      postData();
-    };
-
-    return h("div", [
-      h(SubmitDialog, { open, changeOpen, goToProject }),
-      h(
-        Button,
-        {
-          onClick: changeOpen,
-          intent: "primary",
-        },
-        ["Done"]
-      ),
-    ]);
-  };
-
   const ProjectName = () => {
     const [name, setName] = useState(project.name); // This is to make it look like it's real time edi
     const onChange = (e) => {
@@ -308,7 +265,7 @@ export function NewProjectFormMain() {
     h(ResearcherAddProj),
     h(PubAddProj),
     h(SampleAddProj),
-    h(SubmitButton),
+    h(SubmitButton, { postData }),
   ]);
 }
 
