@@ -21,13 +21,17 @@ We hope to arrive at full conformance for milestone `2.0.0`.
 Extensive editing capabilities on model admin pages. Linking to other data models can be easily done
 through frontend interactions. On project admin page, samples can be directly linked to sessions
 through drag and drop. Forms for new projects and samples accessible for creating new models directly
-in U.I. Metadata helpers use external resources making metadata easier to complete. New publications can be searched
+in U.I.
+
+Metadata helpers use external resources making metadata easier to complete. New publications can be searched
 for, by fuzzy text search or doi, and linked to projects and sessions in the frontend. Material metadata helpers use a vocabulary base from the sparrow db as well as [macrostrat](https://macrostrat.org/). Prototype for sample geo entity can link a sample to its
 geologic context by choosing an entity name (i.e Apex Basalt), an entity type (i.e Formation), a
 reference datum (ie. top), and a reference distance (i.e 0.2 meters) (The sample was taken 0.2 meters
 from the top of the Apex Basalt Formation). New researchers can be created from text field inputs.
 Any data model can be embargoed until a specific date or indefinitely
-(which currently means 3000 years). Frontend filtering of data is supported by robust API filtering
+(which currently means 3000 years).
+
+Frontend filtering of data is supported by robust API filtering
 created in the backend. Data can be filtered by geographic location, date of session performed, embargo status,
 associated doi, and any text fields such as name, material, description, etc.
 
