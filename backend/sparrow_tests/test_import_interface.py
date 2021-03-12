@@ -206,6 +206,12 @@ class TestDeclarativeImporter:
         res = db.load_data("datum_type", data)
         assert res._error_unit is None
 
+    def test_unit_creation(self, db):
+        unit = "Yankovics / sq. meter"
+        res = db.load_data("datum_type", {"parameter": "Weird density", "unit": unit})
+        assert res.unit == unit
+        assert res.error_unit is None
+
     def test_basic_import(self, db):
         db.load_data("session", basic_data)
         ensure_single(db, "sample", name="Soil 001")

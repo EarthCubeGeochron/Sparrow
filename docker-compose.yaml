@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.6"
 services:
   gateway:
     depends_on:
@@ -12,11 +12,11 @@ services:
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend:
-    image: sparrowdata/backend:1.6
+    image: sparrowdata/backend:${SPARROW_BACKEND_VERSION:-latest}
     build:
       context: backend
       cache_from:
-        - sparrowdata/backend:1.6
+        - sparrowdata/backend:${SPARROW_BACKEND_VERSION:-latest}
       target: main
     command: /bin/run
     # Make sure we get colorized terminal output
@@ -90,11 +90,11 @@ services:
     volumes:
       - db_cluster:/var/lib/postgresql/data
   frontend:
-    image: sparrowdata/frontend:2.0-dev
+    image: sparrowdata/frontend:${SPARROW_FRONTEND_VERSION:-latest}
     build:
       context: frontend
       cache_from:
-        - sparrowdata/frontend:2.0-dev
+        - sparrowdata/frontend:${SPARROW_FRONTEND_VERSION:-latest}
     command: webpack
     depends_on:
       - backend
