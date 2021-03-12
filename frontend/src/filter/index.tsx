@@ -125,6 +125,7 @@ function AdminFilter(props) {
     listComponent,
     initParams,
     dropdown = false,
+    addModelButton = null,
   } = props;
 
   const [params, dispatch] = useReducer(reducer, initParams);
@@ -268,6 +269,7 @@ function AdminFilter(props) {
         text: params.like || "",
       }),
       h(TagContainer, { params: tags, removeParam, createParams }),
+      addModelButton,
     ]),
     filterOpen ? Content : listComponent,
   ]);

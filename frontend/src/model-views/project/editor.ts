@@ -317,8 +317,8 @@ function EditResearchers(props) {
     });
   };
 
-  const onSubmit = (id, name) => {
-    const newResearcher = new Array({ id, name });
+  const onSubmit = (id, name, orcid = null) => {
+    const newResearcher = new Array({ id, name, orcid });
     let newResearchers = [...researchers, ...newResearcher];
     actions.updateState({
       model: { researcher: { $set: newResearchers } },
@@ -341,7 +341,7 @@ function EditResearchers(props) {
       setListName("researcher");
     },
     isEditing,
-    rightElement: h(EditProjNewResearcher),
+    //rightElement: h(EditProjNewResearcher),
   });
 }
 
@@ -389,7 +389,7 @@ function EditablePublications(props) {
       setListName("publication");
     },
     isEditing,
-    rightElement: h(EditProjNewPub),
+    //rightElement: h(EditProjNewPub),
   });
 }
 
@@ -425,8 +425,8 @@ export function EditableSamples() {
     });
   };
 
-  const sampleOnClick = (id, name) => {
-    const newSample = new Array({ id, name });
+  const sampleOnClick = (sample) => {
+    const newSample = new Array(sample);
     let newSamples = [...samples, ...newSample];
     return actions.updateState({
       model: { sample: { $set: newSamples } },
@@ -450,7 +450,7 @@ export function EditableSamples() {
     isEditing,
     onClickDelete,
     onClickList,
-    rightElement: h(EditProjNewSample),
+    //rightElement: h(EditProjNewSample),
   });
 }
 

@@ -1,17 +1,10 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useReducer, useState, createContext, useContext } from "react";
-import { Button, Dialog, Tooltip } from "@blueprintjs/core";
-import { AdminPage } from "../../admin/AdminPage";
+import { Button, Dialog } from "@blueprintjs/core";
+import { AdminPage } from "~/admin/AdminPage";
 import { APIHelpers } from "@macrostrat/ui-components";
 import { ModelEditableText, EmbargoDatePick } from "./editor";
-import {
-  NewProjectNewPub,
-  NewProjNewSample,
-  NewProjNewResearcher,
-  SampleAdd,
-  PubAdd,
-  ResearcherAdd,
-} from "../new-model";
+import { SampleAdd, PubAdd, ResearcherAdd, SubmitButton } from "../new-model";
 import {
   PublicationFilterList,
   ResearcherFilterList,
@@ -19,9 +12,9 @@ import {
 } from "../new-model";
 import { MinimalNavbar } from "~/components";
 import { APIV2Context } from "../../api-v2";
-import { Link } from "react-router-dom";
 import { useModelURL } from "~/util/router";
 import axios from "axios";
+//@ts-ignore
 import styles from "./project-form.styl";
 
 const h = hyperStyled(styles);
@@ -144,8 +137,6 @@ export function NewProjectFormMain() {
         researchers: project.researcher_collection,
       },
     ];
-    console.log(route);
-    console.log(projectPost);
 
     const response = await axios.post(route, projectPost).then((response) => {
       return response;
@@ -204,7 +195,6 @@ export function NewProjectFormMain() {
       onClickDelete,
       onClickList,
       data: project.sample_collection,
-      rightElement: h(NewProjNewSample),
     });
   };
 
@@ -222,7 +212,6 @@ export function NewProjectFormMain() {
       data: project.publication_collection,
       onClickDelete,
       onClickList,
-      rightElement: h(NewProjectNewPub),
     });
   };
 
@@ -238,7 +227,6 @@ export function NewProjectFormMain() {
       onClickDelete,
       onClickList,
       data: project.researcher_collection,
-      rightElement: h(NewProjNewResearcher),
     });
   };
 
@@ -248,44 +236,6 @@ export function NewProjectFormMain() {
     };
     const embargo_date = project.embargo_date;
     return h("div", [h(EmbargoDatePick, { onChange, embargo_date })]);
-  };
-
-  const SubmitDialog = (props) => {
-    const { open, changeOpen, goToProject } = props;
-
-    const url = useModelURL(`/project`);
-    return h(Dialog, { isOpen: open }, [
-      //h(Link, { to: url }, [
-      h(Button, { intent: "success", onClick: goToProject }, [
-        "Create New Project",
-      ]),
-      // ]),
-      h(Button, { intent: "danger", onClick: changeOpen }, ["Cancel"]),
-    ]);
-  };
-
-  const SubmitButton = () => {
-    const [open, setOpen] = useState(false);
-
-    const changeOpen = () => {
-      setOpen(!open);
-    };
-
-    const goToProject = () => {
-      postData();
-    };
-
-    return h("div", [
-      h(SubmitDialog, { open, changeOpen, goToProject }),
-      h(
-        Button,
-        {
-          onClick: changeOpen,
-          intent: "primary",
-        },
-        ["Done"]
-      ),
-    ]);
   };
 
   const ProjectName = () => {
@@ -315,7 +265,7 @@ export function NewProjectFormMain() {
     h(ResearcherAddProj),
     h(PubAddProj),
     h(SampleAddProj),
-    h(SubmitButton),
+    h(SubmitButton, { postData }),
   ]);
 }
 
@@ -340,10 +290,10 @@ const ProjectEditListComponent = () => {
     });
   };
 
-  const onClickSam = (id, name) => {
+  const onClickSam = (sample) => {
     dispatch({
       type: "add_sample",
-      payload: { sample_collection: [{ id, name }] },
+      payload: { sample_collection: [sample] },
     });
   };
 

@@ -112,8 +112,7 @@ export function PublicationXDDInput(props) {
 
   const addToModel = (i) => {
     const { doi, title } = pubs[i];
-    const data = new Array({ doi, title });
-    onSubmit(data);
+    onSubmit(null, title, doi);
   };
 
   const SubmitButton = (props) => {
@@ -155,8 +154,9 @@ export function PublicationInputs(props) {
   const { onSubmit } = props;
 
   const addToModel = () => {
-    const data = new Array(pub);
-    onSubmit(data);
+    //const data = new Array(pub);
+    const { doi, title } = pub;
+    onSubmit(null, title, doi);
     //dispatch({ type: "add_pub", payload: { publication_collection: data } });
   };
 
@@ -254,16 +254,16 @@ export function NewProjectNewPub() {
   return h(AddNewPubToModel, { onSubmit });
 }
 
-export function EditProjNewPub() {
+export function EditProjNewPub({ onSubmit }) {
   const { model, actions } = useModelEditor();
 
-  const onSubmit = (data) => {
-    const publication = model.publication == null ? [] : [...model.publication];
-    let newPubs = [...publication, ...data];
-    actions.updateState({
-      model: { publication: { $set: newPubs } },
-    });
-  };
+  // const onSubmit = (data) => {
+  //   const publication = model.publication == null ? [] : [...model.publication];
+  //   let newPubs = [...publication, ...data];
+  //   actions.updateState({
+  //     model: { publication: { $set: newPubs } },
+  //   });
+  // };
   return h(AddNewPubToModel, { onSubmit });
 }
 

@@ -1,6 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useReducer, useState, useContext } from "react";
-import { Button, Drawer, Tooltip } from "@blueprintjs/core";
+import { useState } from "react";
+import { Button, Drawer, Card, Dialog } from "@blueprintjs/core";
 import { useAPIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import styles from "./module.styl";
@@ -31,13 +31,17 @@ export function FormSlider(props) {
   };
 
   return h("div", [
-    h(Tooltip, { content: `Create new ${model}` }, [
-      h(Button, {
-        onClick: changeOpen,
-        minimal: true,
-        icon: "plus",
-        intent: "success",
-      }),
+    h(Card, [
+      h(
+        Button,
+        {
+          onClick: changeOpen,
+          minimal: true,
+          icon: "plus",
+          intent: "success",
+        },
+        [`Create a New ${model}`]
+      ),
     ]),
     h(
       Drawer,
@@ -74,4 +78,42 @@ export const isTitle = (search) => {
   } else {
     return false;
   }
+};
+
+export const SubmitDialog = (props) => {
+  const { open, changeOpen, goToModel } = props;
+
+  return h(Dialog, { isOpen: open }, [
+    //h(Link, { to: url }, [
+    h(Button, { intent: "success", onClick: goToModel }, [
+      "Create New Project",
+    ]),
+    // ]),
+    h(Button, { intent: "danger", onClick: changeOpen }, ["Cancel"]),
+  ]);
+};
+
+export const SubmitButton = (props) => {
+  const { postData } = props;
+  const [open, setOpen] = useState(false);
+
+  const changeOpen = () => {
+    setOpen(!open);
+  };
+
+  const goToModel = () => {
+    postData();
+  };
+
+  return h("div", [
+    h(SubmitDialog, { open, changeOpen, goToModel }),
+    h(
+      Button,
+      {
+        onClick: changeOpen,
+        intent: "primary",
+      },
+      ["Done"]
+    ),
+  ]);
 };
