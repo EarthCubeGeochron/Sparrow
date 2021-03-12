@@ -77,7 +77,7 @@ class TestProjectEdits:
         db.session.commit()
 
         # the updates will have lengthened the publication collection
-        project_test = db.session.query(project).get(new_proj.id)
+        project_test = db.session.query(db.model.project).get(new_proj.id)
         assert len(project_test.publication_collection) == 3
         # adding a new sample to the session.sample attribute creates a new session..
         sessions = db.session.query(db.model.session).all()

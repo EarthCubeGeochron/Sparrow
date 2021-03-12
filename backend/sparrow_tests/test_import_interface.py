@@ -478,3 +478,8 @@ class TestImportDataTypes(object):
         # Test import of simple cosmogenic nuclides data types
         data = json_fixture("simple-cosmo-test.json")
         db.load_data("session", data)
+
+class TestIsolation:
+    def test_isolation(self, db):
+        sessions = db.session.query(db.model.session).all()
+        assert len(sessions) == 0
