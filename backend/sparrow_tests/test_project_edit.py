@@ -22,7 +22,7 @@ class TestProjectEdits:
     https://github.com/realpython/materials/blob/master/flask-connexion-rest-part-2/version_1/people.py
     """
 
-    @mark.skip #xfail(reason="This is experimental")
+    # @mark.skip  # xfail(reason="This is experimental")
     def test_project_edits(self, db):
         data = json_fixture("project-edits.json")
 
@@ -40,7 +40,7 @@ class TestProjectEdits:
 
         # grab existing id and project
         proj_id = data["edit-project"]["id"]
-        existing_project = project.query.get(proj_id)
+        existing_project = db.session.query(project).get(proj_id)
 
         # get updates
         data["edit-project"].pop("id")
@@ -48,7 +48,7 @@ class TestProjectEdits:
 
         # load updates into the project_schema and assign the same id as the existing
         new_proj = project_schema.load(
-            updates, session=db.session, instance=project.query.get(1), partial=True, transient=True
+            updates, session=db.session, instance=existing_project, partial=True, transient=True
         )
         new_proj.id = existing_project.id
 
@@ -65,5 +65,8 @@ class TestProjectEdits:
         db.session.commit()
 
         # the updates will have lengthened the publication collection
-        project_test = project.query.get(proj_id)
+        project_test = db.session.query(project).get(proj_id)
+        sessions = db.session.query(db.model.session).all()
         assert len(project_test.publication_collection) == 3
+        # adding a new sample to the session.sample attribute creates a new session..
+        assert len(sessions) == 2
