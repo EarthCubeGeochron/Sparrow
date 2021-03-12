@@ -8,6 +8,14 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## `[unreleased]` - 2021-03-11
+
+- Improved frontend and backend Docker images to have versions tied to the
+  core application version (currently at `2.0.0.beta1`). This process will
+  soon be integrated into an image building on release automation of some sort.
+- Make Docker image builds use BuildKit and do more intelligent layer caching,
+  potentially leading to significantly faster builds on fresh Sparrow installations.
+
 ## `[2.0.0.beta1]` - 2021-03-01
 
 This is the first release in the beta series for **Sparrow** version `2.0.0`.
