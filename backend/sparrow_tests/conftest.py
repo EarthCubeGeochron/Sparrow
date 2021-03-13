@@ -5,6 +5,7 @@ from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 from sparrow.database.util import wait_for_database
 from sqlalchemy.orm import Session
+from sqlalchemy import event
 from .helpers.database import testing_database
 
 # Slow tests are opt-in
@@ -59,14 +60,33 @@ def app(pytestconfig):
 
 @fixture(scope="class")
 def db(app, pytestconfig):
+    # https://docs.sqlalchemy.org/en/13/orm/session_transaction.html
+    # https://gist.github.com/zzzeek/8443477
     if pytestconfig.option.use_isolation:
         connection = app.database.engine.connect()
         transaction = connection.begin()
         session = Session(bind=connection)
+
+        # start the session in a SAVEPOINT...
+        # start the session in a SAVEPOINT...
+        session.begin_nested()
+
+        # then each time that SAVEPOINT ends, reopen it
+        @event.listens_for(session, "after_transaction_end")
+        def restart_savepoint(session, transaction):
+            if transaction.nested and not transaction._parent.nested:
+
+                # ensure that state is expired the way
+                # session.commit() at the top level normally does
+                # (optional step)
+                session.expire_all()
+                session.begin_nested()
+
         app.database.session = session
         _setup_context(app)
+
         yield app.database
-        app.database.session.close()
+        session.close()
         transaction.rollback()
         connection.close()
     else:

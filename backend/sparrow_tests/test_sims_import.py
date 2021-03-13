@@ -30,10 +30,9 @@ class TestSIMSWebscraper:
         """
         route = "/api/v2/models/project"
 
-        page = Path(relative_path(__file__, "fixtures/wiscsims_publications.html"))
-        page_open = open(page, "r")
-        page_html = page_open.read()
-        page_open.close()
+        page = relative_path(__file__, "fixtures/wiscsims_publications.html")
+        with open(page, "r") as f:
+            page_html = f.read()
 
         page_soup = soup(page_html, "html.parser")
 

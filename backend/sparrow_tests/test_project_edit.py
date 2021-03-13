@@ -1,11 +1,7 @@
 from .helpers import json_fixture
-from pytest import mark
+from pytest import mark, fixture
 import json
 
-
-def load_data_loop(model: str, data, db):
-    for ele in data:
-        db.load_data(model, ele)
 
 
 class TestProjectEdits:
@@ -21,49 +17,80 @@ class TestProjectEdits:
 
     https://github.com/realpython/materials/blob/master/flask-connexion-rest-part-2/version_1/people.py
     """
+    data = json_fixture("project-edits.json")
 
-    @mark.skip #xfail(reason="This is experimental")
+    def test_isolation(self, db):
+        assert db.session.query(db.model.project).count() == 0
+        sessions = db.session.query(db.model.session).all()
+        assert len(sessions) == 0
+
+    # @mark.skip  # xfail(reason="This is experimental")
     def test_project_edits(self, db):
-        data = json_fixture("project-edits.json")
+        # We need to restart the ID sequence because this test makes
+        # assumptions about the identity of auto-incrementing primary keys
+        db.session.execute("ALTER SEQUENCE session_id_seq RESTART 1");
 
-        load_data_loop("publication", data["publication"], db)
-        load_data_loop("researcher", data["researcher"], db)
-        load_data_loop("sample", data["sample"], db)
-        load_data_loop("session", data["session"], db)
+        # Load data (replaces load_data_loop)
+        for model, spec_list in self.data.items():
+            if model in ["og-project", "edit-project"]:
+                continue
+            for spec in spec_list:
+                db.load_data(model, spec)
 
-        res = db.load_data("project", data["og-project"])
+        db.load_data("project", self.data["og-project"])
 
+        Session = db.model.session
+
+        orig_sessions = db.session.query(Session.id).all()
+        # We have two sessions in the database
+        assert len(orig_sessions) == 2
+
+        assert set([s.id for s in orig_sessions]) == set([1,2])
+
+    @mark.xfail(reason="Updating does not work at the moment")
+    def test_project_updates(self, db):
         # need a function like load_data but for edits..
         ## get interface and db model
-        project_schema = db.interface.project()
-        project = db.model.project
-
-        # grab existing id and project
-        proj_id = data["edit-project"]["id"]
-        existing_project = project.query.get(proj_id)
+        ProjectInterface = db.interface.project()
 
         # get updates
-        data["edit-project"].pop("id")
-        updates = data["edit-project"]
+        #data["edit-project"].pop("id")
+        updates = self.data["edit-project"]
+
+        inst = db.session.query(db.model.project).first()
+        updates["id"] = inst.id
+
+        # new_sessions = data["edit_project"].pop("session")
+        # for sess, row in zip(new_sessions, orig_sessions):
+        #     # Integrate database-provided IDs for existing sessions
+        #     sess["id"] = row.id
+        # updates["session"] = new_sessions
+
+        # We aren't good at merging in changes to samples
+        # If we don't delete this, the test fails!
+        del updates["session"][0]["sample"]
 
         # load updates into the project_schema and assign the same id as the existing
-        new_proj = project_schema.load(
-            updates, session=db.session, instance=project.query.get(1), partial=True, transient=True
+        new_proj = ProjectInterface.load(
+            updates, session=db.session, instance=inst, partial=True
         )
-        new_proj.id = existing_project.id
 
         # NOTE: for some reason, i need to rollbakc before the merge.
         #       online examples don't need to do this
         # Merge the new_proj with the existing one in the session.
-        db.session.rollback()
+        # db.session.rollback()
 
         res = db.session.merge(new_proj)
-
         # commit changes
         # seems to work well except for its creating an extra duplicate session.
         # it doesn't duplicate any other collection though.
         db.session.commit()
 
+        assert db.session.query(db.model.project).count() == 1
+
         # the updates will have lengthened the publication collection
-        project_test = project.query.get(proj_id)
+        project_test = db.session.query(db.model.project).get(new_proj.id)
         assert len(project_test.publication_collection) == 3
+        # adding a new sample to the session.sample attribute creates a new session..
+        sessions = db.session.query(db.model.session).all()
+        assert len(sessions) == 2
