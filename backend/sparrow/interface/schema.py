@@ -4,12 +4,11 @@ from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
-from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
-from sqlalchemy.orm.exc import FlushError
 from sqlalchemy.orm import RelationshipProperty
 from collections.abc import Mapping
 from sqlalchemy import inspect
 
+from ..exceptions import SparrowSchemaError
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter, allow_nest
 
@@ -172,7 +171,10 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # log.debug("Expanding keys " + str(pk_vals))
 
         pk = get_primary_keys(self.opts.model)
-        assert len(pk) == len(pk_vals)
+        try:
+            assert len(pk) == len(pk_vals)
+        except AssertionError:
+            raise SparrowSchemaError(f"Could not expand primary key for {self.opts.model.__name__} from {value}")
         return {col.key: val for col, val in zip(pk, pk_vals)}
 
     @post_load

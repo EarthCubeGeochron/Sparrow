@@ -136,7 +136,7 @@ def has_column(engine, table, column):
     insp = get_inspector(engine)
     tbl = insp.tables[table]
     for col in tbl.columns:
-        if col.name == column:
+        if col == column:
             return True
     return False
 
@@ -173,10 +173,11 @@ class SparrowDatabaseMigrator:
                 continue
             self.add_migration(obj)
 
-    def apply_migrations(self, engine):
+    def apply_migrations(self, engine, target):
         """This is the magic function where an ordered changeset gets
         generated and applied"""
-        migrations = [m for m in self._migrations if m.should_apply(engine)]
+        _migrations = [m() for m in self._migrations]
+        migrations = [m for m in _migrations if m.should_apply(engine, target, self)]
         log.info("Applying manual migrations")
         if len(migrations) == 0:
             log.info(f"Found no migrations to apply")
@@ -186,7 +187,7 @@ class SparrowDatabaseMigrator:
             for m in migrations:
                 log.info(f"Applying migration {m.name}")
                 m.apply(engine)
-            migrations = [m for m in migrations if m.should_apply(engine)]
+            migrations = [m for m in _migrations if m.should_apply(engine, target, self)]
 
     def _run_migration(self, engine, target, check=False):
         m = _create_migration(engine, target)
@@ -199,7 +200,7 @@ class SparrowDatabaseMigrator:
             m.apply(quiet=True)
             return
 
-        self.apply_migrations(engine)
+        self.apply_migrations(engine, target)
 
         # Migrating to the new version should now be "safe"
         m = _create_migration(engine, target)
