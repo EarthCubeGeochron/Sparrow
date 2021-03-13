@@ -128,7 +128,8 @@ def connection_args(engine):
         # We passed a connection url!
         engine = create_engine(engine)
     uri = engine.url
-    flags = f"-U {uri.username} -h {uri.host} -p {uri.port}"
+    port = uri.port or 5432
+    flags = f"-U {uri.username} -h {uri.host} -p {port}"
     if password := uri.password:
         flags += f" -P {password}"
     return flags, uri.database

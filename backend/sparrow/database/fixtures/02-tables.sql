@@ -321,7 +321,7 @@ CREATE TABLE IF NOT EXISTS session (
     ON DELETE SET NULL,
   publication_id integer REFERENCES publication(id)
     ON DELETE SET NULL,
-  date timestamp DEFAULT -infinity NOT NULL,
+  date timestamp DEFAULT '-infinity' NOT NULL,
   end_date timestamp,
   date_precision text REFERENCES enum.date_precision(id),
   name text, -- This column can store an (optional) internal lab id
