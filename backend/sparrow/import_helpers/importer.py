@@ -193,6 +193,8 @@ class BaseImporter(ImperativeImportHelperMixin):
             items = ensure_sequence(self.import_datafile(fn, rec, **kwargs))
 
             for created_model in items:
+                if created_model is None:
+                    continue
                 # Track the import of the resulting models
                 df_link = self.__track_model(rec, created_model)
                 if df_link is not None:
