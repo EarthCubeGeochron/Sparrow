@@ -66,7 +66,7 @@ class JWTBackend(AuthenticationBackend):
         return jwt.encode(payload, **kwargs)
 
     def _decode(self, cookie, **kwargs):
-        kwargs.update(key=self.encode_key, verify=True, algorithms={"HS256"})
+        kwargs.update(key=self.encode_key, verify=True, algorithm={"HS256"})
         return jwt.decode(
             cookie,
             # do symmetrical encryption for now

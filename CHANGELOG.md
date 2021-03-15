@@ -8,86 +8,6 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
-## `[unreleased]` - 2021-03-11
-
-- Improved frontend and backend Docker images to have versions tied to the
-  core application version (currently at `2.0.0.beta1`). This process will
-  soon be integrated into an image building on release automation of some sort.
-- Make Docker image builds use BuildKit and do more intelligent layer caching,
-  potentially leading to significantly faster builds on fresh Sparrow installations.
-
-### Frontend
-
-Sparrow now has extensive editing capabilities on model admin pages.
-
-- Linking to other data models can be easily done
-  through frontend interactions.
-  - On project admin page, samples can be directly linked to sessions
-    through drag and drop.
-- Forms for creating new project and sample models make data creation availble directly through the U.I.
-- New researchers can be created from text field inputs.
-- Any data model can be embargoed until a specific date or indefinitely
-  (which currently means 3000 years).
-
-Sparrow also integrates external resources into its editing capabilities to make filling in metadata more efficient.
-
-- New publications can be searched for, by fuzzy text search or doi, and linked to projects and sessions through the U.I.
-  - Search power provided by [xDD](https://xdd.wisc.edu/) and [crossref](https://www.crossref.org/).
-  - Publications not found in search can also be manually added.
-- Material metadata helpers use a vocabulary base from the sparrow db as well as [macrostrat](https://macrostrat.org/) while also leaving the ability for the user to create a new material.
-- A prototype for sample geo entity can link a sample to its
-  geologic context by choosing an entity name (i.e Apex Basalt), an entity type (i.e Formation), a
-  reference datum (ie. top), and a reference distance (i.e 0.2 meters) (The sample was taken 0.2 meters
-  from the top of the Apex Basalt Formation).
-
-Frontend filtering of data is supported by robust API filtering
-created in the backend. Data can be filtered by:
-
-- Geographic location
-- Date of session performed
-- Embargo status
-- Associated doi
-- And any text fields such as name, material, description, etc
-
-Other improvements to frontend include:
-
-- Sample navigation from map sample marker as well as navigation to the map from the project and sample page maps.
-- Enhanced model navigation through admin and catalog pages.
-- Infinite scrolling lists on admin pages that is filterable and hideable to create a larger model view.
-- Refined views overall on catalog and admin pages.
-
-> NOTE:
-> Some frontend editing may not be fully functional yet in their persisting to the database.
-> Linking samples and sessions may create a new session or sample model instead of linking an already existing model.
-> Newer releases will have these fixed as well as have new features including model tagging, ("needs work", "location wrong", etc) to quickly reference workflow, duplicate model consolidating and enhanced capabilities on the datasheet.
-
-### Backend
-
-Sparrow's API has recieved enhacements that include documentation, filtering and data posting.
-
-The API documentation now has:
-
-- More examples
-- Basic information (version, license)
-- Specific endpoint parameter information (more examples and descriptions specific to each model endpoint)
-
-Sparrow's API now has even more extensive data filtering capabilities that are reflected in the frontend. Filters added include:
-
-- `public`: Whether to search public or private data
-- `date_range`: A range of dates that a linked session took place in.
-- `doi_like`: Fuzzy search for a publication doi.
-- `coordinates`: Pass 4 coordinates and recieve all data located with the geographic box.
-- `geometry`: Pass a WKT geometry and get all data from within it.
-- `like`: A general text field search.
-- `age`: Search for a specific age.
-- `ids`: Know the ids of the data models? Pass then in a list and get them all back.
-  Some filters have extendable capabilities using database joins and data model schemas.
-
-Sparrow now has a general all-purpose `PUT` and `POST` endpoint for each data model where edited and new models can be imported into the database through the API. The endpoints use model schemas for more robust handling.
-
-> NOTE:
-> There is still some debugging for the schema loading process, especially for editing data. Some complicated edge cases in editing nested models are still being debugged.
-
 ## `[2.0.0.beta1]` - 2021-03-01
 
 This is the first release in the beta series for **Sparrow** version `2.0.0`.
@@ -126,8 +46,9 @@ together and saving database transactions to the end of a schema unit of
 work.
 
 > Note:
-> There is still a significant work to do on repeated imports of the same data, which
-> should ideally be [_idempotent_](https://en.wikipedia.org/wiki/Idempotence) when data files have not changed. This will be addressed in future releases of the `2.0.0` beta series.
+There is still a significant work to do on repeated imports of the same data, which
+should ideally be [*idempotent*](https://en.wikipedia.org/wiki/Idempotence) when data files have not changed. This will be addressed in future releases of the `2.0.0` beta series.
+
 
 ### Auto-building releases
 
@@ -142,17 +63,17 @@ can be installed with the following one-line command:
 curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh | bash -s -
 ```
 
-Downloadable releases are a **major deal** for
+Downloadable releases are a **major deal** for 
 Sparrow's inter-lab usability. They remove
 the need to download the Sparrow code repository,
 install submodules, etc. in order to install the software. They pave the way for lighter-weight, integrated implementations of the system.
 
 > Note:
-> There are still some problems to be solved,
-> like marking pre-releases appropriately and
-> figuring out how a single application
-> version works with how we manage versioning
-> through different parts of the application.
+There are still some problems to be solved, 
+like marking pre-releases appropriately and
+figuring out how a single application
+version works with how we manage versioning
+through different parts of the application.
 
 ### Command-line bundling
 
@@ -168,7 +89,7 @@ install submodules, etc. in order to install the software. They pave the way for
 - Numerous command-line user-interface enhancements,
   including better organization of commands on the
   basic help page (`sparrow` called with no options)
-- More consistent parsing of backend and
+- More consistent parsing of backend and 
   container-orchestration commands.
 - Improved division of commands into sections
 - Refactored command-line application to a simpler
@@ -179,7 +100,6 @@ install submodules, etc. in order to install the software. They pave the way for
 Sparrow's test suite (runnable with `sparrow test`)
 now includes 72 tests that check all aspects of the
 application's core including data import and export
-
 ### Backend application changes
 
 - Fully transitioned Sparrow's core to a [Starlette](https://www.starlette.io) server backend.
@@ -207,11 +127,10 @@ application's core including data import and export
 - Map now has interactive markers with tooltips and popovers
 - Sample's popovers contain links to the respective sample page
 - Map has superclusters to increase loading performance
-- Map has several default map styles that can be toggled (including macrostrat's geologic map)
 
 > Note: more frontend changes to enable editing
-> features are coming in later versions in the
-> `2.0.0` series.
+features are coming in later versions in the
+`2.0.0` series.
 
 ## `[1.6.0]` - 2020-09-10
 

@@ -1,18 +1,18 @@
 import yaml
-import json
 from starlette.applications import Starlette
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse, Response
-from starlette.exceptions import HTTPException, ExceptionMiddleware
+from starlette.exceptions import HTTPException
 from sparrow.logs import get_logger
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from collections import defaultdict
-from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
-from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, root_example, root_info, meta_info
+from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description
+
 
 log = get_logger(__name__)
+
 
 async def http_exception(request, exc):
     log.error(f"{exc.status_code} {exc.detail}")
@@ -48,7 +48,7 @@ class APIEntry(HTTPEndpoint):
         for k, v in request.app.route_descriptions.items():
             desc = {d["route"]: d["description"] for d in v}
             routes[k] = desc
-        return JSONResponse({**root_info(),"routes": routes, "examples": root_example()})
+        return JSONResponse({"routes": routes})
 
 
 def schema(request):
@@ -82,9 +82,6 @@ class APIv2(Starlette):
         # We will want to layer this back in eventually
         # self._schemas = APISpecSchemaGenerator(self.spec)
         self.add_route("/schema", schema, methods=["GET"], include_in_schema=False)
-    
-    def add_meta_route(self):
-        self.add_route("/meta", JSONResponse(meta_info()) , methods=["GET"], include_in_schema=False)
 
     def _add_routes(self):
 
@@ -95,12 +92,9 @@ class APIv2(Starlette):
         for iface in db.interface:
             self._add_model_route(iface)
 
-        self.add_view_route("authority", schema="vocabulary", description="Route to view authorities for technical descriptions")
-        self.add_view_route("metrics", schema="vocabulary", description="Data Metrics and Statistics")
-        self.add_view_route("age_context", description="Ages directly connected to geologic context")
+        self.add_view_route("authority", schema="vocabulary")
 
         self.add_schema_route()
-        self.add_meta_route()
 
     def _add_model_route(self, iface):
         class Meta:
@@ -142,9 +136,8 @@ class APIv2(Starlette):
         )
         self.route_descriptions[root_route].append(basic_info)
 
-
-    def add_view_route(self, tablename, schema="core_view", description=""):
-        _tbl = self._app.database.mapper.reflect_table(tablename, schema=schema)
+    def add_view_route(self, tablename, schema="core_view"):
+        _tbl = self._app.database.reflect_table(tablename, schema=schema)
 
         class Meta:
             table = _tbl
@@ -160,6 +153,6 @@ class APIv2(Starlette):
             route=endpoint,
             table=_tbl.name,
             schema=schema,
-            description=description,
+            description="",
         )
         self.route_descriptions[root_route].append(basic_info)

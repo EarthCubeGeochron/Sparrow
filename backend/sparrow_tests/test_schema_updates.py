@@ -55,6 +55,3 @@ class TestSchemaUpdates:
     def test_retrieve_sample(self, db):
         obj = db.session.query(db.model.sample).filter_by(name="4c1321a").one()
         assert obj._material.id == "Granite"
-
-    def test_sample_edits_interface(self, db):
-        pass

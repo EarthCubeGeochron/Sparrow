@@ -51,9 +51,7 @@ export const LayerMenu = ({
             intent={MapStyle == style ? "primary" : null}
             labelElement={MapStyle == style ? <Icon icon="tick"></Icon> : null}
             text={name}
-            onClick={() => {
-              chooseMapStyle(style);
-            }}
+            onClick={() => chooseMapStyle(style)}
           />
         );
       })}

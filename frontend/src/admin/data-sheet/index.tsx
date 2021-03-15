@@ -12,12 +12,6 @@ import styles from "./module.styl";
 import { Row, Sheet } from "./components";
 import { useElementSize } from "./util";
 import { sum } from "d3-array";
-import { combineLikeIds, addNecesaryFields } from "./util";
-import { postData } from "./post";
-import {
-  DoiProjectButton,
-} from "./sheet-enter-components/doi-button";
-import { DataEditor } from "react-datasheet/lib";
 import { APIV2Context } from "~/api-v2";
 
 interface ColumnData {
@@ -28,44 +22,25 @@ interface ColumnData {
 }
 
 const columnSpec: ColumnData[] = [
-  { name: "Sample ID", key: "id", editable: false },
-  { name: "Sample Name", key: "name" },
-  { name: "Material", key: "material" },
-  { name: "Latitude", key: "latitude" },
-  { name: "Longitude", key: "longitude" },
-  { name: "Publication ID", key: "publication_id", editable: false },
-  { name: "DOI", key: "doi" },
-  { name: "Project ID", key: "project_id", editable: false },
-  { name: "Project", key: "project_name" },
+  { name: "Sample Name", key: "name", width: 300, editable: false },
+  { name: "IGSN", key: "igsn", width: 50 },
+  { name: "Public", key: "is_public", width: 50 },
+  { name: "Material", key: "material", width: 50 },
+  { name: "Latitude", key: "latitude", width: 50 },
+  { name: "Longitude", key: "longitude", width: 50 },
+  { name: "Location name", key: "location_name", width: 50, editable: false },
+  { name: "Project", key: "project_name", width: 50 },
 ];
 
 function unwrapSampleData(sampleData) {
   /** Unwrap samples from API response to a flattened version */
-  const {
-    geometry,
-    project_id,
-    project_name,
-    publication_id,
-    doi,
-    ...rest
-  } = sampleData;
+  const { geometry, ...rest } = sampleData;
+  console.log(rest);
   let longitude: number, latitude: number;
   if (geometry != null) {
     [longitude, latitude] = geometry?.coordinates;
   }
-  // const [proj_id] = project_id;
-  // const [proj_name] = project_name;
-  // const [pub_id] = publication_id;
-  // const [DOI] = doi;
-  return {
-    longitude,
-    latitude,
-    project_id,
-    project_name,
-    publication_id,
-    doi,
-    ...rest,
-  };
+  return { longitude, latitude, is_public: true, ...rest };
 }
 
 function calculateWidths(data, columns) {
@@ -94,7 +69,7 @@ function apportionWidth(
   const maxContentWidth = calculateWidths(data, columns);
   const totalSize = sum(Object.values(maxContentWidth));
 
-  //console.log(maxContentWidth);
+  console.log(maxContentWidth);
 
   return columns.map((col) => {
     return {
@@ -117,18 +92,13 @@ interface SampleData {
 
 function DataSheet() {
   const [data, setData] = useState<SampleData[]>([]);
-  //console.log(data);
-
-  const [edits, setEdits] = useState([]);
-  /**
-   * For edits, what I could do is create an array of indexes based on the row number.
-   * And at the end I can grab the whole row and send it to the backend.
-   */
-
-  const initialData = useAPIResult(
-    "http://localhost:5002/api/v2/datasheet/view",
-    {},
-    unwrapResponse
+  const initialData = useAPIResult<SampleData[]>(
+    "/sample",
+    { all: true }, //, nest: "sample_geo_entity,geo_entity" },
+    {
+      //context: APIV2Context,
+      unwrapResponse,
+    }
   );
 
   useEffect(() => {
@@ -158,8 +128,7 @@ function DataSheet() {
   );
 
   useEffect(() => {
-    // If we don't have this we'll get an infinite loop
-    if (initialData == null || initialData.length == 0) return
+    console.log(size);
     const col = apportionWidth(initialData, columnSpec, size.width);
     setColumns(col);
   }, [initialData, size]);
@@ -169,7 +138,6 @@ function DataSheet() {
   // Change management
   const handleUndo = () => {
     setData(initialData);
-    setEdits([]);
   };
   const handleSubmit = () => {
     //push method for sending data back to api
@@ -177,35 +145,19 @@ function DataSheet() {
       return null;
     }
     setData(data);
-    const post_data = BuildEdits();
-    console.log(post_data);
-    postData(post_data);
-    setEdits([]);
   };
-
-  function BuildEdits() {
-    /** Grabs the edits from the data for POST.
-     *
-     * How can I group them by rows so I don't have to send a item per cell
-     */
-
-    const editsList = addNecesaryFields(edits, data);
-    const finalEdits = combineLikeIds(editsList);
-    return finalEdits;
-  }
 
   function onCellsChanged(changes) {
     /** Cell change function that uses immutability-helper */
     const spec = {};
-    // const edits = []; // something like what's happening with spec
     console.log(changes);
     changes.forEach(({ cell, row, col, value }) => {
       // Get the key that should be used to assign the value
       const { key } = columns[col];
+      console.log(key);
       // Substitute empty strings for nulls
       const $set = value == "" ? null : value;
-      // sets edits to the state index and the column name
-      setEdits((prevEdits) => [{ row, key }, ...prevEdits]);
+
       spec[row] = {
         ...(spec[row] || {}),
         [key]: { $set },
@@ -267,11 +219,7 @@ function DataSheet() {
           rowRenderer={Row}
           onCellsChanged={onCellsChanged}
           width={size?.width}
-          dataEditor={(props) =>
-            props.col === 6
-              ? h(DoiProjectButton, { data, ...props })
-              : h(DataEditor, { ...props })
-          }
+          // dataEditor={dataEditorComponents}
         />,
       ])}
     </div>,

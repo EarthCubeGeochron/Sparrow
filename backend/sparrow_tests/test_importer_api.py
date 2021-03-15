@@ -100,8 +100,3 @@ class TestAPIImporter:
         # Make sure we don't partially import data
         res = db.session.query(db.model.sample).filter_by(name=new_name).first()
         assert res is None
-
-class TestIsolation:
-    def test_isolation(self, db):
-        sessions = db.session.query(db.model.session).all()
-        assert len(sessions) == 0

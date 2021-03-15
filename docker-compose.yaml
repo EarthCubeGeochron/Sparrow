@@ -1,4 +1,4 @@
-version: "3.6"
+version: "3.4"
 services:
   gateway:
     depends_on:
@@ -12,11 +12,11 @@ services:
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend:
-    image: sparrowdata/backend:${SPARROW_BACKEND_VERSION:-latest}
+    image: sparrowdata/backend:1.6
     build:
       context: backend
       cache_from:
-        - sparrowdata/backend:${SPARROW_BACKEND_VERSION:-latest}
+        - sparrowdata/backend:1.6
       target: main
     command: /bin/run
     # Make sure we get colorized terminal output
@@ -31,7 +31,6 @@ services:
       - SPARROW_BASE_URL
       - SPARROW_LAB_NAME
       - SPARROW_DATABASE=postgresql+psycopg2://postgres@db/sparrow
-      - SPARROW_DATA_DIR
       # A cache for files that need to persist but can be rebuilt.
       - SPARROW_CACHE_DIR=/cache
       - SPARROW_INIT_SQL=/init-sql
@@ -59,11 +58,6 @@ services:
       # Nested volume to keep built files
       # separate from those on our local system
       #- /app/sparrow.egg-info
-      # Link the data directory so we can find files if we are running
-      # the importer in the backend
-      # NOTE: we should think about moving this to another container
-      # but this is precluded by our current plugin architecture.
-      - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
       # Share some configuration between backend
       # and frontend
       - ${SPARROW_INIT_SQL:-placeholder}:/init-sql/:ro
@@ -83,7 +77,6 @@ services:
       # (for example, git repositorites for the PyChron importer). This could conceivably
       # be delegated to a separate importer container, but that seems overcomplex for now.
       - backend_cache:/cache
-
   db:
     image: mdillon/postgis:11
     expose:
@@ -97,11 +90,11 @@ services:
     volumes:
       - db_cluster:/var/lib/postgresql/data
   frontend:
-    image: sparrowdata/frontend:${SPARROW_FRONTEND_VERSION:-latest}
+    image: sparrowdata/frontend:2.0-dev
     build:
       context: frontend
       cache_from:
-        - sparrowdata/frontend:${SPARROW_FRONTEND_VERSION:-latest}
+        - sparrowdata/frontend:2.0-dev
     command: webpack
     depends_on:
       - backend

@@ -1,18 +1,12 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
-import { useState, createContext, useContext } from "react";
+import { useState } from "react";
+import { Button, Icon, NonIdealState } from "@blueprintjs/core";
 import { ProjectMatch } from "~/model-views/project";
 import { ProjectListComponent } from "./infinite-scroll";
 import styles from "./module.styl";
 import { NoStateAdmin } from "./baseview";
-import { AdminPage, createParamsFromURL } from "./AdminPage";
-import {
-  SampleFilterList,
-  PublicationFilterList,
-  ResearcherFilterList,
-  SessionFilterList,
-} from "~/model-views/new-model";
-import { AdminFilter } from "../filter";
+import { AdminPage } from "./AdminPage";
 
 const h = hyperStyled(styles);
 
@@ -31,71 +25,51 @@ export function ProjectMainPanel() {
   ]);
 }
 
-export const ProjectAdminContext = createContext({});
-
-const mainFilterList = (props) => {
-  const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
-
-  const initialState = createParamsFromURL(possibleFilters);
-
-  const [params, setParams] = useState(initialState);
-
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-
-  return h(AdminFilter, {
-    listComponent: h(ProjectListComponent, { params }),
-    possibleFilters,
-    createParams,
-    initParams: params || {},
-  });
-};
-
-const ProjectAdminList = (props) => {
-  const { listName, updateFunction } = useContext(ProjectAdminContext);
-
-  return h("div", [
-    h.if(listName == "main")(mainFilterList),
-    h.if(listName == "sample")(SampleFilterList, {
-      onClick: updateFunction,
-    }),
-    h.if(listName == "publication")(PublicationFilterList, {
-      onClick: updateFunction,
-    }),
-    h.if(listName == "researcher")(ResearcherFilterList, {
-      onClick: updateFunction,
-    }),
-    h.if(listName == "session")(SessionFilterList, {
-      onClick: updateFunction,
-    }),
-  ]);
-};
-
 export function ProjectAdminPage() {
-  const [listName, setListName] = useState("main");
+  return h(AdminPage, {
+    ListComponent: h(ProjectListComponent),
+    MainPageComponent: h(ProjectMainPanel),
+  });
+  // const [hidden, setHidden] = useState(false);
 
-  const [updateFunction, setUpdateFunction] = useState(() =>
-    console.log("add")
-  );
+  // const classname = hidden ? "left-panel.hidden" : "left-panel";
 
-  const changeFunction = (func) => {
-    setUpdateFunction(() => func);
-  };
+  // const SidebarButton = () => {
+  //   const iconname = hidden ? "arrow-right" : "arrow-left";
 
-  return h(
-    ProjectAdminContext.Provider,
-    { value: { setListName, updateFunction, listName, changeFunction } },
-    [
-      h(AdminPage, {
-        listComponent: h(ProjectAdminList),
-        mainPageComponent: h(ProjectMainPanel),
-      }),
-    ]
-  );
+  //   return h(
+  //     Button,
+  //     {
+  //       onClick: () => setHidden(!hidden),
+  //       minimal: true,
+  //       //rightIcon: iconname,
+  //     },
+  //     [
+  //       h("div", { style: { display: "flex", flexDirection: "column" } }, [
+  //         h(Icon, {
+  //           icon: iconname,
+  //           style: { paddingBottom: "150px", paddingTop: "100px" },
+  //         }),
+  //         h(Icon, {
+  //           icon: iconname,
+  //           style: { paddingBottom: "150px" },
+  //         }),
+  //         h(Icon, {
+  //           icon: iconname,
+  //           style: { paddingBottom: "150px" },
+  //         }),
+  //         h(Icon, {
+  //           icon: iconname,
+  //           style: { paddingBottom: "150px" },
+  //         }),
+  //       ]),
+  //     ]
+  //   );
+  // };
+
+  // return h("div.admin-page-main", [
+  //   h(SidebarButton),
+  //   h(`div.${classname}`, null, [h(ProjectListComponent)]),
+  //   h("div.right-panel", null, [h(ProjectMainPanel)]),
+  // ]);
 }

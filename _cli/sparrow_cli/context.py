@@ -6,7 +6,8 @@ from os import environ
 from sparrow_utils.shell import git_revision_info, cmd
 from packaging.specifiers import SpecifierSet, InvalidSpecifier
 from packaging.version import Version
-from .env import prepare_docker_environment
+from .env import setup_command_path
+from .exc import SparrowCommandError
 
 
 @dataclass
@@ -106,33 +107,7 @@ class SparrowConfig:
         self.version_info = test_version(self)
 
         # Setup path for subcommands
-        self._setup_command_path()
-
-        # Set version information needed in compose file
-        version = self.find_sparrow_version()
-        environ["SPARROW_BACKEND_VERSION"] = version
-        environ["SPARROW_FRONTEND_VERSION"] = version
-
-        # Enable native builds and layer caching
-        # https://docs.docker.com/develop/develop-images/build_enhancements/
-        # This is kind of experimental
-        environ["COMPOSE_DOCKER_CLI_BUILD"] = "1"
-        environ["DOCKER_BUILDKIT"] = "1"
-
-        prepare_docker_environment()
-
-    def _setup_command_path(self):
-        _bin = self.SPARROW_PATH / "_cli" / "bin"
-        self.bin_directories = [_bin]
-        # Make sure all internal commands can be referenced by name from
-        # within Sparrow (even if `sparrow` command itself isn't on the PATH)
-        _cmd = environ.get("SPARROW_COMMANDS")
-        if _cmd is not None:
-            self.bin_directories.append(Path(_cmd))
-
-        # Add location of Sparrow commands to path
-        _added_path_dirs = [str(i) for i in self.bin_directories]
-        environ["PATH"] = ":".join([*_added_path_dirs, environ["PATH"]])
+        self.bin_directories = setup_command_path()
 
     def git_revision(self):
         # Setup revision info

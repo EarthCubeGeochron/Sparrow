@@ -1,35 +1,9 @@
 models:
-  project: "Grouping of publications, and/or samples pertaining to the same project"
   sample: "Samples organized by the Sparrow data system"
-  session: "Sessions proccessed at lab, organized by the Sparrow data system"
+  session: "Sessions proccessed at Lab, organized by the Sparrow data system"
   researcher: "Names of Researchers associated with projects or publications"
   publication: "Publications associated with projects, samples or sessions"
-  instrument: "Names of instruments used in Lab associated with session"
-  vocabulary_material: "List of geologic materials associated with samples"
+  instrument: "Names of instruments used in Lab associated with Session"
 
-root:
-  info:
-    version: 2
-    description: "Root of the Sparrow API, your home for friendly geochronology data"
-    liscense: "CC-BY 4.0. More info at /meta"
-  examples: ["/api/v2/models/sample", "/api/v2/models/project?per_page=15"]
-
-meta:
-  version: 2
-  liscense: "CC-BY 4.0"
-  data:
-    license: "All data are licensed under Creative Commons BY 4.0 International"
-    citation: "Future publication involving sparrow"
-    api_authors: ["Daven Quinn", "Casey Idzikowski"]
-
-examples:
-  sample:
-    [
-      "/api/v2/models/sample?nest=material,session&has=location&per_page=10",
-      "/api/v2/models/sample?has=location&geometry=POLYGON((0 0,180 90,180 0,0 90,0 0))",
-    ]
-  project:
-    [
-      "/api/v2/models/project?nest=sample,session&date_range=2000-03-23,2013-05-01&per_page=25",
-      "/api/v2/models/project",
-    ]
+  vocabulary:
+    material: "List of Materials associated with Samples"

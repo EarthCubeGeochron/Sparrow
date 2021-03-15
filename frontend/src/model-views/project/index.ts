@@ -1,24 +1,19 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useRouteMatch } from "react-router-dom";
 import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
-import { useAPIv2Result } from "~/api-v2";
 import { ProjectPage } from "./page";
 import { useModelURL } from "~/util/router";
 import "../main.styl";
 import styles from "~/admin/module.styl";
 const h = hyperStyled(styles);
 
-export const pluralize = function(term, arrayOrNumber) {
+const pluralize = function(term, arrayOrNumber) {
   let count = arrayOrNumber;
   if (Array.isArray(arrayOrNumber)) {
     count = arrayOrNumber.length;
   }
   if (count > 1) {
-    if (term.slice(-1) == "s") {
-      term += "es";
-    } else {
-      term += "s";
-    }
+    term += "s";
   }
   return term;
 };
@@ -82,7 +77,7 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
   );
 }
 
-export const ContentArea = ({ data, title, className, minimal = false }) =>
+const ContentArea = ({ data, title, className, minimal = false }) =>
   h("div.content-area", [
     h("h5", [h("span.count", data.length), " ", pluralize(title, data)]),
     h.if(!minimal)(
@@ -99,19 +94,12 @@ interface ProjectProps {
 
 const ProjectComponent = function(props: ProjectProps) {
   const { id, Edit } = props;
-  const data = useAPIv2Result(
-    `/models/project/${id}`,
-    {
-      nest: "publication,session,sample,researcher",
-    },
-    {}
-  );
-
+  const data = useAPIResult("/project", { id });
   if (id == null || data == null) {
     return null;
   }
 
-  const project = data;
+  const project = data[0];
   return h("div.data-view.project", null, h(ProjectPage, { project, Edit }));
 };
 

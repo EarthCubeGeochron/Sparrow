@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Optional
 from rich.console import Console
 from .config_loader import load_config
+from .env import prepare_docker_environment, setup_command_path
 from .exc import SparrowCommandError
 from .context import SparrowConfig
 
@@ -90,3 +91,5 @@ def cli(ctx, verbose=False):
 
     # First steps towards some much more object-oriented configuration
     ctx.obj = SparrowConfig()
+
+    prepare_docker_environment()

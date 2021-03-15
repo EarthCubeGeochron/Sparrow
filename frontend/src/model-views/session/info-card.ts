@@ -10,40 +10,32 @@ import { LinkCard } from "@macrostrat/ui-components";
 import { parse, format } from "date-fns";
 import { useModelURL } from "~/util/router";
 
-export const Sample = (props) => {
+const Sample = (props) => {
   const sampleTo = useModelURL(`/sample/${props.id}`);
   console.log(sampleTo);
   return h("div.sample", [
-    h("h4.info", "Sample"),
+    h("h5.info", "Sample"),
     h("div.sample-id", [h("a", { href: sampleTo }, [props.name])]),
     h("div.target", props.target),
   ]);
 };
 
-export const Instrument = function(props) {
-  const { instrument } = props;
-  if (!instrument) return null;
-
-  const { name, id } = instrument;
-
+const Instrument = function({ instrument_name }) {
+  if (instrument_name == null) {
+    return null;
+  }
   return h("div.instrument", [
-    h("h4.small-info", "Instrument"),
-    h("div", name),
+    h("h5.small-info", "Instrument"),
+    h("div", instrument_name),
   ]);
 };
 
-export const Publication = (publication) => {
-  if (!publication) return null;
-
-  return;
-};
-
-export const Technique = function({ technique }) {
+const Technique = function({ technique }) {
   if (technique == null) {
     return null;
   }
   return h("div.technique", [
-    h("h4.small-info", "Technique"),
+    h("h5.small-info", "Technique"),
     h("div", technique),
   ]);
 };
@@ -58,29 +50,20 @@ export const Technique = function({ technique }) {
 //   ]);
 // };
 
-export const SessionProjects = (props) => {
-  const { project } = props;
-  console.log(project);
-
-  if (!project) return null;
-
-  const { name, id } = project;
-  const projectTo = useModelURL(`/project/${id}`);
-
-  return h("div.project", [
-    h("h4", "Project"),
-    h("div", null, [h("a", { href: projectTo }, name) || "—"]),
-  ]);
-};
-
 const SessionInfoComponent = function(props) {
   // add some links to Project, sample, etc
-  const { id, sample, target, project, date: sdate } = props;
-  const date = parse(sdate);
+  const {
+    id,
+    sample_id,
+    sample_name,
+    target,
+    project_name,
+    project_id,
+  } = props;
+  const date = parse(props.date);
   console.log(props);
 
-  const sampleId = sample ? sample.id : null;
-  const sampleName = sample ? sample.name : null;
+  const projectTo = useModelURL(`/project/${project_id}`);
 
   return h([
     h("div.top", [
@@ -88,8 +71,11 @@ const SessionInfoComponent = function(props) {
       h("div.expander"),
     ]),
     h("div.session-info", [
-      h(Sample, { id: sampleId, name: sampleName, target }),
-      h(SessionProjects, { project }),
+      h(Sample, { id: sample_id, name: sample_name, target }),
+      h("div.project", [
+        h("h5.info", "Project"),
+        h("div", null, [h("a", { href: projectTo }, project_name) || "—"]),
+      ]),
       h(Instrument, props),
       h(Technique, props),
       //h(MeasurementGroup, props),

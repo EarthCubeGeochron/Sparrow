@@ -2,15 +2,9 @@ from click import secho
 from sqlalchemy.exc import ProgrammingError, IntegrityError
 from sqlparse import split, format
 from sqlalchemy.sql import ClauseElement
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
-from contextlib import contextmanager
-from sqlalchemy_utils import create_database, database_exists, drop_database
-from sparrow_utils import cmd, get_logger
-from time import sleep
-from click import echo
 
-log = get_logger(__name__)
 
 def db_session(engine):
     factory = sessionmaker(bind=engine)
@@ -23,8 +17,8 @@ def run_query(db, filename_or_query, **kwargs):
     a SQLAlchemy database object) and turn it into a
     `Pandas` dataframe.
     """
-    from pandas import read_sql        
-    
+    from pandas import read_sql
+
     if "SELECT" in str(filename_or_query):
         # We are working with a query string instead of
         # an SQL file.
@@ -107,40 +101,3 @@ def get_or_create(session, model, defaults=None, **kwargs):
         session.add(instance)
         instance._created = True
         return instance
-
-def get_db_model(db, model_name: str):
-    return getattr(db.model, model_name)
-
-@contextmanager
-def temp_database(conn_string, drop=True):
-    """Create a temporary database and tear it down after tests."""
-    if not database_exists(conn_string):
-        create_database(conn_string)
-    try:
-        yield create_engine(conn_string)
-    finally:
-        if drop:
-            drop_database(conn_string)
-
-def connection_args(engine):
-    """Get PostgreSQL connection arguments for a engine"""
-    if isinstance(engine, str):
-        # We passed a connection url!
-        engine = create_engine(engine)
-    uri = engine.url
-    flags = f"-U {uri.username} -h {uri.host} -p {uri.port}"
-    if password := uri.password:
-        flags += f" -P {password}"
-    return flags, uri.database
-
-def db_isready(engine_or_url):
-    args, _ = connection_args(engine_or_url)
-    c = cmd("pg_isready", args)
-    return c.returncode == 0
-
-def wait_for_database(engine_or_url, quiet=False):
-    msg = "Waiting for database..."
-    while not db_isready(engine_or_url):
-        if not quiet: echo(msg)
-        log.info(msg)
-        sleep(1)

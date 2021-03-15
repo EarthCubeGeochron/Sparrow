@@ -32,7 +32,7 @@ class ProjectEditResource(Resource):
         for k, v in args.items():
             setattr(m, k, v)
 
-        db.session.add(m) ## I believe this is redudent, because you're directly editing a sqlalchemy session object
+        db.session.add(m)
         db.session.commit()
 
         res = m.to_dict()

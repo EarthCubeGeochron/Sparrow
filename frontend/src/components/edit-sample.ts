@@ -8,7 +8,6 @@ import {
   InputGroup,
   NumericInput,
 } from "@blueprintjs/core";
-import { MySwitch } from "./misscel";
 import { useToggle } from "../map/components/APIResult";
 
 /** Form for Editing an Existing Sample */
@@ -59,10 +58,10 @@ interface MyInput {
   helperText?: string;
   placeholder?: string;
   label?: string;
-  onChange;
-  value;
-  rightElement?;
-  leftIcon?;
+  onChange: any;
+  value: any;
+  rightElement?: any;
+  leftIcon?: any;
 }
 
 /**
@@ -73,11 +72,12 @@ interface MyInput {
  * @param value: Value of the input field (changed by the onChange handler prop)
  * @param onChange: Function that updates some external state that changes the value prop passed
  * @param leftIcon: (Optional)A SVG icon that will appear in the left of the input field.
- * @param rightElement: (Optional)An icon, button or react element that can have additional actions. i.e dropdown menu
+ * @param rightElement: (Optional)An icon, button or react element that can have additional actions. i.e dropdown menu 
  */
-export function MyTextInput(props) {
+export function MyTextInput(props: MyInput) {
   return h("div", [
-    h(FormGroup, { labelInfo: props.helperText, label: props.label }, [
+    h(FormGroup, { labelInfo: props.helperText, label: props.label }),
+    [
       h(InputGroup, {
         id: props.label + "-input",
         placeholder: props.placeholder,
@@ -87,7 +87,7 @@ export function MyTextInput(props) {
         leftIcon: props.leftIcon,
         rightElement: props.rightElement,
       }),
-    ]),
+    ],
   ]);
 }
 
@@ -96,27 +96,26 @@ interface MyInputNum {
   max?: number;
   helperText?: string;
   placeholder?: string;
-  label?: any;
+  label?: string;
   onChange: any;
   value: any;
   rightElement?: any;
   leftIcon?: any;
-  disabled?: boolean;
 }
 
-/** Numeric Input that has intent validation
- *
+/** Numeric Input that has intent validation 
+ * 
  * @param label{string}: String that will apear on top of Input, generally the name of metadata
  * @param helperText{string}: Text that will appear below input, smaller text, example of valid input.
  * @param placeholder{string}: Optional, text that will appear in input field before typing
  * @param value: Value of the input field (changed by the onChange handler prop)
  * @param onChange: Function that updates some external state that changes the value prop passed
  * @param leftIcon: (Optional)A SVG icon that will appear in the left of the input field.
- * @param rightElement: (Optional)An icon, button or react element that can have additional actions. i.e dropdown menu
+ * @param rightElement: (Optional)An icon, button or react element that can have additional actions. i.e dropdown menu 
  * @param min {number}: The minimum value that can be accepted as a valid data type.
  * @param max {number}: The maximum value that can be accepted as a valid data type.
- *
- */
+ * 
+*/
 export function MyNumericInput(props: MyInputNum) {
   const intent =
     props.value < props.min || props.value > props.max ? "Danger" : null;
@@ -129,7 +128,7 @@ export function MyNumericInput(props: MyInputNum) {
         labelFor: props.label + "-input",
       },
       [
-        h.if(!props.disabled)(NumericInput, {
+        h(NumericInput, {
           id: props.label + "-input",
           placeholder: props.placeholder,
           value: props.value,
@@ -137,9 +136,6 @@ export function MyNumericInput(props: MyInputNum) {
           intent,
           leftIcon: props.leftIcon,
           rightElement: props.rightElement,
-          allowNumericCharactersOnly: false,
-          clampValueOnBlur: true,
-          ...props,
         }),
       ]
     ),

@@ -1,12 +1,11 @@
-import { useAPIv2Result } from "~/api-v2";
+import { useAPIResult } from "@macrostrat/ui-components";
 import { useState, useEffect } from "react";
 import { DataSheetSuggest } from "./datasheet-suggest";
-import { Suggest } from "@blueprintjs/select";
 import h from "@macrostrat/hyper";
 
-const url = "/api/v2/vocabulary/material";
+const url = "http://localhost:5002/api/v2/vocabulary/material";
 
-export function DataSheetMaterialSuggest({
+export function MaterialSuggest({
   defaultValue,
   onCellsChanged,
   onCommit,
@@ -16,7 +15,7 @@ export function DataSheetMaterialSuggest({
 }) {
   const [materials, setMaterials] = useState([]);
 
-  const init = useAPIv2Result(url, { has: "id" });
+  const init = useAPIResult(url, { has: "id" });
 
   useEffect(() => {
     if (init) {

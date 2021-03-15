@@ -12,7 +12,6 @@ import { PagedAPIView, StatefulComponent } from "@macrostrat/ui-components";
 import T from "prop-types";
 import { FilterMenu } from "../map/components/filterMenu";
 import { useState } from "react";
-import { AdminFilter } from "../filter";
 
 class FilterListComponent extends StatefulComponent {
   static propTypes = {
@@ -101,24 +100,23 @@ class FilterListComponent extends StatefulComponent {
  * @description A search Box with right side drop down menu
  * @param {array} filterFields An array of strings that will be mapped over for the dropdown menu
  */
-function FilterBox(props) {
-  const { content } = props;
+function FilterBox({ filterFields }) {
   const [state, setState] = useState({
     filter: "",
     pickedFilter: "",
   });
-  const [text, setText] = useState("");
+  console.log(state);
 
   const handleFilterChange = (e) => {
-    setText(e.target.value);
+    setState({ ...state, filter: e.target.value });
   };
 
   const onClickHandle = (filter) => {
+    console.log(filter);
     setState({ ...state, pickedFilter: filter });
   };
 
-  let filterFields = ["Name", "DOI"];
-  const contentMenu = h(Menu, [
+  const content = h(Menu, [
     filterFields.map((filter) => {
       const selected = filter == state.pickedFilter;
       return h(MenuItem, {
@@ -139,7 +137,7 @@ function FilterBox(props) {
   return h(InputGroup, {
     leftIcon: "search",
     placeholder: "Filter values",
-    value: text,
+    value: state.filter,
     onChange: handleFilterChange,
     rightElement,
   });

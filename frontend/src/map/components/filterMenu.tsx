@@ -1,49 +1,34 @@
 import { useState } from "react";
-import h from "@macrostrat/hyper";
 import * as React from "react";
 import { Menu, MenuItem, Icon, InputGroup, Tag } from "@blueprintjs/core";
 import "../cluster.css";
-import { SampleFilter, AdminFilter } from "../../filter";
-import { createParamsFromURL } from "../../admin/AdminPage";
-import { Popover, Button, Tooltip } from "@blueprintjs/core";
+import { SampleFilter } from "../../filter";
 
-export function FilterMenu({ hide = true, on_map, changeParams }) {
-  const possibleFilters = ["public", "geometry", "date_range"]; //needs to work with "doi_like"
+export function FilterMenu({ hide = true, on_map }) {
+  const [tags, setTags] = useState([]);
 
-  const initialState = createParamsFromURL(possibleFilters);
-
-  const [params, setParams] = useState(initialState);
-
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-    changeParams(params);
+  const inputChange = (e) => {
+    const newTags = tags.concat(e.target.value);
+    setTags(newTags);
+    console.log(tags);
   };
 
-  const dropDown = () => {
-    return h(
-      Popover,
-      {
-        content: h(AdminFilter, {
-          possibleFilters,
-          createParams,
-          initParams: params || {},
-          dropdown: true,
-        }),
-        minimal: true,
-        position: "bottom",
-      },
-      [
-        h(Tooltip, { content: "Choose Multiple Filters" }, [
-          h(Button, { icon: "filter", minimal: true }),
-        ]),
-      ]
-    );
-  };
+  const tagElements = tags.map((tag) => {
+    const onRemove = () => setTags(tags.filter((t) => t !== tag));
+    return <Tag onRemove={onRemove}>{tag}</Tag>;
+  });
 
-  return h(dropDown);
+  return (
+    <div>
+      {hide ? null : (
+        <div style={{ display: "flex" }}>
+          <InputGroup
+            placeholder={"Global Filter"}
+            onChange={(e) => inputChange(e)}
+          />
+          <SampleFilter on_map={on_map} />
+        </div>
+      )}
+    </div>
+  );
 }

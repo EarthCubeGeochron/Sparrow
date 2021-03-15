@@ -1,4 +1,4 @@
-version: "3.6"
+version: "3.4"
 services:
   # Set restart policy to allow docker
   # to bring these containers back up on system

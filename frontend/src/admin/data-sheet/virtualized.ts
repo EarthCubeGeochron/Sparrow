@@ -2,9 +2,8 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { useContext, useRef, useState } from "react";
 import { useElementSize, useScrollOffset } from "./util";
 import ReactDataSheet from "react-datasheet";
-import { DataSheetContext, DataSheetProvider } from "./provider";
+import { DataSheetContext } from "./provider";
 import styles from "./module.styl";
-
 const h = hyperStyled(styles);
 
 const defaultSize = { height: 20, width: 100 };
@@ -14,7 +13,6 @@ function VirtualizedSheet(props) {
     data,
     rowRenderer,
     sheetRenderer,
-    dataEditor,
     onCellsChanged,
     scrollBuffer = 50,
     ...rest
@@ -39,29 +37,6 @@ function VirtualizedSheet(props) {
 
   function virtualRowRenderer({ row, children, className }) {
     return rowRenderer({ row: row + rowOffset, children, className });
-  }
-  function virtualDataEditor({
-    row,
-    children,
-    value,
-    col,
-    cell,
-    onChange,
-    onCommit,
-    onKeyDown,
-    onRevert,
-  }) {
-    return dataEditor({
-      row: row + rowOffset,
-      children,
-      value,
-      col,
-      cell,
-      onChange,
-      onCommit,
-      onKeyDown,
-      onRevert,
-    });
   }
   function virtualSheetRenderer({ column, children, className }) {
     return sheetRenderer({
@@ -99,7 +74,6 @@ function VirtualizedSheet(props) {
           changes.forEach((d) => (d.row += rowOffset));
           onCellsChanged(changes);
         },
-        dataEditor: virtualDataEditor,
         ...rest,
       }),
     ]),
