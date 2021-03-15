@@ -1,16 +1,15 @@
-from sqlalchemy import create_engine
 from contextlib import contextmanager, redirect_stdout
-from sqlalchemy_utils import create_database, database_exists, drop_database
 from sqlalchemy.exc import ProgrammingError, IntegrityError
 from schemainspect import get_inspector
-from schemainspect.misc import quoted_identifier
 from migra import Migration
 from migra.statements import check_for_drop
 import sys
-from .util import _exec_raw_sql, run_sql
 from sparrow_utils import get_logger, cmd
 from sqlalchemy import text
 import os
+
+from .util import _exec_raw_sql, run_sql, temp_database, connection_args
+
 
 log = get_logger(__name__)
 
@@ -61,16 +60,6 @@ class AutoMigration(Migration):
         print(statements, file=sys.stderr)
 
 
-@contextmanager
-def temp_database(conn_string):
-    """Create a temporary database and tear it down after tests."""
-    if not database_exists(conn_string):
-        create_database(conn_string)
-    try:
-        yield create_engine(conn_string)
-    finally:
-        drop_database(conn_string)
-
 
 def _create_migration(db_engine, target, safe=True):
     # For some reason we need to patch this...
@@ -117,15 +106,12 @@ def db_migration(db, safe=True, apply=False):
 
 
 def dump_schema(engine):
-    conn_flags = f"-h {engine.url.host} -p {engine.url.port} -U {engine.url.username}"
-    if password := engine.url.password:
-        conn_flags += f" -P {password}"
-
+    flags, dbname = connection_args(engine)
     res = cmd(
         "pg_dump",
         "--schema-only",
-        conn_flags,
-        engine.url.database,
+        flags,
+        dbname,
         capture_output=True,
     )
     return res.stdout

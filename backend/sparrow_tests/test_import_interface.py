@@ -203,7 +203,8 @@ class TestDeclarativeImporter:
 
         db.load_data("datum_type", data)
         # We should be able to import this idempotently
-        db.load_data("datum_type", data)
+        res = db.load_data("datum_type", data)
+        assert res._error_unit is None
 
     def test_unit_creation(self, db):
         unit = "Yankovics / sq. meter"
@@ -425,6 +426,7 @@ class TestDeclarativeImporter:
         db.load_data("session", data)
 
     def test_expand_id(self, caplog, db):
+        # Intermittently fails
         # caplog.set_level(logging.INFO, "sqlalchemy.engine")
 
         data = {"parameter": "test param", "unit": "test unit"}
@@ -476,3 +478,8 @@ class TestImportDataTypes(object):
         # Test import of simple cosmogenic nuclides data types
         data = json_fixture("simple-cosmo-test.json")
         db.load_data("session", data)
+
+class TestIsolation:
+    def test_isolation(self, db):
+        sessions = db.session.query(db.model.session).all()
+        assert len(sessions) == 0

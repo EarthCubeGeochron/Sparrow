@@ -65,3 +65,5 @@ install-hooks:
 	# Initialize submodules if we haven't already
 	-[ ! -d .git/modules ] && git submodule update --init
 
+format-code:
+	black backend/**/*.py _cli/**/*.py

@@ -91,7 +91,6 @@ export function GeologicFormationSelector() {
   const geologicFormations = useAPIResult(MacGeoFormationUrl, {
     strat_name_like: searchText,
   });
-  console.log(geologicFormations);
 
   React.useEffect(() => {
     if (geologicFormations !== null) {

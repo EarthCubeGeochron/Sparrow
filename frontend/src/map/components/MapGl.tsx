@@ -51,7 +51,11 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
 
   const bounds = mapRef.current
     ? //@ts-ignore
-      mapRef.current.getMap().getBounds().toArray().flat()
+      mapRef.current
+        .getMap()
+        .getBounds()
+        .toArray()
+        .flat()
     : null;
 
   const ModeHandler = state.selectedFeature
@@ -118,7 +122,7 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
   ]);
 }
 
-export function MapFilterInputs({ coordinates, setFeature }) {
+export function MapFilterInputs({ coordinates }) {
   const [state, setState] = useState<coordinates>({
     minlng: null,
     maxlng: null,
@@ -127,21 +131,21 @@ export function MapFilterInputs({ coordinates, setFeature }) {
   });
   console.log(state);
 
-  useEffect(() => {
-    setState(coordinates);
-  }, [coordinates]);
+  // useEffect(() => {
+  //   setState(coordinates);
+  // }, [coordinates]);
 
-  useEffect(() => {
-    if (state != coordinates) {
-      const featureList = [];
-      const { maxlng, minlng, maxlat, minlat } = state;
-      const feature = coordinatesToGeoJSON({ maxlng, minlng, maxlat, minlat });
-      featureList.push(feature);
-      console.log(featureList);
+  // useEffect(() => {
+  //   if (state != coordinates) {
+  //     const featureList = [];
+  //     const { maxlng, minlng, maxlat, minlat } = state;
+  //     const feature = coordinatesToGeoJSON({ maxlng, minlng, maxlat, minlat });
+  //     featureList.push(feature);
+  //     console.log(featureList);
 
-      setFeature(featureList);
-    }
-  }, [state]);
+  //     setFeature(featureList);
+  //   }
+  // }, [state]);
 
   return h(Card, [
     h("div", [

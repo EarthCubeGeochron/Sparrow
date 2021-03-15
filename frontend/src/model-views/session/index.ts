@@ -7,13 +7,11 @@
 import * as React from "react";
 import h from "@macrostrat/hyper";
 import { Breadcrumbs, AnchorButton, Intent } from "@blueprintjs/core";
-import { Link } from "react-router-dom";
 import { Frame } from "app/frame";
-
+import { EditableSessionDetails } from "./editor";
 import { SessionInfoCard } from "./info-card";
 import { SessionDetailPanel } from "./detail-panel";
 import { APIResultView } from "@macrostrat/ui-components";
-import { useModelURL } from "~/util/router";
 import { useRouteMatch } from "react-router-dom";
 
 /**
@@ -41,14 +39,8 @@ function SessionComponent(props) {
   if (id == null) {
     return null;
   }
-  const to = useModelURL("/session");
-  const breadCrumbs = [
-    { text: h(Link, { to }, "Sessions") },
-    { icon: "document", text: h("code.session-id", id) },
-  ];
 
   return h("div.data-view#session", [
-    h(Breadcrumbs, { items: breadCrumbs }),
     h(
       APIResultView,
       {
@@ -60,7 +52,8 @@ function SessionComponent(props) {
         const res = data[0];
         ({ sample_name, id, ...rest } = res);
         return h("div", [
-          h(SessionInfoCard, res),
+          h(EditableSessionDetails, { id }),
+          //h(SessionInfoCard, res),
           h("div.data-files", [
             h("h3", "Data sources"),
             // h(Frame, { id: "dataFileDownloadButton", ...rest }, (props) => {

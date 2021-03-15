@@ -2,7 +2,8 @@ from sparrow.database.migration import create_schema_clone
 from sparrow.app import Sparrow
 from sparrow_utils import relative_path, cmd
 from sparrow.database.migration import _create_migration
-from pytest import mark
+from sparrow.database.util import connection_args, temp_database
+from pytest import mark, fixture
 
 target_db = "postgresql://postgres@db:5432/sparrow_test"
 testing_db = "postgresql://postgres@db:5432/sparrow_migration_base"
@@ -18,18 +19,22 @@ class BasicMigration:
         db.engine.execute("ALTER TABLE analysis DROP COLUMN in_plateau")
 
 
-class TestDatabaseMigrations:
-    def test_create_migration_base(self):
-        fn = relative_path(__file__, "fixtures", "e57d74b-detrital-zircon-F-90.pg-dump")
-        args = "-Upostgres -h db -p 5432"
-        cmd("createdb", args, "sparrow_migration_base")
-        cmd("pg_restore", args, "-d sparrow_migration_base", fn, check=True)
+@fixture(scope="class")
+def migration_base():
+    fn = relative_path(__file__, "fixtures", "e57d74b-detrital-zircon-F-90.pg-dump")
+    args, dbname = connection_args(testing_db)
+    with temp_database(testing_db) as engine:
+        cmd("pg_restore", args, "-d", dbname, fn, check=True)
+        yield engine
 
-    def test_migration(self, db):
-        test_app = Sparrow(debug=True, database=testing_db)
+
+@mark.order(-1)
+class TestDatabaseMigrations:
+    def test_migration(self, db, migration_base):
+        test_app = Sparrow(debug=True, database=migration_base.url)
         test_app.setup_database()
         # We can use the existing testing database as a target
-        m = _create_migration(test_app.database.engine, db.engine)
+        m = _create_migration(test_app.db.engine, db.engine)
 
         # Check that we are not aligned
         assert not m.is_safe

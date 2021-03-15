@@ -7,7 +7,7 @@ import { useRouteMatch } from "react-router-dom";
 import { SamplePage } from "./page";
 import { useModelURL } from "~/util/router";
 import { useAPIv2Result } from "~/api-v2";
-import { APIV2Context } from "~/api-v2";
+import { SampleModelCard } from "../list-cards/utils";
 
 const h = hyper.styled(styles);
 
@@ -17,8 +17,8 @@ const h = hyper.styled(styles);
  *
  *
  */
-const SampleListCard = function (props) {
-  const { material, id, name } = props;
+const SampleListCard = function(props) {
+  const { material, id, name, location } = props;
 
   const to = useModelURL(`/sample/${id}`);
 
@@ -36,7 +36,7 @@ const SampleListCard = function (props) {
   );
 };
 
-const SampleList = function () {
+const SampleList = function() {
   const route = "/sample";
   const filterFields = {
     name: "Sample name",
@@ -67,12 +67,14 @@ interface SampleProps {
   id?: number;
   sendQuery: () => {};
 }
-const SampleComponent = function (props: SampleProps) {
+const SampleComponent = function(props: SampleProps) {
   const { id, Edit } = props;
 
   const url = `/models/sample/${id}`;
 
-  const data = useAPIv2Result(url, { nest: "session,project" });
+  const data = useAPIv2Result(url, {
+    nest: "session,project,sample_geo_entity,geo_entity",
+  });
   if (id == null || data == null) {
     return null;
   }
@@ -90,4 +92,10 @@ function SampleMatch({ Edit }) {
   return h(SampleComponent, { id, Edit });
 }
 
-export { SampleList, SampleListCard, SampleMatch, SampleComponent };
+export {
+  SampleList,
+  SampleListCard,
+  SampleModelCard,
+  SampleMatch,
+  SampleComponent,
+};
