@@ -121,7 +121,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         rec.file_mtime = mtime
         rec.basename = infile.name
 
-    def __create_data_file_record(self, fn):
+    def _create_data_file_record(self, fn):
 
         # Get the path location (this must be unique)
         infile = Path(fn)
@@ -164,7 +164,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         redo = kwargs.pop("redo", False)
         added = False
         if rec is None:
-            rec, added = self.__create_data_file_record(fn)
+            rec, added = self._create_data_file_record(fn)
 
         err_filter = True
         m = self.m.data_file_link
