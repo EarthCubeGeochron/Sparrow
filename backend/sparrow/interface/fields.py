@@ -94,7 +94,6 @@ class SmartNested(Nested, Related):
         self.allow_none = True
 
     def _deserialize(self, value, attr=None, data=None, **kwargs):
-        log.debug(f"Deserializing {value}")
         if isinstance(value, self.schema.opts.model):
             return value
         # Better error message for collections.

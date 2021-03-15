@@ -15,7 +15,8 @@ from webargs_starlette import WebargsHTTPException
 from sparrow import settings
 from ..logs import get_logger
 from .plugins import prepare_plugin_manager, SparrowPluginManager
-from ..startup import wait_for_database, tables_exist
+from ..database.util import wait_for_database
+from ..startup import tables_exist
 
 log = get_logger(__name__)
 
@@ -49,16 +50,20 @@ class Sparrow(Starlette):
         log.info("Booting up application server")
         self.setup_server()
 
+    def __ensure_database(self):
+        if self.db is not None:
+            return
+        from ..database import Database
+        self.db = Database(self.__db_url, self)
+
     def init_database(self, drop=False, force=True):
         # This breaks everything for some reason
-        from ..database import Database
-
         wait_for_database(self.__db_url)
         _exists = tables_exist(self.__db_url)
+        self.__ensure_database()
         if not _exists or drop or force:
             log.info("Creating database tables")
-            db = Database(self.__db_url, self)
-            db.initialize(drop=drop)
+            self.db.initialize(drop=drop)
         elif _exists:
             log.info("Application tables exist")
 
@@ -66,16 +71,14 @@ class Sparrow(Starlette):
         # If we set up the database twice, bad things will happen
         # with overriding of models, etc. We must make sure we only
         # set up the database once.
+        self.__ensure_database()
         if self.database_ready:
             return self.db
-        from ..database import Database
-
-        self.db = Database(self.__db_url, self)
         self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
-        if self.db.automap_base is None:
+        if self.db.mapper is None:
             self.database.automap()
-        if self.db.automap_base is not None:
+        if self.db.mapper is not None:
             self.run_hook("database-ready", self.db)
             self.database_ready = True
         return self.db
@@ -98,6 +101,7 @@ class Sparrow(Starlette):
 
     def setup_server(self):
         # This could maybe be added to the API...
+        log.info("Setting up server")
         self.add_exception_handler(WebargsHTTPException, http_exception)
 
         if self.api_loaded:

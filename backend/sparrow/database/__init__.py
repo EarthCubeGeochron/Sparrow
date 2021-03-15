@@ -1,9 +1,11 @@
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Optional
 from click import secho
 
-from sqlalchemy import create_engine, inspect, MetaData
+from sqlalchemy import create_engine, inspect, MetaData, text
 from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
@@ -12,7 +14,7 @@ from marshmallow.exceptions import ValidationError
 
 from .util import run_sql_file, run_query, get_or_create
 from .models import User, Project, Session, DatumType
-from .mapper import MappedDatabaseMixin
+from .mapper import SparrowDatabaseMapper
 from ..logs import get_logger
 from ..util import relative_path
 from ..interface import ModelSchema, model_interface
@@ -25,7 +27,9 @@ metadata = MetaData()
 log = get_logger(__name__)
 
 
-class Database(MappedDatabaseMixin):
+class Database:
+    mapper: Optional[SparrowDatabaseMapper] = None
+    __inspector__ = None
     def __init__(self, db_conn, app=None):
         """
         We can pass a connection string, a **Flask** application object
@@ -46,25 +50,28 @@ class Database(MappedDatabaseMixin):
         self.session = scoped_session(self._session_factory)
         # Use the self.session_scope function to more explicitly manage sessions.
 
+
     def automap(self):
         log.info("Automapping the database")
-        super().automap()
+        self.mapper = SparrowDatabaseMapper(self)
+
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
         #  they are not included by default)
         # TODO: there is probably a way to do this without having to
         # manually register the models
-        self.register_models(User, Project, Session, DatumType)
+        self.mapper.register_models(User, Project, Session, DatumType)
+
         # Register a new class
         # Automap the core_view.datum relationship
-        cls = self.automap_view(
+        cls = self.mapper.automap_view(
             "datum",
             Column("datum_id", Integer, primary_key=True),
             Column("analysis_id", Integer, ForeignKey(self.table.analysis.c.id)),
             Column("session_id", Integer, ForeignKey(self.table.session.c.id)),
             schema="core_view",
         )
-        self.register_models(cls)
+        self.mapper.register_models(cls)
         self.app.run_hook("database-mapped")
 
     @contextmanager
@@ -144,13 +151,23 @@ class Database(MappedDatabaseMixin):
         res = schema.load(filter_params, session=self.session, partial=True)
         return res
 
+    def exec_sql_text(self, statement):
+        """
+        Executes a sql command, in string on the database
+        Easy way to load data into a test database instance
+        """
+        connection = self.engine.connect()
+        connection.execute(text(statement))
+
     def exec_sql(self, fn):
+        """Executes SQL files passed"""
         # TODO: refactor this to exec_sql_file
         secho(Path(fn).name, fg="cyan", bold=True)
         run_sql_file(self.session, str(fn))
 
     def exec_query(self, *args):
-        run_query(self.session, *args)
+        """Returns a Pandas DataFrame from a SQL query"""
+        return run_query(self.engine, *args)
 
     @property
     def inspector(self):
@@ -208,3 +225,27 @@ class Database(MappedDatabaseMixin):
         migrator.add_module(migrations)
         self.app.run_hook("prepare-database-upgrade", migrator)
         migrator.run_migration(dry_run=dry_run)
+
+    @property
+    def table(self):
+        """
+        Map of all tables in the database as SQLAlchemy table objects
+        """
+        if self.mapper._tables is None:
+            self.automap()
+        return self.mapper._tables
+
+    @property
+    def model(self):
+        """
+        Map of all tables in the database as SQLAlchemy models
+
+        https://docs.sqlalchemy.org/en/latest/orm/extensions/automap.html
+        """
+        if self.mapper._models is None:
+            self.automap()
+        return self.mapper._models
+
+    @property
+    def mapped_classes(self):
+        return self.model

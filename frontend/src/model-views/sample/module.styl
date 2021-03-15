@@ -35,7 +35,10 @@ h3.page-type
   color $gray5
 
 .location
-  float right
+  display flex 
+  flex-direction column
+  justify-content flex-end
+  padding 0
   .location-name
     font-weight 400
     margin-top 0
@@ -45,7 +48,75 @@ h3.page-type
   display flex
   flex-direction row
   margin-right -1em
-  .info-block
-    flex-grow 1
+  justify-content space-between
+  // .info-block
+  //   flex-grow 1
   &>*
     margin-right 1em
+
+.sample-edit-card
+  display flex
+  justify-content space-between
+  background-color: $light-gray4
+  border-radius: 5px
+  margin: 5px
+  padding: 5px 10px
+  flex-grow: 1
+  max-width: 20em
+  .location-name
+    color: $indigo3
+  .material
+    font-style italic
+  .samhover
+    background-color yellow
+  h4
+    margin-top: 0em
+    margin-bottom: 0em
+
+.sample-edit-card-samhover
+  display flex
+  justify-content space-between
+  background-color: yellow
+  border-radius: 5px
+  margin: 5px
+  padding: 5px 10px
+  flex-grow: 1
+  max-width: 20em
+  .location-name
+    color: $indigo3
+  .material
+    font-style italic
+  .samhover
+    background-color yellow
+  h4
+    margin-top: 0em
+    margin-bottom: 0em
+
+.pub-edit-card
+  display flex
+  background-color: $light-gray4
+  border-radius: 5px
+  margin: 5px
+  padding: 5px 10px
+  flex-grow: 1
+  //max-width: 15em
+
+.lon-lat
+  margin 0
+  display flex
+  justify-content flex-end
+  font-style italic
+  color #394B59
+
+.location-editor
+  display flex
+  padding 0
+
+.session-info
+  display flex
+  flex-direction column
+
+.session-container
+  display: flex
+  flex-flow: row wrap
+  margin: 0 -5px

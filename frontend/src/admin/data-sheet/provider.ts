@@ -3,7 +3,12 @@ import h, { compose, C } from "@macrostrat/hyper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-const defaultContext = { columns: [], rowHeight: 20, offset: 0, actions: null };
+const defaultContext = {
+  columns: [],
+  rowHeight: 20,
+  offset: 0,
+  actions: null,
+};
 
 type ColumnInfo = {
   name: string;

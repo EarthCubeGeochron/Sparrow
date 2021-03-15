@@ -1,0 +1,14 @@
+[
+  {
+    "name": "M2C_add",
+    "material": "dacite",
+    "id": 18
+  },
+  {
+    "name": "Test_add",
+    "material": "This_doesn't_exist",
+    "id": 19,
+    "latitude": 32,
+    "longitude": 120
+  }
+]

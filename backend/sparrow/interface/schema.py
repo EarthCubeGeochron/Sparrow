@@ -159,6 +159,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 return instance
             else:
                 log.debug(msg + f"...none found\n...filters: {filters}")
+            log.debug(data)
         return super().get_instance(data)
 
     @pre_load
