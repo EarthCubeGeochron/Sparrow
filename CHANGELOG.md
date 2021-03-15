@@ -64,9 +64,9 @@ Extensive data filtering on the api written in python. Filters added include:
 - ids: Know the ids of the data models? Pass then in a list and get them all back.
   Some filters have extendable capabilities using database joins and data model schemas.
 
-Sparrow now has a general `put` and `post` endpoint for each data model where edited and new models can be imported into the database through the API. The endpoints use model schemas for more robust handling.
+Sparrow now has a general `PUT` and `POST` endpoint for each data model where edited and new models can be imported into the database through the API. The endpoints use model schemas for more robust handling.
 
-> NOTE:
+> note:
 > There is still some debugging for the schema loading process, especially for editing data. Some complicated edge cases in editing nested models are still being debugged.
 
 ## `[2.0.0.beta1]` - 2021-03-01
