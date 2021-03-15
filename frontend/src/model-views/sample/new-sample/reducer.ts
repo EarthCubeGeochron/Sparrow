@@ -1,4 +1,4 @@
-import { sample_reducer, sampleState } from "./types";
+import { sample_reducer } from "./types";
 
 const sampleReducer = (state, action) => {
   switch (action.type) {
@@ -42,6 +42,14 @@ const sampleReducer = (state, action) => {
       return {
         ...state,
         sample_geo_entity: SampleGeoEntitys,
+      };
+    case sample_reducer.REMOVE_GEO_ENTITY:
+      const geoEntities = [...state.sample_geo_entity];
+      const index_remove = action.payload.index;
+      geoEntities.splice(index_remove, 1);
+      return {
+        ...state,
+        sample_geo_entity: geoEntities,
       };
     case sample_reducer.ADD_PROJECT:
       const projects = [...state.project, ...new Array(action.payload.project)];

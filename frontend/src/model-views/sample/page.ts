@@ -29,7 +29,7 @@ import {
   SampleLocation,
   SampleDepth,
   SampleElevation,
-  SampleGeoEntity,
+  GeoContext,
   SampleMaterial,
   ProjectAdd,
   SessionAdd,
@@ -265,25 +265,32 @@ const DepthElevation = (props) => {
 };
 
 const GeoEntity = (props) => {
-  const { isEditing, model } = useModelEditor();
+  const { isEditing, model, actions } = useModelEditor();
 
-  const { sample_geo_entity } = model; // going to be an array..
+  const { sample_geo_entity } = model;
 
-  if (!isEditing) {
-    if (sample_geo_entity.length != 0) {
-      return h("div.parameter", [
-        h("h4.subtitle", "Geo Entity"),
-        sample_geo_entity.map((ele) => {
-          const { type, name } = ele.geo_entity;
-          return h("p.value", [name + " " + type]);
-        }),
-      ]);
-    } else {
-      return null;
-    }
-  } else {
-    return h(SampleGeoEntity, { geoEntity: "", changeGeoEntity: () => {} });
-  }
+  const changeGeoEntity = (entity) => {
+    const currnetEntities = [...sample_geo_entity];
+    const newEntities = [...currnetEntities, ...new Array(entity)];
+    actions.updateState({
+      model: { sample_geo_entity: { $set: newEntities } },
+    });
+  };
+
+  const deleteGeoEntity = (index) => {
+    const currnetEntities = [...sample_geo_entity];
+    currnetEntities.splice(index, 1);
+    actions.updateState({
+      model: { sample_geo_entity: { $set: currnetEntities } },
+    });
+  };
+
+  return h(GeoContext, {
+    sample_geo_entity,
+    isEditing,
+    changeGeoEntity,
+    deleteGeoEntity,
+  });
 };
 
 const SampleProjectAdd = () => {
