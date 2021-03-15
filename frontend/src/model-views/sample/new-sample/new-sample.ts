@@ -159,6 +159,14 @@ function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
     });
   };
 
+  const deleteGeoEntity = (index) => {
+    console.log(index);
+    dispatch({
+      type: sample_reducer.REMOVE_GEO_ENTITY,
+      payload: { index },
+    });
+  };
+
   const { sample_geo_entity, location } = sample;
   const {
     coordinates: [longitude, latitude],
@@ -183,6 +191,7 @@ function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
       h(GeoContext, {
         sample_geo_entity: sample_geo_entity == null ? null : sample_geo_entity,
         changeGeoEntity,
+        deleteGeoEntity,
       }),
     ]),
     h(NewSampleProjectAdd),

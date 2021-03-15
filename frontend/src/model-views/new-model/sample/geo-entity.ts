@@ -120,7 +120,13 @@ export function GeoSpatialRef(props) {
 function GeoEntityText(props) {
   const {
     sample_geo_entity,
-  }: { sample_geo_entity: sample_geo_entity[] } = props;
+    isEditing = true,
+    deleteGeoEntity,
+  }: {
+    sample_geo_entity: sample_geo_entity[];
+    isEditing: boolean;
+    deleteGeoEntity: (index) => void;
+  } = props;
   if (!sample_geo_entity) return null;
   console.log(sample_geo_entity);
 
@@ -140,7 +146,19 @@ function GeoEntityText(props) {
 
     return fullString;
   });
-  return h("div", [listofEntityStrings.map((string) => string)]);
+  if (isEditing) {
+    return h("div", [
+      listofEntityStrings.map((string, index) => {
+        return h(GeoEntityTextContainer, {
+          geoEntityText: string,
+          geoEntity: sample_geo_entity,
+          onClick: () => deleteGeoEntity(index),
+        });
+      }),
+    ]);
+  } else {
+    return h("div", [listofEntityStrings.map((string) => string)]);
+  }
 }
 
 function GeoEntityTextContainer(props) {
@@ -156,15 +174,12 @@ function GeoEntityTextContainer(props) {
 
   return h("div.entity-edit-card", [
     h("h4", [geoEntityText]),
-    h(
-      Button,
-      h(Button, {
-        minimal: true,
-        icon: "trash",
-        intent: "danger",
-        onClick: () => onClick(geoEntity),
-      })
-    ),
+    h(Button, {
+      minimal: true,
+      icon: "trash",
+      intent: "danger",
+      onClick: () => onClick(geoEntity),
+    }),
   ]);
 }
 
@@ -176,15 +191,18 @@ function GeoEntityTextContainer(props) {
  *      Ref datum :"Top, Bottom",
  *      Ref Distance: Number, meters from ref datum
  *  Examples for what possible choices are....
- * TODO: Have output section, editable like other collections, reads it human like
  */
 export function GeoContext(props) {
   const {
+    isEditing = true,
     sample_geo_entity,
     changeGeoEntity,
+    deleteGeoEntity,
   }: {
+    isEditing: boolean;
     sample_geo_entity: sample_geo_entity[];
     changeGeoEntity: (g) => void;
+    deleteGeoEntity: (g) => void;
   } = props;
   const defaultState: sample_geo_entity = {
     ref_datum: null,
@@ -193,7 +211,7 @@ export function GeoContext(props) {
     geo_entity: { type: null, name: null },
   };
   const [geoEntity, setGeoEntity] = useState<sample_geo_entity>(defaultState);
-  console.log(geoEntity);
+  console.log(sample_geo_entity);
 
   const changeDatum = (datum: string) => {
     setGeoEntity((prevEntity) => {
@@ -273,19 +291,30 @@ export function GeoContext(props) {
   const { geo_entity } = geoEntity;
   const { type, name } = geo_entity;
 
-  const content = h("div.geo-entity-drop", [
-    h("div.entity", [
-      h(SampleGeoEntity, { name, changeGeoEntity: changeGeoName }),
-      h(EntityType, { type, onEntityTypeChange: changeGeoType }),
+  const content = h("div.geo-entity-card", [
+    h("div.geo-entity-drop", [
+      h("div.entity", [
+        h(SampleGeoEntity, { name, changeGeoEntity: changeGeoName }),
+        h(EntityType, { type, onEntityTypeChange: changeGeoType }),
+      ]),
+      h(GeoSpatialRef, { geoEntity, changeDistance, changeDatum, changeUnit }),
     ]),
-    h(GeoSpatialRef, { geoEntity, changeDistance, changeDatum, changeUnit }),
     h(Button, { intent: "success", onClick: onSubmitClick }, ["Submit"]),
   ]);
+
+  if (!isEditing) {
+    return h("div", [
+      h.if(sample_geo_entity.length > 0)(GeoEntityText, {
+        sample_geo_entity,
+        isEditing: false,
+      }),
+    ]);
+  }
 
   return h("div", [
     "Geologic Context",
     h(HelpButton, { content: helpContent, position: "top" }),
     content,
-    h(GeoEntityText, { sample_geo_entity }),
+    h(GeoEntityText, { sample_geo_entity, deleteGeoEntity }),
   ]);
 }
