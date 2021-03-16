@@ -9,6 +9,7 @@ import { Button, Divider, Spinner } from "@blueprintjs/core";
 import { parse, format } from "date-fns";
 import { LinkCard } from "@macrostrat/ui-components";
 import { SampleCard } from "../sample/detail-card";
+import { Frame } from "~/frame";
 import { useAPIv2Result } from "~/api-v2";
 
 const h = hyperStyled(styles);
@@ -72,7 +73,7 @@ export const SessionCardInfo = (props) => {
   );
 };
 
-export const SessionLinkCard = function (props) {
+export const SessionLinkCard = function(props) {
   const { session_id } = props;
 
   const to = useModelURL(`/session/${session_id}`);
@@ -185,11 +186,16 @@ export function DataFilePage({ props }) {
       //h("div.projects", [h(ProjectLinks, { project })]),
       h(Samples, { samples }),
       h(SessionList, { sessions }),
+      h(
+        Frame,
+        { id: "datafilePage", data },
+        "Open the Pod Bay Doors please hal"
+      ),
     ]),
   ]);
 }
 
-const DataFileComponent = function (props) {
+const DataFileComponent = function(props) {
   const { file_hash } = props;
   const dataFileURL = `/models/data_file/${file_hash}`;
 

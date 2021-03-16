@@ -190,7 +190,7 @@ export function Sessions(props) {
     return h("div.parameter", [h("h4.subtitle", "Sessions")]);
   }
   return h("div.parameter", [
-    h.if(session.length > 0)("h4.subtitle", "Sessions"),
+    h.if(session.length > 0 || isEditing)("h4.subtitle", "Sessions"),
     h("div.session-container", [
       session.map((obj) => {
         const {
