@@ -1,4 +1,5 @@
 import { ModelCard } from "../utils";
+import { Frame } from "~/frame";
 import hyper from "@macrostrat/hyper";
 import { pluralize } from "../project/index";
 import { format } from "date-fns";
@@ -63,7 +64,14 @@ const SampleModelCard = (props) => {
 
   const sample = { material, id, name, location, session };
 
-  const content = h(sampleContent, { material, id, name, location, session });
+  const content = h(
+    Frame,
+    {
+      id: "sampleCardContent",
+      data: { material, id, name, location, session },
+    },
+    h(sampleContent, { material, id, name, location, session })
+  );
   if (onClick == null) {
     return h(ModelCard, { id, content, model: "sample", link });
   }
@@ -80,9 +88,11 @@ const SampleModelCard = (props) => {
 const PublicationModelCard = (props) => {
   const { year, id, title, doi, author, journal, onClick, link } = props;
 
+  const content = h(Frame, { id: "publicationCardContent" }, h("div", [title]));
+
   return h(ModelCard, {
     id,
-    content: h("div", [title]),
+    content,
     model: "publication",
     link,
     onClick: () => onClick(id, title, doi),
@@ -92,9 +102,15 @@ const PublicationModelCard = (props) => {
 export const ResearcherModelCard = (props) => {
   const { id, name, onClick, link } = props;
 
+  const content = h(
+    Frame,
+    { id: "researcherCardContent", data: { id, name } },
+    h("div", [name])
+  );
+
   return h(ModelCard, {
     id,
-    content: h("div", [name]),
+    content,
     model: "researcher",
     link,
     onClick: () => onClick(id, name),
@@ -140,9 +156,18 @@ const ProjectModelCard = (props) => {
     ]),
   ]);
 
+  const cardContent = h(
+    Frame,
+    {
+      id: "projectCardContent",
+      data: { id, name, description, samples, publication },
+    },
+    content
+  );
+
   return h(ModelCard, {
     id,
-    content,
+    content: cardContent,
     model: "project",
     link,
     onClick: () => onClick(id, name),
@@ -187,9 +212,27 @@ const SessionModelCard = (props) => {
     h("div.footer", [h("div", analysisCount), h("div", ["Target: " + target])]),
   ]);
 
+  const cardContent = h(
+    Frame,
+    {
+      id: "sessionCardContent",
+      data: {
+        session_id,
+        target,
+        date,
+        technique,
+        instrument,
+        analysis,
+        sample,
+        data,
+      },
+    },
+    content
+  );
+
   return h(ModelCard, {
     id: session_id,
-    content,
+    content: cardContent,
     model: "session",
     link,
     onClick: () => onClick(session_id, date, target, technique),
@@ -214,7 +257,20 @@ const DataFileModelCard = (props) => {
     h("div.bod", [h("div", [h("span", basename)]), h("div", [type])]),
   ]);
 
-  return h(ModelCard, { id: file_hash, content, model: "data-file" });
+  const cardContent = h(
+    Frame,
+    {
+      id: "datafileCardContent",
+      data: { file_hash, basename, type, date, link },
+    },
+    content
+  );
+
+  return h(ModelCard, {
+    id: file_hash,
+    content: cardContent,
+    model: "data-file",
+  });
 };
 
 const ContentOverFlow = ({ data, title, className, minimal = false }) =>

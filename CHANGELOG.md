@@ -55,6 +55,18 @@ Other improvements to frontend include:
 - Enhanced model navigation through admin and catalog pages.
 - Infinite scrolling lists on admin pages that is filterable and hideable to create a larger model view.
 - Refined views overall on catalog and admin pages.
+- New Frontend frames for custom frontend components:
+
+  - `mapStyles`: Array of objects that have name and mapystyle (valid mapbox style)
+  - `samplePage`: React element (class or functional component) that is rendered on sample page
+  - `projectPage`: React element (class or functional component) that is rendered on project page
+  - `datafilePage`: React element (class or functional component) that is rendered on project page
+  - `sampleCardContent`: Content to show on the sample model card
+  - `projectCardContent`: Content to show on the project model card
+  - `publicationCardContent`: Content to show on the publication model card
+  - `researcherCardContent`: Content to show on the researcher model card
+  - `sessionCardContent` : Content to show on the session model card
+  - `datafileCardContent`: Content to show on the datafile model card
 
 > NOTE:
 > Some frontend editing may not be fully functional yet in their persisting to the database.

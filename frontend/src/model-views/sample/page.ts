@@ -1,10 +1,5 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 import { useContext, useEffect } from "react";
+import { Frame } from "~/frame";
 import { useAuth } from "~/auth";
 import hyper from "@macrostrat/hyper";
 import {
@@ -195,7 +190,7 @@ export function Sessions(props) {
     return h("div.parameter", [h("h4.subtitle", "Sessions")]);
   }
   return h("div.parameter", [
-    h("h4.subtitle", "Sessions"),
+    h.if(session.length > 0 || isEditing)("h4.subtitle", "Sessions"),
     h("div.session-container", [
       session.map((obj) => {
         const {
@@ -460,6 +455,11 @@ function SamplePage(props) {
             h(Material),
             h(DepthElevation),
             h("div.basic-info", [h(SampleProjectAdd), h(SampleSessionAdd)]),
+            h(
+              Frame,
+              { id: "samplePage", data: sample.data },
+              "This is where a customized component could go"
+            ),
           ]),
           h("div", [h(LocationBlock)]),
         ]),

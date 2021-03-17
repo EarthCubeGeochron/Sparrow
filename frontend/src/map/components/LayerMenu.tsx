@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useContext } from "react";
 import {
   Menu,
   MenuItem,
@@ -8,12 +8,12 @@ import {
   Tooltip,
   Button,
   Position,
-  InputGroup,
 } from "@blueprintjs/core";
 import "../cluster.css";
 import h from "@macrostrat/hyper";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { mapStyle } from "../MapStyle";
+import { Frame, FrameContext } from "~/frame";
 
 export const LayerMenu = ({
   hide,
@@ -25,21 +25,28 @@ export const LayerMenu = ({
 }) => {
   const { isEnabled } = useDarkMode();
 
+  const { getElement } = useContext(FrameContext);
+  console.log(getElement("mapStyles"));
+
+  const externalMapStyles = getElement("mapStyles")
+    ? getElement("mapStyles")
+    : [];
+
   const StandMapMode = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/outdoors-v9";
 
   const mapStyles = [
     { name: "Standard Map", style: StandMapMode },
+<<<<<<< HEAD
     {
       name: "Topographic Map",
       style: "mapbox://styles/thefallingduck/cklb8itjb23wr17pd5ukdlne5",
     },
+=======
+>>>>>>> 33c1e4899dbe4e7102206c0a59061d13813a24ce
     { name: "Geologic Map", style: mapStyle },
-    {
-      name: "Satelite Map",
-      style: "mapbox://styles/jczaplewski/cjeycrpxy1yv22rqju6tdl9xb",
-    },
+    ...externalMapStyles,
   ];
   const dropMenu = (
     <Menu>
@@ -67,6 +74,7 @@ export const LayerMenu = ({
       />
     </Menu>
   );
+
   return (
     <div>
       {hide ? null : (

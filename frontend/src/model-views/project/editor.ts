@@ -22,19 +22,12 @@ import { MinimalNavbar, MySwitch } from "~/components";
 import { put } from "axios";
 import "../main.styl";
 import styles from "~/admin/module.styl";
-import {
-  ResearcherAdd,
-  EditProjNewResearcher,
-  PubAdd,
-  EditProjNewPub,
-  SampleAdd,
-  SessionAdd,
-  EditProjNewSample,
-} from "../new-model";
+import { ResearcherAdd, PubAdd, SampleAdd, SessionAdd } from "../new-model";
 import { DatePicker } from "@blueprintjs/datetime";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
 import { ProjectAdminContext } from "~/admin/project";
+import { Frame } from "~/frame";
 
 const h = hyperStyled(styles);
 
@@ -530,6 +523,11 @@ const EditableProjectDetails = function(props) {
               h(EditResearchers),
               h(EditSessions),
               h(SampleMapComponent),
+              h(
+                Frame,
+                { id: "projectPage", data: project.data },
+                "Open the pod bay doors, please, hal"
+              ),
             ]),
           ]),
         ]
