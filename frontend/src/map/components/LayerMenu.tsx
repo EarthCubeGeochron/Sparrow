@@ -38,13 +38,10 @@ export const LayerMenu = ({
 
   const mapStyles = [
     { name: "Standard Map", style: StandMapMode },
-<<<<<<< HEAD
     {
       name: "Topographic Map",
       style: "mapbox://styles/thefallingduck/cklb8itjb23wr17pd5ukdlne5",
     },
-=======
->>>>>>> 33c1e4899dbe4e7102206c0a59061d13813a24ce
     { name: "Geologic Map", style: mapStyle },
     ...externalMapStyles,
   ];
