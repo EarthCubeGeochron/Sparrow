@@ -24,6 +24,7 @@
     "@urbica/react-map-gl-draw": "^0.3.5",
     "@vx/axis": "0.0.183",
     "@vx/gradient": "0.0.183",
+    "@vx/marker": "0.0.199",
     "@vx/scale": "0.0.182",
     "@vx/shape": "0.0.183",
     "axios": "^0.18.0",

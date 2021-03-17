@@ -3,6 +3,7 @@ from datetime import datetime
 from pytest import mark
 from .fixtures import basic_data, basic_d18O_data
 from .helpers import json_fixture
+import sys
 
 
 class TestAPIImporter:
@@ -46,6 +47,42 @@ class TestAPIImporter:
         complex_data["data"]["analysis"] = complex_data["data"]["analysis"][3:4]
 
         db.load_data("session", complex_data["data"])
+
+    def test_verylarge_import(self, client):
+
+        import_size = 10
+        size = sys.getsizeof(analysis)
+
+        i = 0
+        analysis = []
+
+        #while size < import_size:
+        for i in range(10):
+            item = {
+                            "analysis_type": "Stable isotope analysis",
+                            "session_index": i,
+                            "datum": [
+                                {
+                                    "value": 0.2,
+                                    "error": 0.035,
+                                    "type": {"parameter": "delta 13C", "unit": "permille"},
+                                }
+                            ],
+                        }
+            i = i + 1
+            analysis.append(item)
+            size = sys.getsizeof(analysis)
+
+        data = {
+                    "date": "2020-01-01T00:00:00",
+                    "name": "Session with existing instances",
+                    "sample": {"name": "LargeImport"},
+                    "analysis": analysis
+        }
+
+        res = client.put("/api/v1/import-data/session", json=data)
+        assert 1 == 0
+        assert res.status_code == 201
 
     def test_missing_field(self, client, db):
         """Missing fields should produce a useful error message

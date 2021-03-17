@@ -33,7 +33,7 @@ export const LayerMenu = ({
     { name: "Standard Map", style: StandMapMode },
     {
       name: "Topographic Map",
-      style: "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub",
+      style: "mapbox://styles/thefallingduck/cklb8itjb23wr17pd5ukdlne5",
     },
     { name: "Geologic Map", style: mapStyle },
     {
