@@ -33,7 +33,7 @@ const yMax = height - margin.top - margin.bottom;
 
 const xScale = scaleLinear({
   range: [0, xMax],
-  domain: [-3500, 3500],
+  domain: [0, 200],
 });
 
 const yScale = scaleLinear({
@@ -48,9 +48,10 @@ const getY = (d) => d.stage_Y;
 function IPtimeChartInner(props) {
   const { session_id } = props;
   const data = useAPIResult("/analysis", { session_id }, null);
+  console.log(data);
   if (data == null) return h(Spinner);
   const analysis_data = data.map((d) => {
-    const stage_X = d.data.find((d) => d.parameter == "X");
+    const stage_X = d.data.find((d) => d.parameter == "INDEX");
     const stage_Y = d.data.find((d) => d.parameter == "IPnA");
     return { stage_X: stage_X?.value, stage_Y: stage_Y?.value };
   });
@@ -64,13 +65,14 @@ function IPtimeChartInner(props) {
     <div>
       <svg width={width} height={height}>
         <Group top={margin.top} left={margin.left}>
-          <MarkerCircle id="marker-circle" fill="#333" size={5} refX={2} />
+          <MarkerCircle id="marker-circle-2" fill="#333" size={5} refX={2} />
           // This portion makes the x-y points show up on the plot.
           <LinePath
             data={culled_data}
             x={(d) => xScale(getX(d))}
             y={(d) => yScale(getY(d))}
-            markerMid="url(#marker-circle)"
+            markerMid="url(#marker-circle-2)"
+            markerEnd="url(#marker-circle-2)"
           />
           <AxisLeft
             scale={yScale}
@@ -83,7 +85,7 @@ function IPtimeChartInner(props) {
           <AxisBottom
             scale={xScale}
             top={yMax}
-            label={"Stage Coordinate X (\u03BCm)"}
+            label={"Analysis Order"}
             stroke={"#1b1a1e"}
             tickTextFill={"#1b1a1e"}
           />

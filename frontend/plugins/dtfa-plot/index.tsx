@@ -64,13 +64,15 @@ function DtfaMountChartInner(props) {
     <div>
       <svg width={width} height={height}>
         <Group top={margin.top} left={margin.left}>
-          <MarkerCircle id="marker-circle" fill="#333" size={2} />
+          <MarkerCircle id="marker-circle-3" fill="#333" size={2} />
           // This portion makes the x-y points show up on the plot.
           <LinePath
             data={culled_data}
             x={(d) => xScale(getX(d))}
             y={(d) => yScale(getY(d))}
-            markerMid="url(#marker-circle)"
+            markerMid="url(#marker-circle-3)"
+            markerEnd="url(#marker-circle-3)"
+            markerStart="url(#marker-circle-3)"
           />
           <AxisLeft
             scale={yScale}
