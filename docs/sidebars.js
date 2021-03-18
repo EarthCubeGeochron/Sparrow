@@ -7,6 +7,7 @@ module.exports = {
       "datascience",
       "schema-imp",
       "embargo",
+      "CHANGELOG",
     ],
     Resources: ["presentations", "implementations"],
     Documentation: [

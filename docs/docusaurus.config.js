@@ -32,6 +32,12 @@ module.exports = {
           label: "Guides",
           position: "left",
         },
+        {
+          to: "docs/CHANGELOG",
+          activeBasePath: "Guides",
+          label: "CHANGELOG",
+          position: "left",
+        },
         /*{
           to: "docs/motivation-and-design",
           activeBasePath: "Guides",
