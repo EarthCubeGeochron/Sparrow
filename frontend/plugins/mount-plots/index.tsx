@@ -16,35 +16,6 @@ import { useAPIResult } from "@macrostrat/ui-components";
 import { Card, Spinner } from "@blueprintjs/core";
 import ReactJSON from "react-json-view";
 
-const width = 400;
-const height = 400;
-
-const orange = "#ff9933";
-
-// Bounds
-const margin = {
-  top: 80,
-  bottom: 80,
-  left: 80,
-  right: 80,
-};
-const xMax = width - margin.left - margin.right;
-const yMax = height - margin.top - margin.bottom;
-
-const xScale = scaleLinear({
-  range: [0, xMax],
-  domain: [-12500, 12500],
-});
-
-const yScale = scaleLinear({
-  range: [yMax, 0],
-  domain: [-12500, 12500],
-});
-
-//These need to change to pull from parameters in Sparrow.
-const getX = (d) => d.stage_X;
-const getY = (d) => d.stage_Y;
-
 function MountMapChartInner(props) {
   const { session_id } = props;
   const data = useAPIResult("/analysis", { session_id }, null);
@@ -59,18 +30,48 @@ function MountMapChartInner(props) {
     (d) => d.stage_X != null && d.stage_Y != null
   );
   console.log(culled_data);
+  const width = 400;
+  const height = 400;
+
+  const orange = "#ff9933";
+
+  // Bounds
+  const margin = {
+    top: 80,
+    bottom: 80,
+    left: 80,
+    right: 80,
+  };
+  const xMax = width - margin.left - margin.right;
+  const yMax = height - margin.top - margin.bottom;
+
+  const xScale = scaleLinear({
+    range: [0, xMax],
+    domain: [-12500, 12500],
+  });
+
+  const yScale = scaleLinear({
+    range: [yMax, 0],
+    domain: [-12500, 12500],
+  });
+
+  //These need to change to pull from parameters in Sparrow.
+  const getX = (d) => d.stage_X;
+  const getY = (d) => d.stage_Y;
 
   return (
     <div>
       <svg width={width} height={height}>
         <Group top={margin.top} left={margin.left}>
-          <MarkerCircle id="marker-circle" fill="#333" size={2} />
+          <MarkerCircle id="marker-circle-1" fill="#333" size={2} />
           // This portion makes the x-y points show up on the plot.
           <LinePath
             data={culled_data}
             x={(d) => xScale(getX(d))}
             y={(d) => yScale(getY(d))}
-            markerMid="url(#marker-circle)"
+            markerMid="url(#marker-circle-1)"
+            markerEnd="url(#marker-circle-1)"
+            markerStart="url(#marker-circle-1)"
           />
           <AxisLeft
             scale={yScale}
