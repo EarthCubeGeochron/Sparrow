@@ -20,19 +20,6 @@ import h from "@macrostrat/hyper";
 export const FrameContext = createContext({});
 
 // custom hook to retrieve data from FrameContext
-
-// function FrameProvider({ props }) {
-//   const { overrides, ...rest } = props;
-//   const [state, setState] = useState({ registry: {} });
-//   const getElement = (id) => {
-//     return overrides[id] || null;
-//   };
-//   const register = (registry) => {
-//     setState({ registry: registry });
-//   };
-//   const value = { register: register, getElement };
-//   return h(FrameContext.Provider, { value }, props.children);
-// }
 class FrameProvider extends Component {
   static propTypes = {
     overrides: T.objectOf(T.node),

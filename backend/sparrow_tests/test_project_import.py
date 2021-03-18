@@ -4,6 +4,7 @@ from json import dumps, loads
 from sparrow.encoders import JSONEncoder
 from datetime import datetime
 from pytest import mark
+import logging
 
 
 def omit_key(changeset, key):
@@ -11,18 +12,23 @@ def omit_key(changeset, key):
 
 
 class TestProjectImport:
-    def test_import_dumpfile(self, db):
+    def test_import_dumpfile(self, db, caplog):
         data = json_fixture("project-dump.json")
+        #with caplog.at_level(logging.INFO, logger="sparrow.interface.schema"):
+        #    # So we don't get spammed with output
         db.load_data("project", data["data"])
 
-    def test_retrieve_dumpfile(self, db):
+    def test_retrieve_dumpfile(self, db, caplog):
         data = json_fixture("project-dump.json")["data"]
 
         schema = db.interface.project(many=False, allowed_nests="all")
         res = db.session.query(schema.opts.model).filter_by(name=data["name"]).first()
         assert res is not None
-        out = loads(dumps(schema.dump(res), allow_nan=False, cls=JSONEncoder))
+        with caplog.at_level(logging.INFO, logger="sparrow.interface.schema"):
+            out = loads(dumps(schema.dump(res), allow_nan=False, cls=JSONEncoder))
         assert len(out["session"]) == len(data["session"])
+
+        assert out["session"][0]["uuid"] == data["session"][0]["uuid"]
 
         dd = DeepDiff(data, out)
         non_pk_changes = omit_key(dd["values_changed"], "id")
@@ -33,6 +39,12 @@ class TestProjectImport:
         removed = dd["dictionary_item_removed"]
         assert len(removed) > 0
         assert len(omit_key(removed, "in_plateau")) == 0
+
+    def test_project_api_retreival(self, client):
+        """Checks if models/sample is working"""
+        res = client.get("/api/v2/models/project", params={"per_page": 1})
+        assert res.status_code == 200
+        res.json()
 
     def test_make_private(self, db):
         proj = db.session.query(db.model.project).first()

@@ -10,8 +10,7 @@ def show_interface(app, model, depth=0):
     """
     Show the import interface for a database model.
     """
-    with app.app_context():
-        # `using` is related to this issue:
-        # https://github.com/ipython/ipython/issues/11523
-        m = getattr(app.database.interface, model)
-        m().pretty_print(nested=depth)
+    # `using` is related to this issue:
+    # https://github.com/ipython/ipython/issues/11523
+    m = getattr(app.database.interface, model)
+    m().pretty_print(nested=depth)

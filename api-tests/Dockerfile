@@ -1,4 +1,4 @@
-FROM sparrowdata/backend-base:1.1
+FROM sparrowdata/backend-base:1.2
 
 ## This should probably go in backend-base
 RUN apk add --no-cache bash && pip3 install --upgrade pip

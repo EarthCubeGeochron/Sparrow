@@ -1,21 +1,15 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { useAPIResult } from "./APIResult";
 import useSuperCluster from "use-supercluster";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 import "../cluster.css";
 import {
-  Tooltip,
   Popover,
-  Button,
-  Intent,
-  Icon,
   Card,
 } from "@blueprintjs/core";
 import { Marker, FlyToInterpolator } from "react-map-gl";
 import styles from "./components.module.css";
-import { SampleCard } from "../../admin/sample/detail-card";
 
 // This component controls the State and the UI for the markers and the markercluster
 
@@ -24,25 +18,22 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
   useEffect(() => {
     // Set the data back to the initial data
     if (data == null) return;
-    const markers = data
-      .filter((d) => d.geometry != null)
-      .map((markers) => ({
-        type: "Feature",
-        properties: {
-          cluster: false,
-          id: markers.id,
-          Sample_name: markers.name,
-          project_name: markers.project_name,
-          material: markers.material,
-        },
-        geometry: {
-          type: "Point",
-          coordinates: [
-            markers.geometry.coordinates[0],
-            markers.geometry.coordinates[1],
-          ],
-        },
-      }));
+    const markers = data.map((markers) => ({
+      type: "Feature",
+      properties: {
+        cluster: false,
+        id: markers.id,
+        Sample_name: markers.name,
+        material: markers.material,
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [
+          markers.location.coordinates[0],
+          markers.location.coordinates[1],
+        ],
+      },
+    }));
 
     setMarkers(markers);
   }, [data]);
