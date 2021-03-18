@@ -11,10 +11,31 @@ import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
-import { useAPIResult } from "@macrostrat/ui-components";
+import { useAPIActions } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
 import styles from "./module.styl";
 import { SiteTitle } from "app/components";
+import { useAPIv2Result, APIV2Context } from "~/api-v2";
+
+function changeStateOnParams(params, setData) {
+  const { get } = useAPIActions(APIV2Context);
+
+  async function getData(url, params) {
+    try {
+      const data = await get(url, params, {});
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    const url = "/models/sample";
+    const data = getData(url, params);
+    data.then((res) => {
+      setData(res.data);
+    });
+  }, [JSON.stringify(params)]);
+}
 
 export const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
@@ -51,7 +72,19 @@ export function MapPanel({
   useEffect(() => {
     setState({ ...state, mounted: true });
   }, []);
-  const initialData = useAPIResult("/sample", { all: true });
+
+  const [params, setParams] = useState({ all: "true", has: "location" });
+  const initialData = useAPIv2Result("/models/sample", params);
+
+  const [data, setData] = useState(initialData);
+  console.log(data);
+
+  changeStateOnParams(params, setData);
+
+  const changePararms = (newParams) => {
+    const state = { all: "true", has: "location", ...newParams };
+    setParams(state);
+  };
 
   const initialViewport = {
     latitude,
@@ -169,7 +202,7 @@ export function MapPanel({
                 toggleShowMarkers={toggleShowMarkers}
               ></LayerMenu>
               <FilterMenu
-                //className={styles["filter-menu"]}
+                changeParams={changePararms}
                 hide={hide_filter}
                 on_map={on_map}
               ></FilterMenu>
@@ -204,7 +237,7 @@ export function MapPanel({
           )}
           {state.showMarkers ? (
             <MarkerCluster
-              data={initialData}
+              data={data}
               viewport={viewport}
               changeViewport={changeViewport}
               bounds={bounds}

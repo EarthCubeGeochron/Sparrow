@@ -1,9 +1,13 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
-import h from "@macrostrat/hyper";
-import { useAPIActions } from "@macrostrat/ui-components";
+import { hyperStyled } from "@macrostrat/hyper";
+import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
 import { Spinner } from "@blueprintjs/core";
+import { Expired, NoSearchResults } from "./utils";
+import styles from "./main.styl";
+
+const h = hyperStyled(styles);
 
 /**@description function to implement the infinite scroll component with certain API views
  *
@@ -28,7 +32,15 @@ import { Spinner } from "@blueprintjs/core";
     component: ProjectInfoLink,
   });
  */
-function InfiniteAPIView({ url, unwrapData, params, component, context }) {
+function InfiniteAPIView({
+  url,
+  unwrapData,
+  params,
+  component,
+  componentProps = {},
+  context,
+  filterParams,
+}) {
   const [data, setData] = useState([]);
   const [nextPage, setNextPage] = useState("");
   const { get } = useAPIActions(context);
@@ -36,7 +48,8 @@ function InfiniteAPIView({ url, unwrapData, params, component, context }) {
   async function getNextPageAPI(nextPage, url, params) {
     const constParams =
       nextPage == "" ? { per_page: 15 } : { per_page: 15, page: nextPage };
-    const newParams = { ...params, ...constParams };
+    const moreParams = { ...params, ...filterParams };
+    const newParams = { ...moreParams, ...constParams };
     try {
       const data = await get(url, newParams, {});
       return data;
@@ -46,33 +59,60 @@ function InfiniteAPIView({ url, unwrapData, params, component, context }) {
   }
 
   useEffect(() => {
-    const initData = getNextPageAPI("", url, params);
+    dataFetch(data);
+  }, []);
+
+  const dataFetch = (data, next = "") => {
+    const initData = getNextPageAPI(next, url, params);
     initData.then((res) => {
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
-      setNextPage(res.next_page);
-      setData(newState);
-    });
-  }, []);
-
-  const fetchNewData = () => {
-    if (!nextPage) return;
-    const newData = getNextPageAPI(nextPage, url, params);
-    newData.then((res) => {
-      const dataObj = unwrapData(res);
-      const newState = [...data, ...dataObj];
-      setNextPage(res.next_page);
+      const next_page = res.next_page;
+      setNextPage(next_page);
       setData(newState);
     });
   };
+
+  useEffect(() => {
+    setData([]);
+    dataFetch([]);
+  }, [JSON.stringify(filterParams)]);
+
+  const fetchNewData = () => {
+    if (!nextPage) return;
+    dataFetch(data, nextPage);
+  };
+
+  const child = h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 
   return data.length > 0
     ? h(ForeverScroll, {
         initialData: data,
         fetch: fetchNewData,
         component,
+        componentProps,
       })
-    : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
+    : h(Expired, { child, delay: 3000 });
 }
 
 export { InfiniteAPIView };
+
+/**
+ * This can probably get replaced with something from U.I Components
+ * @param params {} key, value pairs of parameters
+ */
+export function urlSearchFromParams(params) {
+  setQueryString(params);
+  // let string = "";
+  // for (const [key, value] of Object.entries(params)) {
+  //   const queryString = `${key}=${value}&`;
+  //   string += queryString;
+  // }
+  // let searchString = string.slice(0, -1);
+  // console.log(searchString);
+  // const url =
+  //   Object.entries(params).length > 0
+  //     ? window.location.origin + window.location.pathname + "?" + searchString
+  //     : window.location.origin + window.location.pathname;
+  // history.pushState({}, "", url);
+}

@@ -1,0 +1,51 @@
+[
+  {
+    "name": "Test Project Name 1",
+    "description": "A test description for Project Name 1",
+    "sample": [
+      {
+        "name": "test_sample_1",
+        "material": "basalt",
+        "location": { "type": "POINT", "coordinates": [104, 45] }
+      },
+      {
+        "name": "test_sample_2",
+        "material": "ignimbrite",
+        "longitude": 120,
+        "latitude": 80
+      }
+    ],
+    "publication": [
+      { "doi": "10.1034", "title": "Test pub1" },
+      { "doi": "10.10344", "title": "Test pub2" }
+    ],
+    "researcher": [{ "name": "Casey Idzikowski" }, { "name": "Daven Quinn" }]
+  },
+  {
+    "name": "Test Project Name 2",
+    "description": "A test description for Project Name 2",
+    "publication": [
+      { "doi": "10.1034", "title": "Test pub1" },
+      { "doi": "10.10344", "title": "Test pub2" }
+    ],
+    "researcher": [
+      { "name": "Ben Linzmeier" },
+      { "name": "Shan Ye" },
+      { "name": "Ben Bruck" }
+    ],
+    "sample": [
+      {
+        "name": "sample_1",
+        "material": "olivine",
+        "longitude": 0,
+        "latitude": 0
+      },
+      {
+        "name": "test_sample_1",
+        "material": "basalt",
+        "longitude": 104,
+        "latitude": 45
+      }
+    ]
+  }
+]

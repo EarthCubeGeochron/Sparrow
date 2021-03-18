@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { join } from "path";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import loadable from "@loadable/component";
-
+import { MapToaster } from "./map/map-area";
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
@@ -19,12 +19,12 @@ import Catalog from "./catalog";
 
 //import { MapSelector } from "./data-sheet/sheet-enter-components";
 
-const APIExplorerV2 = loadable(async function () {
+const APIExplorerV2 = loadable(async function() {
   const module = await import("./api-v2");
   return module.APIExplorerV2;
 });
 
-const MapPage = loadable(async function () {
+const MapPage = loadable(async function() {
   const module = await import("./map");
   return module.MapPage;
 });
@@ -70,7 +70,7 @@ function AppRouter(props) {
   );
 }
 
-const errorHandler = function (route, response) {
+const errorHandler = function(route, response) {
   let msg;
   const { error } = response;
   if (error != null) {
@@ -84,7 +84,12 @@ function App() {
   // Nest application in React context providers
   const baseURL = "/";
   const apiBaseURL = join(process.env.BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
-
+  useEffect(() => {
+    const onMap = window.location.pathname == "/map";
+    if (!onMap) {
+      MapToaster.clear();
+    }
+  }, [window.location.pathname]);
   return h(
     compose(
       C(FrameProvider, { overrides: siteContent }),

@@ -18,3 +18,4 @@ class APIv2Plugin(SparrowCorePlugin):
             Route("/api/v2", endpoint=redirect),
             Mount("/api/v2/", app=api_v2),
         ]
+        

@@ -203,7 +203,14 @@ class TestDeclarativeImporter:
 
         db.load_data("datum_type", data)
         # We should be able to import this idempotently
-        db.load_data("datum_type", data)
+        res = db.load_data("datum_type", data)
+        assert res._error_unit is None
+
+    def test_unit_creation(self, db):
+        unit = "Yankovics / sq. meter"
+        res = db.load_data("datum_type", {"parameter": "Weird density", "unit": unit})
+        assert res.unit == unit
+        assert res.error_unit is None
 
     def test_basic_import(self, db):
         db.load_data("session", basic_data)
@@ -271,6 +278,13 @@ class TestDeclarativeImporter:
 
         db.load_data("session", data)
 
+    def test_datum_type_accuracy(self, db):
+        DatumType = db.model.datum_type
+        res = db.session.query(DatumType).filter_by(parameter="soil water content", unit="weight %").all()
+        assert len(res) == 1
+        dt = res[0]
+        assert dt.error_unit is None
+
     def test_session_merging(self, db):
         data = {
             "date": str(datetime.now()),
@@ -299,6 +313,14 @@ class TestDeclarativeImporter:
         db.load_data("session", data)
         ensure_single(db, "session", name="Session merging test")
         ensure_single(db, "datum", value=0.252)
+
+    def test_datum_type_no_error_unit(self, db):
+        """We haven't specified an error unit, so one should not be in the database"""
+        DatumType = db.model.datum_type
+        res = db.session.query(DatumType).filter_by(parameter="soil water content", unit="weight %").all()
+        assert len(res) == 1
+        dt = res[0]
+        assert dt.error_unit is None
 
     def test_datum_type_merging(self, db):
         """Datum types should successfully find values already in the database."""
@@ -404,6 +426,7 @@ class TestDeclarativeImporter:
         db.load_data("session", data)
 
     def test_expand_id(self, caplog, db):
+        # Intermittently fails
         # caplog.set_level(logging.INFO, "sqlalchemy.engine")
 
         data = {"parameter": "test param", "unit": "test unit"}
@@ -455,3 +478,8 @@ class TestImportDataTypes(object):
         # Test import of simple cosmogenic nuclides data types
         data = json_fixture("simple-cosmo-test.json")
         db.load_data("session", data)
+
+class TestIsolation:
+    def test_isolation(self, db):
+        sessions = db.session.query(db.model.session).all()
+        assert len(sessions) == 0

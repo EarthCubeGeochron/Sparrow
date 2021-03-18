@@ -50,7 +50,6 @@ const DetailPageHeader = (props) => {
  */
 export const SessionCardInfo = (props) => {
   const { session_id, target, date, technique } = props;
-  console.log(date);
   return h(
     "div",
     {
@@ -195,7 +194,7 @@ const DataFileComponent = function (props) {
   const dataFileURL = `/models/data_file/${file_hash}`;
 
   const initdata = useAPIv2Result(dataFileURL, {
-    nest: "data_file_link,session,sample,project",
+    nest: "data_file_link,session,sample",
   });
   if (file_hash == null || initdata == null) {
     return null;

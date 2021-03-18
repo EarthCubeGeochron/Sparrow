@@ -38,8 +38,9 @@ class ViewAPIEndpoint(HTTPEndpoint):
         args = await parser.parse(self.args_schema, request, location="querystring")
         log.info(args)
 
-        if not len(request.query_params.keys()):
-            return JSONResponse({})
+        ## This is why the response was blank
+        # if not len(request.query_params.keys()):
+        #     return JSONResponse({"Hello": "World"})
 
         q = db.session.query(self.meta.table)
         if args["all"]:
@@ -52,3 +53,4 @@ class ViewAPIEndpoint(HTTPEndpoint):
             raise ValidationError("Invalid page token.")
 
         return APIResponse(res, total_count=q.count(), to_dict=True)
+
