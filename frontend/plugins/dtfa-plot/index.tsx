@@ -31,34 +31,60 @@ const margin = {
 const xMax = width - margin.left - margin.right;
 const yMax = height - margin.top - margin.bottom;
 
-const xScale = scaleLinear({
-  range: [0, xMax],
-  domain: [-50, 50],
-});
-
-const yScale = scaleLinear({
-  range: [yMax, 0],
-  domain: [-50, 50],
-});
+function findDomain(xyData) {
+  console.log(xyData)
+  return {
+    xDomain: extent(xyData, (d) => d.x),
+    yDomain: extent(xyData, (d) => d.y)
+  }
+}
 
 //These need to change to pull from parameters in Sparrow.
-const getX = (d) => d.stage_X;
-const getY = (d) => d.stage_Y;
+const getX = (d) => d.x;
+const getY = (d) => d.y;
+
+// define a function for repetitive operations
+function getDatum(analysis, parameter) {
+  // Gets a datum for an analysis if it exists
+  return analysis.data.find((d) => d.parameter == parameter) 
+}
 
 function DtfaMountChartInner(props) {
   const { session_id } = props;
   const data = useAPIResult("/analysis", { session_id }, null);
   if (data == null) return h(Spinner);
-  const analysis_data = data.map((d) => {
-    const stage_X = d.data.find((d) => d.parameter == "DTFAX");
-    const stage_Y = d.data.find((d) => d.parameter == "DTFAY");
-    return { stage_X: stage_X?.value, stage_Y: stage_Y?.value };
+
+  
+  const analysisData = data.map((d) => {
+    const stage_X = getDatum(d,"DTFAX");
+    const stage_Y = getDatum(d, "DTFAY");
+    // change to x and y
+    return { x: stage_X?.value, y: stage_Y?.value };
   });
+
   //Culled nulls to see if it fixes the plot...
-  const culled_data = analysis_data.filter(
-    (d) => d.stage_X != null && d.stage_Y != null
+  const culledData = analysisData.filter(
+    (d) => d.x != null && d.y != null
   );
-  console.log(culled_data);
+  // minor point but "camelCase" is standard for variables in JS.
+  // "snake_case" for python. I didn't make the rules I just follow them :)
+  console.log(culledData);
+  console.log("HEELO")
+
+  // now we have domains!
+  const { xDomain, yDomain } = findDomain(culledData)
+  console.log(xDomain, yDomain)
+
+  // Move scale creation inside render function, so we can set domains
+  const xScale = scaleLinear({
+    range: [0, xMax],
+    domain: xDomain,
+  });
+
+  const yScale = scaleLinear({
+    range: [yMax, 0],
+    domain: yDomain,
+  });
 
   return (
     <div>
@@ -67,10 +93,11 @@ function DtfaMountChartInner(props) {
           <MarkerCircle id="marker-circle" fill="#333" size={2} />
           // This portion makes the x-y points show up on the plot.
           <LinePath
-            data={culled_data}
+            data={culledData}
             x={(d) => xScale(getX(d))}
             y={(d) => yScale(getY(d))}
             markerMid="url(#marker-circle)"
+            stroke="black" // This was needed. unfortunately.
           />
           <AxisLeft
             scale={yScale}
