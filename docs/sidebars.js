@@ -25,10 +25,7 @@ module.exports = {
       {
         type: "category",
         label: "Frontend",
-        items: [
-          //"frontend/frames",
-          "frontend/data-input-form",
-        ],
+        items: ["frontend/frames", "frontend/data-input-form"],
       },
       "sparrow-on-windows",
       "local-development",
