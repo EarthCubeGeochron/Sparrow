@@ -5,7 +5,7 @@ with [**WiscAr**](https://wiscar-sparrow.geoscience.wisc.edu) at University of
 Wisconsin. It serves as a demo of the basic structure of the application and in-development
 metadata management tools.
 
-The code for this test implementation is housed in [the Sparrow GitHub repository](https://github.com/EarthCubeGeochron/Sparrow/tree/master/test-lab), and
+The code for this test implementation is housed in [the Sparrow GitHub repository](https://github.com/EarthCubeGeochron/Sparrow/tree/HEAD/test-lab), and
 a local version of the configuration can be created using the `sparrow create-test-lab`
 command.
 
