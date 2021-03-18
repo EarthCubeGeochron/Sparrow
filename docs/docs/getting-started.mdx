@@ -31,26 +31,28 @@ make sure your user can run `docker` without root permissions (typically
 `sudo usermod -aG docker ${USER}`).
 Installation is also possible on Windows 10 using Windows Subsystem for Linux.
 
-# Two options
+# Downloading Sparrow
 
-:::info New!
-Sparrow is now available via a [bundled download](/docs/getting-started#option-1-bundled-version).
+:::tip New!
+Sparrow is now available via a [bundled download](/docs/getting-started#bundled-version).
 :::
 
-Currently there are two options for downloading Sparrow. Either
+Currently there are two ways to downloading Sparrow. Either
 download a bundled version or clone the codebase directly from Github. The former, bundled version,
-is an easier download and startup process although it doesn't allow access the core repository. However,
-there is still the ability to customize a Sparrow instance through frontend and backend plugins.
+is the main way Sparrow should be downloaded. The bundled version has an easier download and startup process and removes
+the need for the user to manage a core codebase. There is, however, still the ability to customize a Sparrow instance through
+frontend and backend plugins.
 
-The second option is to clone the Sparrow repository from Github. This process is slightly more involved, however it gives
-access to the core codebase. **NOTE:** modifying the main codebase might make it difficult or
-impossible to recieve software updates.
+The second way to download Sparrow is to clone the [Sparrow](https://github.com/EarthCubeGeochron/Sparrow) repository from Github.
+This process is more involved, however it gives access to the core codebase.
+**NOTE:** modifying the main codebase should only be done if the user intends to
+contribute to Sparrow.
 
-## Option 1: Bundled Version
+## Bundled Version
 
 ### Shell command
 
-Downloading the bundled version of Sparrow occurs through a command line `curl` command. `curl` commands are used
+Downloading the bundled version of Sparrow occurs through a `curl` command. `curl` commands are used
 to transfer data from servers.
 
 ```
@@ -72,9 +74,25 @@ You can immediately view the instance of sparrow by running.
 SPARROW_SECRET_KEY=TemporaryKey sparrow up
 ```
 
-Or you can continute onto to [creating a new user](/docs/getting-started#creating-a-user) and [creating a sparrow configuration](/docs/getting-started#running-a-configured-application).
+Or you can continute onto to [creating a new user](/docs/getting-started#creating-a-user) and
+[creating a sparrow configuration](/docs/getting-started#running-a-configured-application).
 
-## Option 2: Cloning Sparrow Codebase
+The quickest way to set up an instance of Sparrow is by running:
+
+```
+sparrow create-test-lab <directory name>
+```
+
+This will create an out of the box Sparrow instance that will come pre-configured with a Sparrow configuration file as well
+as directories used for frontend and backend plugins. There is also some test data that is pre-loaded in the backend plugin.
+
+## Cloning Sparrow Codebase
+
+:::caution
+Cloning Sparrow's codebase should only be done by those who wish to contribute to the core codebase.
+If you want to set up a lab instance of Sparrow without modifying the core codebase please refer to
+the [bundled version](/docs/getting-started#bundled-version).
+:::
 
 ### Getting the code
 

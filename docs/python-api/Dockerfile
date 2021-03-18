@@ -1,4 +1,4 @@
-FROM sparrowdata/backend
+FROM sparrowdata/backend:1.6
 
 WORKDIR /docs
 
