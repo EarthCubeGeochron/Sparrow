@@ -7,6 +7,7 @@ from ..ext.pychron import PyChronImportPlugin
 from ..datasheet import DatasheetPlugin
 from ..project_edits import ProjectEdits
 from ..ext.data_validation import DataValidationPlugin
+from ..metrics_endpoint import MetricsEndpoint
 from ..web import WebPlugin
 from ..logs import get_logger
 
@@ -27,6 +28,7 @@ def prepare_plugin_manager(app):
         DatasheetPlugin,
         ProjectEdits,
         DataValidationPlugin,
+        MetricsEndpoint,
     )
     # GraphQL is disabled for now
     # self.plugins.add(GraphQLPlugin)
