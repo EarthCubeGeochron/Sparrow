@@ -51,13 +51,12 @@ class TestAPIImporter:
     def test_verylarge_import(self, client):
 
         import_size = 10
-        size = sys.getsizeof(analysis)
 
         i = 0
         analysis = []
 
         #while size < import_size:
-        for i in range(10):
+        for i in range(import_size):
             item = {
                             "analysis_type": "Stable isotope analysis",
                             "session_index": i,
@@ -81,6 +80,47 @@ class TestAPIImporter:
         }
 
         res = client.put("/api/v1/import-data/session", json=data)
+        assert 1 == 0
+        assert res.status_code == 201
+
+    def test_duplicate_datum_import(self, client, db):
+
+        new_name = "Test error vvv"
+        data = {
+            "date": str(datetime.now()),
+            "name": "Session with existing instances",
+            "sample": {"name": new_name},
+            "analysis": [
+                {
+                    "analysis_type": "Stable isotope analysis",
+                    "session_index": 0,
+                    "datum": [
+                        {
+                            "value": 0.1,
+                            "error": 0.025,
+                            "type": {
+                                "parameter": "delta 13C",
+                                "unit": "permille"
+                            },
+                        }
+                    ],
+                },
+                {
+                    "analysis_type": "Stable isotope analysis",
+                    "session_index": 1,
+                    "datum": [
+                        {
+                            "value": 0.1,
+                            "error": 0.025,
+                            "type": {"parameter": "delta 13C", "unit": "permille"},
+                        }
+                    ],
+                },
+            ],
+        }
+        #Two datum with unique analysis numbers should be created, but are not.
+        db.load_data("session", data)
+
         assert 1 == 0
         assert res.status_code == 201
 

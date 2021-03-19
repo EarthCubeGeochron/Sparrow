@@ -59,7 +59,7 @@ function IPtimeChartInner(props) {
   const culled_data = analysis_data.filter(
     (d) => d.stage_X != null && d.stage_Y != null
   );
-  console.log(culled_data);
+  // console.log(culled_data);
 
   return (
     <div>

@@ -32,11 +32,11 @@ const xMax = width - margin.left - margin.right;
 const yMax = height - margin.top - margin.bottom;
 
 function findDomain(xyData) {
-  console.log(xyData)
+  // console.log(xyData);
   return {
     xDomain: extent(xyData, (d) => d.x),
-    yDomain: extent(xyData, (d) => d.y)
-  }
+    yDomain: extent(xyData, (d) => d.y),
+  };
 }
 
 //These need to change to pull from parameters in Sparrow.
@@ -46,7 +46,7 @@ const getY = (d) => d.y;
 // define a function for repetitive operations
 function getDatum(analysis, parameter) {
   // Gets a datum for an analysis if it exists
-  return analysis.data.find((d) => d.parameter == parameter) 
+  return analysis.data.find((d) => d.parameter == parameter);
 }
 
 function DtfaMountChartInner(props) {
@@ -54,26 +54,23 @@ function DtfaMountChartInner(props) {
   const data = useAPIResult("/analysis", { session_id }, null);
   if (data == null) return h(Spinner);
 
-  
   const analysisData = data.map((d) => {
-    const stage_X = getDatum(d,"DTFAX");
+    const stage_X = getDatum(d, "DTFAX");
     const stage_Y = getDatum(d, "DTFAY");
     // change to x and y
     return { x: stage_X?.value, y: stage_Y?.value };
   });
 
   //Culled nulls to see if it fixes the plot...
-  const culledData = analysisData.filter(
-    (d) => d.x != null && d.y != null
-  );
+  const culledData = analysisData.filter((d) => d.x != null && d.y != null);
   // minor point but "camelCase" is standard for variables in JS.
   // "snake_case" for python. I didn't make the rules I just follow them :)
-  console.log(culledData);
-  console.log("HEELO")
+  // console.log(culledData);
+  // console.log("HEELO");
 
   // now we have domains!
-  const { xDomain, yDomain } = findDomain(culledData)
-  console.log(xDomain, yDomain)
+  const { xDomain, yDomain } = findDomain(culledData);
+  // console.log(xDomain, yDomain);
 
   // Move scale creation inside render function, so we can set domains
   const xScale = scaleLinear({
@@ -96,8 +93,8 @@ function DtfaMountChartInner(props) {
             data={culledData}
             x={(d) => xScale(getX(d))}
             y={(d) => yScale(getY(d))}
-            markerMid="url(#marker-circle)"
-            stroke="black" // This was needed. unfortunately.
+            markerMid="url(#marker-circle-3)"
+            // stroke="black" // This was needed. unfortunately.
             markerEnd="url(#marker-circle-3)"
             markerStart="url(#marker-circle-3)"
           />

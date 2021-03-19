@@ -1,106 +1,103 @@
-import h from "react-hyperscript";
-import React from "react";
-import styled from "@emotion/styled";
-// import { appleStock } from '@vx/mock-data';
-import { Group } from "@vx/group";
-import { scaleTime, scaleLinear } from "@vx/scale";
-import { AreaClosed } from "@vx/shape";
-import { LinePath } from "@vx/shape";
-import { AxisLeft, AxisBottom } from "@vx/axis";
-import { LinearGradient } from "@vx/gradient";
-import { extent, max } from "d3-array";
-import { curveMonotoneX } from "@vx/curve";
-import { Point } from "@vx/point";
-import { MarkerCircle } from "@vx/marker";
-import { useAPIResult } from "@macrostrat/ui-components";
-import { Card, Spinner } from "@blueprintjs/core";
-import ReactJSON from "react-json-view";
-
-function MountMapChartInner(props) {
-  const { session_id } = props;
-  const data = useAPIResult("/analysis", { session_id }, null);
-  if (data == null) return h(Spinner);
-  const analysis_data = data.map((d) => {
-    const stage_X = d.data.find((d) => d.parameter == "X");
-    const stage_Y = d.data.find((d) => d.parameter == "Y");
-    return { stage_X: stage_X?.value, stage_Y: stage_Y?.value };
-  });
-  //Culled nulls to see if it fixes the plot...
-  const culled_data = analysis_data.filter(
-    (d) => d.stage_X != null && d.stage_Y != null
-  );
-  console.log(data);
-  console.log(analysis_data);
-  console.log(culled_data);
-  const width = 400;
-  const height = 400;
-
-  const orange = "#ff9933";
-
-  // Bounds
-  const margin = {
-    top: 80,
-    bottom: 80,
-    left: 80,
-    right: 80,
-  };
-  const xMax = width - margin.left - margin.right;
-  const yMax = height - margin.top - margin.bottom;
-
-  const xScale = scaleLinear({
-    range: [0, xMax],
-    domain: [-12500, 12500],
-  });
-
-  const yScale = scaleLinear({
-    range: [yMax, 0],
-    domain: [-12500, 12500],
-  });
-
-  //These need to change to pull from parameters in Sparrow.
-  const getX = (d) => d.stage_X;
-  const getY = (d) => d.stage_Y;
-
-  return (
-    <div>
-      <svg width={width} height={height}>
-        <Group top={margin.top} left={margin.left}>
-          <MarkerCircle id="marker-circle-1" fill="#333" size={2} />
-          // This portion makes the x-y points show up on the plot.
-          <LinePath
-            data={culled_data}
-            x={(d) => xScale(getX(d))}
-            y={(d) => yScale(getY(d))}
-            markerMid="url(#marker-circle-1)"
-            markerEnd="url(#marker-circle-1)"
-            markerStart="url(#marker-circle-1)"
-          />
-          <AxisLeft
-            scale={yScale}
-            top={0}
-            left={0}
-            label={"Stage Coordinate Y (\u03BCm)"}
-            stroke={"#1b1a1e"}
-            tickTextFill={"#1b1a1e"}
-          />
-          <AxisBottom
-            scale={xScale}
-            top={yMax}
-            label={"Stage Coordinate X (\u03BCm)"}
-            stroke={"#1b1a1e"}
-            tickTextFill={"#1b1a1e"}
-          />
-        </Group>
-      </svg>
-    </div>
-  );
-}
-
-function MountMapChart(props) {
-  return h(Card, {}, h(MountMapChartInner, props));
-}
-
-export { MountMapChart };
+// import h from "react-hyperscript";
+// import React from "react";
+// import styled from "@emotion/styled";
+// // import { appleStock } from '@vx/mock-data';
+// import { Group } from "@vx/group";
+// import { scaleTime, scaleLinear } from "@vx/scale";
+// import { AreaClosed } from "@vx/shape";
+// import { LinePath } from "@vx/shape";
+// import { AxisLeft, AxisBottom } from "@vx/axis";
+// import { LinearGradient } from "@vx/gradient";
+// import { extent, max } from "d3-array";
+// import { curveMonotoneX } from "@vx/curve";
+// import { Point } from "@vx/point";
+// import { MarkerCircle } from "@vx/marker";
+// import { useAPIResult } from "@macrostrat/ui-components";
+// import { Card, Spinner } from "@blueprintjs/core";
+// import ReactJSON from "react-json-view";
+//
+// const width = 400;
+// const height = 400;
+//
+// const orange = "#ff9933";
+//
+// // Bounds
+// const margin = {
+//   top: 80,
+//   bottom: 80,
+//   left: 80,
+//   right: 80,
+// };
+// const xMax = width - margin.left - margin.right;
+// const yMax = height - margin.top - margin.bottom;
+//
+// const xScale = scaleLinear({
+//   range: [0, xMax],
+//   domain: [-50, 50],
+// });
+//
+// const yScale = scaleLinear({
+//   range: [yMax, 0],
+//   domain: [-50, 50],
+// });
+//
+// //These need to change to pull from parameters in Sparrow.
+// const getX = (d) => d.dtfa_X;
+// const getY = (d) => d.dtfa_Y;
+//
+// function DtfaMountChartInner(props) {
+//   const { session_id } = props;
+//   const data = useAPIResult("/analysis", { session_id }, null);
+//   if (data == null) return h(Spinner);
+//   const analysis_data = data.map((d) => {
+//     const dtfa_X = d.data.find((d) => d.parameter == "DTFAX");
+//     const dtfa_Y = d.data.find((d) => d.parameter == "DTFAY");
+//     return { dtfa_X: dtfa_X?.value, dtfa_Y: dtfa_Y?.value };
+//   });
+//   //Culled nulls to see if it fixes the plot...
+//   const culled_data = analysis_data.filter(
+//     (d) => d.dtfa_X != null && d.dtfa_Y != null
+//   );
+//   console.log(culled_data);
+//
+//   return (
+//     <div>
+//       <svg width={width} height={height}>
+//         <Group top={margin.top} left={margin.left}>
+//           <MarkerCircle id="marker-circle" fill="#333" size={10} />
+//           // This portion makes the x-y points show up on the plot.
+//           <LinePath
+//             data={culled_data}
+//             x={(d) => xScale(getX(d))}
+//             y={(d) => yScale(getY(d))}
+//             markerMid="url(#marker-circle)"
+//           />
+//           <AxisLeft
+//             scale={yScale}
+//             top={0}
+//             left={0}
+//             label={"DTFA Y"}
+//             stroke={"#1b1a1e"}
+//             tickTextFill={"#1b1a1e"}
+//           />
+//           <AxisBottom
+//             scale={xScale}
+//             top={yMax}
+//             label={"DTFA X"}
+//             stroke={"#1b1a1e"}
+//             tickTextFill={"#1b1a1e"}
+//           />
+//         </Group>
+//       </svg>
+//     </div>
+//   );
+// }
+//
+// function DtfaMountChart(props) {
+//   return h(Card, {}, h(DtfaMountChartInner, props));
+// }
+//
+// export { DtfaMountChart };
 
 // import h from "react-hyperscript";
 // import styled from "@emotion/styled";
