@@ -1,5 +1,9 @@
 @require '~app/shared/mixins'
 @require '~app/shared/colors'
+@require "~app/admin/module"
+
+.data-model-links :global(.link-card)
+  margin-bottom 1em
 
 .minimal-navbar
   display: flex
@@ -47,29 +51,6 @@
       border-radius 3px
       margin-right 0.5em
 
-.model-edit-text
-  c1 = alpha($gray1, 0.1)
-  c2 = alpha($bp3-intent-success,0.1)
-  box-shadow: 0 0 0 3px c1;
-  background-color: c1
-  border-radius: 2px
-  &:global(.bp3-intent-success)
-    background-color: c2;
-    box-shadow: 0 0 0 3px c2;
-
-.project-editor-navbar
-  align-items normal
-  display flex
-  flex-direction: row
-  justify-content space-between
-  &>*
-    margin-right 2em
-    &:last-child
-      margin-right 0
-  h4
-    padding-top 0.5em
-    flex-grow 1
-
 .flex-row
   display flex
   flex-direction row
@@ -102,8 +83,6 @@
     &.hidden
       margin 0 0 0 -29.5em
       transition .6s margin ease
-
-
 
   .right-panel
     flex 1

@@ -1,9 +1,4 @@
-import { useState } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import {
-  ProjectInfoLink, //@ts-ignore
-} from "~/model-views/project";
-import { SampleListCard } from "../model-views/sample/list";
 import {
   ProjectModelCard,
   SampleModelCard,
@@ -11,13 +6,11 @@ import {
   DataFileModelCard,
   PublicationModelCard,
   ResearcherModelCard,
-} from "../model-views/list-cards/utils";
-import { DataFilesCard } from "../model-views/data-files";
-import { SessionLinkCard } from "../model-views/data-files/page";
-import { FilterBox } from "../components/filter-list";
-import { InfiniteAPIView } from "../components/infinite-scroll/infinite-api-view";
+} from "../../model-views/components/list-cards/utils";
+import { InfiniteAPIView } from "./infinite-api-view";
 import { APIV2Context } from "~/api-v2";
-import styles from "./module.styl";
+//@ts-ignore
+import styles from "./main.styl";
 
 const h = hyperStyled(styles);
 
@@ -32,7 +25,6 @@ function unwrapProjectCardData(data) {
 }
 
 const ProjectListComponent = ({ params, componentProps = {} }) => {
-  /* List of projects for the catalog. Could potentially move there... */
   return h("div", { style: { padding: "1px" } }, [
     h(InfiniteAPIView, {
       url: "/models/project",
@@ -67,7 +59,6 @@ function SampleListComponent({ params }) {
   ]);
 }
 
-// const { id, date, target, technique } = props;
 function unwrapSessionCardData(data) {
   const dataObj = data.data.map((obj) => {
     const {

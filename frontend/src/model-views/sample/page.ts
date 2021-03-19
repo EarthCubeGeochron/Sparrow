@@ -14,12 +14,9 @@ import { MapLink } from "app/map";
 import { Button } from "@blueprintjs/core";
 import {
   EditNavBar,
-  EditStatusButtons,
-  EmbargoEditor,
+  ProjectModelCard,
+  SessionModelCard,
   ModelEditableText,
-} from "../project/editor";
-import { ProjectModelCard, SessionModelCard } from "../list-cards/utils";
-import {
   NewSampleMap,
   SampleLocation,
   SampleDepth,
@@ -28,13 +25,29 @@ import {
   SampleMaterial,
   ProjectAdd,
   SessionAdd,
-} from "../new-model";
-import { ProjectEditCard, SessionEditCard } from "./detail-card";
+  EmbargoDatePick,
+  EditStatusButtons,
+  ProjectEditCard,
+  SessionEditCard,
+  DataSheetButton,
+} from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import { DndContainer } from "~/components";
 import styles from "./module.styl";
 
 const h = hyper.styled(styles);
+
+export const EmbargoEditor = function(props) {
+  const { model, actions, isEditing } = useModelEditor();
+  const onChange = (date) => {
+    actions.updateState({
+      model: { embargo_date: { $set: date } },
+    });
+  };
+  const embargo_date = model.embargo_date;
+
+  return h(EmbargoDatePick, { onChange, embargo_date, active: isEditing });
+};
 
 const EditNavBarSample = () => {
   const { hasChanges, actions, isEditing, model } = useModelEditor();
@@ -106,7 +119,6 @@ const ProjectLink = function({ d }) {
 };
 
 export const SampleProjects = ({ data, isEditing, onClick }) => {
-  //console.log(data);
   if (isEditing) {
     return h("div.parameter", [
       h("h4.subtitle", "Project"),
@@ -114,7 +126,7 @@ export const SampleProjects = ({ data, isEditing, onClick }) => {
     ]);
   }
   return h("div.parameter", [
-    h("h4.subtitle", "Project"),
+    h.if(data.project.length > 0)("h4.subtitle", "Project"),
     h("p.value", [h(ProjectLink, { d: data })]),
   ]);
 };
@@ -163,18 +175,6 @@ const Material = function(props) {
     });
   }
 };
-
-function DataSheetButton() {
-  const url = "/admin/data-sheet";
-  const handleClick = (e) => {
-    e.preventDefault();
-    window.location.href = url;
-  };
-
-  return h("div", { style: { padding: "0px 5px 5px 0px" } }, [
-    h(Button, { onClick: handleClick }, ["Data Sheet View"]),
-  ]);
-}
 
 export function Sessions(props) {
   const {
@@ -365,8 +365,6 @@ const SampleLocationEleDepthEditor = () => {
 
   const sample = { ...model, longitude, latitude };
 
-  //console.log(longitude, latitude);
-
   const changeCoordinates = (coords) => {
     const { lat, lon } = coords;
     const newLoc = {
@@ -455,11 +453,7 @@ function SamplePage(props) {
             h(Material),
             h(DepthElevation),
             h("div.basic-info", [h(SampleProjectAdd), h(SampleSessionAdd)]),
-            h(
-              Frame,
-              { id: "samplePage", data: sample.data },
-              "This is where a customized component could go"
-            ),
+            h(Frame, { id: "samplePage", data: sample.data }, null),
           ]),
           h("div", [h(LocationBlock)]),
         ]),

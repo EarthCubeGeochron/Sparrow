@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Switch, Checkbox, Card, Button, ButtonGroup } from "@blueprintjs/core";
+import { useState } from "react";
+import { Card, Button, ButtonGroup } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import { FilterAccordian } from "./utils";
 import styles from "./module.styl";

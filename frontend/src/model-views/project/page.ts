@@ -6,7 +6,7 @@ import {
   SampleEditCard,
   PubEditCard,
   ResearcherEditCard,
-} from "../sample/detail-card";
+} from "../components";
 import { DndChild } from "~/components";
 import "../main.styl";
 import styles from "~/admin/module.styl";
@@ -77,12 +77,7 @@ export const ProjectPublications = function({
   ]);
 };
 
-export const ProjectResearchers = function({
-  data,
-  isEditing,
-  onClick,
-  rightElement,
-}) {
+export const ProjectResearchers = function({ data, isEditing, onClick }) {
   let content = [h("p", "No researchers")];
   if (data != null) {
     content = data.map((d) => h("div.researcher", d.name));
@@ -91,7 +86,6 @@ export const ProjectResearchers = function({
     return h("div.researchers", [
       h("h4", { style: { display: "flex", alignItems: "baseline" } }, [
         "Researchers",
-        rightElement,
       ]),
       data.length > 0
         ? data.map((res) => {
@@ -101,7 +95,7 @@ export const ProjectResearchers = function({
         : null,
     ]);
   } else {
-    return h("div.researchers", [h("h4", "Researchers"), ...content]);
+    return h("div.researchers");
   }
 };
 

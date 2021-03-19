@@ -4,13 +4,13 @@ import { useState, useContext, useEffect } from "react";
 import MapGL from "@urbica/react-map-gl";
 import Draw from "@urbica/react-map-gl-draw";
 import { FormSlider } from "../utils";
-import { ModelEditableText } from "../../project/editor";
-import { ProjectFormContext } from "../../project/new-project";
+import { ModelEditableText } from "../utils";
+import { ProjectFormContext } from "../../../project/new-project";
 import { useAPIv2Result } from "~/api-v2";
-import { MySuggest } from "../../../components/blueprint.select";
+import { MySuggest } from "../../../../components/blueprint.select";
 import { FormGroup, Button, Icon, Tooltip } from "@blueprintjs/core";
 import { HelpButton, MySwitch } from "~/components";
-import { MyNumericInput } from "../../../components/edit-sample";
+import { MyNumericInput } from "../../../../components/edit-sample";
 import { GeoContext } from "./geo-entity";
 //@ts-ignore
 import styles from "./module.styl";

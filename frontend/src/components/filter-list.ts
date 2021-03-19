@@ -1,18 +1,7 @@
 import h from "@macrostrat/hyper";
-import {
-  InputGroup,
-  Menu,
-  MenuItem,
-  Popover,
-  Button,
-  Position,
-  Icon,
-} from "@blueprintjs/core";
+import { InputGroup, Menu, Popover, Button, Position } from "@blueprintjs/core";
 import { PagedAPIView, StatefulComponent } from "@macrostrat/ui-components";
 import T from "prop-types";
-import { FilterMenu } from "../map/components/filterMenu";
-import { useState } from "react";
-import { AdminFilter } from "../filter";
 
 class FilterListComponent extends StatefulComponent {
   static propTypes = {
@@ -97,52 +86,4 @@ class FilterListComponent extends StatefulComponent {
   }
 }
 
-/**
- * @description A search Box with right side drop down menu
- * @param {array} filterFields An array of strings that will be mapped over for the dropdown menu
- */
-function FilterBox(props) {
-  const { content } = props;
-  const [state, setState] = useState({
-    filter: "",
-    pickedFilter: "",
-  });
-  const [text, setText] = useState("");
-
-  const handleFilterChange = (e) => {
-    setText(e.target.value);
-  };
-
-  const onClickHandle = (filter) => {
-    setState({ ...state, pickedFilter: filter });
-  };
-
-  let filterFields = ["Name", "DOI"];
-  const contentMenu = h(Menu, [
-    filterFields.map((filter) => {
-      const selected = filter == state.pickedFilter;
-      return h(MenuItem, {
-        intent: selected ? "primary" : null,
-        labelElement: selected ? h(Icon, { icon: "tick" }) : null,
-        key: filter,
-        text: filter,
-        onClick: () => onClickHandle(filter),
-      });
-    }),
-  ]);
-
-  const position = Position.BOTTOM_RIGHT;
-  const rightElement = h(Popover, { content, position }, [
-    h(Button, { minimal: true, rightIcon: "caret-down" }),
-  ]);
-
-  return h(InputGroup, {
-    leftIcon: "search",
-    placeholder: "Filter values",
-    value: text,
-    onChange: handleFilterChange,
-    rightElement,
-  });
-}
-
-export { FilterListComponent, FilterBox };
+export { FilterListComponent };

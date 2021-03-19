@@ -1,18 +1,20 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useReducer, useState, createContext, useContext } from "react";
-import { Button, Dialog } from "@blueprintjs/core";
 import { AdminPage } from "~/admin/AdminPage";
 import { APIHelpers } from "@macrostrat/ui-components";
-import { ModelEditableText, EmbargoDatePick } from "./editor";
-import { SampleAdd, PubAdd, ResearcherAdd, SubmitButton } from "../new-model";
 import {
+  ModelEditableText,
+  SampleAdd,
+  PubAdd,
+  ResearcherAdd,
+  SubmitButton,
+  EmbargoDatePick,
   PublicationFilterList,
   ResearcherFilterList,
   SampleFilterList,
-} from "../new-model";
+} from "../components";
 import { MinimalNavbar } from "~/components";
 import { APIV2Context } from "../../api-v2";
-import { useModelURL } from "~/util/router";
 import axios from "axios";
 //@ts-ignore
 import styles from "./project-form.styl";
@@ -20,12 +22,6 @@ import styles from "./project-form.styl";
 const h = hyperStyled(styles);
 
 export const ProjectFormContext = createContext({});
-
-function objectFilter(obj, predicate) {
-  //const { obj, predicate } = props;
-  const newObject = Object.fromEntries(Object.entries(obj).filter(predicate));
-  return newObject;
-}
 
 const projectReducer = (state, action) => {
   switch (action.type) {

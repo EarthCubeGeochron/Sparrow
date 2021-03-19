@@ -1,12 +1,11 @@
-import { AddSampleCard } from "../sample/detail-card";
+import { AddSampleCard } from "./detail-card";
 import { Tooltip } from "@blueprintjs/core";
 import {
   ProjectSamples,
   ProjectPublications,
   ProjectResearchers,
-} from "../project/page";
-import { SampleProjects, Sessions } from "../sample/page";
-import { MultipleSelectFilter } from "../../filter/components";
+} from "../../project/page";
+import { SampleProjects, Sessions } from "../../sample/page";
 import { hyperStyled } from "@macrostrat/hyper";
 import styles from "./module.styl";
 
@@ -142,26 +141,3 @@ export const SessionAdd = (props) => {
     }),
   ]);
 };
-
-function ModelTags({ isEditing }) {
-  const tags = [
-    "Needs Work",
-    "Check Location",
-    "Link to Publication",
-    "Link to Project",
-    "Add material",
-  ];
-
-  if (isEditing) {
-    return h("div", [
-      h("h4.subtitle", ["Sample Tags"]),
-      h(MultipleSelectFilter, {
-        items: tags,
-        sendQuery: () => null,
-      }),
-    ]);
-  }
-  if (!isEditing) {
-    return h("div", [h("h4.subtitle", ["Sample Tags"])]);
-  }
-}

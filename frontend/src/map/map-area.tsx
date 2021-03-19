@@ -1,12 +1,9 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import MapGl, { FlyToInterpolator, Marker } from "react-map-gl";
-//import "mapbox-gl/dist/mapbox-gl.css";
-import { mapStyles } from "../../plugins/MapStyle";
 import h from "@macrostrat/hyper";
 import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
-//import { Link } from "react-router-dom";
 import { LayerMenu } from "./components/LayerMenu";
 import { MarkerCluster } from "./components/MarkerCluster";
 import { FilterMenu } from "./components/filterMenu";

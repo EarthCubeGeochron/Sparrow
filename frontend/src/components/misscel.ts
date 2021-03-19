@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Popover, Button, Switch } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import styles from "./module.styl";
@@ -69,4 +70,10 @@ export function DndChild(props) {
 export function MySwitch(props) {
   const { checked, onChange } = props;
   return h(Switch, { checked, onChange });
+}
+
+export function useToggle(initialValue: boolean): [boolean, () => void] {
+  const [value, setValue] = useState<boolean>(initialValue);
+  const toggleValue = () => setValue(!value);
+  return [value, toggleValue];
 }

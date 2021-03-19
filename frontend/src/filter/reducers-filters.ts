@@ -1,4 +1,3 @@
-import React, { useReducer } from "react";
 /**
  * Reducers to handle the filters on admin list components
  *

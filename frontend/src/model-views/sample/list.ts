@@ -7,7 +7,7 @@ import { useRouteMatch } from "react-router-dom";
 import { SamplePage } from "./page";
 import { useModelURL } from "~/util/router";
 import { useAPIv2Result } from "~/api-v2";
-import { SampleModelCard } from "../list-cards/utils";
+import { SampleModelCard } from "../components/list-cards/utils";
 
 const h = hyper.styled(styles);
 

@@ -3,7 +3,6 @@ import { Card, Icon, Button, ButtonGroup } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
 import style from "./card.module.css";
 import styles from "./module.styl";
-import { parse, format } from "date-fns";
 import { useModelURL } from "~/util/router";
 
 const h = hyperStyled(styles);
