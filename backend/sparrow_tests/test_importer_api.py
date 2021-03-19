@@ -120,6 +120,7 @@ class TestAPIImporter:
         }
         #Two datum with unique analysis numbers should be created, but are not.
         db.load_data("session", data)
+        assert len(db.session.query(db.model.datum).all()) == 2
 
         assert 1 == 0
         assert res.status_code == 201
