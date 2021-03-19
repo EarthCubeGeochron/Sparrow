@@ -1,10 +1,11 @@
-import { AddSampleCard } from "./detail-card";
+import { AddSampleCard } from "../new-model/detail-card";
 import { Tooltip } from "@blueprintjs/core";
 import {
   ProjectSamples,
   ProjectPublications,
   ProjectResearchers,
 } from "../../project/page";
+import { ModelPublications } from "./publication";
 import { SampleProjects, Sessions } from "../../sample/page";
 import { hyperStyled } from "@macrostrat/hyper";
 import styles from "./module.styl";
@@ -64,7 +65,7 @@ export const PubAdd = (props) => {
   }
   return h("div", [
     h("div", [
-      h(ProjectPublications, {
+      h(ModelPublications, {
         data,
         isEditing,
         onClick: onClickDelete,

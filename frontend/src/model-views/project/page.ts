@@ -6,37 +6,13 @@ import {
   SampleEditCard,
   PubEditCard,
   ResearcherEditCard,
+  Publication,
 } from "../components";
 import { DndChild } from "~/components";
 import "../main.styl";
 import styles from "~/admin/module.styl";
 
 const h = hyperStyled(styles);
-
-export function Publication(props) {
-  const { doi, title } = props;
-
-  const interior = () => {
-    let doiAddendum = [];
-    if (doi != null) {
-      doiAddendum = [
-        " – ",
-        h("span.doi-info", [
-          h("span.label", "DOI:"),
-          h("span.doi.bp3-monospace-text", doi),
-        ]),
-      ];
-    }
-    return h("div.publication", [h("span.title", title), ...doiAddendum]);
-  };
-
-  if (doi == null) {
-    return h(interior);
-  } else {
-    const href = `https://dx.doi.org/${doi}`;
-    return h("a.publication", { href, target: "_blank" }, h(interior));
-  }
-}
 
 export const ProjectPublications = function({
   data,
