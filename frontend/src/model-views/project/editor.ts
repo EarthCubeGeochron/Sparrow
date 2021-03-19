@@ -9,6 +9,7 @@ import {
 } from "@macrostrat/ui-components";
 import { put } from "axios";
 import "../main.styl";
+//@ts-ignore
 import styles from "~/admin/module.styl";
 import {
   ResearcherAdd,

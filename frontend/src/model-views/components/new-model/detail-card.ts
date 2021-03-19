@@ -1,7 +1,9 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Card, Icon, Button, ButtonGroup } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
-import style from "./card.module.css";
+//@ts-ignore
+import style from "./card.module.css"; // I know this looks repitative, but don't delete yet please
+//@ts-ignore
 import styles from "./module.styl";
 import { useModelURL } from "~/util/router";
 
@@ -14,8 +16,8 @@ interface SampleCardProps {
   material: string;
   session: any;
   location_name?: string;
-  setID?: (any) => {};
-  onClick?: (any) => {};
+  setID?: (e) => void;
+  onClick?: (e) => void;
 }
 /**
  *
@@ -198,7 +200,7 @@ interface AddSample {
 }
 
 const AddSampleCard = (props: AddSample) => {
-  const { onClick, icon_name } = props;
+  const { onClick } = props;
   return h("div", { className: style.addSample, onClick }, ["+"]);
 };
 

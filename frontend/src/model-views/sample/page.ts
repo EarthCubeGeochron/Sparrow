@@ -9,13 +9,10 @@ import {
 } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { put } from "axios";
-import { SampleContextMap } from "app/components";
-import { MapLink } from "app/map";
-import { Button } from "@blueprintjs/core";
+import { SampleContextMap } from "~/components";
+import { MapLink } from "~/map";
 import {
   EditNavBar,
-  ProjectModelCard,
-  SessionModelCard,
   ModelEditableText,
   NewSampleMap,
   SampleLocation,
@@ -27,17 +24,14 @@ import {
   SessionAdd,
   EmbargoDatePick,
   EditStatusButtons,
-  ProjectEditCard,
-  SessionEditCard,
   DataSheetButton,
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
-import { DndContainer } from "~/components";
 import styles from "./module.styl";
 
 const h = hyper.styled(styles);
 
-export const EmbargoEditor = function(props) {
+const EmbargoEditor = function(props) {
   const { model, actions, isEditing } = useModelEditor();
   const onChange = (date) => {
     actions.updateState({
@@ -94,43 +88,6 @@ const Parameter = ({ name, value, ...rest }) => {
   ]);
 };
 
-const ProjectLink = function({ d }) {
-  const project = d.project.map((obj) => {
-    if (obj) {
-      const { name: project_name, id: project_id } = obj;
-      return { project_name, project_id };
-    }
-    return null;
-  });
-
-  const [test] = project;
-  if (test == null) return null;
-
-  return project.map((ele) => {
-    if (!ele) return null;
-    const { project_name, project_id, description } = ele;
-    return h(ProjectModelCard, {
-      id: project_id,
-      name: project_name,
-      description,
-      link: true,
-    });
-  });
-};
-
-export const SampleProjects = ({ data, isEditing, onClick }) => {
-  if (isEditing) {
-    return h("div.parameter", [
-      h("h4.subtitle", "Project"),
-      h("p.value", [h(ProjectEditCard, { d: data, onClick })]),
-    ]);
-  }
-  return h("div.parameter", [
-    h.if(data.project.length > 0)("h4.subtitle", "Project"),
-    h("p.value", [h(ProjectLink, { d: data })]),
-  ]);
-};
-
 const LocationBlock = function(props) {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
 
@@ -165,7 +122,7 @@ const Material = function(props) {
     });
   };
   if (isEditing) {
-    return h(SampleMaterial, { changeMaterial, sample: model }); //material component from sample page
+    return h(SampleMaterial, { changeMaterial, sample: model });
   }
   if (!isEditing) {
     if (model.material == null) return null;
@@ -175,70 +132,6 @@ const Material = function(props) {
     });
   }
 };
-
-export function Sessions(props) {
-  const {
-    isEditing,
-    session,
-    onClick,
-    sampleHoverID = null,
-    onDrop = () => {},
-  } = props;
-
-  if (session == null && !isEditing) return null;
-  if (session == null && isEditing) {
-    return h("div.parameter", [h("h4.subtitle", "Sessions")]);
-  }
-  return h("div.parameter", [
-    h.if(session.length > 0 || isEditing)("h4.subtitle", "Sessions"),
-    h("div.session-container", [
-      session.map((obj) => {
-        const {
-          id: session_id,
-          technique,
-          target,
-          date,
-          analysis,
-          data,
-          sample,
-        } = obj;
-        const onHover =
-          sampleHoverID && sample ? sample.id == sampleHoverID : false;
-        if (isEditing) {
-          return h(
-            DndContainer,
-            {
-              id: session_id,
-              onDrop,
-            },
-            [
-              h(SessionEditCard, {
-                session_id,
-                sample,
-                technique,
-                target,
-                date,
-                onClick,
-                onHover,
-              }),
-            ]
-          );
-        } else {
-          return h(SessionModelCard, {
-            session_id,
-            technique,
-            target,
-            date,
-            data,
-            analysis,
-            sample,
-            onHover,
-          });
-        }
-      }),
-    ]),
-  ]);
-}
 
 const DepthElevation = (props) => {
   const { isEditing, model } = useModelEditor();

@@ -1,7 +1,8 @@
 import hyper from "@macrostrat/hyper";
 import { Callout } from "@blueprintjs/core";
-import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
-import { FilterListComponent } from "app/components/filter-list";
+import { LinkCard } from "@macrostrat/ui-components";
+import { FilterListComponent } from "~/components/filter-list";
+//@ts-ignore
 import styles from "./module.styl";
 import { useRouteMatch } from "react-router-dom";
 import { SamplePage } from "./page";
@@ -12,7 +13,7 @@ import { SampleModelCard } from "../components/list-cards/utils";
 const h = hyper.styled(styles);
 
 /**
- *
+ * Catalog Page
  * @param props : material, id, name (from samples)
  *
  *
@@ -36,6 +37,7 @@ const SampleListCard = function(props) {
   );
 };
 
+//Catalog Page
 const SampleList = function() {
   const route = "/sample";
   const filterFields = {
@@ -65,7 +67,7 @@ const SampleList = function() {
 interface SampleProps {
   Edit?: boolean;
   id?: number;
-  sendQuery: () => {};
+  sendQuery?: () => {};
 }
 const SampleComponent = function(props: SampleProps) {
   const { id, Edit } = props;
@@ -81,7 +83,6 @@ const SampleComponent = function(props: SampleProps) {
 
   console.log(data);
 
-  //const sample = data[0];
   return h("div.data-view.sample", null, h(SamplePage, { id, data, Edit }));
 };
 

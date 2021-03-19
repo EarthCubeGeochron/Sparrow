@@ -116,9 +116,7 @@ class TestAPIV2:
         res = client.get("/api/v2/models/session")
         assert res.status_code == 200
         data = res.json()
-        assert (
-            data["total_count"] == 1
-        )  ## it fails here because theres no data. db.load_data isn't working
+        assert data["total_count"] == 1  ## it fails here because theres no data. db.load_data isn't working
         assert data["data"][0]["name"] == "Declarative import test"
 
     def test_model_analysis(self, client, db):

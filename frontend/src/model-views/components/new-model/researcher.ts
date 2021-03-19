@@ -5,6 +5,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { ProjectFormContext } from "../../project/new-project";
 import { ModelEditableText } from "./utils";
 import { FormSlider } from "./utils";
+//@ts-ignore
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);

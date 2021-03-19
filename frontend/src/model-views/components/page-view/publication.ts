@@ -1,5 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
+import { AddCard } from "./page-view";
 import { PubEditCard } from "../index";
+//@ts-ignore
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -29,11 +31,10 @@ export function Publication(props) {
   }
 }
 
-export const ModelPublications = function({
+export const PageViewPublications = function({
   data,
   isEditing = false,
   onClick,
-  rightElement,
 }) {
   if (data == null) {
     data = [];
@@ -42,7 +43,6 @@ export const ModelPublications = function({
     return h("div.publications", [
       h("div", { style: { display: "flex", alignItems: "baseline" } }, [
         h("h4", "Publications"),
-        rightElement,
       ]),
       data.length > 0
         ? data.map((pub) => {
@@ -57,7 +57,7 @@ export const ModelPublications = function({
         : null,
     ]);
   }
-  return h([
+  return h("div", [
     h.if(data.length)("div.publications", [
       h("h4", "Publications"),
       (data || []).map((d, i) =>
@@ -65,5 +65,25 @@ export const ModelPublications = function({
       ),
     ]),
     h.if(data == null)("div.publications", "No publications"),
+  ]);
+};
+
+export const PubAdd = (props) => {
+  const { onClickDelete, onClickList, data, isEditing = true } = props;
+  if (!isEditing && data == null) {
+    return null;
+  }
+  return h("div", [
+    h("div", [
+      h(PageViewPublications, {
+        data,
+        isEditing,
+        onClick: onClickDelete,
+      }),
+      h.if(isEditing)(AddCard, {
+        model: "publication",
+        onClick: onClickList,
+      }),
+    ]),
   ]);
 };

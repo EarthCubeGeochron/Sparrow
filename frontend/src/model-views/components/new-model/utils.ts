@@ -20,6 +20,7 @@ import {
 } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { MySwitch, MinimalNavbar } from "~/components";
+//@ts-ignore
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
