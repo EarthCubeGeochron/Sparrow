@@ -4,7 +4,7 @@ module.exports = {
       "guides",
       "getting-started",
       "motivation-and-design",
-      "datascience/data-sci",
+      "datascience",
       "schema-imp",
       "embargo",
     ],

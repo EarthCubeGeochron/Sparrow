@@ -1,11 +1,49 @@
-import { ModelCard } from "../utils";
+import { useState, useEffect } from "react";
 import { Frame } from "~/frame";
 import hyper from "@macrostrat/hyper";
-import { pluralize } from "../project/index";
+import { Link } from "react-router-dom";
+import { pluralize } from "../new-model";
 import { format } from "date-fns";
+import { useModelURL } from "~/util";
 import styles from "./card.styl";
 
 const h = hyper.styled(styles);
+
+export function ModelCard(props) {
+  const { content, id, model, link = true, onClick = () => {} } = props;
+
+  const [clicked, setClicked] = useState();
+
+  useEffect(() => {
+    const list = window.location.pathname.split("/");
+    if (list.length > 3) {
+      setClicked(list[3]); //list[3] will be the id
+    }
+  }, [window.location.pathname]);
+
+  const to = useModelURL(`/${model}/${id}`);
+
+  const classname = clicked
+    ? clicked == `${id}`
+      ? "model-card.clicked"
+      : "model-card"
+    : "model-card";
+  if (link) {
+    return h(Link, { to, style: { textDecoration: "none" } }, [
+      h(`div.${classname}`, [content]),
+    ]);
+  } else {
+    return h("div", [
+      h(
+        `div.${classname}`,
+        {
+          onClick,
+        },
+        [content]
+      ),
+    ]);
+  }
+}
 
 export const sampleContent = (props) => {
   const { material, id, name, location, session } = props;
@@ -137,7 +175,7 @@ const ProjectModelCard = (props) => {
       : null;
 
   const content = h("div.project-card", [
-    h("h3", name),
+    h("h4", name),
     h("p.description", description),
     samples.length > 0
       ? h(ContentOverFlow, {

@@ -9,11 +9,6 @@ import { parse, format } from "date-fns";
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { useAuth } from "~/auth";
 import { put } from "axios";
-import {
-  EmbargoDatePick,
-  EditStatusButtons,
-  EditNavBar,
-} from "../project/editor";
 import { Link } from "react-router-dom";
 import { Breadcrumbs, Card } from "@blueprintjs/core";
 import { useModelURL, useModelURLBool } from "~/util/router";
@@ -23,7 +18,14 @@ import {
   SessionProjects,
   SessionInfoCard,
 } from "./info-card";
-import { SampleAdd, ProjectAdd, PubAdd } from "../new-model";
+import {
+  EditNavBar,
+  SampleAdd,
+  ProjectAdd,
+  PubAdd,
+  EmbargoDatePick,
+  EditStatusButtons,
+} from "../components";
 import { SessionAdminContext } from "~/admin/session";
 import styles from "./module.styl";
 

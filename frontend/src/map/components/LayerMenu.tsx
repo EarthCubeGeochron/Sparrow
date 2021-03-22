@@ -10,16 +10,14 @@ import {
   Position,
 } from "@blueprintjs/core";
 import "../cluster.css";
-import h from "@macrostrat/hyper";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { mapStyle } from "../MapStyle";
-import { Frame, FrameContext } from "~/frame";
+import { FrameContext } from "~/frame";
 
 export const LayerMenu = ({
   hide,
   MapStyle,
   chooseMapStyle,
-  //mapstyles,
   showMarkers,
   toggleShowMarkers,
 }) => {

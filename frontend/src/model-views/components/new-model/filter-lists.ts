@@ -1,20 +1,19 @@
 import { useState } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { AdminFilter } from "~/filter";
-import { SampleAdd, PubAdd, ResearcherAdd } from "./page-view";
 import {
   SampleAddList,
   PublicationAddList,
   ResearcherAddList,
   ProjectListComponent,
   SessionListComponent,
-} from "../../admin/infinite-scroll";
+} from "../../../components/infinite-scroll/infinite-scroll";
 import {
   EditProjNewPub,
   EditProjNewResearcher,
   EditProjNewSample,
 } from "./index";
-import { modelEditList } from "../sample/new-sample";
+import { modelEditList } from "../../sample/new-sample";
 //@ts-ignore
 import styles from "./module.styl";
 

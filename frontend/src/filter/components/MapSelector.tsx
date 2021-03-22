@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import h from "@macrostrat/hyper";
 import MapGL from "@urbica/react-map-gl";
 import Draw from "@urbica/react-map-gl-draw";
