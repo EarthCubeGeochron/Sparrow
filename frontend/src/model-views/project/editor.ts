@@ -20,6 +20,7 @@ import {
   EmbargoDatePick,
   EditStatusButtons,
   EditNavBar,
+  NewProjectPageButton,
 } from "../components";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
@@ -286,7 +287,10 @@ export function EditableSamples() {
 const ProjEditNavBar = ({ header }) => {
   return h(EditNavBar, {
     header,
-    editButtons: h(EditStatusButtonsProj),
+    editButtons: h("div", { style: { display: "flex" } }, [
+      h(NewProjectPageButton),
+      h(EditStatusButtonsProj),
+    ]),
     embargoEditor: h(EmbargoEditor),
   });
 };

@@ -1,8 +1,10 @@
 import { hyperStyled } from "@macrostrat/hyper";
+import styled from "@emotion/styled";
+import { Button } from "@blueprintjs/core";
 import { AddCard } from "./page-view";
 import { SampleCard, SampleEditCard } from "../index";
 import { DndChild } from "~/components";
-import styled from "@emotion/styled";
+import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -103,3 +105,17 @@ export const PageViewSamples = function({
     }
   }
 };
+
+export function NewSamplePageButton() {
+  const to = useModelURL("/new-sample");
+  const handleClick = (e) => {
+    e.preventDefault();
+    window.location.href = to;
+  };
+
+  return h(
+    Button,
+    { minimal: true, intent: "success", onClick: handleClick, icon: "add" },
+    ["Create New Sample"]
+  );
+}

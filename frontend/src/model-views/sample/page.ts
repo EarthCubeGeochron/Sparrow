@@ -25,6 +25,7 @@ import {
   EmbargoDatePick,
   EditStatusButtons,
   DataSheetButton,
+  NewSamplePageButton,
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
@@ -65,12 +66,15 @@ const EditNavBarSample = () => {
 
   return h(EditNavBar, {
     header: "Manage Sample",
-    editButtons: h(EditStatusButtons, {
-      onClickCancel,
-      onClickSubmit,
-      hasChanges,
-      isEditing,
-    }),
+    editButtons: h("div", { style: { display: "flex" } }, [
+      h(NewSamplePageButton),
+      h(EditStatusButtons, {
+        onClickCancel,
+        onClickSubmit,
+        hasChanges,
+        isEditing,
+      }),
+    ]),
     embargoEditor: h(EmbargoEditor, {
       onChange,
       embargo_date,

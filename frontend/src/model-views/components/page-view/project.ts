@@ -1,5 +1,7 @@
+import { Button } from "@blueprintjs/core";
 import { AddCard, ProjectModelCard, ProjectEditCard } from "../index";
 import { hyperStyled } from "@macrostrat/hyper";
+import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -57,3 +59,17 @@ export const PageViewProjects = ({ data, isEditing, onClick }) => {
     h("p.value", [h(ProjectLink, { d: data })]),
   ]);
 };
+
+export function NewProjectPageButton() {
+  const to = useModelURL("/new-project");
+  const handleClick = (e) => {
+    e.preventDefault();
+    window.location.href = to;
+  };
+
+  return h(
+    Button,
+    { minimal: true, intent: "success", onClick: handleClick, icon: "add" },
+    ["Create New Project"]
+  );
+}
