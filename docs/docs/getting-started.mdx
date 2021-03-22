@@ -31,7 +31,70 @@ make sure your user can run `docker` without root permissions (typically
 `sudo usermod -aG docker ${USER}`).
 Installation is also possible on Windows 10 using Windows Subsystem for Linux.
 
-## Getting the code
+# Downloading Sparrow
+
+:::tip New!
+Sparrow is now available via a [bundled download](/docs/getting-started#bundled-version).
+:::
+
+Currently there are two ways to downloading Sparrow. Either
+download a bundled version or clone the codebase directly from Github. The former, bundled version,
+is the main way Sparrow should be downloaded. The bundled version has an easier download and startup process and removes
+the need for the user to manage a core codebase. There is, however, still the ability to customize a Sparrow instance through
+frontend and backend plugins.
+
+The second way to download Sparrow is to clone the [Sparrow](https://github.com/EarthCubeGeochron/Sparrow) repository from Github.
+This process is more involved, however it gives access to the core codebase.
+**NOTE:** modifying the main codebase should only be done if the user intends to
+contribute to Sparrow.
+
+## Bundled Version
+
+### Shell command
+
+Downloading the bundled version of Sparrow occurs through a `curl` command. `curl` commands are used
+to transfer data from servers.
+
+```
+curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh | bash -s -
+```
+
+This is the most updated `curl` command at this time. The most recent release can be found at [Sparrow's Github page](https://github.com/EarthCubeGeochron/Sparrow) in the right most column
+under **Releases**. This command will download all the files to your `usr/local/bin` and `usr/local/opt` directories.
+In your favorite terminal or shell, run the command from above. If it is installed properly you should
+see the output _Sparrow executable installed!_
+
+If the installation works, try running `sparrow` on in the same terminal or shell. If the Sparrow CLI has been downloaded correctly
+you will see a list of possible [sparrow commands](/docs/command-line-interface). If you do **not** see a list of sparrow commands you may have to write `usr/local/bin` to your `PATH` variable.
+Otherwise, you have successfully installed Sparrow!
+
+You can immediately view the instance of sparrow by running.
+
+```
+SPARROW_SECRET_KEY=TemporaryKey sparrow up
+```
+
+Or you can continute onto to [creating a new user](/docs/getting-started#creating-a-user) and
+[creating a sparrow configuration](/docs/getting-started#running-a-configured-application).
+
+The quickest way to set up an instance of Sparrow is by running:
+
+```
+sparrow create-test-lab <directory name>
+```
+
+This will create an out of the box Sparrow instance that will come pre-configured with a Sparrow configuration file as well
+as directories used for frontend and backend plugins. There is also some test data that is pre-loaded in the backend plugin.
+
+## Cloning Sparrow Codebase
+
+:::caution
+Cloning Sparrow's codebase should only be done by those who wish to contribute to the core codebase.
+If you want to set up a lab instance of Sparrow without modifying the core codebase please refer to
+the [bundled version](/docs/getting-started#bundled-version).
+:::
+
+### Getting the code
 
 Currently, all installations of Sparrow require you to fetch the source code
 from GitHub. Work is progressing on a "standalone" version of Sparrow that does not require
@@ -43,7 +106,7 @@ git clone https://github.com/EarthCubeGeochron/Sparrow.git
 cd Sparrow
 ```
 
-## Installing the command-line interface
+### Installing the command-line interface
 
 **Sparrow** is administered using the `sparrow` command-line
 interface. This command wraps application management, database management,
@@ -70,7 +133,7 @@ instead run `SPARROW_INSTALL_DIR=<root-path> make install`. This will install `s
 to `<root-path>/bin/sparrow`.
 :::
 
-## Running Sparrow
+### Running Sparrow
 
 Typing `sparrow` at the command line will download and build containers
 (this will take a long time on initial run)
@@ -94,7 +157,7 @@ command to set up database tables.
 The **Sparrow** web interface can then be accessed at `http://localhost:5002`;
 the API can be found at `http://localhost:5002/api`.
 
-### Creating a user
+## Creating a user
 
 On navigating to the web interface for the first time, you will not be logged
 in — indeed, no user will exist! To create a user, run the `sparrow create-user` command and follow the prompts. There should be a single row in
@@ -131,7 +194,7 @@ is taken by the [UW Cosmogenic Nuclide lab](https://github.com/EarthCubeGeochron
 [the Desert Research Institute](https://github.com/EarthCubeGeochron/Sparrow-luminescence-demo),
 and other implementing facilities.
 
-### Inspecting the running application
+## Inspecting the running application
 
 Several `sparrow` subcommands allow inspection of the running
 **Sparrow** application:

@@ -8,67 +8,49 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
-## `[unreleased]` - 2021-03-11
-
-- Improved frontend and backend Docker images to have versions tied to the
-  core application version (currently at `2.0.0.beta1`). This process will
-  soon be integrated into an image building on release automation of some sort.
-- Make Docker image builds use BuildKit and do more intelligent layer caching,
-  potentially leading to significantly faster builds on fresh Sparrow installations.
-
+## `[2.0.0.beta2]` - 2021-03-18
 ### Frontend
 
 Sparrow now has extensive editing capabilities on model admin pages.
 
 - Linking to other data models can be easily done
   through frontend interactions.
-  - On project admin page, samples can be directly linked to sessions
-    through drag and drop.
+  For instance, on the project admin page, samples can be directly linked to sessions
+  through drag and drop.
 - Forms for creating new project and sample models make data creation availble directly through the U.I.
 - New researchers can be created from text field inputs.
-- Any data model can be embargoed until a specific date or indefinitely
-  (which currently means 3000 years).
+- Any data model can be embargoed until a specific date or indefinitely.
 
-Sparrow also integrates external resources into its editing capabilities to make filling in metadata more efficient.
+Sparrow also integrates external resources into its editing capabilities to make filling metadata more efficient.
 
 - New publications can be searched for, by fuzzy text search or doi, and linked to projects and sessions through the U.I.
-  - Search power provided by [xDD](https://xdd.wisc.edu/) and [crossref](https://www.crossref.org/).
+  - Search power provided by [xDD](https://xdd.wisc.edu/) and [CrossRef](https://www.crossref.org/).
   - Publications not found in search can also be manually added.
-- Material metadata helpers use a vocabulary base from the sparrow db as well as [macrostrat](https://macrostrat.org/) while also leaving the ability for the user to create a new material.
+- Material metadata helpers use a vocabulary base from the Sparrow database
+  and [Macrostrat](https://macrostrat.org/), while also leaving the ability for the user to create new materials.
 - A prototype for sample geo entity can link a sample to its
-  geologic context by choosing an entity name (i.e Apex Basalt), an entity type (i.e Formation), a
-  reference datum (ie. top), and a reference distance (i.e 0.2 meters) (The sample was taken 0.2 meters
-  from the top of the Apex Basalt Formation).
+  geologic context by choosing an entity name (e.g., *Apex Basalt*), an entity type (e.g., *Formation*), a
+  reference datum (e.g., *top*), and a reference distance (e.g., *0.2 meters*), yielding the statement
+  "*The sample was taken 0.2 meters from the top of the Apex Basalt Formation*".
 
-Frontend filtering of data is supported by robust API filtering
-created in the backend. Data can be filtered by:
+New data filtering capabilities are supported by robust
+API filtering (see backend changes). So far, data can be filtered by:
 
 - Geographic location
 - Date of session performed
 - Embargo status
-- Associated doi
-- And any text fields such as name, material, description, etc
+- Associated DOI
+- Any text field (e.g., name, material, description, etc.)
 
-Other improvements to frontend include:
+Other improvements to frontend include
 
-- Sample navigation from map sample marker as well as navigation to the map from the project and sample page maps.
+- Navigation from map (individual sample marker) to the sample page
+- Navigation to the map from the project and sample page maps.
 - Enhanced model navigation through admin and catalog pages.
-- Infinite scrolling lists on admin pages that is filterable and hideable to create a larger model view.
+- Infinite-scrolling lists sidebars on admin pages that are is filterable and hideable
 - Refined views overall on catalog and admin pages.
-- New Frontend frames for custom frontend components:
 
-  - `mapStyles`: Array of objects that have name and mapystyle (valid mapbox style)
-  - `samplePage`: React element (class or functional component) that is rendered on sample page
-  - `projectPage`: React element (class or functional component) that is rendered on project page
-  - `datafilePage`: React element (class or functional component) that is rendered on project page
-  - `sampleCardContent`: Content to show on the sample model card
-  - `projectCardContent`: Content to show on the project model card
-  - `publicationCardContent`: Content to show on the publication model card
-  - `researcherCardContent`: Content to show on the researcher model card
-  - `sessionCardContent` : Content to show on the session model card
-  - `datafileCardContent`: Content to show on the datafile model card
-
-> NOTE:
+> Note:
 > Some frontend editing may not be fully functional yet in their persisting to the database.
 > Linking samples and sessions may create a new session or sample model instead of linking an already existing model.
 > Newer releases will have these fixed as well as have new features including model tagging, ("needs work", "location wrong", etc) to quickly reference workflow, duplicate model consolidating and enhanced capabilities on the datasheet.
@@ -83,7 +65,7 @@ The API documentation now has:
 - Basic information (version, license)
 - Specific endpoint parameter information (more examples and descriptions specific to each model endpoint)
 
-Sparrow's API now has even more extensive data filtering capabilities that are reflected in the frontend. Filters added include:
+Sparrow's API now has extensive data filtering capabilities that are reflected in the frontend. Filters added include:
 
 - `public`: Whether to search public or private data
 - `date_range`: A range of dates that a linked session took place in.
@@ -95,10 +77,22 @@ Sparrow's API now has even more extensive data filtering capabilities that are r
 - `ids`: Know the ids of the data models? Pass then in a list and get them all back.
   Some filters have extendable capabilities using database joins and data model schemas.
 
-Sparrow now has a general all-purpose `PUT` and `POST` endpoint for each data model where edited and new models can be imported into the database through the API. The endpoints use model schemas for more robust handling.
+Sparrow now has a general all-purpose `PUT` and `POST` endpoint for each data model where edited and
+new models can be imported into the database through the API. The endpoints use model schemas for robust handling of edits.
 
-> NOTE:
-> There is still some debugging for the schema loading process, especially for editing data. Some complicated edge cases in editing nested models are still being debugged.
+> Note:
+> There is still some debugging needed for the schema loading process, especially for editing data.
+> Some complicated edge cases in editing nested models are still being debugged.
+
+### Development process
+
+- Frontend and backend Docker image versions are now tied to the
+  core application version (currently at `2.0.0.beta1`). This process will
+  soon be integrated into an "image building on release" automation of some sort.
+- Docker image builds now use **BuildKit** for more intelligent layer caching,
+  potentially leading to significantly faster builds on fresh Sparrow installations.
+- Sparrow's default branch has changed from `master` to `main`. Running `git remote set-head origin -a`
+  will update your remote `HEAD` reference to the correct version.
 
 ## `[2.0.0.beta1]` - 2021-03-01
 
