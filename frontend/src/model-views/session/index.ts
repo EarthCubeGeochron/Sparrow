@@ -6,10 +6,9 @@
  */
 import * as React from "react";
 import h from "@macrostrat/hyper";
-import { Breadcrumbs, AnchorButton, Intent } from "@blueprintjs/core";
-import { Frame } from "app/frame";
+import { AnchorButton, Intent } from "@blueprintjs/core";
+import { Frame } from "~/frame";
 import { EditableSessionDetails } from "./editor";
-import { SessionInfoCard } from "./info-card";
 import { SessionDetailPanel } from "./detail-panel";
 import { APIResultView } from "@macrostrat/ui-components";
 import { useRouteMatch } from "react-router-dom";
@@ -21,7 +20,7 @@ import { useRouteMatch } from "react-router-dom";
 export function DownloadButton(props) {
   const { file_hash, file_type } = props;
 
-  let text = "Data file";
+  let text: any | React.ReactNode = "Data file";
   if (file_type != null) {
     text = h([h("b", file_type), " file"]);
   }

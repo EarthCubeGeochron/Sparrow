@@ -1,12 +1,12 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIv2Result } from "~/api-v2";
-import { Card, Spinner } from "@blueprintjs/core";
-import styles from "./module.styl";
+import { Spinner } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
 import { useModelURL } from "~/util/router";
 import { Route, Switch } from "react-router-dom";
-import { DataFilePage, DataFileMatch } from "./page";
-import { parse, format } from "date-fns";
+import { DataFileMatch } from "./page";
+import { format } from "date-fns";
+import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 

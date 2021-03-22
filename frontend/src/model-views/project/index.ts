@@ -4,24 +4,10 @@ import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
 import { useAPIv2Result } from "~/api-v2";
 import { ProjectPage } from "./page";
 import { useModelURL } from "~/util/router";
+import { pluralize } from "../components";
 import "../main.styl";
 import styles from "~/admin/module.styl";
 const h = hyperStyled(styles);
-
-export const pluralize = function(term, arrayOrNumber) {
-  let count = arrayOrNumber;
-  if (Array.isArray(arrayOrNumber)) {
-    count = arrayOrNumber.length;
-  }
-  if (count > 1) {
-    if (term.slice(-1) == "s") {
-      term += "es";
-    } else {
-      term += "s";
-    }
-  }
-  return term;
-};
 
 interface Project {
   id: number;

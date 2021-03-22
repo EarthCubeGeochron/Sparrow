@@ -1,15 +1,6 @@
 import { useState, useReducer, useEffect } from "react";
 import { reducer } from "./reducers-filters";
-import {
-  Button,
-  Tooltip,
-  Card,
-  Popover,
-  Icon,
-  Tag,
-  Dialog,
-  Drawer,
-} from "@blueprintjs/core";
+import { Button, Tooltip, Card, Popover, Icon, Tag } from "@blueprintjs/core";
 import {
   AgeSlideSelect,
   DatePicker,
@@ -17,7 +8,7 @@ import {
   SearchInput,
   GeologicFormationSelector,
 } from "./components";
-import { useToggle, useAPIResult } from "../map/components/APIResult";
+import { useToggle } from "~/components";
 import { hyperStyled } from "@macrostrat/hyper";
 import { EmabrgoSwitch } from "./components/Embargo";
 import styles from "./module.styl";

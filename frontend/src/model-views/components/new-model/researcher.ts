@@ -2,9 +2,10 @@ import { useState, useEffect, useContext } from "react";
 import { useModelEditor } from "@macrostrat/ui-components";
 import { Button } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { ProjectFormContext } from "../project/new-project";
-import { ModelEditableText } from "../project/editor";
+import { ProjectFormContext } from "../../project/new-project";
+import { ModelEditableText } from "./utils";
 import { FormSlider } from "./utils";
+//@ts-ignore
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
