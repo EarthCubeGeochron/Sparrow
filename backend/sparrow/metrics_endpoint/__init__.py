@@ -9,16 +9,17 @@ import json
 
 
 class MetricsEndpoint(SparrowCorePlugin):
-    '''
-        This Sparrow Plugin adds a GET route to the API. 
-        It works by reading in a postgreSQL query from a 
-        file in this directory, querying the sparrow 
-        database, and then returning the response a JSON.
+    """
+    This Sparrow Plugin adds a GET route to the API.
+    It works by reading in a postgreSQL query from a
+    file in this directory, querying the sparrow
+    database, and then returning the response a JSON.
 
-        It then uses the on_api_initialized_v2 hook to add the route
-        and some route documentation that shows up on the api.
-    '''
-    name = 'metrics'
+    It then uses the on_api_initialized_v2 hook to add the route
+    and some route documentation that shows up on the api.
+    """
+
+    name = "metrics"
 
     def metrics_view(self):
 
@@ -28,16 +29,16 @@ class MetricsEndpoint(SparrowCorePlugin):
         query = sqlfile.read()
 
         metrics = db.exec_query(query)
-        res = metrics.to_json(orient='records')
+        res = metrics.to_json(orient="records")
 
         return JSONResponse(json.loads(res))
 
     def on_api_initialized_v2(self, api):
-        
+
         root_route = "core_view"
         basic_info = dict(
-            route = "/metrics",
-            description = "A metrics route for Sparrow",
+            route="/core_view/metrics",
+            description="A metrics route for Sparrow",
         )
-        api.add_route("/metrics", self.metrics_view(), methods=['GET'], include_in_schema=False)
+        api.add_route("/core_view/metrics", self.metrics_view(), methods=["GET"], include_in_schema=False)
         api.route_descriptions[root_route].append(basic_info)
