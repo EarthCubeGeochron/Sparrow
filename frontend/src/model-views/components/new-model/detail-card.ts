@@ -59,6 +59,7 @@ const SampleCard = function(props: SampleCardProps) {
   return h(
     component,
     {
+      draggable: false,
       className: "sample-card",
       to,
       onMouseEnter: onHover,
