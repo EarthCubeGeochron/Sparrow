@@ -1,4 +1,4 @@
-import { AddCard, SessionModelCard, SessionEditCard } from "../index";
+import { AddCard, SessionPageViewModelCard, SessionEditCard } from "../index";
 import { DndContainer } from "~/components";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
@@ -79,7 +79,7 @@ export function PageViewSessions(props) {
             ]
           );
         } else {
-          return h(SessionModelCard, {
+          return h(SessionPageViewModelCard, {
             session_id,
             technique,
             target,
