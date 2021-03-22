@@ -60,11 +60,11 @@ export function DndChild(props) {
     e.stopPropagation();
   };
 
-  return h(
-    "div",
-    { id, onDragStart: dragStart, onDragOver: dragOver, draggable },
-    [childern]
-  );
+  const dragProps = draggable
+    ? { id, onDragStart: dragStart, onDragOver: dragOver, draggable }
+    : {};
+
+  return h("div", { ...dragProps }, [childern]);
 }
 
 export function MySwitch(props) {

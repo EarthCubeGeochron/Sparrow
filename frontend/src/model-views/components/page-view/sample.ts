@@ -13,6 +13,7 @@ export const SampleAdd = (props) => {
     onClickDelete,
     onClickList,
     data,
+    draggable = true,
     isEditing = true,
     setID = () => {},
   } = props;
@@ -22,6 +23,7 @@ export const SampleAdd = (props) => {
       h(PageViewSamples, {
         data,
         isEditing,
+        draggable,
         onClick: onClickDelete,
         setID,
       }),
@@ -75,29 +77,18 @@ export const PageViewSamples = function({
         h(SampleContainer, [
           data.map((d) => {
             const { id, name, session } = d;
-            return h(
-              DndChild,
-              {
+            return h(DndChild, {
+              id,
+              data: d,
+              draggable,
+              childern: h(SampleEditCard, {
                 id,
-                data: d,
-                draggable,
-                childern: h(SampleEditCard, {
-                  id,
-                  name,
-                  session,
-                  setID,
-                  onClick,
-                }),
-              },
-              [
-                h(SampleEditCard, {
-                  id,
-                  name,
-                  setID,
-                  onClick,
-                }),
-              ]
-            );
+                name,
+                session,
+                setID,
+                onClick,
+              }),
+            });
           }),
         ]),
       ]);

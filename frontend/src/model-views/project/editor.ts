@@ -240,6 +240,8 @@ export function EditableSamples() {
 
   const samples =
     model.sample == null || model.sample == [] ? [] : [...model.sample];
+  const sessions =
+    model.session == null || model.session == [] ? [] : [...model.session];
 
   const onClickDelete = ({ id, name }) => {
     const newSamples = id
@@ -269,9 +271,12 @@ export function EditableSamples() {
     setListName("sample");
   };
 
+  const draggable = isEditing && sessions.length > 0;
+
   return h(SampleAdd, {
     data: model.sample,
     setID: setHoverID,
+    draggable,
     isEditing,
     onClickDelete,
     onClickList,
