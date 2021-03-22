@@ -33,7 +33,7 @@ class TestAPIV2:
         data = res.json()
         assert data["description"] is not None
 
-    @mark.parametrize("route", ["/api/v2/vocabulary/metrics"])
+    @mark.parametrize("route", ["/api/v2/core_view/metrics"])
     def test_api_metrics(self, client, route):
         """Checks to See if the Metrics API endpoint is working"""
         res = client.get(route)
