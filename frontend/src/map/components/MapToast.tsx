@@ -1,22 +1,18 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Button,
   Card,
-  Collapse,
   Spinner,
   Divider,
   Dialog,
   NumericInput,
   InputGroup,
 } from "@blueprintjs/core";
-import { useAPIResult, useToggle } from "./APIResult";
+import { useAPIResult } from "@macrostrat/ui-components";
+import { useToggle } from "~/components";
 import { mapStyle } from "../MapStyle";
-import {
-  MultipleSelectFilter,
-  GeologicFormationSelector,
-  NoLocalSampleSelector,
-} from "../../filter/components";
+import { MultipleSelectFilter } from "~/components";
 
 /**
  * Form that pops up from the Toaster component.
@@ -34,7 +30,6 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
           onClose={toggleOpen}
         >
           <Card>
-            {/* <NoLocalSampleSelector /> */}
             <MultipleSelectFilter
               text="Connect to Sample without location: "
               items={[
@@ -176,7 +171,6 @@ export function MapToast({ lng, lat, mapstyle }) {
                   <h5>
                     <p key={object.name}>{object.b_init_name}</p>
                     <p key={object.name}>{object.descrip}</p>
-                    {/* <p key={object.lith}>{object.lith}</p> */}
                   </h5>
                   <Divider />
                 </div>

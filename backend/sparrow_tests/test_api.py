@@ -33,7 +33,7 @@ class TestAPIV2:
         data = res.json()
         assert data["description"] is not None
 
-    @mark.parametrize("route", ["/api/v2/vocabulary/metrics"])
+    @mark.parametrize("route", ["/api/v2/core_view/metrics"])
     def test_api_metrics(self, client, route):
         """Checks to See if the Metrics API endpoint is working"""
         res = client.get(route)
@@ -116,9 +116,7 @@ class TestAPIV2:
         res = client.get("/api/v2/models/session")
         assert res.status_code == 200
         data = res.json()
-        assert (
-            data["total_count"] == 1
-        )  ## it fails here because theres no data. db.load_data isn't working
+        assert data["total_count"] == 1  ## it fails here because theres no data. db.load_data isn't working
         assert data["data"][0]["name"] == "Declarative import test"
 
     def test_model_analysis(self, client, db):

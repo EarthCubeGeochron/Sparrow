@@ -3,9 +3,9 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { FormGroup, Button } from "@blueprintjs/core";
 import { HelpButton } from "~/components";
 import { useAPIv2Result } from "~/api-v2";
-import { sample_geo_entity } from "../../sample/new-sample/types";
-import { MySuggest } from "../../../components/blueprint.select";
-import { MyNumericInput } from "../../../components/edit-sample";
+import { sample_geo_entity } from "../../../sample/new-sample/types";
+import { MySuggest } from "../../../../components/blueprint.select";
+import { MyNumericInput } from "../../../../components/edit-sample";
 //@ts-ignore
 import styles from "./module.styl";
 

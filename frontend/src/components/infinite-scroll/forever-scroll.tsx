@@ -82,7 +82,7 @@ function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
 
   return (
     <div className="ForeverScroll" style={{ marginTop: "20px" }}>
-      {data.map((d) => h(component, { ...componentProps, ...d }))}
+      {data.map((d, i) => h(component, { id: i, ...componentProps, ...d }))}
 
       {loadingBottom && h(Spinner)}
 

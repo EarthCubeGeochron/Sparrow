@@ -1,178 +1,33 @@
 import { useContext, useState, useEffect, createContext } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import {
-  EditableText,
-  Intent,
-  Button,
-  Popover,
-  ButtonGroup,
-  Card,
-} from "@blueprintjs/core";
 import { useAuth } from "~/auth";
 import {
   ModelEditor,
   ModelEditorContext,
-  ModelEditButton,
-  CancelButton,
-  SaveButton,
   useModelEditor,
   APIHelpers,
 } from "@macrostrat/ui-components";
-import { MinimalNavbar, MySwitch } from "~/components";
 import { put } from "axios";
 import "../main.styl";
+//@ts-ignore
 import styles from "~/admin/module.styl";
 import {
   ResearcherAdd,
-  EditProjNewResearcher,
   PubAdd,
-  EditProjNewPub,
   SampleAdd,
   SessionAdd,
-  EditProjNewSample,
-} from "../new-model";
-import { DatePicker } from "@blueprintjs/datetime";
+  ModelEditableText,
+  EmbargoDatePick,
+  EditStatusButtons,
+  EditNavBar,
+  NewProjectPageButton,
+} from "../components";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
 import { ProjectAdminContext } from "~/admin/project";
+import { Frame } from "~/frame";
 
 const h = hyperStyled(styles);
-
-const ModelEditableText = function(props) {
-  let {
-    multiline,
-    field,
-    placeholder,
-    is,
-    editOn = false,
-    onChange = () => {},
-    value = null,
-    ...rest
-  } = props;
-  const el = is || "div";
-  if (placeholder == null) {
-    placeholder = "Add a " + field;
-  }
-  delete rest.is;
-
-  if (!editOn) {
-    const { model, actions, isEditing } = useContext(ModelEditorContext);
-
-    // Show text with primary intent if changes have been made
-    const intent = actions.hasChanges(field) ? Intent.SUCCESS : null;
-
-    return h(el, rest, [
-      h.if(isEditing)(EditableText, {
-        className: `model-edit-text field-${field}`,
-        multiline,
-        placeholder,
-        intent,
-        onChange: actions.onChange(field),
-        value: model[field],
-      }),
-      h.if(!isEditing)("span", model[field]),
-    ]);
-  }
-  const { id, onConfirm } = rest;
-  return h(el, [
-    h(EditableText, {
-      className: "model-edit-text",
-      multiline,
-      placeholder,
-      onChange,
-      value,
-      id,
-      onConfirm,
-    }),
-  ]);
-};
-
-const ToInfinityDate = (date) => {
-  const newYear = date.getFullYear() + 3000;
-  const month = date.getMonth();
-  const day = date.getDay();
-  return new Date(newYear, month, day);
-};
-
-export const EmbargoDatePick = (props) => {
-  const { onChange, embargo_date, active = true } = props;
-  // need to add an un-embargo if data is embargoed. And an infinite embargo
-  const embargoDate = embargo_date ? new Date(embargo_date) : null;
-
-  let today = new Date();
-  let tomorrow = new Date();
-  tomorrow.setDate(today.getDate() + 1);
-
-  const embargoed = embargoDate ? true : false;
-
-  const infinite =
-    embargoDate && embargoDate.getFullYear() === today.getFullYear() + 3000
-      ? true
-      : false;
-
-  const text =
-    embargoDate != null
-      ? infinite
-        ? "Embargoed Indefinitely"
-        : `Embargoed Until: ${embargoDate.toISOString().split("T")[0]}`
-      : "Public";
-  const icon = embargoDate != null ? "lock" : "unlock";
-
-  console.log(embargoed);
-  console.log(infinite);
-
-  const switchChange = () => {
-    if (infinite) {
-      onChange(null);
-    } else {
-      onChange(ToInfinityDate(today));
-    }
-  };
-
-  console.log(tomorrow);
-
-  const Content = () => {
-    return h(Card, [
-      h(DatePicker, {
-        minDate: new Date(),
-        maxDate: new Date(2050, 1, 1),
-        onChange: (e) => {
-          let date = e.toISOString().split("T")[0];
-          onChange(e);
-        },
-      }),
-      h("div", [
-        "Emargo Forever: ",
-        h(MySwitch, {
-          checked: infinite,
-          onChange: switchChange,
-        }),
-      ]),
-      h(
-        Button,
-        {
-          disabled: !embargoed,
-          onClick: () => onChange(null),
-          minimal: true,
-        },
-        ["Make Public"]
-      ),
-    ]);
-  };
-
-  return h("div.embargo-editor", [
-    h(Popover, { content: h(Content), disabled: !active }, [
-      h(Button, {
-        text,
-        minimal: true,
-        interactive: false,
-        rightIcon: icon,
-        intent: Intent.SUCCESS,
-        disabled: !active,
-      }),
-    ]),
-  ]);
-};
 
 export const EmbargoEditor = function(props) {
   const { model, actions, isEditing } = useContext(ModelEditorContext);
@@ -184,33 +39,6 @@ export const EmbargoEditor = function(props) {
   const embargo_date = model.embargo_date;
 
   return h(EmbargoDatePick, { onChange, embargo_date, active: isEditing });
-};
-
-export const EditStatusButtons = function(props) {
-  const { hasChanges, isEditing, onClickCancel, onClickSubmit } = props;
-
-  const changed = hasChanges();
-  return h("div.edit-status-controls", [
-    h.if(!isEditing)(ModelEditButton, { minimal: true }, "Edit"),
-    h.if(isEditing)(ButtonGroup, { minimal: true }, [
-      h(
-        SaveButton,
-        {
-          disabled: !changed,
-          onClick: onClickSubmit,
-        },
-        "Save"
-      ),
-      h(
-        CancelButton,
-        {
-          intent: changed ? "warning" : "none",
-          onClick: onClickCancel,
-        },
-        "Done"
-      ),
-    ]),
-  ]);
 };
 
 function EditStatusButtonsProj() {
@@ -341,7 +169,6 @@ function EditResearchers(props) {
       setListName("researcher");
     },
     isEditing,
-    //rightElement: h(EditProjNewResearcher),
   });
 }
 
@@ -389,7 +216,6 @@ function EditablePublications(props) {
       setListName("publication");
     },
     isEditing,
-    //rightElement: h(EditProjNewPub),
   });
 }
 
@@ -415,6 +241,8 @@ export function EditableSamples() {
 
   const samples =
     model.sample == null || model.sample == [] ? [] : [...model.sample];
+  const sessions =
+    model.session == null || model.session == [] ? [] : [...model.session];
 
   const onClickDelete = ({ id, name }) => {
     const newSamples = id
@@ -444,29 +272,25 @@ export function EditableSamples() {
     setListName("sample");
   };
 
+  const draggable = isEditing && sessions.length > 0;
+
   return h(SampleAdd, {
     data: model.sample,
     setID: setHoverID,
+    draggable,
     isEditing,
     onClickDelete,
     onClickList,
-    //rightElement: h(EditProjNewSample),
   });
 }
-
-const EditNavBar = function(props) {
-  const { editButtons, embargoEditor, header } = props;
-  return h(MinimalNavbar, { className: "project-editor-navbar" }, [
-    h("h4", header),
-    editButtons,
-    embargoEditor,
-  ]);
-};
 
 const ProjEditNavBar = ({ header }) => {
   return h(EditNavBar, {
     header,
-    editButtons: h(EditStatusButtonsProj),
+    editButtons: h("div", { style: { display: "flex" } }, [
+      h(NewProjectPageButton),
+      h(EditStatusButtonsProj),
+    ]),
     embargoEditor: h(EmbargoEditor),
   });
 };
@@ -530,6 +354,7 @@ const EditableProjectDetails = function(props) {
               h(EditResearchers),
               h(EditSessions),
               h(SampleMapComponent),
+              h(Frame, { id: "projectPage", data: project.data }, null),
             ]),
           ]),
         ]
@@ -538,4 +363,4 @@ const EditableProjectDetails = function(props) {
   );
 };
 
-export { EditableProjectDetails, EditNavBar, ModelEditableText };
+export { EditableProjectDetails };

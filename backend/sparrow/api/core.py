@@ -96,7 +96,6 @@ class APIv2(Starlette):
             self._add_model_route(iface)
 
         self.add_view_route("authority", schema="vocabulary", description="Route to view authorities for technical descriptions")
-        self.add_view_route("metrics", schema="vocabulary", description="Data Metrics and Statistics")
         self.add_view_route("age_context", description="Ages directly connected to geologic context")
 
         self.add_schema_route()

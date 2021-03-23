@@ -3,14 +3,14 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
 import { NoStateAdmin } from "./baseview";
 import { SessionMatch } from "../model-views";
-import { SessionListComponent } from "./infinite-scroll";
+import { SessionListComponent } from "../components/infinite-scroll/infinite-scroll";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
 import {
   ProjectFilterList,
   PublicationFilterList,
   SampleFilterList,
-} from "../model-views/new-model";
+} from "../model-views/components/new-model";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);

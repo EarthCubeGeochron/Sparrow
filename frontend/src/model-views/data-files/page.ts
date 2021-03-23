@@ -1,14 +1,13 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useParams } from "react-router-dom";
 import { useModelURL } from "~/util/router";
-import { useAPIResult } from "@macrostrat/ui-components";
-import { SampleListCard } from "../sample/list";
 import styles from "./module.styl";
 import { DownloadButton } from "../session";
-import { Button, Divider, Spinner } from "@blueprintjs/core";
-import { parse, format } from "date-fns";
+import { Divider, Spinner } from "@blueprintjs/core";
+import { format } from "date-fns";
 import { LinkCard } from "@macrostrat/ui-components";
-import { SampleCard } from "../sample/detail-card";
+import { SampleCard } from "../components/new-model/detail-card";
+import { Frame } from "~/frame";
 import { useAPIv2Result } from "~/api-v2";
 
 const h = hyperStyled(styles);
@@ -72,7 +71,7 @@ export const SessionCardInfo = (props) => {
   );
 };
 
-export const SessionLinkCard = function (props) {
+export const SessionLinkCard = function(props) {
   const { session_id } = props;
 
   const to = useModelURL(`/session/${session_id}`);
@@ -182,14 +181,14 @@ export function DataFilePage({ props }) {
     ]),
     h(Divider),
     h("div.info-container", [
-      //h("div.projects", [h(ProjectLinks, { project })]),
       h(Samples, { samples }),
       h(SessionList, { sessions }),
+      h(Frame, { id: "datafilePage", data }, null),
     ]),
   ]);
 }
 
-const DataFileComponent = function (props) {
+const DataFileComponent = function(props) {
   const { file_hash } = props;
   const dataFileURL = `/models/data_file/${file_hash}`;
 
