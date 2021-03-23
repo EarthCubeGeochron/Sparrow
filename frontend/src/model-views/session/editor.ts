@@ -184,18 +184,16 @@ export function EditableSessionDetails(props) {
   const { id } = props;
 
   const Edit = useModelURLBool();
-
   const res = useAPIv2Result(`/models/session/${id}`, {
     nest: "sample,instrument,publication,project",
   });
-  if (!res) return null;
-
-  console.log(res);
-
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
-
   const to = useModelURL("/session");
+  
+  if (!res) return null;
+
+
   const breadCrumbs = [
     { text: h(Link, { to }, "Sessions") },
     { icon: "document", text: h("code.session-id", id) },
