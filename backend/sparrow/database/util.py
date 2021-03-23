@@ -12,6 +12,7 @@ from click import echo
 
 log = get_logger(__name__)
 
+
 def db_session(engine):
     factory = sessionmaker(bind=engine)
     return factory()
@@ -23,8 +24,8 @@ def run_query(db, filename_or_query, **kwargs):
     a SQLAlchemy database object) and turn it into a
     `Pandas` dataframe.
     """
-    from pandas import read_sql        
-    
+    from pandas import read_sql
+
     if "SELECT" in str(filename_or_query):
         # We are working with a query string instead of
         # an SQL file.
@@ -99,17 +100,17 @@ def get_or_create(session, model, defaults=None, **kwargs):
         instance._created = False
         return instance
     else:
-        params = dict(
-            (k, v) for k, v in kwargs.items() if not isinstance(v, ClauseElement)
-        )
+        params = dict((k, v) for k, v in kwargs.items() if not isinstance(v, ClauseElement))
         params.update(defaults or {})
         instance = model(**params)
         session.add(instance)
         instance._created = True
         return instance
 
+
 def get_db_model(db, model_name: str):
     return getattr(db.model, model_name)
+
 
 @contextmanager
 def temp_database(conn_string, drop=True):
@@ -122,25 +123,32 @@ def temp_database(conn_string, drop=True):
         if drop:
             drop_database(conn_string)
 
+
 def connection_args(engine):
     """Get PostgreSQL connection arguments for a engine"""
+    _psql_flags = {"-U": "username", "-h": "host", "-p": "port", "-P": "password"}
+
     if isinstance(engine, str):
         # We passed a connection url!
         engine = create_engine(engine)
-    uri = engine.url
-    flags = f"-U {uri.username} -h {uri.host} -p {uri.port}"
-    if password := uri.password:
-        flags += f" -P {password}"
-    return flags, uri.database
+    flags = ""
+    for flag, _attr in _psql_flags.items():
+        val = getattr(engine.url, _attr)
+        if val is not None:
+            flags += f" {flag} {val}"
+    return flags, engine.url.database
+
 
 def db_isready(engine_or_url):
     args, _ = connection_args(engine_or_url)
     c = cmd("pg_isready", args)
     return c.returncode == 0
 
+
 def wait_for_database(engine_or_url, quiet=False):
     msg = "Waiting for database..."
     while not db_isready(engine_or_url):
-        if not quiet: echo(msg)
+        if not quiet:
+            echo(msg)
         log.info(msg)
         sleep(1)
