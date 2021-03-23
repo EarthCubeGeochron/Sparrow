@@ -173,7 +173,8 @@ class TestDuplication:
         }
 
         # Two datum with unique analysis numbers should be created, but are not.
-        db.load_data("session", data)
+        res = db.load_data("session", data)
+        assert len(res.analysis_collection) == 2
+        for a in res.analysis_collection:
+            assert len(a.datum_collection) == 1
         assert len(db.session.query(db.model.datum).all()) == 2
-
-        assert res.status_code == 201
