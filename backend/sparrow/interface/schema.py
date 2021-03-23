@@ -186,21 +186,39 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
     @post_load
     def make_instance(self, data, **kwargs):
-        # Find instance in cache
+        # We start off with no instance loaded
         instance = None
+        # FIRST, try to load from cached values created during this import
+        #
+        # This cache exists primarily to cover cases where we import models that need to be
+        # linked in multiple places (e.g. units, parameters, and datum_types). We could potentially
+        # expand it to cover cases where we want to create several models up front and then reference
+        # them from other places in the import model hierarchy.
+        #
+        # Datum (and some other analytical models) can easily be pulled in without a specific provided
+        # identity (they get their uniqueness in part from their link to analysis). Given this,
+        # it is possible for us to "steal" them from other analyses imported
+        # at the same time. It's likely this could happen with analysis and other models as well.
+        #
+        # See https://github.com/EarthCubeGeochron/Sparrow/issues/80
+        #
+        # We solve this by exempting these models from caching. However, there are
+        # likely more issues that will arise along these lines in the near future.
         cache_key = None
-        if self.opts.model.__name__ not in ["datum", "analysis", "session", "sample"]:
-            # Datum (and some other analytical models) can easily be pulled in without a specific
-            # identity, which makes it possible for us to "steal" them from other analyses imported
-            # at the same time. It's likely this could happen with analysis and other models as well.
-            #
-            # For
+        # We should figure out a better way to do this than a blacklist...or at
+        # least pull the blacklist into config code somewhere.
+        _cache_blacklist = ["datum", "analysis", "session", "sample"]
+        if self.opts.model.__name__ not in _cache_blacklist:
             instance, cache_key = self._get_cached_instance(data)
+
+        # THEN, try to load from existing instances
         if instance is None:
             instance = self._get_instance(data)
+
+        # FINALLY, make a new instance if one can't be found
         if instance is None:
             instance = self.opts.model(**data)
-            log.debug(f"Adding {instance}")
+            log.debug(f"Adding new {instance} to session")
             self.session.add(instance)
         if cache_key is not None:
             self.__instance_cache[cache_key] = instance
