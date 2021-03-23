@@ -8,6 +8,11 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## `[2.0.0.beta3]` - 2021-03-23
+
+- Fixed a small but important database initialization [bug](https://github.com/EarthCubeGeochron/Sparrow/issues/76) that blocks new database setup for most lab setups
+- **Frontend:** editing mode consistency across pages, partial refactor
+- Remove unnecessary `metrics` database view (information is fetched using direct SQL querying instead).
 ## `[2.0.0.beta2]` - 2021-03-18
 ### Frontend
 
