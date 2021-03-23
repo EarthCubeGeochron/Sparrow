@@ -1,14 +1,12 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useParams } from "react-router-dom";
 import { useModelURL } from "~/util/router";
-import { useAPIResult } from "@macrostrat/ui-components";
-import { SampleListCard } from "../sample/list";
 import styles from "./module.styl";
 import { DownloadButton } from "../session";
-import { Button, Divider, Spinner } from "@blueprintjs/core";
-import { parse, format } from "date-fns";
+import { Divider, Spinner } from "@blueprintjs/core";
+import { format } from "date-fns";
 import { LinkCard } from "@macrostrat/ui-components";
-import { SampleCard } from "../sample/detail-card";
+import { SampleCard } from "../components/new-model/detail-card";
 import { Frame } from "~/frame";
 import { useAPIv2Result } from "~/api-v2";
 
@@ -183,14 +181,9 @@ export function DataFilePage({ props }) {
     ]),
     h(Divider),
     h("div.info-container", [
-      //h("div.projects", [h(ProjectLinks, { project })]),
       h(Samples, { samples }),
       h(SessionList, { sessions }),
-      h(
-        Frame,
-        { id: "datafilePage", data },
-        "Open the Pod Bay Doors please hal"
-      ),
+      h(Frame, { id: "datafilePage", data }, null),
     ]),
   ]);
 }

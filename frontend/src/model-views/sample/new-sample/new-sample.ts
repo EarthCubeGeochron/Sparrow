@@ -13,10 +13,12 @@ import {
   SampleMaterial,
   SampleName,
   SubmitButton,
-} from "../../new-model";
+  EmbargoDatePick,
+  ModelAddFilterLists,
+  ProjectAdd,
+  SessionAdd,
+} from "../../components";
 import { sampleReducer } from "./reducer";
-import { ModelAddFilterLists, ProjectAdd, SessionAdd } from "../../new-model";
-import { EmbargoDatePick } from "../../project/editor";
 import { MinimalNavbar } from "~/components";
 import {
   modelEditList,

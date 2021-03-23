@@ -5,7 +5,7 @@ import { DataFileMatch } from "../model-views/data-files/page";
 import { NoStateAdmin } from "./baseview";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
-import { DataFilesListComponent } from "./infinite-scroll";
+import { DataFilesListComponent } from "../components/infinite-scroll/infinite-scroll";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);

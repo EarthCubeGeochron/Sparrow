@@ -1,9 +1,7 @@
 import { useState } from "react";
 import h from "@macrostrat/hyper";
-import * as React from "react";
-import { Menu, MenuItem, Icon, InputGroup, Tag } from "@blueprintjs/core";
 import "../cluster.css";
-import { SampleFilter, AdminFilter } from "../../filter";
+import { AdminFilter } from "../../filter";
 import { createParamsFromURL } from "../../admin/AdminPage";
 import { Popover, Button, Tooltip } from "@blueprintjs/core";
 

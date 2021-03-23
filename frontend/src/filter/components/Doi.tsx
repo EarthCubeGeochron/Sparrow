@@ -1,4 +1,3 @@
-import React from "react";
 import { InputGroup, Card } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import styles from "./module.styl";

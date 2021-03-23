@@ -1,7 +1,7 @@
 import { NonIdealState } from "@blueprintjs/core";
 import h from "@macrostrat/hyper";
 
-const UnderConstruction = function (props) {
+const UnderConstruction = function(props) {
   const { name } = props;
   const rest = " view is not yet implemented. Sorry!";
   let desc = "This" + rest;

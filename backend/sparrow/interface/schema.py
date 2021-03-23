@@ -67,9 +67,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         self.allowed_nests = nests
         if len(self.allowed_nests) > 0:
             model = self.opts.model.__name__
-            log.debug(
-                f"\nSetting up schema for model {model}\n  allowed nests: {nests}"
-            )
+            log.debug(f"\nSetting up schema for model {model}\n  allowed nests: {nests}")
 
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
@@ -88,9 +86,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         for prop in self.opts.model.__mapper__.iterate_properties:
             columns = getattr(prop, "columns", False)
             if columns:
-                is_fully_defined = all(
-                    [any([c.primary_key, c.unique]) for c in columns]
-                )
+                is_fully_defined = all([any([c.primary_key, c.unique]) for c in columns])
                 # Shim for the fact that we don't correctly find Session.uuid as unique at the moment...
                 # TODO: fix this in general
                 # if self.opts.model.__name__ == "Session" and prop.key == "uuid":
@@ -175,24 +171,54 @@ class ModelSchema(SQLAlchemyAutoSchema):
         assert len(pk) == len(pk_vals)
         return {col.key: val for col, val in zip(pk, pk_vals)}
 
-    @post_load
-    def make_instance(self, data, **kwargs):
-        # Find instance in cache
+    def _get_cached_instance(self, data):
+        """Get an instance cached within this load transaction"""
         cache_key = None
         try:
             cache_key = hash(frozenset(data.items()))
             match_ = self.__instance_cache.get(cache_key, None)
             if match_ is not None:
-                log.debug(
-                    f"Found {match_} in session cache for {data} (key: {cache_key})"
-                )
-                return match_
+                log.debug(f"Found {match_} in session cache for {data} (key: {cache_key})")
+                return match_, cache_key
         except TypeError:
             pass
+        return None, cache_key
 
-        instance = self._get_instance(data)
+    @post_load
+    def make_instance(self, data, **kwargs):
+        # We start off with no instance loaded
+        instance = None
+        # FIRST, try to load from cached values created during this import
+        #
+        # This cache exists primarily to cover cases where we import models that need to be
+        # linked in multiple places (e.g. units, parameters, and datum_types). We could potentially
+        # expand it to cover cases where we want to create several models up front and then reference
+        # them from other places in the import model hierarchy.
+        #
+        # Datum (and some other analytical models) can easily be pulled in without a specific provided
+        # identity (they get their uniqueness in part from their link to analysis). Given this,
+        # it is possible for us to "steal" them from other analyses imported
+        # at the same time. It's likely this could happen with analysis and other models as well.
+        #
+        # See https://github.com/EarthCubeGeochron/Sparrow/issues/80
+        #
+        # We solve this by exempting these models from caching. However, there are
+        # likely more issues that will arise along these lines in the near future.
+        cache_key = None
+        # We should figure out a better way to do this than a blacklist...or at
+        # least pull the blacklist into config code somewhere.
+        _cache_blacklist = ["datum", "analysis", "session", "sample"]
+        if self.opts.model.__name__ not in _cache_blacklist:
+            instance, cache_key = self._get_cached_instance(data)
+
+        # THEN, try to load from existing instances
+        if instance is None:
+            instance = self._get_instance(data)
+
+        # FINALLY, make a new instance if one can't be found
         if instance is None:
             instance = self.opts.model(**data)
+            log.debug(f"Adding new {instance} to session")
             self.session.add(instance)
         if cache_key is not None:
             self.__instance_cache[cache_key] = instance

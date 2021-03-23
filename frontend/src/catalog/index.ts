@@ -5,9 +5,9 @@ not include editing functionality.
 */
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch } from "react-router-dom";
-import { LinkCard } from "@macrostrat/ui-components";
 import { Frame } from "~/frame";
 import { ErrorBoundaryRoute as Route } from "~/util";
+import { DataModelLinks } from "./nav";
 import { SessionListComponent } from "./session-list";
 import { ProjectListComponent } from "./project-list";
 import { ProjectMatch } from "~/model-views/project";
@@ -15,31 +15,12 @@ import { SampleMain } from "~/model-views/sample";
 import { LoginSuggest } from "~/auth";
 import { InsetText } from "~/components/layout";
 import { CatalogNavbar } from "./nav";
+//@ts-ignore
 import styles from "./module.styl";
 import { SessionMatch } from "../model-views/session";
 import { DataFilesMain } from "../model-views/data-files";
 
 const h = hyperStyled(styles);
-
-function DataModelLinks(props) {
-  const { base = "/catalog" } = props;
-  return h("div.data-model-links", [
-    h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
-    h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
-    h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
-    h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
-  ]);
-}
-
-function AdminDataModelLinks(props) {
-  const { base = "/catalog" } = props;
-  return h("div.data-model-links", [
-    h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
-    h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
-    h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
-    h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
-  ]);
-}
 
 const CatalogMain = ({ base, ...rest }) => {
   if (base == null) {
@@ -101,4 +82,3 @@ const Catalog = ({ base }) =>
   ]);
 
 export default Catalog;
-export { AdminDataModelLinks, DataModelLinks };

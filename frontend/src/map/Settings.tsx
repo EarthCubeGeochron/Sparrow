@@ -7,6 +7,4 @@ export const SETTINGS = {
   apiDomain: "https://dev.macrostrat.org",
   gddDomain: "https://geodeepdive.org",
   pbdbDomain: "https://paleobiodb.org",
-  mapboxAccessToken:
-    "pk.eyJ1IjoiamN6YXBsZXdza2kiLCJhIjoiWnQxSC01USJ9.oleZzfREJUKAK1TMeCD0bg",
 };

@@ -5,15 +5,8 @@
  */
 import h from "react-hyperscript";
 import styled from "@emotion/styled";
-import { Component, useState } from "react";
-import {
-  Callout,
-  Icon,
-  Card,
-  NonIdealState,
-  Drawer,
-  Button,
-} from "@blueprintjs/core";
+import { useState } from "react";
+import { Callout, NonIdealState, Drawer, Button } from "@blueprintjs/core";
 import {
   CollapsePanel,
   APIResultView,

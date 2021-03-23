@@ -3,10 +3,10 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
 import { NoStateAdmin } from "./baseview";
 import { SampleMatch } from "~/model-views/sample/list";
-import { SampleListComponent } from "./infinite-scroll";
+import { SampleListComponent } from "../components/infinite-scroll/infinite-scroll";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
-import { ProjectFilterList, SessionFilterList } from "../model-views/new-model";
+import { ProjectFilterList, SessionFilterList } from "../model-views/components/new-model";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -55,14 +55,6 @@ const MainFilterList = () => {
 
 function SampleAdminList() {
   const { listName, updateFunction } = useContext(SampleAdminContext);
-
-  const testclick = (id, name) => {
-    console.log(name);
-  };
-  const testclicks = (session_id, date, target, technique) => {
-    console.log(session_id, date, target, technique);
-  };
-
   return h("div", [
     h.if(listName == "main")(MainFilterList),
     h.if(listName == "project")(ProjectFilterList, { onClick: updateFunction }),

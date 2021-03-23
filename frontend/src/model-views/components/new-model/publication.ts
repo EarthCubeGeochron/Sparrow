@@ -1,14 +1,14 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useReducer, useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { useModelEditor } from "@macrostrat/ui-components";
 import { Button, Tooltip, InputGroup, Divider } from "@blueprintjs/core";
-import { Publication } from "../project/page";
-import { ModelEditableText } from "../project/editor";
+import { Publication } from "../page-view";
+import { ModelEditableText } from "./utils";
 import { FormSlider, isTitle } from "./utils";
 import { useAPIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
-import { FilterAccordian } from "../../filter/components/utils";
-import { ProjectFormContext } from "../project/new-project";
+import { FilterAccordian } from "../../../filter/components/utils";
+import { ProjectFormContext } from "../../project/new-project";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -255,15 +255,6 @@ export function NewProjectNewPub() {
 }
 
 export function EditProjNewPub({ onSubmit }) {
-  const { model, actions } = useModelEditor();
-
-  // const onSubmit = (data) => {
-  //   const publication = model.publication == null ? [] : [...model.publication];
-  //   let newPubs = [...publication, ...data];
-  //   actions.updateState({
-  //     model: { publication: { $set: newPubs } },
-  //   });
-  // };
   return h(AddNewPubToModel, { onSubmit });
 }
 
