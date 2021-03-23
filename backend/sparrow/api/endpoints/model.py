@@ -34,7 +34,8 @@ from ...logs import get_logger
 from ...util import relative_path
 from .utils import location_check, material_check, commit_changes, commit_edits, collection_handler
 import json
-import copy
+import logging
+import io
 
 log = get_logger(__name__)
 
@@ -205,6 +206,19 @@ class ModelAPIEndpoint(HTTPEndpoint):
     async def get(self, request):
         """Handler for all GET requests"""
 
+        ## start off by setting up listening for sqlalchemy logging
+        logger = logging.getLogger('sqlalchemy.engine')
+        logger.setLevel(logging.INFO) # needs to be separate line
+
+        ## set up a log handler
+        log_capture_string = io.StringIO()
+        ch = logging.StreamHandler(log_capture_string)
+        ch.setLevel(logging.INFO)
+
+        # add the handler to the sqlalchemy logger
+        logger.addHandler(ch)
+        # now all sqlalchemy logs can get picked up later in this function
+
         if request.path_params.get("id") is not None:
             # Pass off to the single-item handler
             return await self.get_single(request)
@@ -230,11 +244,14 @@ class ModelAPIEndpoint(HTTPEndpoint):
         for _filter in self._filters:
             q = _filter(q, args)
 
-        if ENV == "development" and args.get("show_sql", False):
-            return PlainTextResponse(stringify_query(q))
 
         if args["all"]:
             res = q.all()
+            if ENV == "development" and args.get("show_sql", False):
+                # grab logs and save as variable
+                log_contents = log_capture_string.getvalue()
+                log_capture_string.close()
+                return PlainTextResponse(log_contents)
             return APIResponse(res, schema=schema, total_count=len(res))
 
         # By default, we order by the "natural" order of Primary Keys. This
@@ -246,6 +263,15 @@ class ModelAPIEndpoint(HTTPEndpoint):
             res = get_page(q, per_page=args["per_page"], page=args["page"])
         except ValueError:
             raise ValidationError("Invalid page token.")
+
+        if ENV == "development" and args.get("show_sql", False):
+            # grab logs and save as variable
+            log_contents = log_capture_string.getvalue()
+            log_capture_string.close()
+            return PlainTextResponse(log_contents)
+        # close the stream handler at end
+        log_capture_string.close()
+
 
         return APIResponse(res, schema=schema, total_count=q.count())
 
