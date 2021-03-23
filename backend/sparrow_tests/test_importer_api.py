@@ -8,9 +8,7 @@ import sys
 
 class TestAPIImporter:
     def test_api_import(self, client):
-        res = client.put(
-            "/api/v1/import-data/session", json={"filename": None, "data": basic_data}
-        )
+        res = client.put("/api/v1/import-data/session", json={"filename": None, "data": basic_data})
         assert res.status_code == 201
 
     def test_basic_import(self, client):
@@ -33,9 +31,7 @@ class TestAPIImporter:
         db.load_data("session", complex_data["data"])
 
         a = db.model.analysis
-        q = db.session.query(a).filter(
-            and_(a.session_index is not None, a.analysis_type == "d18O measurement")
-        )
+        q = db.session.query(a).filter(and_(a.session_index is not None, a.analysis_type == "d18O measurement"))
         assert q.count() > 1
 
     def test_complex_single_row(self, client, db):
@@ -48,81 +44,38 @@ class TestAPIImporter:
 
         db.load_data("session", complex_data["data"])
 
-    def test_verylarge_import(self, client):
+    def test_very_large_import(self, client):
 
         import_size = 10
 
         i = 0
         analysis = []
 
-        #while size < import_size:
+        # while size < import_size:
         for i in range(import_size):
             item = {
-                            "analysis_type": "Stable isotope analysis",
-                            "session_index": i,
-                            "datum": [
-                                {
-                                    "value": 0.2,
-                                    "error": 0.035,
-                                    "type": {"parameter": "delta 13C", "unit": "permille"},
-                                }
-                            ],
-                        }
+                "analysis_type": "Stable isotope analysis",
+                "session_index": i,
+                "datum": [
+                    {
+                        "value": 0.2,
+                        "error": 0.035,
+                        "type": {"parameter": "delta 13C", "unit": "permille"},
+                    }
+                ],
+            }
             i = i + 1
             analysis.append(item)
             size = sys.getsizeof(analysis)
 
         data = {
-                    "date": "2020-01-01T00:00:00",
-                    "name": "Session with existing instances",
-                    "sample": {"name": "LargeImport"},
-                    "analysis": analysis
-        }
-
-        res = client.put("/api/v1/import-data/session", json=data)
-        assert 1 == 0
-        assert res.status_code == 201
-
-    def test_duplicate_datum_import(self, client, db):
-
-        new_name = "Test error vvv"
-        data = {
-            "date": str(datetime.now()),
+            "date": "2020-01-01T00:00:00",
             "name": "Session with existing instances",
-            "sample": {"name": new_name},
-            "analysis": [
-                {
-                    "analysis_type": "Stable isotope analysis",
-                    "session_index": 0,
-                    "datum": [
-                        {
-                            "value": 0.1,
-                            "error": 0.025,
-                            "type": {
-                                "parameter": "delta 13C",
-                                "unit": "permille"
-                            },
-                        }
-                    ],
-                },
-                {
-                    "analysis_type": "Stable isotope analysis",
-                    "session_index": 1,
-                    "datum": [
-                        {
-                            "value": 0.1,
-                            "error": 0.025,
-                            "type": {"parameter": "delta 13C", "unit": "permille"},
-                        }
-                    ],
-                },
-            ],
+            "sample": {"name": "LargeImport"},
+            "analysis": analysis,
         }
-        #Two datum with unique analysis numbers should be created, but are not.
-        db.load_data("session", data)
-        assert len(db.session.query(db.model.datum).all()) == 2
 
-        assert 1 == 0
+        res = client.put("/api/v1/import-data/session", json={"filename": None, "data": data})
         assert res.status_code == 201
 
     def test_missing_field(self, client, db):
@@ -164,9 +117,7 @@ class TestAPIImporter:
             ],
         }
 
-        res = client.put(
-            "/api/v1/import-data/session", json={"filename": None, "data": data}
-        )
+        res = client.put("/api/v1/import-data/session", json={"filename": None, "data": data})
         assert res.status_code == 400
         err = res.json()["error"]
 
@@ -179,7 +130,50 @@ class TestAPIImporter:
         res = db.session.query(db.model.sample).filter_by(name=new_name).first()
         assert res is None
 
+
 class TestIsolation:
     def test_isolation(self, db):
         sessions = db.session.query(db.model.session).all()
         assert len(sessions) == 0
+
+
+class TestDuplication:
+    def test_duplicate_datum_import(self, client, db):
+        """Seems like we are not importing data points that are the same between analyses..."""
+
+        new_name = "Test error vvv"
+        data = {
+            "date": str(datetime.now()),
+            "name": "Session with existing instances",
+            "sample": {"name": new_name},
+            "analysis": [
+                {
+                    "analysis_type": "Stable isotope analysis",
+                    "session_index": 0,
+                    "datum": [
+                        {
+                            "value": 0.1,
+                            "error": 0.025,
+                            "type": {"parameter": "delta 13C", "unit": "permille"},
+                        }
+                    ],
+                },
+                {
+                    "analysis_type": "Stable isotope analysis",
+                    "session_index": 1,
+                    "datum": [
+                        {
+                            "value": 0.1,
+                            "error": 0.025,
+                            "type": {"parameter": "delta 13C", "unit": "permille"},
+                        }
+                    ],
+                },
+            ],
+        }
+
+        # Two datum with unique analysis numbers should be created, but are not.
+        db.load_data("session", data)
+        assert len(db.session.query(db.model.datum).all()) == 2
+
+        assert res.status_code == 201
