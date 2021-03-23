@@ -165,11 +165,12 @@ def wait_for_database(engine_or_url, quiet=False):
 @dataclass
 class QueryInfo:
     exc_time: float
-    statement: Statement
-
-
+    #statement: Statement
+    ## What is "Statement" supposed to be?
+ 
 class QueryLogger:
-    """Sets up handlers for two events that let us track the execution time of
+    """
+    Sets up handlers for two events that let us track the execution time of
     queries.
     Based on https://github.com/pallets/flask-sqlalchemy/blob/master/src/flask_sqlalchemy/__init__.py
     """
