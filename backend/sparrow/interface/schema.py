@@ -4,9 +4,10 @@ from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
-from sqlalchemy.exc import StatementError, IntegrityError
+from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
+from sqlalchemy.orm.exc import FlushError
 from sqlalchemy.orm import RelationshipProperty
-from sqlalchemy.dialects.postgresql import JSONB
+from collections.abc import Mapping
 from sqlalchemy import inspect
 
 from .util import is_pk_defined, pk_values, prop_is_required
@@ -45,6 +46,16 @@ def is_model_ready(model, data):
     return True
 
 
+def matches(instance, filters):
+    for k, v in filters.items():
+        try:
+            if getattr(instance, k) != v:
+                return False
+        except AttributeError:
+            return False
+    return True
+
+
 class ModelSchema(SQLAlchemyAutoSchema):
     """
     :param: allowed_nests: List of strings or "all"
@@ -56,67 +67,36 @@ class ModelSchema(SQLAlchemyAutoSchema):
         self.allowed_nests = nests
         if len(self.allowed_nests) > 0:
             model = self.opts.model.__name__
-            log.debug(
-                f"\nSetting up schema for model {model}\n  allowed nests: {nests}"
-            )
+            log.debug(f"\nSetting up schema for model {model}\n  allowed nests: {nests}")
 
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
 
         super().__init__(*args, **kwargs)
 
-    def _ready_for_flush(self, instance):
-        if instance is None:
-            return False
-        if any([p is None for p in pk_values(instance)]):
-            return False
-        for prop in self.opts.model.__mapper__.iterate_properties:
-            is_required = prop_is_required(prop)
-            if not is_required:
-                continue
-            if getattr(instance, prop.key, None) is None:
-                return False
-
-        return True
-
     @property
     def _table(self):
         return self.opts.model.__table__
 
-    def _get_session_instance(self, filters):
-        sess = self.session
-        for inst in list(sess.new):
-            if not isinstance(inst, self.opts.model):
-                continue
-            for k, value in filters.items():
-                if value != getattr(inst, k):
-                    return None
-            log.debug(f"Found instance {inst} in session")
-            return inst
-        return None
-
     def _build_filters(self, data):
         # Filter on properties that actually have a local column
         filters = {}
-        related_models = {}
 
         # Try to get filters for unique and pk columns first
         for prop in self.opts.model.__mapper__.iterate_properties:
             columns = getattr(prop, "columns", False)
             if columns:
-                is_fully_defined = all(
-                    [any([c.primary_key, c.unique]) for c in columns]
-                )
+                is_fully_defined = all([any([c.primary_key, c.unique]) for c in columns])
                 # Shim for the fact that we don't correctly find Session.uuid as unique at the moment...
                 # TODO: fix this in general
-                if self.opts.model.__name__ == "Session" and prop.key == "uuid":
-                    is_fully_defined = True
+                # if self.opts.model.__name__ == "Session" and prop.key == "uuid":
+                #    is_fully_defined = True
                 if is_fully_defined:
                     val = data.get(prop.key, None)
                     if val is not None:
                         filters[prop.key] = val
         if filters:
-            return filters, related_models
+            return filters
 
         for prop in self.opts.model.__mapper__.iterate_properties:
             val = data.get(prop.key, None)
@@ -128,15 +108,19 @@ class ModelSchema(SQLAlchemyAutoSchema):
                     # For relationships
                     if is_pk_defined(val):
                         filters[prop.key] = val
-                    else:
-                        related_models[prop.key] = val
                 else:
                     filters[prop.key] = val
             elif hasattr(prop, "direction"):
                 # This is unsatisfying, as we can't filter on pre-existing
                 # related fields
                 filters[prop.key] = None
-        return filters, related_models
+        return filters
+
+    def load(self, data, **kwargs):
+        if self.session is None:
+            return super().load(data, **kwargs)
+        with self.session.no_autoflush:
+            return super().load(data, **kwargs)
 
     def _get_instance(self, data):
         """Gets pre-existing instances if they are available."""
@@ -144,93 +128,109 @@ class ModelSchema(SQLAlchemyAutoSchema):
         if isinstance(data, self.opts.model):
             return data
 
-        filters, related_models = self._build_filters(data)
+        filters = self._build_filters(data)
+
+        # Create "fast paths" to make sure we don't grab data and analysis
+        # if they aren't properly linked. NOTE: we can probably solve this
+        # in general by requiring nullable foreign keys to be specified
+        if self.opts.model.__name__ == "datum":
+            if filters.get("_analysis") is None:
+                return None
+
+        if self.opts.model.__name__ == "analysis":
+            if filters.get("_session") is None:
+                return None
 
         msg = f"Finding instance of {self.opts.model.__name__}"
-        # Try to get value from session
-        # log.debug(msg)
-        #
-        # log.debug(f"..related models: {related_models}")
-        # log.debug(f"..data: {data}")
-        instance = self._get_session_instance(filters)
 
-        # Need to get relationship columns for primary keys!
-        if instance is None:
+        with self.session.no_autoflush:
+            # Need to get relationship columns for primary keys!
             query = self.session.query(self.opts.model).filter_by(**filters)
             instance = query.first()
-            if instance is None:
-                log.debug(msg + f"...none found\n...filters: {filters}")
-            else:
+
+            if instance is not None:
                 log.debug(msg + f"...success!\n...filters: {filters}")
-        if instance is None:
-            instance = super().get_instance(data)
-
-        if instance is not None:
-            for k, v in data.items():
-                setattr(instance, k, v)
-            self.session.add(instance)
-            self.session.flush(objects=[instance])
-
-        # Get rid of filters by value
-        # if self.opts.model.__name__ == 'analysis':
-        #     print(filters)
-        #     import pdb; pdb.set_trace()
-        # self.__instance_cache[__hash] = instance
-
-        return instance
+                for k, v in data.items():
+                    setattr(instance, k, v)
+                return instance
+            else:
+                log.debug(msg + f"...none found\n...filters: {filters}")
+            log.debug(data)
+        return super().get_instance(data)
 
     @pre_load
     def expand_primary_keys(self, value, **kwargs):
         # If we have a database model, leave it alone.
-        if isinstance(value, self.opts.model):
+        if isinstance(value, self.opts.model) or isinstance(value, Mapping):
             return value
-        # We might have a mapping of values
-        # TODO: a better way to do this might test for whether primary key
-        # columns are specifically present...
+
+        pk_vals = ensure_list(value)
+        # log.debug("Expanding keys " + str(pk_vals))
+
+        pk = get_primary_keys(self.opts.model)
+        assert len(pk) == len(pk_vals)
+        return {col.key: val for col, val in zip(pk, pk_vals)}
+
+    def _get_cached_instance(self, data):
+        """Get an instance cached within this load transaction"""
+        cache_key = None
         try:
-            return dict(**value)
+            cache_key = hash(frozenset(data.items()))
+            match_ = self.__instance_cache.get(cache_key, None)
+            if match_ is not None:
+                log.debug(f"Found {match_} in session cache for {data} (key: {cache_key})")
+                return match_, cache_key
         except TypeError:
             pass
-        val_list = ensure_list(value)
-        log.debug("Expanding keys " + str(val_list))
-
-        model = self.opts.model
-        pk = get_primary_keys(model)
-        assert len(pk) == len(val_list)
-        res = {}
-        for col, val in zip(pk, val_list):
-            res[col.key] = val
-
-        return res
+        return None, cache_key
 
     @post_load
     def make_instance(self, data, **kwargs):
-        with self.session.no_autoflush:
-            instance = self._get_instance(data)
+        # We start off with no instance loaded
+        instance = None
+        # FIRST, try to load from cached values created during this import
+        #
+        # This cache exists primarily to cover cases where we import models that need to be
+        # linked in multiple places (e.g. units, parameters, and datum_types). We could potentially
+        # expand it to cover cases where we want to create several models up front and then reference
+        # them from other places in the import model hierarchy.
+        #
+        # Datum (and some other analytical models) can easily be pulled in without a specific provided
+        # identity (they get their uniqueness in part from their link to analysis). Given this,
+        # it is possible for us to "steal" them from other analyses imported
+        # at the same time. It's likely this could happen with analysis and other models as well.
+        #
+        # See https://github.com/EarthCubeGeochron/Sparrow/issues/80
+        #
+        # We solve this by exempting these models from caching. However, there are
+        # likely more issues that will arise along these lines in the near future.
+        cache_key = None
+        # We should figure out a better way to do this than a blacklist...or at
+        # least pull the blacklist into config code somewhere.
+        _cache_blacklist = ["datum", "analysis", "session", "sample"]
+        if self.opts.model.__name__ not in _cache_blacklist:
+            instance, cache_key = self._get_cached_instance(data)
+
+        # THEN, try to load from existing instances
         if instance is None:
-            try:
-                # Begin a nested subtransaction
-                self.session.begin_nested()
-                instance = self.opts.model(**data)
-                self.session.add(instance)
-                log.debug(f"Created instance {instance} with parameters {data}")
+            instance = self._get_instance(data)
 
-                self.session.flush(objects=[instance])
-                self.session.commit()
-                log.debug("Successfully persisted to database")
-            except IntegrityError as err:
-                self.session.rollback()
-                log.debug("Could not persist")
-
+        # FINALLY, make a new instance if one can't be found
+        if instance is None:
+            instance = self.opts.model(**data)
+            log.debug(f"Adding new {instance} to session")
+            self.session.add(instance)
+        if cache_key is not None:
+            self.__instance_cache[cache_key] = instance
         return instance
 
     @post_dump
     def remove_internal_fields(self, data, many, **kwargs):
         if not self._show_audit_id:
-            data.pop("audit_id")
+            data.pop("audit_id", None)
         return data
 
-    def to_json_schema(model):
+    def to_json_schema(self, model):
         return json_schema.dump(model)
 
     def _available_nests(self):

@@ -1,4 +1,7 @@
 from contextvars import ContextVar
+from .logs import get_logger
+
+log = get_logger(__name__)
 
 
 class SparrowContext:
@@ -6,17 +9,17 @@ class SparrowContext:
     and holds global objects and configuration.
     """
 
-    def __init__(self, flask_app, *args, **kwargs):
-        self.v1_app = flask_app
+    def __init__(self, app, *args, **kwargs):
+        self.app = app
         super().__init__(*args, **kwargs)
 
     @property
     def database(self):
-        return self.v1_app.database
+        return self.app.database
 
     @property
     def plugins(self):
-        return self.v1_app.plugins
+        return self.app.plugins
 
 
 _sparrow_context: ContextVar[SparrowContext] = ContextVar(
@@ -24,10 +27,26 @@ _sparrow_context: ContextVar[SparrowContext] = ContextVar(
 )
 
 
-def _setup_context(v1_app):
-    ctx = SparrowContext(v1_app)
+def _setup_context(app):
+    log.debug("Setting up application context")
+    ctx = SparrowContext(app)
     _sparrow_context.set(ctx)
 
 
 def app_context() -> SparrowContext:
     return _sparrow_context.get()
+
+
+def get_sparrow_app():
+    from .app.base import Sparrow
+
+    val = _sparrow_context.get()
+    if val is None:
+        app = Sparrow()
+        _setup_context(app)
+        return app
+    return val.app
+
+
+def get_database():
+    return get_sparrow_app().database

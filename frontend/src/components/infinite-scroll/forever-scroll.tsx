@@ -45,27 +45,30 @@ const perPage = 15;
  * @param component: A component that can take in the mapped data and format it into what the user wants to display
  * @param {function} fetch A function that will call an API to fetch the next page of data when intersection is observed
  */
-function ForeverScroll({ initialData, component, fetch }) {
-  const [state, dispatch] = useReducer(reducer, {
+function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
+  const initialState = {
     loadingBottom: false,
     hasMoreAfter: true,
     data: [],
     after: 0,
-  });
+  };
+
+  const [state, dispatch] = useReducer(reducer, initialState);
   const [setBottom, visibleBottom] = useOnScreen();
 
   // List of Data that the application references for indexes
   const totalData = initialData;
-  //console.log(totalData);
 
   const loadBottom = () => {
     dispatch({ type: "startBottom" });
 
-    // api call to fetch more data
-
-    const newData = totalData.slice(after, after + perPage);
-
-    dispatch({ type: "loadedBottom", newData });
+    if (totalData.length < perPage) {
+      let newData = totalData;
+      dispatch({ type: "loadedBottom", newData });
+    } else {
+      let newData = [...totalData.slice(after, after + perPage)];
+      dispatch({ type: "loadedBottom", newData });
+    }
   };
 
   const { loadingBottom, data, after, hasMoreAfter } = state;
@@ -79,13 +82,13 @@ function ForeverScroll({ initialData, component, fetch }) {
 
   return (
     <div className="ForeverScroll" style={{ marginTop: "20px" }}>
-      {data.map((d) => h(component, d))}
+      {data.map((d, i) => h(component, { id: i, ...componentProps, ...d }))}
 
       {loadingBottom && h(Spinner)}
 
       {hasMoreAfter && (
         <div ref={setBottom} style={{ marginTop: "50px" }}>
-          This is where it Refreshes
+          <Spinner />
         </div>
       )}
     </div>

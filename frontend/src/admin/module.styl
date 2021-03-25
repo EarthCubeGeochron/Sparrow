@@ -1,5 +1,9 @@
 @require '~app/shared/mixins'
 @require '~app/shared/colors'
+@require "~app/admin/module"
+
+.data-model-links :global(.link-card)
+  margin-bottom 1em
 
 .minimal-navbar
   display: flex
@@ -47,29 +51,6 @@
       border-radius 3px
       margin-right 0.5em
 
-.model-edit-text
-  c1 = alpha($gray1, 0.1)
-  c2 = alpha($bp3-intent-success,0.1)
-  box-shadow: 0 0 0 3px c1;
-  background-color: c1
-  border-radius: 2px
-  &:global(.bp3-intent-success)
-    background-color: c2;
-    box-shadow: 0 0 0 3px c2;
-
-.project-editor-navbar
-  align-items normal
-  display flex
-  flex-direction: row
-  justify-content space-between
-  &>*
-    margin-right 2em
-    &:last-child
-      margin-right 0
-  h4
-    padding-top 0.5em
-    flex-grow 1
-
 .flex-row
   display flex
   flex-direction row
@@ -95,7 +76,7 @@
   .left-panel
     z-index 1
     width 28em
-    overflow-y: scroll
+    overflow-y: auto
     overflow-x hidden
     padding 0 1em 0 1em
     transition .6s margin ease
@@ -103,14 +84,12 @@
       margin 0 0 0 -29.5em
       transition .6s margin ease
 
-      
-
   .right-panel
     flex 1
     padding 0 3em 0 2em
     overflow-y: scroll
 
-@keyframes leftArrow 
+@keyframes leftArrow
   0%  {left: 500px}
   100% {left: 0px}
 
@@ -118,14 +97,13 @@
   position relative
   animation leftArrow 3s infinite
 
-.listcomponent
-  position webkit sticky 
-  position sticky
-  top 0px
-  padding-top 10px
-  background-color white
+// .listcomponent
+//   position webkit-sticky
+//   position sticky
+//   top 0px
+//   padding-top 10px
+//   background-color var(--background-color)
 
 .vertical
   transform rotate(90deg)
-  float left 
-  
+  float left

@@ -8,7 +8,7 @@ from ..exceptions import ValidationError
 from ..response import APIResponse
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
-from ...context import app_context
+from ...context import get_database
 
 log = get_logger(__name__)
 
@@ -32,14 +32,15 @@ class ViewAPIEndpoint(HTTPEndpoint):
 
     async def get(self, request):
         """Handler for all GET requests"""
-        db = app_context().database
+        db = get_database()
 
         log.info(request.query_params)
         args = await parser.parse(self.args_schema, request, location="querystring")
         log.info(args)
 
-        if not len(request.query_params.keys()):
-            return JSONResponse({})
+        ## This is why the response was blank
+        # if not len(request.query_params.keys()):
+        #     return JSONResponse({"Hello": "World"})
 
         q = db.session.query(self.meta.table)
         if args["all"]:
@@ -52,3 +53,4 @@ class ViewAPIEndpoint(HTTPEndpoint):
             raise ValidationError("Invalid page token.")
 
         return APIResponse(res, total_count=q.count(), to_dict=True)
+

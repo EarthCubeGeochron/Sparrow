@@ -6,20 +6,24 @@ from json import dumps
 from click import pass_context
 from .util import with_database, with_app, with_full_app
 from ..util import working_directory
-from ..app import App
+from ..context import get_sparrow_app
 from ..auth.create_user import create_user
 from ..database.migration import db_migration
+from sparrow_utils.logs import setup_stderr_logs
+from typing import Optional
+from ..plugins import SparrowPlugin
+from logging import INFO
 
 
 def _build_app_context(config):
-    app = App(__name__, config=config, verbose=False)
-    app.load()
-    return app
+    return get_sparrow_app()
 
 
 class SparrowCLI(click.Group):
     """Sparrow's internal command-line application is integrated tightly with
     the version that also organizes Docker containers"""
+
+    __plugin_context: Optional[SparrowPlugin] = None
 
     def __init__(self, *args, **kwargs):
         # https://click.palletsprojects.com/en/7.x/commands/#custom-multi-commands
@@ -36,7 +40,20 @@ class SparrowCLI(click.Group):
         obj = _build_app_context(config)
         kwargs["context_settings"]["obj"] = obj
         super().__init__(*args, **kwargs)
-        obj.run_hook("setup-cli", self)
+        self.run_cli_init_hook(obj)
+
+    def run_cli_init_hook(self, app):
+        """We extend the setup CLI hook-runner function to
+        report back the plugin context"""
+        for plugin, method in app.plugins._iter_hooks("setup-cli"):
+            self.__plugin_context = plugin
+            method(self)
+        self.__plugin_context = None
+
+    def add_command(self, cmd, name=None):
+        if self.__plugin_context is not None:
+            cmd._plugin = self.__plugin_context.name
+        super().add_command(cmd, name=name)
 
 
 @click.group(cls=SparrowCLI)
@@ -59,12 +76,12 @@ def abort(message, status=1):
 
 @cli.command(name="init")
 @click.option("--drop", is_flag=True, default=False)
-@with_database
-def init_database(db, drop=False):
+@with_app
+def init_database(app, drop=False):
     """
     Initialize database schema (non-destructive)
     """
-    db.initialize(drop=drop)
+    app.init_database(drop=drop, force=True)
 
 
 @cli.command(name="create-views")
@@ -76,6 +93,7 @@ def create_views(db):
     # Don't need to build the app just for this
     with working_directory(__file__):
         db.exec_sql("../database/fixtures/05-views.sql")
+        db.exec_sql("../database/fixtures/07-apiv2views.sql") 
 
 
 @cli.command(name="shell")
@@ -86,11 +104,10 @@ def shell(app):
     """
     from IPython import embed
 
-    with app.app_context():
-        db = app.database
-        # `using` is related to this issue:
-        # https://github.com/ipython/ipython/issues/11523
-        embed(using=False)
+    db = app.database
+    # `using` is related to this issue:
+    # https://github.com/ipython/ipython/issues/11523
+    embed(using=False)
 
 
 @cli.command(name="config")
@@ -134,15 +151,24 @@ def plugins(app):
     """
     Print a list of enabled plugins
     """
-    with app.app_context():
-        for p in app.plugins.order_plugins():
-            print(p.name)
+    for p in app.plugins.order_plugins():
+        print(p.name)
 
 
 @cli.command(name="db-migration")
 @with_database
-def _db_migration(db):
-    db_migration(db)
+@click.option("--safe", is_flag=True, default=True)
+@click.option("--apply", is_flag=True, default=False)
+def _db_migration(db, safe=True, apply=False):
+    """Command to generate a basic migration."""
+    db_migration(db, safe=safe, apply=apply)
+
+
+@cli.command(name="db-update")
+@with_database
+def db_update(db):
+    setup_stderr_logs(level=INFO)
+    db.update_schema(dry_run=True)
 
 
 def command_info(ctx, cli):
@@ -150,8 +176,10 @@ def command_info(ctx, cli):
         cmd = cli.get_command(ctx, name)
         if cmd.hidden:
             continue
-        help = cmd.get_short_help_str()
-        yield name, help
+        yield name, {
+            "help": cmd.get_short_help_str(limit=120),
+            "plugin": getattr(cmd, "_plugin", None),
+        }
 
 
 @cli.command(name="get-cli-info", hidden=True)

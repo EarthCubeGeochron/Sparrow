@@ -6,6 +6,7 @@ from time import sleep
 
 from .env import validate_environment
 from .util import compose, container_id, cmd
+from .help.backend import get_backend_help_info
 
 
 @click.command()
@@ -21,7 +22,9 @@ def sparrow_up(container, force_recreate=False):
     if container is None:
         container = ""
     res = compose(
-        "up --build --no-start", "--force-recreate" if force_recreate else "", container
+        "up --build --no-start",
+        "--force-recreate" if force_recreate else "",
+        container,
     )
     if res.returncode != 0:
         print("[red]One or more containers did not build successfully, aborting.[/red]")
@@ -29,6 +32,9 @@ def sparrow_up(container, force_recreate=False):
     p = Popen(["sparrow", "logs", container])
     print("[green]Following container logs[/green]")
     compose("start", container)
+    # While we're spinning up, repopulate command help in case it's changed
+    get_backend_help_info(cache=True)
+
     p.wait()
 
 

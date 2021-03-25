@@ -9,10 +9,15 @@
   text-align: center;
   position: relative;
   overflow: hidden;
-  background-image: url(/images/gowganda.jpg);
-  background-size: 100%;
+  background-image: url(https://sparrow-data.org/images/gowganda.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
   min-height: 300px;
   max-height: 400px;
+}
+
+:global([data-theme="dark"] .hero-description) {
+  color: white;
 }
 
 @media screen and (max-width: 966px) {
@@ -32,7 +37,6 @@
   align-items: center;
   padding: 2rem 0;
   width: 100%;
-
 }
 
 .featureImage {

@@ -26,7 +26,7 @@ log = get_logger(__name__)
 allowed_collections = {
     "data_file": ["data_file_link"],
     "data_file_link": ["session", "sample", "analysis"],
-    "sample": ["session", "material", "sample_geo_entity"],
+    "sample": ["session", "material", "project", "sample_geo_entity"],
     "geo_entity": "all",
     "sample_geo_entity": "all",
     "session": [
@@ -47,7 +47,7 @@ allowed_collections = {
         "material",
     ],
     "attribute": ["parameter", "unit"],
-    "project": ["researcher", "publication", "session"],
+    "project": ["researcher", "publication", "session", "sample"],
     "datum": ["datum_type"],
     "datum_type": ["parameter", "unit", "error_unit", "error_metric"],
 }
@@ -158,7 +158,6 @@ class SparrowConverter(ModelConverter):
         # Somewhat ugly method, mostly to decide if field is dump_only or required
         kwargs = super()._get_field_kwargs_for_property(prop)
         kwargs["data_key"] = self._get_key(prop)
-
         kwargs["allow_nan"] = True
 
         if isinstance(prop, RelationshipProperty):  # Relationship property
@@ -214,9 +213,12 @@ class SparrowConverter(ModelConverter):
 
     def property2field(self, prop, **kwargs):
         """This override improves our handling of relationships"""
-        if not isinstance(prop, RelationshipProperty):
+        if isinstance(prop, RelationshipProperty):
+            return self._property2relationship(prop, **kwargs)
+        else:
             return super().property2field(prop, **kwargs)
 
+    def _property2relationship(self, prop, **kwargs):
         # The "name" is actually the name of the related model, NOT the name
         # of field
         cls = self._related_entity(prop)

@@ -26,7 +26,6 @@ class BaseImporter(ImperativeImportHelperMixin):
         print_sql = kwargs.pop("print_sql", False)
         self.verbose = kwargs.pop("verbose", False)
         # We shouldn't have to do this,
-        # self.db.automap()
 
         # This is kinda unsatisfying
         self.basedir = environ.get("SPARROW_DATA_DIR", None)
@@ -66,7 +65,8 @@ class BaseImporter(ImperativeImportHelperMixin):
         self.models = self.m
 
     def session_changes(self):
-        changed = lambda i: self.db.session.is_modified(i, include_collections=True)
+        def changed(i): return self.db.session.is_modified(
+            i, include_collections=True)
         # Bug: For some reason, changes on many-to-many links are not recorded.
         return dict(
             dirty=self.__dirty,
@@ -133,7 +133,8 @@ class BaseImporter(ImperativeImportHelperMixin):
         hash = md5hash(str(fn))
         # Get data file record if it exists
         rec = (
-            self.db.session.query(self.m.data_file).filter_by(file_path=file_path)
+            self.db.session.query(self.m.data_file).filter_by(
+                file_path=file_path)
         ).first()
 
         added = rec is None

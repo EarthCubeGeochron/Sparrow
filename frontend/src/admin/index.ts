@@ -2,6 +2,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { useContext } from "react";
 import { Switch } from "react-router-dom";
 import loadable from "@loadable/component";
+import { LinkCard } from "@macrostrat/ui-components";
 
 import { Frame } from "~/frame";
 import { LoginRequired } from "~/auth";
@@ -11,17 +12,40 @@ import { ProjectAdminPage } from "./project";
 
 import { SampleAdminPage } from "./sample";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
-import { DataModelLinks, AdminDataModelLinks } from "~/catalog";
 import { NavButton } from "~/components";
-import { AdminNavLinks } from "~/catalog/nav";
 import styles from "./module.styl";
 import { SessionAdminPage } from "./session";
 import { DataFileAdminPage } from "./data-file";
 import { VocabularyPage } from "./vocabulary";
 
+import { NewProjectForm } from "../model-views/project/new-project";
+import { NewSamplePage } from "~/model-views/sample/new-sample";
+
 const DataSheet = loadable(() => import("./data-sheet"));
 
 const h = hyperStyled(styles);
+
+function AdminDataModelLinks(props) {
+  const { base = "/catalog" } = props;
+  return h("div.data-model-links", [
+    h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
+    h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
+    h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
+    h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
+  ]);
+}
+
+const AdminNavLinks = function({ base }) {
+  if (base == null) {
+    base = "/catalog";
+  }
+  return h("div", [
+    h(NavButton, { to: base + "/project" }, "Projects"),
+    h(NavButton, { to: base + "/sample" }, "Samples"),
+    h(NavButton, { to: base + "/session" }, "Sessions"),
+    h(NavButton, { to: base + "/data-file" }, "Data Files"),
+  ]);
+};
 
 const AdminNavbar = (props) => {
   const { base, ...rest } = props;
@@ -57,6 +81,14 @@ const AdminRouter = ({ base }) =>
     h(Route, {
       path: base + "/project",
       render: () => h(ProjectAdminPage),
+    }),
+    h(Route, {
+      path: base + "/new-project",
+      render: () => h(NewProjectForm),
+    }),
+    h(Route, {
+      path: base + "/new-sample",
+      render: () => h(NewSamplePage),
     }),
     h(Route, {
       path: base + "/sample",

@@ -1,15 +1,13 @@
 import * as React from "react";
 import { useState } from "react";
 import { RangeSlider, Card } from "@blueprintjs/core";
-import { useToggle } from "../../map/components/APIResult";
 
 export function AgeSlideSelect() {
-  const [range, setRange] = useState([0, 4600]);
+  const [range, setRange] = useState<[number, number]>([0, 4600]);
 
   const handleRangeChange = (range) => {
     setRange(range);
   };
-  //console.log(range);
   return (
     <Card>
       <h5>Sample Age (Ma): </h5>

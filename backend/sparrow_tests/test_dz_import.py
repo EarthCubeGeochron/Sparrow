@@ -32,10 +32,9 @@ def test_dz_import_iterative(db, dz_data):
     _session = model_interface(db.model.session, session=db.session)()
     _analysis = model_interface(db.model.analysis, session=db.session)()
 
-    with db.session.no_autoflush:
-        session = _session.load(dz_data, session=db.session)
-        for a in analysis_list:
-            a1 = _analysis.load(a, session=db.session, partial=True)
-            session.analysis_collection.append(a1)
-        db.session.add(session)
-        db.session.commit()
+    session = _session.load(dz_data, session=db.session)
+    for a in analysis_list:
+        a1 = _analysis.load(a, session=db.session, partial=True)
+        session.analysis_collection.append(a1)
+    db.session.add(session)
+    db.session.commit()

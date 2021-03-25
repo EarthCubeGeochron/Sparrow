@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="sparrow",
-    version="0.1",
+    version="1.6.0",
     # Currently these package directories don't appear to be used
     # to actually install the files.
     packages=["sparrow", "sparrow_tests"],
