@@ -31,7 +31,7 @@ export function DownloadButton(props) {
 interface TabDef {
   id: string,
   title: string,
-  panel: React.ReactElement
+  component: React.ComponentType<any>
 }
 
 function SessionPageTabs(props) {
@@ -44,7 +44,7 @@ function SessionPageTabs(props) {
   return h(Tabs, {
       id: 'sessionDetailTabs'
   }, [
-    extraTabs.map(({ title, ...rest }) => h(Tab, rest, title)),
+    extraTabs.map(({ title, component, id }) => h(Tab, {id, panel: h(component, props)}, title)),
     h(Tab, {id: 'analysisDetails', panel: coreComponent}, "Analysis details")
   ])
 }

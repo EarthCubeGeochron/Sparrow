@@ -29,7 +29,7 @@ class DetritalZirconBase extends Component {
 
     let minmax = extent(data, accessor);
     const delta = minmax[1]-minmax[0];
-    const bandwidth = delta/50;
+    const bandwidth = 20;
     minmax = [minmax[0] - (bandwidth*4), minmax[1] + (bandwidth*4)];
 
     const hist = histogram()
