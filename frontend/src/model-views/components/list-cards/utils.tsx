@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { Frame } from "~/frame";
-import hyper from "@macrostrat/hyper";
+import {hyperStyled} from "@macrostrat/hyper";
 import { Link } from "react-router-dom";
 import { pluralize } from "../new-model";
 import { format } from "date-fns";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
 
-const h = hyper.styled(styles);
+const h = hyperStyled(styles);
 
 export function ModelCard(props) {
   const { content, id, model, link = true, onClick = () => {} } = props;

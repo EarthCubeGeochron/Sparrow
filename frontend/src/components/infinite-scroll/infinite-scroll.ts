@@ -6,7 +6,7 @@ import {
   DataFileModelCard,
   PublicationModelCard,
   ResearcherModelCard,
-} from "../../model-views/components/list-cards/utils";
+} from "~/model-views/components/list-cards/utils";
 import { InfiniteAPIView } from "./infinite-api-view";
 import { APIV2Context } from "~/api-v2";
 //@ts-ignore
