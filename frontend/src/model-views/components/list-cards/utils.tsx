@@ -283,7 +283,7 @@ const DataFileModelCard = (props) => {
   let sampleName = "";
   if (link.length > 0) {
     if (link[0].session) {
-      sampleName += link[0].session.sample.name;
+      sampleName += link[0].session?.sample?.name ?? "";
     }
   }
 
