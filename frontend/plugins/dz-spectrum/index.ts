@@ -21,31 +21,20 @@ import {
 import './main.styl';
 import { useAPIv2Result } from '~/api-v2';
 
-function DetritalZirconComponent(props) {
-  const data = useAPIResult( '/datum', {unit: 'Ma', is_accepted: true, ...props} )
-  const { session_id } = props;
+function DZPlotInner(props) {
+  const { ageRange = [0, 4000], data, children, width, height, marginTop = 5, marginBottom = 5 } = props
+  let minmax = ageRange
 
   if (data == null) { return null; }
 
   const accessor = d => d.value;
 
-  let minmax = extent(data, accessor);
   const delta = minmax[1]-minmax[0];
   const bandwidth = 20;
   minmax = [minmax[0] - (bandwidth*4), minmax[1] + (bandwidth*4)];
 
-  const hist = histogram()
-    .domain(minmax)
-    .thresholds(80)
-    .value(accessor);
-
   const margin = 10;
-  const marginTop = 10;
-  const marginBottom = 50;
-  const innerWidth = 750;
-  const eachHeight = 150;
-  const height = eachHeight+marginTop+marginBottom;
-  const width = innerWidth+(2*margin);
+  const eachHeight = height-marginTop-marginBottom;
 
   const xScale = scaleLinear({
     range: [0, width],
@@ -97,14 +86,58 @@ function DetritalZirconComponent(props) {
         top: eachHeight,
         ...labelProps
       }),
-      createElement('foreignObject', {x: 0, y: -20, width: 500, height: 50}, (
-        h('h4', null, [
-          `${data.length} grains`
-        ])
-      )
-      )
+      children
     ])
   ]);
 }
 
-export {DetritalZirconComponent};
+function DetritalZirconComponent(props) {
+  const data = useAPIResult( '/datum', {unit: 'Ma', is_accepted: true, ...props} )
+  const { session_id } = props;
+
+  if (data == null) { return null; }
+
+  const accessor = d => d.value;
+
+  let minmax = extent(data, accessor);
+  const delta = minmax[1]-minmax[0];
+  const bandwidth = 20;
+  minmax = [minmax[0] - (bandwidth*4), minmax[1] + (bandwidth*4)];
+
+  const margin = 10;
+  const marginTop = 10;
+  const marginBottom = 50;
+  const innerWidth = 750;
+  const eachHeight = 150;
+  const height = eachHeight+marginTop+marginBottom;
+  const width = innerWidth+(2*margin);
+
+  return h(DZPlotInner, { data, width, height, ageRange: minmax, marginTop, marginBottom }, [
+    createElement('foreignObject', {x: 0, y: -20, width: 500, height: 50}, (
+      h('h4', null, [
+        `${data.length} grains`
+      ])
+    ))
+  ]);
+}
+
+function DZSessionData({ session_id, date, sample }) {
+  const name = sample?.name ?? ""
+  const height = 50
+  const width = 340
+  const data = useAPIResult('/datum', { unit: 'Ma', is_accepted: true, session_id })
+
+  let text = name
+  if (data != null) text += " " + `(${data.length} ages)`
+
+  return h("div", [
+    h("h5", text),
+    h("div.plot-container", {
+      style: { height }
+    },
+      h(DZPlotInner, { session_id, height, width, data })
+    )
+  ])
+}
+
+export {DetritalZirconComponent, DZSessionData};
