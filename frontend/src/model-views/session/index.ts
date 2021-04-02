@@ -20,7 +20,7 @@ export function DownloadButton(props) {
     text = h([h("b", file_type), " file"]);
   }
 
-  const href = `${process.env.BASE_URL}data-file/${file_hash}`;
+  const href = `${process.env.BASE_URL}api/v2/data_file/${file_hash}`;
   return h(
     AnchorButton,
     { href, icon: "document", intent: Intent.PRIMARY },
