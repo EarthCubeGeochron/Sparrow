@@ -1,9 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-// https://bl.ocks.org/mbostock/4341954
 import {mean} from 'd3-array';
 
 const kernelDensityEstimator = (kernel, X) => V => X.map(x => [x, mean(V, v => kernel(x - v))]);
