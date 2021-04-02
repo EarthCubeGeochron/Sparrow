@@ -47,8 +47,12 @@ class APIEntry(HTTPEndpoint):
         """
         routes = {}
         for k, v in request.app.route_descriptions.items():
-            desc = {d["route"]: d["description"] for d in v}
-            routes[k] = desc
+            # We should refactor this significantly...
+            if isinstance(v, str):
+                routes[k] = v
+            else:
+                desc = {d["route"]: d["description"] for d in v}
+                routes[k] = desc
         return JSONResponse({**root_info(), "routes": routes, "examples": root_example()})
 
 
@@ -81,15 +85,15 @@ class APIv2(Starlette):
 
     def add_route(self, path, *args, **kwargs):
         desc = kwargs.pop("help", None)
-        # if desc is not None:
-        #     self.route_descriptions[path] = desc
+        if desc is not None:
+            self.route_descriptions[path] = desc
 
         super().add_route(path, *args, **kwargs)
 
     def mount(self, path, app, **kwargs):
         desc = kwargs.pop("help", None)
-        # if desc is not None:
-        #     self.route_descriptions[path] = desc
+        if desc is not None:
+            self.route_descriptions[path] = desc
         super().mount(path, app, **kwargs)
 
     def add_schema_route(self):
