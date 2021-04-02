@@ -10,7 +10,9 @@ web = Blueprint("frontend", __name__)
 @web.route("/data-file/<string:uuid>")
 def stream_data(uuid):
     # Send the user to the "protected" data dir to get the file with NGINX
-    db = get_sparrow_app().database
+    # Need to rework with starlette and stuff...
+    app = get_sparrow_app()
+    db = app.database
     m = db.model.data_file
 
     datafile = db.session.query(m).get(uuid)

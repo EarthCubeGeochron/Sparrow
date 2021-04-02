@@ -14,6 +14,7 @@ from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, roo
 
 log = get_logger(__name__)
 
+
 async def http_exception(request, exc):
     log.error(f"{exc.status_code} {exc.detail}")
     # if exc.detail == "Internal Server Error":
@@ -48,7 +49,7 @@ class APIEntry(HTTPEndpoint):
         for k, v in request.app.route_descriptions.items():
             desc = {d["route"]: d["description"] for d in v}
             routes[k] = desc
-        return JSONResponse({**root_info(),"routes": routes, "examples": root_example()})
+        return JSONResponse({**root_info(), "routes": routes, "examples": root_example()})
 
 
 def schema(request):
@@ -78,13 +79,26 @@ class APIv2(Starlette):
         self._add_routes()
         self._app.run_hook("api-initialized-v2", self)
 
+    def add_route(self, path, *args, **kwargs):
+        desc = kwargs.pop("help", None)
+        # if desc is not None:
+        #     self.route_descriptions[path] = desc
+
+        super().add_route(path, *args, **kwargs)
+
+    def mount(self, path, app, **kwargs):
+        desc = kwargs.pop("help", None)
+        # if desc is not None:
+        #     self.route_descriptions[path] = desc
+        super().mount(path, app, **kwargs)
+
     def add_schema_route(self):
         # We will want to layer this back in eventually
         # self._schemas = APISpecSchemaGenerator(self.spec)
         self.add_route("/schema", schema, methods=["GET"], include_in_schema=False)
-    
+
     def add_meta_route(self):
-        self.add_route("/meta", JSONResponse(meta_info()) , methods=["GET"], include_in_schema=False)
+        self.add_route("/meta", JSONResponse(meta_info()), methods=["GET"])
 
     def _add_routes(self):
 
@@ -95,7 +109,9 @@ class APIv2(Starlette):
         for iface in db.interface:
             self._add_model_route(iface)
 
-        self.add_view_route("authority", schema="vocabulary", description="Route to view authorities for technical descriptions")
+        self.add_view_route(
+            "authority", schema="vocabulary", description="Route to view authorities for technical descriptions"
+        )
         self.add_view_route("age_context", description="Ages directly connected to geologic context")
 
         self.add_schema_route()
@@ -120,15 +136,7 @@ class APIv2(Starlette):
 
         self.spec.path(
             path=endpoint,
-            operations=dict(
-                get=dict(
-                    responses={
-                        "200": {
-                            "content": {"application/json": {"schema": iface.__name__}}
-                        }
-                    }
-                )
-            ),
+            operations=dict(get=dict(responses={"200": {"content": {"application/json": {"schema": iface.__name__}}}})),
         )
 
         tbl = iface.opts.model.__table__
@@ -140,7 +148,6 @@ class APIv2(Starlette):
             description=str(desc),
         )
         self.route_descriptions[root_route].append(basic_info)
-
 
     def add_view_route(self, tablename, schema="core_view", description=""):
         _tbl = self._app.database.mapper.reflect_table(tablename, schema=schema)

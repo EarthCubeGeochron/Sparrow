@@ -184,7 +184,6 @@ export function DataFilePage(props) {
 
   const samples = data_file_link.map((d) => d.sample).filter((d) => d != null);
 
-  //console.log(project);
   return h("div.data-page-container", [
     h("div.header", [
       h(DetailPageHeader, { date_upload: date, basename, type, file_hash }),
