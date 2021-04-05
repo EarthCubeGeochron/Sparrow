@@ -4,11 +4,8 @@ import useSuperCluster from "use-supercluster";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 import "../cluster.css";
-import {
-  Popover,
-  Card,
-} from "@blueprintjs/core";
-import { Marker, FlyToInterpolator } from "react-map-gl";
+import { Popover, Card } from "@blueprintjs/core";
+import { Marker } from "react-map-gl";
 import styles from "./components.module.css";
 
 // This component controls the State and the UI for the markers and the markercluster
@@ -18,25 +15,26 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
   useEffect(() => {
     // Set the data back to the initial data
     if (data == null) return;
-    const markers = data.map((markers) => ({
-      type: "Feature",
-      properties: {
-        cluster: false,
-        id: markers.id,
-        Sample_name: markers.name,
-        material: markers.material,
-      },
-      geometry: {
-        type: "Point",
-        coordinates: [
-          markers.location.coordinates[0],
-          markers.location.coordinates[1],
-        ],
-      },
-    }));
+    // const markers = data.map((markers) => ({
+    //   type: "Feature",
+    //   properties: {
+    //     //cluster: false,
+    //     id: markers.id,
+    //     Sample_name: markers.name,
+    //     material: markers.material,
+    //   },
+    //   geometry: {
+    //     type: "Point",
+    //     coordinates: [
+    //       markers.location.coordinates[0],
+    //       markers.location.coordinates[1],
+    //     ],
+    //   },
+    // }));
 
-    setMarkers(markers);
+    setMarkers(data);
   }, [data]);
+  // console.log(markers);
 
   const { clusters, supercluster } = useSuperCluster({
     points: markers,
@@ -111,7 +109,7 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
                 <Link to={`/catalog/sample/${cluster.properties.id}`}>
                   <Card>
                     <div style={{ display: "flex", flexDirection: "column" }}>
-                      <b>{cluster.properties.Sample_name}</b>
+                      <b>{cluster.properties.name}</b>
                       {cluster.properties.material && (
                         <i>{cluster.properties.material}</i>
                       )}

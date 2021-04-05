@@ -11,7 +11,7 @@ import { MapToast } from "./components/MapToast";
 import { useAPIActions } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
 import styles from "./module.styl";
-import { SiteTitle } from "app/components";
+import { ShortSiteTitle } from "~/components";
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
 
 function changeStateOnParams(params, setData) {
@@ -71,12 +71,11 @@ export function MapPanel({
   }, []);
 
   const [params, setParams] = useState({ all: "true", has: "location" });
-  const initialData = useAPIv2Result("/models/sample", params);
+  const initialData = useAPIv2Result("/core_view/geojson");
 
   const [data, setData] = useState(initialData);
-  console.log(data);
 
-  changeStateOnParams(params, setData);
+  //changeStateOnParams(params, setData);
 
   const changePararms = (newParams) => {
     const state = { all: "true", has: "location", ...newParams };
@@ -113,13 +112,11 @@ export function MapPanel({
     setViewport({ ...viewport, zoom, latitude, longitude });
   }
 
+  // This makes sure the maptoasters are cleared
+  // when the component unmounts
   useEffect(() => {
-    const onMap = window.location.pathname == "/map";
-    if (!onMap) {
-      MapToaster.clear();
-    }
-    console.log(onMap);
-  }, [window.location.pathname]);
+    return () => MapToaster.clear();
+  }, []);
 
   useEffect(() => {
     if (firstWindowHash !== "") {
@@ -185,7 +182,7 @@ export function MapPanel({
             <Navbar.Group className={styles["map-navbar-inner"]}>
               <Navbar.Heading>
                 <h1 className="site-title">
-                  <SiteTitle />
+                  <ShortSiteTitle />
                 </h1>
               </Navbar.Heading>
               <Navbar.Divider />
@@ -194,15 +191,14 @@ export function MapPanel({
                 hide={hide_filter}
                 MapStyle={state.MapStyle}
                 chooseMapStyle={chooseMapStyle}
-                //mapstyles={mapStyles}
                 showMarkers={state.showMarkers}
                 toggleShowMarkers={toggleShowMarkers}
               ></LayerMenu>
-              <FilterMenu
+              {/* <FilterMenu
                 changeParams={changePararms}
                 hide={hide_filter}
                 on_map={on_map}
-              ></FilterMenu>
+              ></FilterMenu> */}
             </Navbar.Group>
           </Navbar>
         )}
@@ -234,7 +230,7 @@ export function MapPanel({
           )}
           {state.showMarkers ? (
             <MarkerCluster
-              data={data}
+              data={initialData}
               viewport={viewport}
               changeViewport={changeViewport}
               bounds={bounds}
