@@ -154,12 +154,22 @@ const ProjectLinks = (props) => {
   }
 };
 
-export function DataFilePage({ props }) {
-  const { data } = props;
-  console.log(data);
-  if (!data) return h(Spinner);
+export function DataFilePage(props) {
+  const { file_hash } = props;
+  if (file_hash == null) return null
+
+  const dataFileURL = `/models/data_file/${file_hash}`;
+
+  const res = useAPIv2Result(dataFileURL, {
+    nest: "data_file_link,session,sample",
+  });
+
+  const data = res?.data
+
+
+  if (data == null) return h(Spinner);
+
   const {
-    file_hash,
     type,
     data_file_link, // is an array
     basename,
@@ -174,7 +184,6 @@ export function DataFilePage({ props }) {
 
   const samples = data_file_link.map((d) => d.sample).filter((d) => d != null);
 
-  //console.log(project);
   return h("div.data-page-container", [
     h("div.header", [
       h(DetailPageHeader, { date_upload: date, basename, type, file_hash }),
@@ -188,21 +197,7 @@ export function DataFilePage({ props }) {
   ]);
 }
 
-const DataFileComponent = function(props) {
-  const { file_hash } = props;
-  const dataFileURL = `/models/data_file/${file_hash}`;
-
-  const initdata = useAPIv2Result(dataFileURL, {
-    nest: "data_file_link,session,sample",
-  });
-  if (file_hash == null || initdata == null) {
-    return null;
-  }
-
-  return h("div.data-view.project", [h(DataFilePage, { props: initdata })]);
-};
-
 export function DataFileMatch() {
   const { file_hash } = useParams();
-  return h(DataFileComponent, { file_hash });
+  return h(DataFilePage, { file_hash });
 }
