@@ -47,6 +47,9 @@ class DataFileAPI(HTTPEndpoint):
             }
         )
 
+    async def post(self, request):
+        pass
+
 
 class DataFilePlugin(SparrowCorePlugin):
     name = "data-file"
