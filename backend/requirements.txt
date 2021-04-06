@@ -38,7 +38,7 @@ aiofiles==0.6.0
 
 # Import file reading
 xlrd==1.2.0
-pyyaml==5.3
+pyyaml==5.4
 beautifulsoup4==4.8.2
 html5lib==1.0.1
 datefinder==0.7.0
