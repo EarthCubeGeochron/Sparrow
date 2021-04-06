@@ -2,7 +2,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import {
   ProjectModelCard,
   SampleModelCard,
-  SessionModelCard,
+  SessionListModelCard,
   DataFileModelCard,
   PublicationModelCard,
   ResearcherModelCard,
@@ -92,7 +92,7 @@ function SessionListComponent({ params, componentProps = {} }) {
       unwrapData: unwrapSessionCardData,
       params: { nest: "instrument,project,sample" },
       filterParams: { ...params },
-      component: SessionModelCard,
+      component: SessionListModelCard,
       componentProps,
       context: APIV2Context,
     }),

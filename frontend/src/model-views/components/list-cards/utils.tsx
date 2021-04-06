@@ -212,7 +212,72 @@ const ProjectModelCard = (props) => {
   });
 };
 
-const SessionModelCard = (props) => {
+const SessionListContent = (props) => {
+  const {
+    classname,
+    target,
+    date,
+    technique,
+    instrument,
+    analysis,
+    sample,
+    data,
+  } = props;
+
+  const instruName = instrument ? instrument.name : "";
+  const sampleName = sample ? `${sample.name}` : "";
+
+  const Irradiation = data && data.Irradiation ? data.Irradiation : null;
+  const FCS = data && data.FCS ? data.FCS : null;
+
+  const analysisName = analysis.length > 1 ? "Analyses" : "Analysis";
+  const analysisCount = analysis.length + " " + analysisName;
+
+  return h(`div.${classname}`, [
+    h("div.card-header", [h("div", date.split("T")[0]), h("div", sampleName)]),
+    h("div.bod", [
+      h.if(FCS)("div", [FCS]),
+      h("div", [h("span", technique)]),
+      h("div", ["Instrument: " + instruName]),
+      h.if(Irradiation)("div", [Irradiation]),
+    ]),
+    h("div.footer", [h("div", analysisCount), h("div", ["Target: " + target])]),
+  ]);
+};
+
+const SessionPageViewContent = (props) => {
+  const {
+    classname,
+    target,
+    date,
+    technique,
+    instrument,
+    analysis,
+    sample,
+    data,
+  } = props;
+  const instruName = instrument ? instrument.name : "";
+  const sampleName = sample ? `Linked through ${sample.name}` : "";
+
+  const Irradiation = data && data.Irradiation ? data.Irradiation : null;
+  const FCS = data && data.FCS ? data.FCS : null;
+
+  const analysisName = analysis.length > 1 ? "Analyses" : "Analysis";
+  const analysisCount = analysis.length + " " + analysisName;
+
+  return h(`div.${classname}`, [
+    h("div.card-header", [h("div", date.split("T")[0]), h("div", sampleName)]),
+    h("div.bod", [
+      h.if(FCS)("div", [FCS]),
+      h("div", [h("span", technique)]),
+      h("div", ["Instrument: " + instruName]),
+      h.if(Irradiation)("div", [Irradiation]),
+    ]),
+    h("div.footer", [h("div", analysisCount), h("div", ["Target: " + target])]),
+  ]);
+};
+
+const SessionListModelCard = (props) => {
   const {
     session_id,
     target,
@@ -227,28 +292,73 @@ const SessionModelCard = (props) => {
     onHover = false,
   } = props;
 
-  const instruName = instrument ? instrument.name : "";
-  const sampleName = sample ? `Linked through ${sample.name}` : "";
+  const classname = onHover ? "session-card-hover" : "session-card";
 
-  const Irradiation = data && data.Irradiation ? data.Irradiation : null;
-  const FCS = data && data.FCS ? data.FCS : null;
+  const content = h(SessionListContent, {
+    classname,
+    target,
+    date,
+    technique,
+    instrument,
+    analysis,
+    sample,
+    data,
+  });
 
-  const analysisName = analysis.length > 1 ? "Analyses" : "Analysis";
-  const analysisCount = analysis.length + " " + analysisName;
+  const cardContent = h(
+    Frame,
+    {
+      id: "sessionCardContent",
+      data: {
+        session_id,
+        target,
+        date,
+        technique,
+        instrument,
+        analysis,
+        sample,
+        data,
+      },
+    },
+    content
+  );
+
+  return h(ModelCard, {
+    id: session_id,
+    content: cardContent,
+    model: "session",
+    link,
+    onClick: () => onClick(session_id, date, target, technique),
+  });
+};
+
+const SessionPageViewModelCard = (props) => {
+  const {
+    session_id,
+    target,
+    date,
+    technique,
+    instrument,
+    analysis,
+    sample,
+    data,
+    link,
+    onClick,
+    onHover = false,
+  } = props;
 
   const classname = onHover ? "session-card-hover" : "session-card";
-  const textColor = onHover ? "yellow" : "black";
 
-  const content = h(`div.${classname}`, [
-    h("div.card-header", [h("div", date.split("T")[0]), h("div", sampleName)]),
-    h("div.bod", [
-      h.if(FCS)("div", [FCS]),
-      h("div", [h("span", technique)]),
-      h("div", ["Instrument: " + instruName]),
-      h.if(Irradiation)("div", [Irradiation]),
-    ]),
-    h("div.footer", [h("div", analysisCount), h("div", ["Target: " + target])]),
-  ]);
+  const content = h(SessionPageViewContent, {
+    classname,
+    target,
+    date,
+    technique,
+    instrument,
+    analysis,
+    sample,
+    data,
+  });
 
   const cardContent = h(
     Frame,
@@ -326,7 +436,8 @@ const ContentOverFlow = ({ data, title, className, minimal = false }) =>
 export {
   SampleModelCard,
   ProjectModelCard,
-  SessionModelCard,
+  SessionPageViewModelCard,
+  SessionListModelCard,
   DataFileModelCard,
   PublicationModelCard,
 };
