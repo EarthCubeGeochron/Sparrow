@@ -61,7 +61,7 @@ class SparrowDatabaseMapper:
             generate_relationship=_gen_relationship,
         )
 
-        for schema in ("vocabulary", "core_view"):
+        for schema in ("vocabulary", "core_view", "tags"):
             # Reflect tables in schemas we care about
             # Note: this will not reflect views because they don't have
             # primary keys.

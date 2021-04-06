@@ -1,0 +1,12 @@
+{
+  "new_tag": {
+    "name": "Lab Error",
+    "description": "This data is incorrect due to a know lab error",
+    "color": "#DC143C"
+  },
+  "new_sample": {
+    "name": "Lab Error Sample",
+    "material": "unobtainium",
+    "elevation": 23
+  }
+}

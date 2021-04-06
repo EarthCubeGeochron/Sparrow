@@ -54,6 +54,7 @@ class Sparrow(Starlette):
         if self.db is not None:
             return
         from ..database import Database
+
         self.db = Database(self.__db_url, self)
 
     def init_database(self, drop=False, force=True):
