@@ -115,9 +115,10 @@ services:
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container
       - SPARROW_SITE_CONTENT=/app/site-content
+      - SPARROW_FRONTEND_BUILD_DIR=/build
       - SPARROW_ENV
     volumes:
-      - frontend_build:/app/_assets
+      - frontend_build:/build
       # Right now, we configure default site content
       # rather than allowing any customization
       - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/app/site-content
