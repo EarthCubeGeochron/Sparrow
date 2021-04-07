@@ -31,15 +31,17 @@ def prepare_compose_overrides():
     compose_files = [main]
 
     def add_override(name):
-        compose_files.append(relative_path(base, f"docker-compose.{name}.yaml"))
+        fn = relative_path(base, "compose-overrides", f"docker-compose.{name}.yaml")
+        compose_files.append(fn)
 
     env = environ.get("SPARROW_ENV", "development")
     is_production = env == "production"
 
-    # Use certbot for SSL  if certain conditions are met
+    # Use certbot for SSL if certain conditions are met
     use_certbot = is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
 
     if use_certbot:
+        # add_message("attempting to use Certbot for HTTPS")
         add_override("certbot")
     else:
         add_override("base")
