@@ -102,7 +102,6 @@ services:
       context: frontend
       cache_from:
         - sparrowdata/frontend:${SPARROW_FRONTEND_VERSION:-latest}
-    command: webpack
     depends_on:
       - backend
     environment:
@@ -118,8 +117,6 @@ services:
       - SPARROW_SITE_CONTENT=/app/site-content
       - SPARROW_ENV
     volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/plugins:/app/plugins
       - frontend_build:/app/_assets
       # Right now, we configure default site content
       # rather than allowing any customization
