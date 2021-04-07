@@ -11,5 +11,8 @@
   "dependencies": {
     "@blueprintjs/core": "^3.39.0",
     "@macrostrat/hyper": "^1.2.11"
+  },
+  "devDependencies": {
+    "typescript": "^4.2.3"
   }
 }
