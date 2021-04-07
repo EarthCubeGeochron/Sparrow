@@ -35,7 +35,7 @@ function VocabularyList(props) {
   let { data } = params;
   if (exclude != null) data = data.filter((d) => d.authority != exclude);
   if (local)
-    data = data.filter((d) => d.authority == null || d.authority == "WiscAr");
+    data = data.filter((d) => d.authority == null || d.authority != "Sparrow");
 
   return h("div.list-column", [
     h.if(authority != null)("h2", authority),

@@ -1,0 +1,22 @@
+[
+  {
+    "authority": "Sparrow",
+    "description": "Crystallization age of a detrital mineral grain in sedimentary rock",
+    "id": "Detrital grain age",
+  },
+  {
+    "authority": "Sparrow",
+    "description": "Duration of surface exposure to present",
+    "id": "Surface exposure age",
+  },
+  {
+    "authority": "Sparrow",
+    "description": "Age of last surface exposure",
+    "id": "Burial age",
+  },
+  {
+    "authority": "Sparrow",
+    "description": "Crystallization age of a volcanic or igneous rock",
+    "id": "Igneous crystallization age",
+  },
+]

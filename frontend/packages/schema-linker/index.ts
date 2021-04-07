@@ -1,5 +1,6 @@
 import h from "@macrostrat/hyper"
-import {Card} from "@blueprintjs/core"
+import { Card } from "@blueprintjs/core"
+import "./module.styl"
 
 export function TermCard(props) {
   const { data } = props;
