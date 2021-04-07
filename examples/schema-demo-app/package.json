@@ -9,11 +9,15 @@
   },
   "author": "",
   "license": "ISC",
+  "workspaces": [
+    "../../frontend/packages/*"
+  ],
   "devDependencies": {
     "typescript": "^4.2.3"
   },
   "dependencies": {
     "@macrostrat/hyper": "^1.2.11",
+    "hello-world": "*",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   }
