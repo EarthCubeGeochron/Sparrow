@@ -1,5 +1,5 @@
 {
-  "name": "hello-world",
+  "name": "@earthcube/schema-linker",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
@@ -9,6 +9,7 @@
   "author": "Daven Quinn",
   "license": "ISC",
   "dependencies": {
+    "@blueprintjs/core": "^3.39.0",
     "@macrostrat/hyper": "^1.2.11"
   }
 }
