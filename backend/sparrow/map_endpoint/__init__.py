@@ -18,13 +18,17 @@ class MapGeoJSONEndpoint(SparrowCorePlugin):
         sqlfile = open(p, "r")
         query = sqlfile.read()
 
+        ## returns array of objects, we don't want the key
         geojson = db.session.execute(query)
         a = []
         for r in geojson:
-            for c,v in r.items():
-                a.append(v)
+            # r is an object with the geojson as the value
+            # we iterate through all key, value pairs 
+            # and only append the value (geojson) to return
+            for key,value in r.items():
+                a.append(value)
 
-        return JSONResponse(a)
+        return JSONResponse(a) # a is a list of geojson objects
 
     def on_api_initialized_v2(self, api):
 
