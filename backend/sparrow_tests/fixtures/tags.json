@@ -8,5 +8,9 @@
     "name": "Lab Error Sample",
     "material": "unobtainium",
     "elevation": 23
+  },
+  "edit_tag": {
+    "name": "User Error",
+    "description": "Incorrect data from User error"
   }
 }

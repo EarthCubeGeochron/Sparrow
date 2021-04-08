@@ -24,7 +24,9 @@ class TestTags:
 
         new_tag = data["new_tag"]
 
-        db.load_data("tags_tag", new_tag)
+        res = client.post("/api/v2/tags/tag", json=new_tag)
+
+        assert res.status_code == 200
 
         q = db.session.query(tags).filter(tags.name == new_tag["name"]).first()
         assert q.name == new_tag["name"]
@@ -61,6 +63,8 @@ class TestTags:
     
     def test_remove_tag_from_model(self, client, db):
         '''Remove a tag from the model created above'''
+        # TODO: We need a test doing this the interface way to figure out collections..
+        
         data = json_fixture("tags.json")
 
         new_sample = data['new_sample']
@@ -96,5 +100,22 @@ class TestTags:
                 exist_col.append(tag)
         
         assert len(exist_col) == 0
+    
+    def test_edit_tag(self, client, db):
+        '''Edit a tag's name and color'''
+        data = json_fixture("tags.json")
+
+        new_tag = data['new_tag']
+        tags = db.model.tags_tag 
+
+        t = db.session.query(tags).filter(tags.name == new_tag['name']).first()
+        edits = data['edit_tag']
+
+        res = client.put(f"/api/v2/tags/tag/{t.id}", json=data['edit_tag'])
+
+        t = db.session.query(tags).filter(tags.name == edits['name']).first()
+
+        assert t.description == edits['description']
+        
 
 
