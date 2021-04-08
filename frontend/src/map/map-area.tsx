@@ -71,7 +71,7 @@ export function MapPanel({
   }, []);
 
   const [params, setParams] = useState({ all: "true", has: "location" });
-  const initialData = useAPIv2Result("/core_view/geojson");
+  const initialData = useAPIv2Result("/core_view/all_samples");
 
   const [data, setData] = useState(initialData);
 
@@ -181,7 +181,7 @@ export function MapPanel({
           <Navbar className={styles["map-navbar"]}>
             <Navbar.Group className={styles["map-navbar-inner"]}>
               <Navbar.Heading>
-                <h1 className="site-title">
+                <h1>
                   <ShortSiteTitle />
                 </h1>
               </Navbar.Heading>

@@ -19,8 +19,11 @@ const ShortSiteTitle = () => {
   const { getElement } = useContext(FrameContext);
 
   const title = getElement("siteTitle");
-  const content = title.slice(0, 4) + "...";
-  return h(NavLink, { to: "/" }, h(Frame, { id: "shortSiteTitle" }, [content]));
+  return h(
+    NavLink,
+    { to: "/" },
+    h("div.shortTitle", [h(Frame, { id: "shortSiteTitle" }, [title])])
+  );
 };
 
 function AppNavbar({ children, fullTitle, subtitle, ...rest }) {
