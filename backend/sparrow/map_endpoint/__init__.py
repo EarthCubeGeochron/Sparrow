@@ -30,8 +30,8 @@ class MapGeoJSONEndpoint(SparrowCorePlugin):
 
         root_route = "core_view"
         basic_info = dict(
-            route="/core_view/geojson",
-            description="A GeoJSON route for samples",
+            route="/core_view/all_samples",
+            description="A GeoJSON route for all samples",
         )
-        api.add_route("/core_view/geojson", self.geojson_view(), methods=["GET"], include_in_schema=False)
+        api.add_route("/core_view/all_samples", self.geojson_view(), methods=["GET"], include_in_schema=False)
         api.route_descriptions[root_route].append(basic_info)
