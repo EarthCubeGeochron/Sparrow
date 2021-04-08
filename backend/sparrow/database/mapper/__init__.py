@@ -22,9 +22,7 @@ from .base import BaseModel
 log = get_logger(__name__)
 
 
-def _gen_relationship(
-    base, direction, return_fn, attrname, local_cls, referred_cls, **kw
-):
+def _gen_relationship(base, direction, return_fn, attrname, local_cls, referred_cls, **kw):
     if local_cls.__table__.schema is None and referred_cls.__table__.schema is not None:
         kw["backref"] = None
     # kw["enable_typechecks"] = False
@@ -32,9 +30,7 @@ def _gen_relationship(
 
     # make use of the built-in function to actually return
     # the result.
-    return generate_relationship(
-        base, direction, return_fn, attrname, local_cls, referred_cls, **kw
-    )
+    return generate_relationship(base, direction, return_fn, attrname, local_cls, referred_cls, **kw)
 
 
 class AutomapError(Exception):
@@ -69,9 +65,7 @@ class SparrowDatabaseMapper:
             if schema is None:
                 _schema = "public"
             log.info(f"Reflecting schema {_schema}")
-            BaseModel.metadata.reflect(
-                bind=self.db.engine, schema=schema, **reflection_kwargs
-            )
+            BaseModel.metadata.reflect(bind=self.db.engine, schema=schema, **reflection_kwargs)
         BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
 
         self.automap_base = BaseModel
@@ -102,7 +96,8 @@ class SparrowDatabaseMapper:
             autoload_with=self.db.engine,
             **kwargs,
         )
-        log.info([c.name for c in tables.columns])
+        log.info(f"Automapping table {tablename}")
+        # log.info([c.name for c in tables.columns])
         return tables
 
     def reflect_view(self, tablename, *column_args, **kwargs):

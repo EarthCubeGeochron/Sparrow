@@ -11,7 +11,7 @@ root:
   info:
     version: 2
     description: "Root of the Sparrow API, your home for friendly geochronology data"
-    liscense: "CC-BY 4.0. More info at /meta"
+    license: "CC-BY 4.0. More info at /meta"
   examples: ["/api/v2/models/sample", "/api/v2/models/project?per_page=15"]
 
 meta:

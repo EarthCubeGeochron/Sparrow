@@ -2,11 +2,11 @@ import { hyperStyled } from "@macrostrat/hyper";
 import {
   ProjectModelCard,
   SampleModelCard,
-  SessionModelCard,
+  SessionListModelCard,
   DataFileModelCard,
   PublicationModelCard,
   ResearcherModelCard,
-} from "../../model-views/components/list-cards/utils";
+} from "~/model-views/components/list-cards/utils";
 import { InfiniteAPIView } from "./infinite-api-view";
 import { APIV2Context } from "~/api-v2";
 //@ts-ignore
@@ -92,7 +92,7 @@ function SessionListComponent({ params, componentProps = {} }) {
       unwrapData: unwrapSessionCardData,
       params: { nest: "instrument,project,sample" },
       filterParams: { ...params },
-      component: SessionModelCard,
+      component: SessionListModelCard,
       componentProps,
       context: APIV2Context,
     }),
