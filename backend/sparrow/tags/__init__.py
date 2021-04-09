@@ -57,6 +57,3 @@ class Tags(SparrowCorePlugin):
 
         # Initialize tag data if none
         self.default_tags()
-
-        ## Already happens by automatically
-        api.add_route("/core_view/tags", self.get_tags(), methods=["GET"], include_in_schema=False)

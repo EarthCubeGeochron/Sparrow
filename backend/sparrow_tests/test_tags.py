@@ -38,33 +38,32 @@ class TestTags:
         tags = db.model.tags_tag
 
         data = json_fixture("tags.json")
+
+        new_tag = data['new_tag']
         new_sample = data["new_sample"]
 
         db.load_data("sample", new_sample)
 
-        q = db.session.query(sample).filter(sample.name == new_sample["name"]).first()
+        sa = db.session.query(sample).filter(sample.name == new_sample["name"]).first()
 
-        assert q.name == new_sample["name"]
+        assert sa.name == new_sample["name"]
 
-        sample_id = q.id
+        sample_id = sa.id
 
-        tag = db.session.query(tags).filter(tags.name == data["new_tag"]["name"]).first()
+        tag = db.session.query(tags).filter(tags.name == new_tag["name"]).first()
+        tag_id = tag.id
 
-        q.tags_tag_collection.append(tag)
-        assert len(db.session.dirty) == 1  # Intermittently Fails here!
+        new_tag['id'] = tag_id
 
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
+        res = client.put(f"/api/v2/models/sample/{sample_id}", json = {"tags_tag" : [new_tag]})
 
-        s = db.session.query(sample).get(sample_id)
-        assert len(s.tags_tag_collection) != 0
+        sa = db.session.query(sample).get(sample_id)
+        assert len(sa.tags_tag_collection) != 0
     
     def test_remove_tag_from_model(self, client, db):
         '''Remove a tag from the model created above'''
         # TODO: We need a test doing this the interface way to figure out collections..
-        
+
         data = json_fixture("tags.json")
 
         new_sample = data['new_sample']
