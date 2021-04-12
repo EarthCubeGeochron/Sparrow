@@ -1,0 +1,33 @@
+- authority: ALC
+  description:
+  id: U
+- authority: ALC
+  description:
+  id: 206Pb_204Pb
+- authority: ALC
+  description:
+  id: U_Th
+- authority: ALC
+  description:
+  id: 206Pb_207Pb
+- authority: ALC
+  description: Ratio of 206Pb to 207Pb
+  id: 207Pb_235U
+- authority: ALC
+  description: Ratio of 207Pb to 235U
+  id: 206Pb_238U
+- authority: ALC
+  description:
+  id: error_corr
+- authority: ALC
+  description:
+  id: age_206Pb_238U
+- authority: ALC
+  description:
+  id: age_207Pb_235U
+- authority: ALC
+  description:
+  id: age_206Pb_207Pb
+- authority: ALC
+  description:
+  id: concordance
