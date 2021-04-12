@@ -1,4 +1,4 @@
-import { TermCard } from "@earthcube/schema-linker";
+import { TermCard, CompositeTermCard } from "@earthcube/schema-linker";
 import h from "@macrostrat/hyper";
 import d1 from "./lab-data.yaml";
 import d2 from "./output-data.yaml";
@@ -14,7 +14,7 @@ function TermList(props) {
 }
 
 export default function () {
-  return h("div.schema-linker-ui.bp3-dark", [
+  return h("div.schema-linker-ui", [
     h(TermList, { data: d1 }),
     h(TermList, { data: d2 }),
   ]);
