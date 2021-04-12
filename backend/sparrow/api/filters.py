@@ -26,12 +26,7 @@ def has_join_path(start, end):
     Function to be used in the Should_Apply for filters.
     """
     path = join_path(start, end)
-    # if path cannot be formed path will be False
-    # else it will be a list of at least 1 ele, if start and end are same.
-    if not path:
-        return False
-    else:
-        return True
+    return path is not None
 
 
 class BaseFilter:
