@@ -4,7 +4,7 @@ from ..interface.converter import allowed_collections
 
 def join_path(start, end, allowed_collections=allowed_collections):
     """
-    Function to return the path of nesting needed to get from one model to another. If impossible returns False.
+    Function to return the path of nesting needed to get from one model to another. 
 
     start (string) : Starting model
     end (string) : Ending model
@@ -67,3 +67,21 @@ def join_loops(path, query, db, model):
     db_query = getattr(query, "join")(*list1)
 
     return db_query
+
+
+def text_fields(model):
+    """
+    Function to return the column model attributes for a sqlalchemy model whose type is text
+    i.e sample.name
+    """
+    fields = model.__table__.columns.keys()
+    text_fields = []
+    for c in fields:
+        if f"{getattr(model,c).type}" == "TEXT":
+            text_fields.append(c)
+
+    atr = []
+    for c in text_fields:
+        atr.append(getattr(model, c))
+
+    return atr
