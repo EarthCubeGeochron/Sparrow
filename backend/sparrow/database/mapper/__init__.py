@@ -2,7 +2,6 @@ from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
 from sqlalchemy.ext.automap import generate_relationship
 from ...logs import get_logger
-from ...exceptions import DatabaseMappingError
 
 # Drag in geographic types for database reflection
 from geoalchemy2 import Geometry, Geography
