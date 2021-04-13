@@ -12,7 +12,7 @@ scripts.
 """
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column
+from sqlalchemy import Column, String, ForeignKey
 from os import environ
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -21,7 +21,7 @@ from .mapper import BaseModel
 
 class User(BaseModel):
     __tablename__ = "user"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = {"extend_existing": True}
 
     # Columns are automagically mapped from database
     # *NEVER* directly set the password column.
@@ -38,7 +38,7 @@ class User(BaseModel):
 
 class Project(BaseModel):
     __tablename__ = "project"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = {"extend_existing": True}
 
     def add_researcher(self, researcher):
         self.researcher_collection.append(researcher)
@@ -46,9 +46,10 @@ class Project(BaseModel):
     def add_session(self, session):
         self.session_collection.append(session)
 
+
 class Session(BaseModel):
     __tablename__ = "session"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = {"extend_existing": True}
     # Define UUID column so it is caught as unique
     uuid = Column(
         UUID(as_uuid=True),
@@ -57,6 +58,7 @@ class Session(BaseModel):
         default=uuid4,
         server_default="uuid_generate_v4()",
     )
+
     def get_attribute(self, type):
         # There has got to be a better way to get self!
         att = self.db.model.attribute
@@ -71,8 +73,10 @@ class Session(BaseModel):
 
 class DatumType(BaseModel):
     __tablename__ = "datum_type"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = {"extend_existing": True}
 
     # We need to override foreign keys
-    _error_unit = relationship("vocabulary_unit", foreign_keys="DatumType.error_unit")
-    _unit = relationship("vocabulary_unit", foreign_keys="DatumType.unit")
+    unit = Column("unit", String, ForeignKey("vocabulary.unit.id"))
+    error_unit = Column("error_unit", String, ForeignKey("vocabulary.unit.id"))
+    _unit = relationship("vocabulary_unit", foreign_keys=[unit])
+    _error_unit = relationship("vocabulary_unit", foreign_keys=[error_unit], back_populates=None)

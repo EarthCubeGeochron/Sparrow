@@ -23,13 +23,10 @@ log = get_logger(__name__)
 
 
 def _gen_relationship(base, direction, return_fn, attrname, local_cls, referred_cls, **kw):
-    if local_cls.__table__.schema is None and referred_cls.__table__.schema is not None:
-        kw["backref"] = None
-    # kw["enable_typechecks"] = False
-    # kw["cascade"] = "all"
-
-    # make use of the built-in function to actually return
-    # the result.
+    support_schemas = ["vocabulary", "core_view"]
+    if local_cls.__table__.schema in support_schemas and referred_cls.__table__.schema is None:
+        # Don't create relationships on vocabulary and core_view models back to the main schema
+        return
     return generate_relationship(base, direction, return_fn, attrname, local_cls, referred_cls, **kw)
 
 
