@@ -61,11 +61,8 @@ class SparrowDatabaseMapper:
             # Reflect tables in schemas we care about
             # Note: this will not reflect views because they don't have
             # primary keys.
-            _schema = schema
-            if schema is None:
-                _schema = "public"
-            log.info(f"Reflecting schema {_schema}")
-            BaseModel.metadata.reflect(bind=self.db.engine, schema=schema, **reflection_kwargs)
+            log.info(f"Reflecting schema {schema}")
+            BaseModel.metadata.reflect(bind=self.db.engine, schema=schema)
         BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
 
         self.automap_base = BaseModel
