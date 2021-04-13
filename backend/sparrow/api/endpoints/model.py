@@ -186,7 +186,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
     async def api_docs(self, request, schema):
         return JSONResponse(
             {
-                "liscense": "CC-BY 4.0",
+                "license": "CC-BY 4.0",
                 "description": str(self.description),
                 "parameters": dict(self.build_param_help()),
                 "allowed_nests": list(set(schema._available_nests())),
