@@ -43,6 +43,7 @@ def pytest_addoption(parser):
         help="Tear down database after tests run",
     )
 
+
 def pytest_configure(config):
     if not config.option.slow:
         setattr(config.option, "markexpr", "not slow")
@@ -91,6 +92,7 @@ def db(app, pytestconfig):
         connection.close()
     else:
         yield app.database
+
 
 @fixture(scope="class")
 def client(app, db):

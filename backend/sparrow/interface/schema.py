@@ -10,6 +10,7 @@ from sqlalchemy.orm import RelationshipProperty
 from collections.abc import Mapping
 from sqlalchemy import inspect
 
+from .fields import SmartNested
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter, allow_nest
 
@@ -80,6 +81,25 @@ class ModelSchema(SQLAlchemyAutoSchema):
     @property
     def _table(self):
         return self.opts.model.__table__
+
+    def _nested_relationships(self, *, nests=None):
+        """Get relationship fields for nested models, allowing them
+        to be pre-joined"""
+        # It would be nice if we didn't have to pass nests down here...
+        _nests = nests or self.allowed_nests
+        for key, field in self.fields.items():
+            if not isinstance(field, SmartNested):
+                continue
+            if not field._should_nest():
+                continue
+            # Yield this relationship
+            yield getattr(self.opts.model, key).property
+            field.schema.allowed_nests = _nests
+            # Get relationships from nested models
+            yield from field.schema._nested_relationships(nests=_nests)
+
+    def nested_relationships(self):
+        return list(self._nested_relationships())
 
     def _build_filters(self, data):
         # Filter on properties that actually have a local column

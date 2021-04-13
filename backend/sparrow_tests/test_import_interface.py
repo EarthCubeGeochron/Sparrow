@@ -7,6 +7,7 @@ from pytest import mark
 from sparrow.logs import get_logger
 from sparrow.encoders import JSONEncoder
 from json import dumps
+from sqlalchemy.orm import RelationshipProperty
 
 from .fixtures import basic_data, incomplete_analysis, basic_project
 from .helpers import json_fixture, ensure_single
@@ -59,9 +60,7 @@ class TestImperativeImport(object):
         db.session.add(a_type)
 
         # Material
-        mat = db.get_or_create(
-            db.model.vocabulary_material, id="long-staple cotton", authority=authority
-        )
+        mat = db.get_or_create(db.model.vocabulary_material, id="long-staple cotton", authority=authority)
         db.session.add(mat)
 
         # Analysis
@@ -98,9 +97,7 @@ class TestImperativeImport(object):
         db.session.flush()
 
         # Parameter
-        datum = db.get_or_create(
-            db.model.datum, analysis=analysis.id, type=type.id, value=121, error=22
-        )
+        datum = db.get_or_create(db.model.datum, analysis=analysis.id, type=type.id, value=121, error=22)
 
         db.session.add(datum)
         db.session.commit()
@@ -129,9 +126,7 @@ class TestImperativeImport(object):
         assert total_ops > 0
 
         res = db.session.execute(
-            "SELECT table_operation, table_name "
-            "FROM pgmemento.table_event_log "
-            "ORDER BY id DESC LIMIT 1"
+            "SELECT table_operation, table_name " "FROM pgmemento.table_event_log " "ORDER BY id DESC LIMIT 1"
         )
         (op, tbl) = res.first()
         assert op == "INSERT"
@@ -355,11 +350,7 @@ class TestDeclarativeImporter:
 
     def test_get_instance(self, db):
         data = dict(parameter="soil water content", unit="weight %")
-        dt = (
-            db.session.query(db.model.datum_type)
-            .filter_by(**data, error_unit=None)
-            .first()
-        )
+        dt = db.session.query(db.model.datum_type).filter_by(**data, error_unit=None).first()
 
         assert dt is not None
 
@@ -457,10 +448,7 @@ class TestDeclarativeImporter:
             db.load_data("project", invalid_project)
             assert False  # Did not raise
         except ValidationError as err:
-            assert (
-                err.messages["researcher"][0]
-                == "Provided a single object for a collection field"
-            )
+            assert err.messages["researcher"][0] == "Provided a single object for a collection field"
 
 
 class TestStagedImport:
@@ -479,7 +467,18 @@ class TestImportDataTypes(object):
         data = json_fixture("simple-cosmo-test.json")
         db.load_data("session", data)
 
+
 class TestIsolation:
     def test_isolation(self, db):
         sessions = db.session.query(db.model.session).all()
         assert len(sessions) == 0
+
+
+class TestNestedQuerying:
+    def test_nested_querying(self, db):
+        SampleSchema = db.interface.sample
+        ss = SampleSchema(allowed_nests=["session", "analysis"])
+        relationships = ss.nested_relationships()
+        assert len(relationships) == 2
+        for rel in relationships:
+            assert isinstance(rel, RelationshipProperty)
