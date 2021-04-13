@@ -8,7 +8,7 @@ from marshmallow_sqlalchemy.fields import Related, RelatedList
 
 import geoalchemy2 as geo
 from sqlalchemy.orm import RelationshipProperty
-from sqlalchemy.types import Integer
+from sqlalchemy.types import Integer, Numeric
 from sqlalchemy.dialects import postgresql
 
 from ..database.mapper.util import trim_postfix
@@ -158,7 +158,9 @@ class SparrowConverter(ModelConverter):
         # Somewhat ugly method, mostly to decide if field is dump_only or required
         kwargs = super()._get_field_kwargs_for_property(prop)
         kwargs["data_key"] = self._get_key(prop)
-        kwargs["allow_nan"] = True
+
+        if isinstance(prop, Numeric):
+            kwargs["allow_nan"] = True
 
         if isinstance(prop, RelationshipProperty):  # Relationship property
             cols = list(getattr(prop, "local_columns", []))
