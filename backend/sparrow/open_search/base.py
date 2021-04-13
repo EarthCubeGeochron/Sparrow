@@ -18,6 +18,8 @@ class OpenSearchEndpoint(HTTPEndpoint):
 
         db = app_context().database
         params = request.query_params
+        if len(params) == 0:
+            return JSONResponse({"Status":"Success", "Message": "Provide a string as a query parameter", "example": "/api/v2/search?query=lava"})
 
         sql = open(open_search_file).read()
 
@@ -25,9 +27,9 @@ class OpenSearchEndpoint(HTTPEndpoint):
 
         json_res = [dict(r) for r in query_res]
         
-        res = select_page(db.session, text(sql), 15)
+        #res = select_page(db.session, text(sql).selectable, 15)
 
-        return APIResponse(res, total_count=len(json_res))
+        return APIResponse(json_res, total_count=len(json_res))
 
 
 Open_Search_API = Router(
