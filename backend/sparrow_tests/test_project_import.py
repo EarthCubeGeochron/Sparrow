@@ -1,7 +1,10 @@
+from contextlib import redirect_stdout
 from .helpers import json_fixture
 from deepdiff import DeepDiff
 from json import dumps, loads
 from sparrow.encoders import JSONEncoder
+from sqlalchemy import event
+from sqlalchemy.orm import joinedload
 from datetime import datetime
 from pytest import mark
 import logging
@@ -14,7 +17,7 @@ def omit_key(changeset, key):
 class TestProjectImport:
     def test_import_dumpfile(self, db, caplog):
         data = json_fixture("project-dump.json")
-        #with caplog.at_level(logging.INFO, logger="sparrow.interface.schema"):
+        # with caplog.at_level(logging.INFO, logger="sparrow.interface.schema"):
         #    # So we don't get spammed with output
         db.load_data("project", data["data"])
 
@@ -51,6 +54,33 @@ class TestProjectImport:
         proj.embargo_date = datetime.max
         db.session.add(proj)
         db.session.commit()
+
+    def test_lazy_load(self, db, statements):
+        assert len(statements) == 0  # Sanity check for fixture
+        SampleSchema = db.interface.sample
+        ss = SampleSchema(many=True, allowed_nests=["session", "analysis"])
+
+        # First, do a "lazy load"
+        res = db.session.query(ss.opts.model).all()
+        assert len(res) > 0
+        output = ss.dump(res)
+        assert len(output) == len(res)
+        assert len(statements) > len(res)
+        # Don't keep objects around for later tests,
+        # they will interfere with query counting because
+        # cached session objects will be fetched instead
+        db.session.expire_all()
+
+    def test_joined_load(self, db, statements):
+        """Test that we can do a joined load, which is important for
+        rapidly assembling nested result sets (see API v2)"""
+        SampleSchema = db.interface.sample
+        ss = SampleSchema(many=True, allowed_nests=["session", "analysis"])
+        res = db.session.query(ss.opts.model).all()
+        assert len(res) > 0
+        output = ss.dump(res)
+        assert len(output) == len(res)
+        assert len(statements) == 1
 
     @mark.xfail(reason="We need to figure out how to effectively overwrite data")
     def test_reimport_dumpfile(self, db):

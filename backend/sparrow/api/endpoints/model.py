@@ -4,6 +4,7 @@ from webargs.fields import DelimitedList, Str, Int, Boolean
 from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
 from starlette.responses import JSONResponse
 from yaml import safe_load
 
@@ -219,8 +220,12 @@ class ModelAPIEndpoint(HTTPEndpoint):
             return await self.api_docs(request, schema)
 
         q = self.query(schema)  # constructs query to send to database
+
         for _filter in self._filters:
             q = _filter(q, args)
+
+        joins = [joinedload(rel) for rel in schema.nested_relationships()]
+        q = q.options(*joins)
 
         if args["all"]:
             res = q.all()

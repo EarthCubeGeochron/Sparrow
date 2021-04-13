@@ -481,4 +481,4 @@ class TestNestedQuerying:
         relationships = ss.nested_relationships()
         assert len(relationships) == 2
         for rel in relationships:
-            assert isinstance(rel, RelationshipProperty)
+            assert isinstance(rel.property, RelationshipProperty)

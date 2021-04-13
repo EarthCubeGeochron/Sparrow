@@ -93,7 +93,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             if not field._should_nest():
                 continue
             # Yield this relationship
-            yield getattr(self.opts.model, key).property
+            yield getattr(self.opts.model, key)
             field.schema.allowed_nests = _nests
             # Get relationships from nested models
             yield from field.schema._nested_relationships(nests=_nests)

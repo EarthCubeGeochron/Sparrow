@@ -59,6 +59,18 @@ def app(pytestconfig):
         yield _app
 
 
+@fixture(scope="function")
+def statements(db):
+    stmts = []
+
+    def catch_queries(conn, cursor, statement, parameters, context, executemany):
+        stmts.append(statement)
+
+    event.listen(db.engine, "before_cursor_execute", catch_queries)
+    yield stmts
+    event.remove(db.engine, "before_cursor_execute", catch_queries)
+
+
 @fixture(scope="class")
 def db(app, pytestconfig):
     # https://docs.sqlalchemy.org/en/13/orm/session_transaction.html
