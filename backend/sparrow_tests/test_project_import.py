@@ -77,15 +77,8 @@ class TestProjectImport:
         SampleSchema = db.interface.sample
         ss = SampleSchema(many=True, allowed_nests=["session", "analysis"])
         q = db.session.query(ss.opts.model)
-        q = q.options(
-            joinedload(ss.opts.model.session_collection),
-            joinedload(ss.opts.model.session_collection, db.model.session.analysis_collection),
-            joinedload(
-                ss.opts.model.session_collection,
-                db.model.session.analysis_collection,
-                db.model.analysis.datum_collection,
-            ),
-        )
+        joins = [joinedload(*arg) for arg in ss.nested_relationships()]
+        q = q.options(*joins)
         res = q.all()
 
         assert len(res) > 0
