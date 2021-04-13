@@ -9,6 +9,7 @@ import { LoginRequired } from "~/auth";
 import { ErrorBoundaryRoute as Route, NoMatchPage } from "~/util";
 import { AuthContext } from "~/auth/context";
 import { ProjectAdminPage } from "./project";
+import { OpenSearch } from "~/components";
 
 import { SampleAdminPage } from "./sample";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
@@ -62,9 +63,21 @@ const AdminNavbar = (props) => {
   ]);
 };
 
+const QuickLinks = ({ base }) => {
+  return h("div", { style: { position: "sticky", top: "0px" } }, [
+    h("h2", { style: { marginTop: "0px" } }, "Quick Links"),
+    h(AdminDataModelLinks, { base }),
+  ]);
+};
+
 const AdminBody = ({ base, ...rest }) => {
   return h(Frame, { id: "adminBase", ...rest }, [
-    h(AdminDataModelLinks, { base }),
+    h("div", { style: { display: "flex", justifyContent: "space-between" } }, [
+      h("div", { style: { flexGrow: 1, marginRight: "50px", width: "28em" } }, [
+        h(OpenSearch),
+      ]),
+      h("div", { style: { flexGrow: 2 } }, [h(QuickLinks, { base })]),
+    ]),
   ]);
 };
 
