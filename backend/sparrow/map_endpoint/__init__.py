@@ -1,6 +1,7 @@
 from sparrow.plugins import SparrowCorePlugin
 from sparrow.context import app_context
 from sparrow.util import relative_path
+from sparrow.database.util import run_sql_query_file
 from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
 import pandas as pd
@@ -15,18 +16,10 @@ class MapGeoJSONEndpoint(SparrowCorePlugin):
 
         db = self.app.database
         p = Path(relative_path(__file__, "geojson.sql"))
-        sqlfile = open(p, "r")
-        query = sqlfile.read()
-
+        
         ## returns array of objects, we don't want the key
-        geojson = db.session.execute(query)
-        a = []
-        for r in geojson:
-            # r is an object with the geojson as the value
-            # we iterate through all key, value pairs 
-            # and only append the value (geojson) to return
-            for key,value in r.items():
-                a.append(value)
+        geojson = run_sql_query_file(db.session, p)
+        a = [v for v, in geojson.fetchall()] ## very strange tuple unpacking
 
         return JSONResponse(a) # a is a list of geojson objects
 
