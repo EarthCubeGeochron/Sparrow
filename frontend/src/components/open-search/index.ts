@@ -19,6 +19,18 @@ function OpenSearch() {
   const url = query == "" ? "/api/v2/search" : `/api/v2/search?query=${query}`;
   const data = useAPIv2Result(url);
 
+  useEffect(() => {
+    if (data && data["data"] != null) {
+      setScrollData(data["data"]);
+    } else if (query.length == 0) {
+      setScrollData([]);
+    }
+    console.log("triggered");
+    return () => {
+      setScrollData([]);
+    };
+  }, [query, data]);
+
   if (!data) return null;
 
   const onChange = (text, value) => {
@@ -27,10 +39,6 @@ function OpenSearch() {
 
   const onSearch = (e) => {
     e.preventDefault();
-    setScrollData([]);
-    if (data && data["data"] != null) {
-      setScrollData(data["data"]);
-    }
   };
 
   return h("div", [
