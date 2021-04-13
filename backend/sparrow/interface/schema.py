@@ -61,13 +61,16 @@ class ModelSchema(SQLAlchemyAutoSchema):
     :param: allowed_nests: List of strings or "all"
     """
 
+    # A list of SQLAlchemy collections that we are nesting on
+    nest_collections = []
+
     def __init__(self, *args, **kwargs):
         kwargs["unknown"] = True
         nests = kwargs.pop("allowed_nests", [])
         self.allowed_nests = nests
         if len(self.allowed_nests) > 0:
             model = self.opts.model.__name__
-            log.debug(f"\nSetting up schema for model {model}\n  allowed nests: {nests}")
+            log.info(f"\nSetting up schema for model {model}\n  allowed nests: {nests}")
 
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
@@ -233,14 +236,17 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def to_json_schema(self, model):
         return json_schema.dump(model)
 
-    def _available_nests(self):
+    def _nest_relationships(self):
         model = self.opts.model
         nests = []
         for prop in model.__mapper__.iterate_properties:
             if not isinstance(prop, RelationshipProperty):
                 continue
             if allow_nest(model.__table__.name, prop.target.name):
-                nests.append(prop.target.name)
+                nests.append(prop)
         return nests
+
+    def _available_nests(self):
+        return [rel.target.name for rel in self._nest_relationships()]
 
     from .display import pretty_print
