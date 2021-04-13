@@ -59,13 +59,13 @@ class SparrowDatabaseMapper:
             # primary keys.
             log.info(f"Reflecting schema {schema}")
             BaseModel.metadata.reflect(bind=self.db.engine, schema=schema)
+        log.info("Reflecting core tables")
         BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
 
         self.automap_base = BaseModel
 
         self._models = ModelCollection(self.automap_base.classes)
         self._tables = TableCollection(self._models)
-        log.info("Finished automapping database")
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """
