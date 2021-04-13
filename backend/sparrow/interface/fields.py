@@ -77,18 +77,9 @@ class SmartNested(Nested, Related):
     # https://github.com/marshmallow-code/marshmallow-sqlalchemy/blob/dev/src/marshmallow_sqlalchemy/fields.py
     # TODO: better conformance of this field to Marshmallow's OpenAPI schema generation
     # https://apispec.readthedocs.io/en/latest/using_plugins.html
-    def __init__(
-        self, name, *, only=None, exclude=(), many=False, unknown=None, **field_kwargs
-    ):
-        super(Nested, self).__init__(
-            name,
-            only=only,
-            exclude=exclude,
-            many=many,
-            unknown=unknown,
-            **field_kwargs,
-        )
-        super(Related, self).__init__(**field_kwargs)
+    def __init__(self, name, *, only=None, exclude=(), many=False, unknown=None, **field_kwargs):
+        Nested.__init__(self, name, only=only, exclude=exclude, many=many, unknown=unknown, **field_kwargs)
+        Related.__init__(self, **field_kwargs)
         self._many = many
         self._instances = set()
         self.allow_none = True
