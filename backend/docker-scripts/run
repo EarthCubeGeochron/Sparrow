@@ -4,39 +4,24 @@ set -e
 
 cd /app
 
-while ! pg_isready -h db -p 5432 -U postgres ; do
-  echo "Waiting for database..."
-  sleep 1
-done
-
-# We no longer import EarthChem vocabularies by default
-
-# (non-foolproof) check for whether tables exist
-res=$(psql -tA -h db -p 5432 -U postgres sparrow -c "
-SELECT EXISTS (
-  SELECT *
-  FROM information_schema.tables
-  WHERE table_schema = 'public'
-    AND table_name = 'datum'
-);")
-
-# Create tables if they don't exist
-[ ! $res = 't' ] && python3 sparrow init
-
 HOST=0.0.0.0
 PORT=5000
 
+# Wait a tick to allow us to echo
+# (this is kind of a hack and may cause problems)
+sleep 1
+echo "Running backend in $SPARROW_ENV mode"
 if [ $SPARROW_ENV = 'development' ]; then
   ## Could also try hypercorn for better reloading...
-  echo "Running in development mode"
   exec hypercorn \
+    -w 1 \
     --config python:sparrow.logs.config \
     --reload \
     --bind $HOST:$PORT \
     "sparrow.__entry__:app"
 else
   exec hypercorn --bind $HOST:$PORT \
-    -w 3 \
+    -w 1 \
     --log-file - \
     --log-level warning \
     "sparrow.__entry__:app"
