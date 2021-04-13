@@ -73,10 +73,21 @@ class TestProjectImport:
 
     def test_joined_load(self, db, statements):
         """Test that we can do a joined load, which is important for
-        rapidly assembling nested result sets (see API v2)"""
+        rapidly assembling nested result sets (see API v2)."""
         SampleSchema = db.interface.sample
         ss = SampleSchema(many=True, allowed_nests=["session", "analysis"])
-        res = db.session.query(ss.opts.model).all()
+        q = db.session.query(ss.opts.model)
+        q = q.options(
+            joinedload(ss.opts.model.session_collection),
+            joinedload(ss.opts.model.session_collection, db.model.session.analysis_collection),
+            joinedload(
+                ss.opts.model.session_collection,
+                db.model.session.analysis_collection,
+                db.model.analysis.datum_collection,
+            ),
+        )
+        res = q.all()
+
         assert len(res) > 0
         output = ss.dump(res)
         assert len(output) == len(res)
