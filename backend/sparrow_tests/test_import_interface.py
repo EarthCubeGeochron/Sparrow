@@ -478,7 +478,10 @@ class TestNestedQuerying:
     def test_nested_querying(self, db):
         SampleSchema = db.interface.sample
         ss = SampleSchema(allowed_nests=["session", "analysis"])
-        relationships = ss.nested_relationships()
+        relationships = ss.nested_relationships(mode="inner")
         assert len(relationships) == 2
-        for rel in relationships:
-            assert isinstance(rel.property, RelationshipProperty)
+        relationships = ss.nested_relationships()
+        assert len(relationships) >= 2
+        for rel_list in relationships:
+            for rel in rel_list:
+                assert isinstance(rel.property, RelationshipProperty)

@@ -82,9 +82,17 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _table(self):
         return self.opts.model.__table__
 
-    def _nested_relationships(self, *, nests=None):
+    def _nested_relationships(self, *, nests=None, mode="outer"):
         """Get relationship fields for nested models, allowing them
-        to be pre-joined"""
+        to be pre-joined.
+
+        kwargs:
+        mode [nested, related, hybrid]
+            - nested: loads only the models directly referenced in nests
+            - related: loads all models, even those referenced in related models only
+            - hybrid [default]: loads all models, attempting to pull back only needed
+                attributes that define the relationship...
+        """
         # It would be nice if we didn't have to pass nests down here...
         _nests = nests or self.allowed_nests
         for key, field in self.fields.items():
@@ -92,6 +100,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 continue
             # Yield this relationship
             this_relationship = getattr(self.opts.model, key)
+            if mode == "inner" and not field._should_nest():
+                continue
             yield [this_relationship]
             field.schema.allowed_nests = _nests
             if not field._should_nest():
@@ -100,8 +110,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
             for nested in field.schema._nested_relationships(nests=_nests):
                 yield [this_relationship, *nested]
 
-    def nested_relationships(self):
-        return list(self._nested_relationships())
+    def nested_relationships(self, *, mode="outer"):
+        return list(self._nested_relationships(mode=mode))
 
     def _build_filters(self, data):
         # Filter on properties that actually have a local column
