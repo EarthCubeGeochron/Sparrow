@@ -1,9 +1,10 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIv2Result } from "~/api-v2";
-import { Tooltip2 } from "@blueprintjs/popover2";
+import { Tooltip } from "@blueprintjs/core";
+import { isTooDark } from "../misscel";
+import { tagBody } from "./types";
 //@ts-ignore
 import styles from "./module.styl";
-import { tagBody } from "./types";
 
 const h = hyperStyled(styles);
 
@@ -13,10 +14,19 @@ const h = hyperStyled(styles);
  * @returns
  */
 function TagBody(props: tagBody) {
-  const { name, description, color } = props;
+  const { name, description, color, id = 10000 } = props;
 
-  return h(Tooltip2, { content: description }, [
-    h("div.tag-body", { style: { color } }, [name]),
+  const showName = name.length > 0 ? name : "Tag Preview";
+  const darkTag = isTooDark(color);
+
+  const textColor = darkTag ? "white" : "black";
+
+  return h(Tooltip, { content: description }, [
+    h(
+      "div.tag-body",
+      { key: id, style: { backgroundColor: color, color: textColor } },
+      [showName]
+    ),
   ]);
 }
 

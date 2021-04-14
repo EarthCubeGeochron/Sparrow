@@ -77,3 +77,22 @@ export function useToggle(initialValue: boolean): [boolean, () => void] {
   const toggleValue = () => setValue(!value);
   return [value, toggleValue];
 }
+
+export const randomHexColor = () => {
+  const hexColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+  return hexColor;
+};
+
+/**
+ * This function parses a hexcode and decides if the color is dark
+ * @param hexcolor : string, hex code for color
+ * @returns boolean (true == dark)
+ */
+export function isTooDark(hexcolor) {
+  var r = parseInt(hexcolor.substr(1, 2), 16);
+  var g = parseInt(hexcolor.substr(3, 2), 16);
+  var b = parseInt(hexcolor.substr(4, 2), 16);
+  var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+
+  return yiq < 90;
+}
