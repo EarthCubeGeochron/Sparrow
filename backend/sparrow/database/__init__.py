@@ -38,7 +38,7 @@ class Database:
         the SPARROW_BACKEND_CONFIG file, if available.
         """
         log.info(f"Setting up database connection '{db_conn}'")
-        self.engine = create_engine(db_conn, executemany_mode="batch")
+        self.engine = create_engine(db_conn, executemany_mode="batch", echo=False)
         metadata.create_all(bind=self.engine)
         self.meta = metadata
         self.app = app

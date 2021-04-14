@@ -6,10 +6,11 @@ from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
 from sqlalchemy.orm.exc import FlushError
-from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy.orm import RelationshipProperty, joinedload
 from collections.abc import Mapping
 from sqlalchemy import inspect
 
+from .fields import SmartNested
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter, allow_nest
 
@@ -61,13 +62,16 @@ class ModelSchema(SQLAlchemyAutoSchema):
     :param: allowed_nests: List of strings or "all"
     """
 
+    # A list of SQLAlchemy collections that we are nesting on
+    nest_collections = []
+
     def __init__(self, *args, **kwargs):
         kwargs["unknown"] = True
         nests = kwargs.pop("allowed_nests", [])
         self.allowed_nests = nests
         if len(self.allowed_nests) > 0:
             model = self.opts.model.__name__
-            log.debug(f"\nSetting up schema for model {model}\n  allowed nests: {nests}")
+            log.info(f"\nSetting up schema for model {model}\n  allowed nests: {nests}")
 
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
@@ -77,6 +81,53 @@ class ModelSchema(SQLAlchemyAutoSchema):
     @property
     def _table(self):
         return self.opts.model.__table__
+
+    def _nested_relationships(self, *, nests=None):
+        """Get relationship fields for nested models, allowing them
+        to be pre-joined.
+
+        kwargs:
+        mode [nested, related, hybrid]
+            - nested: loads only the models directly referenced in nests
+            - related: loads all models, even those referenced in related models only
+            - hybrid [default]: loads all models, attempting to pull back only needed
+                attributes that define the relationship...
+        """
+        # It would be nice if we didn't have to pass nests down here...
+        _nests = nests or self.allowed_nests
+        for key, field in self.fields.items():
+            if not isinstance(field, Related):
+                continue
+            # Yield this relationship
+            this_relationship = getattr(self.opts.model, key)
+
+            nested = isinstance(field, SmartNested) and field._should_nest()
+
+            load_hint = None
+            # We are passing through load_hints to allow us to
+            # return only a subset of columns when primary keys are
+            # desired.
+            # if not nested:
+            #    load_hint = this_relationship.property.remote_side
+
+            yield [this_relationship], load_hint
+            if not nested:
+                continue
+            # We're only working with nested fields now
+            field.schema.allowed_nests = _nests
+            # Get relationships from nested models
+            for rel, load_hint in field.schema._nested_relationships(nests=_nests):
+                yield [this_relationship, *rel], load_hint
+
+    def query_options(self):
+        for rel, load_hint in self._nested_relationships():
+            res = joinedload(*rel)
+            if load_hint is not None:
+                res = res.load_only(*list(load_hint))
+            yield res
+
+    def nested_relationships(self):
+        return [v for v, _ in self._nested_relationships()]
 
     def _build_filters(self, data):
         # Filter on properties that actually have a local column
@@ -233,14 +284,17 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def to_json_schema(self, model):
         return json_schema.dump(model)
 
-    def _available_nests(self):
+    def _nest_relationships(self):
         model = self.opts.model
         nests = []
         for prop in model.__mapper__.iterate_properties:
             if not isinstance(prop, RelationshipProperty):
                 continue
             if allow_nest(model.__table__.name, prop.target.name):
-                nests.append(prop.target.name)
+                nests.append(prop)
         return nests
+
+    def _available_nests(self):
+        return [rel.target.name for rel in self._nest_relationships()]
 
     from .display import pretty_print
