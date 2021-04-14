@@ -6,7 +6,7 @@ from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
 from sqlalchemy.orm.exc import FlushError
-from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy.orm import RelationshipProperty, joinedload
 from collections.abc import Mapping
 from sqlalchemy import inspect
 
@@ -82,7 +82,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _table(self):
         return self.opts.model.__table__
 
-    def _nested_relationships(self, *, nests=None, mode="outer"):
+    def _nested_relationships(self, *, nests=None):
         """Get relationship fields for nested models, allowing them
         to be pre-joined.
 
@@ -96,22 +96,38 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # It would be nice if we didn't have to pass nests down here...
         _nests = nests or self.allowed_nests
         for key, field in self.fields.items():
-            if not isinstance(field, SmartNested):
+            if not isinstance(field, Related):
                 continue
             # Yield this relationship
             this_relationship = getattr(self.opts.model, key)
-            if mode == "inner" and not field._should_nest():
-                continue
-            yield [this_relationship]
-            field.schema.allowed_nests = _nests
-            if not field._should_nest():
-                continue
-            # Get relationships from nested models
-            for nested in field.schema._nested_relationships(nests=_nests):
-                yield [this_relationship, *nested]
 
-    def nested_relationships(self, *, mode="outer"):
-        return list(self._nested_relationships(mode=mode))
+            nested = isinstance(field, SmartNested) and field._should_nest()
+
+            load_hint = None
+            # We are passing through load_hints to allow us to
+            # return only a subset of columns when primary keys are
+            # desired.
+            # if not nested:
+            #    load_hint = this_relationship.property.remote_side
+
+            yield [this_relationship], load_hint
+            if not nested:
+                continue
+            # We're only working with nested fields now
+            field.schema.allowed_nests = _nests
+            # Get relationships from nested models
+            for rel, load_hint in field.schema._nested_relationships(nests=_nests):
+                yield [this_relationship, *rel], load_hint
+
+    def query_options(self):
+        for rel, load_hint in self._nested_relationships():
+            res = joinedload(*rel)
+            if load_hint is not None:
+                res = res.load_only(*list(load_hint))
+            yield res
+
+    def nested_relationships(self):
+        return [v for v, _ in self._nested_relationships()]
 
     def _build_filters(self, data):
         # Filter on properties that actually have a local column

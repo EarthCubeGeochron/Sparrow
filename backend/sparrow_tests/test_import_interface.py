@@ -478,8 +478,6 @@ class TestNestedQuerying:
     def test_nested_querying(self, db):
         SampleSchema = db.interface.sample
         ss = SampleSchema(allowed_nests=["session", "analysis"])
-        relationships = ss.nested_relationships(mode="inner")
-        assert len(relationships) == 2
         relationships = ss.nested_relationships()
         assert len(relationships) >= 2
         for rel_list in relationships:

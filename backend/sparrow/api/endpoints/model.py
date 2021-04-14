@@ -224,8 +224,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         for _filter in self._filters:
             q = _filter(q, args)
 
-        joins = [joinedload(*rel) for rel in schema.nested_relationships()]
-        q = q.options(*joins)
+        q = q.options(*list(schema.query_options()))
 
         if args["all"]:
             res = q.all()
