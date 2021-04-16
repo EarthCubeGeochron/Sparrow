@@ -20,6 +20,7 @@ from ..interface import ModelSchema, model_interface
 from ..exceptions import DatabaseMappingError
 from .postgresql import on_conflict
 from .migration import SparrowDatabaseMigrator
+from ..settings import ECHO_SQL
 
 metadata = MetaData()
 
@@ -38,7 +39,7 @@ class Database:
         the SPARROW_BACKEND_CONFIG file, if available.
         """
         log.info(f"Setting up database connection '{db_conn}'")
-        self.engine = create_engine(db_conn, executemany_mode="batch", echo=False)
+        self.engine = create_engine(db_conn, executemany_mode="batch", echo=ECHO_SQL)
         metadata.create_all(bind=self.engine)
         self.meta = metadata
         self.app = app

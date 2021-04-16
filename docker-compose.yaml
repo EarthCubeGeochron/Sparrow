@@ -30,6 +30,7 @@ services:
       - SPARROW_SECRET_KEY
       - SPARROW_BASE_URL
       - SPARROW_LAB_NAME
+      - SPARROW_ECHO_SQL
       - SPARROW_DATABASE=postgresql+psycopg2://postgres@db/sparrow
       - SPARROW_DATA_DIR
       # A cache for files that need to persist but can be rebuilt.
@@ -107,6 +108,7 @@ services:
     environment:
       - CONTAINERIZED=1
       - SPARROW_LAB_NAME
+      - SPARROW_ECHO_SQL
       - SPARROW_BASE_URL
       # We need to forward SPARROW_HTTP_PORT to the frontend so that we can
       # load BrowserSync on the correct port if in development mode
