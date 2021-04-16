@@ -5,7 +5,7 @@ from .helpers import json_fixture
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, Point
 import datetime
-import pdb
+import time
 
 
 def create_location_from_coordinates(longitude, latitude):
@@ -132,3 +132,11 @@ class TestAPIV2:
     def test_api_nesting(self, client):
         res = client.get("/api/v2/models/sample", params={"nest": "session", "all": True})
         assert res.status_code == 200
+
+    def test_api_time(self,client):
+        start = time.time()
+        res = client.get("/api/v2/models/sample", params={"nest": "session", "all": True})
+        end = time.time()
+        elapsed_time = end - start #seconds taken for code to run 
+
+        assert elapsed_time is not None

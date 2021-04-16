@@ -27,12 +27,13 @@ from ..filters import (
     AgeRangeFilter,
     IdListFilter,
 )
+from sparrow.api.utils import format_transaction_time
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
 from ...util import relative_path
-from .utils import location_check, material_check, commit_changes, commit_edits, collection_handler
 import json
 import copy
+import time
 
 log = get_logger(__name__)
 
@@ -180,9 +181,13 @@ class ModelAPIEndpoint(HTTPEndpoint):
         log.info(request.query_params)
 
         schema = self.meta.schema(many=False, allowed_nests=args["nest"])
+
+        start = time.time()
         res = self.query(schema).get(id)
+        end = time.time()
+        transaction_time = end - start
         # https://github.com/djrobstep/sqlakeyset
-        return APIResponse(res, schema=schema)
+        return APIResponse(res, schema=schema, transaction_time=transaction_time)
 
     async def api_docs(self, request, schema):
         return JSONResponse(
@@ -227,8 +232,13 @@ class ModelAPIEndpoint(HTTPEndpoint):
         q = q.options(*list(schema.query_options()))
 
         if args["all"]:
+
+            start = time.time()
             res = q.all()
-            return APIResponse(res, schema=schema, total_count=len(res))
+            end = time.time()
+            transaction_time = end - start
+
+            return APIResponse(res, schema=schema, total_count=len(res), transaction_time = transaction_time)
 
         # By default, we order by the "natural" order of Primary Keys. This
         # is not really what we want in most cases, probably.
@@ -236,11 +246,14 @@ class ModelAPIEndpoint(HTTPEndpoint):
         q = q.order_by(*pk)
         # https://github.com/djrobstep/sqlakeyset
         try:
+            start = time.time()
             res = get_page(q, per_page=args["per_page"], page=args["page"])
+            end = time.time()
+            transaction_time = end - start
         except ValueError:
             raise ValidationError("Invalid page token.")
 
-        return APIResponse(res, schema=schema, total_count=q.count())
+        return APIResponse(res, schema=schema, total_count=q.count(), transaction_time=transaction_time)
 
     async def put(self, request):
         """Handler for all PUT requests"""
@@ -270,11 +283,15 @@ class ModelAPIEndpoint(HTTPEndpoint):
                 updates.id = existing.id
                 db.session.rollback()
                 db.session.merge(updates)
+                
+                start = time.time()
                 db.session.commit()
+                end = time.time()
+                transaction_time = format_transaction_time(end - start)
 
                 dump = schema.dump(updates)
                 return_data.append(dump)
-            return JSONResponse({"Status": f"success to {self._model_name}", "data": return_data})
+            return JSONResponse({"Status": f"success to {self._model_name}", "transaction_time": transaction_time,"data": return_data})
         else:
             id_ = request.path_params.get("id")
             if id_ is None:
@@ -286,11 +303,15 @@ class ModelAPIEndpoint(HTTPEndpoint):
             updates.id = existing.id
             db.session.rollback()
             db.session.merge(updates)
+
+            start = time.time()
             db.session.commit()
+            end = time.time()
+            transaction_time = format_transaction_time(end - start)
 
             return_data = schema.dump(updates)
 
-            return JSONResponse({"Status": f"success to {self._model_name}", "data": return_data})
+            return JSONResponse({"Status": f"success to {self._model_name}", "transaction_time": transaction_time,"data": return_data})
 
     async def post(self, request):
         """
@@ -314,13 +335,21 @@ class ModelAPIEndpoint(HTTPEndpoint):
         if _type == list:
             return_data = []
             for ele in data:
+                start = time.time()
                 new_row = db.load_data(self._model_name, ele)
+                end = time.time()
+                transaction_time = format_transaction_time(end-start)
+
                 new_row_json = schema.dump(new_row)
                 return_data.append(new_row_json)
-            return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "data": return_data})
+            return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "transaction_time": transaction_time,"data": return_data})
 
         else:
+            start = time.time()
             new_row = db.load_data(self._model_name, data)
+            end = time.time()
+            transaction_time = format_transaction_time(end-start)
+
             return_data = schema.dump(new_row)
 
-            return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "data": return_data})
+            return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "transaction_time": transaction_time,"data": return_data})

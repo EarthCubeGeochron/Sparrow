@@ -85,3 +85,22 @@ def text_fields(model):
         atr.append(getattr(model, c))
 
     return atr
+
+def is_seconds(time):
+    '''
+    Function to tell if passed time is seconds or miliseconds.
+
+    :params time, float, in seconds. (time.time())
+
+    :returns boolean
+    '''
+    if time > 1:
+        return True
+    else:
+        return False
+
+def format_transaction_time(time):
+    if is_seconds(time):
+        return f'{round(time,3)} seconds'
+    else:
+        return f'{round(time * 1e3, 3)} miliseconds'

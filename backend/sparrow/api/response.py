@@ -5,6 +5,7 @@ from typing import Any
 from ..logs import get_logger
 from ..encoders import JSONEncoder
 from .exceptions import SerializationError
+from .utils import format_transaction_time
 
 log = get_logger(__name__)
 
@@ -16,6 +17,8 @@ class APIResponse(JSONResponse):
     def __init__(self, *args, **kwargs):
         self.schema = kwargs.pop("schema", None)
         self.total_count = kwargs.pop("total_count", None)
+        self.status = kwargs.pop("status", "Success")
+        self.transaction_time = kwargs.pop("transaction_time", None)
         self.to_dict = kwargs.pop("to_dict", False)
         super().__init__(*args, **kwargs)
 
@@ -33,6 +36,9 @@ class APIResponse(JSONResponse):
             page["previous_page"] = (
                 paging.bookmark_previous if paging.has_previous else None
             )
+        header = {"status": self.status}
+        if self.transaction_time is not None:
+            header['transaction_time'] = format_transaction_time(self.transaction_time)
 
         try:
             if self.schema is not None:
@@ -43,7 +49,7 @@ class APIResponse(JSONResponse):
         except Exception:
             raise SerializationError(status_code=500)
 
-        return self._encode(dict(data=content, **page))
+        return self._encode(dict(**header,data=content, **page))
 
     def _encode(self, content: Any) -> bytes:
         """Shim for starlette's JSONResponse (subclassed by Flama)
