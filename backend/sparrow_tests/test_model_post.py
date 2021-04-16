@@ -22,14 +22,15 @@ class TestModelPost:
         assert len(test_projects) == 2
 
     def test_replace_project(self, client, test_projects):
-        id = test_projects[0]["id"]
-        route = f"{self.route}/{id}"
+        id_ = test_projects[0]["id"]
+        route = f"{self.route}/{id_}"
         new_project = json_fixture("new-project.json")
         res = client.post(route, json=new_project)
         data = res.json()
+        assert data['transaction_time'] is not None
         # Need to actually test something here....
 
-    @mark.skip(reason="This clearly needs some work")
+    #@mark.skip(reason="This clearly needs some work")
     def test_edit_researcher_in_project(self, client, test_projects):
         id = test_projects[0]["id"]
         edits = {"researcher": [{"name": "casey", "orcid": None}]}
