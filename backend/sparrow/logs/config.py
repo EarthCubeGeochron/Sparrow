@@ -1,5 +1,3 @@
-from sparrow.settings import ECHO_SQL
-
 include_server_header = False
 workers = 1
 
@@ -37,7 +35,7 @@ logconfig_dict = {
         "sqlalchemy.engine": {
             "handlers": ["default"],
             "level": "INFO",
-            "propagate": ECHO_SQL,
+            "propagate": False,
         },
         "__main__": {  # if __name__ == '__main__'
             "handlers": ["error_console"],
