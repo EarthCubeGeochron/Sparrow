@@ -3,7 +3,9 @@ import json
 from starlette.applications import Starlette
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse, Response
-from starlette.exceptions import HTTPException, ExceptionMiddleware
+from starlette.exceptions import HTTPException
+from timing_asgi import TimingMiddleware, TimingClient
+from timing_asgi.integrations import StarletteScopeToName
 from sparrow.logs import get_logger
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -11,6 +13,7 @@ from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
 from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, root_example, root_info, meta_info
+from .response import APIResponse
 
 log = get_logger(__name__)
 
@@ -61,6 +64,9 @@ def schema(request):
     return JSONResponse(s)
     # return OpenAPIResponse(s)
 
+class PrintTimings(TimingClient):
+    def timing(self, metric_name, timing, tags):
+        print(metric_name, timing, tags)
 
 class APIv2(Starlette):
     """
@@ -79,6 +85,12 @@ class APIv2(Starlette):
             info={"description": "An API for accessing geochemical data"},
             plugins=[MarshmallowPlugin()],
         )
+
+        self._app.add_middleware(
+            TimingMiddleware,
+            client=PrintTimings(),
+            metric_namer=StarletteScopeToName(prefix="sparrow", starlette_app=self._app)
+            )
 
         self._add_routes()
         self._app.run_hook("api-initialized-v2", self)
