@@ -1,4 +1,4 @@
-import * as React from "react";
+import { AppToaster } from "~/toaster";
 import { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
 import { hyperStyled } from "@macrostrat/hyper";
@@ -42,6 +42,7 @@ function InfiniteAPIView({
   filterParams,
 }) {
   const [data, setData] = useState([]);
+  const [noResults, setNoResults] = useState(false);
   const [nextPage, setNextPage] = useState("");
   const { get } = useAPIActions(context);
 
@@ -65,11 +66,23 @@ function InfiniteAPIView({
   const dataFetch = (data, next = "") => {
     const initData = getNextPageAPI(next, url, params);
     initData.then((res) => {
-      const dataObj = unwrapData(res);
-      const newState = [...data, ...dataObj];
-      const next_page = res.next_page;
-      setNextPage(next_page);
-      setData(newState);
+      try {
+        if (res.data.length == 0) {
+          setNoResults(true);
+        }
+        const dataObj = unwrapData(res);
+        const newState = [...data, ...dataObj];
+        const next_page = res.next_page;
+        setNextPage(next_page);
+        setData(newState);
+      } catch (error) {
+        let msg;
+        if (error != null) {
+          msg = error.message;
+        }
+        const message = h("div.api-error", [h("p", msg)]);
+        AppToaster.show({ message, intent: "danger" });
+      }
     });
   };
 
@@ -83,8 +96,6 @@ function InfiniteAPIView({
     dataFetch(data, nextPage);
   };
 
-  const child = h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
-
   return data.length > 0
     ? h(ForeverScroll, {
         initialData: data,
@@ -92,7 +103,9 @@ function InfiniteAPIView({
         component,
         componentProps,
       })
-    : h(Expired, { child, delay: 3000 });
+    : noResults
+    ? h(NoSearchResults)
+    : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 }
 
 export { InfiniteAPIView };
