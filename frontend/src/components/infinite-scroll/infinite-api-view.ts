@@ -64,6 +64,7 @@ function InfiniteAPIView({
   }, []);
 
   const dataFetch = (data, next = "") => {
+    setNoResults(false);
     const initData = getNextPageAPI(next, url, params);
     initData.then((res) => {
       try {
