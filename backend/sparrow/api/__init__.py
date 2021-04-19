@@ -2,7 +2,7 @@ from starlette.routing import Mount, Route, RedirectResponse
 from timing_asgi import TimingMiddleware, TimingClient
 from timing_asgi.integrations import StarletteScopeToName
 from sparrow.plugins import SparrowCorePlugin
-from .core import APIv2, PrintTimings
+from .core import APIv2
 
 # Shim redirect for root path.
 # TODO: clean this up

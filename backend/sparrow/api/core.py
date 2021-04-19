@@ -1,6 +1,8 @@
 import yaml
 import json
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse, Response
 from starlette.exceptions import HTTPException
@@ -64,9 +66,20 @@ def schema(request):
     return JSONResponse(s)
     # return OpenAPIResponse(s)
 
-class PrintTimings(TimingClient):
-    def timing(self, metric_name, timing, tags):
-        print(metric_name, timing, tags)
+class ServerTimings(TimingClient, BaseHTTPMiddleware):
+    times = ""
+
+    ## looks like this is happening after dispatch
+    async def timing(self, metric_name, timing, tags):
+        if tags == "time:wall":
+            time = f'wall;dur={timing}'            
+            self.times = time 
+    
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers['server-timing'] = self.times
+        return response
+
 
 class APIv2(Starlette):
     """
@@ -86,11 +99,15 @@ class APIv2(Starlette):
             plugins=[MarshmallowPlugin()],
         )
 
-        self._app.add_middleware(
+        self.add_middleware(
             TimingMiddleware,
-            client=PrintTimings(),
-            metric_namer=StarletteScopeToName(prefix="sparrow", starlette_app=self._app)
+            client=ServerTimings(self),
+            metric_namer=StarletteScopeToName(prefix="sparrow", starlette_app=self)
             )
+
+        self.add_middleware(
+            ServerTimings,
+        )
 
         self._add_routes()
         self._app.run_hook("api-initialized-v2", self)
