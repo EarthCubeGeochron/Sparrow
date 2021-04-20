@@ -82,7 +82,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _table(self):
         return self.opts.model.__table__
 
-    def _nested_relationships(self, *, nests=None):
+    def _nested_relationships(self, *, nests=None, current_depth = 0):
         """Get relationship fields for nested models, allowing them
         to be pre-joined.
 
@@ -93,9 +93,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
             - hybrid [default]: loads all models, attempting to pull back only needed
                 attributes that define the relationship...
         """
+        depth = current_depth
+        if depth > 1:
+            return [], None
         # It would be nice if we didn't have to pass nests down here...
         _nests = nests or self.allowed_nests
         for key, field in self.fields.items():
+           
             if not isinstance(field, Related):
                 continue
             # Yield this relationship
@@ -103,20 +107,21 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
             nested = isinstance(field, SmartNested) and field._should_nest()
 
+            ##load_hint needs to be the attribute of the model joining
             load_hint = None
             # We are passing through load_hints to allow us to
             # return only a subset of columns when primary keys are
             # desired.
             # if not nested:
             #    load_hint = this_relationship.property.remote_side
-
+        
             yield [this_relationship], load_hint
             if not nested:
                 continue
             # We're only working with nested fields now
             field.schema.allowed_nests = _nests
             # Get relationships from nested models
-            for rel, load_hint in field.schema._nested_relationships(nests=_nests):
+            for rel, load_hint in field.schema._nested_relationships(nests=_nests, current_depth = depth+1):
                 yield [this_relationship, *rel], load_hint
 
     def query_options(self):
