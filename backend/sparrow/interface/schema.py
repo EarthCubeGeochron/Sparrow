@@ -68,6 +68,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def __init__(self, *args, **kwargs):
         kwargs["unknown"] = True
         nests = kwargs.pop("allowed_nests", [])
+        self.max_depth = kwargs.pop("max_depth", 1)
         self.allowed_nests = nests
         if len(self.allowed_nests) > 0:
             model = self.opts.model.__name__
@@ -94,7 +95,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 attributes that define the relationship...
         """
         depth = current_depth
-        if depth > 1:
+        if depth > self.max_depth:
             return [], None
         # It would be nice if we didn't have to pass nests down here...
         _nests = nests or self.allowed_nests
