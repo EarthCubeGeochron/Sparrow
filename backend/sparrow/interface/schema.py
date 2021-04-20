@@ -68,7 +68,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def __init__(self, *args, **kwargs):
         kwargs["unknown"] = True
         nests = kwargs.pop("allowed_nests", [])
-        self.max_depth = kwargs.pop("max_depth", 1)
         self.allowed_nests = nests
         if len(self.allowed_nests) > 0:
             model = self.opts.model.__name__
@@ -83,7 +82,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _table(self):
         return self.opts.model.__table__
 
-    def _nested_relationships(self, *, nests=None, current_depth = 0):
+    def _nested_relationships(self, *, nests=None, current_depth = 0, max_depth = 1):
         """Get relationship fields for nested models, allowing them
         to be pre-joined.
 
@@ -95,7 +94,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
                 attributes that define the relationship...
         """
         depth = current_depth
-        if depth > self.max_depth:
+        if depth > max_depth:
             return [], None
         # It would be nice if we didn't have to pass nests down here...
         _nests = nests or self.allowed_nests
@@ -122,11 +121,11 @@ class ModelSchema(SQLAlchemyAutoSchema):
             # We're only working with nested fields now
             field.schema.allowed_nests = _nests
             # Get relationships from nested models
-            for rel, load_hint in field.schema._nested_relationships(nests=_nests, current_depth = depth+1):
+            for rel, load_hint in field.schema._nested_relationships(nests=_nests, current_depth = depth+1, max_depth=max_depth):
                 yield [this_relationship, *rel], load_hint
 
-    def query_options(self):
-        for rel, load_hint in self._nested_relationships():
+    def query_options(self, max_depth = 1):
+        for rel, load_hint in self._nested_relationships(max_depth=max_depth):
             res = joinedload(*rel)
             if load_hint is not None:
                 res = res.load_only(*list(load_hint))
