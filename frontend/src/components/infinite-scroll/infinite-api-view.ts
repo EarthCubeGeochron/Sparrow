@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
-import { Spinner } from "@blueprintjs/core";
-import { Expired, NoSearchResults } from "./utils";
+import { Spinner, Callout } from "@blueprintjs/core";
+import { NoSearchResults } from "./utils";
 import styles from "./main.styl";
 
 const h = hyperStyled(styles);
@@ -42,6 +42,7 @@ function InfiniteAPIView({
   filterParams,
 }) {
   const [data, setData] = useState([]);
+  const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
   const [nextPage, setNextPage] = useState("");
   const { get } = useAPIActions(context);
@@ -55,7 +56,11 @@ function InfiniteAPIView({
       const data = await get(url, newParams, {});
       return data;
     } catch (error) {
-      console.log(error);
+      let msg;
+      if (error != null) {
+        msg = error.message;
+        setError(msg);
+      }
     }
   }
 
@@ -67,23 +72,14 @@ function InfiniteAPIView({
     setNoResults(false);
     const initData = getNextPageAPI(next, url, params);
     initData.then((res) => {
-      try {
-        if (res.data.length == 0) {
-          setNoResults(true);
-        }
-        const dataObj = unwrapData(res);
-        const newState = [...data, ...dataObj];
-        const next_page = res.next_page;
-        setNextPage(next_page);
-        setData(newState);
-      } catch (error) {
-        let msg;
-        if (error != null) {
-          msg = error.message;
-        }
-        const message = h("div.api-error", [h("p", msg)]);
-        AppToaster.show({ message, intent: "danger" });
+      if (res.data.length == 0) {
+        setNoResults(true);
       }
+      const dataObj = unwrapData(res);
+      const newState = [...data, ...dataObj];
+      const next_page = res.next_page;
+      setNextPage(next_page);
+      setData(newState);
     });
   };
 
@@ -96,6 +92,19 @@ function InfiniteAPIView({
     if (!nextPage) return;
     dataFetch(data, nextPage);
   };
+
+  if (error) {
+    return h(
+      Callout,
+      {
+        title: "API Error",
+        icon: "error",
+        intent: "danger",
+        style: { marginTop: "10px" },
+      },
+      [h("p", error)]
+    );
+  }
 
   return data.length > 0
     ? h(ForeverScroll, {
