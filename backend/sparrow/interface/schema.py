@@ -132,7 +132,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             yield res
 
     def nested_relationships(self, max_depth= 1):
-        return [v for v, _ in self._nested_relationships(max_depth=1)]
+        return [v for v, _ in self._nested_relationships(max_depth=max_depth)]
 
     def _build_filters(self, data):
         # Filter on properties that actually have a local column
