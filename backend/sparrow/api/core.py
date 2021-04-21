@@ -6,8 +6,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse, Response
 from starlette.exceptions import HTTPException
-from timing_asgi import TimingMiddleware, TimingClient
-from timing_asgi.integrations import StarletteScopeToName
 from sparrow.logs import get_logger
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -16,6 +14,7 @@ from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
 from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, root_example, root_info, meta_info
 from .response import APIResponse
+import time
 
 log = get_logger(__name__)
 
@@ -66,18 +65,13 @@ def schema(request):
     return JSONResponse(s)
     # return OpenAPIResponse(s)
 
-class ServerTimings(TimingClient, BaseHTTPMiddleware):
-    times = ""
-
-    ## looks like this is happening after dispatch
-    async def timing(self, metric_name, timing, tags):
-        if tags == "time:wall":
-            time = f'wall;dur={timing}'            
-            self.times = time 
+class ServerTimings(BaseHTTPMiddleware):
     
     async def dispatch(self, request, call_next):
+        start = time.time()
         response = await call_next(request)
-        response.headers['server-timing'] = self.times
+        dur = (time.time() - start)*1e3
+        response.headers['Server-Timing'] = f'total;dur={dur}'
         return response
 
 
@@ -98,12 +92,6 @@ class APIv2(Starlette):
             info={"description": "An API for accessing geochemical data"},
             plugins=[MarshmallowPlugin()],
         )
-
-        self.add_middleware(
-            TimingMiddleware,
-            client=ServerTimings(self),
-            metric_namer=StarletteScopeToName(prefix="sparrow", starlette_app=self)
-            )
 
         self.add_middleware(
             ServerTimings,
