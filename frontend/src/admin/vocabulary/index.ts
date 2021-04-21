@@ -12,7 +12,7 @@ import {
 } from "@blueprintjs/core";
 import { Switch, Route, useRouteMatch } from "react-router-dom";
 import { MinimalNavbar, NavButton } from "~/components";
-import {TermCard} from "@earthcube/schema-linker"
+import { TermCard } from "@earthcube/schema-linker";
 
 import styles from "./module.styl";
 const h = hyperStyled(styles);
@@ -21,8 +21,6 @@ enum Term {
   PARAMETER = "parameter",
   MATERIAL = "material",
 }
-
-
 
 function VocabularyList(props) {
   const { authority, exclude, local = false, term = Term.PARAMETER } = props;

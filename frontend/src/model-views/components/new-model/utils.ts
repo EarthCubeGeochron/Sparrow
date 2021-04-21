@@ -272,7 +272,7 @@ export const EmbargoDatePick = (props) => {
   ]);
 };
 
-export const EditStatusButtons = function(props) {
+export const EditStatusButtons = function (props) {
   const { hasChanges, isEditing, onClickCancel, onClickSubmit } = props;
 
   const changed = hasChanges();
@@ -299,7 +299,7 @@ export const EditStatusButtons = function(props) {
   ]);
 };
 
-export const EditNavBar = function(props) {
+export const EditNavBar = function (props) {
   const { editButtons, embargoEditor, header } = props;
   return h(MinimalNavbar, { className: "project-editor-navbar" }, [
     h("h4", header),
@@ -320,7 +320,7 @@ export function DataSheetButton() {
   ]);
 }
 
-export const pluralize = function(term, arrayOrNumber) {
+export const pluralize = function (term, arrayOrNumber) {
   let count = arrayOrNumber;
   if (Array.isArray(arrayOrNumber)) {
     count = arrayOrNumber.length;

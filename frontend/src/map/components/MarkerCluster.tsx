@@ -4,10 +4,7 @@ import useSuperCluster from "use-supercluster";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 import "../cluster.css";
-import {
-  Popover,
-  Card,
-} from "@blueprintjs/core";
+import { Popover, Card } from "@blueprintjs/core";
 import { Marker, FlyToInterpolator } from "react-map-gl";
 import styles from "./components.module.css";
 

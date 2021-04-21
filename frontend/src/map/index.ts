@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 
 const h = hyperStyled(styles);
 
-const MapNavbar = function(props) {
+const MapNavbar = function (props) {
   const { children, ...rest } = props;
   return h(Menu, { className: "map-navbar", ...rest }, [
     h(MenuItem, {
@@ -76,13 +76,13 @@ const MapPage = (props) => {
   ]);
 };
 
-const LocationLink = function(props) {
+const LocationLink = function (props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
   const link = `/map#${zoom}/${latitude}/${longitude}`;
   return link;
 };
 
-const MapLink = function(props) {
+const MapLink = function (props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
   return h(
     HashLink,

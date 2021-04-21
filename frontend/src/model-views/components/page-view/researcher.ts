@@ -5,7 +5,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-export const PageViewResearchers = function({ data, isEditing, onClick }) {
+export const PageViewResearchers = function ({ data, isEditing, onClick }) {
   let content;
   if (data != null) {
     content = h("div", [

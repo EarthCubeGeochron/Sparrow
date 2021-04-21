@@ -24,7 +24,7 @@ function useElementSize(
   useEffect(() => {
     if (!trackWindowResize) return;
     window.addEventListener("resize", sizeCallback);
-    return function() {
+    return function () {
       window.removeEventListener("resize", sizeCallback);
     };
   }, [ref.current]);

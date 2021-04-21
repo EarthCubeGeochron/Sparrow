@@ -12,43 +12,51 @@ import React, {
   useContext,
   useState,
   Children,
-  ReactNode
+  ReactNode,
 } from "react";
 import { ErrorBoundary } from "../util";
 import T from "prop-types";
 import h from "@macrostrat/hyper";
 
-
 interface FrameRegistry {
-  [key: string]: ReactNode
+  [key: string]: ReactNode;
 }
 interface FrameCtx {
   //register(key: string, el: ReactNode): void
-  registry: FrameRegistry
-  getElement(key: string): any
+  registry: FrameRegistry;
+  getElement(key: string): any;
 }
 
 const defaultCtx = {
   //register(k, el) { },
   registry: {},
-  getElement(k) { return null }
-}
+  getElement(k) {
+    return null;
+  },
+};
 export const FrameContext = createContext<FrameCtx>(defaultCtx);
 
 // custom hook to retrieve data from FrameContext
 
 function FrameProvider({ overrides = {}, children }) {
   // could eventually create a registry state and register function
-  return h(FrameContext.Provider, {
-    value: {
-      getElement(id) { return overrides[id] || null }, registry: overrides
-    }
-  }, children);
+  return h(
+    FrameContext.Provider,
+    {
+      value: {
+        getElement(id) {
+          return overrides[id] || null;
+        },
+        registry: overrides,
+      },
+    },
+    children
+  );
 }
 
 function useFrameOverride(id) {
   const { getElement } = useContext(FrameContext);
-  return getElement(id)
+  return getElement(id);
 }
 
 const Frame = (props) => {

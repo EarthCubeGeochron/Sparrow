@@ -35,7 +35,7 @@ function AdminDataModelLinks(props) {
   ]);
 }
 
-const AdminNavLinks = function({ base }) {
+const AdminNavLinks = function ({ base }) {
   if (base == null) {
     base = "/catalog";
   }
