@@ -3,6 +3,22 @@ import { Callout } from "@blueprintjs/core";
 import { Route } from "react-router-dom";
 import h from "@macrostrat/hyper";
 
+function ErrorCallout(props) {
+  const { error, description, title } = props;
+
+  const des = description ? description : error.toString();
+
+  return h(
+    Callout,
+    {
+      title,
+      icon: "error",
+      intent: "danger",
+    },
+    [h("p", [des])]
+  );
+}
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -25,22 +41,18 @@ class ErrorBoundary extends React.Component {
       const { error } = this.state;
       if (description == null) description = error.toString();
       // You can render any custom fallback UI
-      return (
-        <Callout
-          title={"A rendering error occurred"}
-          icon="error"
-          intent="danger"
-        >
-          <p>{description}</p>
-        </Callout>
-      );
+      return h(ErrorCallout, {
+        error,
+        description,
+        title: "A rendering error has occured",
+      });
     }
 
     return this.props.children;
   }
 }
 
-const ErrorBoundaryRoute = function (props) {
+const ErrorBoundaryRoute = function(props) {
   const { component, render: baseRender, ...rest } = props;
 
   // Use render function unless component is provided
@@ -57,4 +69,4 @@ const ErrorBoundaryRoute = function (props) {
   });
 };
 
-export { ErrorBoundaryRoute, ErrorBoundary };
+export { ErrorBoundaryRoute, ErrorBoundary, ErrorCallout };
