@@ -1,10 +1,10 @@
-import { AppToaster } from "~/toaster";
 import { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
-import { Spinner, Callout } from "@blueprintjs/core";
+import { Spinner } from "@blueprintjs/core";
 import { NoSearchResults } from "./utils";
+import { ErrorCallout } from "~/util";
 import styles from "./main.styl";
 
 const h = hyperStyled(styles);
@@ -40,6 +40,7 @@ function InfiniteAPIView({
   componentProps = {},
   context,
   filterParams,
+  errorHandler = ErrorCallout,
 }) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
@@ -94,16 +95,7 @@ function InfiniteAPIView({
   };
 
   if (error) {
-    return h(
-      Callout,
-      {
-        title: "API Error",
-        icon: "error",
-        intent: "danger",
-        style: { marginTop: "10px" },
-      },
-      [h("p", error)]
-    );
+    return h(errorHandler, { error, title: "An API error has occured" });
   }
 
   return data.length > 0
