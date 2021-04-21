@@ -15,12 +15,12 @@ type ColumnInfo = {
   width: number | null;
 };
 
-interface DataSheetContext {
+interface DataSheetCtx {
   columns: ColumnInfo[];
   rowHeight: number;
 }
 
-const DataSheetContext = createContext(defaultContext);
+const DataSheetContext = createContext<DataSheetCtx>(defaultContext);
 
 function DataSheetProviderBase(props) {
   /** This context/context provider don't do much right now, but they will
