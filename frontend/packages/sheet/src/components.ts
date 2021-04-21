@@ -23,12 +23,9 @@ type DragItem = {
   index: number;
 };
 
-function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
-  const { name, width } = col;
-  const ref = useRef();
+function useColumnDropTarget(ref, index) {
   const { actions } = useContext(DataSheetContext);
-
-  const [, drop] = useDrop({
+  return useDrop({
     accept: "column",
     hover(item: DragItem, monitor: DropTargetMonitor) {
       if (!ref.current) {
@@ -79,6 +76,13 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
       item.index = hoverIndex;
     },
   });
+}
+
+function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
+  const { name, width } = col;
+  const ref = useRef();
+
+  const [, drop] = useColumnDropTarget(ref, index);
 
   const [{ isDragging }, drag] = useDrag({
     item: { id: col.name, index },
@@ -92,11 +96,20 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
 
   drag(drop(ref));
   return h(
-    "td.cell.header.read-only",
-    { ref, style: { opacity }, key: col.name },
+    "td.cell.header.read-only.header-cell",
+    { style: { opacity }, key: col.name },
     [
-      h("span.cell-content", name),
-      h(Draggable, { axis: "x" }, h("span.cell-drag-handle")),
+      h("div.cell-content", { ref }, name),
+      h(
+        Draggable,
+        { axis: "x" },
+        h("span.cell-drag-handle", {
+          onMouseDown(e) {
+            e.preventDefault();
+            e.stopPropagation();
+          },
+        })
+      ),
     ]
   );
 }
