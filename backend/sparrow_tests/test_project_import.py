@@ -77,14 +77,14 @@ class TestProjectImport:
         SampleSchema = db.interface.sample
         ss = SampleSchema(many=True, allowed_nests=["session", "analysis"])
         q = db.session.query(ss.opts.model)
-        joins = [joinedload(*arg) for arg in ss.nested_relationships(max_depth=10)]
+        joins = [joinedload(*arg) for arg in ss.nested_relationships()]
         q = q.options(*joins)
         res = q.all()
 
         assert len(res) > 0
         output = ss.dump(res)
         assert len(output) == len(res)
-        assert len(statements) == 1 
+        assert len(statements) == 1
 
     @mark.xfail(reason="We need to figure out how to effectively overwrite data")
     def test_reimport_dumpfile(self, db):
