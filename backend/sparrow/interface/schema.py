@@ -82,7 +82,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _table(self):
         return self.opts.model.__table__
 
-    def _nested_relationships(self, *, nests=None):
+    def _nested_relationships(self, *, nests=None, current_depth=0, max_depth=None):
         """Get relationship fields for nested models, allowing them
         to be pre-joined.
 
@@ -93,9 +93,13 @@ class ModelSchema(SQLAlchemyAutoSchema):
             - hybrid [default]: loads all models, attempting to pull back only needed
                 attributes that define the relationship...
         """
+        depth = current_depth
+        if max_depth != None and depth > max_depth:
+            return [], None
         # It would be nice if we didn't have to pass nests down here...
         _nests = nests or self.allowed_nests
         for key, field in self.fields.items():
+
             if not isinstance(field, Related):
                 continue
             # Yield this relationship
@@ -103,6 +107,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
             nested = isinstance(field, SmartNested) and field._should_nest()
 
+            ##load_hint needs to be the attribute of the model joining
             load_hint = None
             # We are passing through load_hints to allow us to
             # return only a subset of columns when primary keys are
@@ -116,18 +121,20 @@ class ModelSchema(SQLAlchemyAutoSchema):
             # We're only working with nested fields now
             field.schema.allowed_nests = _nests
             # Get relationships from nested models
-            for rel, load_hint in field.schema._nested_relationships(nests=_nests):
+            for rel, load_hint in field.schema._nested_relationships(
+                nests=_nests, current_depth=depth + 1, max_depth=max_depth
+            ):
                 yield [this_relationship, *rel], load_hint
 
-    def query_options(self):
-        for rel, load_hint in self._nested_relationships():
+    def query_options(self, max_depth=None):
+        for rel, load_hint in self._nested_relationships(max_depth=max_depth):
             res = joinedload(*rel)
             if load_hint is not None:
                 res = res.load_only(*list(load_hint))
             yield res
 
-    def nested_relationships(self):
-        return [v for v, _ in self._nested_relationships()]
+    def nested_relationships(self, max_depth=None):
+        return [v for v, _ in self._nested_relationships(max_depth=max_depth)]
 
     def _build_filters(self, data):
         # Filter on properties that actually have a local column

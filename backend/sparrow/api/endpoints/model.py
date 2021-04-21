@@ -224,7 +224,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         for _filter in self._filters:
             q = _filter(q, args)
 
-        q = q.options(*list(schema.query_options()))
+        q = q.options(*list(schema.query_options(max_depth=1)))
 
         if args["all"]:
             res = q.all()
