@@ -2,7 +2,7 @@ import collections
 from ..interface.converter import allowed_collections
 
 
-def join_path(start, end, allowed_collections=allowed_collections):
+def nested_collection_path(start, end, allowed_collections=allowed_collections):
     """
     Function to return the path of nesting needed to get from one model to another. 
 
@@ -28,9 +28,10 @@ def join_path(start, end, allowed_collections=allowed_collections):
     return shortest_path
 
 
-def join_loops(path, query, db, model):
+def nested_collection_joins(path, query, db, model):
     """
     Function to create a query join through a loop depending on the path passed.
+
 
     path ([string]): path of allowed collections
     query: db query to join and filter off of
@@ -50,7 +51,8 @@ def join_loops(path, query, db, model):
     for i, ele in enumerate(path):
         if i + 1 < len(path):
             # determines whether it will be a collection join or normal table
-            if hasattr(getattr(db.model, ele), path[i + 1] + "_colletion"):
+            ##   This checks if the current model has the next element has a collection attribute
+            if hasattr(getattr(db.model, ele), path[i + 1] + "_collection"):
                 model_col.append(path[i + 1] + "_collection")
             else:
                 model_col.append(path[i + 1])

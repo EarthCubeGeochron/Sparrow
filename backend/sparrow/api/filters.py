@@ -5,7 +5,7 @@ import datetime
 
 from sparrow.context import app_context
 from ..datasheet.utils import create_bound_shape
-from .utils import join_path, join_loops, text_fields
+from .utils import nested_collection_path, nested_collection_joins, text_fields
 
 
 def _schema_fields(schema):
@@ -167,7 +167,7 @@ class DateFilter(BaseFilter):
         answer = (
             hasattr(self.model, "date")
             or hasattr(self.model, "session_collection")
-            or join_path(model_name, "session") is not None
+            or nested_collection_path(model_name, "session") is not None
         )
         return answer
 
@@ -188,9 +188,9 @@ class DateFilter(BaseFilter):
         if hasattr(self.model, "session_collection"):
             return query.join(self.model.session_collection).filter(and_(Session.date > start, Session.date < end))
 
-        path = join_path(model_name, "session")
+        path = nested_collection_path(model_name, "session")
         if path is not None and len(path) > 1:
-            db_query = join_loops(path, query, db, self.model)
+            db_query = nested_collection_joins(path, query, db, self.model)
 
             return db_query.filter(and_(Session.date > start, Session.date < end))
 
@@ -212,7 +212,7 @@ class DOIFilter(BaseFilter):
         answer = (
             hasattr(self.model, "doi")
             or hasattr(self.model, "publication_collection")
-            or join_path(model_name, "publication") is not None
+            or nested_collection_path(model_name, "publication") is not None
         )
         return answer
 
@@ -229,9 +229,9 @@ class DOIFilter(BaseFilter):
         if hasattr(self.model, "publication_collection"):
             return query.join(self.model.publication_collection).filter(publication.doi.like(f"%{doi_string}%"))
 
-        path = join_path(model_name, "publication")
+        path = nested_collection_path(model_name, "publication")
         if path is not None and len(path) > 1:
-            db_query = join_loops(path, query, db, self.model)
+            db_query = nested_collection_joins(path, query, db, self.model)
 
             return db_query.filter(publication.doi.like(f"%{doi_string}%"))
 
@@ -251,7 +251,7 @@ class CoordinateFilter(BaseFilter):
 
     def should_apply(self):
         model_name = create_model_name_string(self.model)
-        return hasattr(self.model, "location") or join_path(model_name, "sample") is not None
+        return hasattr(self.model, "location") or nested_collection_path(model_name, "sample") is not None
 
     def apply(self, args, query):
         if self.key not in args:
@@ -264,9 +264,9 @@ class CoordinateFilter(BaseFilter):
         pnts = [int(pnt) for pnt in points]
         bounding_shape = create_bound_shape(pnts)
 
-        path = join_path(model_name, "sample")
+        path = nested_collection_path(model_name, "sample")
         if path is not None and len(path) > 1:
-            db_query = join_loops(path, query, db, self.model)
+            db_query = nested_collection_joins(path, query, db, self.model)
             sample = db.model.sample
 
             return db_query.filter(bounding_shape.ST_Contains(func.ST_Transform(sample.location, 4326)))
@@ -290,7 +290,7 @@ class GeometryFilter(BaseFilter):
         return (
             hasattr(self.model, "location")
             or hasattr(self.model, "sample_collection")
-            or join_path(model_name, "sample") is not None
+            or nested_collection_path(model_name, "sample") is not None
         )
 
     def apply(self, args, query):
@@ -309,9 +309,9 @@ class GeometryFilter(BaseFilter):
                 func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(sample.location, 4326))
             )
         
-        path = join_path(model_name, "sample")
+        path = nested_collection_path(model_name, "sample")
         if path is not None and len(path) > 1:
-            db_query = join_loops(path, query, db, self.model)
+            db_query = nested_collection_joins(path, query, db, self.model)
 
             return db_query.filter(
                 func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(sample.location, 4326))
@@ -334,7 +334,7 @@ class AgeRangeFilter(BaseFilter):
 
     def should_apply(self):
         model_name = create_model_name_string(self.model)
-        return model_name == "datum" or hasattr(self.model, "datum_collection") or join_path(model_name, "datum") is not None
+        return model_name == "datum" or hasattr(self.model, "datum_collection") or nested_collection_path(model_name, "datum") is not None
 
     def apply(self, args, query):
         if self.key not in args:
@@ -349,9 +349,9 @@ class AgeRangeFilter(BaseFilter):
             datum = db.model.datum
             return query.join(self.model.datum_collection).filter(datum.value < age)
 
-        path = join_path(model_name, "datum")
+        path = nested_collection_path(model_name, "datum")
         if path is not None and len(path) > 1:
-            db_query = join_loops(path, query, db, self.model)
+            db_query = nested_collection_joins(path, query, db, self.model)
             datum = db.model.datum
 
             return db_query.filter(datum.value < age)
