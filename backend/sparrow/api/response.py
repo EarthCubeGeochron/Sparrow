@@ -1,5 +1,4 @@
 from starlette.responses import JSONResponse
-from timing_asgi import TimingClient
 from json import dumps
 from typing import Any
 
@@ -20,10 +19,6 @@ class APIResponse(JSONResponse):
         self.to_dict = kwargs.pop("to_dict", False)
         self.page = {}
         super().__init__(*args, **kwargs)
-
-    # def timing(self, metric_name, timing, tags):
-    #     '''Here we add the timing info to the page response'''
-    #     self.page['timing'] = "test"
 
     def render(self, content: Any):
         """Creates output JSON representation of the API route, optionally applying
