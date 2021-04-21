@@ -43,6 +43,7 @@ def pytest_addoption(parser):
         help="Tear down database after tests run",
     )
 
+
 def pytest_configure(config):
     if not config.option.slow:
         setattr(config.option, "markexpr", "not slow")
@@ -56,6 +57,18 @@ def app(pytestconfig):
         _app.bootstrap(init=True)
         _setup_context(_app)
         yield _app
+
+
+@fixture(scope="function")
+def statements(db):
+    stmts = []
+
+    def catch_queries(conn, cursor, statement, parameters, context, executemany):
+        stmts.append(statement)
+
+    event.listen(db.engine, "before_cursor_execute", catch_queries)
+    yield stmts
+    event.remove(db.engine, "before_cursor_execute", catch_queries)
 
 
 @fixture(scope="class")
@@ -91,6 +104,7 @@ def db(app, pytestconfig):
         connection.close()
     else:
         yield app.database
+
 
 @fixture(scope="class")
 def client(app, db):

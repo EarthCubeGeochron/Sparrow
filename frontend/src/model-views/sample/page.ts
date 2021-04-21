@@ -32,7 +32,7 @@ import styles from "./module.styl";
 
 const h = hyper.styled(styles);
 
-const EmbargoEditor = function(props) {
+const EmbargoEditor = function (props) {
   const { model, actions, isEditing } = useModelEditor();
   const onChange = (date) => {
     actions.updateState({
@@ -92,7 +92,7 @@ const Parameter = ({ name, value, ...rest }) => {
   ]);
 };
 
-const LocationBlock = function(props) {
+const LocationBlock = function (props) {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
 
   const { location, location_name } = model;
@@ -117,7 +117,7 @@ const LocationBlock = function(props) {
   ]);
 };
 
-const Material = function(props) {
+const Material = function (props) {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
 
   const changeMaterial = (material) => {

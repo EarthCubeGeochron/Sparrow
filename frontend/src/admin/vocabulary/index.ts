@@ -12,6 +12,7 @@ import {
 } from "@blueprintjs/core";
 import { Switch, Route, useRouteMatch } from "react-router-dom";
 import { MinimalNavbar, NavButton } from "~/components";
+import { TermCard } from "@earthcube/schema-linker";
 
 import styles from "./module.styl";
 const h = hyperStyled(styles);
@@ -19,17 +20,6 @@ const h = hyperStyled(styles);
 enum Term {
   PARAMETER = "parameter",
   MATERIAL = "material",
-}
-
-function TermCard(props) {
-  const { data } = props;
-  return h(Card, { className: "term-card", elevation: 0 }, [
-    h("div.row", [
-      h("h4", data.id),
-      h.if(data.authority != null)("p.authority", data.authority),
-    ]),
-    h.if(data.description != null)("p.description", data.description),
-  ]);
 }
 
 function VocabularyList(props) {
@@ -43,7 +33,7 @@ function VocabularyList(props) {
   let { data } = params;
   if (exclude != null) data = data.filter((d) => d.authority != exclude);
   if (local)
-    data = data.filter((d) => d.authority == null || d.authority == "WiscAr");
+    data = data.filter((d) => d.authority == null || d.authority != "Sparrow");
 
   return h("div.list-column", [
     h.if(authority != null)("h2", authority),

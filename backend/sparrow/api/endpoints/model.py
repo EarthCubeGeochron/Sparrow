@@ -4,6 +4,7 @@ from webargs.fields import DelimitedList, Str, Int, Boolean
 from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
 from starlette.responses import JSONResponse
 from yaml import safe_load
 
@@ -186,7 +187,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
     async def api_docs(self, request, schema):
         return JSONResponse(
             {
-                "liscense": "CC-BY 4.0",
+                "license": "CC-BY 4.0",
                 "description": str(self.description),
                 "parameters": dict(self.build_param_help()),
                 "allowed_nests": list(set(schema._available_nests())),
@@ -219,8 +220,11 @@ class ModelAPIEndpoint(HTTPEndpoint):
             return await self.api_docs(request, schema)
 
         q = self.query(schema)  # constructs query to send to database
+
         for _filter in self._filters:
             q = _filter(q, args)
+
+        q = q.options(*list(schema.query_options(max_depth=1)))
 
         if args["all"]:
             res = q.all()

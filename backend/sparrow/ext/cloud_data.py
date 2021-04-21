@@ -63,3 +63,10 @@ class CloudDataPlugin(SparrowPlugin):
 
     def _already_tracked(self, meta):
         return self._instance_for_meta(meta) is not None
+
+    def get_download_url(self, key):
+        # If we have an access-controlled bucket, we need to get a "presigned" URL
+        # https://www.digitalocean.com/community/questions/signed-urls-for-private-objects-in-spaces
+        return self.session.generate_presigned_url(
+            ClientMethod="get_object", Params={"Bucket": self.auth["bucket"], "Key": key}, ExpiresIn=300
+        )

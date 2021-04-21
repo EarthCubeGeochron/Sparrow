@@ -18,12 +18,12 @@ import Catalog from "./catalog";
 
 //import { MapSelector } from "./data-sheet/sheet-enter-components";
 
-const APIExplorerV2 = loadable(async function() {
+const APIExplorerV2 = loadable(async function () {
   const module = await import("./api-v2");
   return module.APIExplorerV2;
 });
 
-const MapPage = loadable(async function() {
+const MapPage = loadable(async function () {
   const module = await import("./map");
   return module.MapPage;
 });
@@ -69,7 +69,7 @@ function AppRouter(props) {
   );
 }
 
-const errorHandler = function(route, response) {
+const errorHandler = function (route, response) {
   let msg;
   const { error } = response;
   if (error != null) {

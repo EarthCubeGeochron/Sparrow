@@ -1,7 +1,12 @@
-FROM node:11-alpine AS base
+FROM node:14 AS base
 
-RUN npm install -g webpack webpack-cli
+RUN npm install -g npm@7 webpack webpack-cli
 WORKDIR /app
+
+CMD npm run dev
+
+FROM base AS frontend
+
 COPY package.json /app
 RUN npm install --unsafe-perm
 COPY ./ /app/

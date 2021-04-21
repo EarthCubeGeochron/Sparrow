@@ -11,7 +11,7 @@ import bbox from "@turf/bbox";
 import WebMercatorViewport from "viewport-mercator-project";
 import { MapLink } from "~/map";
 
-const ProjectMap = function(props) {
+const ProjectMap = function (props) {
   let { width, height, samples, padding, minExtent, hoverID } = props;
   if (samples == null) {
     return null;
@@ -61,7 +61,7 @@ const ProjectMap = function(props) {
         width,
         height,
       },
-      locatedSamples.map(function(d) {
+      locatedSamples.map(function (d) {
         const { id } = d;
         [longitude, latitude] = d.location.coordinates;
         return h(StaticMarker, { latitude, longitude, id, hoverID });

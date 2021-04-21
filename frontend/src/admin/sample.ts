@@ -6,7 +6,10 @@ import { SampleMatch } from "~/model-views/sample/list";
 import { SampleListComponent } from "../components/infinite-scroll/infinite-scroll";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
-import { ProjectFilterList, SessionFilterList } from "../model-views/components/new-model";
+import {
+  ProjectFilterList,
+  SessionFilterList,
+} from "../model-views/components/new-model";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);

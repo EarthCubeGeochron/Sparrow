@@ -5,6 +5,7 @@ import os
 from sys import argv
 from click import echo
 from subprocess import run
+from time import sleep
 
 args = argv[1:]
 
@@ -19,8 +20,5 @@ print("Running tests")
 run(["pytest", "/app/sparrow_tests", *args])
 
 if psql:
-    echo(
-        "Initializing psql shell. "
-        "The database is also available on localhost port 54322"
-    )
+    echo("Initializing psql shell. " "The database is also available on localhost port 54322")
     run(["psql", *dbargs, "sparrow_test"])

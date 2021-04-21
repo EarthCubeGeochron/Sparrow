@@ -77,21 +77,16 @@ class SmartNested(Nested, Related):
     # https://github.com/marshmallow-code/marshmallow-sqlalchemy/blob/dev/src/marshmallow_sqlalchemy/fields.py
     # TODO: better conformance of this field to Marshmallow's OpenAPI schema generation
     # https://apispec.readthedocs.io/en/latest/using_plugins.html
-    def __init__(
-        self, name, *, only=None, exclude=(), many=False, unknown=None, **field_kwargs
-    ):
-        super(Nested, self).__init__(
-            name,
-            only=only,
-            exclude=exclude,
-            many=many,
-            unknown=unknown,
-            **field_kwargs,
-        )
-        super(Related, self).__init__(**field_kwargs)
+    def __init__(self, name, *, only=None, exclude=(), many=False, unknown=None, **field_kwargs):
+        Nested.__init__(self, name, only=only, exclude=exclude, many=many, unknown=unknown, **field_kwargs)
+        Related.__init__(self, **field_kwargs)
         self._many = many
         self._instances = set()
         self.allow_none = True
+
+        # Pass through allowed_nests configuration to child schema
+        self._copy_config("allowed_nests")
+        self._copy_config("_show_audit_id")
 
     def _deserialize(self, value, attr=None, data=None, **kwargs):
         if isinstance(value, self.schema.opts.model):
@@ -124,14 +119,18 @@ class SmartNested(Nested, Related):
         self._instances.add(value)
         return self._serialize_related_key(value)
 
+    def _should_nest(self):
+        other_name = self.related_model.__table__.name
+        _allowed = self.root.allowed_nests
+        return other_name in _allowed or _allowed == "all"
+
     def _serialize(self, value, attr, obj):
         # Pass through allowed_nests configuration to child schema
+        # Unclear why we have to do this again, but a test fails
         self._copy_config("allowed_nests")
         self._copy_config("_show_audit_id")
 
-        other_name = self.related_model.__table__.name
-        _allowed = self.root.allowed_nests
-        if other_name in _allowed or _allowed == "all":
+        if self._should_nest():
             # Serialize as nested
             return super(Nested, self)._serialize(value, attr, obj)
         # If we don't want to nest

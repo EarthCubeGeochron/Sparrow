@@ -24,7 +24,7 @@ function relativePath(...tokens) {
   return path.resolve(__dirname, "..", ...tokens);
 }
 
-let assetsDir = relativePath("_assets");
+let assetsDir = process.env.SPARROW_FRONTEND_BUILD_DIR || relativePath("_assets");
 let srcRoot = relativePath("src");
 
 let assetsRoute = process.env.SPARROW_BASE_URL || process.env.BASE_URL;

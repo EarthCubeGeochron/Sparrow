@@ -15,45 +15,44 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
   useEffect(() => {
     // Set the data back to the initial data
     if (data == null) return;
-    // const markers = data.map((markers) => ({
-    //   type: "Feature",
-    //   properties: {
-    //     //cluster: false,
-    //     id: markers.id,
-    //     Sample_name: markers.name,
-    //     material: markers.material,
-    //   },
-    //   geometry: {
-    //     type: "Point",
-    //     coordinates: [
-    //       markers.location.coordinates[0],
-    //       markers.location.coordinates[1],
-    //     ],
-    //   },
-    // }));
+    const markers = data.data.map(markers => ({
+      type: "Feature",
+      properties: {
+        cluster: false,
+        id: markers.id,
+        Sample_name: markers.name,
+        material: markers.material
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [
+          markers.location.coordinates[0],
+          markers.location.coordinates[1]
+        ]
+      }
+    }));
 
-    setMarkers(data);
+    setMarkers(markers);
   }, [data]);
-  // console.log(markers);
 
   const { clusters, supercluster } = useSuperCluster({
     points: markers,
     zoom: viewport.zoom,
     bounds,
-    options: { radius: 75, maxZoom: 5 },
+    options: { radius: 75, maxZoom: 5 }
   });
 
-  const markerClicked = (e) => {
+  const markerClicked = e => {
     return console.log(e);
   };
 
   return (
     <div>
-      {clusters.map((cluster) => {
+      {clusters.map(cluster => {
         const [longitude, latitude] = cluster.geometry.coordinates;
         const {
           cluster: isCluster,
-          point_count: pointCount,
+          point_count: pointCount
         } = cluster.properties;
 
         const clusterSize = Math.sqrt(5 * pointCount);
@@ -62,7 +61,7 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
           "cluster-marker": pointCount < 50,
           "cluster-markerGreen": pointCount >= 50 && pointCount < 100,
           "cluster-markerYellow": pointCount >= 100 && pointCount < 200,
-          "cluster-markerRed": pointCount >= 200,
+          "cluster-markerRed": pointCount >= 200
         });
         if (isCluster) {
           return (
@@ -79,9 +78,9 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
                   width: clusterSize,
                   height: clusterSize,
                   marginTop: -clusterSize / 2,
-                  marginRight: -clusterSize / 2,
+                  marginRight: -clusterSize / 2
                 }}
-                onDoubleClick={(e) => {
+                onDoubleClick={e => {
                   e.stopPropagation();
                   const expansionZoom = Math.min(
                     supercluster.getClusterExpansionZoom(cluster.id),
@@ -109,7 +108,7 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
                 <Link to={`/catalog/sample/${cluster.properties.id}`}>
                   <Card>
                     <div style={{ display: "flex", flexDirection: "column" }}>
-                      <b>{cluster.properties.name}</b>
+                      <b>{cluster.properties.Sample_name}</b>
                       {cluster.properties.material && (
                         <i>{cluster.properties.material}</i>
                       )}

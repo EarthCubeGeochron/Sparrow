@@ -29,7 +29,7 @@ import { Frame } from "~/frame";
 
 const h = hyperStyled(styles);
 
-export const EmbargoEditor = function(props) {
+export const EmbargoEditor = function (props) {
   const { model, actions, isEditing } = useContext(ModelEditorContext);
   const onChange = (date) => {
     actions.updateState({
@@ -297,7 +297,7 @@ const ProjEditNavBar = ({ header }) => {
 
 const SampleHoverIDContext = createContext({});
 
-const EditableProjectDetails = function(props) {
+const EditableProjectDetails = function (props) {
   const { project, Edit } = props;
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
