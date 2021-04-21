@@ -130,11 +130,7 @@ export function MapPanel({
   const mapRef = useRef();
 
   const bounds = mapRef.current
-    ? mapRef.current
-        .getMap()
-        .getBounds()
-        .toArray()
-        .flat()
+    ? mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
   const toggleShowMarkers = () => {

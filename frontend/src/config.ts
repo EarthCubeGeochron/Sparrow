@@ -2,6 +2,6 @@
 Generates site-specific configuration data
 */
 
-export default ({
-  siteTitle: "Daven Quinn Lab"
-});
+export default {
+  siteTitle: "Daven Quinn Lab",
+};

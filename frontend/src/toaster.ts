@@ -1,5 +1,5 @@
-import {Toaster} from '@blueprintjs/core';
+import { Toaster } from "@blueprintjs/core";
 
 const AppToaster = Toaster.create();
 
-export {AppToaster};
+export { AppToaster };

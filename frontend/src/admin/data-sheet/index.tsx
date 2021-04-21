@@ -14,9 +14,7 @@ import { useElementSize } from "./util";
 import { sum } from "d3-array";
 import { combineLikeIds, addNecesaryFields } from "./util";
 import { postData } from "./post";
-import {
-  DoiProjectButton,
-} from "./sheet-enter-components/doi-button";
+import { DoiProjectButton } from "./sheet-enter-components/doi-button";
 import { DataEditor } from "react-datasheet/lib";
 import { APIV2Context } from "~/api-v2";
 
@@ -31,8 +29,8 @@ const columnSpec: ColumnData[] = [
   { name: "Sample ID", key: "id", editable: false },
   { name: "Sample Name", key: "name" },
   { name: "Material", key: "material" },
-  { name: "Latitude", key: "latitude" },
   { name: "Longitude", key: "longitude" },
+  { name: "Latitude", key: "latitude" },
   { name: "Publication ID", key: "publication_id", editable: false },
   { name: "DOI", key: "doi" },
   { name: "Project ID", key: "project_id", editable: false },
@@ -159,7 +157,7 @@ function DataSheet() {
 
   useEffect(() => {
     // If we don't have this we'll get an infinite loop
-    if (initialData == null || initialData.length == 0) return
+    if (initialData == null || initialData.length == 0) return;
     const col = apportionWidth(initialData, columnSpec, size.width);
     setColumns(col);
   }, [initialData, size]);

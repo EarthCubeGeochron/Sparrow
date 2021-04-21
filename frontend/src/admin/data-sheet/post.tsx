@@ -28,10 +28,10 @@ export function postData(data) {
 
   axios
     .post("http://localhost:5002/api/v2/datasheet/edits", post_data)
-    .then(function(response) {
+    .then(function (response) {
       console.log(response);
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }

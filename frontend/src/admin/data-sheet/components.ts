@@ -106,7 +106,11 @@ function Header({ width }) {
   return h("thead", { style }, [
     h("tr.header", { style }, [
       h("td.index-column.cell", ""),
-      columns.map((col, index) => h(HeaderCell, { key: col.name, col, index })),
+      columns.map((col, index) => {
+        console.log(col);
+        if (col.name == "Latitude") return null;
+        return h(HeaderCell, { key: col.name, col, index });
+      }),
     ]),
   ]);
 }

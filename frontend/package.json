@@ -93,6 +93,7 @@
     "dev": "npm install --legacy-peer-deps && webpack",
     "start": "webpack"
   },
+  "prettier": {},
   "moduleRoots": "./_webpack/custom-resolver.js",
   "author": "Daven Quinn",
   "license": "ISC"

@@ -6,7 +6,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const StaticMarker = function(props) {
+const StaticMarker = function (props) {
   let offsetTop;
   let { size, id, hoverID, ...rest } = props;
   if (size == null) {

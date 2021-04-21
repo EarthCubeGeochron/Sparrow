@@ -43,7 +43,7 @@ flex-flow: row wrap;
 margin: 0 -5px;\
 `;
 
-export const PageViewSamples = function({
+export const PageViewSamples = function ({
   data,
   isEditing,
   setID = () => {},

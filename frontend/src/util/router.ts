@@ -2,7 +2,7 @@ import h from "@macrostrat/hyper";
 import { useLocation, Route } from "react-router-dom";
 import { PageSkeleton, InsetText } from "~/components";
 
-export const NoMatchPage = function() {
+export const NoMatchPage = function () {
   let location = useLocation();
   return h(InsetText, [
     h("h2", "404"),
