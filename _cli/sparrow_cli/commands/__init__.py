@@ -5,6 +5,7 @@ from .docs import sparrow_docs  # noqa
 from .dev import sparrow_dev  # noqa
 from .info import sparrow_info  # noqa
 from .build import sparrow_build
+from .attach import sparrow_attach
 
 
 def add_commands(cli):
@@ -15,3 +16,4 @@ def add_commands(cli):
     cli.add_command(sparrow_db, name="db")
     cli.add_command(sparrow_test, name="test")
     cli.add_command(sparrow_test_lab, name="create-test-lab")
+    cli.add_command(sparrow_attach, name="attach")
