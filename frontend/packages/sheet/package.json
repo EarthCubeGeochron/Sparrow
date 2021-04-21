@@ -1,8 +1,8 @@
 {
-  "name": "@earthdata/schema-linker",
+  "name": "@earthdata/sheet",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,7 +10,10 @@
   "license": "ISC",
   "dependencies": {
     "@blueprintjs/core": "^3.39.0",
-    "@macrostrat/hyper": "^1.2.11"
+    "@macrostrat/hyper": "^1.2.11",
+    "react": "^17.0.2",
+    "react-dnd": "^14.0.2",
+    "react-dnd-html5-backend": "^14.0.0"
   },
   "devDependencies": {
     "typescript": "^4.2.3"

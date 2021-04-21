@@ -12,7 +12,7 @@ import {
 } from "@blueprintjs/core";
 import { Switch, Route, useRouteMatch } from "react-router-dom";
 import { MinimalNavbar, NavButton } from "~/components";
-import { TermCard } from "@earthcube/schema-linker";
+import { TermCard } from "@earthdata/schema-linker";
 
 import styles from "./module.styl";
 const h = hyperStyled(styles);

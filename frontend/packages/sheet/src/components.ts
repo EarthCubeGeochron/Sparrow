@@ -77,7 +77,8 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
   });
 
   const [{ isDragging }, drag] = useDrag({
-    item: { type: "column", id: col.name, index },
+    item: { id: col.name, index },
+    type: "column",
     collect: (monitor: any) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -86,7 +87,11 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
   const opacity = isDragging ? 0 : 1;
 
   drag(drop(ref));
-  return h("td.cell.header.read-only", { ref, style: { opacity } }, name);
+  return h(
+    "td.cell.header.read-only",
+    { ref, style: { opacity }, key: col.name },
+    name
+  );
 }
 
 function Columns({ width }) {
@@ -107,8 +112,6 @@ function Header({ width }) {
     h("tr.header", { style }, [
       h("td.index-column.cell", ""),
       columns.map((col, index) => {
-        console.log(col);
-        if (col.name == "Latitude") return null;
         return h(HeaderCell, { key: col.name, col, index });
       }),
     ]),
