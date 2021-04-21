@@ -1,6 +1,4 @@
 from starlette.routing import Mount, Route, RedirectResponse
-from timing_asgi import TimingMiddleware, TimingClient
-from timing_asgi.integrations import StarletteScopeToName
 from sparrow.plugins import SparrowCorePlugin
 from .core import APIv2
 
