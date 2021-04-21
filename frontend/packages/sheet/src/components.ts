@@ -1,8 +1,12 @@
 import { useContext, useRef } from "react";
-import h from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import { DataSheetContext, ColumnInfo } from "./provider";
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
+import Draggable from "react-draggable";
+import styles from "./module.styl";
 // https://codesandbox.io/s/github/react-dnd/react-dnd/tree/gh-pages/examples_hooks_ts/04-sortable/simple?from-embed=&file=/src/Container.tsx
+
+const h = hyperStyled(styles);
 
 function Row({ row, children, className }) {
   const { rowHeight } = useContext(DataSheetContext);
@@ -90,7 +94,10 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
   return h(
     "td.cell.header.read-only",
     { ref, style: { opacity }, key: col.name },
-    name
+    [
+      h("span.cell-content", name),
+      h(Draggable, { axis: "x" }, h("span.cell-drag-handle")),
+    ]
   );
 }
 

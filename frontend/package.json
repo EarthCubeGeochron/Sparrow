@@ -20,7 +20,7 @@
     "@emotion/core": "^10.0.7",
     "@emotion/styled": "^10.0.7",
     "@loadable/component": "^5.10.2",
-    "@macrostrat/hyper": "^1.2.11",
+    "@macrostrat/hyper": "^1.2.12",
     "@macrostrat/ui-components": "^0.4.3",
     "@mapbox/mapbox-gl-draw": "^1.2.0",
     "@turf/bbox": "^6.0.1",
@@ -81,6 +81,7 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^4.3.0",
     "husky": "4.2.5",
+    "lerna": "^3.22.1",
     "lint-staged": "10.2.11",
     "markdown-loader": "^5.0.0",
     "style-loader": "^0.23.1",
@@ -91,7 +92,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm install --legacy-peer-deps && webpack",
+    "dev": "lerna bootstrap --hoist && webpack",
     "start": "webpack"
   },
   "prettier": {},
