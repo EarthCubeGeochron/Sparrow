@@ -102,7 +102,13 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
       h("div.cell-content", { ref }, name),
       h(
         Draggable,
-        { axis: "x", positionOffset: { x: 0, y: 0 } },
+        {
+          axis: "x",
+          positionOffset: { x: 0, y: 0 },
+          onStop() {
+            console.log(arguments);
+          },
+        },
         h("span.cell-drag-handle", {
           onMouseDown(e) {
             e.preventDefault();

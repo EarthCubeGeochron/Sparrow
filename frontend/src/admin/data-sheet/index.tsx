@@ -4,13 +4,16 @@ import { useAPIResult } from "@macrostrat/ui-components";
 import update from "immutability-helper";
 import h from "@macrostrat/hyper";
 import { Frame } from "~/frame";
-import { DataSheetProvider } from "@earthdata/sheet/src/provider";
+import {
+  DataSheetProvider,
+  Row,
+  Sheet,
+  useElementSize,
+} from "@earthdata/sheet/src/index.ts";
 import { SheetToolbar } from "./toolbar";
 import { VirtualizedSheet } from "./virtualized";
 import classNames from "classnames";
 import styles from "./module.styl";
-import { Row, Sheet } from "@earthdata/sheet/src/components";
-import { useElementSize } from "./util";
 import { sum } from "d3-array";
 import { combineLikeIds, addNecesaryFields } from "./util";
 import { postData } from "./post";

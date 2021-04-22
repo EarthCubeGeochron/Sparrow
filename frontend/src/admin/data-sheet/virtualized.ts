@@ -1,8 +1,11 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useContext, useRef, useState } from "react";
-import { useElementSize, useScrollOffset } from "./util";
 import ReactDataSheet from "react-datasheet";
-import { DataSheetContext } from "@earthdata/sheet/src/provider";
+import {
+  DataSheetContext,
+  useElementSize,
+  useScrollOffset,
+} from "@earthdata/sheet/src/index.ts";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
