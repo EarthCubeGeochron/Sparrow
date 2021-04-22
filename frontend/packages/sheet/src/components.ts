@@ -1,6 +1,6 @@
 import { useContext, useRef } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import { DataSheetContext, ColumnInfo } from "./provider";
+import { DataSheetContext, ColumnInfo, useDispatch } from "./provider";
 import { useElementSize } from "./helpers";
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
 import Draggable from "react-draggable";
@@ -81,6 +81,8 @@ function useColumnDropTarget(ref, index) {
 
 function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
   const { name, width } = col;
+  const { columnWidths, dispatch } = useContext(DataSheetContext);
+
   const ref = useRef();
 
   const [, drop] = useColumnDropTarget(ref, index);
@@ -105,12 +107,9 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
         Draggable,
         {
           axis: "x",
-          positionOffset: { x: 0, y: 0 },
-          onStart() {
-            console.log(arguments);
-          },
-          onStop() {
-            console.log(arguments);
+          position: { x: columnWidths[col.name] ?? width ?? 0, y: 0 },
+          onStop(event, { x }) {
+            dispatch({ type: "update-column-width", key: col.name, value: x });
           },
         },
         h("span.cell-drag-handle", {
@@ -125,12 +124,17 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
 }
 
 function Columns({ width }) {
-  const { columns } = useContext(DataSheetContext);
+  const { columns, columnWidths } = useContext(DataSheetContext);
   return h("colgroup", [
     h("col.index-column", { key: "index", style: { width: 50 } }),
-    columns.map((col) =>
-      h("col", { key: col.name, style: { width: col.width } })
-    ),
+    columns.map((col) => {
+      console.log(col);
+      const width = columnWidths[col.name];
+      return h("col", {
+        key: col.name,
+        style: { width: width ?? col.width },
+      });
+    }),
   ]);
 }
 

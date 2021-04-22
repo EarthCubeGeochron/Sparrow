@@ -2,6 +2,7 @@ import { createContext, useReducer, useContext, Dispatch } from "react";
 import h, { compose, C } from "@macrostrat/hyper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import update from "immutability-helper";
 
 const defaultContext = {
   columns: [],
@@ -31,11 +32,23 @@ interface DataSheetCtx extends DataSheetState {
   dispatch: Dispatch<DataSheetAction>;
 }
 
-type DataSheetAction = any;
+type UpdateColumnWidth = {
+  type: "update-column-width";
+  key: string;
+  value: number;
+};
+
+type DataSheetAction = UpdateColumnWidth;
 
 const DataSheetContext = createContext<DataSheetCtx>(defaultContext);
 
 function dataSheetReducer(state: DataSheetState, action: DataSheetAction) {
+  switch (action.type) {
+    case "update-column-width":
+      return update(state, {
+        columnWidths: { [action.key]: { $set: action.value } },
+      });
+  }
   return state;
 }
 
@@ -64,11 +77,6 @@ const DataSheetProvider = compose(
   DataSheetProviderBase
 );
 
-const useDataSheetDispatch = () => useContext(DataSheetContext).dispatch;
+const useDispatch = () => useContext(DataSheetContext).dispatch;
 
-export {
-  DataSheetContext,
-  DataSheetProvider,
-  ColumnInfo,
-  useDataSheetDispatch,
-};
+export { DataSheetContext, DataSheetProvider, ColumnInfo, useDispatch };

@@ -10,6 +10,7 @@ import {
   Sheet,
   useElementSize,
   apportionWidths,
+  ColumnSpec,
 } from "@earthdata/sheet/src/index.ts";
 import { SheetToolbar } from "./toolbar";
 import { VirtualizedSheet } from "./virtualized";
@@ -19,7 +20,6 @@ import { combineLikeIds, addNecesaryFields } from "./util";
 import { postData } from "./post";
 import { DoiProjectButton } from "./sheet-enter-components/doi-button";
 import { DataEditor } from "react-datasheet/lib";
-import { APIV2Context } from "~/api-v2";
 
 const columnSpec: ColumnData[] = [
   { name: "Sample ID", key: "id", editable: false },
