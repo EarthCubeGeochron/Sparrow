@@ -1,4 +1,10 @@
-import { useLayoutEffect, useEffect, useState, useCallback } from "react";
+import {
+  useLayoutEffect,
+  useEffect,
+  useState,
+  useCallback,
+  RefObject,
+} from "react";
 
 type ElementSize = {
   height: number;
@@ -7,7 +13,7 @@ type ElementSize = {
 
 // Should factor this into UI Components
 function useElementSize(
-  ref: React.RefObject<HTMLElement>,
+  ref: RefObject<HTMLElement>,
   trackWindowResize: boolean = true
 ): ElementSize | null {
   const [size, setSize] = useState<ElementSize>(null);

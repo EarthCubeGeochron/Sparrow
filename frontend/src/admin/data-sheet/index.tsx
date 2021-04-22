@@ -9,24 +9,17 @@ import {
   Row,
   Sheet,
   useElementSize,
+  apportionWidths,
 } from "@earthdata/sheet/src/index.ts";
 import { SheetToolbar } from "./toolbar";
 import { VirtualizedSheet } from "./virtualized";
 import classNames from "classnames";
 import styles from "./module.styl";
-import { sum } from "d3-array";
 import { combineLikeIds, addNecesaryFields } from "./util";
 import { postData } from "./post";
 import { DoiProjectButton } from "./sheet-enter-components/doi-button";
 import { DataEditor } from "react-datasheet/lib";
 import { APIV2Context } from "~/api-v2";
-
-interface ColumnData {
-  name: string;
-  key: string;
-  width?: number;
-  editable?: boolean;
-}
 
 const columnSpec: ColumnData[] = [
   { name: "Sample ID", key: "id", editable: false },
@@ -85,26 +78,6 @@ function calculateWidths(data, columns) {
   }, {});
 }
 
-function apportionWidth(
-  data,
-  columns: ColumnData[],
-  containerWidth: number
-): ColumnData[] {
-  if (data == null || columns == null || containerWidth == null) return columns;
-
-  const maxContentWidth = calculateWidths(data, columns);
-  const totalSize = sum(Object.values(maxContentWidth));
-
-  //console.log(maxContentWidth);
-
-  return columns.map((col) => {
-    return {
-      ...col,
-      width: (maxContentWidth[col.key] / totalSize) * (containerWidth - 50),
-    };
-  });
-}
-
 function unwrapResponse(apiResult) {
   /** Flatten latitudes and longitudes for entire API response */
   return apiResult.map(unwrapSampleData);
@@ -161,7 +134,8 @@ function DataSheet() {
   useEffect(() => {
     // If we don't have this we'll get an infinite loop
     if (initialData == null || initialData.length == 0) return;
-    const col = apportionWidth(initialData, columnSpec, size.width);
+    const desiredWidths = calculateWidths(data, columnSpec);
+    const col = apportionWidths(columnSpec, desiredWidths, size.width);
     setColumns(col);
   }, [initialData, size]);
 

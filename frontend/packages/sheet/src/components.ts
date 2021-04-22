@@ -1,6 +1,7 @@
 import { useContext, useRef } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { DataSheetContext, ColumnInfo } from "./provider";
+import { useElementSize } from "./helpers";
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
 import Draggable from "react-draggable";
 import styles from "./module.styl";
@@ -105,6 +106,9 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
         {
           axis: "x",
           positionOffset: { x: 0, y: 0 },
+          onStart() {
+            console.log(arguments);
+          },
           onStop() {
             console.log(arguments);
           },

@@ -8,7 +8,7 @@
     "declaration": true,
     "sourceMap": true,
     "declarationDir": "dist/types",
-    "lib": ["es6", "es7", "esnext", "dom"],
+    "lib": ["es6", "es7", "esnext", "dom", "es2017"],
     "jsx": "react",
     "esModuleInterop": true,
     "typeRoots": ["node_modules/@types"],
