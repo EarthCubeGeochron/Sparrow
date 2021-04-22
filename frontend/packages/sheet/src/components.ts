@@ -5,6 +5,7 @@ import { useElementSize } from "./helpers";
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
 import Draggable from "react-draggable";
 import styles from "./module.styl";
+import { kernelDensityEstimator } from "plugins/dz-spectrum/kernel-density";
 // https://codesandbox.io/s/github/react-dnd/react-dnd/tree/gh-pages/examples_hooks_ts/04-sortable/simple?from-embed=&file=/src/Container.tsx
 
 const h = hyperStyled(styles);
@@ -101,25 +102,7 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
   return h(
     "td.cell.header.read-only.header-cell",
     { style: { opacity }, key: col.name },
-    [
-      h("div.cell-content", { ref }, name),
-      h(
-        Draggable,
-        {
-          axis: "x",
-          position: { x: columnWidths[col.name] ?? width ?? 0, y: 0 },
-          onStop(event, { x }) {
-            dispatch({ type: "update-column-width", key: col.name, value: x });
-          },
-        },
-        h("span.cell-drag-handle", {
-          onMouseDown(e) {
-            e.preventDefault();
-            e.stopPropagation();
-          },
-        })
-      ),
-    ]
+    [h("div.cell-content", { ref }, name)]
   );
 }
 
@@ -140,7 +123,19 @@ function Columns({ width }) {
 
 function Header({ width }) {
   const style = { width };
-  const { columns } = useContext(DataSheetContext);
+  const { columns, dispatch, columnWidths } = useContext(DataSheetContext);
+
+  let widthArray = [];
+  let offset = 50;
+  for (const col of columns) {
+    const width = columnWidths[col.name] ?? col.width ?? 0;
+    widthArray.push({
+      key: col.name,
+      offset: offset,
+      width,
+    });
+    offset += width;
+  }
 
   return h("thead", { style }, [
     h("tr.header", { style }, [
@@ -149,6 +144,31 @@ function Header({ width }) {
         return h(HeaderCell, { key: col.name, col, index });
       }),
     ]),
+    h(
+      "div.column-resizers",
+      widthArray.map((d, i) => {
+        return h(
+          Draggable,
+          {
+            axis: "x",
+            position: { x: d.offset + d.width, y: 0 },
+            onStop(event, { x }) {
+              dispatch({
+                type: "update-column-width",
+                key: d.key,
+                value: x - d.offset,
+              });
+            },
+          },
+          h("span.cell-drag-handle", {
+            onMouseDown(e) {
+              e.preventDefault();
+              e.stopPropagation();
+            },
+          })
+        );
+      })
+    ),
   ]);
 }
 
