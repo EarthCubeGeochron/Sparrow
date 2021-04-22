@@ -171,16 +171,17 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
     async def get_single(self, request):
         """Handler for single instance GET requests"""
-        args = await parser.parse(self.instance_schema, request, location="querystring")
+        db = get_database()
         id = request.path_params.get("id")
-        log.info(request.query_params)
+        args = await self.parse_querystring(request, self.instance_schema)
 
-        # This needs to be wrapped in an error-handling block!
-        schema = self.meta.schema(many=False, allowed_nests=args["nest"])
-        q = db.session.query(schema.opts.model)
-        res = q.get(id)
-        # https://github.com/djrobstep/sqlakeyset
-        return APIResponse(res, schema=schema)
+        with db.session_scope(commit=False):
+            schema = self.meta.schema(many=False, allowed_nests=args["nest"])
+            # This needs to be wrapped in an error-handling block!
+            q = db.session.query(schema.opts.model)
+            res = q.get(id)
+            # https://github.com/djrobstep/sqlakeyset
+            return APIResponse(res, schema=schema)
 
     async def api_docs(self, request, schema):
         return JSONResponse(
@@ -194,35 +195,35 @@ class ModelAPIEndpoint(HTTPEndpoint):
             }
         )
 
+    async def parse_querystring(self, request, schema):
+        try:
+            args = await parser.parse(schema, request, location="querystring")
+            # We don't properly allow 'all' in nested field
+            if len(args["nest"]) == 1 and args["nest"][0] == "all":
+                args["nest"] = "all"
+            log.info(args)
+            return args
+        except Exception:
+            raise ValidationError("Failed parsing query string {request.query_params}")
+
     async def get(self, request):
         """Handler for all GET requests"""
-
         if request.path_params.get("id") is not None:
             # Pass off to the single-item handler
             return await self.get_single(request)
-
-        log.info(request)
-        log.info(request.query_params)
-        args = await parser.parse(self.args_schema, request, location="querystring")
-        log.info(args)
-
-        # We don't properly allow 'all' in nested field
-        if len(args["nest"]) == 1 and args["nest"][0] == "all":
-            args["nest"] = "all"
-        log.info(args["nest"])
-
+        args = await self.parse_querystring(request, self.args_schema)
         db = get_database()
+
+        schema = self.meta.schema(many=True, allowed_nests=args["nest"])
+        model = schema.opts.model
+
+        if not len(request.query_params.keys()):
+            return await self.api_docs(request, schema)
 
         # Wrap entire query infrastructure in error-handling block.
         # We should probably make this a "with" statement or something
         # to use throughout our API code.
         with db.session_scope(commit=False):
-
-            schema = self.meta.schema(many=True, allowed_nests=args["nest"])
-            model = schema.opts.model
-
-            if not len(request.query_params.keys()):
-                return await self.api_docs(request, schema)
 
             q = db.session.query(schema.opts.model)
 
