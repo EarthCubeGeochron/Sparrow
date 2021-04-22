@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 from yaml import safe_load
 
 from ...context import get_database
-from ..exceptions import ValidationError
+from ..exceptions import ValidationError, HTTPException, ApplicationError
 from ..fields import NestedModelField
 from ..response import APIResponse
 from ..filters import (
@@ -148,10 +148,6 @@ class ModelAPIEndpoint(HTTPEndpoint):
             self.args_schema.update(**params)
         self._filters.append(f)
 
-    def query(self, schema):
-        db = get_database()
-        return db.session.query(schema.opts.model)
-
     @property
     def description(self):
         return model_description(self.meta.schema)
@@ -179,8 +175,10 @@ class ModelAPIEndpoint(HTTPEndpoint):
         id = request.path_params.get("id")
         log.info(request.query_params)
 
+        # This needs to be wrapped in an error-handling block!
         schema = self.meta.schema(many=False, allowed_nests=args["nest"])
-        res = self.query(schema).get(id)
+        q = db.session.query(schema.opts.model)
+        res = q.get(id)
         # https://github.com/djrobstep/sqlakeyset
         return APIResponse(res, schema=schema)
 
@@ -213,34 +211,41 @@ class ModelAPIEndpoint(HTTPEndpoint):
             args["nest"] = "all"
         log.info(args["nest"])
 
-        schema = self.meta.schema(many=True, allowed_nests=args["nest"])
-        model = schema.opts.model
+        db = get_database()
 
-        if not len(request.query_params.keys()):
-            return await self.api_docs(request, schema)
+        # Wrap entire query infrastructure in error-handling block.
+        # We should probably make this a "with" statement or something
+        # to use throughout our API code.
+        with db.session_scope(commit=False):
 
-        q = self.query(schema)  # constructs query to send to database
+            schema = self.meta.schema(many=True, allowed_nests=args["nest"])
+            model = schema.opts.model
 
-        for _filter in self._filters:
-            q = _filter(q, args)
+            if not len(request.query_params.keys()):
+                return await self.api_docs(request, schema)
 
-        q = q.options(*list(schema.query_options(max_depth=1)))
+            q = db.session.query(schema.opts.model)
 
-        if args["all"]:
-            res = q.all()
-            return APIResponse(res, schema=schema, total_count=len(res))
+            for _filter in self._filters:
+                q = _filter(q, args)
 
-        # By default, we order by the "natural" order of Primary Keys. This
-        # is not really what we want in most cases, probably.
-        pk = [desc(p) for p in get_primary_keys(model)]
-        q = q.order_by(*pk)
-        # https://github.com/djrobstep/sqlakeyset
-        try:
-            res = get_page(q, per_page=args["per_page"], page=args["page"])
-        except ValueError:
-            raise ValidationError("Invalid page token.")
+            q = q.options(*list(schema.query_options(max_depth=1)))
 
-        return APIResponse(res, schema=schema, total_count=q.count())
+            if args["all"]:
+                res = q.all()
+                return APIResponse(res, schema=schema, total_count=len(res))
+
+            # By default, we order by the "natural" order of Primary Keys. This
+            # is not really what we want in most cases, probably.
+            pk = [desc(p) for p in get_primary_keys(model)]
+            q = q.order_by(*pk)
+            # https://github.com/djrobstep/sqlakeyset
+            try:
+                res = get_page(q, per_page=args["per_page"], page=args["page"])
+            except ValueError:
+                raise ValidationError("Invalid page token.")
+
+            return APIResponse(res, schema=schema, total_count=q.count())
 
     async def put(self, request):
         """Handler for all PUT requests"""
