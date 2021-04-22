@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 from yaml import safe_load
 
 from ...context import get_database
-from ..exceptions import ValidationError
+from ..exceptions import ValidationError, HTTPException, ApplicationError
 from ..fields import NestedModelField
 from ..response import APIResponse
 from ..filters import (
@@ -148,10 +148,6 @@ class ModelAPIEndpoint(HTTPEndpoint):
             self.args_schema.update(**params)
         self._filters.append(f)
 
-    def query(self, schema):
-        db = get_database()
-        return db.session.query(schema.opts.model)
-
     @property
     def description(self):
         return model_description(self.meta.schema)
@@ -175,14 +171,17 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
     async def get_single(self, request):
         """Handler for single instance GET requests"""
-        args = await parser.parse(self.instance_schema, request, location="querystring")
+        db = get_database()
         id = request.path_params.get("id")
-        log.info(request.query_params)
+        args = await self.parse_querystring(request, self.instance_schema)
 
-        schema = self.meta.schema(many=False, allowed_nests=args["nest"])
-        res = self.query(schema).get(id)
-        # https://github.com/djrobstep/sqlakeyset
-        return APIResponse(res, schema=schema)
+        with db.session_scope(commit=False):
+            schema = self.meta.schema(many=False, allowed_nests=args["nest"])
+            # This needs to be wrapped in an error-handling block!
+            q = db.session.query(schema.opts.model)
+            res = q.get(id)
+            # https://github.com/djrobstep/sqlakeyset
+            return APIResponse(res, schema=schema)
 
     async def api_docs(self, request, schema):
         return JSONResponse(
@@ -196,22 +195,24 @@ class ModelAPIEndpoint(HTTPEndpoint):
             }
         )
 
+    async def parse_querystring(self, request, schema):
+        try:
+            args = await parser.parse(schema, request, location="querystring")
+            # We don't properly allow 'all' in nested field
+            if len(args["nest"]) == 1 and args["nest"][0] == "all":
+                args["nest"] = "all"
+            log.info(args)
+            return args
+        except Exception:
+            raise ValidationError("Failed parsing query string {request.query_params}")
+
     async def get(self, request):
         """Handler for all GET requests"""
-
         if request.path_params.get("id") is not None:
             # Pass off to the single-item handler
             return await self.get_single(request)
-
-        log.info(request)
-        log.info(request.query_params)
-        args = await parser.parse(self.args_schema, request, location="querystring")
-        log.info(args)
-
-        # We don't properly allow 'all' in nested field
-        if len(args["nest"]) == 1 and args["nest"][0] == "all":
-            args["nest"] = "all"
-        log.info(args["nest"])
+        args = await self.parse_querystring(request, self.args_schema)
+        db = get_database()
 
         schema = self.meta.schema(many=True, allowed_nests=args["nest"])
         model = schema.opts.model
@@ -219,28 +220,33 @@ class ModelAPIEndpoint(HTTPEndpoint):
         if not len(request.query_params.keys()):
             return await self.api_docs(request, schema)
 
-        q = self.query(schema)  # constructs query to send to database
+        # Wrap entire query infrastructure in error-handling block.
+        # We should probably make this a "with" statement or something
+        # to use throughout our API code.
+        with db.session_scope(commit=False):
 
-        for _filter in self._filters:
-            q = _filter(q, args)
+            q = db.session.query(schema.opts.model)
 
-        q = q.options(*list(schema.query_options(max_depth=1)))
+            for _filter in self._filters:
+                q = _filter(q, args)
 
-        if args["all"]:
-            res = q.all()
-            return APIResponse(res, schema=schema, total_count=len(res))
+            q = q.options(*list(schema.query_options(max_depth=1)))
 
-        # By default, we order by the "natural" order of Primary Keys. This
-        # is not really what we want in most cases, probably.
-        pk = [desc(p) for p in get_primary_keys(model)]
-        q = q.order_by(*pk)
-        # https://github.com/djrobstep/sqlakeyset
-        try:
-            res = get_page(q, per_page=args["per_page"], page=args["page"])
-        except ValueError:
-            raise ValidationError("Invalid page token.")
+            if args["all"]:
+                res = q.all()
+                return APIResponse(res, schema=schema, total_count=len(res))
 
-        return APIResponse(res, schema=schema, total_count=q.count())
+            # By default, we order by the "natural" order of Primary Keys. This
+            # is not really what we want in most cases, probably.
+            pk = [desc(p) for p in get_primary_keys(model)]
+            q = q.order_by(*pk)
+            # https://github.com/djrobstep/sqlakeyset
+            try:
+                res = get_page(q, per_page=args["per_page"], page=args["page"])
+            except ValueError:
+                raise ValidationError("Invalid page token.")
+
+            return APIResponse(res, schema=schema, total_count=q.count())
 
     async def put(self, request):
         """Handler for all PUT requests"""

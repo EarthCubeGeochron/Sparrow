@@ -77,20 +77,20 @@ class Database:
         log.info("Finished automapping database")
 
     @contextmanager
-    def session_scope(self):
+    def session_scope(self, commit=True):
         """Provide a transactional scope around a series of operations."""
-        self.__old_session = self.session
-        session = self._session_factory()
-        self.session = session
+        # self.__old_session = self.session
+        # session = self._session_factory()
+        session = self.session
         try:
             yield session
-            session.commit()
+            if commit:
+                session.commit()
         except Exception:
             session.rollback()
             raise
         finally:
             session.close()
-            self.session = self.__old_session
 
     def model_schema(self, model_name) -> ModelSchema:
         """
