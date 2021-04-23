@@ -4,6 +4,7 @@ interface ColumnData {
   name: string;
   key: string;
   width?: number;
+  idealWidth?: number;
   editable?: boolean;
 }
 

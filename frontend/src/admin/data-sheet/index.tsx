@@ -227,30 +227,34 @@ function DataSheet() {
     //key is name of column
   );
 
-  return h(DataSheetProvider, { columns, reorderColumns }, [
-    <div className={styles["data-sheet"]}>
-      <SheetToolbar
-        onSubmit={handleSubmit}
-        onUndo={handleUndo}
-        hasChanges={initialData != data}
-      />
-      {h("div.sheet", { ref }, [
-        <VirtualizedSheet
-          data={cellData}
-          valueRenderer={(cell) => `${cell.value ?? ""}`}
-          sheetRenderer={Sheet}
-          rowRenderer={Row}
-          onCellsChanged={onCellsChanged}
-          width={size?.width}
-          dataEditor={(props) =>
-            props.col === 6
-              ? h(DoiProjectButton, { data, ...props })
-              : h(DataEditor, { ...props })
-          }
-        />,
-      ])}
-    </div>,
-  ]);
+  return h(
+    DataSheetProvider,
+    { columns, reorderColumns, containerWidth: size.width },
+    [
+      <div className={styles["data-sheet"]}>
+        <SheetToolbar
+          onSubmit={handleSubmit}
+          onUndo={handleUndo}
+          hasChanges={initialData != data}
+        />
+        {h("div.sheet", { ref }, [
+          <VirtualizedSheet
+            data={cellData}
+            valueRenderer={(cell) => `${cell.value ?? ""}`}
+            sheetRenderer={Sheet}
+            rowRenderer={Row}
+            onCellsChanged={onCellsChanged}
+            width={size?.width}
+            dataEditor={(props) =>
+              props.col === 6
+                ? h(DoiProjectButton, { data, ...props })
+                : h(DataEditor, { ...props })
+            }
+          />,
+        ])}
+      </div>,
+    ]
+  );
 }
 
 function DataSheetPage(props) {

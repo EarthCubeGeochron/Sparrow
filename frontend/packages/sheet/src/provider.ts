@@ -7,6 +7,7 @@ import update from "immutability-helper";
 const defaultContext = {
   columns: [],
   rowHeight: 20,
+  containerWidth: 500,
   offset: 0,
   actions: null,
   columnWidths: {},
@@ -29,6 +30,7 @@ interface DataSheetState {
 interface DataSheetCtx extends DataSheetState {
   columns: ColumnInfo[];
   rowHeight: number;
+  containerWidth: number;
   dispatch: Dispatch<DataSheetAction>;
 }
 
@@ -58,7 +60,14 @@ function DataSheetProviderBase(props) {
 
   const [state, dispatch] = useReducer(dataSheetReducer, { columnWidths: {} });
 
-  const { columns, rowHeight, offset, reorderColumns, children } = props;
+  const {
+    columns,
+    rowHeight,
+    offset,
+    reorderColumns,
+    children,
+    containerWidth,
+  } = props;
   const value = {
     columns,
     rowHeight,
@@ -66,6 +75,7 @@ function DataSheetProviderBase(props) {
     actions: { reorderColumns },
     columnWidths: state.columnWidths,
     dispatch,
+    containerWidth,
   };
   return h(DataSheetContext.Provider, { value }, children);
 }
@@ -77,6 +87,13 @@ const DataSheetProvider = compose(
   DataSheetProviderBase
 );
 
-const useDispatch = () => useContext(DataSheetContext).dispatch;
+const useDataSheet = () => useContext(DataSheetContext);
+const useDispatch = () => useDataSheet().dispatch;
 
-export { DataSheetContext, DataSheetProvider, ColumnInfo, useDispatch };
+export {
+  DataSheetContext,
+  DataSheetProvider,
+  ColumnInfo,
+  useDispatch,
+  useDataSheet,
+};

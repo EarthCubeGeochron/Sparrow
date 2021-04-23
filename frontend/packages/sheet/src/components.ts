@@ -1,6 +1,11 @@
 import { useContext, useRef } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import { DataSheetContext, ColumnInfo, useDispatch } from "./provider";
+import {
+  DataSheetContext,
+  ColumnInfo,
+  useDispatch,
+  useDataSheet,
+} from "./provider";
 import { useElementSize } from "./helpers";
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
 import Draggable from "react-draggable";
@@ -106,16 +111,42 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
   );
 }
 
+interface ColumnWidthInfo {
+  key: string;
+  offset: number;
+  width: number;
+}
+
+function useColumnWidths(): ColumnWidthInfo[] {
+  const { columns, columnWidths, containerWidth } = useDataSheet();
+
+  let widthArray = [];
+  let offset = 50; // for index, we should probably not hard-code this...
+  for (const [i, col] of columns.entries()) {
+    let width = columnWidths[col.name] ?? col.width ?? 0;
+    if (i == columns.length - 1) {
+      // special case for last column to fill container
+      width = containerWidth - offset;
+    }
+
+    widthArray.push({
+      key: col.name,
+      offset: offset,
+      width,
+    });
+    offset += width;
+  }
+  return widthArray;
+}
+
 function Columns({ width }) {
-  const { columns, columnWidths } = useContext(DataSheetContext);
+  const columns = useColumnWidths();
   return h("colgroup", [
     h("col.index-column", { key: "index", style: { width: 50 } }),
-    columns.map((col) => {
-      console.log(col);
-      const width = columnWidths[col.name];
+    columns.map(({ width, key }) => {
       return h("col", {
-        key: col.name,
-        style: { width: width ?? col.width },
+        key,
+        style: { width },
       });
     }),
   ]);
@@ -123,12 +154,19 @@ function Columns({ width }) {
 
 function Header({ width }) {
   const style = { width };
-  const { columns, dispatch, columnWidths } = useContext(DataSheetContext);
+  const { columns, dispatch, containerWidth } = useContext(DataSheetContext);
+
+  const columnWidths = useColumnWidths();
 
   let widthArray = [];
   let offset = 50;
-  for (const col of columns) {
-    const width = columnWidths[col.name] ?? col.width ?? 0;
+  for (const [i, col] of columns.entries()) {
+    let width = columnWidths[col.name] ?? col.width ?? 0;
+    if (i == columns.length - 1) {
+      // special case for last column to fill container
+      width = containerWidth - offset;
+    }
+
     widthArray.push({
       key: col.name,
       offset: offset,
@@ -146,7 +184,8 @@ function Header({ width }) {
     ]),
     h(
       "div.column-resizers",
-      widthArray.map((d, i) => {
+      columnWidths.map((d, i) => {
+        if (i == columnWidths.length - 1) return null;
         return h(
           Draggable,
           {
