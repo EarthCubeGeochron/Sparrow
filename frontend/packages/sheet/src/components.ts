@@ -190,7 +190,8 @@ function Header({ width }) {
   ]);
 }
 
-function Sheet({ className, children, width }) {
+function Sheet({ className, children }) {
+  const { containerWidth: width } = useDataSheet();
   return h("table", { className, style: { width } }, [
     h(Columns),
     h(Header, { width }),

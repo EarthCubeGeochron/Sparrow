@@ -16,7 +16,6 @@ function VirtualizedSheet(props) {
   const {
     data,
     rowRenderer,
-    sheetRenderer,
     dataEditor,
     onCellsChanged,
     scrollBuffer = 50,
@@ -84,7 +83,6 @@ function VirtualizedSheet(props) {
           dispatch({ type: "set-selection", value: sel });
         },
         rowRenderer: virtualRowRenderer,
-        sheetRenderer: virtualSheetRenderer,
         onCellsChanged(changes) {
           console.log(changes);
           changes.forEach((d) => (d.row += rowOffset));
