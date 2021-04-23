@@ -1,10 +1,12 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useContext, useRef, useState, memo, useMemo } from "react";
+import { useContext, useRef, useEffect } from "react";
 import ReactDataSheet from "react-datasheet";
 import {
   useElementSize,
   useScrollOffset,
   useDataSheet,
+  VirtualizedDataEditor,
+  offsetSelection,
 } from "@earthdata/sheet/src/index.ts";
 import styles from "./module.styl";
 
@@ -15,7 +17,6 @@ const defaultSize = { height: 20, width: 100 };
 function VirtualizedSheet(props) {
   const {
     data,
-    rowRenderer,
     dataEditor,
     onCellsChanged,
     scrollBuffer = 50,
@@ -34,61 +35,26 @@ function VirtualizedSheet(props) {
   const rowsToDisplay = Math.ceil((height + scrollBuffer) / rowHeight);
   const rowOffset = Math.floor(percentage * (data.length - rowsToDisplay + 5));
 
-  const virtualRowRenderer = ({ row, ...rest }) =>
-    rowRenderer({ row: row + rowOffset, ...rest });
-
-  function virtualDataEditor({ row, ...rest }) {
-    return dataEditor({
-      row: row + rowOffset,
-      ...rest,
-    });
-  }
-  const virtualSheetRenderer = (props) => {
-    console.log(props);
-    return sheetRenderer(props);
-  };
+  useEffect(() => {
+    dispatch({ type: "set-row-offset", value: rowOffset });
+  }, [rowOffset]);
 
   const lastRow = Math.min(rowOffset + rowsToDisplay, data.length - 1);
-
-  /*
-  function onSelect(sel) {
-    setSelection(sel);
-    return;
-    console.log(sel);
-    // Offset the row selection by the displayed range of rows
-    const { start, end } = sel;
-    console.log(sel, rowOffset);
-    setSelection({
-      start: { i: start.i + rowOffset, j: start.j },
-      end: { i: end.i + rowOffset, j: end.j },
-    });
-  }
-
-  let offsetSelection = null;
-  if (selection != null) {
-    offsetSelection = {
-      start: { i: selection.start.i - rowOffset, j: selection.start.j },
-      end: { i: selection.end.i - rowOffset, j: selection.end.j },
-    };
-  }
-  */
 
   return h("div.virtualized-sheet", { ref }, [
     h("div.ui", { style: { height, width } }, [
       h(ReactDataSheet, {
         ...rest,
         data: data.slice(rowOffset, lastRow),
-        selected: selection,
+        selected: offsetSelection(selection, -rowOffset),
         onSelect(sel) {
           dispatch({ type: "set-selection", value: sel });
         },
-        rowRenderer: virtualRowRenderer,
+        dataEditor: VirtualizedDataEditor,
         onCellsChanged(changes) {
-          console.log(changes);
           changes.forEach((d) => (d.row += rowOffset));
           onCellsChanged(changes);
         },
-        //dataEditor: virtualDataEditor,
       }),
     ]),
     h("div.scroll-panel", {

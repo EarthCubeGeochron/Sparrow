@@ -4,12 +4,13 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
 import ReactDataSheet from "react-datasheet";
+import { offsetSelection } from "./virtualized";
 
 const defaultContext = {
   columns: [],
   rowHeight: 20,
   containerWidth: 500,
-  offset: 0,
+  rowOffset: 0,
   actions: null,
   selection: null,
   columnWidths: {},
@@ -29,6 +30,7 @@ type WidthSpec = {
 interface DataSheetState {
   columnWidths: WidthSpec;
   selection: ReactDataSheet.Selection | null;
+  rowOffset: number;
 }
 
 interface DataSheetCtx extends DataSheetState {
@@ -50,7 +52,12 @@ type SetSelection = {
   value: ReactDataSheet.Selection;
 };
 
-type DataSheetAction = UpdateColumnWidth | SetSelection;
+type SetRowOffset = {
+  type: "set-row-offset";
+  value: number;
+};
+
+type DataSheetAction = UpdateColumnWidth | SetSelection | SetRowOffset;
 
 const DataSheetContext = createContext<DataSheetCtx>(defaultContext);
 
@@ -61,7 +68,11 @@ function dataSheetReducer(state: DataSheetState, action: DataSheetAction) {
         columnWidths: { [action.key]: { $set: action.value } },
       });
     case "set-selection":
-      return update(state, { selection: { $set: action.value } });
+      return update(state, {
+        selection: { $set: offsetSelection(action.value, state.rowOffset) },
+      });
+    case "set-row-offset":
+      return update(state, { rowOffset: { $set: action.value } });
   }
   return state;
 }
@@ -73,20 +84,22 @@ function DataSheetProviderBase(props) {
   const [state, dispatch] = useReducer(dataSheetReducer, {
     columnWidths: {},
     selection: null,
+    rowOffset: 0,
   });
 
   const {
     columns,
     rowHeight,
-    offset,
     reorderColumns,
     children,
+    virtualized = true,
     containerWidth,
   } = props;
   const value = {
     columns,
+    virtualized,
     rowHeight,
-    offset,
+    rowOffset: state.rowOffset,
     actions: { reorderColumns },
     dispatch,
     containerWidth,

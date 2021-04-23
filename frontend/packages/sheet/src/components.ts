@@ -8,10 +8,10 @@ import styles from "./module.styl";
 const h = hyperStyled(styles);
 
 function Row({ row, children, className }) {
-  const { rowHeight } = useContext(DataSheetContext);
+  const { rowHeight, rowOffset } = useContext(DataSheetContext);
   const style = { height: rowHeight };
   return h("tr", { style, className }, [
-    h("td.index-cell.cell.read-only.index", row + 1),
+    h("td.index-cell.cell.read-only.index", row + rowOffset + 1),
     children,
   ]);
 }
