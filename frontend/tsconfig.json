@@ -16,12 +16,5 @@
       "~/*": ["src/*"]
     }
   },
-  "include": [
-    "src",
-    "plugins",
-    "default-content",
-    "packages/sheet/src/components.ts",
-    "packages/sheet/src/virtualized.ts",
-    "packages/sheet/src/provider.ts"
-  ]
+  "include": ["src", "plugins", "default-content", "packages"]
 }
