@@ -9,9 +9,9 @@ import {
   Sheet,
   useElementSize,
   apportionWidths,
+  VirtualizedSheet,
 } from "@earthdata/sheet/src/index.ts";
 import { SheetToolbar } from "./toolbar";
-import { VirtualizedSheet } from "./virtualized";
 import classNames from "classnames";
 import styles from "./module.styl";
 import { combineLikeIds, addNecesaryFields } from "./util";
