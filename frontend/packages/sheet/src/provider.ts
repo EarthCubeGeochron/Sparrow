@@ -1,10 +1,17 @@
-import { createContext, useReducer, useContext, Dispatch } from "react";
+import React, {
+  createContext,
+  useReducer,
+  useContext,
+  Dispatch,
+  useEffect,
+} from "react";
 import h, { compose, C } from "@macrostrat/hyper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
 import ReactDataSheet from "react-datasheet";
 import { offsetSelection } from "./virtualized";
+import { ColumnData, apportionWidths } from "./components/column-utils";
 
 const defaultContext = {
   columns: [],
@@ -31,15 +38,25 @@ interface DataSheetState {
   columnWidths: WidthSpec;
   selection: ReactDataSheet.Selection | null;
   rowOffset: number;
+  columns: ColumnData[];
 }
 
-interface DataSheetCtx extends DataSheetState {
-  columns: ColumnInfo[];
+interface DataSheetParams {
   rowHeight: number;
   containerWidth: number;
   virtualized: boolean;
-  dispatch: Dispatch<DataSheetAction>;
+  columns: ColumnData[];
 }
+
+type DataSheetCtx = DataSheetState &
+  DataSheetParams & {
+    dispatch: Dispatch<DataSheetAction>;
+  };
+
+type SetColumns = {
+  type: "set-columns";
+  value: ColumnData[];
+};
 
 type UpdateColumnWidth = {
   type: "update-column-width";
@@ -52,12 +69,29 @@ type SetSelection = {
   value: ReactDataSheet.Selection;
 };
 
+type MoveColumn = {
+  type: "move-column";
+  dragIndex: number;
+  hoverIndex: number;
+};
+
 type SetRowOffset = {
   type: "set-row-offset";
   value: number;
 };
 
-type DataSheetAction = UpdateColumnWidth | SetSelection | SetRowOffset;
+type DataSheetProps = DataSheetParams & {
+  // This is too complicated by half...
+  desiredWidths: WidthSpec;
+  children: React.ReactNode;
+};
+
+type DataSheetAction =
+  | UpdateColumnWidth
+  | SetSelection
+  | SetRowOffset
+  | SetColumns
+  | MoveColumn;
 
 const DataSheetContext = createContext<DataSheetCtx>(defaultContext);
 
@@ -66,6 +100,19 @@ function dataSheetReducer(state: DataSheetState, action: DataSheetAction) {
     case "update-column-width":
       return update(state, {
         columnWidths: { [action.key]: { $set: action.value } },
+      });
+    case "set-columns":
+      return { ...state, columns: action.value };
+    case "move-column":
+      // Move a column in response ot a drag
+      const { dragIndex, hoverIndex } = action;
+      return update(state, {
+        columns: {
+          $splice: [
+            [dragIndex, 1], // remove column from drag index
+            [hoverIndex, 0, state.columns[dragIndex]], // ...and insert at hover index
+          ],
+        },
       });
     case "set-selection":
       return update(state, {
@@ -77,30 +124,36 @@ function dataSheetReducer(state: DataSheetState, action: DataSheetAction) {
   return state;
 }
 
-function DataSheetProviderBase(props) {
+function DataSheetProviderBase(props: DataSheetProps) {
   /** This context/context provider don't do much right now, but they will
       take an increasing role in state management going forward */
+  const {
+    columns,
+    rowHeight,
+    children,
+    virtualized = true,
+    desiredWidths,
+    containerWidth,
+  } = props;
 
   const [state, dispatch] = useReducer(dataSheetReducer, {
     columnWidths: {},
     selection: null,
     rowOffset: 0,
+    columns,
   });
 
-  const {
-    columns,
-    rowHeight,
-    reorderColumns,
-    children,
-    virtualized = true,
-    containerWidth,
-  } = props;
+  useEffect(() => {
+    // If we don't have this we'll get an infinite loop
+    const col = apportionWidths(columns, desiredWidths, containerWidth);
+    console.log(col, containerWidth);
+    dispatch({ type: "set-columns", value: col });
+  }, [containerWidth, desiredWidths, columns]);
+
   const value = {
-    columns,
     virtualized,
     rowHeight,
     rowOffset: state.rowOffset,
-    actions: { reorderColumns },
     dispatch,
     containerWidth,
     ...state,

@@ -93,6 +93,8 @@ function DataSheet() {
   const [data, setData] = useState<SampleData[]>([]);
   //console.log(data);
 
+  const columns = columnSpec;
+
   const [edits, setEdits] = useState([]);
   /**
    * For edits, what I could do is create an array of indexes based on the row number.
@@ -111,33 +113,13 @@ function DataSheet() {
     setData(initialData);
   }, [initialData]);
 
-  const ref = useRef<HTMLDivElement>();
-  const size = useElementSize(ref) ?? { width: 500, height: 100 };
+  const ref = useRef();
+  const size = useElementSize(ref) ?? { width: 1000, height: 100 };
 
-  const [columns, setColumns] = useState(columnSpec);
+  //const [columns, setDesiredWidth] = useState(columnSpec);
 
-  const reorderColumns = useCallback(
-    (dragIndex: number, hoverIndex: number) => {
-      /** Reorder columns with drag/drop */
-      setColumns(
-        update(columns, {
-          $splice: [
-            [dragIndex, 1],
-            [hoverIndex, 0, columns[dragIndex]],
-          ],
-        })
-      );
-    },
-    [columns]
-  );
-
-  useEffect(() => {
-    // If we don't have this we'll get an infinite loop
-    if (initialData == null || initialData.length == 0) return;
-    const desiredWidths = calculateWidths(data, columnSpec);
-    const col = apportionWidths(columnSpec, desiredWidths, size.width);
-    setColumns(col);
-  }, [initialData, size]);
+  const desiredWidths =
+    initialData != null ? calculateWidths(initialData, columnSpec) : {};
 
   if (data.length === 0) return null;
 
@@ -231,9 +213,10 @@ function DataSheet() {
     //key is name of column
   );
 
+  //console.log(size);
   return h(
     DataSheetProvider,
-    { columns, reorderColumns, containerWidth: size.width },
+    { columns, containerWidth: size.width, desiredWidths },
     h("div.data-sheet", [
       h(SheetToolbar, {
         onSubmit: handleSubmit,

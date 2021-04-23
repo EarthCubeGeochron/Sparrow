@@ -44,7 +44,7 @@ function apportionWidths(
 }
 
 function useColumnDropTarget(ref, index) {
-  const { actions } = useDataSheet();
+  const { dispatch } = useDataSheet();
   return useDrop({
     accept: "column",
     hover(item: DragItem, monitor: DropTargetMonitor) {
@@ -86,7 +86,7 @@ function useColumnDropTarget(ref, index) {
       }
 
       // Time to actually perform the action
-      actions?.reorderColumns(dragIndex, hoverIndex);
+      dispatch({ type: "move-column", dragIndex, hoverIndex });
       //moveCard(dragIndex, hoverIndex);
 
       // Note: we're mutating the monitor item here!
