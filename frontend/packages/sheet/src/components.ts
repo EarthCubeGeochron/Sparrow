@@ -152,28 +152,40 @@ function Columns({ width }) {
   ]);
 }
 
+function ColumnResizeHandles() {
+  const { dispatch } = useContext(DataSheetContext);
+  const columnWidths = useColumnWidths();
+  return h(
+    "div.column-resizers",
+    columnWidths.map((d, i) => {
+      if (i == columnWidths.length - 1) return null;
+      return h(
+        Draggable,
+        {
+          axis: "x",
+          position: { x: d.offset + d.width, y: 0 },
+          onStop(event, { x }) {
+            dispatch({
+              type: "update-column-width",
+              key: d.key,
+              value: x - d.offset,
+            });
+          },
+        },
+        h("span.cell-drag-handle", {
+          onMouseDown(e) {
+            e.preventDefault();
+            e.stopPropagation();
+          },
+        })
+      );
+    })
+  );
+}
+
 function Header({ width }) {
   const style = { width };
-  const { columns, dispatch, containerWidth } = useContext(DataSheetContext);
-
-  const columnWidths = useColumnWidths();
-
-  let widthArray = [];
-  let offset = 50;
-  for (const [i, col] of columns.entries()) {
-    let width = columnWidths[col.name] ?? col.width ?? 0;
-    if (i == columns.length - 1) {
-      // special case for last column to fill container
-      width = containerWidth - offset;
-    }
-
-    widthArray.push({
-      key: col.name,
-      offset: offset,
-      width,
-    });
-    offset += width;
-  }
+  const { columns } = useDataSheet();
 
   return h("thead", { style }, [
     h("tr.header", { style }, [
@@ -182,32 +194,7 @@ function Header({ width }) {
         return h(HeaderCell, { key: col.name, col, index });
       }),
     ]),
-    h(
-      "div.column-resizers",
-      columnWidths.map((d, i) => {
-        if (i == columnWidths.length - 1) return null;
-        return h(
-          Draggable,
-          {
-            axis: "x",
-            position: { x: d.offset + d.width, y: 0 },
-            onStop(event, { x }) {
-              dispatch({
-                type: "update-column-width",
-                key: d.key,
-                value: x - d.offset,
-              });
-            },
-          },
-          h("span.cell-drag-handle", {
-            onMouseDown(e) {
-              e.preventDefault();
-              e.stopPropagation();
-            },
-          })
-        );
-      })
-    ),
+    h(ColumnResizeHandles),
   ]);
 }
 
