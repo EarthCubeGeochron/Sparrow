@@ -14,6 +14,7 @@
     "d3-array": "^2.12.1",
     "immutability-helper": "^3.1.1",
     "react": "^17.0.2",
+    "react-datasheet": "^1.4.9",
     "react-dnd": "^14.0.2",
     "react-dnd-html5-backend": "^14.0.0",
     "react-draggable": "^4.4.3"

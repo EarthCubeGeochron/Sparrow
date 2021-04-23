@@ -1,10 +1,10 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef, useState, memo, useMemo } from "react";
 import ReactDataSheet from "react-datasheet";
 import {
-  DataSheetContext,
   useElementSize,
   useScrollOffset,
+  useDataSheet,
 } from "@earthdata/sheet/src/index.ts";
 import styles from "./module.styl";
 
@@ -22,13 +22,8 @@ function VirtualizedSheet(props) {
     scrollBuffer = 50,
     ...rest
   } = props;
-  const { rowHeight } = useContext(DataSheetContext);
 
-  // { start: { i: number, j; number }, end: { i: number, j: number } }
-  const [selection, setSelection] = useState({
-    offset: null,
-    notOffset: null,
-  });
+  const { rowHeight, selection, dispatch } = useDataSheet();
 
   const ref = useRef<HTMLDivElement>();
 
@@ -40,70 +35,62 @@ function VirtualizedSheet(props) {
   const rowsToDisplay = Math.ceil((height + scrollBuffer) / rowHeight);
   const rowOffset = Math.floor(percentage * (data.length - rowsToDisplay + 5));
 
-  function virtualRowRenderer({ row, children, className }) {
-    return rowRenderer({ row: row + rowOffset, children, className });
-  }
-  function virtualDataEditor({
-    row,
-    children,
-    value,
-    col,
-    cell,
-    onChange,
-    onCommit,
-    onKeyDown,
-    onRevert,
-  }) {
+  const virtualRowRenderer = ({ row, ...rest }) =>
+    rowRenderer({ row: row + rowOffset, ...rest });
+
+  function virtualDataEditor({ row, ...rest }) {
     return dataEditor({
       row: row + rowOffset,
-      children,
-      value,
-      col,
-      cell,
-      onChange,
-      onCommit,
-      onKeyDown,
-      onRevert,
+      ...rest,
     });
   }
-  function virtualSheetRenderer({ column, children, className }) {
-    return sheetRenderer({
-      column: column,
-      children,
-      className,
-      width,
-    });
-  }
+  const virtualSheetRenderer = (props) => {
+    console.log(props);
+    return sheetRenderer(props);
+  };
 
   const lastRow = Math.min(rowOffset + rowsToDisplay, data.length - 1);
 
-  function onSelect({ start, end }) {
-    /** Offset the row selection by the displayed range of rows */
-    const startI = start.i + rowOffset;
-    const startJ = start.j;
-    const endI = end.i + rowOffset;
-    const endJ = end.j;
-    const selected = {
-      start: { i: startI, j: startJ },
-      end: { i: endI, j: endJ },
-    };
-    setSelection({ offset: selected, notOffset: { start, end } });
+  /*
+  function onSelect(sel) {
+    setSelection(sel);
+    return;
+    console.log(sel);
+    // Offset the row selection by the displayed range of rows
+    const { start, end } = sel;
+    console.log(sel, rowOffset);
+    setSelection({
+      start: { i: start.i + rowOffset, j: start.j },
+      end: { i: end.i + rowOffset, j: end.j },
+    });
   }
+
+  let offsetSelection = null;
+  if (selection != null) {
+    offsetSelection = {
+      start: { i: selection.start.i - rowOffset, j: selection.start.j },
+      end: { i: selection.end.i - rowOffset, j: selection.end.j },
+    };
+  }
+  */
 
   return h("div.virtualized-sheet", { ref }, [
     h("div.ui", { style: { height, width } }, [
       h(ReactDataSheet, {
+        ...rest,
         data: data.slice(rowOffset, lastRow),
-        //selected: selection.notOffset,
-        //onSelect,
+        selected: selection,
+        onSelect(sel) {
+          dispatch({ type: "set-selection", value: sel });
+        },
         rowRenderer: virtualRowRenderer,
         sheetRenderer: virtualSheetRenderer,
         onCellsChanged(changes) {
+          console.log(changes);
           changes.forEach((d) => (d.row += rowOffset));
           onCellsChanged(changes);
         },
-        dataEditor: virtualDataEditor,
-        ...rest,
+        //dataEditor: virtualDataEditor,
       }),
     ]),
     h("div.scroll-panel", {

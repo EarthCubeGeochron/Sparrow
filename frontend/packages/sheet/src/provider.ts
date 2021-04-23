@@ -3,6 +3,7 @@ import h, { compose, C } from "@macrostrat/hyper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
+import ReactDataSheet from "react-datasheet";
 
 const defaultContext = {
   columns: [],
@@ -10,8 +11,10 @@ const defaultContext = {
   containerWidth: 500,
   offset: 0,
   actions: null,
+  selection: null,
   columnWidths: {},
   dispatch: () => {},
+  virtualized: false,
 };
 
 type ColumnInfo = {
@@ -25,12 +28,14 @@ type WidthSpec = {
 
 interface DataSheetState {
   columnWidths: WidthSpec;
+  selection: ReactDataSheet.Selection | null;
 }
 
 interface DataSheetCtx extends DataSheetState {
   columns: ColumnInfo[];
   rowHeight: number;
   containerWidth: number;
+  virtualized: boolean;
   dispatch: Dispatch<DataSheetAction>;
 }
 
@@ -40,7 +45,12 @@ type UpdateColumnWidth = {
   value: number;
 };
 
-type DataSheetAction = UpdateColumnWidth;
+type SetSelection = {
+  type: "set-selection";
+  value: ReactDataSheet.Selection;
+};
+
+type DataSheetAction = UpdateColumnWidth | SetSelection;
 
 const DataSheetContext = createContext<DataSheetCtx>(defaultContext);
 
@@ -50,6 +60,8 @@ function dataSheetReducer(state: DataSheetState, action: DataSheetAction) {
       return update(state, {
         columnWidths: { [action.key]: { $set: action.value } },
       });
+    case "set-selection":
+      return update(state, { selection: { $set: action.value } });
   }
   return state;
 }
@@ -58,7 +70,10 @@ function DataSheetProviderBase(props) {
   /** This context/context provider don't do much right now, but they will
       take an increasing role in state management going forward */
 
-  const [state, dispatch] = useReducer(dataSheetReducer, { columnWidths: {} });
+  const [state, dispatch] = useReducer(dataSheetReducer, {
+    columnWidths: {},
+    selection: null,
+  });
 
   const {
     columns,
@@ -73,9 +88,9 @@ function DataSheetProviderBase(props) {
     rowHeight,
     offset,
     actions: { reorderColumns },
-    columnWidths: state.columnWidths,
     dispatch,
     containerWidth,
+    ...state,
   };
   return h(DataSheetContext.Provider, { value }, children);
 }

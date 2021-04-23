@@ -1,8 +1,7 @@
-import * as React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
 import update from "immutability-helper";
-import h from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import { Frame } from "~/frame";
 import {
   DataSheetProvider,
@@ -10,7 +9,6 @@ import {
   Sheet,
   useElementSize,
   apportionWidths,
-  ColumnSpec,
 } from "@earthdata/sheet/src/index.ts";
 import { SheetToolbar } from "./toolbar";
 import { VirtualizedSheet } from "./virtualized";
@@ -20,6 +18,8 @@ import { combineLikeIds, addNecesaryFields } from "./util";
 import { postData } from "./post";
 import { DoiProjectButton } from "./sheet-enter-components/doi-button";
 import { DataEditor } from "react-datasheet/lib";
+
+const h = hyperStyled(styles);
 
 const columnSpec: ColumnData[] = [
   { name: "Sample ID", key: "id", editable: false },
@@ -209,7 +209,11 @@ function DataSheet() {
       "nowrap",
       "clip"
     );
-    return { value, className, readOnly };
+    return {
+      value,
+      className,
+      readOnly,
+    };
   };
 
   /** We now build cell properties in the render function, rather than storing
@@ -230,32 +234,34 @@ function DataSheet() {
   return h(
     DataSheetProvider,
     { columns, reorderColumns, containerWidth: size.width },
-    [
-      <div className={styles["data-sheet"]}>
-        <SheetToolbar
-          onSubmit={handleSubmit}
-          onUndo={handleUndo}
-          hasChanges={initialData != data}
-        />
-        {h("div.sheet", { ref }, [
-          <VirtualizedSheet
-            data={cellData}
-            valueRenderer={(cell) => `${cell.value ?? ""}`}
-            sheetRenderer={Sheet}
-            rowRenderer={Row}
-            onCellsChanged={onCellsChanged}
-            width={size?.width}
-            dataEditor={(props) =>
-              props.col === 6
-                ? h(DoiProjectButton, { data, ...props })
-                : h(DataEditor, { ...props })
-            }
-          />,
-        ])}
-      </div>,
-    ]
+    h("div.data-sheet", [
+      h(SheetToolbar, {
+        onSubmit: handleSubmit,
+        onUndo: handleUndo,
+        hasChanges: initialData != data,
+      }),
+      h("div.sheet", { ref }, [
+        h(VirtualizedSheet, {
+          data: cellData,
+          valueRenderer: (cell) => `${cell.value ?? ""}`,
+          sheetRenderer: Sheet,
+          rowRenderer: Row,
+          onCellsChanged,
+          width: size?.width ?? 500,
+          dataEditor: DataEditor,
+        }),
+      ]),
+    ])
   );
 }
+
+/*
+(props) =>
+            props.col === 6
+              ? h(DoiProjectButton, { data, ...props })
+              : h(DataEditor, { ...props }),
+        }
+*/
 
 function DataSheetPage(props) {
   return h(Frame, { id: "dataSheet" }, h(DataSheet, props));

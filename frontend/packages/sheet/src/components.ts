@@ -1,17 +1,9 @@
 import { useContext, useRef } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import {
-  DataSheetContext,
-  ColumnInfo,
-  useDispatch,
-  useDataSheet,
-} from "./provider";
-import { useElementSize } from "./helpers";
+import { DataSheetContext, ColumnInfo, useDataSheet } from "./provider";
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
 import Draggable from "react-draggable";
 import styles from "./module.styl";
-import { kernelDensityEstimator } from "plugins/dz-spectrum/kernel-density";
-// https://codesandbox.io/s/github/react-dnd/react-dnd/tree/gh-pages/examples_hooks_ts/04-sortable/simple?from-embed=&file=/src/Container.tsx
 
 const h = hyperStyled(styles);
 
