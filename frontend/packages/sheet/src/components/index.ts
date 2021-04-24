@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, memo } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { ColumnInfo, useDataSheet } from "../provider";
 import { useColumnDropTarget, useColumnWidths } from "./column-utils";
@@ -84,7 +84,7 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
   );
 }
 
-function Header({ width }) {
+function Header_({ width }) {
   const style = { width };
   const { columns } = useDataSheet();
 
@@ -98,6 +98,8 @@ function Header({ width }) {
     ]),
   ]);
 }
+
+const Header = memo(Header_);
 
 function Sheet({ className, children }) {
   const { containerWidth: width } = useDataSheet();

@@ -9,7 +9,7 @@ const h = hyperStyled(styles);
 
 function VirtualizedDataEditor({ row, ...rest }) {
   const { rowOffset } = useDataSheet();
-  return DataEditor({
+  return h(DataEditor, {
     row: row + rowOffset,
     ...rest,
   });
