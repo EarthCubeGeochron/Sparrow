@@ -100,6 +100,7 @@ function useColumnDropTarget(ref, index) {
 
 function useColumnWidths(): ColumnWidthInfo[] {
   const { columns, columnWidths, containerWidth } = useDataSheet();
+  console.log("Container width:", containerWidth);
 
   let widthArray = [];
   let offset = 50; // for index, we should probably not hard-code this...

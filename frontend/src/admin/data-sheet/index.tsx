@@ -114,14 +114,13 @@ function DataSheet() {
   }, [initialData]);
 
   const ref = useRef();
-  const size = useElementSize(ref) ?? { width: 1000, height: 100 };
+  const size = useElementSize(ref);
+  console.log("Size 2:", size);
 
   //const [columns, setDesiredWidth] = useState(columnSpec);
 
   const desiredWidths =
     initialData != null ? calculateWidths(initialData, columnSpec) : {};
-
-  if (data.length === 0) return null;
 
   // Change management
   const handleUndo = () => {
@@ -216,7 +215,7 @@ function DataSheet() {
   //console.log(size);
   return h(
     DataSheetProvider,
-    { columns, containerWidth: size.width, desiredWidths },
+    { columns, containerWidth: size?.width ?? 500, desiredWidths },
     h("div.data-sheet", [
       h(SheetToolbar, {
         onSubmit: handleSubmit,

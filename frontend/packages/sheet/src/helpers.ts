@@ -19,12 +19,14 @@ function useElementSize(
   const [size, setSize] = useState<ElementSize>(null);
 
   const sizeCallback = useCallback(() => {
+    console.log(ref);
     if (ref.current == null) return;
     const { height, width } = ref.current.getBoundingClientRect();
+    console.log("Size:", { height, width });
     setSize({ height, width });
-  }, [ref.current]);
+  }, [ref]);
 
-  useLayoutEffect(sizeCallback, [ref.current]);
+  useLayoutEffect(sizeCallback, [ref]);
 
   // Also respond on window resize (if "trackWindowResize" is set)
   useEffect(() => {
@@ -33,7 +35,7 @@ function useElementSize(
     return function () {
       window.removeEventListener("resize", sizeCallback);
     };
-  }, [ref.current]);
+  }, [sizeCallback]);
 
   return size;
 }

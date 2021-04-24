@@ -34,7 +34,7 @@ function ColumnResizeHandles() {
   const { dispatch } = useDataSheet();
   const columnWidths = useColumnWidths();
   return h(
-    "div.column-resizers",
+    "td.column-resizers",
     columnWidths.map((d, i) => {
       if (i == columnWidths.length - 1) return null;
       return h(
@@ -94,8 +94,8 @@ function Header({ width }) {
       columns.map((col, index) => {
         return h(HeaderCell, { key: col.name, col, index });
       }),
+      h(ColumnResizeHandles),
     ]),
-    h(ColumnResizeHandles),
   ]);
 }
 
