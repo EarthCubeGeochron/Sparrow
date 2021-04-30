@@ -8,6 +8,14 @@ and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 We hope to arrive at full conformance for milestone `2.0.0`.
 
+## `[2.0.0.beta4]` - 2021-04-30
+
+- Major fixes to the data sheet to prepare it for the future,
+  especially column resizing and improved state management
+- New multi-package repository organization for frontend code
+- Better API error handling
+- Improved speed for model-based APIs
+
 ## `[2.0.0.beta3]` - 2021-03-23
 
 - Fixed a small but important database initialization [bug](https://github.com/EarthCubeGeochron/Sparrow/issues/76) that blocks new database setup for most lab setups
