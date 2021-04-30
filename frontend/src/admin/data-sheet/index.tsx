@@ -1,29 +1,25 @@
-import * as React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAPIResult } from "@macrostrat/ui-components";
 import update from "immutability-helper";
-import h from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import { Frame } from "~/frame";
-import { DataSheetProvider } from "./provider";
+import {
+  DataSheetProvider,
+  Row,
+  Sheet,
+  useElementSize,
+  apportionWidths,
+  VirtualizedSheet,
+} from "@earthdata/sheet/src/index.ts";
 import { SheetToolbar } from "./toolbar";
-import { VirtualizedSheet } from "./virtualized";
 import classNames from "classnames";
 import styles from "./module.styl";
-import { Row, Sheet } from "./components";
-import { useElementSize } from "./util";
-import { sum } from "d3-array";
 import { combineLikeIds, addNecesaryFields } from "./util";
 import { postData } from "./post";
 import { DoiProjectButton } from "./sheet-enter-components/doi-button";
 import { DataEditor } from "react-datasheet/lib";
-import { APIV2Context } from "~/api-v2";
 
-interface ColumnData {
-  name: string;
-  key: string;
-  width?: number;
-  editable?: boolean;
-}
+const h = hyperStyled(styles);
 
 const columnSpec: ColumnData[] = [
   { name: "Sample ID", key: "id", editable: false },
@@ -82,26 +78,6 @@ function calculateWidths(data, columns) {
   }, {});
 }
 
-function apportionWidth(
-  data,
-  columns: ColumnData[],
-  containerWidth: number
-): ColumnData[] {
-  if (data == null || columns == null || containerWidth == null) return columns;
-
-  const maxContentWidth = calculateWidths(data, columns);
-  const totalSize = sum(Object.values(maxContentWidth));
-
-  //console.log(maxContentWidth);
-
-  return columns.map((col) => {
-    return {
-      ...col,
-      width: (maxContentWidth[col.key] / totalSize) * (containerWidth - 50),
-    };
-  });
-}
-
 function unwrapResponse(apiResult) {
   /** Flatten latitudes and longitudes for entire API response */
   return apiResult.map(unwrapSampleData);
@@ -116,6 +92,8 @@ interface SampleData {
 function DataSheet() {
   const [data, setData] = useState<SampleData[]>([]);
   //console.log(data);
+
+  const columns = columnSpec;
 
   const [edits, setEdits] = useState([]);
   /**
@@ -135,34 +113,14 @@ function DataSheet() {
     setData(initialData);
   }, [initialData]);
 
-  const ref = useRef<HTMLDivElement>();
-  const size = useElementSize(ref) ?? { width: 500, height: 100 };
+  const ref = useRef();
+  const size = useElementSize(ref);
+  console.log("Size 2:", size);
 
-  const [columns, setColumns] = useState(columnSpec);
+  //const [columns, setDesiredWidth] = useState(columnSpec);
 
-  const reorderColumns = useCallback(
-    (dragIndex: number, hoverIndex: number) => {
-      /** Reorder columns with drag/drop */
-      setColumns(
-        update(columns, {
-          $splice: [
-            [dragIndex, 1],
-            [hoverIndex, 0, columns[dragIndex]],
-          ],
-        })
-      );
-    },
-    [columns]
-  );
-
-  useEffect(() => {
-    // If we don't have this we'll get an infinite loop
-    if (initialData == null || initialData.length == 0) return;
-    const col = apportionWidth(initialData, columnSpec, size.width);
-    setColumns(col);
-  }, [initialData, size]);
-
-  if (data.length === 0) return null;
+  const desiredWidths =
+    initialData != null ? calculateWidths(initialData, columnSpec) : {};
 
   // Change management
   const handleUndo = () => {
@@ -232,7 +190,11 @@ function DataSheet() {
       "nowrap",
       "clip"
     );
-    return { value, className, readOnly };
+    return {
+      value,
+      className,
+      readOnly,
+    };
   };
 
   /** We now build cell properties in the render function, rather than storing
@@ -250,31 +212,38 @@ function DataSheet() {
     //key is name of column
   );
 
-  return h(DataSheetProvider, { columns, reorderColumns }, [
-    <div className={styles["data-sheet"]}>
-      <SheetToolbar
-        onSubmit={handleSubmit}
-        onUndo={handleUndo}
-        hasChanges={initialData != data}
-      />
-      {h("div.sheet", { ref }, [
-        <VirtualizedSheet
-          data={cellData}
-          valueRenderer={(cell) => `${cell.value ?? ""}`}
-          sheetRenderer={Sheet}
-          rowRenderer={Row}
-          onCellsChanged={onCellsChanged}
-          width={size?.width}
-          dataEditor={(props) =>
+  //console.log(size);
+  return h(
+    DataSheetProvider,
+    { columns, containerWidth: size?.width ?? 500, desiredWidths },
+    h("div.data-sheet", [
+      h(SheetToolbar, {
+        onSubmit: handleSubmit,
+        onUndo: handleUndo,
+        hasChanges: initialData != data,
+      }),
+      h("div.sheet", { ref }, [
+        h(VirtualizedSheet, {
+          data: cellData,
+          valueRenderer: (cell) => `${cell.value ?? ""}`,
+          sheetRenderer: Sheet,
+          rowRenderer: Row,
+          onCellsChanged,
+          width: size?.width ?? 500,
+          dataEditor: DataEditor,
+        }),
+      ]),
+    ])
+  );
+}
+
+/*
+(props) =>
             props.col === 6
               ? h(DoiProjectButton, { data, ...props })
-              : h(DataEditor, { ...props })
-          }
-        />,
-      ])}
-    </div>,
-  ]);
-}
+              : h(DataEditor, { ...props }),
+        }
+*/
 
 function DataSheetPage(props) {
   return h(Frame, { id: "dataSheet" }, h(DataSheet, props));

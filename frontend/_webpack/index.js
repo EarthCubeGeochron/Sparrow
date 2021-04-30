@@ -24,7 +24,8 @@ function relativePath(...tokens) {
   return path.resolve(__dirname, "..", ...tokens);
 }
 
-let assetsDir = process.env.SPARROW_FRONTEND_BUILD_DIR || relativePath("_assets");
+let assetsDir =
+  process.env.SPARROW_FRONTEND_BUILD_DIR || relativePath("_assets");
 let srcRoot = relativePath("src");
 
 let assetsRoute = process.env.SPARROW_BASE_URL || process.env.BASE_URL;
@@ -38,7 +39,12 @@ let baseConfig = {
   devtool: "source-map",
   resolve: {
     // Resolve node modules from Sparrow's own node_modules if not found in plugins
-    modules: ["_local_modules", "node_modules", relativePath("node_modules")],
+    modules: [
+      "packages",
+      "_local_modules",
+      "node_modules",
+      relativePath("node_modules"),
+    ],
     extensions: [
       ".ts",
       ".tsx",

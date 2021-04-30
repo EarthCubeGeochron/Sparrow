@@ -1,5 +1,5 @@
 {
-  "name": "@earthcube/schema-linker",
+  "name": "@earthdata/schema-linker",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@blueprintjs/core": "^3.39.0",
-    "@macrostrat/hyper": "^1.2.11"
+    "@macrostrat/hyper": "^1.2.12"
   },
   "devDependencies": {
     "typescript": "^4.2.3"

@@ -1,8 +1,9 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useContext } from "react";
+import { useContext, Suspense } from "react";
 import { Switch } from "react-router-dom";
-import loadable from "@loadable/component";
+import { lazy } from "@loadable/component";
 import { LinkCard } from "@macrostrat/ui-components";
+import { Spinner } from "@blueprintjs/core";
 
 import { Frame } from "~/frame";
 import { LoginRequired } from "~/auth";
@@ -21,7 +22,11 @@ import { VocabularyPage } from "./vocabulary";
 import { NewProjectForm } from "../model-views/project/new-project";
 import { NewSamplePage } from "~/model-views/sample/new-sample";
 
-const DataSheet = loadable(() => import("./data-sheet"));
+const DataSheet = lazy(() => import("./data-sheet"));
+
+function DataSheetPage() {
+  return h(Suspense, { fallback: h(Spinner) }, h(DataSheet));
+}
 
 const h = hyperStyled(styles);
 
@@ -72,7 +77,7 @@ const AdminRouter = ({ base }) =>
   h(Switch, [
     h(Route, {
       path: base + "/data-sheet",
-      render: () => h(DataSheet),
+      render: () => h(DataSheetPage),
     }),
     h(Route, {
       path: base + "/session",

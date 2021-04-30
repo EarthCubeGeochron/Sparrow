@@ -1,4 +1,4 @@
-import { TermCard, CompositeTermCard } from "@earthcube/schema-linker";
+import { TermCard, CompositeTermCard } from "@earthdata/schema-linker";
 import h from "@macrostrat/hyper";
 import d1 from "./lab-data.yaml";
 import d2 from "./output-data.yaml";
