@@ -128,3 +128,7 @@ class TestAPIV2:
 
         res = client.get("/api/v2/models/analysis")
         assert res.status_code == 200
+
+    def test_api_nesting(self, client):
+        res = client.get("/api/v2/models/sample", params={"nest": "session", "all": True})
+        assert res.status_code == 200

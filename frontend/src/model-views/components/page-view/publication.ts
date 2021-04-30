@@ -24,18 +24,14 @@ export function Publication(props) {
   };
 
   if (doi == null) {
-    return h(interior);
+    return h("div.publication", interior);
   } else {
     const href = `https://dx.doi.org/${doi}`;
     return h("a.publication", { href, target: "_blank" }, h(interior));
   }
 }
 
-export const PageViewPublications = function({
-  data,
-  isEditing = false,
-  onClick,
-}) {
+export const PageViewPublications = ({ data, isEditing = false, onClick }) => {
   if (data == null) {
     data = [];
   }

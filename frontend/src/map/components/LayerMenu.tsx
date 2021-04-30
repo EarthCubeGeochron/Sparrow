@@ -24,7 +24,6 @@ export const LayerMenu = ({
   const { isEnabled } = useDarkMode();
 
   const { getElement } = useContext(FrameContext);
-  console.log(getElement("mapStyles"));
 
   const externalMapStyles = getElement("mapStyles")
     ? getElement("mapStyles")
@@ -36,6 +35,10 @@ export const LayerMenu = ({
 
   const mapStyles = [
     { name: "Standard Map", style: StandMapMode },
+    {
+      name: "Topographic Map",
+      style: "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub",
+    },
     { name: "Geologic Map", style: mapStyle },
     ...externalMapStyles,
   ];

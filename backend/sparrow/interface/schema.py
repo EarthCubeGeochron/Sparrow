@@ -6,10 +6,11 @@ from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
 from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
 from sqlalchemy.orm.exc import FlushError
-from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy.orm import RelationshipProperty, joinedload
 from collections.abc import Mapping
 from sqlalchemy import inspect
 
+from .fields import SmartNested
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter, allow_nest
 
@@ -61,15 +62,16 @@ class ModelSchema(SQLAlchemyAutoSchema):
     :param: allowed_nests: List of strings or "all"
     """
 
+    # A list of SQLAlchemy collections that we are nesting on
+    nest_collections = []
+
     def __init__(self, *args, **kwargs):
         kwargs["unknown"] = True
         nests = kwargs.pop("allowed_nests", [])
         self.allowed_nests = nests
         if len(self.allowed_nests) > 0:
             model = self.opts.model.__name__
-            log.debug(
-                f"\nSetting up schema for model {model}\n  allowed nests: {nests}"
-            )
+            log.info(f"\nSetting up schema for model {model}\n  allowed nests: {nests}")
 
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
@@ -80,6 +82,60 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _table(self):
         return self.opts.model.__table__
 
+    def _nested_relationships(self, *, nests=None, current_depth=0, max_depth=None):
+        """Get relationship fields for nested models, allowing them
+        to be pre-joined.
+
+        kwargs:
+        mode [nested, related, hybrid]
+            - nested: loads only the models directly referenced in nests
+            - related: loads all models, even those referenced in related models only
+            - hybrid [default]: loads all models, attempting to pull back only needed
+                attributes that define the relationship...
+        """
+        depth = current_depth
+        if max_depth != None and depth > max_depth:
+            return [], None
+        # It would be nice if we didn't have to pass nests down here...
+        _nests = nests or self.allowed_nests
+        for key, field in self.fields.items():
+
+            if not isinstance(field, Related):
+                continue
+            # Yield this relationship
+            this_relationship = getattr(self.opts.model, key)
+
+            nested = isinstance(field, SmartNested) and field._should_nest()
+
+            ##load_hint needs to be the attribute of the model joining
+            load_hint = None
+            # We are passing through load_hints to allow us to
+            # return only a subset of columns when primary keys are
+            # desired.
+            # if not nested:
+            #    load_hint = this_relationship.property.remote_side
+
+            yield [this_relationship], load_hint
+            if not nested:
+                continue
+            # We're only working with nested fields now
+            field.schema.allowed_nests = _nests
+            # Get relationships from nested models
+            for rel, load_hint in field.schema._nested_relationships(
+                nests=_nests, current_depth=depth + 1, max_depth=max_depth
+            ):
+                yield [this_relationship, *rel], load_hint
+
+    def query_options(self, max_depth=None):
+        for rel, load_hint in self._nested_relationships(max_depth=max_depth):
+            res = joinedload(*rel)
+            if load_hint is not None:
+                res = res.load_only(*list(load_hint))
+            yield res
+
+    def nested_relationships(self, max_depth=None):
+        return [v for v, _ in self._nested_relationships(max_depth=max_depth)]
+
     def _build_filters(self, data):
         # Filter on properties that actually have a local column
         filters = {}
@@ -88,9 +144,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
         for prop in self.opts.model.__mapper__.iterate_properties:
             columns = getattr(prop, "columns", False)
             if columns:
-                is_fully_defined = all(
-                    [any([c.primary_key, c.unique]) for c in columns]
-                )
+                is_fully_defined = all([any([c.primary_key, c.unique]) for c in columns])
                 # Shim for the fact that we don't correctly find Session.uuid as unique at the moment...
                 # TODO: fix this in general
                 # if self.opts.model.__name__ == "Session" and prop.key == "uuid":
@@ -175,24 +229,54 @@ class ModelSchema(SQLAlchemyAutoSchema):
         assert len(pk) == len(pk_vals)
         return {col.key: val for col, val in zip(pk, pk_vals)}
 
-    @post_load
-    def make_instance(self, data, **kwargs):
-        # Find instance in cache
+    def _get_cached_instance(self, data):
+        """Get an instance cached within this load transaction"""
         cache_key = None
         try:
             cache_key = hash(frozenset(data.items()))
             match_ = self.__instance_cache.get(cache_key, None)
             if match_ is not None:
-                log.debug(
-                    f"Found {match_} in session cache for {data} (key: {cache_key})"
-                )
-                return match_
+                log.debug(f"Found {match_} in session cache for {data} (key: {cache_key})")
+                return match_, cache_key
         except TypeError:
             pass
+        return None, cache_key
 
-        instance = self._get_instance(data)
+    @post_load
+    def make_instance(self, data, **kwargs):
+        # We start off with no instance loaded
+        instance = None
+        # FIRST, try to load from cached values created during this import
+        #
+        # This cache exists primarily to cover cases where we import models that need to be
+        # linked in multiple places (e.g. units, parameters, and datum_types). We could potentially
+        # expand it to cover cases where we want to create several models up front and then reference
+        # them from other places in the import model hierarchy.
+        #
+        # Datum (and some other analytical models) can easily be pulled in without a specific provided
+        # identity (they get their uniqueness in part from their link to analysis). Given this,
+        # it is possible for us to "steal" them from other analyses imported
+        # at the same time. It's likely this could happen with analysis and other models as well.
+        #
+        # See https://github.com/EarthCubeGeochron/Sparrow/issues/80
+        #
+        # We solve this by exempting these models from caching. However, there are
+        # likely more issues that will arise along these lines in the near future.
+        cache_key = None
+        # We should figure out a better way to do this than a blacklist...or at
+        # least pull the blacklist into config code somewhere.
+        _cache_blacklist = ["datum", "analysis", "session", "sample"]
+        if self.opts.model.__name__ not in _cache_blacklist:
+            instance, cache_key = self._get_cached_instance(data)
+
+        # THEN, try to load from existing instances
+        if instance is None:
+            instance = self._get_instance(data)
+
+        # FINALLY, make a new instance if one can't be found
         if instance is None:
             instance = self.opts.model(**data)
+            log.debug(f"Adding new {instance} to session")
             self.session.add(instance)
         if cache_key is not None:
             self.__instance_cache[cache_key] = instance
@@ -207,14 +291,17 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def to_json_schema(self, model):
         return json_schema.dump(model)
 
-    def _available_nests(self):
+    def _nest_relationships(self):
         model = self.opts.model
         nests = []
         for prop in model.__mapper__.iterate_properties:
             if not isinstance(prop, RelationshipProperty):
                 continue
             if allow_nest(model.__table__.name, prop.target.name):
-                nests.append(prop.target.name)
+                nests.append(prop)
         return nests
+
+    def _available_nests(self):
+        return [rel.target.name for rel in self._nest_relationships()]
 
     from .display import pretty_print

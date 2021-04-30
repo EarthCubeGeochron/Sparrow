@@ -18,7 +18,7 @@ const h = hyper.styled(styles);
  *
  *
  */
-const SampleListCard = function(props) {
+const SampleListCard = function (props) {
   const { material, id, name, location } = props;
 
   const to = useModelURL(`/sample/${id}`);
@@ -38,7 +38,7 @@ const SampleListCard = function(props) {
 };
 
 //Catalog Page
-const SampleList = function() {
+const SampleList = function () {
   const route = "/sample";
   const filterFields = {
     name: "Sample name",
@@ -69,7 +69,7 @@ interface SampleProps {
   id?: number;
   sendQuery?: () => {};
 }
-const SampleComponent = function(props: SampleProps) {
+const SampleComponent = function (props: SampleProps) {
   const { id, Edit } = props;
 
   const url = `/models/sample/${id}`;

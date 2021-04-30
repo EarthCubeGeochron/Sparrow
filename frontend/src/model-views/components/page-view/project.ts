@@ -23,7 +23,7 @@ export const ProjectAdd = (props) => {
   ]);
 };
 
-const ProjectLink = function({ d }) {
+const ProjectLink = ({ d }) => {
   const project = d.project.map((obj) => {
     if (obj) {
       const { name: project_name, id: project_id } = obj;

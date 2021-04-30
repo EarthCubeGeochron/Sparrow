@@ -16,7 +16,6 @@ export const MapNav = () => {
     { name: "Sample", link: "/catalog/sample", icon: "circle" },
     { name: "Project", link: "/catalog/project", icon: "clipboard" },
     { name: "Session", link: "/catalog/session", icon: "heatmap" },
-    { name: "Data Sheet", link: "/data-sheet", icon: "grid-view" },
   ];
   const dropMenu = (
     <Menu>

@@ -1,10 +1,10 @@
-import * as React from "react";
 import { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
 import { Spinner } from "@blueprintjs/core";
-import { Expired, NoSearchResults } from "./utils";
+import { NoSearchResults } from "./utils";
+import { ErrorCallout } from "~/util";
 import styles from "./main.styl";
 
 const h = hyperStyled(styles);
@@ -40,8 +40,11 @@ function InfiniteAPIView({
   componentProps = {},
   context,
   filterParams,
+  errorHandler = ErrorCallout,
 }) {
   const [data, setData] = useState([]);
+  const [error, setError] = useState(null);
+  const [noResults, setNoResults] = useState(false);
   const [nextPage, setNextPage] = useState("");
   const { get } = useAPIActions(context);
 
@@ -54,7 +57,11 @@ function InfiniteAPIView({
       const data = await get(url, newParams, {});
       return data;
     } catch (error) {
-      console.log(error);
+      let msg;
+      if (error != null) {
+        msg = error.message;
+        setError(msg);
+      }
     }
   }
 
@@ -63,8 +70,12 @@ function InfiniteAPIView({
   }, []);
 
   const dataFetch = (data, next = "") => {
+    setNoResults(false);
     const initData = getNextPageAPI(next, url, params);
     initData.then((res) => {
+      if (res.data.length == 0) {
+        setNoResults(true);
+      }
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
       const next_page = res.next_page;
@@ -83,7 +94,9 @@ function InfiniteAPIView({
     dataFetch(data, nextPage);
   };
 
-  const child = h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
+  if (error) {
+    return h(errorHandler, { error, title: "An API error has occured" });
+  }
 
   return data.length > 0
     ? h(ForeverScroll, {
@@ -92,7 +105,9 @@ function InfiniteAPIView({
         component,
         componentProps,
       })
-    : h(Expired, { child, delay: 3000 });
+    : noResults
+    ? h(NoSearchResults)
+    : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 }
 
 export { InfiniteAPIView };

@@ -4,11 +4,8 @@ import useSuperCluster from "use-supercluster";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 import "../cluster.css";
-import {
-  Popover,
-  Card,
-} from "@blueprintjs/core";
-import { Marker, FlyToInterpolator } from "react-map-gl";
+import { Popover, Card } from "@blueprintjs/core";
+import { Marker } from "react-map-gl";
 import styles from "./components.module.css";
 
 // This component controls the State and the UI for the markers and the markercluster
@@ -18,21 +15,21 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
   useEffect(() => {
     // Set the data back to the initial data
     if (data == null) return;
-    const markers = data.map((markers) => ({
+    const markers = data.data.map(markers => ({
       type: "Feature",
       properties: {
         cluster: false,
         id: markers.id,
         Sample_name: markers.name,
-        material: markers.material,
+        material: markers.material
       },
       geometry: {
         type: "Point",
         coordinates: [
           markers.location.coordinates[0],
-          markers.location.coordinates[1],
-        ],
-      },
+          markers.location.coordinates[1]
+        ]
+      }
     }));
 
     setMarkers(markers);
@@ -42,20 +39,20 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
     points: markers,
     zoom: viewport.zoom,
     bounds,
-    options: { radius: 75, maxZoom: 5 },
+    options: { radius: 75, maxZoom: 5 }
   });
 
-  const markerClicked = (e) => {
+  const markerClicked = e => {
     return console.log(e);
   };
 
   return (
     <div>
-      {clusters.map((cluster) => {
+      {clusters.map(cluster => {
         const [longitude, latitude] = cluster.geometry.coordinates;
         const {
           cluster: isCluster,
-          point_count: pointCount,
+          point_count: pointCount
         } = cluster.properties;
 
         const clusterSize = Math.sqrt(5 * pointCount);
@@ -64,7 +61,7 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
           "cluster-marker": pointCount < 50,
           "cluster-markerGreen": pointCount >= 50 && pointCount < 100,
           "cluster-markerYellow": pointCount >= 100 && pointCount < 200,
-          "cluster-markerRed": pointCount >= 200,
+          "cluster-markerRed": pointCount >= 200
         });
         if (isCluster) {
           return (
@@ -81,9 +78,9 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
                   width: clusterSize,
                   height: clusterSize,
                   marginTop: -clusterSize / 2,
-                  marginRight: -clusterSize / 2,
+                  marginRight: -clusterSize / 2
                 }}
-                onDoubleClick={(e) => {
+                onDoubleClick={e => {
                   e.stopPropagation();
                   const expansionZoom = Math.min(
                     supercluster.getClusterExpansionZoom(cluster.id),
