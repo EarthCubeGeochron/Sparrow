@@ -21,7 +21,7 @@ Flask-RESTful==0.3.7
 # Core application
 migra==3.0.1616366383
 sqlakeyset==1.0.1616300210
-Pygments==2.5.2
+Pygments==2.7.4
 SQLAlchemy==1.4.7
 sqlalchemy-utils==0.37.0
 sqlparse==0.3.0
