@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { join } from "path";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import loadable from "@loadable/component";
-import { MapToaster } from "./map/map-area";
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
@@ -84,12 +83,7 @@ function App() {
   // Nest application in React context providers
   const baseURL = "/";
   const apiBaseURL = join(process.env.BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
-  useEffect(() => {
-    const onMap = window.location.pathname == "/map";
-    if (!onMap) {
-      MapToaster.clear();
-    }
-  }, [window.location.pathname]);
+
   return h(
     compose(
       C(FrameProvider, { overrides: siteContent }),
