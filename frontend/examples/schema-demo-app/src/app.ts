@@ -15,7 +15,7 @@ function TermList(props) {
 }
 
 export default function () {
-  return h(LinksDemo);
+  //return h(LinksDemo, { width: 800, height: 400 });
   return h("div.schema-linker-ui", [
     h(TermList, { data: d1 }),
     h(TermList, { data: d2 }),

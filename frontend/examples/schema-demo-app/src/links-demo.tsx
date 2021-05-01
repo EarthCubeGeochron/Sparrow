@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { Group } from "@visx/group";
 import { hierarchy, Tree } from "@visx/hierarchy";
 import { LinearGradient } from "@visx/gradient";
-import { LinkHorizontalLine } from "@visx/shape";
+import { LinkHorizontalCurve, LinkHorizontal } from "@visx/shape";
 import { pointRadial } from "d3-shape";
-import LinkControls from "./LinkControls";
 
 function useForceUpdate() {
   const [, setValue] = useState<number>(0);
@@ -102,7 +101,7 @@ export default function Example({
     }
   }
 
-  const LinkComponent = LinkHorizontalLine; //getLinkComponent({ layout, linkType, orientation });
+  const LinkComponent = LinkHorizontal; //getLinkComponent({ layout, linkType, orientation });
 
   return totalWidth < 10 ? null : (
     <div>
