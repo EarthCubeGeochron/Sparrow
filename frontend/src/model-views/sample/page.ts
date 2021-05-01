@@ -26,6 +26,7 @@ import {
   EditStatusButtons,
   DataSheetButton,
   NewSamplePageButton,
+  TagContainer,
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
@@ -305,6 +306,21 @@ const SampleLocationEleDepthEditor = () => {
   );
 };
 
+function SampleTagContainer() {
+  const { model, actions, isEditing } = useModelEditor();
+
+  const onAdd = (item) => {
+    const currentTags = [...model.tags_tag];
+    currentTags.push(item);
+    console.log(currentTags);
+    actions.updateState({
+      model: { tags_tag: { $set: currentTags } },
+    });
+  };
+
+  return h(TagContainer, { isEditing, tags: model.tags_tag, onChange: onAdd });
+}
+
 function SamplePage(props) {
   const { data: sample, Edit } = props;
 
@@ -342,6 +358,7 @@ function SamplePage(props) {
           field: "name",
           multiline: true,
         }),
+        h.if(Edit)(SampleTagContainer),
         h("div.flex-row", [
           h("div.info-block", [
             Edit ? h(DataSheetButton) : null,

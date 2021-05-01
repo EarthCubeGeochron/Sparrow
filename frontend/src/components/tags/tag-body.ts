@@ -14,14 +14,14 @@ const h = hyperStyled(styles);
  * @returns
  */
 function TagBody(props: tagBody) {
-  const { name, description, color, id = 10000 } = props;
+  const { name, description, color, id = 10000, disabled = false } = props;
 
   const showName = name.length > 0 ? name : "Tag Preview";
   const darkTag = isTooDark(color);
 
   const textColor = darkTag ? "white" : "black";
 
-  return h(Tooltip, { content: description }, [
+  return h(Tooltip, { content: description, disabled }, [
     h(
       "div.tag-body",
       { key: id, style: { backgroundColor: color, color: textColor } },

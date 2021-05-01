@@ -3,6 +3,7 @@ interface tagBody {
   description: string;
   color: string;
   id?: number;
+  disabled?: boolean;
 }
 
 enum tag_reducer {
