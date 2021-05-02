@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Group } from "@visx/group";
 import { hierarchy, Tree } from "@visx/hierarchy";
 import { LinearGradient } from "@visx/gradient";
-import { LinkHorizontalCurve, LinkHorizontal } from "@visx/shape";
+import { LinkHorizontal } from "@visx/shape";
 import { pointRadial } from "d3-shape";
+import useDimensions from "react-use-dimensions";
 
 function useForceUpdate() {
   const [, setValue] = useState<number>(0);
@@ -65,46 +66,22 @@ export type LinkTypesProps = {
   margin?: { top: number; right: number; bottom: number; left: number };
 };
 
-export default function Example({
-  width: totalWidth,
-  height: totalHeight,
-  margin = defaultMargin,
-}: LinkTypesProps) {
+export default function Example({ margin = defaultMargin }: LinkTypesProps) {
   const [layout, setLayout] = useState<string>("cartesian");
   const [orientation, setOrientation] = useState<string>("horizontal");
   const [linkType, setLinkType] = useState<string>("diagonal");
   const [stepPercent, setStepPercent] = useState<number>(0.5);
+  const [ref, { width: totalWidth, height: totalHeight }] = useDimensions();
   const forceUpdate = useForceUpdate();
 
   const innerWidth = totalWidth - margin.left - margin.right;
   const innerHeight = totalHeight - margin.top - margin.bottom;
-
-  let origin: { x: number; y: number };
-  let sizeWidth: number;
-  let sizeHeight: number;
-
-  if (layout === "polar") {
-    origin = {
-      x: innerWidth / 2,
-      y: innerHeight / 2,
-    };
-    sizeWidth = 2 * Math.PI;
-    sizeHeight = Math.min(innerWidth, innerHeight) / 2;
-  } else {
-    origin = { x: 0, y: 0 };
-    if (orientation === "vertical") {
-      sizeWidth = innerWidth;
-      sizeHeight = innerHeight;
-    } else {
-      sizeWidth = innerHeight;
-      sizeHeight = innerWidth;
-    }
-  }
-
-  const LinkComponent = LinkHorizontal; //getLinkComponent({ layout, linkType, orientation });
+  const origin = { x: 0, y: 0 };
+  const sizeWidth = innerHeight;
+  const sizeHeight = innerWidth;
 
   return totalWidth < 10 ? null : (
-    <div>
+    <div className="linker-ui-demo" ref={ref}>
       <svg width={totalWidth} height={totalHeight}>
         <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
         <rect width={totalWidth} height={totalHeight} rx={14} fill="#272b4d" />
@@ -117,7 +94,7 @@ export default function Example({
             {(tree) => (
               <Group top={origin.y} left={origin.x}>
                 {tree.links().map((link, i) => (
-                  <LinkComponent
+                  <LinkHorizontal
                     key={i}
                     data={link}
                     percent={stepPercent}
