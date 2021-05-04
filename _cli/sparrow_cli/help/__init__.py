@@ -108,7 +108,8 @@ class SparrowHelpFormatter(HelpFormatter):
         d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
         self.write_line(f"Lab: {d1}")
 
-        if ver := ctx.version_info:
+        ver = ctx.version_info
+        if ver:
             msg2 = " "
             msg2 += "matches" if ver.is_match else "does not match"
             msg2 += " target "
@@ -129,12 +130,8 @@ class SparrowHelpFormatter(HelpFormatter):
         commands = get_backend_command_help()
         if commands is None:
             return
-        core_commands = {
-            k: format_help(v) for k, v in commands.items() if not is_plugin_command(v)
-        }
-        plugin_commands = {
-            k: format_help(v) for k, v in commands.items() if is_plugin_command(v)
-        }
+        core_commands = {k: format_help(v) for k, v in commands.items() if not is_plugin_command(v)}
+        plugin_commands = {k: format_help(v) for k, v in commands.items() if is_plugin_command(v)}
         self.write_section(
             "Core commands",
             core_commands,
