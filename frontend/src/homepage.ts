@@ -8,7 +8,7 @@ import loadable from "@loadable/component";
 //import { SampleMap } from "../plugins/globe";
 //import { useContext } from "react";
 
-const MapHome = loadable(async function() {
+const MapHome = loadable(async function () {
   const module = await import("./map");
   return module.MapHome;
 });

@@ -1,5 +1,6 @@
 from .helpers import json_fixture
 from sparrow.api.endpoints.utils import create_location_from_coordinates
+from sparrow.api.utils import nested_collection_joins, nested_collection_path
 from sparrow.database.util import get_db_model
 from pytest import mark
 import datetime
@@ -7,6 +8,27 @@ import json
 
 
 class TestAPIV2_filters:
+    def test_join_functions(self, client, db):
+        '''some sanity checks'''
+        start = "sample"
+        end = "datum"
+
+        Sample = db.model.sample
+
+        path = nested_collection_path(start, end)
+
+        assert path == ['sample', 'session', 'analysis', 'datum']
+
+        query = db.session.query(Sample)
+
+        _query = nested_collection_joins(path, query, db, Sample)
+
+        sql_string = str(_query)
+
+        assert "JOIN" in sql_string
+        for model in path:
+            assert model in sql_string
+
     @mark.skip(reason="For some reason, this breaks project_import tests later in the sequence")
     def test_load_data(self, client, db):
         Material = get_db_model(db, "vocabulary_material")

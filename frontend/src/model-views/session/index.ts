@@ -6,7 +6,7 @@ import { EditableSessionDetails } from "./editor";
 import { SessionDetailPanel } from "./detail-panel";
 import { APIResultView } from "@macrostrat/ui-components";
 import { useRouteMatch } from "react-router-dom";
-import {Tab, Tabs} from "@blueprintjs/core"
+import { Tab, Tabs } from "@blueprintjs/core";
 
 /**
  *
@@ -29,24 +29,34 @@ export function DownloadButton(props) {
 }
 
 interface TabDef {
-  id: string,
-  title: string,
-  component: React.ComponentType<any>
+  id: string;
+  title: string;
+  component: React.ComponentType<any>;
 }
 
 function SessionPageTabs(props) {
-  const coreComponent = h(SessionDetailPanel, { showTitle: true, ...props })
-  const extraTabs: TabDef[] = useFrameOverride("sessionDetailTabs")
+  const coreComponent = h(SessionDetailPanel, { showTitle: true, ...props });
+  const extraTabs: TabDef[] = useFrameOverride("sessionDetailTabs");
   if (extraTabs == null) {
-    return coreComponent
+    return coreComponent;
   }
 
-  return h(Tabs, {
-      id: 'sessionDetailTabs'
-  }, [
-    extraTabs.map(({ title, component, id }) => h(Tab, {id, panel: h(component, props)}, title)),
-    h(Tab, {id: 'analysisDetails', panel: coreComponent}, "Analysis details")
-  ])
+  return h(
+    Tabs,
+    {
+      id: "sessionDetailTabs",
+    },
+    [
+      extraTabs.map(({ title, component, id }) =>
+        h(Tab, { id, panel: h(component, props) }, title)
+      ),
+      h(
+        Tab,
+        { id: "analysisDetails", panel: coreComponent },
+        "Analysis details"
+      ),
+    ]
+  );
 }
 
 function SessionComponent(props) {
@@ -74,11 +84,15 @@ function SessionComponent(props) {
             // h(Frame, { id: "dataFileDownloadButton", ...rest }, (props) => {
             //   return h(DownloadButton, props);
             // }),
-            
           ]),
-          h(Frame, {
-            id: "sessionDetail", session_id: id
-          }, SessionPageTabs)
+          h(
+            Frame,
+            {
+              id: "sessionDetail",
+              session_id: id,
+            },
+            SessionPageTabs
+          ),
         ]);
       }
     ),

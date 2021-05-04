@@ -71,7 +71,7 @@ export const SessionCardInfo = (props) => {
   );
 };
 
-export const SessionLinkCard = function(props) {
+export const SessionLinkCard = function (props) {
   const { session_id } = props;
 
   const to = useModelURL(`/session/${session_id}`);
@@ -156,7 +156,7 @@ const ProjectLinks = (props) => {
 
 export function DataFilePage(props) {
   const { file_hash } = props;
-  if (file_hash == null) return null
+  if (file_hash == null) return null;
 
   const dataFileURL = `/models/data_file/${file_hash}`;
 
@@ -164,8 +164,7 @@ export function DataFilePage(props) {
     nest: "data_file_link,session,sample",
   });
 
-  const data = res?.data
-
+  const data = res?.data;
 
   if (data == null) return h(Spinner);
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Frame } from "~/frame";
-import {hyperStyled} from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import { Link } from "react-router-dom";
 import { pluralize } from "../new-model";
 import { format } from "date-fns";
