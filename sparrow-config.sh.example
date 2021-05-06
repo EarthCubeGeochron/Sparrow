@@ -26,3 +26,6 @@ export LASERCHRON_DATA_DIR="$laserchron/test-data"
 # and contact email
 export SPARROW_DOMAIN="sparrow.test-lab.org"
 export CERTBOT_EMAIL="test@test-lab.org"
+
+# Needed for enabling Mapbox maps publically
+# export export MAPBOX_API_TOKEN="valid mapbox token"
