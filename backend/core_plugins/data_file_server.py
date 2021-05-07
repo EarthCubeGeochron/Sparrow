@@ -47,9 +47,23 @@ class DataFileAPI(HTTPEndpoint):
             }
         )
 
+    async def post(self, request):
+        pass
+
+
+class DataFileCreateEndpoint(HTTPEndpoint):
+    async def post(self, request):
+        form = await request.form()
+        filename = form["upload_file"].filename
+        contents = await form["upload_file"].read()
+        return JSONResponse({"success": True, "filename": filename})
+
 
 class DataFilePlugin(SparrowCorePlugin):
     name = "data-file"
 
     def on_api_initialized_v2(self, api):
+        api.mount(
+            "/data_file_new", DataFileCreateEndpoint, name="data_file_api_import", help="Import a data file [WIP]"
+        )
         api.mount("/data_file/{uuid}", DataFileAPI, name="data_file_api", help="Download a data file by URL")

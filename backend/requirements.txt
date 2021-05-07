@@ -70,6 +70,9 @@ webargs-starlette==2.0.0
 apispec==3.3.1
 starlette-apispec==1.0.3
 
+# File upload parsing
+python-multipart==0.0.5
+
 # S3/AWS file access
 boto3==1.12.25
 

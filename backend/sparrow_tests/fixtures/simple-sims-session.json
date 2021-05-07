@@ -6,7 +6,7 @@
     {
       "analysis_name": "20140513@171.asc",
       "analysis_type": "d18O10",
-      "datums": [
+      "datum": [
         {
           "value": 251,
           "type": { "parameter": "INDEX", "unit": "INDEXexcel" }
