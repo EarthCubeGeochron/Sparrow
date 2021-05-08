@@ -223,7 +223,11 @@ A physical object to be measured
 CREATE TABLE IF NOT EXISTS sample (
   id serial PRIMARY KEY,
   name text,
+  sample_name text,
+  group_id text,
+  sample_type text,
   igsn text UNIQUE,
+  pub_year numeric,
   material text REFERENCES vocabulary.material(id),
   /* #### Location fields
   These might be best moved to an external model.
