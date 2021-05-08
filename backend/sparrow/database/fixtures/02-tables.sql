@@ -243,6 +243,8 @@ CREATE TABLE IF NOT EXISTS sample (
   lab_standard text,
   -- atmospheric pressure in hPa
   atm_pressure numeric,
+  reference numeric,
+  compilation numeric,
   location geometry,
   /* NOTE: Elevation and depth are not normalized in the current schema!
   Potentially, these columns should be recast as *references* to a specific
