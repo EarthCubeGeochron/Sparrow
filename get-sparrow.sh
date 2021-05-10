@@ -35,9 +35,9 @@ if ! [ -w $dist_dir ]
 then
     echo "To install to path, we need to elevate permissions."
     echo "If you choose to continute you will be prompted for your password"
-    echo "Would you like to continue? (Y/n)"
+    echo "Would you like to continue? (y/N)"
     read answer
-    if [ $answer = "Y" ]
+    if [[ $answer == "y" || $answer == "Y" || $answer == "yes" || $answer == "Yes" ]]
     then
         echo "Please enter your password."
         exec sudo bash "$0" "$@"
