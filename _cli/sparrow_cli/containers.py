@@ -20,6 +20,7 @@ def sparrow_up(container, force_recreate=False):
     validate_environment()
 
     if container is None:
+        sleep(1)
         container = ""
     res = compose(
         "up --build --no-start",
@@ -33,7 +34,7 @@ def sparrow_up(container, force_recreate=False):
     # Make sure popen call gets logged...
     _log_cmd = ["sparrow", "logs", container]
     log.debug(" ".join(_log_cmd))
-    p = Popen(_log_cmd, stderr=PIPE)
+    p = Popen(_log_cmd)
 
     print("[green]Following container logs[/green]")
     compose("start", container)
@@ -47,7 +48,9 @@ def sparrow_up(container, force_recreate=False):
 @click.argument("container", type=str, required=False, default=None)
 def sparrow_logs(container):
     if container is None:
-        compose("logs -f --tail=0")
+        print("[red]Container is None!![/red]")
+        compose("logs --tail=0 --follow")
     else:
         id = container_id(container)
-        cmd("docker logs -f", id)
+        #cmd_docker_logs("docker logs -f", id)
+        compose("logs --tail=0 --follow")

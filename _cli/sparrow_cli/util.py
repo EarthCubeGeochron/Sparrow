@@ -8,6 +8,7 @@ from .exc import SparrowCommandError
 from json.decoder import JSONDecodeError
 from sparrow_utils.logs import get_logger
 from sparrow_utils.shell import cmd as cmd_
+from rich import print
 
 log = get_logger(__name__)
 
@@ -20,9 +21,10 @@ def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
         if fn.is_file():
             return str(fn)
 
-
 def cmd(*v, **kwargs):
     kwargs["logger"] = log
+    val = " ".join(v)
+    print("[green]COMMAND CALLED[/green]", val)
     return cmd_(*v, **kwargs)
 
 
