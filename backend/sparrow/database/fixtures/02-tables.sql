@@ -432,8 +432,7 @@ CREATE TABLE IF NOT EXISTS sample_publication (
   sample_id integer REFERENCES sample(id) ON DELETE CASCADE,
   publication_id integer REFERENCES publication(id) ON DELETE CASCADE,
   PRIMARY KEY (sample_id, publication_id)
-)
-
+);
 
 CREATE TABLE IF NOT EXISTS datum (
   id serial PRIMARY KEY,
