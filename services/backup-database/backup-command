@@ -1,0 +1,46 @@
+#!/bin/sh
+
+## Get rid of pesky stderr message
+mkdir -p /config/rclone
+touch /config/rclone/rclone.conf
+
+remote=remote:$BACKUP_BUCKET
+list=/tmp/bucket-list
+
+now="$(date +%Y-%m-%d:%H:%M:%S)"
+
+backup_name="$now.pg-dump"
+dumpfile=/tmp/$backup_name
+remote_dump=$remote/$backup_name
+dbname=$BACKUP_DBNAME
+
+rclone ls $remote | sed 's/.* //g' > $list
+
+nfiles=$(cat $list | wc -l)
+
+echo "Existing backups:"
+cat $list
+echo ""
+
+oldest_file=$(cat $list | head -n 1)
+latest_file=$(cat $list | tail -n 1)
+
+
+# Dump the database. Files always change, unfortunately.
+echo "Backing up $dbname to $dumpfile"
+pg_dump -h database -p 5432 -Fc -C -UDaven -f $dumpfile $dbname
+ls -sh $dumpfile
+echo ""
+
+echo "Uploading to $remote_dump"
+rclone copy $dumpfile $remote
+
+# Prune oldest backup if there are many
+max_n=20
+if [ $nfiles -gt $max_n ]; then
+  echo "More than $max_n backups available."
+  echo "Pruning the oldest ($oldest_file)."
+  rclone deletefile $remote/$oldest_file
+fi
+
+rm -f $list $dumpfile
