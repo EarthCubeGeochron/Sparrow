@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useAPIResult } from "@macrostrat/ui-components";
+import { useState, useEffect, useRef, useContext, useCallback } from "react";
+import { useAPIResult, APIHelpers } from "@macrostrat/ui-components";
+import { APIV2Context } from "~/api-v2";
 import update from "immutability-helper";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Frame } from "~/frame";
@@ -9,7 +10,7 @@ import {
   Sheet,
   useElementSize,
   apportionWidths,
-  VirtualizedSheet,
+  VirtualizedSheet
 } from "@earthdata/sheet/src/index.ts";
 import { SheetToolbar } from "./toolbar";
 import classNames from "classnames";
@@ -18,6 +19,7 @@ import { combineLikeIds, addNecesaryFields } from "./util";
 import { postData } from "./post";
 import { DoiProjectButton } from "./sheet-enter-components/doi-button";
 import { DataEditor } from "react-datasheet/lib";
+import { join } from "path";
 
 const h = hyperStyled(styles);
 
@@ -30,7 +32,7 @@ const columnSpec: ColumnData[] = [
   { name: "Publication ID", key: "publication_id", editable: false },
   { name: "DOI", key: "doi" },
   { name: "Project ID", key: "project_id", editable: false },
-  { name: "Project", key: "project_name" },
+  { name: "Project", key: "project_name" }
 ];
 
 function unwrapSampleData(sampleData) {
@@ -58,7 +60,7 @@ function unwrapSampleData(sampleData) {
     project_name,
     publication_id,
     doi,
-    ...rest,
+    ...rest
   };
 }
 
@@ -101,10 +103,14 @@ function DataSheet() {
    * And at the end I can grab the whole row and send it to the backend.
    */
 
+  const { buildURL } = APIHelpers(useContext(APIV2Context));
+
+  const url = buildURL("/datasheet/view");
+
   const initialData = useAPIResult(
-    "http://localhost:5002/api/v2/datasheet/view",
+    url,
     {},
-    unwrapResponse
+    { unwrapResponse, context: APIV2Context }
   );
 
   useEffect(() => {
@@ -161,10 +167,10 @@ function DataSheet() {
       // Substitute empty strings for nulls
       const $set = value == "" ? null : value;
       // sets edits to the state index and the column name
-      setEdits((prevEdits) => [{ row, key }, ...prevEdits]);
+      setEdits(prevEdits => [{ row, key }, ...prevEdits]);
       spec[row] = {
         ...(spec[row] || {}),
-        [key]: { $set },
+        [key]: { $set }
       };
     });
     console.log(spec);
@@ -193,7 +199,7 @@ function DataSheet() {
     return {
       value,
       className,
-      readOnly,
+      readOnly
     };
   };
 
@@ -220,19 +226,19 @@ function DataSheet() {
       h(SheetToolbar, {
         onSubmit: handleSubmit,
         onUndo: handleUndo,
-        hasChanges: initialData != data,
+        hasChanges: initialData != data
       }),
       h("div.sheet", { ref }, [
         h(VirtualizedSheet, {
           data: cellData,
-          valueRenderer: (cell) => `${cell.value ?? ""}`,
+          valueRenderer: cell => `${cell.value ?? ""}`,
           sheetRenderer: Sheet,
           rowRenderer: Row,
           onCellsChanged,
           width: size?.width ?? 500,
-          dataEditor: DataEditor,
-        }),
-      ]),
+          dataEditor: DataEditor
+        })
+      ])
     ])
   );
 }
