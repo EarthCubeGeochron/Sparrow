@@ -134,6 +134,25 @@ services:
     command: echo
     depends_on:
       - backend
+  database_backup:
+    # This service backs up the database periodically
+    # to a remote S3 bucket or a local directory on the server
+    restart: unless-stopped
+    environment:
+      - SPARROW_S3_ENDPOINT
+      - SPARROW_S3_BUCKET
+      - SPARROW_S3_KEY
+      - SPARROW_S3_SECRET
+      - SPARROW_BACKUP_BUCKET
+      # If we don't specify all S3 parameters,
+      # we fall back to using the local backup directory
+      - SPARROW_BACKUP_DIR
+    build: services/backup-database
+    tty: true
+    entrypoint: ""
+    command: /conf/backup-service
+    depends_on:
+      - database
 volumes:
   frontend_build:
   # Anonymous volume to preserve `sparrow shell` history

@@ -4,6 +4,22 @@
 mkdir -p /config/rclone
 touch /config/rclone/rclone.conf
 
+# We mount local SPARROW_BACKUP_DIR as 
+if [ -d "${SPARROW_BACKUP_DIR}/sparrow-backup-dir" ]; then
+  # Back up to the local directory
+  # ...
+fi
+
+# Rest of the script is for backing up to a server...
+
+# Set RClone configuration values
+export RCLONE_CONFIG_REMOTE_TYPE=s3
+export RCLONE_CONFIG_REMOTE_ENDPOINT=${SPARROW_S3_ENDPOINT}
+export RCLONE_CONFIG_REMOTE_ACCESS_KEY_ID=${SPARROW_S3_KEY}
+export RCLONE_CONFIG_REMOTE_SECRET_ACCESS_KEY=${SPARROW_S3_SECRET}
+export BACKUP_BUCKET=${SPARROW_BACKUP_BUCKET}
+BACKUP_DBNAME=davenquinn
+
 remote=remote:$BACKUP_BUCKET
 list=/tmp/bucket-list
 
