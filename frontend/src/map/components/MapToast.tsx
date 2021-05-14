@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   Button,
   Card,
@@ -7,44 +7,125 @@ import {
   Divider,
   Dialog,
   NumericInput,
-  InputGroup,
+  FormGroup,
+  InputGroup
 } from "@blueprintjs/core";
-import { useAPIResult } from "@macrostrat/ui-components";
-import { useToggle } from "~/components";
+import { useAPIResult, APIHelpers } from "@macrostrat/ui-components";
+import { useAPIv2Result, APIV2Context } from "~/api-v2";
+import { useToggle, MySuggest } from "~/components";
+import { SampleGeoEntity } from "~/model-views/components";
 import { mapStyle } from "../MapStyle";
-import { MultipleSelectFilter } from "~/components";
+import axios from "axios";
 
-/**
- * Form that pops up from the Toaster component.
- * Has the ability to suggest Geologic Formations from macrostrat
- */
+function GeoEntityTextShort(props) {
+  const { geo_entity_id } = props;
+
+  const unwrapEntity = obj => {
+    console.log(obj);
+    const { data } = obj;
+    const { id, name, type } = data;
+    return { id, name, type };
+  };
+
+  const entity = useAPIv2Result(
+    `/models/geo_entity/${geo_entity_id}`,
+    {},
+    { unwrapResponse: unwrapEntity }
+  );
+  if (!entity) return null;
+  return (
+    <div>
+      <h3>
+        This sample is park of the {entity.name} {entity.type}
+      </h3>
+    </div>
+  );
+}
+
+const unwrapSamples = obj => {
+  const { data } = obj;
+  const names = data.map(sample => {
+    const { name, id, sample_geo_entity } = sample;
+    return { name, id, sample_geo_entity };
+  });
+  return names;
+};
+//needs more complex state management
 function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
   const [state, setState] = useState("");
+  const [sampleState, setSampleState] = useState({
+    name: "",
+    id: null,
+    sample_geo_entity: []
+  });
+  const [geoEntExists, setGeoEntExists] = useState(false);
+  const { buildURL } = APIHelpers(useContext(APIV2Context));
 
+  const samples = useAPIv2Result(
+    "/models/sample",
+    { all: "true", not_has: "location" },
+    { unwrapResponse: unwrapSamples }
+  );
+
+  const onChange = sampleName => {
+    if (samples) {
+      console.log(sampleName);
+      const sample = samples.filter(samp => samp.name == sampleName);
+      console.log(sample);
+      if (sample[0].sample_geo_entity.length > 0) {
+        setGeoEntExists(true);
+      }
+      setSampleState(sample[0]);
+    }
+  };
+
+  const setGeoEntity = en => {
+    setSampleState(prevState => {
+      return {
+        ...prevState,
+        sample_geo_entity: [{ geo_entity: en }]
+      };
+    });
+  };
+
+  const onCloseDialog = () => {
+    setState("");
+    setSampleState({
+      name: "",
+      id: null,
+      sample_geo_entity: []
+    });
+    setGeoEntExists(false);
+    toggleOpen();
+  };
+
+  const onSubmit = async () => {
+    let url = buildURL(`/models/sample/${sampleState.id}`);
+    const updatedSample = { ...sampleState, longitude: lng, latitude: lat };
+    const response = await axios.put(url, sampleState);
+  };
+
+  let sampleNames = [];
+  if (samples) {
+    sampleNames = samples.map(sample => sample.name);
+  }
+  if (!samples) return null;
   return (
     <div style={{ position: "absolute", zIndex: 50 }}>
       <div>
         <Dialog
           isOpen={open}
           title="Add Sample At Location"
-          onClose={toggleOpen}
+          onClose={onCloseDialog}
         >
           <Card>
-            <MultipleSelectFilter
-              text="Connect to Sample without location: "
-              items={[
-                "84C207AB",
-                "90T112B",
-                "SMUB-13",
-                "86C471B",
-                "AT80-36",
-                "CH9-11",
-                "AT11",
-                "GR-11-103",
-                "NI-010813-7",
-              ]}
-              sendQuery={() => null}
-            />
+            <FormGroup label="Connect to Sample without location">
+              <MySuggest
+                items={sampleNames}
+                onChange={onChange}
+                createNew={false}
+              />
+            </FormGroup>
             <br></br>
 
             <p>Longitude: </p>
@@ -54,30 +135,43 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
             <NumericInput defaultValue={Number(lat).toFixed(5)}></NumericInput>
             <br></br>
 
-            <p>Geologic Formation: </p>
-            <InputGroup
-              value={state}
-              onChange={(event) => setState(event.target.value)}
-            />
-            <h5>
-              <i>Nearby units suggested by MacroStrat: </i>
-            </h5>
-            {data !== null ? (
-              data.success.data.map((object) => {
-                return (
-                  <div key={object.name}>
-                    <Button
-                      minimal={true}
-                      onClick={() => setState(object.name)}
-                    >
-                      {object.name}
-                    </Button>
-                  </div>
-                );
-              })
+            {!geoEntExists ? (
+              <div>
+                <SampleGeoEntity
+                  changeGeoEntity={setGeoEntity}
+                  initialQuery={state}
+                />
+                <h5>
+                  <i>Nearby units suggested by MacroStrat: </i>
+                </h5>
+                {data !== null ? (
+                  data.success.data.map(object => {
+                    return (
+                      <div key={object.name}>
+                        <Button
+                          minimal={true}
+                          onClick={() => {
+                            setState(object.name);
+                            setGeoEntity(object.name);
+                          }}
+                        >
+                          {object.name}
+                        </Button>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <Spinner size={50} />
+                )}
+              </div>
             ) : (
-              <Spinner size={50} />
+              sampleState.sample_geo_entity.map(ent => {
+                return <GeoEntityTextShort geo_entity_id={ent.geo_entity_id} />;
+              })
             )}
+            <Button onClick={onSubmit} intent="success">
+              Submit
+            </Button>
           </Card>
         </Dialog>
       </div>
@@ -111,12 +205,12 @@ export function MapToast({ lng, lat, mapstyle }) {
 
   const rockdNearbyData = useAPIResult(RockdURL, {
     lat: lat,
-    lng: lng,
+    lng: lng
   });
 
   const MacostratData = useAPIResult(MacURl, {
     lng: lng,
-    lat: lat,
+    lat: lat
   });
 
   const NearByCity = () => {
@@ -161,7 +255,7 @@ export function MapToast({ lng, lat, mapstyle }) {
               <a href="https://macrostrat.org/">MacroStrat</a>
             </h5>
 
-            {MacostratData.success.data.map((object) => {
+            {MacostratData.success.data.map(object => {
               return (
                 <div>
                   <h4 style={{ color: "black" }}>

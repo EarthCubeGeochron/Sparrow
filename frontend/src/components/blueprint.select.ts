@@ -1,15 +1,29 @@
 import { Suggest, MultiSelect } from "@blueprintjs/select";
 import { MenuItem, Icon } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./select.css";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
 export function MySuggest(props) {
-  const { items, onChange, onFilter = () => {} } = props;
+  const {
+    items,
+    onChange,
+    onFilter = () => {},
+    initialQuery,
+    createNew = true
+  } = props;
   const [selectedItem, setSelectedItem] = useState("");
+  const [query, setQuery] = useState("");
+  console.log(query);
+
+  useEffect(() => {
+    if (initialQuery) {
+      setQuery(initialQuery);
+    }
+  }, [initialQuery]);
 
   const itemz = [...items];
 
@@ -60,13 +74,14 @@ export function MySuggest(props) {
         minimal: true,
         popoverClassName: "my-suggest"
       },
+      query,
       onItemSelect,
       onQueryChange,
       itemRenderer,
       itemPredicate,
       selectedItem,
-      createNewItemRenderer,
-      createNewItemFromQuery
+      createNewItemRenderer: createNew ? createNewItemRenderer : null,
+      createNewItemFromQuery: createNew ? createNewItemFromQuery : null
     })
   ]);
 }

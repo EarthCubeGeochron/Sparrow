@@ -24,9 +24,17 @@ const unwrapSparrowGeoEntites = obj => {
 };
 
 export const SampleGeoEntity = props => {
-  const { geoEntity, changeGeoEntity } = props;
+  const { geoEntity, changeGeoEntity, initialQuery } = props;
   const [query, setQuery] = useState("");
   const [entities, setEntities] = useState([]);
+
+  console.log(initialQuery);
+  console.log(query);
+  useEffect(() => {
+    if (initialQuery) {
+      setQuery(initialQuery);
+    }
+  }, [initialQuery]);
 
   const changeQueryOnFilter = query => {
     setQuery(query);
@@ -64,6 +72,7 @@ export const SampleGeoEntity = props => {
     [
       h(MySuggest, {
         items: entities,
+        initialQuery,
         onChange: changeGeoEntity,
         onFilter: changeQueryOnFilter
       })
@@ -145,7 +154,7 @@ export function GeoSpatialRef(props) {
   ]);
 }
 
-function GeoEntityText(props) {
+export function GeoEntityText(props) {
   const {
     sample_geo_entity,
     isEditing = true,
