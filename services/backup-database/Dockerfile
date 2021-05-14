@@ -4,4 +4,4 @@ RUN apk --update add --no-cache postgresql-client
 
 COPY ./ /conf/
 
-ENTRYPOINT ""
+ENTRYPOINT /conf/backup-command

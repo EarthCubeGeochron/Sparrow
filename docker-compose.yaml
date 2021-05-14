@@ -160,7 +160,7 @@ services:
     entrypoint: ""
     command: /conf/backup-service
     depends_on:
-      - database
+      - db
     volumes:
       - ${SPARROW_BACKUP_DIR:-placeholder}:/local-backups
 volumes:
