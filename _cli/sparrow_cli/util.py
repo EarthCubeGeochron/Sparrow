@@ -27,20 +27,13 @@ def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
 def cmd(*v, **kwargs):
     kwargs["logger"] = log
     # val = " ".join(v)
-    # We shouldn't print unless we specify a debug/verbose flag...
+    # TODO: We shouldn't print unless we specify a debug/verbose flag...
     # print("[green]COMMAND CALLED[/green]", val)
     return cmd_(*v, **kwargs)
 
 
 def compose(*args, **kwargs):
-    saved_argv = sys.argv
-    try:
-        all_args = " ".join(args)
-        log.debug(f"COMPOSE COMMAND: {all_args}")
-        sys.argv = [sys.argv[0], *split(all_args)]
-        main()
-    finally:
-        sys.argv = saved_argv
+    return cmd("docker-compose", *args, **kwargs)
 
 
 def container_id(container):

@@ -22,7 +22,8 @@ def sparrow_up(container, force_recreate=False):
     if container is None:
         sleep(1)
         container = ""
-    res = compose(
+    res = cmd(
+        "sparrow compose",
         "up --build --no-start",
         "--force-recreate" if force_recreate else "",
         container,
@@ -52,5 +53,5 @@ def sparrow_logs(container):
         compose("logs --tail=0 --follow")
     else:
         id = container_id(container)
-        #cmd_docker_logs("docker logs -f", id)
+        # cmd_docker_logs("docker logs -f", id)
         compose("logs --tail=0 --follow")
