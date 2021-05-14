@@ -71,24 +71,37 @@ export const SampleGeoEntity = props => {
   );
 };
 
+const unwrapEntityTypes = obj => {
+  const { data } = obj;
+  const types = data.map(entity => entity.id);
+  return types;
+};
+
 export function EntityType(props) {
   const { onEntityTypeChange } = props;
+
+  const entity_names = useAPIv2Result(
+    "/vocabulary/entity_type",
+    {
+      all: "true"
+    },
+    { unwrapResponse: unwrapEntityTypes }
+  );
+
+  console.log(entity_names);
   const onChange = entity => {
     console.log(entity);
     onEntityTypeChange(entity);
   };
+  let names = [];
+
+  if (entity_names) {
+    names = [...entity_names];
+  }
 
   return h(FormGroup, { label: "Entity Type" }, [
     h(MySuggest, {
-      items: [
-        "Formation",
-        "Memeber",
-        "Unit",
-        "Lake",
-        "Glacier",
-        "Volcano",
-        "Ashbed"
-      ],
+      items: names,
       onChange
     })
   ]);
@@ -109,9 +122,20 @@ export function GeoSpatialRef(props) {
     changeDatum(ref);
     changeUnit("meters");
   };
+
+  const refs = useAPIv2Result(
+    "/vocabulary/entity_reference",
+    { all: "true" },
+    { unwrapResponse: unwrapEntityTypes }
+  );
+
+  let references = [];
+  if (refs) {
+    references = [...refs];
+  }
   return h("div", [
     h(FormGroup, { label: "Spatial Reference" }, [
-      h(MySuggest, { items: ["top", "bottom"], onChange })
+      h(MySuggest, { items: references, onChange })
     ]),
     h(MyNumericInput, {
       label: "Distance from reference (m)",
