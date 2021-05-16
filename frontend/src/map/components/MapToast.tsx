@@ -83,7 +83,9 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
     setSampleState(prevState => {
       return {
         ...prevState,
-        sample_geo_entity: [{ geo_entity: en }]
+        sample_geo_entity: [
+          { geo_entity: { name: en }, sample_id: sampleState.id }
+        ]
       };
     });
   };
@@ -101,8 +103,16 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
 
   const onSubmit = async () => {
     let url = buildURL(`/models/sample/${sampleState.id}`);
-    const updatedSample = { ...sampleState, longitude: lng, latitude: lat };
-    const response = await axios.put(url, sampleState);
+    console.log(url);
+    const updatedSample = {
+      ...sampleState,
+      location: {
+        type: "Point",
+        coordinates: [Number(lng).toFixed(3), Number(lat).toFixed(3)]
+      }
+    };
+    console.log(updatedSample);
+    const response = await axios.put(url, updatedSample);
   };
 
   let sampleNames = [];
@@ -135,7 +145,7 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
             <NumericInput defaultValue={Number(lat).toFixed(5)}></NumericInput>
             <br></br>
 
-            {!geoEntExists ? (
+            {/* {!geoEntExists ? (
               <div>
                 <SampleGeoEntity
                   changeGeoEntity={setGeoEntity}
@@ -168,7 +178,7 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
               sampleState.sample_geo_entity.map(ent => {
                 return <GeoEntityTextShort geo_entity_id={ent.geo_entity_id} />;
               })
-            )}
+            )} */}
             <Button onClick={onSubmit} intent="success">
               Submit
             </Button>
