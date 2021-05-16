@@ -234,18 +234,20 @@ export function GeoContext(props) {
     isEditing = true,
     sample_geo_entity,
     changeGeoEntity,
-    deleteGeoEntity
+    deleteGeoEntity,
+    initialQuery = null
   }: {
     isEditing: boolean;
     sample_geo_entity: sample_geo_entity[];
     changeGeoEntity: (g) => void;
     deleteGeoEntity: (g) => void;
+    initialQuery: string;
   } = props;
   const defaultState: sample_geo_entity = {
     ref_datum: null,
     ref_distance: null,
     ref_unit: null,
-    geo_entity: { type: null, name: null }
+    geo_entity: { type: null, name: initialQuery }
   };
   const [geoEntity, setGeoEntity] = useState<sample_geo_entity>(defaultState);
   console.log(sample_geo_entity);
@@ -295,6 +297,12 @@ export function GeoContext(props) {
     });
   };
 
+  useEffect(() => {
+    if (initialQuery != "") {
+      changeGeoName(initialQuery);
+    }
+  }, [initialQuery]);
+
   const helpContent = h("div.help-geo-entity", [
     h("div", [
       h("b", "Spatial Reference"),
@@ -331,7 +339,11 @@ export function GeoContext(props) {
   const content = h("div.geo-entity-card", [
     h("div.geo-entity-drop", [
       h("div.entity", [
-        h(SampleGeoEntity, { name, changeGeoEntity: changeGeoName }),
+        h(SampleGeoEntity, {
+          name,
+          changeGeoEntity: changeGeoName,
+          initialQuery
+        }),
         h(EntityType, { type, onEntityTypeChange: changeGeoType })
       ]),
       h(GeoSpatialRef, { geoEntity, changeDistance, changeDatum, changeUnit })

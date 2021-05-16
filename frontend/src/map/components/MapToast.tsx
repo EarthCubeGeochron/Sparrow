@@ -13,34 +13,9 @@ import {
 import { useAPIResult, APIHelpers } from "@macrostrat/ui-components";
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { useToggle, MySuggest } from "~/components";
-import { SampleGeoEntity } from "~/model-views/components";
+import { GeoContext } from "~/model-views/components";
 import { mapStyle } from "../MapStyle";
 import axios from "axios";
-
-function GeoEntityTextShort(props) {
-  const { geo_entity_id } = props;
-
-  const unwrapEntity = obj => {
-    console.log(obj);
-    const { data } = obj;
-    const { id, name, type } = data;
-    return { id, name, type };
-  };
-
-  const entity = useAPIv2Result(
-    `/models/geo_entity/${geo_entity_id}`,
-    {},
-    { unwrapResponse: unwrapEntity }
-  );
-  if (!entity) return null;
-  return (
-    <div>
-      <h3>
-        This sample is park of the {entity.name} {entity.type}
-      </h3>
-    </div>
-  );
-}
 
 const unwrapSamples = obj => {
   const { data } = obj;
@@ -58,7 +33,6 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
     id: null,
     sample_geo_entity: []
   });
-  const [geoEntExists, setGeoEntExists] = useState(false);
   const { buildURL } = APIHelpers(useContext(APIV2Context));
 
   const samples = useAPIv2Result(
@@ -72,20 +46,18 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
       console.log(sampleName);
       const sample = samples.filter(samp => samp.name == sampleName);
       console.log(sample);
-      if (sample[0].sample_geo_entity.length > 0) {
-        setGeoEntExists(true);
-      }
       setSampleState(sample[0]);
     }
   };
 
   const setGeoEntity = en => {
+    // copy this from new-sample
+    console.log(en);
+    let SGE = [...sampleState.sample_geo_entity, ...new Array(en)];
     setSampleState(prevState => {
       return {
         ...prevState,
-        sample_geo_entity: [
-          { geo_entity: { name: en }, sample_id: sampleState.id }
-        ]
+        sample_geo_entity: SGE
       };
     });
   };
@@ -97,7 +69,6 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
       id: null,
       sample_geo_entity: []
     });
-    setGeoEntExists(false);
     toggleOpen();
   };
 
@@ -137,48 +108,40 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
               />
             </FormGroup>
             <br></br>
-
             <p>Longitude: </p>
             <NumericInput defaultValue={Number(lng).toFixed(5)}></NumericInput>
             <br></br>
             <p>Latitude</p>
             <NumericInput defaultValue={Number(lat).toFixed(5)}></NumericInput>
             <br></br>
-
-            {/* {!geoEntExists ? (
-              <div>
-                <SampleGeoEntity
-                  changeGeoEntity={setGeoEntity}
-                  initialQuery={state}
-                />
-                <h5>
-                  <i>Nearby units suggested by MacroStrat: </i>
-                </h5>
-                {data !== null ? (
-                  data.success.data.map(object => {
-                    return (
-                      <div key={object.name}>
-                        <Button
-                          minimal={true}
-                          onClick={() => {
-                            setState(object.name);
-                            setGeoEntity(object.name);
-                          }}
-                        >
-                          {object.name}
-                        </Button>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <Spinner size={50} />
-                )}
-              </div>
-            ) : (
-              sampleState.sample_geo_entity.map(ent => {
-                return <GeoEntityTextShort geo_entity_id={ent.geo_entity_id} />;
-              })
-            )} */}
+            <div>
+              <GeoContext
+                sample_geo_entity={sampleState.sample_geo_entity}
+                changeGeoEntity={setGeoEntity}
+                initialQuery={state}
+              />
+              <h5>
+                <i>Nearby units suggested by MacroStrat: </i>
+              </h5>
+              {data !== null ? (
+                data.success.data.map(object => {
+                  return (
+                    <div key={object.name}>
+                      <Button
+                        minimal={true}
+                        onClick={() => {
+                          setState(object.name);
+                        }}
+                      >
+                        {object.name}
+                      </Button>
+                    </div>
+                  );
+                })
+              ) : (
+                <Spinner size={50} />
+              )}
+            </div>
             <Button onClick={onSubmit} intent="success">
               Submit
             </Button>

@@ -19,13 +19,15 @@ export function MySuggest(props) {
   const [query, setQuery] = useState("");
   console.log(query);
 
+  let itemz = [...items];
+
   useEffect(() => {
-    if (initialQuery) {
+    if (initialQuery && initialQuery != "") {
       setQuery(initialQuery);
+      itemz = [...itemz, initialQuery];
+      setSelectedItem(initialQuery);
     }
   }, [initialQuery]);
-
-  const itemz = [...items];
 
   const itemRenderer = (item, itemProps) => {
     const isSelected = item == selectedItem;
