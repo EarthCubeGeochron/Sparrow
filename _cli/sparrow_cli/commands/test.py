@@ -77,7 +77,7 @@ def compose(*args, **kwargs):
     )
 
     kwargs["env"] = env
-    return cmd("docker-compose", *args, **kwargs)
+    return cmd("sparrow compose", *args, **kwargs)
 
 
 __ctx = dict(ignore_unknown_options=True, help_option_names=[])
@@ -90,10 +90,7 @@ def sparrow_test(ctx):
     PyTest."""
     pth = environ.get("SPARROW_PATH", None)
     if pth is None:
-        print(
-            "SPARROW_PATH not found. For now, tests can only be run when "
-            "a source directory is available."
-        )
+        print("SPARROW_PATH not found. For now, tests can only be run when " "a source directory is available.")
         ctx.exit()
     chdir(pth)
 
@@ -119,9 +116,7 @@ def cli_tests(ctx, pytest_args):
 @sparrow_test.command("app", context_settings=__ctx)
 @click.argument("pytest_args", nargs=-1, type=click.UNPROCESSED)
 @click.option("--help", is_flag=True, default=False, help="Print this page and exit")
-@click.option(
-    "--pytest-help", is_flag=True, default=False, help="Print the PyTest help"
-)
+@click.option("--pytest-help", is_flag=True, default=False, help="Print the PyTest help")
 @click.option(
     "--psql",
     is_flag=True,
@@ -161,10 +156,7 @@ def sparrow_test_main(
 
     pth = environ.get("SPARROW_PATH", None)
     if pth is None:
-        print(
-            "SPARROW_PATH not found. For now, tests can "
-            "only be run when a source directory is available."
-        )
+        print("SPARROW_PATH not found. For now, tests can " "only be run when a source directory is available.")
         return
 
     print("Preparing [cyan]Sparrow[/cyan] application images")

@@ -20,6 +20,7 @@ def create_params(description, example):
 def create_model_name_string(model):
     return f"{model}".split(".")[-1].split("'")[0].lower()
 
+
 class BaseFilter:
     params = None
     help = None
@@ -306,18 +307,16 @@ class GeometryFilter(BaseFilter):
 
         if hasattr(self.model, "sample_collection"):
             return query.join(self.model.sample_collection).filter(
-                func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(sample.location, 4326))
+                func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_SetSRID(sample.location, 4326))
             )
-        
+
         path = nested_collection_path(model_name, "sample")
         if path is not None and len(path) > 1:
             db_query = nested_collection_joins(path, query, db, self.model)
 
-            return db_query.filter(
-                func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(sample.location, 4326))
-            )
+            return db_query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_SetSRID(sample.location, 4326)))
 
-        return query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_Transform(self.model.location, 4326)))
+        return query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_SetSRID(self.model.location, 4326)))
 
 
 class AgeRangeFilter(BaseFilter):
@@ -334,7 +333,11 @@ class AgeRangeFilter(BaseFilter):
 
     def should_apply(self):
         model_name = create_model_name_string(self.model)
-        return model_name == "datum" or hasattr(self.model, "datum_collection") or nested_collection_path(model_name, "datum") is not None
+        return (
+            model_name == "datum"
+            or hasattr(self.model, "datum_collection")
+            or nested_collection_path(model_name, "datum") is not None
+        )
 
     def apply(self, args, query):
         if self.key not in args:
