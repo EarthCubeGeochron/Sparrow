@@ -86,7 +86,10 @@ function OpenSearch() {
         {
           key: model,
           minimal: true,
-          onClick: () => setModel(model),
+          onClick: () => {
+            setScrollData([]);
+            setModel(model);
+          },
         },
         [model]
       );
