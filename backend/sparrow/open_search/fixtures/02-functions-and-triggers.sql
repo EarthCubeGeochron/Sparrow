@@ -29,7 +29,7 @@ language plpgsql;
 
 DROP TRIGGER IF EXISTS project_doc ON project;
 CREATE TRIGGER project_doc
-	AFTER INSERT ON project
+	AFTER INSERT OR UPDATE ON project
 	FOR EACH ROW
 	EXECUTE PROCEDURE project_doc_update();
 
@@ -57,7 +57,7 @@ language plpgsql;
 
 DROP TRIGGER IF EXISTS sample_doc ON sample;
 CREATE TRIGGER sample_doc
-	AFTER INSERT ON sample
+	AFTER INSERT OR UPDATE ON sample
 	FOR EACH ROW
 	EXECUTE PROCEDURE sample_doc_update();
 
@@ -83,7 +83,7 @@ language plpgsql;
 
 DROP TRIGGER IF EXISTS session_doc ON session;
 CREATE TRIGGER session_doc
-	AFTER INSERT ON session
+	AFTER INSERT OR UPDATE ON session
 	FOR EACH ROW
 	EXECUTE PROCEDURE session_doc_update();
 

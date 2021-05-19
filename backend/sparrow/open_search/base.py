@@ -46,4 +46,4 @@ class OpenSearchEndpoint(HTTPEndpoint):
         return APIResponse(json_res, total_count=len(json_res))
 
 
-Open_Search_API = Router([Route("/search", endpoint=OpenSearchEndpoint, methods=["GET"])])
+Open_Search_API = Router([Route("/query", endpoint=OpenSearchEndpoint, methods=["GET"])])
