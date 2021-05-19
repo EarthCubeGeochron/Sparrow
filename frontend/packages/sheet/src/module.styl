@@ -1,0 +1,41 @@
+.header-cell
+  position relative
+  overflow visible !important
+  border-right: 1px solid #888
+  .cell-content
+    width 100%
+
+thead
+  position relative
+  .cell-drag-handle
+    display: none
+  &:hover
+    .cell-drag-handle
+      display: block
+
+.cell-drag-handle
+  top 0
+  left -2px
+  bottom 0
+  width 4px
+  display: block
+  position absolute
+  background: var(--border-color)
+  cursor: ew-resize
+  z-index: 50
+
+.virtualized-sheet
+  position: absolute;
+  top: 0px
+  bottom: 0px
+  left 0em
+  right 0em
+  overflow-y scroll
+  overflow-x: hidden
+
+  .ui
+    position: sticky
+    top: 0px
+    bottom: 0px
+    left 0px
+    right 0px

@@ -51,11 +51,7 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
 
   const bounds = mapRef.current
     ? //@ts-ignore
-      mapRef.current
-        .getMap()
-        .getBounds()
-        .toArray()
-        .flat()
+      mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
   const ModeHandler = state.selectedFeature

@@ -5,7 +5,7 @@ import styles from "~/admin/module.styl";
 
 const h = hyperStyled(styles);
 
-const ProjectPage = function(props) {
+const ProjectPage = function (props) {
   const { project, Edit } = props;
 
   return h("div.project-page", [

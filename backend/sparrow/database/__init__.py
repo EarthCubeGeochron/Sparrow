@@ -5,7 +5,6 @@ from click import secho
 
 from sqlalchemy import create_engine, inspect, MetaData, text
 from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
@@ -21,6 +20,7 @@ from ..interface import ModelSchema, model_interface
 from ..exceptions import DatabaseMappingError
 from .postgresql import on_conflict
 from .migration import SparrowDatabaseMigrator
+from ..settings import ECHO_SQL
 
 metadata = MetaData()
 
@@ -30,6 +30,7 @@ log = get_logger(__name__)
 class Database:
     mapper: Optional[SparrowDatabaseMapper] = None
     __inspector__ = None
+
     def __init__(self, db_conn, app=None):
         """
         We can pass a connection string, a **Flask** application object
@@ -38,7 +39,7 @@ class Database:
         the SPARROW_BACKEND_CONFIG file, if available.
         """
         log.info(f"Setting up database connection '{db_conn}'")
-        self.engine = create_engine(db_conn, executemany_mode="batch")
+        self.engine = create_engine(db_conn, executemany_mode="batch", echo=ECHO_SQL)
         metadata.create_all(bind=self.engine)
         self.meta = metadata
         self.app = app
@@ -50,7 +51,6 @@ class Database:
         self.session = scoped_session(self._session_factory)
         # Use the self.session_scope function to more explicitly manage sessions.
 
-
     def automap(self):
         log.info("Automapping the database")
         self.mapper = SparrowDatabaseMapper(self)
@@ -61,6 +61,7 @@ class Database:
         # TODO: there is probably a way to do this without having to
         # manually register the models
         self.mapper.register_models(User, Project, Session, DatumType)
+        log.info("Registered core model overrides")
 
         # Register a new class
         # Automap the core_view.datum relationship
@@ -73,22 +74,23 @@ class Database:
         )
         self.mapper.register_models(cls)
         self.app.run_hook("database-mapped")
+        log.info("Finished automapping database")
 
     @contextmanager
-    def session_scope(self):
+    def session_scope(self, commit=True):
         """Provide a transactional scope around a series of operations."""
-        self.__old_session = self.session
-        session = self._session_factory()
-        self.session = session
+        # self.__old_session = self.session
+        # session = self._session_factory()
+        session = self.session
         try:
             yield session
-            session.commit()
+            if commit:
+                session.commit()
         except Exception:
             session.rollback()
             raise
         finally:
             session.close()
-            self.session = self.__old_session
 
     def model_schema(self, model_name) -> ModelSchema:
         """
@@ -98,9 +100,7 @@ class Database:
             iface = getattr(self.interface, model_name)
             return iface()
         except AttributeError as err:
-            raise DatabaseMappingError(
-                f"Could not find schema interface for model '{model_name}'"
-            )
+            raise DatabaseMappingError(f"Could not find schema interface for model '{model_name}'")
 
     def _flush_nested_objects(self, session):
         """
@@ -122,9 +122,7 @@ class Database:
         # Do an end-around for lack of creating interfaces on app startup
         model = getattr(self.model, model_name)
         if not hasattr(model, "__mapper__"):
-            raise DatabaseMappingError(
-                f"Model {model} does not have appropriate field mapping"
-            )
+            raise DatabaseMappingError(f"Model {model} does not have appropriate field mapping")
         schema = model_interface(model, session)()
 
         with on_conflict("do-nothing"):

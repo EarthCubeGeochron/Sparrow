@@ -2,6 +2,8 @@ import sys
 from os import environ, path
 from click import secho
 from rich import print
+from sparrow_utils import relative_path
+
 
 def prepare_docker_environment():
     if environ.get("_SPARROW_ENV_PREPARED", "0") == "1":
@@ -25,24 +27,36 @@ def is_defined(envvar):
 
 def prepare_compose_overrides():
     base = environ["SPARROW_PATH"]
-    main = path.join(base, "docker-compose.yaml")
-
+    main = relative_path(base, "docker-compose.yaml")
     compose_files = [main]
 
-    is_production = environ.get("SPARROW_ENV", "development") == "production"
+    def add_override(name):
+        fn = relative_path(base, "compose-overrides", f"docker-compose.{name}.yaml")
+        compose_files.append(fn)
 
-    # Use certbot for SSL  if certain conditions are met
-    use_certbot = (
-        is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
-    )
+    env = environ.get("SPARROW_ENV", "development")
+    is_production = env == "production"
+
+    # Use the docker-compose profile tool to enable some services
+    # NOTE: this is a nicer way to do some things that needed to be handled by
+    # compose-file overrides in the past.
+    if is_production:
+        environ["COMPOSE_PROFILES"] = "production"
+
+    # Use certbot for SSL if certain conditions are met
+    use_certbot = is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
 
     if use_certbot:
-        compose_files.append(path.join(base, "docker-compose.certbot.yaml"))
+        # add_message("attempting to use Certbot for HTTPS")
+        add_override("certbot")
     else:
-        compose_files.append(path.join(base, "docker-compose.base.yaml"))
+        add_override("base")
 
     if is_production:
-        compose_files.append(path.join(base, "docker-compose.production.yaml"))
+        add_override("production")
+
+    if env == "development":
+        add_override("development")
 
     # Overrides should now be formatted as a COMPOSE_FILE colon-separated list
     overrides = environ.get("SPARROW_COMPOSE_OVERRIDES", "")
@@ -64,7 +78,5 @@ def prepare_compose_overrides():
 def validate_environment():
     # Check for failing environment
     if environ.get("SPARROW_SECRET_KEY") is None:
-        print(
-            "[red]You [underline]must[/underline] set [bold]SPARROW_SECRET_KEY[/bold]. Exiting..."
-        )
+        print("[red]You [underline]must[/underline] set [bold]SPARROW_SECRET_KEY[/bold]. Exiting...")
         sys.exit(1)

@@ -6,48 +6,65 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import {
+import React, {
   Component,
   createContext,
   useContext,
   useState,
   Children,
+  ReactNode,
 } from "react";
 import { ErrorBoundary } from "../util";
 import T from "prop-types";
 import h from "@macrostrat/hyper";
 
-export const FrameContext = createContext({});
+interface FrameRegistry {
+  [key: string]: ReactNode;
+}
+interface FrameCtx {
+  //register(key: string, el: ReactNode): void
+  registry: FrameRegistry;
+  getElement(key: string): any;
+}
+
+const defaultCtx = {
+  //register(k, el) { },
+  registry: {},
+  getElement(k) {
+    return null;
+  },
+};
+export const FrameContext = createContext<FrameCtx>(defaultCtx);
 
 // custom hook to retrieve data from FrameContext
-class FrameProvider extends Component {
-  static propTypes = {
-    overrides: T.objectOf(T.node),
-  };
-  static defaultProps = { overrides: {} };
-  constructor(props) {
-    super(props);
-    this.getElement = this.getElement.bind(this);
-    this.state = { registry: {} };
-  }
-  render() {
-    const value = { register: this.register, getElement: this.getElement };
-    return h(FrameContext.Provider, { value }, this.props.children);
-  }
 
-  getElement(id) {
-    const { overrides } = this.props;
-    return overrides[id] || null;
-  }
+function FrameProvider({ overrides = {}, children }) {
+  // could eventually create a registry state and register function
+  return h(
+    FrameContext.Provider,
+    {
+      value: {
+        getElement(id) {
+          return overrides[id] || null;
+        },
+        registry: overrides,
+      },
+    },
+    children
+  );
+}
+
+function useFrameOverride(id) {
+  const { getElement } = useContext(FrameContext);
+  return getElement(id);
 }
 
 const Frame = (props) => {
   /* Main component for overriding parts of the UI with
      lab-specific components. Must be nested below a *FrameProvider*
   */
-  const { getElement } = useContext(FrameContext);
   const { id, iface, children, ...rest } = props;
-  const el = getElement(id);
+  const el = useFrameOverride(id);
 
   // By default we just render the children
   const defaultContent = children;
@@ -72,4 +89,4 @@ Frame.propTypes = {
   rest: T.object,
 };
 
-export { FrameProvider, Frame };
+export { FrameProvider, Frame, useFrameOverride };

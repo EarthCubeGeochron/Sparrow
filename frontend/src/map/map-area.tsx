@@ -28,7 +28,7 @@ function changeStateOnParams(params, setData) {
   useEffect(() => {
     const url = "/models/sample";
     const data = getData(url, params);
-    data.then((res) => {
+    data.then(res => {
       setData(res.data);
     });
   }, [JSON.stringify(params)]);
@@ -36,7 +36,7 @@ function changeStateOnParams(params, setData) {
 
 export const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
-  maxToasts: 1,
+  maxToasts: 1
 });
 
 interface MapProps {
@@ -58,26 +58,26 @@ export function MapPanel({
   latitude = 0,
   longitude = 0,
   zoom = 1,
-  mapstyle,
+  mapstyle
 }: MapProps) {
   const initialState = {
     MapStyle: mapstyle,
     showMarkers: true,
     clickPnt: { lng: 0, lat: 0 },
-    mounted: false,
+    mounted: false
   };
   useEffect(() => {
     setState({ ...state, mounted: true });
   }, []);
 
   const [params, setParams] = useState({ all: "true", has: "location" });
-  const initialData = useAPIv2Result("/core_view/all_samples");
+  const initialData = useAPIv2Result("/models/sample", params);
 
   const [data, setData] = useState(initialData);
 
   //changeStateOnParams(params, setData);
 
-  const changePararms = (newParams) => {
+  const changePararms = newParams => {
     const state = { all: "true", has: "location", ...newParams };
     setParams(state);
   };
@@ -89,7 +89,7 @@ export function MapPanel({
     width,
     height,
     transitionInterpolator: null,
-    transitionDuration: null,
+    transitionDuration: null
   };
 
   const [state, setState] = useState(initialState);
@@ -108,7 +108,7 @@ export function MapPanel({
     if (v.length !== 3) {
       return {};
     }
-    const [zoom, latitude, longitude] = v.map((d) => parseFloat(d));
+    const [zoom, latitude, longitude] = v.map(d => parseFloat(d));
     setViewport({ ...viewport, zoom, latitude, longitude });
   }
 
@@ -138,7 +138,7 @@ export function MapPanel({
     setState({ ...state, showMarkers: !state.showMarkers });
   };
 
-  const chooseMapStyle = (props) => {
+  const chooseMapStyle = props => {
     setState({ ...state, MapStyle: props });
   };
 
@@ -149,16 +149,16 @@ export function MapPanel({
       latitude: latitude,
       zoom: expansionZoom,
       transitionInterpolator: new FlyToInterpolator({
-        speed: 1,
+        speed: 1
       }),
-      transitionDuration: "auto",
+      transitionDuration: "auto"
     });
   };
 
-  const mapClicked = (e) => {
+  const mapClicked = e => {
     setState({
       ...state,
-      clickPnt: { lng: e.lngLat[0], lat: e.lngLat[1] },
+      clickPnt: { lng: e.lngLat[0], lat: e.lngLat[1] }
     });
     if (hide_filter == false) {
       return MapToaster.show({
@@ -169,7 +169,7 @@ export function MapPanel({
             lat={e.lngLat[1]}
           />
         ),
-        timeout: 0,
+        timeout: 0
       });
     }
   };
@@ -205,13 +205,13 @@ export function MapPanel({
       </div>
       <div>
         <MapGl
-          onClick={(e) => {
+          onClick={e => {
             mapClicked(e);
           }}
           mapStyle={state.MapStyle}
           mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
           {...viewport}
-          onViewportChange={(viewport) => {
+          onViewportChange={viewport => {
             if (state.mounted) {
               setViewport(viewport);
             }
@@ -224,7 +224,7 @@ export function MapPanel({
               latitude: state.clickPnt.lat,
               longitude: state.clickPnt.lng,
               offsetLeft: -5,
-              offsetTop: -10,
+              offsetTop: -10
             },
             h(Icon, { icon: "map-marker", color: "black" })
           )}

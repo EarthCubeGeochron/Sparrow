@@ -78,11 +78,7 @@ export function MapSelector({
 
   const bounds = mapRef.current
     ? //@ts-ignore
-      mapRef.current
-        .getMap()
-        .getBounds()
-        .toArray()
-        .flat()
+      mapRef.current.getMap().getBounds().toArray().flat()
     : null;
 
   const mapClicked = (e) => {

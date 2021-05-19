@@ -8,7 +8,6 @@ from ..datasheet import DatasheetPlugin
 from ..project_edits import ProjectEdits
 from ..ext.data_validation import DataValidationPlugin
 from ..metrics_endpoint import MetricsEndpoint
-from ..map_endpoint import MapGeoJSONEndpoint
 from sparrow.open_search import OpenSearch
 from ..web import WebPlugin
 from ..logs import get_logger
@@ -31,7 +30,6 @@ def prepare_plugin_manager(app):
         ProjectEdits,
         DataValidationPlugin,
         MetricsEndpoint,
-        MapGeoJSONEndpoint,
         OpenSearch,
     )
     # GraphQL is disabled for now
