@@ -19,7 +19,7 @@ class OpenSearch(SparrowCorePlugin):
     name = "Open Search"
 
     def on_database_ready(self, db):
-        initialization_fn = procedures / "on-initialization.sql"
+        # initialization_fn = procedures / "on-initialization.sql"
 
         filenames = list(fixtures.glob("*.sql"))
         filenames.sort()
@@ -27,7 +27,7 @@ class OpenSearch(SparrowCorePlugin):
         for fn in filenames:
             db.exec_sql(fn)
 
-        db.exec_sql(initialization_fn)
+        # db.exec_sql(initialization_fn)
 
     def on_api_initialized_v2(self, api):
         api.mount("", Open_Search_API, name=self.name)

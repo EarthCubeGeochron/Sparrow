@@ -20,14 +20,14 @@ def prepare_plugin_manager(app):
 
     mgr = SparrowPluginManager()
     mgr.add_all(
-        AuthPlugin,
         APIv1Plugin,
         APIv2Plugin,
+        AuthPlugin,
         WebPlugin,
         InterfacePlugin,
         PyChronImportPlugin,
         DatasheetPlugin,
-        ProjectEdits,
+        # ProjectEdits,
         DataValidationPlugin,
         MetricsEndpoint,
         OpenSearch,
