@@ -67,6 +67,10 @@ function OpenSearch() {
     };
   }, [query, data]);
 
+  useEffect(() => {
+    setScrollData([]);
+  }, [query]);
+
   if (!data) return null;
 
   const onChange = (text, value) => {
