@@ -7,19 +7,19 @@ WITH search AS (
     SELECT to_tsquery(string_agg(lexeme || ':*', ' & ' order by positions)) AS query
     FROM unnest(to_tsvector(:query))
 )
-SELECT p.*
+SELECT DISTINCT p.*
 FROM search, project p
+LEFT JOIN documents.project_document pd
+ON pd.project_id = p.id
 LEFT JOIN project_sample ps 
 ON ps.project_id = p.id
-LEFT JOIN sample s
-ON s.id = ps.sample_id
+LEFT JOIN documents.sample_document sd
+ON sd.sample_id = ps.sample_id
 LEFT JOIN session ss
-ON ss.sample_id = s.id
-LEFT JOIN project_publication pp
-ON pp.project_id = p.id
-LEFT JOIN publication pu
-ON pu.id = pp.publication_id
-WHERE to_tsvector(p::text) @@ search.query OR
-to_tsvector(s::text) @@ search.query OR
-to_tsvector(ss::text) @@ search.query OR
-to_tsvector(pu::text) @@ search.query;
+ON ss.project_id = p.id
+LEFT JOIN documents.session_document ssd
+ON ssd.session_id = ss.id
+WHERE 
+pd.project_token @@ search.query OR
+sd.sample_token @@ search.query OR
+ssd.session_token @@ search.query;
