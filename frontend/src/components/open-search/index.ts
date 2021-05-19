@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
-import { Button } from "@blueprintjs/core";
+import { Button, Popover, Menu } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIv2Result } from "~/api-v2";
-import { ProjectModelCard } from "~/model-views/components";
+import {
+  ProjectModelCard,
+  SessionListModelCard,
+  SampleModelCard,
+} from "~/model-views/components";
 import ForeverScroll from "~/components/infinite-scroll/forever-scroll";
 import { SearchInput } from "~/filter/components";
 //@ts-ignore
@@ -15,17 +19,49 @@ const h = hyperStyled(styles);
  */
 function OpenSearch() {
   const [query, setQuery] = useState("");
+  const [model, setModel] = useState("sample");
   const [scrollData, setScrollData] = useState<any>([]);
-  const url = query == "" ? "/api/v2/search" : `/api/v2/search?query=${query}`;
-  const data = useAPIv2Result(url);
+  const url =
+    query == ""
+      ? "/api/v2/search"
+      : `/api/v2/search?query=${query}&model=${model}`;
+
+  const unwrapData =
+    model == "session"
+      ? (data) => {
+          const dataObj = data.data.map((obj) => {
+            const {
+              id: session_id,
+              technique,
+              target,
+              date,
+              instrument,
+              data,
+            } = obj;
+            return {
+              session_id,
+              technique,
+              target,
+              date,
+              data,
+              instrument,
+            };
+          });
+          return { data: dataObj };
+        }
+      : (data) => data;
+
+  const data = useAPIv2Result(url, {}, { unwrapResponse: unwrapData });
+
+  console.log(scrollData);
 
   useEffect(() => {
     if (data && data["data"] != null) {
+      setScrollData([]);
       setScrollData(data["data"]);
     } else if (query.length == 0) {
       setScrollData([]);
     }
-    console.log("triggered");
     return () => {
       setScrollData([]);
     };
@@ -37,27 +73,44 @@ function OpenSearch() {
     setQuery(value);
   };
 
-  const onSearch = (e) => {
-    e.preventDefault();
-  };
+  const possibleModels = ["project", "sample", "session"];
+
+  const content = h(Menu, [
+    possibleModels.map((model) => {
+      return h(
+        Button,
+        {
+          key: model,
+          minimal: true,
+          onClick: () => setModel(model),
+        },
+        [model]
+      );
+    }),
+  ]);
+
+  const rightElement = h(Popover, { content, position: "bottom-right" }, [
+    h(Button, { minimal: true, rightIcon: "caret-down" }, model),
+  ]);
 
   return h("div", [
     h("div.searchbox", [
       h(SearchInput, {
+        leftIcon: "search",
         updateParams: onChange,
         value: query,
-        rightElement: h(Button, {
-          icon: "search",
-          onClick: onSearch,
-          minimal: true,
-          type: "submit",
-        }),
+        rightElement: rightElement,
       }),
     ]),
     h("div.results", [
       h.if(scrollData.length > 0)(ForeverScroll, {
         initialData: scrollData,
-        component: ProjectModelCard,
+        component:
+          model == "sample"
+            ? SampleModelCard
+            : model == "project"
+            ? ProjectModelCard
+            : SessionListModelCard,
         fetch: () => {},
       }),
     ]),
