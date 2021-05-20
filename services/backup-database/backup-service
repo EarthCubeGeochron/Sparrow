@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Allow the database to come up properly
+# NOTE: we could be better about how we do this...
+sleep 60
+
+while true; do
+  echo "Backing up database."
+  /conf/backup-command
+  # Run once a week
+  sleep 604800
+done
