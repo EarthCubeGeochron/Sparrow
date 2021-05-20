@@ -21,10 +21,7 @@ function OpenSearch() {
   const [query, setQuery] = useState("");
   const [model, setModel] = useState("sample");
   const [scrollData, setScrollData] = useState<any>([]);
-  const url =
-    query == ""
-      ? "/api/v2/search/query"
-      : `/api/v2/search/query?query=${query}&model=${model}`;
+  const url = "/api/v2/search/query";
 
   const unwrapData =
     model == "session"
@@ -51,7 +48,11 @@ function OpenSearch() {
         }
       : data => data;
 
-  const data = useAPIv2Result(url, {}, { unwrapResponse: unwrapData });
+  const data = useAPIv2Result(
+    url,
+    { query: query, model: model },
+    { unwrapResponse: unwrapData }
+  );
 
   console.log(scrollData);
 

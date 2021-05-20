@@ -19,25 +19,27 @@ class OpenSearchEndpoint(HTTPEndpoint):
     async def get(self, request):
 
         db = app_context().database
-        params = request.query_params
-        if len(params) == 0:
+        query_params = request.query_params
+        if 'query' not in query_params or 'model' not in query_params:
             return JSONResponse(
                 {
                     "Status": "Success",
-                    "Message": "Provide a string as a query parameter",
-                    "example": "/api/v2/search?query=lava",
+                    "Message": "Provide a string as a query parameter or model",
+                    "example": "/api/v2/search?query=lava&model=sample",
                 }
             )
 
-        model = params["model"]
+        params = {"query": query_params["query"]}
+        model = query_params["model"]
+        
         if model == "sample":
-            sql = open(search_sample).read()
-        if model == "project":
-            sql = open(search_project).read()
-        if model == "session":
-            sql = open(search_session).read()
+            sql_fn = search_sample
+        elif model == "project":
+            sql_fn = search_project
+        else:
+            sql_fn = search_session
 
-        query_res = db.session.execute(sql, {"query": params["query"]})
+        query_res = db.exec_sql_query(fn = sql_fn, params=params)
 
         json_res = [dict(r) for r in query_res]
 
@@ -46,4 +48,4 @@ class OpenSearchEndpoint(HTTPEndpoint):
         return APIResponse(json_res, total_count=len(json_res))
 
 
-Open_Search_API = Router([Route("/query", endpoint=OpenSearchEndpoint, methods=["GET"])])
+OpenSearchAPI = Router([Route("/query", endpoint=OpenSearchEndpoint, methods=["GET"])])
