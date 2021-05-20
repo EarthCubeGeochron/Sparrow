@@ -27,14 +27,14 @@ build_dir=_cli/dist/sparrow
 dist_dir=$install_path/opt/sparrow
 symlink=$install_path/bin/sparrow
 executable=$dist_dir/sparrow
-temp_path=$install_path/sparrowtemp
+TMPDIR=$install_path/sparrowtemp
 
 #check permissions
 # if permissions are needed it will notify and attempy a sudo login
 if ! [ -w $dist_dir ]
 then
-    echo "To install to path, we need to elevate permissions."
-    echo "If you choose to continute you will be prompted for your password"
+    echo "To install to path elevated permissions are required!"
+    echo "If you choose to continue you will be prompted for your password."
     echo "Would you like to continue? (y/N)"
     read answer
     if [[ $answer == "y" || $answer == "Y" || $answer == "yes" || $answer == "Yes" ]]
@@ -52,8 +52,8 @@ fi
 rm -r $dist_dir
 mkdir -p $dist_dir
 
-rm -r $temp_path
-mkdir -p $temp_path
+## create temporary directory using the TMPDIR environmental variable
+temp_dir=$(mktemp -d)
 
 
 ## check header to make sure url exists
@@ -66,9 +66,9 @@ fi
 echo "Downloading Sparrow CLI $version"
 echo 
 echo
-curl -L -s ${url} | tar xzf - -C $temp_path
+curl -L -s ${url} | tar xzf - -C $temp_dir
 
-test_file=$temp_path/sparrow
+test_file=$temp_dir/sparrow
 
 if [ -f "$test_file" ]; then
         echo "You have successfully downloaded Sparrow!!"
@@ -80,14 +80,15 @@ fi
 
 ## Move files to the correct directory
 # and test they have successfully moved
-mv $temp_path/* $dist_dir
+mv $temp_dir/* $dist_dir
 
 move_test_file=$dist_dir/sparrow
 
 if [ -f "$move_test_file" ]; 
 then
-    rm -r $temp_path
+    rm -R ${temp_dir}
 else
+    rm -R ${temp_dir}
     abort "Problem when copying files"
 fi
 
