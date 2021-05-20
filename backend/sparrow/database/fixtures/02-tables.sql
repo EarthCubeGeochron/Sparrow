@@ -292,6 +292,23 @@ CREATE TABLE IF NOT EXISTS standard_sample (
 /*
 # Analytical data
 
+## Instrument session
+
+A group of sessions measured under the same instrument conditions and running standardization
+*/
+
+CREATE TABLE IF NOT EXISTS instrument_session (
+  id serial PRIMARY KEY,
+  project_id integer REFERENCES project(id),
+  instrument integer REFERENCES instrument(id),
+  start_date timestamp,
+  end_date timestamp,
+  name text, -- An arbitrary, lab-specific identifier
+  data jsonb -- Additional data if applicable
+);
+
+/*
+
 ## Session
 
 Set of analyses on the same instrument
@@ -315,6 +332,7 @@ CREATE TABLE IF NOT EXISTS session (
      for interoperability without affecting the internal organization
      of the *Sparrow* database. */
   uuid uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
+  instrument_session_id integer REFERENCES instrument_session(id),
   sample_id integer REFERENCES sample(id),
   project_id integer REFERENCES project(id)
     ON DELETE SET NULL,
@@ -414,6 +432,12 @@ CREATE TABLE IF NOT EXISTS project_researcher (
   project_id integer REFERENCES project(id) ON DELETE CASCADE,
   researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
   PRIMARY KEY (project_id, researcher_id)
+);
+
+CREATE TABLE IF NOT EXISTS instrument_session_researcher (
+  instrument_session_id integer REFERENCES instrument_session(id) ON DELETE CASCADE,
+  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
+  PRIMARY KEY (instrument_session_id, researcher_id)
 );
 
 CREATE TABLE IF NOT EXISTS project_publication (
@@ -556,6 +580,9 @@ CREATE TABLE IF NOT EXISTS data_file_link (
   sample_id integer
     REFERENCES sample(id)
     ON DELETE CASCADE,
+  instrument_session_id integer
+    REFERENCES instrument_session(id)
+    ON DELETE CASCADE,
   /* Only one of the linked data file columns should be
      set at a time (a data file should only be packaged at
      one level, even if it encompasses information about
@@ -565,8 +592,9 @@ CREATE TABLE IF NOT EXISTS data_file_link (
   CHECK (
       (session_id IS NOT NULL)::int
     + (analysis_id IS NOT NULL)::int
-    + (sample_id IS NOT NULL)::int <= 1
+    + (sample_id IS NOT NULL)::int
+    + (instrument_session_id IS NOT NULL)::int <= 1
   ),
   -- Only one link between a data file and its model
-  UNIQUE (file_hash, session_id, analysis_id, sample_id)
+  UNIQUE (file_hash, session_id, analysis_id, sample_id, instrument_session_id)
 );

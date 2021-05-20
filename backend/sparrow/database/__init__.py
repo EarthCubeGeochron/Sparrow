@@ -215,14 +215,14 @@ class Database:
             secho("Could not load plugins", fg="red", dim=True)
             secho(str(err))
 
-    def update_schema(self, dry_run=True):
+    def update_schema(self, **kwargs):
         # Might be worth creating an interactive upgrader
         from sparrow import migrations
 
         migrator = SparrowDatabaseMigrator(self)
         migrator.add_module(migrations)
         self.app.run_hook("prepare-database-upgrade", migrator)
-        migrator.run_migration(dry_run=dry_run)
+        migrator.run_migration(**kwargs)
 
     @property
     def table(self):
