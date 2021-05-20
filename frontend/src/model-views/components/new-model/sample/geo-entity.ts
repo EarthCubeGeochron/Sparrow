@@ -330,7 +330,6 @@ export function GeoContext(props) {
 
   const onSubmitClick = () => {
     changeGeoEntity(geoEntity);
-    setGeoEntity(defaultState);
   };
 
   const { geo_entity } = geoEntity;

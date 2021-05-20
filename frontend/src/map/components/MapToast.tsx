@@ -79,11 +79,15 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
       ...sampleState,
       location: {
         type: "Point",
-        coordinates: [Number(lng).toFixed(3), Number(lat).toFixed(3)]
+        coordinates: [
+          parseFloat(Number(lng).toFixed(3)),
+          parseFloat(Number(lat).toFixed(3))
+        ]
       }
     };
     console.log(updatedSample);
     const response = await axios.put(url, updatedSample);
+    toggleOpen();
   };
 
   let sampleNames = [];
@@ -109,12 +113,12 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
             </FormGroup>
             <br></br>
             <p>Longitude: </p>
-            <NumericInput defaultValue={Number(lng).toFixed(5)}></NumericInput>
+            <NumericInput defaultValue={Number(lng).toFixed(3)}></NumericInput>
             <br></br>
             <p>Latitude</p>
-            <NumericInput defaultValue={Number(lat).toFixed(5)}></NumericInput>
+            <NumericInput defaultValue={Number(lat).toFixed(3)}></NumericInput>
             <br></br>
-            <div>
+            {/* <div>
               <GeoContext
                 sample_geo_entity={sampleState.sample_geo_entity}
                 changeGeoEntity={setGeoEntity}
@@ -141,7 +145,7 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
               ) : (
                 <Spinner size={50} />
               )}
-            </div>
+            </div> */}
             <Button onClick={onSubmit} intent="success">
               Submit
             </Button>

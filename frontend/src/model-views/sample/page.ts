@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Frame } from "~/frame";
 import { useAuth } from "~/auth";
 import hyper from "@macrostrat/hyper";
@@ -330,8 +330,7 @@ function SamplePage(props) {
           updatedModel
         );
         const { data } = response;
-        ({ id, ...rest } = data);
-        return rest;
+        console.log(data);
       }
     },
     [
