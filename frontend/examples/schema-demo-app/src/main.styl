@@ -3,15 +3,37 @@
   --text-color-dim: #444
 
 body
-  margin 5px
+  margin 0
+  padding 0
 
 .schema-linker-ui
   display flex
   flex-direction: row
   justify-content: space-between
-  margin 2
+  padding 1em
+  height 100vh
+  &>div
+    margin-right 1em
+    &:last-child
+      margin-right: 0
 
+h2
+  margin-top 0
 
-.linker-ui-demo
-  width 100%
-  height 100%
+.term-list
+  display flex
+  flex-direction: column
+  margin-bottom -1em
+
+  .term-list-data
+    padding 2px
+    flex-grow 1
+    overflow-y: scroll
+
+.workspace
+  flex-grow 1
+  display flex
+  flex-direction: column
+
+.linker-ui-workspace
+  flex-grow 1

@@ -32,3 +32,13 @@
     - "authority": "LaserChron"
       "id": "Concordia age"
       list: true
+- "authority": "LaserChron"
+  id: "Concordia age"
+  "description": "An U-Pb age that can contribute to a concordia measurement"
+  members:
+    - id: "Concordia parameters"
+    - id: "206Pb/238U age"
+    - id: "207Pb/235U age"
+    - id: "206Pb/238U age"
+- authority: LaserChron
+  id: Best age

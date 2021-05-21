@@ -18,14 +18,14 @@ interface TreeNode {
 }
 
 const data: TreeNode = {
-  name: "T",
+  name: "Sparrow User API",
   children: [
     {
-      name: "A",
+      name: "Concordia parameters",
       children: [
-        { name: "A1" },
-        { name: "A2" },
-        { name: "A3" },
+        { name: "Error correlation" },
+        { name: "206Pb/238U ratio" },
+        { name: "207Pb/238U ratio" },
         {
           name: "C",
           children: [
@@ -67,9 +67,6 @@ export type LinkTypesProps = {
 };
 
 export default function Example({ margin = defaultMargin }: LinkTypesProps) {
-  const [layout, setLayout] = useState<string>("cartesian");
-  const [orientation, setOrientation] = useState<string>("horizontal");
-  const [linkType, setLinkType] = useState<string>("diagonal");
   const [stepPercent, setStepPercent] = useState<number>(0.5);
   const [ref, { width: totalWidth, height: totalHeight }] = useDimensions();
   const forceUpdate = useForceUpdate();
@@ -81,53 +78,48 @@ export default function Example({ margin = defaultMargin }: LinkTypesProps) {
   const sizeHeight = innerWidth;
 
   return totalWidth < 10 ? null : (
-    <div className="linker-ui-demo" ref={ref}>
+    <div className="linker-ui-workspace" ref={ref}>
       <svg width={totalWidth} height={totalHeight}>
-        <LinearGradient id="links-gradient" from="#fd9b93" to="#fe6e9e" />
-        <rect width={totalWidth} height={totalHeight} rx={14} fill="#272b4d" />
-        <Group top={margin.top} left={margin.left}>
+        <LinearGradient id="links-gradient" from="#cccccc" to="#dddddd" />
+        <rect width={totalWidth} height={totalHeight} rx={14} fill="#dddddd" />
+        <Group top={margin.top} left={margin.left + sizeHeight}>
           <Tree
             root={hierarchy(data, (d) => (d.isExpanded ? null : d.children))}
-            size={[sizeWidth, sizeHeight]}
+            size={[sizeWidth, -sizeHeight]}
             separation={(a, b) => (a.parent === b.parent ? 1 : 0.5) / a.depth}
           >
             {(tree) => (
               <Group top={origin.y} left={origin.x}>
-                {tree.links().map((link, i) => (
-                  <LinkHorizontal
-                    key={i}
-                    data={link}
-                    percent={stepPercent}
-                    stroke="rgb(254,110,158,0.6)"
-                    strokeWidth="1"
-                    fill="none"
-                  />
-                ))}
+                {tree.links().map((link, i) => {
+                  console.log(link);
+                  return (
+                    <LinkHorizontal
+                      key={i}
+                      data={link}
+                      percent={stepPercent}
+                      stroke="#4af2a1"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                  );
+                })}
 
                 {tree.descendants().map((node, key) => {
-                  const width = 40;
-                  const height = 20;
+                  const width = 80;
+                  const height = 30;
 
-                  let top: number;
-                  let left: number;
-                  if (layout === "polar") {
-                    const [radialX, radialY] = pointRadial(node.x, node.y);
-                    top = radialY;
-                    left = radialX;
-                  } else if (orientation === "vertical") {
-                    top = node.y;
-                    left = node.x;
-                  } else {
-                    top = node.x;
-                    left = node.y;
-                  }
+                  let top = node.x;
+                  let left = node.y;
 
                   return (
                     <Group top={top} left={left} key={key}>
                       {node.depth === 0 && (
-                        <circle
-                          r={12}
-                          fill="url('#links-gradient')"
+                        <rect
+                          height={30}
+                          width={30}
+                          y={-15}
+                          x={-15}
+                          fill="salmon"
                           onClick={() => {
                             node.data.isExpanded = !node.data.isExpanded;
                             console.log(node);
@@ -141,12 +133,12 @@ export default function Example({ margin = defaultMargin }: LinkTypesProps) {
                           width={width}
                           y={-height / 2}
                           x={-width / 2}
-                          fill="#272b4d"
-                          stroke={node.data.children ? "#03c0dc" : "#26deb0"}
+                          fill="#ffffff"
+                          stroke="#888888"
                           strokeWidth={1}
                           strokeDasharray={node.data.children ? "0" : "2,2"}
                           strokeOpacity={node.data.children ? 1 : 0.6}
-                          rx={node.data.children ? 0 : 10}
+                          rx={node.data.children ? 0 : 4}
                           onClick={() => {
                             node.data.isExpanded = !node.data.isExpanded;
                             console.log(node);
@@ -160,13 +152,7 @@ export default function Example({ margin = defaultMargin }: LinkTypesProps) {
                         fontFamily="Arial"
                         textAnchor="middle"
                         style={{ pointerEvents: "none" }}
-                        fill={
-                          node.depth === 0
-                            ? "#71248e"
-                            : node.children
-                            ? "white"
-                            : "#26deb0"
-                        }
+                        fill="black"
                       >
                         {node.data.name}
                       </text>
