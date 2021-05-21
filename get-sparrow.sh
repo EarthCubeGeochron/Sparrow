@@ -7,22 +7,92 @@ get_latest_release() {
     sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
 }
 
+abort() {
+    echo $1
+
+    echo "aborting..."
+    exit
+}
+
+################################################################### script
+
 repo_name=EarthCubeGeochron/Sparrow
+version=${1:-$(get_latest_release $repo_name)}
 platform=$(uname -s)
+
+url=https://github.com/$repo_name/releases/download/$version/sparrow-$platform-x86_64.tar.gz
+
 install_path=${SPARROW_INSTALL_PATH:-${INSTALL_PATH:-/usr/local}}
 build_dir=_cli/dist/sparrow
 dist_dir=$install_path/opt/sparrow
 symlink=$install_path/bin/sparrow
 executable=$dist_dir/sparrow
+TMPDIR=$install_path/sparrowtemp
+
+#check permissions
+# if permissions are needed it will notify and attempy a sudo login
+if ! [ -w $dist_dir ]
+then
+    echo "To install to path elevated permissions are required!"
+    echo "If you choose to continue you will be prompted for your password."
+    echo "Would you like to continue? (y/N)"
+    read answer
+    if [[ $answer == "y" || $answer == "Y" || $answer == "yes" || $answer == "Yes" ]]
+    then
+        echo "Please enter your password."
+        exec sudo bash "$0" "$@"
+        echo
+        echo
+    else 
+        abort "No permissions granted."
+    fi
+fi
+
 
 rm -r $dist_dir
 mkdir -p $dist_dir
 
-version=${1:-$(get_latest_release $repo_name)}
+## create temporary directory using the TMPDIR environmental variable
+temp_dir=$(mktemp -d)
 
+
+## check header to make sure url exists
+if [ `curl -I -s ${url} | grep -c "Not Found"` -eq 1 ]
+then 
+    abort "${url} not found"
+fi
+
+## download into temp directory to see if it downloaded correctly
 echo "Downloading Sparrow CLI $version"
-curl -L -s https://github.com/$repo_name/releases/download/$version/sparrow-$platform-x86_64.tar.gz \
-| tar xzf - -C $dist_dir
+echo 
+echo
+curl -L -s ${url} | tar xzf - -C $temp_dir
+
+test_file=$temp_dir/sparrow
+
+if [ -f "$test_file" ]; then
+        echo "You have successfully downloaded Sparrow!!"
+        echo
+        echo
+    else
+        abort "Download unsuccessful"
+fi
+
+## Move files to the correct directory
+# and test they have successfully moved
+mv $temp_dir/* $dist_dir
+
+move_test_file=$dist_dir/sparrow
+
+if [ -f "$move_test_file" ]; 
+then
+    rm -R ${temp_dir}
+else
+    rm -R ${temp_dir}
+    abort "Problem when copying files"
+fi
+
+
 
 # Link executable onto the path
 echo "Linking $symlink -> $executable"

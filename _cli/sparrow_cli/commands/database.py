@@ -43,22 +43,18 @@ def sparrow_db(ctx):
     pass
 
 
-@sparrow_db.command(name="migration")
-def migration():
+@sparrow_db.command(name="migration", context_settings=dict(ignore_unknown_options=True))
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def migration(args):
     """Generate a changeset against the optimal database schema"""
-    exec_sparrow("db-migration")
+    exec_sparrow("db-migration", *args)
 
 
-@sparrow_db.command(name="migrate")
-def migrate():
-    """Migrate the database to a newer version (legacy)"""
-    exec_sparrow("db-migration", "--apply")
-
-
-@sparrow_db.command(name="update")
-def update():
+@sparrow_db.command(name="update", context_settings=dict(ignore_unknown_options=True))
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def update(args):
     """Update the database schema"""
-    exec_sparrow("db-update")
+    exec_sparrow("db-update", *args)
 
 
 for k, v in shell_commands.items():
