@@ -118,16 +118,4 @@ export { InfiniteAPIView };
  */
 export function urlSearchFromParams(params) {
   setQueryString(params);
-  // let string = "";
-  // for (const [key, value] of Object.entries(params)) {
-  //   const queryString = `${key}=${value}&`;
-  //   string += queryString;
-  // }
-  // let searchString = string.slice(0, -1);
-  // console.log(searchString);
-  // const url =
-  //   Object.entries(params).length > 0
-  //     ? window.location.origin + window.location.pathname + "?" + searchString
-  //     : window.location.origin + window.location.pathname;
-  // history.pushState({}, "", url);
 }
