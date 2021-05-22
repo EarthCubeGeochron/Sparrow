@@ -10,6 +10,7 @@ from ..ext.data_validation import DataValidationPlugin
 from ..metrics_endpoint import MetricsEndpoint
 from ..web import WebPlugin
 from ..logs import get_logger
+from ..import_data import ImportDataPlugin
 
 log = get_logger(__name__)
 
@@ -29,6 +30,7 @@ def prepare_plugin_manager(app):
         ProjectEdits,
         DataValidationPlugin,
         MetricsEndpoint,
+        ImportDataPlugin
     )
     # GraphQL is disabled for now
     # self.plugins.add(GraphQLPlugin)
