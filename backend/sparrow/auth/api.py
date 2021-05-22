@@ -27,7 +27,9 @@ async def login(request, username: str, password: str):
     log.debug(current_user)
 
     if current_user is not None and current_user.is_correct_password(password):
-        resp = JSONResponse(dict(login=True, username=username))
+        day = 24 * 60 * 60
+        token = backend.set_cookie(None, "access", max_age=day,identity=username)
+        resp = JSONResponse(dict(login=True, username=username, token=token))
         return backend.set_login_cookies(resp, identity=username)
 
     return backend.logout(UnauthorizedResponse(status_code=401))
