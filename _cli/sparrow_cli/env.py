@@ -37,6 +37,12 @@ def prepare_compose_overrides():
     env = environ.get("SPARROW_ENV", "development")
     is_production = env == "production"
 
+    # Use the docker-compose profile tool to enable some services
+    # NOTE: this is a nicer way to do some things that needed to be handled by
+    # compose-file overrides in the past.
+    if is_production:
+        environ["COMPOSE_PROFILES"] = "production"
+
     # Use certbot for SSL if certain conditions are met
     use_certbot = is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
 

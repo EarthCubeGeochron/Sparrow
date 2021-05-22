@@ -7,6 +7,7 @@ import sys
 from sparrow_utils import get_logger, cmd
 from sqlalchemy import text
 import os
+from rich import print
 
 from .util import _exec_raw_sql, run_sql, temp_database, connection_args
 
@@ -15,10 +16,12 @@ log = get_logger(__name__)
 
 
 class AutoMigration(Migration):
-    def changes_omitting_view_drops(self):
+    def changes_omitting_views(self):
         nsel_drops = self.changes.non_table_selectable_drops()
+        nsel_creations = self.changes.non_table_selectable_creations()
+        # Warning: this also may omit changes to functions etc. We need to test this.
         for stmt in self.statements:
-            if stmt in nsel_drops:
+            if stmt in nsel_drops or stmt in nsel_creations:
                 continue
             yield stmt
 
@@ -36,9 +39,7 @@ class AutoMigration(Migration):
         log.debug(f"Applying migration with {n} operations")
         for stmt in self.statements:
             self._exec(stmt, quiet=quiet)
-        self.changes.i_from = get_inspector(
-            self.s_from, schema=self.schema, exclude_schema=self.exclude_schema
-        )
+        self.changes.i_from = get_inspector(self.s_from, schema=self.schema, exclude_schema=self.exclude_schema)
 
         safety_on = self.statements.safe
         self.clear()
@@ -52,17 +53,22 @@ class AutoMigration(Migration):
         the user. Usually, these views are just dropped and recreated anyway when dependent
         tables change."""
         # We could try to apply 'non-table-selectable drops' first and then check again...
-        unsafe = any(check_for_drop(s) for s in self.changes_omitting_view_drops())
+        unsafe = any(check_for_drop(s) for s in self.changes_omitting_views())
         return not unsafe
+
+    def unsafe_changes(self):
+        for stmt in self.changes_omitting_views():
+            if check_for_drop(stmt):
+                yield stmt
 
     def print_changes(self):
         statements = "\n".join(self.statements)
         print(statements, file=sys.stderr)
 
 
-
 def _create_migration(db_engine, target, safe=True):
     # For some reason we need to patch this...
+    log.info("Creating an automatic migration")
     target.dialect.server_version_info = db_engine.dialect.server_version_info
     m = AutoMigration(db_engine, target)  # , exclude_schema="core_view")
     m.set_safety(safe)
@@ -72,13 +78,17 @@ def _create_migration(db_engine, target, safe=True):
 
 
 @contextmanager
-def _target_db(url):
+def _target_db(url, quiet=False):
     from sparrow.app import Sparrow
+
+    stdout = sys.stderr
+    if quiet:
+        stdout = open(os.devnull, "w")
 
     log.debug("Creating migration target")
     with temp_database(url) as engine:
         app = Sparrow(database=url)
-        with redirect_stdout(open(os.devnull, "w")):
+        with redirect_stdout(stdout):
             app.init_database()
         yield engine
 
@@ -94,11 +104,14 @@ def needs_migration(db):
     return len(migration.statements) == 0
 
 
-def db_migration(db, safe=True, apply=False):
+def db_migration(db, safe=True, apply=False, hide_view_changes=False):
     """Create a database migration against the idealized schema"""
     m = create_migration(db, safe=safe)
+    stmts = m.statements
+    if hide_view_changes:
+        stmts = m.changes_omitting_views()
     print("===MIGRATION BELOW THIS LINE===", file=sys.stderr)
-    for s in m.statements:
+    for s in stmts:
         if apply:
             run_sql(db.session, s)
         else:
@@ -118,9 +131,7 @@ def dump_schema(engine):
 
 
 @contextmanager
-def create_schema_clone(
-    engine, db_url="postgresql://postgres@db:5432/sparrow_schema_clone"
-):
+def create_schema_clone(engine, db_url="postgresql://postgres@db:5432/sparrow_schema_clone"):
     schema = dump_schema(engine)
     with temp_database(db_url) as clone_engine:
         # Not sure why we have to mess with this, but we do
@@ -132,19 +143,28 @@ def create_schema_clone(
         yield clone_engine
 
 
+def has_table(engine, table):
+    insp = get_inspector(engine)
+    return table in insp.tables
+
+
 def has_column(engine, table, column):
     insp = get_inspector(engine)
     tbl = insp.tables[table]
     for col in tbl.columns:
-        if col.name == column:
+        if col == column:
             return True
     return False
+
+
+class SparrowMigrationError(Exception):
+    pass
 
 
 class SparrowMigration:
     name = None
 
-    def should_apply(self, engine, target, migrator):
+    def should_apply(self, source, target, migrator):
         return False
 
     def apply(self, engine):
@@ -161,7 +181,7 @@ class SparrowDatabaseMigrator:
 
     def add_migration(self, migration):
         assert issubclass(migration, SparrowMigration)
-        self._migrations.append(migration)
+        self._migrations.append(migration())
 
     def add_module(self, module):
         for _, obj in module.__dict__.items():
@@ -173,10 +193,10 @@ class SparrowDatabaseMigrator:
                 continue
             self.add_migration(obj)
 
-    def apply_migrations(self, engine):
+    def apply_migrations(self, engine, target):
         """This is the magic function where an ordered changeset gets
         generated and applied"""
-        migrations = [m for m in self._migrations if m.should_apply(engine)]
+        migrations = [m for m in self._migrations if m.should_apply(engine, target, self)]
         log.info("Applying manual migrations")
         if len(migrations) == 0:
             log.info(f"Found no migrations to apply")
@@ -186,7 +206,9 @@ class SparrowDatabaseMigrator:
             for m in migrations:
                 log.info(f"Applying migration {m.name}")
                 m.apply(engine)
-            migrations = [m for m in migrations if m.should_apply(engine)]
+                # We have applied this migration and should not do it again.
+                migrations.remove(m)
+            migrations = [m for m in migrations if m.should_apply(engine, target, self)]
 
     def _run_migration(self, engine, target, check=False):
         m = _create_migration(engine, target)
@@ -199,11 +221,17 @@ class SparrowDatabaseMigrator:
             m.apply(quiet=True)
             return
 
-        self.apply_migrations(engine)
+        self.apply_migrations(engine, target)
 
         # Migrating to the new version should now be "safe"
         m = _create_migration(engine, target)
-        assert m.is_safe
+        try:
+            assert m.is_safe
+        except AssertionError as err:
+            print("[bold red]Manual migration needed! Unsafe changes:[/bold red]")
+            for s in m.unsafe_changes():
+                print(s, file=sys.stderr)
+            raise err
 
         m.apply(quiet=True)
         # Re-add changes (this is time-consuming)
@@ -216,10 +244,12 @@ class SparrowDatabaseMigrator:
             self._run_migration(src, target)
         log.info("Migration dry run successful")
 
-    def run_migration(self, dry_run=True):
+    def run_migration(self, dry_run=True, apply=True):
         with _target_db(self.target_url) as target:
             if dry_run:
                 self.dry_run_migration(target)
+            if not apply:
+                return
             log.info("Running migration")
             self._run_migration(self.db.engine, target)
             log.info("Finished running migration")
