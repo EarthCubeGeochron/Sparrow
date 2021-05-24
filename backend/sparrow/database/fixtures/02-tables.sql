@@ -242,6 +242,7 @@ CREATE TABLE IF NOT EXISTS sample (
   thickness numeric,
   -- name of the lab conducted the measurements, and the date of analysis
   lab_name text,
+  boulder_height numeric,
   lab_date timestamp,
   --standard used in the measurements
   lab_standard text,
