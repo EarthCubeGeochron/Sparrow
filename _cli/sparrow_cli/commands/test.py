@@ -4,7 +4,11 @@ from os import environ, path, chdir
 from rich import print
 from click_default_group import DefaultGroup
 from textwrap import dedent
-from ..util import cmd, exec_or_run, compose
+from ..util import cmd, exec_or_run
+from ..util import compose as _compose
+from sparrow_utils import get_logger
+
+log = get_logger(__name__)
 
 
 class TestGroup(DefaultGroup):
@@ -77,7 +81,7 @@ def compose(*args, **kwargs):
     )
 
     kwargs["env"] = env
-    return cmd("sparrow compose", *args, **kwargs)
+    return _compose(*args, **kwargs)
 
 
 __ctx = dict(ignore_unknown_options=True, help_option_names=[])
@@ -174,19 +178,20 @@ def sparrow_test_main(
     # if container_is_running("backend") and not standalone:
     #     res = compose("exec backend", "/bin/run-tests", *args, flag)
     # else:
-    flags = "--psql" if psql else ""
-    flags += " --keep-database" if quick else ""
-    res = compose(
-        "run --rm --service-ports backend",
-        "/bin/run-tests",
-        *pytest_args,
-        flags,
-    )
+    if quick:
+        pytest_args.append(" --keep-database")
+
+    res = compose("run --rm --service-ports backend", "pytest", "/app/sparrow_tests", *pytest_args)
     # if "--keep-database" not in args:
+    if psql:
+        print("Initializing psql shell. " "The database is also available on localhost port 54322")
+        compose("run --rm --service-ports backend psql -h db -p 5432 -U postgres sparrow_test")
+
     if quick:
         teardown = False
     if teardown:
         compose("down --remove-orphans")
+    log.debug(f"Exiting with return code {res.returncode}")
     sys.exit(res.returncode)
 
 

@@ -47,7 +47,8 @@ def main(ctx, args):
         sys.exit(0)
 
     if subcommand == "compose":
-        return compose(*rest)
+        res = compose(*rest)
+        sys.exit(res.returncode)
 
     _command = find_subcommand(cfg.bin_directories, subcommand)
 

@@ -135,4 +135,7 @@ class TestAPIV2:
 
     def test_api_server_timing(self, client):
         res = client.get("/api/v2/models/sample", params={"per_page": 15})
-        assert 'Server-Timing' in res.headers
+        assert "Server-Timing" in res.headers
+
+    def test_failure(self):
+        assert False

@@ -39,7 +39,7 @@ def pytest_addoption(parser):
         "--teardown",
         action="store_true",
         dest="teardown",
-        default=True,
+        default=False,
         help="Tear down database after tests run",
     )
 
