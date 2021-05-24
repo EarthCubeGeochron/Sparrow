@@ -1,5 +1,5 @@
 from starlette.endpoints import HTTPEndpoint
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from sparrow.context import app_context
 from sparrow import get_logger
 from sparrow.plugins import SparrowCorePlugin
@@ -19,8 +19,8 @@ def construct_error_response(err: Exception, code: int):
     except AttributeError:
         msg = [str(err)]
 
-    return (
-        {
+    return JSONResponse(
+       content= {
             "error": {
                 "type": get_qualified_name(err),
                 "code": code,
@@ -30,7 +30,7 @@ def construct_error_response(err: Exception, code: int):
                 # (possibly large) datasets the client already has.
             }
         },
-        code,
+        status_code= code,
     )
 
 
@@ -47,10 +47,12 @@ class ImportData(HTTPEndpoint):
         try:
             model_name = request.path_params["model_name"]
 
-            data = await request.json()
+            req = await request.json()
+            data = req['data']
             log.debug(data)
             res = db.load_data(model_name, data)
-            return res.id, 201
+
+            return JSONResponse({'status':'success',f'{model_name} id':res.id})
         except Exception as err:
             return construct_error_response(err, 400)
     
