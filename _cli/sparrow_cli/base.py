@@ -3,7 +3,7 @@ import click
 from click import echo, secho, style
 from click_default_group import DefaultGroup
 from sparrow_utils.logs import setup_stderr_logs
-from os import environ, getcwd, chdir
+from os import environ, getcwd, chdir, getenv
 from pathlib import Path
 from typing import Optional
 from rich.console import Console
@@ -45,13 +45,16 @@ def get_config() -> Optional[Path]:
     return Path(__config)
 
 
+def env_flag(variable):
+    """Parse a boolean environment flag"""
+    return getenv(variable, "False").lower() in ("true", "1", "t", "y", "yes")
+
+
 console = Console(highlight=True)
 
 
-@click.group(
-    name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True
-)
-@click.option("--verbose/--no-verbose", is_flag=True, default=False)
+@click.group(name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True)
+@click.option("--verbose/--no-verbose", is_flag=True, default=env_flag("SPARROW_VERBOSE"))
 @click.pass_context
 def cli(ctx, verbose=False):
     """Startup function that sets configuration environment variables. Much of the
@@ -60,6 +63,8 @@ def cli(ctx, verbose=False):
     """
     if verbose:
         setup_stderr_logs("sparrow_cli")
+        # Set verbose environment variable for nested commands
+        environ["SPARROW_VERBOSE"] = "1"
 
     environ["SPARROW_WORKDIR"] = getcwd()
     here = Path(environ["SPARROW_WORKDIR"])

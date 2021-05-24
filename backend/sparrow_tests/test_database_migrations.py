@@ -29,7 +29,7 @@ def migration_base():
         yield engine
 
 
-@mark.order(-1)
+# @mark.order(-1)
 class TestDatabaseMigrations:
     def test_migration(self, db, migration_base):
         test_app = Sparrow(debug=True, database=migration_base.url)

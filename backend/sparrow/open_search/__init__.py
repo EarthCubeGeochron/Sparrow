@@ -17,6 +17,7 @@ procedures = here / "procedures"
 class OpenSearch(SparrowCorePlugin):
 
     name = "open-search"
+    dependencies = ["versioning"]
 
     def initialize_tables(self, db):
         initialization_fn = procedures / "on-initialization.sql"
@@ -31,10 +32,6 @@ class OpenSearch(SparrowCorePlugin):
         # checks if tables are empty, if so try to fill with info from other tables
         db.exec_sql(initialization_fn)
 
-    def on_database_ready(self, db):
-        """"Initialize tables on database ready"""
-        self.initialize_tables(db)
-      
     def on_core_tables_initialized(self, db):
         """Initialize tables on sparrow init"""
         self.initialize_tables(db)

@@ -36,6 +36,7 @@ def sparrow_up(container, force_recreate=False):
     _log_cmd = ["sparrow", "logs", container]
     log.debug(" ".join(_log_cmd))
     p = Popen(_log_cmd)
+    sleep(0.05)
 
     print("[green]Following container logs[/green]")
     compose("start", container)
@@ -49,9 +50,7 @@ def sparrow_up(container, force_recreate=False):
 @click.argument("container", type=str, required=False, default=None)
 def sparrow_logs(container):
     if container is None:
-        print("[red]Container is None!![/red]")
         compose("logs --tail=0 --follow")
     else:
         id = container_id(container)
-        # cmd_docker_logs("docker logs -f", id)
-        compose("logs --tail=0 --follow")
+        cmd("docker logs -f", str(id))

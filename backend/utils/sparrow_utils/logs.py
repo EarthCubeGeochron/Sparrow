@@ -37,14 +37,18 @@ def get_logger(name=None, level=logging.DEBUG, handler=None):
     return log
 
 
-def setup_stderr_logs(name="sparrow", level=logging.DEBUG):
+def setup_stderr_logs(*args, level=logging.DEBUG):
     # Customize Sparrow's root logger so we don't get overridden by uvicorn
     # We may want to customize this further eventually
     # https://github.com/encode/uvicorn/issues/410
+    if len(args) == 0:
+        args = ["sparrow"]
+
     handler = StreamHandler(stderr)
     handler.setFormatter(SparrowLogFormatter())
     handler.setLevel(level)
-    logger = logging.getLogger(name)
-    if logger.hasHandlers():
-        logger.handlers.clear()
-    logger.addHandler(handler)
+    for name in args:
+        logger = logging.getLogger(name)
+        if logger.hasHandlers():
+            logger.handlers.clear()
+        logger.addHandler(handler)
