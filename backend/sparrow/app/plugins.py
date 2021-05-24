@@ -11,6 +11,7 @@ from ..metrics_endpoint import MetricsEndpoint
 from sparrow.open_search import OpenSearch
 from ..web import WebPlugin
 from ..logs import get_logger
+from ..import_data import ImportDataPlugin
 
 log = get_logger(__name__)
 
@@ -30,6 +31,7 @@ def prepare_plugin_manager(app):
         # ProjectEdits,
         DataValidationPlugin,
         MetricsEndpoint,
+        ImportDataPlugin,
         OpenSearch,
     )
     # GraphQL is disabled for now
