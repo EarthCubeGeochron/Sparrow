@@ -1,7 +1,7 @@
 from starlette.endpoints import HTTPEndpoint
 from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
-import json
+from starlette.authentication import requires
 
 from ..context import app_context
 
@@ -13,6 +13,7 @@ from ..context import app_context
 
 
 class ProjectEdits(HTTPEndpoint):
+    @requires("admin")
     async def put(self, request):
         """
         Improved endpoint for Admin Projects page. Using Schemas

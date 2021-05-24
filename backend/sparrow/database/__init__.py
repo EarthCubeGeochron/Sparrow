@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from marshmallow.exceptions import ValidationError
 
-from .util import run_sql_file, run_query, get_or_create
+from .util import run_sql_file, run_query, get_or_create, run_sql_query_file
 from .models import User, Project, Session, DatumType
 from .mapper import SparrowDatabaseMapper
 from ..logs import get_logger
@@ -162,6 +162,9 @@ class Database:
         # TODO: refactor this to exec_sql_file
         secho(Path(fn).name, fg="cyan", bold=True)
         run_sql_file(self.session, str(fn))
+    
+    def exec_sql_query(self, fn, params=None):
+        return run_sql_query_file(self.session, fn, params)
 
     def exec_query(self, *args):
         """Returns a Pandas DataFrame from a SQL query"""

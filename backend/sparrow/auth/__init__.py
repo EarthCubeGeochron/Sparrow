@@ -60,4 +60,4 @@ class AuthPlugin(SparrowCorePlugin):
         api.add_middleware(AuthenticationMiddleware, backend=self.backend)
 
     def on_api_initialized_v2(self, api):
-        api.mount("/auth", AuthAPI, name="auth_api")
+        api.mount("/auth", AuthAPI, name="auth")
