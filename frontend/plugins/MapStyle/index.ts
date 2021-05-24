@@ -1,5 +1,5 @@
 import { mapStyle } from "../../src/map/MapStyle";
-import { mapStyle2 } from "../../src/map/MapStyle2";
+//import { mapStyle2 } from "../../src/map/MapStyle2";
 //import { Frame, FrameChild } from "../../src/frame";
 import h from "@macrostrat/hyper";
 
@@ -29,7 +29,6 @@ export const mapStyles = [
     name: "Satelite Map",
     style: "mapbox://styles/jczaplewski/cjeycrpxy1yv22rqju6tdl9xb",
   },
-  { name: "test map", style: mapStyle2},
 ];
 
 //export const mapStyles = h(FrameChild, { id: "MapStyles" });
