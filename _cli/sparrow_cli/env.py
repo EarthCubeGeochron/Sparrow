@@ -18,6 +18,11 @@ def prepare_docker_environment():
     environ.setdefault("SPARROW_BASE_URL", "/")
     environ.setdefault("SPARROW_LAB_NAME", "")
 
+    # Have to get rid of random printing to stdout in order to not break
+    # logging and container ID
+    # https://github.com/docker/scan-cli-plugin/issues/149
+    environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
+
     prepare_compose_overrides()
 
 

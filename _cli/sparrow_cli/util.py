@@ -26,9 +26,7 @@ def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
 
 def cmd(*v, **kwargs):
     kwargs["logger"] = log
-    # val = " ".join(v)
     # TODO: We shouldn't print unless we specify a debug/verbose flag...
-    # print("[green]COMMAND CALLED[/green]", val)
     return cmd_(*v, **kwargs)
 
 
