@@ -17,6 +17,7 @@ procedures = here / "procedures"
 class OpenSearch(SparrowCorePlugin):
 
     name = "open-search"
+    dependencies = ["versioning"]
 
     def initialize_tables(self, db):
         initialization_fn = procedures / "on-initialization.sql"

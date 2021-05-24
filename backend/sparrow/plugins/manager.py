@@ -13,18 +13,16 @@ def handle_compat_error(plugin):
         f"Plugin '{plugin.name}' is incompatible with Sparrow core "
         f"version {sparrow.__version__} (expected {plugin.sparrow_version})"
     )
+    log.error(_error)
     if issubclass(plugin, SparrowCorePlugin):
         raise SparrowPluginError(_error)
-    else:
-        log.error(_error)
 
 
 def handle_load_error(plugin, err):
     _error = f"Could not load plugin '{plugin.name}': {err}"
+    log.error(_error)
     if issubclass(plugin, SparrowCorePlugin):
         raise SparrowPluginError(_error)
-    else:
-        log.error(_error)
 
 
 class SparrowPluginManager(object):
@@ -97,9 +95,9 @@ class SparrowPluginManager(object):
             if getattr(p, "name") is None:
                 raise SparrowPluginError(f"Sparrow plugin '{p}' must have a name attribute.")
         struct = {p.name: set(p.dependencies) for p in store}
-        map = {p.name: p for p in store}
+        map_ = {p.name: p for p in store}
         res = toposort_flatten(struct, sort=True)
-        return {map[k] for k in res}
+        return {map_[k] for k in res}
 
     def __load_plugin(self, plugin_class, app):
         if not issubclass(plugin_class, SparrowPlugin):
