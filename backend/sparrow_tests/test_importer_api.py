@@ -7,13 +7,13 @@ import sys
 
 
 class TestAPIImporter:
-    def test_api_import(self, client):
-        res = client.put("/api/v1/import-data/session", json={"filename": None, "data": basic_data})
-        assert res.status_code == 201
+    def test_api_import(self, client,token):
+        res = client.put("/api/v2/import-data/models/session", headers={"Authorization":token}, json={"filename": None, "data": basic_data})
+        assert res.status_code == 200
 
-    def test_basic_import(self, client):
-        res = client.put("/api/v1/import-data/session", json=basic_d18O_data)
-        assert res.status_code == 201
+    def test_basic_import(self, client, token):
+        res = client.put("/api/v2/import-data/models/session", headers={"Authorization":token},json=basic_d18O_data)
+        assert res.status_code == 200
 
     @mark.skip
     def test_complex_single_row_prior(self, client, db):
@@ -44,7 +44,7 @@ class TestAPIImporter:
 
         db.load_data("session", complex_data["data"])
 
-    def test_very_large_import(self, client):
+    def test_very_large_import(self, client, token):
 
         import_size = 10
 
@@ -75,10 +75,10 @@ class TestAPIImporter:
             "analysis": analysis,
         }
 
-        res = client.put("/api/v1/import-data/session", json={"filename": None, "data": data})
-        assert res.status_code == 201
+        res = client.put("/api/v2/import-data/models/session",headers={"Authorization":token}, json={"filename": None, "data": data})
+        assert res.status_code == 200
 
-    def test_missing_field(self, client, db):
+    def test_missing_field(self, client, db, token):
         """Missing fields should produce a useful error message
         and insert no data"""
         new_name = "Test error vvv"
@@ -117,7 +117,7 @@ class TestAPIImporter:
             ],
         }
 
-        res = client.put("/api/v1/import-data/session", json={"filename": None, "data": data})
+        res = client.put("/api/v2/import-data/models/session", headers={"Authorization":token},json={"filename": None, "data": data})
         assert res.status_code == 400
         err = res.json()["error"]
 

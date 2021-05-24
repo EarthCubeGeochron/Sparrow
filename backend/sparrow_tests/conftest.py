@@ -4,6 +4,7 @@ from starlette.testclient import TestClient
 from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 from sparrow.database.util import wait_for_database
+from sparrow.auth.create_user import _create_user
 from sqlalchemy.orm import Session
 from sqlalchemy import event
 from .helpers.database import testing_database
@@ -110,3 +111,20 @@ def db(app, pytestconfig):
 def client(app, db):
     _client = TestClient(app)
     yield _client
+
+@fixture(scope="class")
+def token(db, client):
+    if db.session.query(db.model.user).get("test") == None:
+        user = "test"
+        password = "test"
+
+        _create_user(db, user, password)
+    res = client.post(
+            "/api/v2/auth/login", json={"username": "test", "password": "test"}
+        )
+
+    token = res.json()['token']
+
+    return token
+
+    
