@@ -88,6 +88,10 @@ class BaseImporter(ImperativeImportHelperMixin):
         """An importer must `yield` models that are to be tracked in the `data_file_link` table."""
         raise NotImplementedError()
 
+    def run(self):
+        """Run the pipeline"""
+        raise NotImplementedError()
+
     def delete_session(self, rec):
         """
         Delete session(s) and associated analysis and datum records,

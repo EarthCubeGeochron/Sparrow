@@ -243,7 +243,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
             ):
                 q = q.filter(schema.opts.model.embargo_date == None)
 
-            q = q.options(*list(schema.query_options(max_depth=1)))
+            q = q.options(*list(schema.query_options(max_depth=None)))
 
             if args["all"]:
                 res = q.all()
