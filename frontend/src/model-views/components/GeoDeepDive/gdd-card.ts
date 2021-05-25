@@ -14,13 +14,13 @@ import {
 } from "@macrostrat/ui-components";
 import "./gdd-card.styl";
 
-const Snippet = function({ html }) {
+const Snippet = function ({ html }) {
   const __html = html;
   console.log(__html);
   return h("p.snippet", { dangerouslySetInnerHTML: { __html } });
 };
 
-const SnippetResult = function(props) {
+const SnippetResult = function (props) {
   const {
     title,
     pubname,

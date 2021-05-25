@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "[pre-commit hook: $1]"
+
+_cli/sparrow-dev-shim dev sync-version-info || echo "Pre-commit hook could not be run!! Check your local dev setup."

@@ -60,3 +60,15 @@ Container management:
   test-runtime            Run tests for Sparrow
   restart
 ```
+
+
+## Container orchestration
+
+Sparrow bundles its own version of [`docker-compose`](https://docs.docker.com/compose/)
+for container orchestration. All commands that are part of the compose interface
+can be used to access and manage containers that are part of a
+Sparrow installation.
+
+Some key commands:
+
+- `sparrow compose config`: print out the entire Docker-compose configuration

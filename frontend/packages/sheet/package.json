@@ -1,0 +1,25 @@
+{
+  "name": "@earthdata/sheet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daven Quinn",
+  "license": "ISC",
+  "dependencies": {
+    "@blueprintjs/core": "^3.39.0",
+    "@macrostrat/hyper": "^1.2.12",
+    "d3-array": "^2.12.1",
+    "immutability-helper": "^3.1.1",
+    "react": "^17.0.2",
+    "react-datasheet": "^1.4.9",
+    "react-dnd": "^14.0.2",
+    "react-dnd-html5-backend": "^14.0.0",
+    "react-draggable": "^4.4.3"
+  },
+  "devDependencies": {
+    "typescript": "^4.2.3"
+  }
+}

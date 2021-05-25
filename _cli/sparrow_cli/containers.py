@@ -1,11 +1,11 @@
 import sys
 import click
-from subprocess import Popen
+from subprocess import Popen, PIPE
 from rich import print
 from time import sleep
 
 from .env import validate_environment
-from .util import compose, container_id, cmd
+from .util import compose, container_id, cmd, log
 from .help.backend import get_backend_help_info
 
 
@@ -20,8 +20,10 @@ def sparrow_up(container, force_recreate=False):
     validate_environment()
 
     if container is None:
+        sleep(1)
         container = ""
-    res = compose(
+    res = cmd(
+        "sparrow compose",
         "up --build --no-start",
         "--force-recreate" if force_recreate else "",
         container,
@@ -29,7 +31,13 @@ def sparrow_up(container, force_recreate=False):
     if res.returncode != 0:
         print("[red]One or more containers did not build successfully, aborting.[/red]")
         sys.exit(res.returncode)
-    p = Popen(["sparrow", "logs", container])
+
+    # Make sure popen call gets logged...
+    _log_cmd = ["sparrow", "logs", container]
+    log.debug(" ".join(_log_cmd))
+    p = Popen(_log_cmd)
+    sleep(0.05)
+
     print("[green]Following container logs[/green]")
     compose("start", container)
     # While we're spinning up, repopulate command help in case it's changed
@@ -42,7 +50,7 @@ def sparrow_up(container, force_recreate=False):
 @click.argument("container", type=str, required=False, default=None)
 def sparrow_logs(container):
     if container is None:
-        compose("logs -f --tail=0")
+        compose("logs --tail=0 --follow")
     else:
         id = container_id(container)
-        cmd("docker logs -f", id)
+        cmd("docker logs -f", str(id))

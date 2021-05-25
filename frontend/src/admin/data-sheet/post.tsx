@@ -22,12 +22,19 @@
  */
 
 import axios from "axios";
+import { APIV2Context } from "~/api-v2";
+import { APIHelpers } from "@macrostrat/ui-components";
+import { useContext } from "react";
 
 export function postData(data) {
   const post_data = JSON.stringify(data);
+  const { buildURL } = APIHelpers(useContext(APIV2Context));
+
+  const url = buildURL("/datasheet/edits");
+  console.log(url);
 
   axios
-    .post("http://localhost:5002/api/v2/datasheet/edits", post_data)
+    .post(url, post_data)
     .then(function(response) {
       console.log(response);
     })

@@ -17,6 +17,7 @@ class APIResponse(JSONResponse):
         self.schema = kwargs.pop("schema", None)
         self.total_count = kwargs.pop("total_count", None)
         self.to_dict = kwargs.pop("to_dict", False)
+        self.page = {}
         super().__init__(*args, **kwargs)
 
     def render(self, content: Any):
@@ -25,12 +26,11 @@ class APIResponse(JSONResponse):
         # Use output schema to validate and format data
 
         paging = getattr(content, "paging", None)
-        page = {}
         if self.total_count is not None:
-            page["total_count"] = self.total_count
+            self.page["total_count"] = self.total_count
         if paging is not None:
-            page["next_page"] = paging.bookmark_next if paging.has_next else None
-            page["previous_page"] = (
+            self.page["next_page"] = paging.bookmark_next if paging.has_next else None
+            self.page["previous_page"] = (
                 paging.bookmark_previous if paging.has_previous else None
             )
 
@@ -43,7 +43,7 @@ class APIResponse(JSONResponse):
         except Exception:
             raise SerializationError(status_code=500)
 
-        return self._encode(dict(data=content, **page))
+        return self._encode(dict(data=content, **self.page))
 
     def _encode(self, content: Any) -> bytes:
         """Shim for starlette's JSONResponse (subclassed by Flama)

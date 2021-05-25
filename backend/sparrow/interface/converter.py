@@ -8,7 +8,7 @@ from marshmallow_sqlalchemy.fields import Related, RelatedList
 
 import geoalchemy2 as geo
 from sqlalchemy.orm import RelationshipProperty
-from sqlalchemy.types import Integer
+from sqlalchemy.types import Integer, Numeric
 from sqlalchemy.dialects import postgresql
 
 from ..database.mapper.util import trim_postfix
@@ -25,8 +25,8 @@ log = get_logger(__name__)
 # - we also might want to move this to a configuration section so it can be modified
 allowed_collections = {
     "data_file": ["data_file_link"],
-    "data_file_link": ["session", "sample", "analysis"],
-    "sample": ["session", "material", "project", "sample_geo_entity"],
+    "data_file_link": ["session", "sample", "analysis", "instrument_session"],
+    "sample": ["session", "material", "project", "sample_geo_entity", "publication"],
     "geo_entity": "all",
     "sample_geo_entity": "all",
     "session": [
@@ -36,6 +36,7 @@ allowed_collections = {
         "publication",
         "sample",
         "instrument",
+        "instrument_session",
         "target",
         "method",
     ],
@@ -47,7 +48,8 @@ allowed_collections = {
         "material",
     ],
     "attribute": ["parameter", "unit"],
-    "project": ["researcher", "publication", "session", "sample"],
+    "instrument_session": ["session", "project", "researcher"],
+    "project": ["researcher", "publication", "session", "sample", "instrument_session"],
     "datum": ["datum_type"],
     "datum_type": ["parameter", "unit", "error_unit", "error_metric"],
 }
@@ -158,7 +160,9 @@ class SparrowConverter(ModelConverter):
         # Somewhat ugly method, mostly to decide if field is dump_only or required
         kwargs = super()._get_field_kwargs_for_property(prop)
         kwargs["data_key"] = self._get_key(prop)
-        kwargs["allow_nan"] = True
+
+        if isinstance(prop, Numeric):
+            kwargs["allow_nan"] = True
 
         if isinstance(prop, RelationshipProperty):  # Relationship property
             cols = list(getattr(prop, "local_columns", []))

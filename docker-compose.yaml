@@ -30,6 +30,7 @@ services:
       - SPARROW_SECRET_KEY
       - SPARROW_BASE_URL
       - SPARROW_LAB_NAME
+      - SPARROW_ECHO_SQL
       - SPARROW_DATABASE=postgresql+psycopg2://postgres@db/sparrow
       - SPARROW_DATA_DIR
       # A cache for files that need to persist but can be rebuilt.
@@ -54,7 +55,7 @@ services:
       - type: bind
         source: ./backend/
         target: /app
-        read_only: false
+        read_only: true
         consistency: cached
       # Nested volume to keep built files
       # separate from those on our local system
@@ -102,12 +103,12 @@ services:
       context: frontend
       cache_from:
         - sparrowdata/frontend:${SPARROW_FRONTEND_VERSION:-latest}
-    command: webpack
     depends_on:
       - backend
     environment:
       - CONTAINERIZED=1
       - SPARROW_LAB_NAME
+      - SPARROW_ECHO_SQL
       - SPARROW_BASE_URL
       # We need to forward SPARROW_HTTP_PORT to the frontend so that we can
       # load BrowserSync on the correct port if in development mode
@@ -116,11 +117,10 @@ services:
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container
       - SPARROW_SITE_CONTENT=/app/site-content
+      - SPARROW_FRONTEND_BUILD_DIR=/build
       - SPARROW_ENV
     volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/plugins:/app/plugins
-      - frontend_build:/app/_assets
+      - frontend_build:/build
       # Right now, we configure default site content
       # rather than allowing any customization
       - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/app/site-content
@@ -134,6 +134,35 @@ services:
     command: echo
     depends_on:
       - backend
+  database_backup:
+    # This service backs up the database periodically
+    # to a remote S3 bucket or a local directory on the server.
+    restart: unless-stopped
+    # This service should only run under the "production" profile
+    # https://docs.docker.com/compose/profiles/
+    profiles:
+      - production
+    environment:
+      - SPARROW_S3_ENDPOINT
+      - SPARROW_S3_BUCKET
+      - SPARROW_S3_KEY
+      - SPARROW_S3_SECRET
+      - SPARROW_BACKUP_BUCKET
+      # If we don't specify all S3 parameters,
+      # we fall back to using the local backup directory
+      - SPARROW_BACKUP_DIR
+      # Mounted volume for local backups (mapped to Sparrow backup dir)
+      - SPARROW_BACKUP_VOLUME=/local-backups
+      # The unique-ish identifier of the lab (used to prefix backups)
+      - SPARROW_LAB_ID
+    build: services/backup-database
+    tty: true
+    entrypoint: ""
+    command: /conf/backup-service
+    depends_on:
+      - db
+    volumes:
+      - ${SPARROW_BACKUP_DIR:-placeholder}:/local-backups
 volumes:
   frontend_build:
   # Anonymous volume to preserve `sparrow shell` history

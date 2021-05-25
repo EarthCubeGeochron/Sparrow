@@ -8,6 +8,9 @@ from .exc import SparrowCommandError
 from json.decoder import JSONDecodeError
 from sparrow_utils.logs import get_logger
 from sparrow_utils.shell import cmd as cmd_
+from rich import print
+from compose.cli.main import main
+import sys
 
 log = get_logger(__name__)
 
@@ -23,11 +26,11 @@ def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
 
 def cmd(*v, **kwargs):
     kwargs["logger"] = log
+    # TODO: We shouldn't print unless we specify a debug/verbose flag...
     return cmd_(*v, **kwargs)
 
 
 def compose(*args, **kwargs):
-    kwargs.setdefault("cwd", environ["SPARROW_PATH"])
     return cmd("docker-compose", *args, **kwargs)
 
 
@@ -43,9 +46,7 @@ def container_is_running(name):
     return res.returncode == 0
 
 
-def exec_or_run(
-    container, *args, log_level=None, run_args=("--rm",), tty=True, **popen_kwargs
-):
+def exec_or_run(container, *args, log_level=None, run_args=("--rm",), tty=True, **popen_kwargs):
     """Run a command against sparrow within a docker container
     This `exec`/`run` switch is added because there are apparently
     database/locking issues caused by spinning up arbitrary
@@ -60,13 +61,9 @@ def exec_or_run(
         tty_args = ["-T"]
 
     if container_is_running(container):
-        return compose(
-            *compose_args, "exec", *tty_args, container, *args, **popen_kwargs
-        )
+        return compose(*compose_args, "exec", *tty_args, container, *args, **popen_kwargs)
     else:
-        return compose(
-            *compose_args, "run", *tty_args, *run_args, container, *args, **popen_kwargs
-        )
+        return compose(*compose_args, "run", *tty_args, *run_args, container, *args, **popen_kwargs)
 
 
 def exec_sparrow(*args, **kwargs):
@@ -77,9 +74,7 @@ def fail_without_docker():
     try:
         res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
     except FileNotFoundError:
-        raise SparrowCommandError(
-            "Cannot find the docker command. Is docker installed?"
-        )
+        raise SparrowCommandError("Cannot find the docker command. Is docker installed?")
     try:
         errors = loads(str(res.stdout, "utf-8"))
     except JSONDecodeError:

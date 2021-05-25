@@ -14,7 +14,7 @@ export const Sample = (props) => {
   ]);
 };
 
-export const Instrument = function(props) {
+export const Instrument = function (props) {
   const { instrument } = props;
   if (!instrument) return null;
 
@@ -32,7 +32,7 @@ export const Publication = (publication) => {
   return;
 };
 
-export const Technique = function({ technique }) {
+export const Technique = function ({ technique }) {
   if (technique == null) {
     return null;
   }
@@ -67,7 +67,7 @@ export const SessionProjects = (props) => {
   ]);
 };
 
-const SessionInfoComponent = function(props) {
+const SessionInfoComponent = function (props) {
   // add some links to Project, sample, etc
   const { id, sample, target, project, date: sdate } = props;
   const date = parse(sdate);
@@ -91,7 +91,7 @@ const SessionInfoComponent = function(props) {
   ]);
 };
 
-const SessionInfoLink = function(props) {
+const SessionInfoLink = function (props) {
   const { id } = props;
 
   const to = useModelURL(`/session/${id}`);
@@ -107,7 +107,7 @@ const SessionInfoLink = function(props) {
   );
 };
 
-const SessionInfoCard = function(props) {
+const SessionInfoCard = function (props) {
   const { id } = props;
   return h(
     Card,

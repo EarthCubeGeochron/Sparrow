@@ -83,7 +83,7 @@ interface ProjectProps {
   id?: number;
 }
 
-const ProjectComponent = function(props: ProjectProps) {
+const ProjectComponent = function (props: ProjectProps) {
   const { id, Edit } = props;
   const data = useAPIv2Result(
     `/models/project/${id}`,

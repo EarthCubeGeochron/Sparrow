@@ -114,3 +114,19 @@ class TestSparrowAuth:
             # We expect an assertion error here...
             return
         assert False
+
+    def test_access_token(self, client):
+        res = client.post(
+            "/api/v2/auth/login", json={"username": "Test", "password": "test"}
+        )
+        data = res.json()
+        assert 'error' not in data
+
+        token = data['token']
+
+        res = client.get(
+            "/api/v2/auth/secret"
+        )
+        data = res.json()
+        assert 'error' not in data
+        assert data['answer'] == 42

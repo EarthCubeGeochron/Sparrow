@@ -4,6 +4,7 @@ from starlette.testclient import TestClient
 from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 from sparrow.database.util import wait_for_database
+from sparrow.auth.create_user import _create_user
 from sqlalchemy.orm import Session
 from sqlalchemy import event
 from .helpers.database import testing_database
@@ -39,9 +40,10 @@ def pytest_addoption(parser):
         "--teardown",
         action="store_true",
         dest="teardown",
-        default=True,
+        default=False,
         help="Tear down database after tests run",
     )
+
 
 def pytest_configure(config):
     if not config.option.slow:
@@ -56,6 +58,18 @@ def app(pytestconfig):
         _app.bootstrap(init=True)
         _setup_context(_app)
         yield _app
+
+
+@fixture(scope="function")
+def statements(db):
+    stmts = []
+
+    def catch_queries(conn, cursor, statement, parameters, context, executemany):
+        stmts.append(statement)
+
+    event.listen(db.engine, "before_cursor_execute", catch_queries)
+    yield stmts
+    event.remove(db.engine, "before_cursor_execute", catch_queries)
 
 
 @fixture(scope="class")
@@ -92,7 +106,25 @@ def db(app, pytestconfig):
     else:
         yield app.database
 
+
 @fixture(scope="class")
 def client(app, db):
     _client = TestClient(app)
     yield _client
+
+@fixture(scope="class")
+def token(db, client):
+    if db.session.query(db.model.user).get("test") == None:
+        user = "test"
+        password = "test"
+
+        _create_user(db, user, password)
+    res = client.post(
+            "/api/v2/auth/login", json={"username": "test", "password": "test"}
+        )
+
+    token = res.json()['token']
+
+    return token
+
+    
