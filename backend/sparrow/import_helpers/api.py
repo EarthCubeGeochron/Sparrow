@@ -1,4 +1,4 @@
-from asyncio import sleep
+from asyncio import sleep, get_event_loop, gather, create_task, wait
 
 from starlette.responses import JSONResponse
 from sparrow.plugins import SparrowCorePlugin
@@ -21,9 +21,14 @@ class ImporterEndpoint(WebSocketEndpoint):
 
         await session.accept()
         await session.send_text("Bienvenue sur le websocket!")
-        await self.send_periodically(session, 5)
+        task = create_task(self.send_periodically(session))
+        # loop = get_event_loop()
+        # task = loop.create_task(self.send_periodically(session, 5))
+        # self.send_periodically(session)
+        # loop = get_event_loop()
+        # counter = create_task(self.send_periodically(session))
 
-    async def send_periodically(self, session, timer):
+    async def send_periodically(self, session):
         while True:
             await session.send_text(f"Hello, planet {self.counter}!")
             await sleep(1)
