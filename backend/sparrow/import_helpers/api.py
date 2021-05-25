@@ -1,5 +1,5 @@
 from asyncio import sleep, get_event_loop, gather, create_task, wait
-
+from json import loads
 from starlette.responses import JSONResponse
 from sparrow.plugins import SparrowCorePlugin
 from starlette.endpoints import WebSocketEndpoint
@@ -12,16 +12,26 @@ class ImporterEndpoint(WebSocketEndpoint):
     encoding = "json"
     pipeline = None
     is_running = False
+    task = None
 
-    async def on_receive(self, session, data):
-        await session.send_text(f"Message text: {data}")
+    async def on_receive(self, session, message):
+        try:
+            action = message.get("action", None)
+            if action == "start":
+                self.task = create_task(self.send_periodically(session))
+            if action == "stop" and self.task is not None:
+                self.task.cancel()
+            await session.send_json(message)
+        except Exception as exc:
+            await session.send_json({"error": str(exc)})
 
     async def on_connect(self, session):
         self.pipeline = session.path_params["pipeline"]
 
         await session.accept()
-        await session.send_text("Bienvenue sur le websocket!")
-        task = create_task(self.send_periodically(session))
+        await session.send_json({"text": "Bienvenue sur le websocket!"})
+        # self.task = create_task(self.send_periodically(session))
+
         # loop = get_event_loop()
         # task = loop.create_task(self.send_periodically(session, 5))
         # self.send_periodically(session)
@@ -30,7 +40,7 @@ class ImporterEndpoint(WebSocketEndpoint):
 
     async def send_periodically(self, session):
         while True:
-            await session.send_text(f"Hello, planet {self.counter}!")
+            await session.send_json({"text": f"Hello, planet {self.counter}!"})
             await sleep(1)
             self.counter += 1
 

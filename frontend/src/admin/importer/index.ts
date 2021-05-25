@@ -23,7 +23,7 @@ function ImporterMain({ pipeline = "laserchron-data" }) {
   const url = `ws://localhost:5002/api/v2/import-tracker/pipeline/${pipeline}`;
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(url, {
-    onOpen: () => console.log("opened"),
+    shouldReconnect: (closeEvent) => true,
   });
   const messageHistory = useRef([]);
   const [isRunning, setIsRunning] = useState(false);
@@ -31,7 +31,25 @@ function ImporterMain({ pipeline = "laserchron-data" }) {
   const connectionStatus = statusOptions[readyState];
 
   messageHistory.current = useMemo(() => {
-    return messageHistory.current?.concat(lastMessage);
+    let message = null;
+    console.log(lastMessage);
+    if (lastMessage?.data != null) {
+      try {
+        message = JSON.parse(lastMessage.data);
+      } catch (error) {}
+    }
+    console.log(message);
+
+    if (message?.action == "start") {
+      setIsRunning(true);
+      return [];
+    } else if (message?.action == "stop") {
+      setIsRunning(false);
+    }
+    //if (message?.text != null) {
+    return messageHistory.current?.concat(message?.text);
+    //}
+    return messageHistory.current;
   }, [lastMessage]);
 
   return h("div.importer-main", [
@@ -58,7 +76,7 @@ function ImporterMain({ pipeline = "laserchron-data" }) {
       "div.message-history",
       messageHistory.current?.map((d) => {
         if (d == null) return null;
-        return h("div.message", d.data);
+        return h("div.message", d);
       })
     ),
   ]);
