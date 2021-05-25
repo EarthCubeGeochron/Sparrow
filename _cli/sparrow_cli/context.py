@@ -2,7 +2,7 @@ import typing
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from os import environ
+from os import environ, chdir
 from sparrow_utils.shell import git_revision_info, cmd
 from packaging.specifiers import SpecifierSet, InvalidSpecifier
 from packaging.version import Version
@@ -141,9 +141,7 @@ class SparrowConfig:
         if self.is_frozen:
             rev = (self.bundle_dir / "GIT_REVISION").open().read()
         else:
-            rev = git_revision_info(
-                capture_output=True, cwd=self.SPARROW_PATH
-            ).stdout.decode("utf-8")
+            rev = git_revision_info(capture_output=True, cwd=self.SPARROW_PATH).stdout.decode("utf-8")
         rev = rev.strip()
         return dict(revision=rev, dirty=rev.endswith("-dirty"))
 
