@@ -32,23 +32,22 @@ function ImporterMain({ pipeline = "laserchron-data" }) {
 
   messageHistory.current = useMemo(() => {
     let message = null;
-    console.log(lastMessage);
     if (lastMessage?.data != null) {
       try {
         message = JSON.parse(lastMessage.data);
       } catch (error) {}
     }
     console.log(message);
-
     if (message?.action == "start") {
       setIsRunning(true);
       return [];
     } else if (message?.action == "stop") {
       setIsRunning(false);
     }
-    //if (message?.text != null) {
-    return messageHistory.current?.concat(message?.text);
-    //}
+    const text = message?.text;
+    if (text != null) {
+      return messageHistory.current?.concat(message?.text);
+    }
     return messageHistory.current;
   }, [lastMessage]);
 
@@ -60,6 +59,7 @@ function ImporterMain({ pipeline = "laserchron-data" }) {
           Button,
           {
             rightIcon: isRunning ? "stop" : "play",
+            disabled: readyState != ReadyState.OPEN,
             onClick() {
               console.log("Sending message");
               sendMessage(

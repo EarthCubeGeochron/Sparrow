@@ -1,3 +1,5 @@
+from asyncio.events import get_running_loop
+from asyncio import run
 from click import secho
 from sqlalchemy import text
 from datetime import datetime
@@ -7,10 +9,29 @@ from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import inspect
 from IPython import embed
+from sys import stdout
+from io import TextIOBase
 
+from ..context import get_sparrow_app
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
 from .imperative_helpers import ImperativeImportHelperMixin
+
+from sparrow_utils import get_logger
+
+log = get_logger(__name__)
+
+
+class WebSocketLogger(TextIOBase):
+    def __init__(self, session):
+        self.session = session
+
+    def write(self, __s: str) -> int:
+        print(__s)
+        log.debug(__s)
+        print("websocket logger")
+        run(self.session.send_json({"text": __s}))
+        return super().write(__s)
 
 
 class BaseImporter(ImperativeImportHelperMixin):
@@ -21,8 +42,9 @@ class BaseImporter(ImperativeImportHelperMixin):
     authority = None
     file_type = None
 
-    def __init__(self, db, **kwargs):
-        self.db = db
+    def __init__(self, app, **kwargs):
+        self.app = app
+        self.db = self.app.database
         self.m = self.db.model
         print_sql = kwargs.pop("print_sql", False)
         self.verbose = kwargs.pop("verbose", False)
@@ -110,15 +132,16 @@ class BaseImporter(ImperativeImportHelperMixin):
         for fn in file_sequence:
             self.__import_datafile(fn, None, **kwargs)
 
-    def iter_records(self, seq, **kwargs):
+    async def iter_records(self, seq, **kwargs):
         """
         This is kind of outmoded by the new version of iterfiles
         """
+        loop = kwargs.pop("loop", get_running_loop())
         for rec in seq:
             if rec is None:
                 continue
             secho(str(rec.file_path), dim=True)
-            self.__import_datafile(None, rec, **kwargs)
+            await loop.run_until_complete(self.__import_datafile(None, rec, **kwargs))
 
     def __set_file_info(self, infile, rec):
         _ = infile.stat().st_mtime
