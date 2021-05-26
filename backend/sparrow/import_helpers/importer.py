@@ -1,5 +1,6 @@
 from asyncio.events import get_running_loop
-from asyncio import run
+from asyncio import run, sleep
+from asyncio.tasks import run_coroutine_threadsafe
 from click import secho
 from sqlalchemy import text
 from datetime import datetime
@@ -23,15 +24,14 @@ log = get_logger(__name__)
 
 
 class WebSocketLogger(TextIOBase):
-    def __init__(self, session):
+    def __init__(self, session, loop=None, **kwargs):
         self.session = session
+        self.loop = kwargs.get("loop", get_running_loop())
 
     def write(self, __s: str) -> int:
         print(__s)
-        log.debug(__s)
-        print("websocket logger")
-        run(self.session.send_json({"text": __s}))
-        return super().write(__s)
+        run_coroutine_threadsafe(self.session.send_json({"text": __s}), self.loop)
+        # return super().write(__s)
 
 
 class BaseImporter(ImperativeImportHelperMixin):
@@ -141,7 +141,7 @@ class BaseImporter(ImperativeImportHelperMixin):
             if rec is None:
                 continue
             secho(str(rec.file_path), dim=True)
-            await loop.run_until_complete(self.__import_datafile(None, rec, **kwargs))
+            # await loop.run_until_complete(self.__import_datafile(None, rec, **kwargs))
 
     def __set_file_info(self, infile, rec):
         _ = infile.stat().st_mtime

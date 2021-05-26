@@ -69,8 +69,8 @@ class ImporterEndpoint(WebSocketEndpoint):
             self.counter += 1
 
     async def websocket_import(self, session, pipeline_name):
-        logger = WebSocketLogger(session)
         plugin = get_sparrow_app().plugins.get("import-tracker")
+        logger = WebSocketLogger(session, loop=plugin.loop)
         importer = plugin.pipelines[pipeline_name]
         while True:
             print("Print printy print", file=logger)
