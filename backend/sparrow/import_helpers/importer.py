@@ -1,5 +1,5 @@
 from asyncio.events import get_running_loop
-from asyncio import run, sleep
+from asyncio import run, sleep, ensure_future
 from asyncio.tasks import run_coroutine_threadsafe
 from click import secho
 from sqlalchemy import text
@@ -41,6 +41,8 @@ class BaseImporter(ImperativeImportHelperMixin):
 
     authority = None
     file_type = None
+    log_socket = None
+    run_loop = None
 
     def __init__(self, app, **kwargs):
         self.app = app
@@ -104,7 +106,7 @@ class BaseImporter(ImperativeImportHelperMixin):
     ###
 
     def warn(self, message):
-        secho(str(message), fg="yellow")
+        self.log(str(message), fg="yellow")
 
     def import_datafile(self, fn, rec, **kwargs):
         """An importer must `yield` models that are to be tracked in the `data_file_link` table."""
@@ -136,12 +138,14 @@ class BaseImporter(ImperativeImportHelperMixin):
         """
         This is kind of outmoded by the new version of iterfiles
         """
-        loop = kwargs.pop("loop", get_running_loop())
+        loop = self.run_loop
+        if loop is None:
+            loop = get_running_loop()
         for rec in seq:
             if rec is None:
                 continue
-            secho(str(rec.file_path), dim=True)
-            # await loop.run_until_complete(self.__import_datafile(None, rec, **kwargs))
+            self.log(str(rec.file_path), dim=True)
+            await ensure_future(self.__import_datafile(None, rec, **kwargs))
 
     def __set_file_info(self, infile, rec):
         _ = infile.stat().st_mtime
@@ -186,7 +190,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         self.__set_file_info(_infile, rec)
         return rec, should_add_record
 
-    def __import_datafile(self, fn, rec=None, **kwargs):
+    async def __import_datafile(self, fn, rec=None, **kwargs):
         """
         A wrapper for data file import that tracks data files through
         the import process and builds links to data file types.
@@ -210,7 +214,7 @@ class BaseImporter(ImperativeImportHelperMixin):
             .count()
         )
         if prev_imports > 0 and not added and not redo:
-            secho("Already imported", fg="green", dim=True)
+            self.log("Already imported", fg="green", dim=True)
             return
         # It might get ugly here if we're trying to overwrite
         # old records but haven't deleted the appropriate
@@ -239,7 +243,7 @@ class BaseImporter(ImperativeImportHelperMixin):
             if df_link is not None:
                 self.db.session.add(df_link)
             self.db.session.commit()
-            secho(str(err), fg="red")
+            self.log(str(err), fg="red")
 
         if redo:
             self.__track_changes()
@@ -249,14 +253,23 @@ class BaseImporter(ImperativeImportHelperMixin):
         self.db.session.commit()
         secho("")
 
+    def log(self, *args, **kwargs):
+        text = " ".join([str(a) for a in args])
+        secho(text, **kwargs)
+        loop = self.run_loop
+        if loop is None:
+            loop = get_running_loop()
+        if self.log_socket is not None:
+            run_coroutine_threadsafe(self.log_socket.send_json(dict(text=text, **kwargs)), loop)
+
     def __track_changes(self):
         new_changed = set(i for i in self.__new if self.__has_changes(i))
         modified = set(i for i in self.__dirty if self.__has_changes(i))
 
-        def _echo(v, n, **kwargs):
+        def _report(v, n, **kwargs):
             i = len(v)
             if i > 0:
-                secho(f"{i} {n}", **kwargs)
+                self.log(f"{i} {n}", **kwargs)
 
         # has_new_models = len(self.__new) > 0
         # has_dirty_models = len(self.__dirty) > 0
@@ -264,14 +277,14 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         if self.verbose:
             problems = (self.__new & new_changed) | (self.__dirty & modified)
-            _echo(problems, "update attempted for unchanged model", fg="yellow")
+            _report(problems, "update attempted for unchanged model", fg="yellow")
             self.__print_changes(modified)
 
         if not has_modified_models:
-            secho("No modifications", fg="green")
+            self.log("No modifications", fg="green")
         else:
-            _echo(self.__new, "records added", fg="green")
-            _echo(modified, "records modified", fg="yellow")
+            _report(self.__new, "records added", fg="green")
+            _report(modified, "records modified", fg="yellow")
         secho("")
 
     def __print_changes(self, dirty_records):

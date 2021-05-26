@@ -4,12 +4,14 @@ from asyncio import sleep, get_event_loop, gather, create_task, wait
 from asyncio.events import AbstractEventLoop
 from json import loads
 import time
-from click import command
+import sys
+from click import command, echo
 from sparrow.context import get_sparrow_app
 from starlette.responses import JSONResponse
 from sparrow.plugins import SparrowCorePlugin
 from starlette.endpoints import WebSocketEndpoint
 from contextlib import redirect_stdout
+from click._compat import _force_correct_text_writer
 
 from .importer import WebSocketLogger
 
@@ -73,8 +75,9 @@ class ImporterEndpoint(WebSocketEndpoint):
         plugin = get_sparrow_app().plugins.get("import-tracker")
         logger = WebSocketLogger(session, loop=plugin.loop)
         importer = plugin.pipelines[pipeline_name]
-        with redirect_stdout(logger):
-            await self.send_periodically(session)
+        importer.log_socket = session
+        importer.run_loop = plugin.loop
+        await importer.import_data()
 
 
 class ImportTrackerPlugin(SparrowCorePlugin):
