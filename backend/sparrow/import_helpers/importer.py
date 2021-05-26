@@ -29,7 +29,7 @@ class WebSocketLogger(TextIOBase):
         self.loop = kwargs.get("loop", get_running_loop())
 
     def write(self, __s: str) -> int:
-        print(__s)
+        # print(__s)
         run_coroutine_threadsafe(self.session.send_json({"text": __s}), self.loop)
         # return super().write(__s)
 

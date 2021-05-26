@@ -72,10 +72,11 @@ class ImporterEndpoint(WebSocketEndpoint):
         plugin = get_sparrow_app().plugins.get("import-tracker")
         logger = WebSocketLogger(session, loop=plugin.loop)
         importer = plugin.pipelines[pipeline_name]
-        while True:
-            print("Print printy print", file=logger)
-            await sleep(2)
-            # await importer.import_data()
+        with redirect_stdout(logger):
+            while True:
+                print("Print printy print")
+                await sleep(2)
+                # await importer.import_data()
 
 
 class ImportTrackerPlugin(SparrowCorePlugin):
