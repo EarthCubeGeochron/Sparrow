@@ -46,7 +46,7 @@ function ImporterMain({ pipeline = "laserchron-data" }) {
     }
     const text = message?.text;
     if (text != null) {
-      return messageHistory.current?.concat(message?.text);
+      return messageHistory.current?.concat(message);
     }
     return messageHistory.current;
   }, [lastMessage]);
@@ -76,7 +76,9 @@ function ImporterMain({ pipeline = "laserchron-data" }) {
       "div.message-history",
       messageHistory.current?.map((d) => {
         if (d == null) return null;
-        return h("div.message", d);
+        let color = d.fg ?? "black";
+        let opacity = d.dim ?? false ? 0.5 : 1;
+        return h("div.message", { style: { color, opacity } }, d.text);
       })
     ),
   ]);
