@@ -31,31 +31,43 @@ async def test_import(session, loop):
 class ImporterEndpoint(WebSocketEndpoint):
     counter = 0
     encoding = "json"
-    pipeline = None
     is_running = False
     task = None
 
-    async def on_receive(self, session, message):
+    def get_importer(self, session):
+        name = session.path_params["pipeline"]
         plugin = get_sparrow_app().plugins.get("import-tracker")
-        loop = plugin.loop
+        return plugin.pipelines[name]
+
+    def get_loop(self):
+        plugin = get_sparrow_app().plugins.get("import-tracker")
+        return plugin.loop
+
+    async def on_receive(self, session, message):
+        importer = self.get_importer(session)
+        loop = self.get_loop()
         try:
             action = message.get("action", None)
-            if action == "start":
+            if action == "start" and importer._task is None:
                 print("Starting importer")
-                self.task = loop.create_task(self.websocket_import(session, self.pipeline))
-                # self.task = loop.create_task(self.send_periodically(session))
-            if action == "stop" and self.task is not None:
+                importer.websocket = session
+                importer._task = loop.create_task(self.websocket_import(session))
+                print(importer._task)
+            if action == "stop" and importer._task is not None:
                 print("Stopping importer")
-                self.task.cancel()
+                importer._task.cancel()
+                print(importer._task)
             await session.send_json(message)
         except Exception as exc:
+            print(exc)
             await session.send_json({"error": str(exc)})
 
     async def on_connect(self, session):
-        self.pipeline = session.path_params["pipeline"]
-
         await session.accept()
         await session.send_json({"text": "Bienvenue sur le websocket!"})
+
+        importer = self.get_importer(session)
+        importer.websocket = session
         # self.task = create_task(self.send_periodically(session))
 
         # loop = get_event_loop()
@@ -71,12 +83,9 @@ class ImporterEndpoint(WebSocketEndpoint):
             await sleep(1)
             self.counter += 1
 
-    async def websocket_import(self, session, pipeline_name):
-        plugin = get_sparrow_app().plugins.get("import-tracker")
-        logger = WebSocketLogger(session, loop=plugin.loop)
-        importer = plugin.pipelines[pipeline_name]
-        importer.log_socket = session
-        importer.run_loop = plugin.loop
+    async def websocket_import(self, session):
+        importer = self.get_importer(session)
+        importer.run_loop = self.get_loop()
         await importer.import_data()
 
 

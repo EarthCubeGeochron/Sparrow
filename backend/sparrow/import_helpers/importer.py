@@ -1,5 +1,5 @@
 from asyncio.events import get_running_loop
-from asyncio import run, sleep, ensure_future
+from asyncio import run, sleep, ensure_future, get_event_loop
 from asyncio.tasks import run_coroutine_threadsafe
 from click import secho
 from sqlalchemy import text
@@ -13,14 +13,18 @@ from IPython import embed
 from sys import stdout
 from io import TextIOBase
 
+import typing
 from ..context import get_sparrow_app
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
 from .imperative_helpers import ImperativeImportHelperMixin
-
+from contextvars import ContextVar
 from sparrow_utils import get_logger
+from rich import print
 
-log = get_logger(__name__)
+
+class SparrowContextError(Exception):
+    pass
 
 
 class WebSocketLogger(TextIOBase):
@@ -34,6 +38,20 @@ class WebSocketLogger(TextIOBase):
         # return super().write(__s)
 
 
+def log(*args, **kwargs):
+    importer = get_running_importer()
+    if importer is None:
+        raise SparrowContextError("Cannot use importer logger outside of a running importer")
+    importer.log(*args, **kwargs)
+
+
+_importer_context: ContextVar[typing.Any] = ContextVar("sparrow-importer-context", default=None)
+
+
+def get_running_importer() -> typing.Any:
+    return _importer_context.get()
+
+
 class BaseImporter(ImperativeImportHelperMixin):
     """
     A basic Sparrow importer to be subclassed.
@@ -41,12 +59,14 @@ class BaseImporter(ImperativeImportHelperMixin):
 
     authority = None
     file_type = None
-    log_socket = None
-    run_loop = None
+    run_loop = get_event_loop()
+    websocket = None
+    _task = None
 
     def __init__(self, app, **kwargs):
         self.app = app
         self.db = self.app.database
+        _importer_context.set(self)
         self.m = self.db.model
         print_sql = kwargs.pop("print_sql", False)
         self.verbose = kwargs.pop("verbose", False)
@@ -146,6 +166,9 @@ class BaseImporter(ImperativeImportHelperMixin):
                 continue
             self.log(str(rec.file_path), dim=True)
             await ensure_future(self.__import_datafile(None, rec, **kwargs))
+
+    async def import_data(self, *args, **kwargs):
+        pass
 
     def __set_file_info(self, infile, rec):
         _ = infile.stat().st_mtime
@@ -259,8 +282,8 @@ class BaseImporter(ImperativeImportHelperMixin):
         loop = self.run_loop
         if loop is None:
             loop = get_running_loop()
-        if self.log_socket is not None:
-            run_coroutine_threadsafe(self.log_socket.send_json(dict(text=text, **kwargs)), loop)
+        if self.websocket is not None:
+            run_coroutine_threadsafe(self.websocket.send_json(dict(text=text, **kwargs)), loop)
 
     def __track_changes(self):
         new_changed = set(i for i in self.__new if self.__has_changes(i))
