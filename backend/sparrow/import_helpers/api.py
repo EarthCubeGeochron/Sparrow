@@ -64,7 +64,8 @@ class ImporterEndpoint(WebSocketEndpoint):
 
     async def send_periodically(self, session):
         while True:
-            await session.send_json({"text": f"Hello, planet {self.counter}!"})
+            print(f"Hello, planet {self.counter}!")
+            # await session.send_json({"text": f"Hello, planet {self.counter}!"})
             await sleep(1)
             self.counter += 1
 
@@ -73,10 +74,7 @@ class ImporterEndpoint(WebSocketEndpoint):
         logger = WebSocketLogger(session, loop=plugin.loop)
         importer = plugin.pipelines[pipeline_name]
         with redirect_stdout(logger):
-            while True:
-                print("Print printy print")
-                await sleep(2)
-                # await importer.import_data()
+            await self.send_periodically(session)
 
 
 class ImportTrackerPlugin(SparrowCorePlugin):
