@@ -97,7 +97,7 @@ class Tags(SparrowCorePlugin):
     name = "tags"
 
     ## database-available hook is before the automapper
-    def on_database_available(self, db):
+    def on_core_tables_initialized(self, db):
         """
         Creates schema and tables for tags
         """
