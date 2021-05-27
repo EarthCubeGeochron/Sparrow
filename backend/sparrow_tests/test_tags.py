@@ -1,4 +1,5 @@
 from .helpers import json_fixture
+from pytest import mark
 import json
 
 
@@ -31,6 +32,7 @@ class TestTags:
         q = db.session.query(tags).filter(tags.name == new_tag["name"]).first()
         assert q.name == new_tag["name"]
     
+    @mark.skip(reason="Only works with the --no-isolation flag")
     def test_edit_tag(self, client, db, token):
         '''Edit a tag's name and color'''
         data = json_fixture("tags.json")
