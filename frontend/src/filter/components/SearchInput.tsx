@@ -3,7 +3,7 @@ import h from "@macrostrat/hyper";
 import { InputGroup } from "@blueprintjs/core";
 
 export function SearchInput(props) {
-  const { rightElement, updateParams, leftElement, text } = props;
+  const { rightElement, updateParams, leftIcon, text } = props;
 
   const handleChange = (e) => {
     updateParams("like", e.target.value);
@@ -11,7 +11,7 @@ export function SearchInput(props) {
 
   return h("form", [
     h(InputGroup, {
-      leftElement,
+      leftIcon,
       placeholder: "Search for anything...",
       value: text,
       onChange: handleChange,

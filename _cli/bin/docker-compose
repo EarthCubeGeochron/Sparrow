@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+# This file allows us to override the `docker-compose` with our own copy
+from compose.cli.main import main
+
+main()

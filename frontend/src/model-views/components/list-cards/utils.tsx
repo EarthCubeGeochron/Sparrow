@@ -95,7 +95,7 @@ const SampleModelCard = (props) => {
     id,
     name,
     location,
-    session,
+    session = [],
     link = true,
     onClick = null,
   } = props;
@@ -219,7 +219,7 @@ const SessionListContent = (props) => {
     date,
     technique,
     instrument,
-    analysis,
+    analysis = [],
     sample,
     data,
   } = props;
@@ -241,7 +241,10 @@ const SessionListContent = (props) => {
       h("div", ["Instrument: " + instruName]),
       h.if(Irradiation)("div", [Irradiation]),
     ]),
-    h("div.footer", [h("div", analysisCount), h("div", ["Target: " + target])]),
+    h("div.footer", [
+      h.if(analysis.length > 1)("div", analysisCount),
+      h("div", ["Target: " + target]),
+    ]),
   ]);
 };
 

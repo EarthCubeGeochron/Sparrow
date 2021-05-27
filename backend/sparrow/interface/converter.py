@@ -25,8 +25,8 @@ log = get_logger(__name__)
 # - we also might want to move this to a configuration section so it can be modified
 allowed_collections = {
     "data_file": ["data_file_link"],
-    "data_file_link": ["session", "sample", "analysis"],
-    "sample": ["session", "material", "project", "sample_geo_entity"],
+    "data_file_link": ["session", "sample", "analysis", "instrument_session"],
+    "sample": ["session", "material", "project", "sample_geo_entity", "publication", "tag"],
     "geo_entity": "all",
     "sample_geo_entity": "all",
     "session": [
@@ -36,8 +36,10 @@ allowed_collections = {
         "publication",
         "sample",
         "instrument",
+        "instrument_session",
         "target",
         "method",
+        "tag"
     ],
     "analysis": [
         "datum",
@@ -45,10 +47,12 @@ allowed_collections = {
         "constant",
         "analysis_type",
         "material",
+        "tag"
     ],
     "attribute": ["parameter", "unit"],
-    "project": ["researcher", "publication", "session", "sample"],
-    "datum": ["datum_type"],
+    "instrument_session": ["session", "project", "researcher"],
+    "project": ["researcher", "publication", "session", "sample", "instrument_session", "tag"],
+    "datum": ["datum_type", "tag"],
     "datum_type": ["parameter", "unit", "error_unit", "error_metric"],
 }
 

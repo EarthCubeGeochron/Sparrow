@@ -13,7 +13,7 @@ class TestSIMSImport:
         db.load_data("session", data)
 
 class TestSIMSWebscraper:
-    def test_webscrape_app_sims(self, db, client):
+    def test_webscrape_app_sims(self, db, client, token):
         """
         This test webscrapes an html page, taken from online.
 
@@ -50,7 +50,7 @@ class TestSIMSWebscraper:
         for i, title in enumerate(title_list):
             proj_titles.append({"name": title, "publications": [{"title": title, "doi": doi_list[i]}]})
 
-        res = client.post(route, json=proj_titles)
+        res = client.post(route, headers={"Authorization":token}, json=proj_titles)
 
         up_json = res.json()
         assert len(up_json["data"]) > 0

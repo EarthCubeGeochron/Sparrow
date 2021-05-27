@@ -1,4 +1,8 @@
-from .database.migration import SparrowMigration, has_column
+import IPython
+from .database.migration import SparrowMigration, has_column, has_table
+from .database.util import run_sql
+from sqlalchemy.orm import sessionmaker
+from schemainspect import get_inspector
 
 
 class PlateauMigration(SparrowMigration):
@@ -10,3 +14,18 @@ class PlateauMigration(SparrowMigration):
 
     def apply(self, db):
         db.engine.execute("ALTER TABLE analysis DROP COLUMN in_plateau")
+
+
+class InstrumentSessionMigration(SparrowMigration):
+    name = "add-instrument-session"
+
+    def should_apply(self, source, target, migrator):
+        pub = '"public"."instrument_session"'
+        return has_table(source, pub) and not has_column(source, '"public"."data_file_link"', "instrument_session_id")
+
+    def apply(self, db):
+        ix = "data_file_link_file_hash_session_id_analysis_id_sample_id_key"
+        sess = sessionmaker(bind=db.engine)()
+        run_sql(sess, f"ALTER TABLE data_file_link DROP CONSTRAINT {ix}")
+        run_sql(sess, "ALTER TABLE data_file_link DROP CONSTRAINT data_file_link_check")
+        run_sql(sess, f"DROP INDEX IF EXISTS {ix}")

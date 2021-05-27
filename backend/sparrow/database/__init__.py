@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from marshmallow.exceptions import ValidationError
 
-from .util import run_sql_file, run_query, get_or_create
+from .util import run_sql_file, run_query, get_or_create, run_sql_query_file
 from .models import User, Project, Session, DatumType
 from .mapper import SparrowDatabaseMapper
 from ..logs import get_logger
@@ -157,11 +157,14 @@ class Database:
         connection = self.engine.connect()
         connection.execute(text(statement))
 
-    def exec_sql(self, fn):
+    def exec_sql(self, fn, params=None):
         """Executes SQL files passed"""
         # TODO: refactor this to exec_sql_file
         secho(Path(fn).name, fg="cyan", bold=True)
-        run_sql_file(self.session, str(fn))
+        run_sql_file(self.session, str(fn), params)
+    
+    def exec_sql_query(self, fn, params=None):
+        return run_sql_query_file(self.session, fn, params)
 
     def exec_query(self, *args):
         """Returns a Pandas DataFrame from a SQL query"""
@@ -215,14 +218,14 @@ class Database:
             secho("Could not load plugins", fg="red", dim=True)
             secho(str(err))
 
-    def update_schema(self, dry_run=True):
+    def update_schema(self, **kwargs):
         # Might be worth creating an interactive upgrader
         from sparrow import migrations
 
         migrator = SparrowDatabaseMigrator(self)
         migrator.add_module(migrations)
         self.app.run_hook("prepare-database-upgrade", migrator)
-        migrator.run_migration(dry_run=dry_run)
+        migrator.run_migration(**kwargs)
 
     @property
     def table(self):

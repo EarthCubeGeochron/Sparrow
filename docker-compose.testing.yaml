@@ -6,7 +6,7 @@ services:
     build:
       context: ./backend
       target: testing
-    command: /bin/run-tests
+    command: pytest /app/sparrow_tests --teardown 
     # Make sure we get colorized terminal output
     tty: true
     depends_on:
