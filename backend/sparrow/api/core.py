@@ -13,7 +13,9 @@ from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
 from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, root_example, root_info, meta_info
+from .endpoints.data_file import DataFileListEndpoint
 from .response import APIResponse
+
 import time
 
 log = get_logger(__name__)
@@ -65,13 +67,13 @@ def schema(request):
     return JSONResponse(s)
     # return OpenAPIResponse(s)
 
+
 class ServerTimings(BaseHTTPMiddleware):
-    
     async def dispatch(self, request, call_next):
         start = time.time()
         response = await call_next(request)
-        dur = (time.time() - start)*1e3
-        response.headers['Server-Timing'] = f'total;dur={dur}'
+        dur = (time.time() - start) * 1e3
+        response.headers["Server-Timing"] = f"total;dur={dur}"
         return response
 
 
@@ -137,6 +139,7 @@ class APIv2(Starlette):
 
         self.add_schema_route()
         self.add_meta_route()
+        self.add_route("/data_file/list", DataFileListEndpoint)
 
     def _add_model_route(self, iface):
         class Meta:
