@@ -17,90 +17,21 @@ class TestTags:
         d = res.json()
         assert len(d["data"]) >= 3
 
-    def test_post_tag(self, client, db):
+    def test_post_tag(self, client, db, token):
         '''Create a new tag add to db and make sure it was entered'''
         data = json_fixture("tags.json")
         tags = db.model.tags_tag
 
         new_tag = data["new_tag"]
 
-        res = client.post("/api/v2/tags/tag", json=new_tag)
+        res = client.post("/api/v2/tags/tag", headers = {"Authorization": token},json=new_tag)
 
         assert res.status_code == 200
 
         q = db.session.query(tags).filter(tags.name == new_tag["name"]).first()
         assert q.name == new_tag["name"]
-
-    def test_add_tag_to_model(self, client, db):
-        """create a new sample and then add a tag to it"""
-
-        sample = db.model.sample
-        tags = db.model.tags_tag
-
-        data = json_fixture("tags.json")
-
-        new_tag = data['new_tag']
-        new_sample = data["new_sample"]
-
-        db.load_data("sample", new_sample)
-
-        sa = db.session.query(sample).filter(sample.name == new_sample["name"]).first()
-
-        assert sa.name == new_sample["name"]
-
-        sample_id = sa.id
-
-        tag = db.session.query(tags).filter(tags.name == new_tag["name"]).first()
-        tag_id = tag.id
-
-        new_tag['id'] = tag_id
-
-        res = client.put(f"/api/v2/models/sample/{sample_id}", json = {"tags_tag" : [new_tag]})
-
-        sa = db.session.query(sample).get(sample_id)
-        assert len(sa.tags_tag_collection) != 0
     
-    def test_remove_tag_from_model(self, client, db):
-        '''Remove a tag from the model created above'''
-        # TODO: We need a test doing this the interface way to figure out collections..
-
-        data = json_fixture("tags.json")
-
-        new_sample = data['new_sample']
-        tag_to_remove = data['new_tag']
-
-        sample = db.model.sample
-        tags = db.model.tags_tag
-
-        s = db.session.query(sample).filter(sample.name == new_sample['name']).first()
-        t = db.session.query(tags).filter(tags.color == tag_to_remove['color']).first()
-
-        assert len(s.tags_tag_collection) > 0
-        assert t.name == tag_to_remove['name']
-
-        tag_id = t.id ## unqiue id assigned in database
-
-        new_tag_collection = []
-        for tag in s.tags_tag_collection:
-            if tag.id != tag_id:
-                new_tag_collection.append(tag)
-        
-        s.tags_tag_collection = new_tag_collection
-        assert len(db.session.dirty) == 1 # we've changed the tag_collection
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
-        
-        s = db.session.query(sample).filter(sample.name == new_sample['name']).first()
-        exist_col = []
-        for tag in s.tags_tag_collection:
-            if tag.id == tag_id:
-                exist_col.append(tag)
-        
-        assert len(exist_col) == 0
-    
-    def test_edit_tag(self, client, db):
+    def test_edit_tag(self, client, db, token):
         '''Edit a tag's name and color'''
         data = json_fixture("tags.json")
 
@@ -110,11 +41,30 @@ class TestTags:
         t = db.session.query(tags).filter(tags.name == new_tag['name']).first()
         edits = data['edit_tag']
 
-        res = client.put(f"/api/v2/tags/tag/{t.id}", json=data['edit_tag'])
+        res = client.put(f"/api/v2/tags/tag/{t.id}", headers={"Authorization":token},json=data['edit_tag'])
 
         t = db.session.query(tags).filter(tags.name == edits['name']).first()
 
         assert t.description == edits['description']
+
+    def test_tag_plugin_endpoints(self, client, db, token):
+        data = json_fixture("tags.json")
+
+        sample = data['new_sample']
+
+        sample_ = db.load_data('sample', sample)
+
+        sample_id = sample_.id
+
+        tag = db.session.query(db.model.tags_tag).first()
+        tag_id = tag.id
+
+        body = {}
+        body['tag_ids'] = [tag_id]
+        body['model_id'] = sample_id
+
+        res = client.put('/api/v2/tags/models/sample', headers={"Authorization":token}, json=body)
         
+        assert res.status_code == 200
 
 
