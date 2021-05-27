@@ -182,6 +182,8 @@ class TestDuplication:
 class TestSampleChange:
     def test_sample_name_change(self, client, db):
         """Change name of sample in database"""
+        
+        Sample = db.model.sample
 
         combined_name = "WI-STD-74"
 
@@ -216,4 +218,4 @@ class TestSampleChange:
         res = db.load_data("session", data)
         # assert 1==0
         # I think looking for 2 samples is the easiest way to check given the DB currently keeps unique keys.
-        assert len(db.session.query(db.model.Sample).all()) == 2
+        assert len(db.session.query(Sample).all()) == 2
