@@ -166,8 +166,10 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
  *
  */
 
-export function MapToast({ lng, lat, mapstyle }) {
+export function MapToast({ lng, lat, mapstyle, login }) {
   const [open, toggleOpen] = useToggle(false);
+
+  console.log(login);
 
   // url to queary macrostrat
   const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
@@ -272,20 +274,23 @@ export function MapToast({ lng, lat, mapstyle }) {
             <NearByCity />
           )}
         </div>
-        <Button minimal={true} onClick={toggleOpen}>
-          Add Sample at Location
-        </Button>
       </div>
-
-      <div>
-        <AddSampleAtLocal
-          lng={lng}
-          lat={lat}
-          data={MacostratData}
-          open={open}
-          toggleOpen={toggleOpen}
-        />
-      </div>
+      {login ? (
+        <div>
+          <Button minimal={true} onClick={toggleOpen}>
+            Add Sample at Location
+          </Button>
+          <div>
+            <AddSampleAtLocal
+              lng={lng}
+              lat={lat}
+              data={MacostratData}
+              open={open}
+              toggleOpen={toggleOpen}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
