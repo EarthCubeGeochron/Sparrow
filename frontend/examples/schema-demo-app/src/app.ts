@@ -9,7 +9,7 @@ import LinksDemo from "./links-demo";
 function TermList(props) {
   const { data, title, children } = props;
   return h("div.term-list", [
-    h.if(title)("h2.term-list-title", title)
+    h.if(title)("h2.term-list-title", title),
     h(
       "div.term-list-data",
       data.map((d) => h(TermCard, { data: d })),
@@ -24,8 +24,8 @@ export default function () {
     h(TermList, { data: d1, title: "Lab fields" }),
     h("div.workspace", [
       h("h2", "Workspace"),
-      h(LinksDemo, { width: 800, height: 500 })
-    ])
-    h(TermList, { data: d2, title: "Output schemas"}),
+      h(LinksDemo, { width: 800, height: 500 }),
+    ]),
+    h(TermList, { data: d2, title: "Output schemas" }),
   ]);
 }
