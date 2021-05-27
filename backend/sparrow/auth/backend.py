@@ -51,9 +51,14 @@ class JWTBackend(AuthenticationBackend):
         payload = dict(iat=now, nbf=now, exp=now + max_age, type=type)
         payload.update(data)
 
+        token = self._encode(payload).decode("utf-8")
+
+        if response is None:
+            return token
+
         response.set_cookie(
             name,
-            value=self._encode(payload).decode("utf-8"),
+            value=token,
             max_age=max_age,
             # We could set this to make cookies valid only at secure paths
             secure=False,
@@ -78,9 +83,13 @@ class JWTBackend(AuthenticationBackend):
         try:
             cookie = request.cookies.get(name)
             if cookie is None:
-                raise AuthenticationError(f"Could not find {name} on request")
-
-            value = self._decode(cookie)
+                if "Authorization" not in request.headers:
+                    raise AuthenticationError(f"Could not find {name} on request")
+                else:
+                    value = self._decode(request.headers['Authorization'])
+            else:
+                value = self._decode(cookie)
+            
             identity = value.get("identity")
             if identity is None:
                 raise AuthenticationError(f"{name} has no key identity")

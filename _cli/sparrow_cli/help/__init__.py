@@ -108,7 +108,8 @@ class SparrowHelpFormatter(HelpFormatter):
         d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
         self.write_line(f"Lab: {d1}")
 
-        if ver := ctx.version_info:
+        ver = ctx.version_info
+        if ver:
             msg2 = " "
             msg2 += "matches" if ver.is_match else "does not match"
             msg2 += " target "
@@ -129,12 +130,8 @@ class SparrowHelpFormatter(HelpFormatter):
         commands = get_backend_command_help()
         if commands is None:
             return
-        core_commands = {
-            k: format_help(v) for k, v in commands.items() if not is_plugin_command(v)
-        }
-        plugin_commands = {
-            k: format_help(v) for k, v in commands.items() if is_plugin_command(v)
-        }
+        core_commands = {k: format_help(v) for k, v in commands.items() if not is_plugin_command(v)}
+        plugin_commands = {k: format_help(v) for k, v in commands.items() if is_plugin_command(v)}
         self.write_section(
             "Core commands",
             core_commands,
@@ -199,9 +196,11 @@ def command_info(ctx, cli):
 
 
 def echo_help(ctx, core_commands=None, user_commands=None):
-    # We want to run `sparrow up` first so we don't get surprised by container errors later
     fail_without_docker()
-    compose("up --no-start --remove-orphans")
+    # We want to run `sparrow up` first so we don't get surprised by container errors later
+    # ...actually we likely don't want to do this. It seems like it pushes errors too early
+    # in Sparrow's installation process
+    # compose("up --no-start --remove-orphans")
 
     fmt = SparrowHelpFormatter()
     fmt.write_frontmatter(ctx.find_object(SparrowConfig))

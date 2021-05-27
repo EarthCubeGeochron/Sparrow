@@ -1,0 +1,25 @@
+{
+  "name": "sparrow-schema-demo-app",
+  "version": "1.0.0",
+  "description": "Externally controlled vocabularies + schema definitions",
+  "main": "index.js",
+  "scripts": {
+    "dev": "parcel index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "../../packages/*"
+  ],
+  "devDependencies": {
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@earthcube/schema-linker": "^1.0.0",
+    "@macrostrat/hyper": "^1.2.11",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "prettier": {}
+}

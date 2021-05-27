@@ -2,7 +2,6 @@ from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
 from sqlalchemy.ext.automap import generate_relationship
 from ...logs import get_logger
-from ...exceptions import DatabaseMappingError
 
 # Drag in geographic types for database reflection
 from geoalchemy2 import Geometry, Geography
@@ -22,19 +21,12 @@ from .base import BaseModel
 log = get_logger(__name__)
 
 
-def _gen_relationship(
-    base, direction, return_fn, attrname, local_cls, referred_cls, **kw
-):
-    if local_cls.__table__.schema is None and referred_cls.__table__.schema is not None:
-        kw["backref"] = None
-    # kw["enable_typechecks"] = False
-    # kw["cascade"] = "all"
-
-    # make use of the built-in function to actually return
-    # the result.
-    return generate_relationship(
-        base, direction, return_fn, attrname, local_cls, referred_cls, **kw
-    )
+def _gen_relationship(base, direction, return_fn, attrname, local_cls, referred_cls, **kw):
+    support_schemas = ["vocabulary", "core_view"]
+    if local_cls.__table__.schema in support_schemas and referred_cls.__table__.schema is None:
+        # Don't create relationships on vocabulary and core_view models back to the main schema
+        return
+    return generate_relationship(base, direction, return_fn, attrname, local_cls, referred_cls, **kw)
 
 
 class AutomapError(Exception):
@@ -65,20 +57,15 @@ class SparrowDatabaseMapper:
             # Reflect tables in schemas we care about
             # Note: this will not reflect views because they don't have
             # primary keys.
-            _schema = schema
-            if schema is None:
-                _schema = "public"
-            log.info(f"Reflecting schema {_schema}")
-            BaseModel.metadata.reflect(
-                bind=self.db.engine, schema=schema, **reflection_kwargs
-            )
+            log.info(f"Reflecting schema {schema}")
+            BaseModel.metadata.reflect(bind=self.db.engine, schema=schema)
+        log.info("Reflecting core tables")
         BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
 
         self.automap_base = BaseModel
 
         self._models = ModelCollection(self.automap_base.classes)
         self._tables = TableCollection(self._models)
-        log.info("Finished automapping database")
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """
@@ -102,7 +89,8 @@ class SparrowDatabaseMapper:
             autoload_with=self.db.engine,
             **kwargs,
         )
-        log.info([c.name for c in tables.columns])
+        log.info(f"Automapping table {tablename}")
+        # log.info([c.name for c in tables.columns])
         return tables
 
     def reflect_view(self, tablename, *column_args, **kwargs):

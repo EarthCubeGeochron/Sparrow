@@ -271,7 +271,7 @@ class BaseImporter(ImperativeImportHelperMixin):
                 "can be tracked independently on import."
             )
 
-        return self.m.data_file_link.get_or_create(**params)
+        return self.db.get_or_create(self.m.data_file_link, **params)
 
 
 class CloudImporter(BaseImporter):

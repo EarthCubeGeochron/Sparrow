@@ -34,7 +34,6 @@ console = Console(highlight=True)
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
 def main(ctx, args):
-    log.debug(f"args: {args}")
     cfg = ctx.find_object(SparrowConfig)
     rest = []
 
@@ -48,7 +47,8 @@ def main(ctx, args):
         sys.exit(0)
 
     if subcommand == "compose":
-        return compose(*rest)
+        res = compose(*rest)
+        sys.exit(res.returncode)
 
     _command = find_subcommand(cfg.bin_directories, subcommand)
 

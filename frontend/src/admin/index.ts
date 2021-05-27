@@ -1,14 +1,16 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useContext } from "react";
+import { useContext, Suspense } from "react";
 import { Switch } from "react-router-dom";
-import loadable from "@loadable/component";
+import { lazy } from "@loadable/component";
 import { LinkCard } from "@macrostrat/ui-components";
+import { Spinner } from "@blueprintjs/core";
 
 import { Frame } from "~/frame";
 import { LoginRequired } from "~/auth";
 import { ErrorBoundaryRoute as Route, NoMatchPage } from "~/util";
 import { AuthContext } from "~/auth/context";
 import { ProjectAdminPage } from "./project";
+import { OpenSearch } from "~/components";
 
 import { SampleAdminPage } from "./sample";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
@@ -22,7 +24,11 @@ import { NewProjectForm } from "../model-views/project/new-project";
 import { NewSamplePage } from "~/model-views/sample/new-sample";
 import { TagManager } from "~/components/tags";
 
-const DataSheet = loadable(() => import("./data-sheet"));
+const DataSheet = lazy(() => import("./data-sheet"));
+
+function DataSheetPage() {
+  return h(Suspense, { fallback: h(Spinner) }, h(DataSheet));
+}
 
 const h = hyperStyled(styles);
 
@@ -36,7 +42,7 @@ function AdminDataModelLinks(props) {
   ]);
 }
 
-const AdminNavLinks = function({ base }) {
+const AdminNavLinks = function ({ base }) {
   if (base == null) {
     base = "/catalog";
   }
@@ -63,9 +69,21 @@ const AdminNavbar = (props) => {
   ]);
 };
 
+const QuickLinks = ({ base }) => {
+  return h("div", { style: { position: "sticky", top: "0px" } }, [
+    h("h2", { style: { marginTop: "0px" } }, "Quick Links"),
+    h(AdminDataModelLinks, { base }),
+  ]);
+};
+
 const AdminBody = ({ base, ...rest }) => {
   return h(Frame, { id: "adminBase", ...rest }, [
-    h(AdminDataModelLinks, { base }),
+    h("div", { style: { display: "flex", justifyContent: "space-between" } }, [
+      h("div", { style: { flexGrow: 1, marginRight: "50px", width: "28em" } }, [
+        h(OpenSearch),
+      ]),
+      h("div", { style: { flexGrow: 2 } }, [h(QuickLinks, { base })]),
+    ]),
   ]);
 };
 
@@ -73,7 +91,7 @@ const AdminRouter = ({ base }) =>
   h(Switch, [
     h(Route, {
       path: base + "/data-sheet",
-      render: () => h(DataSheet),
+      render: () => h(DataSheetPage),
     }),
     h(Route, {
       path: base + "/session",

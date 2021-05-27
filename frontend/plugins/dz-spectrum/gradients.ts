@@ -8,8 +8,8 @@ import {
   GradientPurpleRed,
   GradientPurpleTeal,
   GradientSteelPurple,
-  GradientTealBlue
-} from '@vx/gradient';
+  GradientTealBlue,
+} from "@vx/gradient";
 
 export default [
   GradientDarkgreenGreen,
@@ -21,5 +21,5 @@ export default [
   GradientPurpleRed,
   GradientPurpleTeal,
   GradientSteelPurple,
-  GradientTealBlue
+  GradientTealBlue,
 ];

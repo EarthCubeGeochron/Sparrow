@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { Frame } from "~/frame";
-import hyper from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import { Link } from "react-router-dom";
 import { pluralize } from "../new-model";
 import { format } from "date-fns";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
 
-const h = hyper.styled(styles);
+const h = hyperStyled(styles);
 
 export function ModelCard(props) {
   const { content, id, model, link = true, onClick = () => {} } = props;
@@ -95,7 +95,7 @@ const SampleModelCard = (props) => {
     id,
     name,
     location,
-    session,
+    session = [],
     link = true,
     onClick = null,
   } = props;
@@ -219,7 +219,7 @@ const SessionListContent = (props) => {
     date,
     technique,
     instrument,
-    analysis,
+    analysis = [],
     sample,
     data,
   } = props;
@@ -241,7 +241,10 @@ const SessionListContent = (props) => {
       h("div", ["Instrument: " + instruName]),
       h.if(Irradiation)("div", [Irradiation]),
     ]),
-    h("div.footer", [h("div", analysisCount), h("div", ["Target: " + target])]),
+    h("div.footer", [
+      h.if(analysis.length > 1)("div", analysisCount),
+      h("div", ["Target: " + target]),
+    ]),
   ]);
 };
 
@@ -393,7 +396,7 @@ const DataFileModelCard = (props) => {
   let sampleName = "";
   if (link.length > 0) {
     if (link[0].session) {
-      sampleName += link[0].session.sample.name;
+      sampleName += link[0].session?.sample?.name ?? "";
     }
   }
 

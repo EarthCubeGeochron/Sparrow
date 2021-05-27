@@ -1,0 +1,8 @@
+{
+  "packages": ["packages/*"],
+  "version": "independent",
+  "npmClient": "npm",
+  "bootstrap": {
+    "npmClientArgs": ["--no-package-lock", "--legacy-peer-deps"]
+  }
+}

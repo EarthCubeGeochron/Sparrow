@@ -37,7 +37,7 @@ function CatalogSessionInfoCard(props) {
   return h("div.test", [h(SessionInfoCard, model)]);
 }
 
-const EmbargoEditor = function(props) {
+const EmbargoEditor = function (props) {
   const { model, actions, isEditing } = useModelEditor();
   const onChange = (date) => {
     actions.updateState({
@@ -190,9 +190,8 @@ export function EditableSessionDetails(props) {
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
   const to = useModelURL("/session");
-  
-  if (!res) return null;
 
+  if (!res) return null;
 
   const breadCrumbs = [
     { text: h(Link, { to }, "Sessions") },

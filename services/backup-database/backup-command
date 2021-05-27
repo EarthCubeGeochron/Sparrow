@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# Check whether the right variables exist
+check-vars() {
+  reason="$1"
+  shift
+  var_names=("$@")
+  for var_name in "${var_names[@]}"; do
+    [ -z "${!var_name}" ] && echo "$var_name is required $reason." && var_unset=true
+  done
+  [ -n "$var_unset" ] && return 1
+  return 0
+}
+
+## Get rid of pesky stderr message
+mkdir -p /config/rclone
+touch /config/rclone/rclone.conf
+
+check-vars "for backup" SPARROW_LAB_ID || exit 1
+
+now="$(date +%Y-%m-%d:%H:%M:%S)"
+
+backup_name="$SPARROW_LAB_ID-$now.pg-dump"
+dbname=Sparrow
+
+# We mount local SPARROW_BACKUP_DIR as 
+if check_vars "local backup" SPARROW_BACKUP_DIR ; then
+  # Back up to the local directory
+  # Dump the database. Files always change, unfortunately.
+  # Add an extra variable to be more specific about the mounted directory 
+  export SPARROW_BACKUP_VOLUME=${SPARROW_BACKUP_VOLUME:-"$SPARROW_BACKUP_DIR"}
+
+  dumpfile="$SPARROW_BACKUP_VOLUME"/$backup_name
+  echo "Backing up $dbname to $dumpfile"
+  pg_dump -h database -p 5432 -Fc -C -Upostgres -f $dumpfile $dbname
+  ls -sh $dumpfile
+  echo ""
+fi
+
+# Rest of the script is for backing up to a server...
+
+check-vars "cloud backup" \
+  SPARROW_S3_ENDPOINT SPARROW_S3_KEY \
+  SPARROW_S3_SECRET SPARROW_BACKUP_BUCKET \
+|| exit 1
+
+# Set RClone configuration values
+export RCLONE_CONFIG_REMOTE_TYPE=s3
+export RCLONE_CONFIG_REMOTE_ENDPOINT=${SPARROW_S3_ENDPOINT}
+export RCLONE_CONFIG_REMOTE_ACCESS_KEY_ID=${SPARROW_S3_KEY}
+export RCLONE_CONFIG_REMOTE_SECRET_ACCESS_KEY=${SPARROW_S3_SECRET}
+
+remote=remote:$SPARROW_BACKUP_BUCKET
+list=/tmp/bucket-list
+
+
+dumpfile=/tmp/$backup_name
+remote_dump=$remote/$backup_name
+
+rclone ls $remote | sed 's/.* //g' > $list
+
+nfiles=$(cat $list | wc -l)
+
+echo "Existing backups:"
+cat $list
+echo ""
+
+oldest_file=$(cat $list | head -n 1)
+latest_file=$(cat $list | tail -n 1)
+
+
+# Dump the database. Files always change, unfortunately.
+echo "Backing up $dbname to $dumpfile"
+pg_dump -h database -p 5432 -Fc -C -Upostgres -f $dumpfile $dbname
+ls -sh $dumpfile
+echo ""
+
+echo "Uploading to $remote_dump"
+rclone copy $dumpfile $remote
+
+# Prune oldest backup if there are many
+max_n=20
+if [ $nfiles -gt $max_n ]; then
+  echo "More than $max_n backups available."
+  echo "Pruning the oldest ($oldest_file)."
+  rclone deletefile $remote/$oldest_file
+fi
+
+rm -f $list $dumpfile
