@@ -46,13 +46,16 @@ function ImporterMain({ pipeline = "laserchron-data" }) {
     }
     const text = message?.text;
     if (text != null) {
-      return messageHistory.current?.concat(message);
+      if (messageHistory.current?.length > 500) {
+        messageHistory.current?.pop();
+      }
+      messageHistory.current?.unshift(message);
     }
     return messageHistory.current;
   }, [lastMessage]);
 
   return h("div.importer-main", [
-    h(MinimalNavbar, [
+    h(MinimalNavbar, { className: "navbar" }, [
       h("h3", pipeline),
       h(ButtonGroup, { minimal: true }, [
         h(
@@ -70,8 +73,8 @@ function ImporterMain({ pipeline = "laserchron-data" }) {
           isRunning ? "Stop" : "Start"
         ),
       ]),
+      h("div.status", "WebSocket connection: " + connectionStatus),
     ]),
-    h("div.status", "WebSocket connection: " + connectionStatus),
     h(
       "div.message-history",
       messageHistory.current?.map((d) => {

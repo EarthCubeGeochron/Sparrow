@@ -1,6 +1,7 @@
 import asyncio
 import typing
 from asyncio import sleep, get_event_loop, gather, create_task, wait
+from threading import Thread
 from asyncio.events import AbstractEventLoop
 from json import loads
 import time
@@ -12,6 +13,7 @@ from sparrow.plugins import SparrowCorePlugin
 from starlette.endpoints import WebSocketEndpoint
 from contextlib import redirect_stdout
 from click._compat import _force_correct_text_writer
+from starlette.concurrency import run_in_threadpool
 
 from .importer import WebSocketLogger
 
@@ -48,7 +50,7 @@ class ImporterEndpoint(WebSocketEndpoint):
         loop = self.get_loop()
         try:
             action = message.get("action", None)
-            if action == "start" and importer._task is None:
+            if action == "start":
                 print("Starting importer")
                 importer.websocket = session
                 importer._task = loop.create_task(self.websocket_import(session))
@@ -61,6 +63,11 @@ class ImporterEndpoint(WebSocketEndpoint):
         except Exception as exc:
             print(exc)
             await session.send_json({"error": str(exc)})
+
+    async def on_disconnect(self, session):
+        importer = self.get_importer(session)
+        if importer._task is not None:
+            importer._task.cancel()
 
     async def on_connect(self, session):
         await session.accept()

@@ -14,13 +14,12 @@ from sys import stdout
 from io import TextIOBase
 
 import typing
-from ..context import get_sparrow_app
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
 from .imperative_helpers import ImperativeImportHelperMixin
 from contextvars import ContextVar
-from sparrow_utils import get_logger
 from rich import print
+from starlette.concurrency import run_in_threadpool
 
 
 class SparrowContextError(Exception):
@@ -158,14 +157,14 @@ class BaseImporter(ImperativeImportHelperMixin):
         """
         This is kind of outmoded by the new version of iterfiles
         """
-        loop = self.run_loop
-        if loop is None:
-            loop = get_running_loop()
         for rec in seq:
             if rec is None:
                 continue
             self.log(str(rec.file_path), dim=True)
-            await ensure_future(self.__import_datafile(None, rec, **kwargs))
+            if self.websocket is not None:
+                await run_in_threadpool(self.__import_datafile, None, rec, **kwargs)
+            else:
+                self.__import_datafile(None, rec, **kwargs)
 
     async def import_data(self, *args, **kwargs):
         pass
@@ -213,7 +212,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         self.__set_file_info(_infile, rec)
         return rec, should_add_record
 
-    async def __import_datafile(self, fn, rec=None, **kwargs):
+    def __import_datafile(self, fn, rec=None, **kwargs):
         """
         A wrapper for data file import that tracks data files through
         the import process and builds links to data file types.
