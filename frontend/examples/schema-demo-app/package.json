@@ -29,6 +29,7 @@
     "@visx/group": "^1.7.0",
     "@visx/hierarchy": "^1.7.0",
     "@visx/shape": "^1.8.0",
+    "d3-flextree": "^2.1.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-use-dimensions": "^1.2.1"

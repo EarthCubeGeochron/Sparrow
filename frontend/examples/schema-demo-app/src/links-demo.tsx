@@ -7,6 +7,7 @@ import { pointRadial } from "d3-shape";
 import useDimensions from "react-use-dimensions";
 import h from "@macrostrat/hyper";
 import { useDarkMode } from "@macrostrat/ui-components/src/dark-mode";
+import { flextree } from "d3-flextree";
 
 function useForceUpdate() {
   const [, setValue] = useState<number>(0);
@@ -60,7 +61,7 @@ const data: TreeNode = {
   ],
 };
 
-const defaultMargin = { top: 30, left: 70, right: 70, bottom: 30 };
+const defaultMargin = { top: 30, left: 120, right: 120, bottom: 30 };
 
 export type LinkTypesProps = {
   width: number;
@@ -73,6 +74,7 @@ export type LinkTypesProps = {
 
 function renderLink(link, i) {
   if (link.source.data.name == "hidden_root") return null;
+  console.log(link);
   return h(LinkHorizontal, {
     key: i,
     data: link,
@@ -82,10 +84,10 @@ function renderLink(link, i) {
   });
 }
 
-function Background({ totalWidth, totalHeight, children }) {
-  const inDarkMode = useDarkMode();
-  let data = { from: "#cccccc", to: "#dddddd" };
-  if (inDarkMode) data = { from: "#444444", to: "#333333" };
+function SVGBackground({ totalWidth, totalHeight, children }: any) {
+  const isEnabled = useDarkMode()?.isEnabled;
+  let data = { from: "#dddddd", to: "#eeeeee" };
+  if (isEnabled) data = { from: "#444444", to: "#333333" };
   return h("svg", { width: totalWidth, height: totalHeight }, [
     h(LinearGradient, { id: "links-gradient", ...data }),
     h("rect", {
@@ -120,7 +122,7 @@ function Node({ width, height, node }) {
 }
 
 function renderNodes(node, key) {
-  const width = 80;
+  const width = 180;
   const height = 30;
   let top = node.x;
   let left = node.y;
@@ -138,8 +140,9 @@ function renderNodes(node, key) {
         "text",
         {
           dy: ".33em",
-          fontSize: 9,
-          fontFamily: "Arial",
+          fontSize: 12,
+          fontWeight: 600,
+          fontFamily: "Helvetica Neue",
           textAnchor: "middle",
           style: {
             pointerEvents: "none",
@@ -154,6 +157,7 @@ function renderNodes(node, key) {
 
 export default function LinksArea({
   margin = defaultMargin,
+  addGhostChild = false,
   vocabulary,
 }: LinkTypesProps) {
   const [ref, { width: totalWidth, height: totalHeight }] = useDimensions();
@@ -181,9 +185,11 @@ export default function LinksArea({
           childTerms.push(name);
           return createNode(v);
         } else {
-          return { name, ghost: true };
+          return createNode(d);
         }
       });
+    } else {
+      return { name: term.id };
     }
     return node;
   }
@@ -191,7 +197,8 @@ export default function LinksArea({
   const nestedNodes = vocabulary.terms.filter((d) => d != null).map(createNode);
 
   for (const node of nestedNodes) {
-    if (!childTerms.includes(node.name)) {
+    const shouldRender = !childTerms.includes(node.name);
+    if (shouldRender) {
       tree.children.push(node);
     }
   }
@@ -204,32 +211,63 @@ export default function LinksArea({
 
   if (totalWidth < 10) return null;
 
-  const treeRoot1 = hierarchy(data, (d) => d.children ?? []);
   const treeRoot = hierarchy(tree, (d) => d.children ?? []);
-  console.log(tree, treeRoot, treeRoot1);
   //const treeRoot = hierarchy(data, (d) => (d.isExpanded ? null : d.children));
+
+  // A flexible version
+  // const layout = flextree().spacing(100);
+  // let treeRoot = layout.hierarchy(tree);
+  // layout(treeRoot);
+
   const nLevels = treeRoot.height - 1;
 
   const widthIncludingHiddenRoot = sizeHeight / (nLevels / (nLevels + 1));
 
-  return (
-    <div className="linker-ui-workspace" ref={ref}>
-      <Background totalWidth={totalWidth} totalHeight={totalHeight}>
-        <Group top={margin.top} left={margin.left + widthIncludingHiddenRoot}>
-          <Tree
-            root={treeRoot}
-            size={[sizeWidth, -widthIncludingHiddenRoot]}
-            separation={(a, b) => (a.parent === b.parent ? 0.2 : 0.5) / a.depth}
-          >
-            {(tree) => {
-              return h(Group, { top: origin.y, left: origin.x }, [
-                tree.links().map(renderLink),
-                tree.descendants().map(renderNodes),
-              ]);
-            }}
-          </Tree>
-        </Group>
-      </Background>
-    </div>
+  const renderTree = (tree) => {
+    return h("div.tree-data", [
+      h(
+        SVGBackground,
+        {
+          totalWidth,
+          totalHeight,
+        },
+        h(
+          Group,
+          {
+            top: margin.top,
+            left: margin.left + widthIncludingHiddenRoot,
+          },
+          h(
+            Group,
+            {
+              top: origin.y,
+              left: origin.x,
+            },
+            [tree.links().map(renderLink), tree.descendants().map(renderNodes)]
+          )
+        )
+      ),
+    ]);
+  };
+
+  return h(
+    "div.linker-ui-workspace",
+    { ref },
+
+    h(
+      Tree,
+      {
+        root: treeRoot,
+        size: [sizeWidth, -widthIncludingHiddenRoot],
+        separation: (a, b) => {
+          if (a.children != null || b.children != null) {
+            return 5;
+          }
+
+          return 2;
+        },
+      },
+      renderTree
+    )
   );
 }
