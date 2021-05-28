@@ -1,10 +1,11 @@
 {
   "name": "sparrow-schema-demo-app",
   "version": "1.0.0",
+  "private": true,
   "description": "Externally controlled vocabularies + schema definitions",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel index.html",
+    "dev": "parcel --no-autoinstall --no-cache index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -13,14 +14,14 @@
     "../../packages/*"
   ],
   "devDependencies": {
-    "parcel": "^2.0.0-nightly.411",
+    "@parcel/transformer-stylus": "^2.0.0-nightly.690",
+    "@parcel/transformer-yaml": "^2.0.0-nightly.690",
+    "parcel": "^2.0.0-nightly.688",
     "typescript": "^3.9.9"
   },
   "dependencies": {
     "@earthdata/schema-linker": "^1.0.0",
     "@macrostrat/hyper": "^1.2.11",
-    "@parcel/transformer-yaml": "^2.0.0-alpha.3",
-    "@parcel/transformer-stylus": "^2.0.0-alpha.3",
     "@types/react": "^16.14.5",
     "@visx/gradient": "^1.7.0",
     "@visx/group": "^1.7.0",
