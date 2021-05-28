@@ -22,6 +22,7 @@
   "dependencies": {
     "@earthdata/schema-linker": "^1.0.0",
     "@macrostrat/hyper": "^1.2.11",
+    "@macrostrat/ui-components": "^0.5.2",
     "@types/react": "^16.14.5",
     "@visx/gradient": "^1.7.0",
     "@visx/group": "^1.7.0",

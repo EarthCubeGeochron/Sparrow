@@ -3,6 +3,11 @@ import h from "@macrostrat/hyper";
 import d1 from "./lab-data.yaml";
 import d2 from "./output-data.yaml";
 import vocab from "./vocabulary.yaml";
+import {
+  DarkModeButton,
+  DarkModeProvider,
+} from "@macrostrat/ui-components/src/dark-mode";
+import { Navbar } from "@blueprintjs/core";
 import "@blueprintjs/core/lib/css/blueprint.css";
 import "./main.styl";
 import LinksDemo from "./links-demo";
@@ -13,26 +18,28 @@ function TermList(props) {
     h.if(title)("h2.term-list-title", title),
     h(
       "div.term-list-data",
-      data.map((d) => h(TermCard, { data: d })),
+      data.terms.map((d) => h(TermCard, { data: d })),
       children
     ),
   ]);
 }
 
-//const vocabularies = vocab.map((d) => d.name);
+const vocabularies = vocab.map((d) => d.name);
 
 export default function () {
   //return h(LinksDemo, { width: 800, height: 400 });
-  return h("div.schema-linker-ui", [
-    h(TermList, { data: d1, title: "Lab fields" }),
-    h("div.workspace", [
-      h("div.navbar", [
-        h("h2", "Workspace"),
-        h("div.spacer"),
-        //h(DarkModeButton),
+  return h(DarkModeProvider, { addBodyClasses: true }, [
+    h("div.schema-linker-ui", [
+      h(TermList, { data: vocab[0], title: "Lab fields" }),
+      h("div.workspace", [
+        h("div.navbar", [
+          h("h2", "Workspace"),
+          h("div.spacer"),
+          h(DarkModeButton),
+        ]),
+        h(LinksDemo, { width: 800, height: 500 }),
       ]),
-      h(LinksDemo, { width: 800, height: 500 }),
+      //h(TermList, { data: d2, title: "Output schemas" }),
     ]),
-    //h(TermList, { data: d2, title: "Output schemas" }),
   ]);
 }

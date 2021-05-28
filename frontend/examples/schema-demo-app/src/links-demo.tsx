@@ -6,6 +6,7 @@ import { LinkHorizontal } from "@visx/shape";
 import { pointRadial } from "d3-shape";
 import useDimensions from "react-use-dimensions";
 import h from "@macrostrat/hyper";
+import { useDarkMode } from "@macrostrat/ui-components/src/dark-mode";
 
 function useForceUpdate() {
   const [, setValue] = useState<number>(0);
@@ -77,6 +78,22 @@ function renderLink(link, i) {
     strokeWidth: 2,
     fill: "none",
   });
+}
+
+function Background({ totalWidth, totalHeight, children }) {
+  const inDarkMode = useDarkMode();
+  let data = { from: "#cccccc", to: "#dddddd" };
+  if (inDarkMode) data = { from: "#444444", to: "#333333" };
+  return h("svg", { width: totalWidth, height: totalHeight }, [
+    h(LinearGradient, { id: "links-gradient", ...data }),
+    h("rect", {
+      width: totalWidth,
+      height: totalHeight,
+      rx: 14,
+      fill: data.to,
+    }),
+    children,
+  ]);
 }
 
 function Node({ width, height, node }) {
@@ -154,9 +171,7 @@ export default function Example({
 
   return (
     <div className="linker-ui-workspace" ref={ref}>
-      <svg width={totalWidth} height={totalHeight}>
-        <LinearGradient id="links-gradient" from="#cccccc" to="#dddddd" />
-        <rect width={totalWidth} height={totalHeight} rx={14} fill="#dddddd" />
+      <Background totalWidth={totalWidth} totalHeight={totalHeight}>
         <Group top={margin.top} left={margin.left + widthIncludingHiddenRoot}>
           <Tree
             root={treeRoot}
@@ -171,7 +186,7 @@ export default function Example({
             }}
           </Tree>
         </Group>
-      </svg>
+      </Background>
     </div>
   );
 }
