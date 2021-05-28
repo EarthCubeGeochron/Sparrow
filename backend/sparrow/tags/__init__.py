@@ -11,78 +11,56 @@ import json
 
 here = Path(__file__).parent
 fixtures = here / "fixtures"
-queries = here / "queries"
-procedures = here/"procedures"
+
 
 class TagsEdits(HTTPEndpoint):
     """
     Tags endpoint for adding and removing tag relationships from models.
     SQL assisted, for a current replacement for schemas.
     """
+
     name = "TagsEdits"
-    add_project_fn = procedures / "add-tag-project.sql"
-    add_sample_fn = procedures / "add-tag-sample.sql"
-    add_session_fn = procedures / "add-tag-session.sql"
-    add_analysis_fn = procedures / "add-tag-analysis.sql"
-    add_datum_fn = procedures / "add-tag-datum.sql"
-    remove_fn = procedures / "remove-tag-from-model.sql"
-
-    def execute_sql(self, model, data,fn):
-        '''
-        Put and delete share everything except the sql file.
-        '''
-        db = app_context().database
-
-        tag_ids = data['tag_ids']
-        
-        for tag_id in tag_ids:
-            params = {"model_id": data['model_id'], "tag_id":tag_id}
-            
-            db.exec_sql(fn = fn, params=params)
 
     @requires("admin")
     async def put(self, request):
         """
-        Adds a tag model relationship by adding ids to the join table
+        Adds a tag model relationship through sqlalchemy orm
 
         """
-        model = request.path_params['model']
+        db = app_context().database
+
+        model_name = request.path_params["model"]
+
+        model = getattr(db.model, model_name)
+        tags = db.model.tags_tag
+
         data = await request.json()
 
-        fn = ""
-        if model == "project":
-            fn = self.add_project_fn
-        if model == "sample":
-            fn = self.add_sample_fn
-        if model == "session":
-            fn = self.add_session_fn;
-        if model == "analysis":
-            fn = self.add_analysis_fn
-        if model == "datum":
-            fn = self.add_datum_fn 
-        
-        #try:
-        self.execute_sql(model, data, fn)
-        return JSONResponse({"Status":"Success"})
-        #except:
-         #   return JSONResponse({"Error":"Something went wrong??"})
+        with db.session_scope():
 
-    @requires("admin")
-    async def delete(self, request):
-        '''
-        Remove a tag from a model relationship by removing ids from join table
-        
-        '''
-        model = request.path_params['model']
-        data = await request.json()
+            tag_ids = data["tag_ids"]
+            model_id = data["model_id"]
 
-        try:
-            self.execute_sql(model, data, self.remove_fn)
-            return JSONResponse({"Status":"Success"})
-        except:
-            return JSONResponse({"Error":"Something went wrong??"})
+            # get current model and that models tag collection
+            current_model = db.session.query(model).get(model_id)
+            current_collection = current_model.tags_tag_collection
 
-TagsEditsRouter = Router([Route("/models/{model}", endpoint=TagsEdits, methods=["PUT", "DELETE"])])
+            for tag_id in tag_ids:
+                tag = db.session.query(tags).get(tag_id)
+                current_model.tags_tag_collection = [*current_collection, tag]
+
+                try:
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    return JSONResponse({"Status": "Error", "message": f"cannot insert tag {tag_id}"}, status_code=404)
+
+        return JSONResponse(
+            {"Status": "Success", "tag_ids": f"{tag_ids}", "model": f"{model_name}", "model_id": f"{model_id}"}
+        )
+
+
+TagsEditsRouter = Router([Route("/models/{model}", endpoint=TagsEdits, methods=["PUT"])])
 
 
 class Tags(SparrowCorePlugin):
@@ -104,20 +82,6 @@ class Tags(SparrowCorePlugin):
         f = fixtures / "tags.sql"
         db.exec_sql(f)
 
-    def get_tags(self):
-        """
-        reads query for all tables
-        this is redundant... because it gets automapped..
-
-        """
-        db = self.app.database
-        p = queries / "get.sql"
-        sql = open(p, "r").read()
-        tags = db.exec_query(sql)
-        res = tags.to_json(orient="records")
-
-        return JSONResponse(json.loads(res))
-
     def default_tags(self):
         """Checks if there are any tags, if none, inserts some defualts"""
         f = fixtures / "default-tags.sql"
@@ -132,4 +96,4 @@ class Tags(SparrowCorePlugin):
 
         # Initialize tag data if none
         self.default_tags()
-        api.mount("/tags",TagsEditsRouter, name=TagsEdits.name)
+        api.mount("/tags", TagsEditsRouter, name=TagsEdits.name)
