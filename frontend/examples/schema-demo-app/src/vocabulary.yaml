@@ -53,7 +53,7 @@
       type: number
     - id: 206Pb/238U ratio
       type: number
-    - id: 207Pb/235Pb ratio
+    - id: 207Pb/235U ratio
       type: number
     - id: 206Pb/207Pb ratio
       type: number
@@ -70,7 +70,7 @@
         - id: "Error correlation"
         - id: "206Pb/238U ratio"
         - id: "207Pb/235U ratio"
-        - id: "206Pb/238U ratio"
+        - id: "206Pb/207Pb ratio"
     - id: "Detrital zircon result set"
       description: "Canonical result set for error analysis and concordia generation"
       group_by: sample
@@ -83,9 +83,10 @@
         - id: "Concordia parameters"
         - id: "206Pb/238U age"
         - id: "207Pb/235U age"
-        - id: "206Pb/238U age"
+        - id: "206Pb/207Pb age"
 
 - authority: Macrostrat
+  name: Macrostrat
   type: vocabulary
   terms:
     - description: "Crystallization age of a detrital mineral grain in sedimentary rock"

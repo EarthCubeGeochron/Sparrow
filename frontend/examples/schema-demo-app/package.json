@@ -20,6 +20,7 @@
     "typescript": "^3.9.9"
   },
   "dependencies": {
+    "@blueprintjs/popover2": "^0.10.0",
     "@earthdata/schema-linker": "^1.0.0",
     "@macrostrat/hyper": "^1.2.11",
     "@macrostrat/ui-components": "^0.5.2",

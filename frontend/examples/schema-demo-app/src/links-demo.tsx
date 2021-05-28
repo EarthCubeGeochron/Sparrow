@@ -66,7 +66,9 @@ export type LinkTypesProps = {
   width: number;
   height: number;
   margin?: { top: number; right: number; bottom: number; left: number };
-  hideRoot: boolean;
+  vocabulary: {
+    terms: any[];
+  };
 };
 
 function renderLink(link, i) {
@@ -150,11 +152,49 @@ function renderNodes(node, key) {
   );
 }
 
-export default function Example({
+export default function LinksArea({
   margin = defaultMargin,
-  hideRoot = false,
+  vocabulary,
 }: LinkTypesProps) {
   const [ref, { width: totalWidth, height: totalHeight }] = useDimensions();
+
+  var vocabMap = vocabulary.terms.reduce(function (map, node) {
+    map[node.id] = node;
+    return map;
+  }, {});
+
+  let tree: TreeNode = {
+    name: "hidden_root",
+    children: [],
+  };
+
+  let childTerms: string[] = [];
+
+  function createNode(term) {
+    console.log(term);
+    let node = { name: term.id, term };
+    if (term.members != null) {
+      node.children = term.members.map((d) => {
+        const name = d.id ?? d;
+        const v = vocabMap[name];
+        if (v != null) {
+          childTerms.push(name);
+          return createNode(v);
+        } else {
+          return { name, ghost: true };
+        }
+      });
+    }
+    return node;
+  }
+
+  const nestedNodes = vocabulary.terms.filter((d) => d != null).map(createNode);
+
+  for (const node of nestedNodes) {
+    if (!childTerms.includes(node.name)) {
+      tree.children.push(node);
+    }
+  }
 
   const innerWidth = totalWidth - margin.left - margin.right;
   const innerHeight = totalHeight - margin.top - margin.bottom;
@@ -164,7 +204,10 @@ export default function Example({
 
   if (totalWidth < 10) return null;
 
-  const treeRoot = hierarchy(data, (d) => (d.isExpanded ? null : d.children));
+  const treeRoot1 = hierarchy(data, (d) => d.children ?? []);
+  const treeRoot = hierarchy(tree, (d) => d.children ?? []);
+  console.log(tree, treeRoot, treeRoot1);
+  //const treeRoot = hierarchy(data, (d) => (d.isExpanded ? null : d.children));
   const nLevels = treeRoot.height - 1;
 
   const widthIncludingHiddenRoot = sizeHeight / (nLevels / (nLevels + 1));
