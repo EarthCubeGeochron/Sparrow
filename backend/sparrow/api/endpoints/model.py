@@ -6,7 +6,7 @@ from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.authentication import requires
 from yaml import safe_load
 
@@ -240,7 +240,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
             if not request.user.is_authenticated and hasattr(schema.opts.model, "embargo_date"):
                 q = q.filter(schema.opts.model.embargo_date == None)
 
-            #q = q.options(*list(schema.query_options(max_depth=1)))
+            q = q.options(*list(schema.query_options(max_depth=1)))
 
             if args["all"]:
                 res = q.all()
@@ -344,9 +344,9 @@ class ModelAPIEndpoint(HTTPEndpoint):
             return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "data": return_data})
 
     async def delete(self, request):
-        '''
+        """
         handler of delete requests
-        '''
+        """
         db = self.meta.database
 
         model = self.meta.schema.opts.model
@@ -362,6 +362,5 @@ class ModelAPIEndpoint(HTTPEndpoint):
             db.session.commit()
         except:
             db.session.rollback()
-        
 
         return JSONResponse({"Status": "Success", "DELETE": return_data})
