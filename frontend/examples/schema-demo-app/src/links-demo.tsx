@@ -100,25 +100,34 @@ function SVGBackground({ totalWidth, totalHeight, children }: any) {
   ]);
 }
 
-function Node({ width, height, node }) {
+function Node({ width, height, node, top, left }) {
   const forceUpdate = useForceUpdate();
-  return h("rect", {
-    height: height,
-    width: width,
-    y: -height / 2,
-    x: -width / 2,
-    fill: "#ffffff",
-    stroke: "#888888",
+  return h(
+    "div.node",
+    {
+      style: {
+        height,
+        width,
+        top,
+        left,
+        position: "absolute",
+        //margin: "-50%",
+        //transform: `translate(${-width / 2}px, ${height / 2}px)`,
+      },
+      /*
     strokeWidth: 1,
     strokeDasharray: node.data.children ? "0" : "2,2",
     strokeOpacity: node.data.children ? 1 : 0.6,
     rx: node.data.children ? 0 : 4,
-    onClick: () => {
-      node.data.isExpanded = !node.data.isExpanded;
-      console.log(node);
-      forceUpdate();
+    */
+      onClick: () => {
+        node.data.isExpanded = !node.data.isExpanded;
+        console.log(node);
+        forceUpdate();
+      },
     },
-  });
+    h("div.node-content", node.data.name)
+  );
 }
 
 function renderNodes(node, key) {
@@ -127,6 +136,8 @@ function renderNodes(node, key) {
   let top = node.x;
   let left = node.y;
   if (node.depth === 0) return null;
+  return h(Node, { width, height, node, top, left });
+  /*
   return h(
     Group,
     {
@@ -135,7 +146,6 @@ function renderNodes(node, key) {
       key: key,
     },
     [
-      h(Node, { width, height, node }),
       h(
         "text",
         {
@@ -153,6 +163,7 @@ function renderNodes(node, key) {
       ),
     ]
   );
+  */
 }
 
 export default function LinksArea({
@@ -224,7 +235,7 @@ export default function LinksArea({
   const widthIncludingHiddenRoot = sizeHeight / (nLevels / (nLevels + 1));
 
   const renderTree = (tree) => {
-    return h("div.tree-data", [
+    return h("div.tree-area", [
       h(
         SVGBackground,
         {
@@ -243,9 +254,29 @@ export default function LinksArea({
               top: origin.y,
               left: origin.x,
             },
-            [tree.links().map(renderLink), tree.descendants().map(renderNodes)]
+            [tree.links().map(renderLink)]
           )
         )
+      ),
+      h(
+        "div.tree-nodes",
+        {
+          style: {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: totalWidth,
+            height: totalHeight,
+          },
+        },
+        tree.descendants().map((node) => {
+          const width = 180;
+          const height = 30;
+          const top = node.x;
+          const left = margin.left + widthIncludingHiddenRoot + node.y;
+          if (node.depth === 0) return null;
+          return h(Node, { width, height, node, top, left });
+        })
       ),
     ]);
   };
@@ -260,11 +291,12 @@ export default function LinksArea({
         root: treeRoot,
         size: [sizeWidth, -widthIncludingHiddenRoot],
         separation: (a, b) => {
-          if (a.children != null || b.children != null) {
+          if (a.children != null && b.children != null) {
             return 5;
+          } else if (a.children != null || b.children != null) {
+            return 2;
           }
-
-          return 2;
+          return 0.5;
         },
       },
       renderTree
