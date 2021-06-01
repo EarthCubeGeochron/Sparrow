@@ -9,6 +9,15 @@ import styles from "./card.styl";
 
 const h = hyperStyled(styles);
 
+function clickedClassname(props) {
+  const { clicked, id } = props;
+  if (clicked == `${id}`) {
+    return "model-card.clicked";
+  } else {
+    return "model-card";
+  }
+}
+
 export function ModelCard(props) {
   const { content, id, model, link = true, onClick = () => {} } = props;
 
@@ -23,29 +32,36 @@ export function ModelCard(props) {
 
   const to = useModelURL(`/${model}/${id}`);
 
-  const classname = clicked
-    ? clicked == `${id}`
-      ? "model-card.clicked"
-      : "model-card"
-    : "model-card";
+  const classname = clickedClassname({ clicked, id });
+
   if (link) {
     return h(Link, { to, style: { textDecoration: "none" } }, [
-      h(`div.${classname}`, [content]),
+      h(`div.${classname}`, [content])
     ]);
   } else {
     return h("div", [
       h(
         `div.${classname}`,
         {
-          onClick,
+          onClick
         },
         [content]
-      ),
+      )
     ]);
   }
 }
 
-export const sampleContent = (props) => {
+function sessionDates({ session }) {
+  if (session.lenght == 0) return [];
+
+  const dates = session.map(ss => {
+    const date = ss.date.split("T")[0];
+  });
+
+  return dates;
+}
+
+export const sampleContent = props => {
   const { material, id, name, location, session } = props;
   const Location =
     location != null
@@ -54,42 +70,37 @@ export const sampleContent = (props) => {
           location.coordinates[0].toFixed(3),
           ", ",
           location.coordinates[1].toFixed(3),
-          "]",
+          "]"
         ])
       : h("div", "No Location");
 
   const sampleName = h("div", { style: { marginBottom: "5px" } }, [
     "Sample: ",
-    h("span", name),
+    h("span", name)
   ]);
 
-  const Material =
-    material != null
-      ? h("div", { style: { marginBottom: "5px" } }, ["Material: ", material])
-      : h("div", { style: { marginBottom: "5px" } }, "No material");
+  const Material = h.if(material)("div", { style: { marginBottom: "5px" } }, [
+    "Material: ",
+    material
+  ]);
 
-  const sessionDate =
-    session.length > 0
-      ? session.map((ss) => {
-          return ss.date.split("T")[0];
-        })
-      : null;
+  const sessionDate = sessionDates({ session });
 
   return h("div.sample-content", [
     h("div.card-header", [h("div", id), Location]),
     h("div.bod", [
       sampleName,
       Material,
-      sessionDate
-        ? sessionDate.map((date) => {
-            return h("div", date);
-          })
-        : null,
-    ]),
+      sessionDate.map(date => {
+        if (sessionDate.lenght > 0) {
+          return h("div", date);
+        }
+      })
+    ])
   ]);
 };
 
-const SampleModelCard = (props) => {
+const SampleModelCard = props => {
   const {
     material,
     id,
@@ -97,7 +108,7 @@ const SampleModelCard = (props) => {
     location,
     session = [],
     link = true,
-    onClick = null,
+    onClick = null
   } = props;
 
   const sample = { material, id, name, location, session };
@@ -106,7 +117,7 @@ const SampleModelCard = (props) => {
     Frame,
     {
       id: "sampleCardContent",
-      data: { material, id, name, location, session },
+      data: { material, id, name, location, session }
     },
     h(sampleContent, { material, id, name, location, session })
   );
@@ -119,11 +130,11 @@ const SampleModelCard = (props) => {
     content,
     model: "sample",
     link,
-    onClick: () => onClick(sample),
+    onClick: () => onClick(sample)
   });
 };
 
-const PublicationModelCard = (props) => {
+const PublicationModelCard = props => {
   const { year, id, title, doi, author, journal, onClick, link } = props;
 
   const content = h(Frame, { id: "publicationCardContent" }, h("div", [title]));
@@ -133,11 +144,11 @@ const PublicationModelCard = (props) => {
     content,
     model: "publication",
     link,
-    onClick: () => onClick(id, title, doi),
+    onClick: () => onClick(id, title, doi)
   });
 };
 
-export const ResearcherModelCard = (props) => {
+export const ResearcherModelCard = props => {
   const { id, name, onClick, link } = props;
 
   const content = h(
@@ -151,11 +162,21 @@ export const ResearcherModelCard = (props) => {
     content,
     model: "researcher",
     link,
-    onClick: () => onClick(id, name),
+    onClick: () => onClick(id, name)
   });
 };
 
-const ProjectModelCard = (props) => {
+function pubTitles({ publication }) {
+  if (publication.length > 0) {
+    if (publication.lenght > 1) {
+      return publication[0].title + "....";
+    }
+    return publication[0].title;
+  }
+  return null;
+}
+
+const ProjectModelCard = props => {
   const {
     id,
     name,
@@ -164,41 +185,34 @@ const ProjectModelCard = (props) => {
     publication = [],
     link,
     onClick,
-    minimal = false,
+    minimal = false
   } = props;
 
-  const pubData =
-    publication.length > 0
-      ? publication.length > 1
-        ? publication[0].title + "...."
-        : publication[0].title
-      : null;
+  const pubData = pubTitles({ publication });
 
   const content = h("div.project-card", [
     h("h4", name),
     h("p.description", description),
-    samples.length > 0
-      ? h(ContentOverFlow, {
-          className: "samples",
-          data: samples.map((d) => d.name),
-          title: "sample",
-        })
-      : null,
+    h.if(samples.length > 0)(ContentOverFlow, {
+      className: "samples",
+      data: samples.map(d => d.name),
+      title: "sample"
+    }),
     h.if(publication.length > 0)("div.content-area", [
       h("h5", [
         h("span.count", [
-          publication.length + " " + pluralize("Publication", publication),
+          publication.length + " " + pluralize("Publication", publication)
         ]),
-        h("h5", [pubData]),
-      ]),
-    ]),
+        h("h5", [pubData])
+      ])
+    ])
   ]);
 
   const cardContent = h(
     Frame,
     {
       id: "projectCardContent",
-      data: { id, name, description, samples, publication },
+      data: { id, name, description, samples, publication }
     },
     content
   );
@@ -208,11 +222,11 @@ const ProjectModelCard = (props) => {
     content: cardContent,
     model: "project",
     link,
-    onClick: () => onClick(id, name),
+    onClick: () => onClick(id, name)
   });
 };
 
-const SessionListContent = (props) => {
+const SessionListContent = props => {
   const {
     classname,
     target,
@@ -221,7 +235,7 @@ const SessionListContent = (props) => {
     instrument,
     analysis = [],
     sample,
-    data,
+    data
   } = props;
 
   const instruName = instrument ? instrument.name : "";
@@ -239,48 +253,16 @@ const SessionListContent = (props) => {
       h.if(FCS)("div", [FCS]),
       h("div", [h("span", technique)]),
       h("div", ["Instrument: " + instruName]),
-      h.if(Irradiation)("div", [Irradiation]),
+      h.if(Irradiation)("div", [Irradiation])
     ]),
     h("div.footer", [
       h.if(analysis.length > 1)("div", analysisCount),
-      h("div", ["Target: " + target]),
-    ]),
+      h("div", ["Target: " + target])
+    ])
   ]);
 };
 
-const SessionPageViewContent = (props) => {
-  const {
-    classname,
-    target,
-    date,
-    technique,
-    instrument,
-    analysis,
-    sample,
-    data,
-  } = props;
-  const instruName = instrument ? instrument.name : "";
-  const sampleName = sample ? `Linked through ${sample.name}` : "";
-
-  const Irradiation = data && data.Irradiation ? data.Irradiation : null;
-  const FCS = data && data.FCS ? data.FCS : null;
-
-  const analysisName = analysis.length > 1 ? "Analyses" : "Analysis";
-  const analysisCount = analysis.length + " " + analysisName;
-
-  return h(`div.${classname}`, [
-    h("div.card-header", [h("div", date.split("T")[0]), h("div", sampleName)]),
-    h("div.bod", [
-      h.if(FCS)("div", [FCS]),
-      h("div", [h("span", technique)]),
-      h("div", ["Instrument: " + instruName]),
-      h.if(Irradiation)("div", [Irradiation]),
-    ]),
-    h("div.footer", [h("div", analysisCount), h("div", ["Target: " + target])]),
-  ]);
-};
-
-const SessionListModelCard = (props) => {
+const SessionListModelCard = props => {
   const {
     session_id,
     target,
@@ -292,7 +274,7 @@ const SessionListModelCard = (props) => {
     data,
     link,
     onClick,
-    onHover = false,
+    onHover = false
   } = props;
 
   const classname = onHover ? "session-card-hover" : "session-card";
@@ -305,7 +287,7 @@ const SessionListModelCard = (props) => {
     instrument,
     analysis,
     sample,
-    data,
+    data
   });
 
   const cardContent = h(
@@ -320,8 +302,8 @@ const SessionListModelCard = (props) => {
         instrument,
         analysis,
         sample,
-        data,
-      },
+        data
+      }
     },
     content
   );
@@ -331,11 +313,11 @@ const SessionListModelCard = (props) => {
     content: cardContent,
     model: "session",
     link,
-    onClick: () => onClick(session_id, date, target, technique),
+    onClick: () => onClick(session_id, date, target, technique)
   });
 };
 
-const SessionPageViewModelCard = (props) => {
+const SessionPageViewModelCard = props => {
   const {
     session_id,
     target,
@@ -347,12 +329,12 @@ const SessionPageViewModelCard = (props) => {
     data,
     link,
     onClick,
-    onHover = false,
+    onHover = false
   } = props;
 
   const classname = onHover ? "session-card-hover" : "session-card";
 
-  const content = h(SessionPageViewContent, {
+  const content = h(SessionListContent, {
     classname,
     target,
     date,
@@ -360,7 +342,7 @@ const SessionPageViewModelCard = (props) => {
     instrument,
     analysis,
     sample,
-    data,
+    data
   });
 
   const cardContent = h(
@@ -375,8 +357,8 @@ const SessionPageViewModelCard = (props) => {
         instrument,
         analysis,
         sample,
-        data,
-      },
+        data
+      }
     },
     content
   );
@@ -386,11 +368,11 @@ const SessionPageViewModelCard = (props) => {
     content: cardContent,
     model: "session",
     link,
-    onClick: () => onClick(session_id, date, target, technique),
+    onClick: () => onClick(session_id, date, target, technique)
   });
 };
 
-const DataFileModelCard = (props) => {
+const DataFileModelCard = props => {
   const { file_hash, basename, type, date, data_file_link: link } = props;
 
   let sampleName = "";
@@ -403,16 +385,16 @@ const DataFileModelCard = (props) => {
   const content = h("div.session-card", [
     h("div.card-header", [
       h("div", [format(date, "MMMM D, YYYY")]),
-      sampleName,
+      sampleName
     ]),
-    h("div.bod", [h("div", [h("span", basename)]), h("div", [type])]),
+    h("div.bod", [h("div", [h("span", basename)]), h("div", [type])])
   ]);
 
   const cardContent = h(
     Frame,
     {
       id: "datafileCardContent",
-      data: { file_hash, basename, type, date, link },
+      data: { file_hash, basename, type, date, link }
     },
     content
   );
@@ -420,7 +402,7 @@ const DataFileModelCard = (props) => {
   return h(ModelCard, {
     id: file_hash,
     content: cardContent,
-    model: "data-file",
+    model: "data-file"
   });
 };
 
@@ -431,9 +413,9 @@ const ContentOverFlow = ({ data, title, className, minimal = false }) =>
       "ul",
       { className },
       data.length > 2
-        ? h("div", [data.slice(0, 2).map((d) => h("li", d)), "More..."])
-        : data.map((d) => h("li", d))
-    ),
+        ? h("div", [data.slice(0, 2).map(d => h("li", d)), "More..."])
+        : data.map(d => h("li", d))
+    )
   ]);
 
 export {
@@ -442,5 +424,5 @@ export {
   SessionPageViewModelCard,
   SessionListModelCard,
   DataFileModelCard,
-  PublicationModelCard,
+  PublicationModelCard
 };

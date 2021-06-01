@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import h from "@macrostrat/hyper";
 import { useReducer } from "react";
-import { useOnScreen } from "./useOnScreen";
+import { useOnScreen } from "./utils";
 import "./main.styl";
 import { Spinner } from "@blueprintjs/core";
 
@@ -28,8 +28,7 @@ const reducer = (state, action) => {
         ...state,
         loadingBottom: false,
         data: [...state.data, ...action.newData],
-        hasMoreAfter: action.newData.length === perPage,
-        after: state.after + action.newData.length,
+        after: state.after + action.newData.length
       };
     default:
       throw new Error("Don't understand action");
@@ -45,12 +44,19 @@ const perPage = 15;
  * @param component: A component that can take in the mapped data and format it into what the user wants to display
  * @param {function} fetch A function that will call an API to fetch the next page of data when intersection is observed
  */
-function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
+function ForeverScroll({
+  initialData,
+  component,
+  fetch,
+  hasMoreAfter,
+  total = 0,
+  componentProps = {}
+}) {
   const initialState = {
     loadingBottom: false,
-    hasMoreAfter: true,
+    //hasMoreAfter,
     data: [],
-    after: 0,
+    after: 0
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -71,7 +77,7 @@ function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
     }
   };
 
-  const { loadingBottom, data, after, hasMoreAfter } = state;
+  const { loadingBottom, data, after } = state;
 
   useEffect(() => {
     if (visibleBottom) {
@@ -79,6 +85,7 @@ function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
       fetch();
     }
   }, [visibleBottom]);
+
 
   return (
     <div className="ForeverScroll" style={{ marginTop: "20px" }}>
@@ -91,6 +98,12 @@ function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
       {hasMoreAfter && (
         <div ref={setBottom} style={{ marginTop: "50px" }}>
           <Spinner />
+        </div>
+      )}
+
+      {!hasMoreAfter && (
+        <div className="no-results">
+          Results completed, there are {total} models
         </div>
       )}
     </div>

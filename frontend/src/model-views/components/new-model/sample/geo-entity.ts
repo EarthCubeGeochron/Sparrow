@@ -154,6 +154,21 @@ export function GeoSpatialRef(props) {
   ]);
 }
 
+function geoEntityString(props) {
+  const { name, ref_distance, type, ref_unit, ref_datum } = props;
+
+  const geoEntityString = `This sample is from the ${name} ${type}. `;
+  const refString = `This sample was taken ${ref_distance} ${ref_unit} from the ${ref_datum} of the geo_entity.`;
+
+  if (name && ref_distance) {
+    return geoEntityString + refString;
+  } else if (name) {
+    return geoEntityString;
+  } else {
+    return null;
+  }
+}
+
 export function GeoEntityText(props) {
   const {
     sample_geo_entity,
@@ -171,15 +186,13 @@ export function GeoEntityText(props) {
     const { geo_entity, ref_datum, ref_distance, ref_unit } = sample_geo_entity;
     const { type, name } = geo_entity;
 
-    const geoEntityString = `This sample is from the ${name} ${type}. `;
-    const refString = `This sample was taken ${ref_distance} ${ref_unit} from the ${ref_datum} of the geo_entity.`;
-
-    const fullString =
-      name && ref_distance
-        ? geoEntityString + refString
-        : name
-        ? geoEntityString
-        : null;
+    const fullString = geoEntityString({
+      name,
+      ref_datum,
+      ref_distance,
+      ref_unit,
+      type
+    });
 
     return fullString;
   });

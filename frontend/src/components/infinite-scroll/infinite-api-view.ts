@@ -40,11 +40,12 @@ function InfiniteAPIView({
   componentProps = {},
   context,
   filterParams,
-  errorHandler = ErrorCallout,
+  errorHandler = ErrorCallout
 }) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
+  const [total, setTotal] = useState(0);
   const [nextPage, setNextPage] = useState("");
   const { get } = useAPIActions(context);
 
@@ -72,10 +73,11 @@ function InfiniteAPIView({
   const dataFetch = (data, next = "") => {
     setNoResults(false);
     const initData = getNextPageAPI(next, url, params);
-    initData.then((res) => {
+    initData.then(res => {
       if (res.data.length == 0) {
         setNoResults(true);
       }
+      setTotal(res["total_count"]);
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
       const next_page = res.next_page;
@@ -98,16 +100,23 @@ function InfiniteAPIView({
     return h(errorHandler, { error, title: "An API error has occured" });
   }
 
-  return data.length > 0
-    ? h(ForeverScroll, {
-        initialData: data,
-        fetch: fetchNewData,
-        component,
-        componentProps,
-      })
-    : noResults
-    ? h(NoSearchResults)
-    : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
+  if (noResults) {
+    return h(NoSearchResults);
+  }
+
+  const hasMoreAfter = nextPage == null ? false : true;
+
+  if (data.length > 0) {
+    return h(ForeverScroll, {
+      initialData: data,
+      fetch: fetchNewData,
+      component,
+      componentProps,
+      total,
+      hasMoreAfter
+    });
+  }
+  return h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 }
 
 export { InfiniteAPIView };

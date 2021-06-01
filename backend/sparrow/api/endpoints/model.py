@@ -240,7 +240,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
             if not request.user.is_authenticated and hasattr(schema.opts.model, "embargo_date"):
                 q = q.filter(schema.opts.model.embargo_date == None)
 
-            q = q.options(*list(schema.query_options(max_depth=1)))
+            # q = q.options(*list(schema.query_options(max_depth=1)))
 
             if args["all"]:
                 res = q.all()

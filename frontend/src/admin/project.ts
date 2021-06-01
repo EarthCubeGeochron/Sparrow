@@ -1,8 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
 import { useState, createContext, useContext } from "react";
-import { ProjectMatch } from "~/model-views/project";
-import { ProjectListComponent } from "../components/infinite-scroll/infinite-scroll";
 //@ts-ignore
 import styles from "./module.styl";
 import { NoStateAdmin } from "./baseview";
@@ -12,7 +10,9 @@ import {
   PublicationFilterList,
   ResearcherFilterList,
   SessionFilterList,
-} from "~/model-views/components/new-model";
+  ProjectMatch,
+  ProjectListComponent
+} from "~/model-views";
 import { AdminFilter } from "../filter";
 
 const h = hyperStyled(styles);
@@ -23,25 +23,25 @@ export function ProjectMainPanel() {
   return h(Switch, [
     h(Route, {
       path: base + "/:id",
-      render: () => h(ProjectMatch, { Edit }),
+      render: () => h(ProjectMatch, { Edit })
     }),
     h(Route, {
       path: base,
-      render: () => h(NoStateAdmin, { name: "Project" }),
-    }),
+      render: () => h(NoStateAdmin, { name: "Project" })
+    })
   ]);
 }
 
 export const ProjectAdminContext = createContext({});
 
-const mainFilterList = (props) => {
+const mainFilterList = props => {
   const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
 
   const initialState = createParamsFromURL(possibleFilters);
 
   const [params, setParams] = useState(initialState);
 
-  const createParams = (params) => {
+  const createParams = params => {
     for (let [key, value] of Object.entries(params)) {
       if (value == null) {
         delete params[key];
@@ -54,27 +54,27 @@ const mainFilterList = (props) => {
     listComponent: h(ProjectListComponent, { params }),
     possibleFilters,
     createParams,
-    initParams: params || {},
+    initParams: params || {}
   });
 };
 
-const ProjectAdminList = (props) => {
+const ProjectAdminList = props => {
   const { listName, updateFunction } = useContext(ProjectAdminContext);
 
   return h("div", [
     h.if(listName == "main")(mainFilterList),
     h.if(listName == "sample")(SampleFilterList, {
-      onClick: updateFunction,
+      onClick: updateFunction
     }),
     h.if(listName == "publication")(PublicationFilterList, {
-      onClick: updateFunction,
+      onClick: updateFunction
     }),
     h.if(listName == "researcher")(ResearcherFilterList, {
-      onClick: updateFunction,
+      onClick: updateFunction
     }),
     h.if(listName == "session")(SessionFilterList, {
-      onClick: updateFunction,
-    }),
+      onClick: updateFunction
+    })
   ]);
 };
 
@@ -85,7 +85,7 @@ export function ProjectAdminPage() {
     console.log("add")
   );
 
-  const changeFunction = (func) => {
+  const changeFunction = func => {
     setUpdateFunction(() => func);
   };
 
@@ -95,8 +95,8 @@ export function ProjectAdminPage() {
     [
       h(AdminPage, {
         listComponent: h(ProjectAdminList),
-        mainPageComponent: h(ProjectMainPanel),
-      }),
+        mainPageComponent: h(ProjectMainPanel)
+      })
     ]
   );
 }
