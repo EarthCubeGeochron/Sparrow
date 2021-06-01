@@ -46,7 +46,7 @@ export function useOnScreen() {
       ([entry]) => {
         setVisible(entry.isIntersecting);
       },
-      { rootMargin: "300px 0px 0px 0px" }
+      { rootMargin: "700px 0px 0px 0px" }
     );
 
     if (ref) {

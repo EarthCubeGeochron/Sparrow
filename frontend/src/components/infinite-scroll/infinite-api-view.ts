@@ -45,13 +45,12 @@ function InfiniteAPIView({
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
-  const [total, setTotal] = useState(0);
   const [nextPage, setNextPage] = useState("");
   const { get } = useAPIActions(context);
 
   async function getNextPageAPI(nextPage, url, params) {
-    const constParams =
-      nextPage == "" ? { per_page: 15 } : { per_page: 15, page: nextPage };
+    const constParams = { all: true };
+    // nextPage == "" ? { per_page: 15 } : { per_page: 15, page: nextPage };
     const moreParams = { ...params, ...filterParams };
     const newParams = { ...moreParams, ...constParams };
     try {
@@ -66,9 +65,9 @@ function InfiniteAPIView({
     }
   }
 
-  useEffect(() => {
-    dataFetch(data);
-  }, []);
+  // useEffect(() => {
+  //   dataFetch(data);
+  // }, []);
 
   const dataFetch = (data, next = "") => {
     setNoResults(false);
@@ -77,7 +76,6 @@ function InfiniteAPIView({
       if (res.data.length == 0) {
         setNoResults(true);
       }
-      setTotal(res["total_count"]);
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
       const next_page = res.next_page;
@@ -87,8 +85,12 @@ function InfiniteAPIView({
   };
 
   useEffect(() => {
+    console.log("filter changes");
     setData([]);
     dataFetch([]);
+    return () => {
+      setData([]);
+    };
   }, [JSON.stringify(filterParams)]);
 
   const fetchNewData = () => {
@@ -104,16 +106,12 @@ function InfiniteAPIView({
     return h(NoSearchResults);
   }
 
-  const hasMoreAfter = nextPage == null ? false : true;
-
   if (data.length > 0) {
     return h(ForeverScroll, {
       initialData: data,
       fetch: fetchNewData,
       component,
-      componentProps,
-      total,
-      hasMoreAfter
+      componentProps
     });
   }
   return h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);

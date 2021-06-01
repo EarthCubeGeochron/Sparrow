@@ -27,6 +27,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         loadingBottom: false,
+        hasMoreAfter: action.newData.length === perPage,
         data: [...state.data, ...action.newData],
         after: state.after + action.newData.length
       };
@@ -44,18 +45,11 @@ const perPage = 15;
  * @param component: A component that can take in the mapped data and format it into what the user wants to display
  * @param {function} fetch A function that will call an API to fetch the next page of data when intersection is observed
  */
-function ForeverScroll({
-  initialData,
-  component,
-  fetch,
-  hasMoreAfter,
-  total = 0,
-  componentProps = {}
-}) {
+function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
   const initialState = {
     loadingBottom: false,
-    //hasMoreAfter,
     data: [],
+    hasMoreAfter: true,
     after: 0
   };
 
@@ -77,7 +71,8 @@ function ForeverScroll({
     }
   };
 
-  const { loadingBottom, data, after } = state;
+  const { loadingBottom, data, after, hasMoreAfter } = state;
+
 
   useEffect(() => {
     if (visibleBottom) {
@@ -85,7 +80,6 @@ function ForeverScroll({
       fetch();
     }
   }, [visibleBottom]);
-
 
   return (
     <div className="ForeverScroll" style={{ marginTop: "20px" }}>
@@ -103,7 +97,7 @@ function ForeverScroll({
 
       {!hasMoreAfter && (
         <div className="no-results">
-          Results completed, there are {total} models
+          Results completed, there are {data.length} models
         </div>
       )}
     </div>
