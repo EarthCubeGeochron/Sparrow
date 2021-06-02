@@ -1,4 +1,5 @@
 import { mapStyle } from "../../src/map/MapStyle";
+//import { mapStyle2 } from "../../src/map/MapStyle2";
 //import { Frame, FrameChild } from "../../src/frame";
 import h from "@macrostrat/hyper";
 
@@ -20,14 +21,14 @@ export const mapStyles = [
   { name: "Standard Map", style: "mapbox://styles/mapbox/outdoors-v9" },
   { name: "DarkMode", style: "mapbox://styles/mapbox/dark-v10" },
   {
-    name: "Topographic Map",
-    style: "mapbox://styles/thefallingduck/cklb8itjb23wr17pd5ukdlne5",
-  },
-  { name: "Geologic Map", style: mapStyle },
-  {
     name: "Satelite Map",
     style: "mapbox://styles/jczaplewski/cjeycrpxy1yv22rqju6tdl9xb",
   },
+  {
+    name: "Topographic Map",
+    style: "mapbox://styles/thefallingduck/cklb8itjb23wr17pd5ukdlne5",
+  },
+  { name: "Geologic Map", style: mapStyle }
 ];
 
 //export const mapStyles = h(FrameChild, { id: "MapStyles" });
