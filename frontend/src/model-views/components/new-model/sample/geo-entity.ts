@@ -11,22 +11,34 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const unwrapMacroStratNames = (obj) => {
+const unwrapMacroStratNames = obj => {
   const { success } = obj;
-  const StratNames = success.data.map((ele) => ele.strat_name_long);
+  const StratNames = success.data.map(ele => ele.strat_name_long);
   return StratNames.slice(0, 20);
 };
 
-const unwrapSparrowGeoEntites = (obj) => {
+const unwrapSparrowGeoEntites = obj => {
   const { data } = obj;
-  const entities = data.map((ele) => ele.name);
+  const entities = data.map(ele => ele.name);
   return entities;
 };
 
-export const SampleGeoEntity = (props) => {
-  const { geoEntity, changeGeoEntity } = props;
+export const SampleGeoEntity = props => {
+  const { geoEntity, changeGeoEntity, initialQuery } = props;
   const [query, setQuery] = useState("");
   const [entities, setEntities] = useState([]);
+
+  console.log(initialQuery);
+  console.log(query);
+  useEffect(() => {
+    if (initialQuery) {
+      setQuery(initialQuery);
+    }
+  }, [initialQuery]);
+
+  const changeQueryOnFilter = query => {
+    setQuery(query);
+  };
 
   const macroStratNames = useAPIv2Result(
     "https://macrostrat.org/api/v2/defs/strat_names",
@@ -38,7 +50,7 @@ export const SampleGeoEntity = (props) => {
     "/models/geo_entity",
     {
       like: query,
-      per_page: 20,
+      per_page: 20
     },
     { unwrapResponse: unwrapSparrowGeoEntites }
   );
@@ -50,43 +62,57 @@ export const SampleGeoEntity = (props) => {
         setEntities([...entityNames]);
       }
     }
-  }, [macroStratNames]);
+  }, [macroStratNames, sparrowEntities]);
 
   return h(
     FormGroup,
     {
-      label: "Geologic Entity Name",
+      label: "Geologic Entity Name"
     },
     [
       h(MySuggest, {
         items: entities,
+        initialQuery,
         onChange: changeGeoEntity,
-        onFilter: (query) => setQuery(query),
-      }),
+        onFilter: changeQueryOnFilter
+      })
     ]
   );
 };
 
+const unwrapEntityTypes = obj => {
+  const { data } = obj;
+  const types = data.map(entity => entity.id);
+  return types;
+};
+
 export function EntityType(props) {
   const { onEntityTypeChange } = props;
-  const onChange = (entity) => {
+
+  const entity_names = useAPIv2Result(
+    "/vocabulary/entity_type",
+    {
+      all: "true"
+    },
+    { unwrapResponse: unwrapEntityTypes }
+  );
+
+  console.log(entity_names);
+  const onChange = entity => {
     console.log(entity);
     onEntityTypeChange(entity);
   };
+  let names = [];
+
+  if (entity_names) {
+    names = [...entity_names];
+  }
 
   return h(FormGroup, { label: "Entity Type" }, [
     h(MySuggest, {
-      items: [
-        "Formation",
-        "Memeber",
-        "Unit",
-        "Lake",
-        "Glacier",
-        "Volcano",
-        "Ashbed",
-      ],
-      onChange,
-    }),
+      items: names,
+      onChange
+    })
   ]);
 }
 
@@ -95,33 +121,59 @@ export function GeoSpatialRef(props) {
     geoEntity,
     changeDistance = () => {},
     changeDatum = () => {},
-    changeUnit = () => {},
+    changeUnit = () => {}
   } = props;
 
   const { ref_distance } = geoEntity;
 
-  const onChange = (ref) => {
+  const onChange = ref => {
     console.log(ref);
     changeDatum(ref);
     changeUnit("meters");
   };
+
+  const refs = useAPIv2Result(
+    "/vocabulary/entity_reference",
+    { all: "true" },
+    { unwrapResponse: unwrapEntityTypes }
+  );
+
+  let references = [];
+  if (refs) {
+    references = [...refs];
+  }
   return h("div", [
     h(FormGroup, { label: "Spatial Reference" }, [
-      h(MySuggest, { items: ["top", "bottom"], onChange }),
+      h(MySuggest, { items: references, onChange })
     ]),
     h(MyNumericInput, {
       label: "Distance from reference (m)",
       value: ref_distance,
-      onChange: changeDistance,
-    }),
+      onChange: changeDistance
+    })
   ]);
 }
 
-function GeoEntityText(props) {
+function geoEntityString(props) {
+  const { name, ref_distance, type, ref_unit, ref_datum } = props;
+
+  const geoEntityString = `This sample is from the ${name} ${type}. `;
+  const refString = `This sample was taken ${ref_distance} ${ref_unit} from the ${ref_datum} of the geo_entity.`;
+
+  if (name && ref_distance) {
+    return geoEntityString + refString;
+  } else if (name) {
+    return geoEntityString;
+  } else {
+    return null;
+  }
+}
+
+export function GeoEntityText(props) {
   const {
     sample_geo_entity,
     isEditing = true,
-    deleteGeoEntity,
+    deleteGeoEntity
   }: {
     sample_geo_entity: sample_geo_entity[];
     isEditing: boolean;
@@ -130,19 +182,17 @@ function GeoEntityText(props) {
   if (!sample_geo_entity) return null;
   console.log(sample_geo_entity);
 
-  const listofEntityStrings = sample_geo_entity.map((sample_geo_entity) => {
+  const listofEntityStrings = sample_geo_entity.map(sample_geo_entity => {
     const { geo_entity, ref_datum, ref_distance, ref_unit } = sample_geo_entity;
     const { type, name } = geo_entity;
 
-    const geoEntityString = `This sample is from the ${name} ${type}. `;
-    const refString = `This sample was taken ${ref_distance} ${ref_unit} from the ${ref_datum} of the geo_entity.`;
-
-    const fullString =
-      name && ref_distance
-        ? geoEntityString + refString
-        : name
-        ? geoEntityString
-        : null;
+    const fullString = geoEntityString({
+      name,
+      ref_datum,
+      ref_distance,
+      ref_unit,
+      type
+    });
 
     return fullString;
   });
@@ -152,12 +202,12 @@ function GeoEntityText(props) {
         return h(GeoEntityTextContainer, {
           geoEntityText: string,
           geoEntity: sample_geo_entity,
-          onClick: () => deleteGeoEntity(index),
+          onClick: () => deleteGeoEntity(index)
         });
-      }),
+      })
     ]);
   } else {
-    return h("div", [listofEntityStrings.map((string) => string)]);
+    return h("div", [listofEntityStrings.map(string => string)]);
   }
 }
 
@@ -165,7 +215,7 @@ function GeoEntityTextContainer(props) {
   const {
     geoEntityText,
     geoEntity,
-    onClick,
+    onClick
   }: {
     geoEntityText: string;
     geoEntity: sample_geo_entity;
@@ -178,8 +228,8 @@ function GeoEntityTextContainer(props) {
       minimal: true,
       icon: "trash",
       intent: "danger",
-      onClick: () => onClick(geoEntity),
-    }),
+      onClick: () => onClick(geoEntity)
+    })
   ]);
 }
 
@@ -198,74 +248,82 @@ export function GeoContext(props) {
     sample_geo_entity,
     changeGeoEntity,
     deleteGeoEntity,
+    initialQuery = null
   }: {
     isEditing: boolean;
     sample_geo_entity: sample_geo_entity[];
     changeGeoEntity: (g) => void;
     deleteGeoEntity: (g) => void;
+    initialQuery: string;
   } = props;
   const defaultState: sample_geo_entity = {
     ref_datum: null,
     ref_distance: null,
     ref_unit: null,
-    geo_entity: { type: null, name: null },
+    geo_entity: { type: null, name: initialQuery }
   };
   const [geoEntity, setGeoEntity] = useState<sample_geo_entity>(defaultState);
   console.log(sample_geo_entity);
 
   const changeDatum = (datum: string) => {
-    setGeoEntity((prevEntity) => {
+    setGeoEntity(prevEntity => {
       return {
         ...prevEntity,
-        ref_datum: datum,
+        ref_datum: datum
       };
     });
   };
 
   const changeDistance = (distance: number) => {
-    setGeoEntity((prevEntity) => {
+    setGeoEntity(prevEntity => {
       return {
         ...prevEntity,
-        ref_distance: distance,
+        ref_distance: distance
       };
     });
   };
 
   const changeUnit = (unit: string) => {
-    setGeoEntity((prevEntity) => {
+    setGeoEntity(prevEntity => {
       return {
         ...prevEntity,
-        ref_unit: unit,
+        ref_unit: unit
       };
     });
   };
   const changeGeoType = (type: string) => {
-    setGeoEntity((prevEntity) => {
+    setGeoEntity(prevEntity => {
       const { name } = prevEntity.geo_entity;
       return {
         ...prevEntity,
-        geo_entity: { type, name },
+        geo_entity: { type, name }
       };
     });
   };
   const changeGeoName = (name: string) => {
-    setGeoEntity((prevEntity) => {
+    setGeoEntity(prevEntity => {
       const { type } = prevEntity.geo_entity;
       return {
         ...prevEntity,
-        geo_entity: { name, type },
+        geo_entity: { name, type }
       };
     });
   };
 
+  useEffect(() => {
+    if (initialQuery != "") {
+      changeGeoName(initialQuery);
+    }
+  }, [initialQuery]);
+
   const helpContent = h("div.help-geo-entity", [
     h("div", [
       h("b", "Spatial Reference"),
-      ": Reference point on geo-entity, from which measurement was taken.",
+      ": Reference point on geo-entity, from which measurement was taken."
     ]),
     h("div", [
       h("b", "Distance from reference"),
-      ": A measured distance in meters from the spatial reference point.",
+      ": A measured distance in meters from the spatial reference point."
     ]),
     h("div", [
       h("b", "Example"),
@@ -279,13 +337,12 @@ export function GeoContext(props) {
       h("b", "0.2"),
       " means that the sample was taken ",
       h("b", "0.2 meters"),
-      " from the top of the geo entity.",
-    ]),
+      " from the top of the geo entity."
+    ])
   ]);
 
   const onSubmitClick = () => {
     changeGeoEntity(geoEntity);
-    setGeoEntity(defaultState);
   };
 
   const { geo_entity } = geoEntity;
@@ -294,20 +351,24 @@ export function GeoContext(props) {
   const content = h("div.geo-entity-card", [
     h("div.geo-entity-drop", [
       h("div.entity", [
-        h(SampleGeoEntity, { name, changeGeoEntity: changeGeoName }),
-        h(EntityType, { type, onEntityTypeChange: changeGeoType }),
+        h(SampleGeoEntity, {
+          name,
+          changeGeoEntity: changeGeoName,
+          initialQuery
+        }),
+        h(EntityType, { type, onEntityTypeChange: changeGeoType })
       ]),
-      h(GeoSpatialRef, { geoEntity, changeDistance, changeDatum, changeUnit }),
+      h(GeoSpatialRef, { geoEntity, changeDistance, changeDatum, changeUnit })
     ]),
-    h(Button, { intent: "success", onClick: onSubmitClick }, ["Submit"]),
+    h(Button, { intent: "success", onClick: onSubmitClick }, ["Submit"])
   ]);
 
   if (!isEditing) {
     return h("div", [
       h.if(sample_geo_entity.length > 0)(GeoEntityText, {
         sample_geo_entity,
-        isEditing: false,
-      }),
+        isEditing: false
+      })
     ]);
   }
 
@@ -315,6 +376,6 @@ export function GeoContext(props) {
     "Geologic Context",
     h(HelpButton, { content: helpContent, position: "top" }),
     content,
-    h(GeoEntityText, { sample_geo_entity, deleteGeoEntity }),
+    h(GeoEntityText, { sample_geo_entity, deleteGeoEntity })
   ]);
 }

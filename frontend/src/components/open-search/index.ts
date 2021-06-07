@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button, Popover, Menu } from "@blueprintjs/core";
+import { Button, Popover, Menu, Icon } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIv2Result } from "~/api-v2";
 import {
@@ -104,7 +104,7 @@ function OpenSearch() {
   return h("div", [
     h("div.searchbox", [
       h(SearchInput, {
-        leftIcon: "search",
+        leftElement: h(Icon, { icon: "search" }),
         updateParams: onChange,
         value: query,
         rightElement: rightElement

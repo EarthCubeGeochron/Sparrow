@@ -157,11 +157,11 @@ class Database:
         connection = self.engine.connect()
         connection.execute(text(statement))
 
-    def exec_sql(self, fn):
+    def exec_sql(self, fn, params=None):
         """Executes SQL files passed"""
         # TODO: refactor this to exec_sql_file
         secho(Path(fn).name, fg="cyan", bold=True)
-        run_sql_file(self.session, str(fn))
+        run_sql_file(self.session, str(fn), params)
     
     def exec_sql_query(self, fn, params=None):
         return run_sql_query_file(self.session, fn, params)

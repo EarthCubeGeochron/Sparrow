@@ -6,7 +6,7 @@ from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.authentication import requires
 from yaml import safe_load
 
@@ -342,3 +342,25 @@ class ModelAPIEndpoint(HTTPEndpoint):
             return_data = schema.dump(new_row)
 
             return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "data": return_data})
+
+    async def delete(self, request):
+        """
+        handler of delete requests
+        """
+        db = self.meta.database
+
+        model = self.meta.schema.opts.model
+        schema = self.meta.schema()
+
+        id_ = request.path_params.get("id")
+        data_model = db.session.query(model).get(id_)
+
+        return_data = schema.dump(data_model)
+
+        db.session.delete(data_model)
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+
+        return JSONResponse({"Status": "Success", "DELETE": return_data})

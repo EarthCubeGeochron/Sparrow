@@ -6,7 +6,7 @@ import {
   DatePicker,
   DoiFilter,
   SearchInput,
-  GeologicFormationSelector,
+  GeologicFormationSelector
 } from "./components";
 import { useToggle } from "~/components";
 import { hyperStyled } from "@macrostrat/hyper";
@@ -33,7 +33,7 @@ function SampleFilter({ on_map = false }: Filter) {
     return h(Card, [
       h(AgeSlideSelect),
       h(DatePicker, { updateDateRange: () => {} }),
-      h(GeologicFormationSelector),
+      h(GeologicFormationSelector)
     ]);
   };
 
@@ -43,20 +43,20 @@ function SampleFilter({ on_map = false }: Filter) {
       {
         content: h(filterCard),
         minimal: true,
-        position: "bottom",
+        position: "bottom"
       },
       [
         h(Tooltip, { content: "Choose Multiple Filters" }, [
           h(Button, { onClick: toggleOpen, minimal: true }, [
-            h(Icon, { icon: "filter" }),
-          ]),
-        ]),
+            h(Icon, { icon: "filter" })
+          ])
+        ])
       ]
-    ),
+    )
   ]);
 }
 
-const TagContainer = (props) => {
+const TagContainer = props => {
   const [tags, setTags] = useState({});
   const { params, removeParam, createParams } = props;
 
@@ -73,7 +73,7 @@ const TagContainer = (props) => {
     return newObject;
   }
 
-  const handleRemove = (key) => {
+  const handleRemove = key => {
     removeParam(key);
     const newTags = objectFilter(tags, ([ke, value]) => ke != key);
     setTags(newTags);
@@ -84,12 +84,12 @@ const TagContainer = (props) => {
     geometry: "Map Location",
     date_range: "Date Range",
     doi_like: "doi",
-    public: { true: "Public Only", false: "Private Only" },
+    public: { true: "Public Only", false: "Private Only" }
   };
 
   if (Object.keys(tags).length != 0) {
     return h("div.tag-container", [
-      Object.entries(tags).map((entry) => {
+      Object.entries(tags).map(entry => {
         const [key, value] = entry;
         const name =
           key == "public"
@@ -102,7 +102,7 @@ const TagContainer = (props) => {
           { onRemove: () => handleRemove(key), className: "tag-individ" },
           [name]
         );
-      }),
+      })
     ]);
   }
   return null;
@@ -116,7 +116,7 @@ function AdminFilter(props) {
     listComponent,
     initParams,
     dropdown = false,
-    addModelButton = null,
+    addModelButton = null
   } = props;
 
   const [params, dispatch] = useReducer(reducer, initParams);
@@ -140,7 +140,7 @@ function AdminFilter(props) {
       dispatch({ type: "like", payload: { like: data } });
     }
   };
-  const removeParam = (key) => {
+  const removeParam = key => {
     dispatch({ type: "removeSingle", payload: { field: key } });
   };
 
@@ -151,7 +151,7 @@ function AdminFilter(props) {
     urlSearchFromParams(params);
   };
 
-  const onSearch = (e) => {
+  const onSearch = e => {
     e.preventDefault();
     createParams(params);
     setTags(params);
@@ -162,7 +162,7 @@ function AdminFilter(props) {
       Button,
       {
         intent: "primary",
-        onClick: onSubmit,
+        onClick: onSubmit
       },
       ["Apply Filters"]
     );
@@ -173,7 +173,7 @@ function AdminFilter(props) {
       {
         intent: "danger",
         onClick: () => setFilterOpen(!filterOpen),
-        style: { marginLeft: "10px" },
+        style: { marginLeft: "10px" }
       },
       ["Cancel"]
     );
@@ -183,30 +183,30 @@ function AdminFilter(props) {
     "div",
     {
       style: {
-        marginTop: "15px",
-      },
+        marginTop: "15px"
+      }
     },
     [
       h("div", [
         h.if(possibleFilters.includes("public"))(EmabrgoSwitch, {
-          updateEmbargoFilter: updateParams,
+          updateEmbargoFilter: updateParams
         }),
         h("div", [
           h.if(possibleFilters.includes("date_range"))(DatePicker, {
-            updateDateRange: updateParams,
-          }),
+            updateDateRange: updateParams
+          })
         ]),
         h.if(possibleFilters.includes("doi_like"))(DoiFilter, {
-          updateDoi: updateParams,
+          updateDoi: updateParams
         }),
         h.if(possibleFilters.includes("geometry"))(MapPolygon, {
-          updateParams,
+          updateParams
         }),
         h("div", { style: { margin: "10px", marginLeft: "0px" } }, [
           h(SumbitFilterButton),
-          h(CancelFilterButton),
-        ]),
-      ]),
+          h(CancelFilterButton)
+        ])
+      ])
     ]
   );
 
@@ -224,16 +224,16 @@ function AdminFilter(props) {
           isOpen: open,
           content: Content,
           minimal: true,
-          position: "bottom",
+          position: "bottom"
         },
         [
           h(Tooltip, { content: "Choose Multiple Filters" }, [
             h(Button, { minimal: true, onClick: changeOpen }, [
-              h(Icon, { icon: "filter" }),
-            ]),
-          ]),
+              h(Icon, { icon: "filter" })
+            ])
+          ])
         ]
-      ),
+      )
     ]);
   };
 
@@ -248,21 +248,21 @@ function AdminFilter(props) {
         leftElement: h(Button, {
           icon: "filter",
           onClick: () => setFilterOpen(!filterOpen),
-          minimal: true,
+          minimal: true
         }),
         updateParams,
         rightElement: h(Button, {
           icon: "search",
           onClick: onSearch,
           minimal: true,
-          type: "submit",
+          type: "submit"
         }),
-        text: params.like || "",
+        text: params.like || ""
       }),
       h(TagContainer, { params: tags, removeParam, createParams }),
-      addModelButton,
+      addModelButton
     ]),
-    filterOpen ? Content : listComponent,
+    filterOpen ? Content : listComponent
   ]);
 }
 
