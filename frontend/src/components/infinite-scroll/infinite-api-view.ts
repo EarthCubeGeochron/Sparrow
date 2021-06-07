@@ -5,6 +5,7 @@ import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
 import { Spinner } from "@blueprintjs/core";
 import { NoSearchResults } from "./utils";
 import { ErrorCallout } from "~/util";
+//@ts-ignore
 import styles from "./main.styl";
 
 const h = hyperStyled(styles);
@@ -46,11 +47,14 @@ function InfiniteAPIView({
   const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
   const [nextPage, setNextPage] = useState("");
+  const [moreAfter, setMoreAfter] = useState(true);
   const { get } = useAPIActions(context);
 
+  console.log(moreAfter);
+
   async function getNextPageAPI(nextPage, url, params) {
-    const constParams = { all: true };
-    // nextPage == "" ? { per_page: 15 } : { per_page: 15, page: nextPage };
+    const constParams =
+      nextPage == "" ? { per_page: 15 } : { per_page: 15, page: nextPage };
     const moreParams = { ...params, ...filterParams };
     const newParams = { ...moreParams, ...constParams };
     try {
@@ -65,9 +69,10 @@ function InfiniteAPIView({
     }
   }
 
-  // useEffect(() => {
-  //   dataFetch(data);
-  // }, []);
+  useEffect(() => {
+    //dataFetch(data);
+    console.log("RERENDERED");
+  }, []);
 
   const dataFetch = (data, next = "") => {
     setNoResults(false);
@@ -79,6 +84,10 @@ function InfiniteAPIView({
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
       const next_page = res.next_page;
+      console.log("next page", next_page);
+      if (next_page == null) {
+        setMoreAfter(false);
+      }
       setNextPage(next_page);
       setData(newState);
     });
@@ -91,10 +100,11 @@ function InfiniteAPIView({
     return () => {
       setData([]);
     };
-  }, [JSON.stringify(filterParams)]);
+  }, [filterParams]);
 
-  const fetchNewData = () => {
+  const fetchNewData = async () => {
     if (!nextPage) return;
+    console.log("FETCH TRIGGERED");
     dataFetch(data, nextPage);
   };
 
@@ -111,6 +121,7 @@ function InfiniteAPIView({
       initialData: data,
       fetch: fetchNewData,
       component,
+      moreAfter,
       componentProps
     });
   }
