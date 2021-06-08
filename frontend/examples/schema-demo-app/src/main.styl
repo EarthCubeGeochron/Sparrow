@@ -55,6 +55,7 @@ h2
 .node
   color black
   position relative
+  cursor move
 
 .node-content
   position absolute
@@ -63,8 +64,22 @@ h2
   top 50%
   left -50%
   text-align center
-  background: #cccccc
+  cursor pointer
+  background: #ffffff
   border-radius 6px
+  padding 3px
   vertical-align: baseline
-  padding 6px
-  border 2px solid #dddddd
+  border 2px solid #eeeeee
+  &.schema
+    text-align left
+
+.node-name
+  font-weight bold
+  margin 3px
+
+.members
+  font-size 12px
+  color #888888
+  padding 0 3px 3px
+  .modifier
+    font-style italic

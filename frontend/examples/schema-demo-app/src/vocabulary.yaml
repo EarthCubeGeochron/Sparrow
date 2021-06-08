@@ -16,7 +16,7 @@
     - description: Ratio of 206Pb to 207Pb
       id: 206Pb_207Pb
       type: number
-    - description: Ratio of 206Pb to 235U
+    - description: Ratio of 206Pb to 235U, using natural 235U/238U ratio
       id: 207Pb_235U
       type: number
     - description: Ratio of 207Pb to 238U
@@ -25,25 +25,25 @@
     - description: Error correlation
       id: error_corr
       type: number
-    - description:
+    - description: Measured age in the 206Pb – 238U system
       id: age_206Pb_238U
       type: number
-    - authority: ALC
-      description:
+    - description: Age in the 207Pb – 235U system, using natural 235U/238U ratio
       id: age_207Pb_235U
       type: number
-    - authority: ALC
-      description:
+    - description:
       id: age_206Pb_207Pb
       type: number
-    - authority: ALC
-      description: Concordance
-      id: concordance
+    - id: concordance
+      description: Concordance (%)
       type: number
+    - id: best_age
+      computed: true
+      description: Best age system the U/Pb system
 
 - type: vocabulary
   name: Detrital zircon
-  authority: Community
+  authority: Geochron.org
   terms:
     - id: 206Pb/238U age
       type: number
@@ -64,6 +64,12 @@
       members:
         - id: Best age
           list: true
+    - id: U/Pb system ages
+      description: Ages for the Uranium-Lead system
+      members:
+        - id: "206Pb/238U age"
+        - id: "207Pb/235U age"
+        - id: "206Pb/207Pb age"
     - id: Concordia parameters
       description: "An U-Pb age that can contribute to a concordia measurement"
       members:
@@ -81,9 +87,7 @@
       description: "An U-Pb age that can contribute to a concordia measurement"
       members:
         - id: "Concordia parameters"
-        - id: "206Pb/238U age"
-        - id: "207Pb/235U age"
-        - id: "206Pb/207Pb age"
+        - id: "U/Pb system ages"
 
 - authority: Macrostrat
   name: Macrostrat

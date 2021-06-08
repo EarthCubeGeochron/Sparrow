@@ -63,7 +63,7 @@ export default function () {
       h(TermList, { data: vocab[0], title: "Lab fields" }),
       h("div.workspace", [
         h("div.navbar", [
-          h("h2", "Vocabulary"),
+          h("h2", "Sparrow output schema linker"),
           h(HTMLSelect, {
             options: externalVocabs.map((d) => d.name),
             value: activeVocabulary.name,

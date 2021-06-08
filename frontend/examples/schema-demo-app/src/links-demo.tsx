@@ -8,6 +8,7 @@ import useDimensions from "react-use-dimensions";
 import h from "@macrostrat/hyper";
 import { useDarkMode } from "@macrostrat/ui-components/src/dark-mode";
 import { flextree } from "d3-flextree";
+import classNames from "classnames";
 
 function useForceUpdate() {
   const [, setValue] = useState<number>(0);
@@ -19,47 +20,6 @@ interface TreeNode {
   isExpanded?: boolean;
   children?: TreeNode[];
 }
-
-const data: TreeNode = {
-  name: "hidden_root",
-  children: [
-    {
-      name: "Concordia parameters",
-      children: [
-        { name: "Error correlation" },
-        { name: "206Pb/238U ratio" },
-        { name: "207Pb/238U ratio" },
-        {
-          name: "C",
-          children: [
-            {
-              name: "C1",
-            },
-            {
-              name: "D",
-              children: [
-                {
-                  name: "D1",
-                },
-                {
-                  name: "D2",
-                },
-                {
-                  name: "D3",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    { name: "Z" },
-    {
-      name: "B",
-      children: [{ name: "B1" }, { name: "B2" }, { name: "B3" }],
-    },
-  ],
-};
 
 const defaultMargin = { top: 30, left: 120, right: 120, bottom: 30 };
 
@@ -86,7 +46,7 @@ function renderLink(link, i) {
 
 function SVGBackground({ totalWidth, totalHeight, children }: any) {
   const isEnabled = useDarkMode()?.isEnabled;
-  let data = { from: "#dddddd", to: "#eeeeee" };
+  let data = { from: "#eeeeee", to: "#fafafa" };
   if (isEnabled) data = { from: "#444444", to: "#333333" };
   return h("svg", { width: totalWidth, height: totalHeight }, [
     h(LinearGradient, { id: "links-gradient", ...data }),
@@ -100,7 +60,27 @@ function SVGBackground({ totalWidth, totalHeight, children }: any) {
   ]);
 }
 
+function NodeMembers({ node }) {
+  const { members, group_by } = node.data?.term ?? {};
+  if (members == null) return null;
+  return h(
+    "div.members",
+    members.map((d) =>
+      h("div.sub-term", [
+        d.id ?? d,
+        h.if(d.list ?? false)("span.modifier", [
+          " (list",
+          group_by == null ? "" : " by " + group_by,
+          ")",
+        ]),
+      ])
+    )
+  );
+}
+
 function Node({ width, height, node, top, left }) {
+  const schema = node.data.term?.members != null;
+  const className = classNames({ schema });
   const forceUpdate = useForceUpdate();
   return h(
     "div.node",
@@ -111,59 +91,18 @@ function Node({ width, height, node, top, left }) {
         top,
         left,
         position: "absolute",
-        //margin: "-50%",
-        //transform: `translate(${-width / 2}px, ${height / 2}px)`,
       },
-      /*
-    strokeWidth: 1,
-    strokeDasharray: node.data.children ? "0" : "2,2",
-    strokeOpacity: node.data.children ? 1 : 0.6,
-    rx: node.data.children ? 0 : 4,
-    */
       onClick: () => {
         node.data.isExpanded = !node.data.isExpanded;
         console.log(node);
         forceUpdate();
       },
     },
-    h("div.node-content", node.data.name)
+    h("div.node-content", { className }, [
+      h("div.node-name", node.data.name),
+      h(NodeMembers, { node }),
+    ])
   );
-}
-
-function renderNodes(node, key) {
-  const width = 180;
-  const height = 30;
-  let top = node.x;
-  let left = node.y;
-  if (node.depth === 0) return null;
-  return h(Node, { width, height, node, top, left });
-  /*
-  return h(
-    Group,
-    {
-      top: top,
-      left: left,
-      key: key,
-    },
-    [
-      h(
-        "text",
-        {
-          dy: ".33em",
-          fontSize: 12,
-          fontWeight: 600,
-          fontFamily: "Helvetica Neue",
-          textAnchor: "middle",
-          style: {
-            pointerEvents: "none",
-          },
-          fill: "black",
-        },
-        node.data.name
-      ),
-    ]
-  );
-  */
 }
 
 export default function LinksArea({
@@ -186,7 +125,6 @@ export default function LinksArea({
   let childTerms: string[] = [];
 
   function createNode(term) {
-    console.log(term);
     let node = { name: term.id, term };
     if (term.members != null) {
       node.children = term.members.map((d) => {
@@ -296,7 +234,7 @@ export default function LinksArea({
           } else if (a.children != null || b.children != null) {
             return 2;
           }
-          return 0.5;
+          return 1;
         },
       },
       renderTree
