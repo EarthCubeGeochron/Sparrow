@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Frame } from "~/frame";
 import { useAuth } from "~/auth";
 import hyper from "@macrostrat/hyper";
@@ -25,7 +25,8 @@ import {
   EmbargoDatePick,
   EditStatusButtons,
   DataSheetButton,
-  NewSamplePageButton
+  NewSamplePageButton,
+  TagContainer
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
@@ -305,6 +306,41 @@ const SampleLocationEleDepthEditor = () => {
   );
 };
 
+function SampleTagContainer() {
+  const { model, actions, isEditing } = useModelEditor();
+
+  const onAdd = item => {
+    const currentTags = [...model.tags_tag];
+    currentTags.push(item);
+    console.log(currentTags);
+    actions.updateState({
+      model: { tags_tag: { $set: currentTags } }
+    });
+  };
+
+  return h(TagContainer, { isEditing, tags: model.tags_tag, onChange: onAdd });
+}
+
+async function TagsChangeSet(changeset, updatedModel, url) {
+  /**
+   * tag_ids = data['tag_ids']
+        for tag_id in tag_ids:
+            params = {"jointable":f"tags.{model}_tag", "model_id_column":f"{model}_id",\
+            "model_id": data['model_d'], "tag_id":tag_id}
+   */
+  if (changeset.tags_tag) {
+    let { id } = updatedModel;
+    const model_id = id;
+    const tags = changeset.tags_tag;
+    const tag_ids = tags.map(tag => tag.id);
+    const body = { model_id: model_id, tag_ids: tag_ids };
+    const res = await put(url, body);
+    const { data } = res;
+    return data;
+  }
+  return "no tags";
+}
+
 function SamplePage(props) {
   const { data: sample, Edit } = props;
 
@@ -321,8 +357,16 @@ function SamplePage(props) {
       model: sample.data,
       canEdit: login || Edit,
       persistChanges: async (updatedModel, changeset) => {
-        console.log(changeset);
-        console.log(updatedModel);
+        console.log("changeset", changeset);
+        console.log("updatedModel", updatedModel);
+        console.log(
+          "Tags",
+          TagsChangeSet(
+            changeset,
+            updatedModel,
+            buildURL("/tags/models/sample", {})
+          )
+        );
         let rest;
         let { id } = updatedModel;
         const response = await put(
@@ -330,8 +374,7 @@ function SamplePage(props) {
           updatedModel
         );
         const { data } = response;
-        ({ id, ...rest } = data);
-        return rest;
+        console.log(data);
       }
     },
     [
@@ -342,6 +385,7 @@ function SamplePage(props) {
           field: "name",
           multiline: true
         }),
+        h.if(Edit)(SampleTagContainer),
         h("div.flex-row", [
           h("div.info-block", [
             Edit ? h(DataSheetButton) : null,

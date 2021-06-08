@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import h from "@macrostrat/hyper";
 import { useReducer } from "react";
-import { useOnScreen } from "./useOnScreen";
+import { useOnScreen } from "./utils";
 import "./main.styl";
 import { Spinner } from "@blueprintjs/core";
 
@@ -24,12 +24,12 @@ const reducer = (state, action) => {
     case "startBottom":
       return { ...state, loadingBottom: true };
     case "loadedBottom":
-      return {
+    return {
         ...state,
         loadingBottom: false,
+        hasMoreAfter: action.newData.length == perPage,
         data: [...state.data, ...action.newData],
-        hasMoreAfter: action.newData.length === perPage,
-        after: state.after + action.newData.length,
+        after: state.after + action.newData.length
       };
     default:
       throw new Error("Don't understand action");
@@ -45,12 +45,18 @@ const perPage = 15;
  * @param component: A component that can take in the mapped data and format it into what the user wants to display
  * @param {function} fetch A function that will call an API to fetch the next page of data when intersection is observed
  */
-function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
+function ForeverScroll({
+  initialData,
+  component,
+  fetch,
+  moreAfter = null,
+  componentProps = {}
+}) {
   const initialState = {
     loadingBottom: false,
-    hasMoreAfter: true,
     data: [],
-    after: 0,
+    hasMoreAfter: true,
+    after: 0
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -58,6 +64,7 @@ function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
 
   // List of Data that the application references for indexes
   const totalData = initialData;
+
 
   const loadBottom = () => {
     dispatch({ type: "startBottom" });
@@ -73,12 +80,20 @@ function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
 
   const { loadingBottom, data, after, hasMoreAfter } = state;
 
+
   useEffect(() => {
     if (visibleBottom) {
-      loadBottom();
       fetch();
+      loadBottom();
     }
   }, [visibleBottom]);
+
+  let moreToLoad;
+  if (moreAfter) {
+    moreToLoad = hasMoreAfter || moreAfter;
+  } else {
+    moreToLoad = hasMoreAfter;
+  }
 
   return (
     <div className="ForeverScroll" style={{ marginTop: "20px" }}>
@@ -88,9 +103,16 @@ function ForeverScroll({ initialData, component, fetch, componentProps = {} }) {
 
       {loadingBottom && h(Spinner)}
 
-      {hasMoreAfter && (
+      {moreToLoad && (
+        //@ts-ignore
         <div ref={setBottom} style={{ marginTop: "50px" }}>
           <Spinner />
+        </div>
+      )}
+
+      {!moreToLoad && (
+        <div className="no-results">
+          Results completed, there are {data.length} models
         </div>
       )}
     </div>

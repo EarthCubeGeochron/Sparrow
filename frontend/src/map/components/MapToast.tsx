@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   Button,
   Card,
@@ -7,77 +7,148 @@ import {
   Divider,
   Dialog,
   NumericInput,
-  InputGroup,
+  FormGroup,
+  InputGroup
 } from "@blueprintjs/core";
-import { useAPIResult } from "@macrostrat/ui-components";
-import { useToggle } from "~/components";
+import { useAPIResult, APIHelpers } from "@macrostrat/ui-components";
+import { useAPIv2Result, APIV2Context } from "~/api-v2";
+import { useToggle, MySuggest } from "~/components";
+import { GeoContext } from "~/model-views/components";
 import { mapStyle } from "../MapStyle";
-import { MultipleSelectFilter } from "~/components";
+import axios from "axios";
 
-/**
- * Form that pops up from the Toaster component.
- * Has the ability to suggest Geologic Formations from macrostrat
- */
+const unwrapSamples = obj => {
+  const { data } = obj;
+  const names = data.map(sample => {
+    const { name, id, sample_geo_entity } = sample;
+    return { name, id, sample_geo_entity };
+  });
+  return names;
+};
+//needs more complex state management
 function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
   const [state, setState] = useState("");
+  const [sampleState, setSampleState] = useState({
+    name: "",
+    id: null,
+    sample_geo_entity: []
+  });
+  const { buildURL } = APIHelpers(useContext(APIV2Context));
 
+  const samples = useAPIv2Result(
+    "/models/sample",
+    { all: "true", not_has: "location" },
+    { unwrapResponse: unwrapSamples }
+  );
+
+  const onChange = sampleName => {
+    if (samples) {
+      console.log(sampleName);
+      const sample = samples.filter(samp => samp.name == sampleName);
+      console.log(sample);
+      setSampleState(sample[0]);
+    }
+  };
+
+  const setGeoEntity = en => {
+    // copy this from new-sample
+    console.log(en);
+    let SGE = [...sampleState.sample_geo_entity, ...new Array(en)];
+    setSampleState(prevState => {
+      return {
+        ...prevState,
+        sample_geo_entity: SGE
+      };
+    });
+  };
+
+  const onCloseDialog = () => {
+    setState("");
+    setSampleState({
+      name: "",
+      id: null,
+      sample_geo_entity: []
+    });
+    toggleOpen();
+  };
+
+  const onSubmit = async () => {
+    let url = buildURL(`/models/sample/${sampleState.id}`);
+    console.log(url);
+    const updatedSample = {
+      ...sampleState,
+      location: {
+        type: "Point",
+        coordinates: [
+          parseFloat(Number(lng).toFixed(3)),
+          parseFloat(Number(lat).toFixed(3))
+        ]
+      }
+    };
+    console.log(updatedSample);
+    const response = await axios.put(url, updatedSample);
+    toggleOpen();
+  };
+
+  let sampleNames = [];
+  if (samples) {
+    sampleNames = samples.map(sample => sample.name);
+  }
+  if (!samples) return null;
   return (
     <div style={{ position: "absolute", zIndex: 50 }}>
       <div>
         <Dialog
           isOpen={open}
           title="Add Sample At Location"
-          onClose={toggleOpen}
+          onClose={onCloseDialog}
         >
           <Card>
-            <MultipleSelectFilter
-              text="Connect to Sample without location: "
-              items={[
-                "84C207AB",
-                "90T112B",
-                "SMUB-13",
-                "86C471B",
-                "AT80-36",
-                "CH9-11",
-                "AT11",
-                "GR-11-103",
-                "NI-010813-7",
-              ]}
-              sendQuery={() => null}
-            />
+            <FormGroup label="Connect to Sample without location">
+              <MySuggest
+                items={sampleNames}
+                onChange={onChange}
+                createNew={false}
+              />
+            </FormGroup>
             <br></br>
-
             <p>Longitude: </p>
-            <NumericInput defaultValue={Number(lng).toFixed(5)}></NumericInput>
+            <NumericInput defaultValue={Number(lng).toFixed(3)}></NumericInput>
             <br></br>
             <p>Latitude</p>
-            <NumericInput defaultValue={Number(lat).toFixed(5)}></NumericInput>
+            <NumericInput defaultValue={Number(lat).toFixed(3)}></NumericInput>
             <br></br>
-
-            <p>Geologic Formation: </p>
-            <InputGroup
-              value={state}
-              onChange={(event) => setState(event.target.value)}
-            />
-            <h5>
-              <i>Nearby units suggested by MacroStrat: </i>
-            </h5>
-            {data !== null ? (
-              data.success.data.map((object) => {
-                return (
-                  <div key={object.name}>
-                    <Button
-                      minimal={true}
-                      onClick={() => setState(object.name)}
-                    >
-                      {object.name}
-                    </Button>
-                  </div>
-                );
-              })
-            ) : (
-              <Spinner size={50} />
-            )}
+            {/* <div>
+              <GeoContext
+                sample_geo_entity={sampleState.sample_geo_entity}
+                changeGeoEntity={setGeoEntity}
+                initialQuery={state}
+              />
+              <h5>
+                <i>Nearby units suggested by MacroStrat: </i>
+              </h5>
+              {data !== null ? (
+                data.success.data.map(object => {
+                  return (
+                    <div key={object.name}>
+                      <Button
+                        minimal={true}
+                        onClick={() => {
+                          setState(object.name);
+                        }}
+                      >
+                        {object.name}
+                      </Button>
+                    </div>
+                  );
+                })
+              ) : (
+                <Spinner size={50} />
+              )}
+            </div> */}
+            <Button onClick={onSubmit} intent="success">
+              Submit
+            </Button>
           </Card>
         </Dialog>
       </div>
@@ -95,8 +166,10 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
  *
  */
 
-export function MapToast({ lng, lat, mapstyle }) {
+export function MapToast({ lng, lat, mapstyle, login }) {
   const [open, toggleOpen] = useToggle(false);
+
+  console.log(login);
 
   // url to queary macrostrat
   const MacURl = "https://macrostrat.org/api/v2/geologic_units/map";
@@ -111,12 +184,12 @@ export function MapToast({ lng, lat, mapstyle }) {
 
   const rockdNearbyData = useAPIResult(RockdURL, {
     lat: lat,
-    lng: lng,
+    lng: lng
   });
 
   const MacostratData = useAPIResult(MacURl, {
     lng: lng,
-    lat: lat,
+    lat: lat
   });
 
   const NearByCity = () => {
@@ -161,7 +234,7 @@ export function MapToast({ lng, lat, mapstyle }) {
               <a href="https://macrostrat.org/">MacroStrat</a>
             </h5>
 
-            {MacostratData.success.data.map((object) => {
+            {MacostratData.success.data.map(object => {
               return (
                 <div>
                   <h4 style={{ color: "black" }}>
@@ -201,20 +274,23 @@ export function MapToast({ lng, lat, mapstyle }) {
             <NearByCity />
           )}
         </div>
-        <Button minimal={true} onClick={toggleOpen}>
-          Add Sample at Location
-        </Button>
       </div>
-
-      <div>
-        <AddSampleAtLocal
-          lng={lng}
-          lat={lat}
-          data={MacostratData}
-          open={open}
-          toggleOpen={toggleOpen}
-        />
-      </div>
+      {login ? (
+        <div>
+          <Button minimal={true} onClick={toggleOpen}>
+            Add Sample at Location
+          </Button>
+          <div>
+            <AddSampleAtLocal
+              lng={lng}
+              lat={lat}
+              data={MacostratData}
+              open={open}
+              toggleOpen={toggleOpen}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

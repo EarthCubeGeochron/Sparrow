@@ -13,6 +13,34 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
+const crossRefParamsM = props => {
+  const { search } = props;
+  if (!isTitle(search) && search.length > 6) {
+    return { filter: `doi:${search}`, select: "DOI,title", rows: 5 };
+  } else {
+    return { query: search, select: "DOI,title", rows: 5 };
+  }
+};
+
+const publicationMessage = props => {
+  const { total } = props;
+  if (total <= 5) {
+    return { message: "Only 5 or less results!", intent: "success" };
+  }
+  if (total > 5 && total <= 10) {
+    return {
+      message: "More results than are shown, try to narrow your search",
+      intent: "warning"
+    };
+  } else {
+    return {
+      message:
+        "Ouufff, looks like you have a lot of results. Try to narrow your search",
+      intent: "danger"
+    };
+  }
+};
+
 export function PublicationXDDInput(props) {
   const [search, setSearch] = useState("");
   const [pubs, setPubs] = useState([]);
@@ -29,26 +57,22 @@ export function PublicationXDDInput(props) {
 
   //crossref
   const crossrefRoute = "https://api.crossref.org/works";
-  const crossRefParams = isTitle(search)
-    ? { query: search, select: "DOI,title", rows: 5 }
-    : search.length > 6
-    ? { filter: `doi:${search}`, select: "DOI,title", rows: 5 }
-    : { query: search, select: "DOI,title", rows: 5 };
+  const crossRefParams = crossRefParamsM({ search });
 
   const onSearch = () => {
     const data = get(doiRoute, { ...xDDParams }, {});
-    data.then((res) => {
+    data.then(res => {
       const { data } = res.success;
       if (data) {
-        const unData = data.map((ele) => unwrapPubData(ele));
+        const unData = data.map(ele => unwrapPubData(ele));
         if (unData.length > 0) {
           setPubs(unData.slice(0, 4)); // first 5
           setTotal(unData.length); // can be at max 20
         } else {
           const data = get(crossrefRoute, { ...crossRefParams }, {});
-          data.then((res) => {
+          data.then(res => {
             const { items, "total-results": total } = res.message;
-            const nItems = items.map((ele) => {
+            const nItems = items.map(ele => {
               const { DOI: doi, title } = ele;
               return { doi, title };
             });
@@ -60,48 +84,37 @@ export function PublicationXDDInput(props) {
     });
   };
 
-  const message =
-    total <= 5
-      ? h("div", "Only 5 or less results!")
-      : total > 5 && total <= 10
-      ? "More results than are shown, try to narrow your search"
-      : "Ouufff, looks like you have a lot of results. Try to narrow your search";
-
-  const intent =
-    total <= 5 ? "success" : total > 5 && total <= 10 ? "warning" : "danger";
+  const { message, intent } = publicationMessage({ total });
 
   const totalNumber = total < 20 ? total : "20+";
 
-  const leftElement =
-    pubs.length > 0
-      ? h(
-          Tooltip,
-          {
-            className: "tooltip-pub",
-            content: message,
-            intent,
-            position: "top",
-            modifiers: {
-              preventOverflow: { enabled: false },
-              flip: { enabled: true },
-              hide: { enabled: false },
-            },
-          },
-          [h(Button, { intent }, [totalNumber])]
-        )
-      : null;
+  const leftElement = h.if(pubs.length > 0)(
+    Tooltip,
+    {
+      className: "tooltip-pub",
+      content: message,
+      intent,
+      position: "top",
+      modifiers: {
+        preventOverflow: { enabled: false },
+        flip: { enabled: true },
+        hide: { enabled: false }
+      }
+    },
+    [h(Button, { intent }, [totalNumber])]
+  );
 
   const rightElement = h(Button, {
     icon: "search",
     onClick: onSearch,
-    minimal: true,
+    minimal: true
   });
 
-  const unwrapPubData = (data) => {
+  const unwrapPubData = data => {
     const title = data.title;
     const { identifier } = data;
     if (identifier) {
-      const doi = identifier.map((ele) => {
+      const doi = identifier.map(ele => {
         if (ele.type == "doi") {
           return ele.id;
         }
@@ -110,19 +123,19 @@ export function PublicationXDDInput(props) {
     }
   };
 
-  const addToModel = (i) => {
+  const addToModel = i => {
     const { doi, title } = pubs[i];
     onSubmit(null, title, doi);
   };
 
-  const SubmitButton = (props) => {
+  const SubmitButton = props => {
     const { disabled = false, i } = props;
     return h(Button, {
       onClick: () => addToModel(i),
       intent: "success",
       minimal: true,
       disabled,
-      icon: "plus",
+      icon: "plus"
     });
   };
   const disabled = pubs.length == 0 ? true : false;
@@ -131,21 +144,21 @@ export function PublicationXDDInput(props) {
     h(InputGroup, {
       leftElement,
       rightElement,
-      onChange: (e) => {
+      onChange: e => {
         setSearch(e.target.value);
-      },
+      }
     }),
     h("div", [
-      pubs.length > 0
-        ? pubs.map((pub, i) => {
-            const { doi, title } = pub;
-            return h("div.pub-edit-card", { key: doi }, [
-              h(Publication, { doi, title }),
-              h(SubmitButton, { disabled, i }),
-            ]);
-          })
-        : null,
-    ]),
+      h.if(pubs.length > 0)("div", [
+        pubs.map((pub, i) => {
+          const { doi, title } = pub;
+          return h("div.pub-edit-card", { key: doi }, [
+            h(Publication, { doi, title }),
+            h(SubmitButton, { disabled, i })
+          ]);
+        })
+      ])
+    ])
   ]);
 }
 
@@ -162,17 +175,17 @@ export function PublicationInputs(props) {
 
   const SubmitButton = ({ disabled }) => {
     return h(Button, { onClick: addToModel, intent: "success", disabled }, [
-      "Add to Project",
+      "Add to Project"
     ]);
   };
 
-  const changeDoi = (e) => {
-    setPub((prevPub) => {
+  const changeDoi = e => {
+    setPub(prevPub => {
       return { ...pub, doi: e };
     });
   };
-  const changeTitle = (e) => {
-    setPub((prevPub) => {
+  const changeTitle = e => {
+    setPub(prevPub => {
       return { ...pub, title: e };
     });
   };
@@ -187,7 +200,7 @@ export function PublicationInputs(props) {
       editOn: true,
       onChange: changeTitle,
       value: pub.title,
-      multiline: true,
+      multiline: true
     }),
     h(ModelEditableText, {
       is: "h3",
@@ -197,9 +210,9 @@ export function PublicationInputs(props) {
       editOn: true,
       onChange: changeDoi,
       value: pub.doi,
-      multiline: true,
+      multiline: true
     }),
-    h(SubmitButton, { disabled }),
+    h(SubmitButton, { disabled })
   ]);
 }
 
@@ -218,18 +231,18 @@ function DrawerContent(props) {
           "a",
           { href: "https://github.com/CrossRef/rest-api-doc" },
           "Crossref API"
-        ),
-      ]),
+        )
+      ])
     ]),
     h(PublicationXDDInput, { onSubmit }),
     h("div.divi", [h(Divider)]),
     h(FilterAccordian, {
       content: h("div", [
         h("h3", ["Enter in a Title and DOI"]),
-        h(PublicationInputs, { onSubmit }),
+        h(PublicationInputs, { onSubmit })
       ]),
-      text: "Can't find your paper, or don't have a doi?",
-    }),
+      text: "Can't find your paper, or don't have a doi?"
+    })
   ]);
 }
 
@@ -239,15 +252,15 @@ export function AddNewPubToModel(props) {
   return h("div", [
     h(FormSlider, {
       content: h(DrawerContent, { onSubmit }),
-      model: "Publication",
-    }),
+      model: "Publication"
+    })
   ]);
 }
 
 export function NewProjectNewPub() {
   const { dispatch } = useContext(ProjectFormContext);
 
-  const onSubmit = (data) => {
+  const onSubmit = data => {
     dispatch({ type: "add_pub", payload: { publication_collection: data } });
   };
 
@@ -261,9 +274,9 @@ export function EditProjNewPub({ onSubmit }) {
 export function EditSessNewPub() {
   const { model, actions } = useModelEditor();
 
-  const onSubmit = (data) => {
+  const onSubmit = data => {
     actions.updateState({
-      model: { publication: { $set: data[0] } },
+      model: { publication: { $set: data[0] } }
     });
   };
   return h(AddNewPubToModel, { onSubmit });

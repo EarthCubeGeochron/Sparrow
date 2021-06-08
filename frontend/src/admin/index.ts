@@ -22,6 +22,7 @@ import { VocabularyPage } from "./vocabulary";
 
 import { NewProjectForm } from "../model-views/project/new-project";
 import { NewSamplePage } from "~/model-views/sample/new-sample";
+import { TagManager } from "~/components/tags";
 
 const DataSheet = lazy(() => import("./data-sheet"));
 
@@ -111,6 +112,10 @@ const AdminRouter = ({ base }) =>
     h(Route, {
       path: base + "/sample",
       render: () => h(SampleAdminPage),
+    }),
+    h(Route, {
+      path: base + "/tag-manager",
+      render: () => h(TagManager),
     }),
     h(Route, {
       path: base + "/terms",

@@ -5,9 +5,9 @@ import {
   SessionListModelCard,
   DataFileModelCard,
   PublicationModelCard,
-  ResearcherModelCard,
-} from "~/model-views/components/list-cards/utils";
-import { InfiniteAPIView } from "./infinite-api-view";
+  ResearcherModelCard
+} from "~/model-views";
+import { InfiniteAPIView } from "~/components/infinite-scroll";
 import { APIV2Context } from "~/api-v2";
 //@ts-ignore
 import styles from "./main.styl";
@@ -16,9 +16,9 @@ const h = hyperStyled(styles);
 
 // unwraps the data to be simpatico with the ProjectLink component, also gets the next page
 function unwrapProjectCardData(data) {
-  const dataObj = data.data.map((obj) => {
+  const dataObj = data.data.map(obj => {
     const { id, name, description, publication, sample } = obj;
-    const samples = sample.map((ob) => ob);
+    const samples = sample.map(ob => ob);
     return { id, name, description, publication, samples };
   });
   return dataObj;
@@ -33,13 +33,13 @@ const ProjectListComponent = ({ params, componentProps = {} }) => {
       filterParams: { ...params },
       component: ProjectModelCard,
       componentProps,
-      context: APIV2Context,
-    }),
+      context: APIV2Context
+    })
   ]);
 };
 
 function unwrapSampleCardData(data) {
-  const dataObj = data.data.map((obj) => {
+  const dataObj = data.data.map(obj => {
     const { id, name, material, location, session } = obj;
     return { id, name, material, location, session };
   });
@@ -54,13 +54,13 @@ function SampleListComponent({ params }) {
       params: { nest: "session,project" },
       filterParams: { ...params },
       component: SampleModelCard,
-      context: APIV2Context,
-    }),
+      context: APIV2Context
+    })
   ]);
 }
 
 function unwrapSessionCardData(data) {
-  const dataObj = data.data.map((obj) => {
+  const dataObj = data.data.map(obj => {
     const {
       id: session_id,
       technique,
@@ -69,7 +69,7 @@ function unwrapSessionCardData(data) {
       instrument,
       data,
       analysis,
-      sample,
+      sample
     } = obj;
     return {
       session_id,
@@ -79,7 +79,7 @@ function unwrapSessionCardData(data) {
       data,
       instrument,
       analysis,
-      sample,
+      sample
     };
   });
   return dataObj;
@@ -94,20 +94,20 @@ function SessionListComponent({ params, componentProps = {} }) {
       filterParams: { ...params },
       component: SessionListModelCard,
       componentProps,
-      context: APIV2Context,
-    }),
+      context: APIV2Context
+    })
   ]);
 }
 
 function unwrapDataFileCardData(data) {
-  const dataObj = data.data.map((obj) => {
+  const dataObj = data.data.map(obj => {
     if (obj.data_file_link.length > 0) {
       const {
         basename,
         file_hash,
         type,
         data_file_link: [{ date }],
-        data_file_link,
+        data_file_link
       } = obj;
       return { basename, file_hash, type, date, data_file_link };
     }
@@ -124,12 +124,12 @@ function DataFilesListComponent({ params }) {
       unwrapData: unwrapDataFileCardData,
       params: {
         nest: "data_file_link,sample,session",
-        has: "data_file_link",
+        has: "data_file_link"
       },
       filterParams: { ...params },
       component: DataFileModelCard,
-      context: APIV2Context,
-    }),
+      context: APIV2Context
+    })
   ]);
 }
 
@@ -142,13 +142,13 @@ function SampleAddList({ params, componentProps }) {
       filterParams: { ...params },
       component: SampleModelCard,
       componentProps,
-      context: APIV2Context,
-    }),
+      context: APIV2Context
+    })
   ]);
 }
 
-const unwrapPubs = (data) => {
-  const dataObj = data.data.map((obj) => {
+const unwrapPubs = data => {
+  const dataObj = data.data.map(obj => {
     const { year, id, title, doi, author, journal } = obj;
     return { year, id, title, doi, author, journal };
   });
@@ -164,13 +164,13 @@ function PublicationAddList({ params, componentProps }) {
       filterParams: { ...params },
       component: PublicationModelCard,
       componentProps,
-      context: APIV2Context,
-    }),
+      context: APIV2Context
+    })
   ]);
 }
 
-const unwrapResearchers = (data) => {
-  const dataObj = data.data.map((obj) => {
+const unwrapResearchers = data => {
+  const dataObj = data.data.map(obj => {
     const { id, name } = obj;
     return { id, name };
   });
@@ -186,8 +186,8 @@ function ResearcherAddList({ params, componentProps }) {
       filterParams: { ...params },
       component: ResearcherModelCard,
       componentProps,
-      context: APIV2Context,
-    }),
+      context: APIV2Context
+    })
   ]);
 }
 
@@ -198,5 +198,5 @@ export {
   DataFilesListComponent,
   SampleAddList,
   PublicationAddList,
-  ResearcherAddList,
+  ResearcherAddList
 };

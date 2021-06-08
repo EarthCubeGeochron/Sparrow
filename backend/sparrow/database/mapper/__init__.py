@@ -23,6 +23,8 @@ log = get_logger(__name__)
 
 def _gen_relationship(base, direction, return_fn, attrname, local_cls, referred_cls, **kw):
     support_schemas = ["vocabulary", "core_view"]
+    # kw["lazy"] = "joined"
+    # kw["join_depth"] = 1
     if local_cls.__table__.schema in support_schemas and referred_cls.__table__.schema is None:
         # Don't create relationships on vocabulary and core_view models back to the main schema
         return
@@ -53,7 +55,7 @@ class SparrowDatabaseMapper:
             generate_relationship=_gen_relationship,
         )
 
-        for schema in ("vocabulary", "core_view"):
+        for schema in ("vocabulary", "core_view", "tags"):
             # Reflect tables in schemas we care about
             # Note: this will not reflect views because they don't have
             # primary keys.
