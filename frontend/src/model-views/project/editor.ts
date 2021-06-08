@@ -5,7 +5,7 @@ import {
   ModelEditor,
   ModelEditorContext,
   useModelEditor,
-  APIHelpers,
+  APIHelpers
 } from "@macrostrat/ui-components";
 import { put } from "axios";
 import "../main.styl";
@@ -20,7 +20,7 @@ import {
   EmbargoDatePick,
   EditStatusButtons,
   EditNavBar,
-  NewProjectPageButton,
+  NewProjectPageButton
 } from "../components";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
@@ -29,11 +29,11 @@ import { Frame } from "~/frame";
 
 const h = hyperStyled(styles);
 
-export const EmbargoEditor = function (props) {
+export const EmbargoEditor = function(props) {
   const { model, actions, isEditing } = useContext(ModelEditorContext);
-  const onChange = (date) => {
+  const onChange = date => {
     actions.updateState({
-      model: { embargo_date: { $set: date } },
+      model: { embargo_date: { $set: date } }
     });
   };
   const embargo_date = model.embargo_date;
@@ -59,7 +59,7 @@ function EditStatusButtonsProj() {
     onClickCancel,
     onClickSubmit,
     hasChanges,
-    isEditing,
+    isEditing
   });
 }
 
@@ -73,16 +73,16 @@ function EditSessions(props) {
     const newSess = new Array({ id: session_id, date, target, technique });
     const newSessions = [...currentSessions, ...newSess];
     actions.updateState({
-      model: { session: { $set: newSessions } },
+      model: { session: { $set: newSessions } }
     });
   };
 
   const onClickDelete = ({ session_id: id, date }) => {
     console.log(id, date);
     const ss = [...model.session];
-    const newSs = ss.filter((ele) => ele.id != id);
+    const newSs = ss.filter(ele => ele.id != id);
     actions.updateState({
-      model: { session: { $set: newSs } },
+      model: { session: { $set: newSs } }
     });
   };
   const onClickList = () => {
@@ -104,21 +104,21 @@ function EditSessions(props) {
     const samp = [...model.sample];
     const { id: sample_id, name } = sample;
     console.log(sample_id, name); // this works
-    const dropSession = sess.filter((ss) => ss.id == session_id);
-    const otherSessions = sess.filter((ss) => ss.id != session_id);
+    const dropSession = sess.filter(ss => ss.id == session_id);
+    const otherSessions = sess.filter(ss => ss.id != session_id);
     dropSession[0].sample = { id: sample_id, name };
     const newSess = [...dropSession, ...otherSessions];
     actions.updateState({
-      model: { session: { $set: newSess } },
+      model: { session: { $set: newSess } }
     });
 
     const [ss] = dropSession;
-    const dragSample = samp.filter((sa) => sa.id == sample_id);
-    const otherSamples = samp.filter((sa) => sa.id != sample_id);
+    const dragSample = samp.filter(sa => sa.id == sample_id);
+    const otherSamples = samp.filter(sa => sa.id != sample_id);
     dragSample[0].session.push(ss);
     const newSamples = [...dragSample, ...otherSamples];
     actions.updateState({
-      model: { sample: { $set: newSamples } },
+      model: { sample: { $set: newSamples } }
     });
   };
 
@@ -128,7 +128,7 @@ function EditSessions(props) {
     isEditing,
     onClickList,
     onClickDelete,
-    onDrop,
+    onDrop
   });
 }
 
@@ -139,9 +139,9 @@ function EditResearchers(props) {
   const researchers = model.researcher == null ? [] : [...model.researcher];
 
   const onClickDelete = ({ id, name }) => {
-    const updatedRes = researchers.filter((ele) => ele.name != name);
+    const updatedRes = researchers.filter(ele => ele.name != name);
     actions.updateState({
-      model: { researcher: { $set: updatedRes } },
+      model: { researcher: { $set: updatedRes } }
     });
   };
 
@@ -149,7 +149,7 @@ function EditResearchers(props) {
     const newResearcher = new Array({ id, name, orcid });
     let newResearchers = [...researchers, ...newResearcher];
     actions.updateState({
-      model: { researcher: { $set: newResearchers } },
+      model: { researcher: { $set: newResearchers } }
     });
   };
 
@@ -168,7 +168,7 @@ function EditResearchers(props) {
       changeFunction(onSubmit);
       setListName("researcher");
     },
-    isEditing,
+    isEditing
   });
 }
 
@@ -187,9 +187,9 @@ function EditablePublications(props) {
   const data = model.publication == null ? [] : [...model.publication];
 
   const onClickDelete = ({ id, title }) => {
-    const newPubs = data.filter((ele) => ele.title != title);
+    const newPubs = data.filter(ele => ele.title != title);
     actions.updateState({
-      model: { publication: { $set: newPubs } },
+      model: { publication: { $set: newPubs } }
     });
   };
 
@@ -198,7 +198,7 @@ function EditablePublications(props) {
     const publication = model.publication == null ? [] : [...model.publication];
     let newPubs = [...publication, ...data];
     actions.updateState({
-      model: { publication: { $set: newPubs } },
+      model: { publication: { $set: newPubs } }
     });
   };
 
@@ -215,7 +215,7 @@ function EditablePublications(props) {
       changeFunction(onSubmit);
       setListName("publication");
     },
-    isEditing,
+    isEditing
   });
 }
 
@@ -227,10 +227,10 @@ function SampleMapComponent() {
     h("div", { style: { display: "flex", flexDirection: "row" } }, [
       h("div", { style: { paddingRight: "10px" } }, [
         h("h4", "Location"),
-        h(ProjectMap, { samples: model.sample, hoverID: sampleHoverID }),
+        h(ProjectMap, { samples: model.sample, hoverID: sampleHoverID })
       ]),
-      h(EditableSamples),
-    ]),
+      h(EditableSamples)
+    ])
   ]);
 }
 
@@ -246,18 +246,18 @@ export function EditableSamples() {
 
   const onClickDelete = ({ id, name }) => {
     const newSamples = id
-      ? samples.filter((ele) => ele.id != id)
-      : samples.filter((ele) => ele.name != name);
+      ? samples.filter(ele => ele.id != id)
+      : samples.filter(ele => ele.name != name);
     return actions.updateState({
-      model: { sample: { $set: newSamples } },
+      model: { sample: { $set: newSamples } }
     });
   };
 
-  const sampleOnClick = (sample) => {
+  const sampleOnClick = sample => {
     const newSample = new Array(sample);
     let newSamples = [...samples, ...newSample];
     return actions.updateState({
-      model: { sample: { $set: newSamples } },
+      model: { sample: { $set: newSamples } }
     });
   };
 
@@ -280,7 +280,7 @@ export function EditableSamples() {
     draggable,
     isEditing,
     onClickDelete,
-    onClickList,
+    onClickList
   });
 }
 
@@ -289,22 +289,22 @@ const ProjEditNavBar = ({ header }) => {
     header,
     editButtons: h("div", { style: { display: "flex" } }, [
       h(NewProjectPageButton),
-      h(EditStatusButtonsProj),
+      h(EditStatusButtonsProj)
     ]),
-    embargoEditor: h(EmbargoEditor),
+    embargoEditor: h(EmbargoEditor)
   });
 };
 
 const SampleHoverIDContext = createContext({});
 
-const EditableProjectDetails = function (props) {
+const EditableProjectDetails = function(props) {
   const { project, Edit } = props;
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
 
   const [sampleHoverID, setSampleHoverID] = useState();
 
-  const setHoverID = (id) => {
+  const setHoverID = id => {
     setSampleHoverID(id);
   };
 
@@ -328,7 +328,7 @@ const EditableProjectDetails = function (props) {
         console.log(data);
         ({ data } = data);
         return data;
-      },
+      }
     },
     [
       h(
@@ -337,28 +337,28 @@ const EditableProjectDetails = function (props) {
         [
           h("div.project-editor", [
             h("div", [
-              Edit ? h(ProjEditNavBar, { header: "Manage Project" }) : null,
+              h.if(Edit)(ProjEditNavBar, { header: "Manage Project" })
             ]),
             h("div.project-editor-content", [
               h(ModelEditableText, {
                 is: "h3",
                 field: "name",
-                multiline: true,
+                multiline: true
               }),
               h(ModelEditableText, {
                 is: "p",
                 field: "description",
-                multiline: true,
+                multiline: true
               }),
               h(EditablePublications),
               h(EditResearchers),
               h(EditSessions),
               h(SampleMapComponent),
-              h(Frame, { id: "projectPage", data: project.data }, null),
-            ]),
-          ]),
+              h(Frame, { id: "projectPage", data: project.data }, null)
+            ])
+          ])
         ]
-      ),
+      )
     ]
   );
 };

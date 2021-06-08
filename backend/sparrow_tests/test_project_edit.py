@@ -3,7 +3,6 @@ from pytest import mark, fixture
 import json
 
 
-
 class TestProjectEdits:
     """
     Testing suite for the Project's edit API
@@ -17,6 +16,7 @@ class TestProjectEdits:
 
     https://github.com/realpython/materials/blob/master/flask-connexion-rest-part-2/version_1/people.py
     """
+
     data = json_fixture("project-edits.json")
 
     def test_isolation(self, db):
@@ -28,7 +28,7 @@ class TestProjectEdits:
     def test_project_edits(self, db):
         # We need to restart the ID sequence because this test makes
         # assumptions about the identity of auto-incrementing primary keys
-        db.session.execute("ALTER SEQUENCE session_id_seq RESTART 1");
+        db.session.execute("ALTER SEQUENCE session_id_seq RESTART 1")
 
         # Load data (replaces load_data_loop)
         for model, spec_list in self.data.items():
@@ -45,7 +45,7 @@ class TestProjectEdits:
         # We have two sessions in the database
         assert len(orig_sessions) == 2
 
-        assert set([s.id for s in orig_sessions]) == set([1,2])
+        assert set([s.id for s in orig_sessions]) == set([1, 2])
 
     @mark.xfail(reason="Updating does not work at the moment")
     def test_project_updates(self, db):
@@ -54,7 +54,7 @@ class TestProjectEdits:
         ProjectInterface = db.interface.project()
 
         # get updates
-        #data["edit-project"].pop("id")
+        # data["edit-project"].pop("id")
         updates = self.data["edit-project"]
 
         inst = db.session.query(db.model.project).first()
@@ -71,9 +71,7 @@ class TestProjectEdits:
         del updates["session"][0]["sample"]
 
         # load updates into the project_schema and assign the same id as the existing
-        new_proj = ProjectInterface.load(
-            updates, session=db.session, instance=inst, partial=True
-        )
+        new_proj = ProjectInterface.load(updates, session=db.session, partial=True)
 
         # NOTE: for some reason, i need to rollbakc before the merge.
         #       online examples don't need to do this

@@ -47,6 +47,7 @@ interface MapProps {
   latitude?: number;
   longitude?: number;
   zoom?: number;
+  login?: boolean;
   mapstyle?: any;
 }
 
@@ -58,6 +59,7 @@ export function MapPanel({
   latitude = 0,
   longitude = 0,
   zoom = 1,
+  login = false,
   mapstyle
 }: MapProps) {
   const initialState = {
@@ -164,6 +166,7 @@ export function MapPanel({
       return MapToaster.show({
         message: (
           <MapToast
+            login={login}
             mapstyle={state.MapStyle}
             lng={e.lngLat[0]}
             lat={e.lngLat[1]}

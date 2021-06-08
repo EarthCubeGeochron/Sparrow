@@ -1,17 +1,33 @@
 import { Suggest, MultiSelect } from "@blueprintjs/select";
 import { MenuItem, Icon } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./select.css";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
 export function MySuggest(props) {
-  const { items, onChange, onFilter = () => {} } = props;
+  const {
+    items,
+    onChange,
+    onFilter = () => {},
+    initialQuery,
+    createNew = true
+  } = props;
   const [selectedItem, setSelectedItem] = useState("");
+  const [query, setQuery] = useState("");
+  console.log(query);
 
-  const itemz = [...items];
+  let itemz = [...items];
+
+  useEffect(() => {
+    if (initialQuery && initialQuery != "") {
+      setQuery(initialQuery);
+      itemz = [...itemz, initialQuery];
+      setSelectedItem(initialQuery);
+    }
+  }, [initialQuery]);
 
   const itemRenderer = (item, itemProps) => {
     const isSelected = item == selectedItem;
@@ -22,16 +38,19 @@ export function MySuggest(props) {
       intent: isSelected ? "primary" : null,
       text: item,
       onClick: itemProps.handleClick,
-      active: isSelected ? "active" : itemProps.modifiers.active,
+      active: isSelected ? "active" : itemProps.modifiers.active
     });
   };
 
-  const itemPredicate = (query, item) => {
+  const onQueryChange = query => {
     onFilter(query);
+  };
+
+  const itemPredicate = (query, item) => {
     return item.toLowerCase().indexOf(query.toLowerCase()) >= 0;
   };
 
-  const onItemSelect = (item) => {
+  const onItemSelect = item => {
     onChange(item);
     setSelectedItem(item);
   };
@@ -41,29 +60,31 @@ export function MySuggest(props) {
       icon: "add",
       text: `Create ${query}`,
       onClick: () => onChange(query),
-      intent: "success",
+      intent: "success"
     });
   };
 
-  const createNewItemFromQuery = (query) => {
+  const createNewItemFromQuery = query => {
     return query;
   };
 
   return h("div", [
     h(Suggest, {
-      inputValueRenderer: (item) => item,
+      inputValueRenderer: item => item,
       items: itemz,
       popoverProps: {
         minimal: true,
-        popoverClassName: "my-suggest",
+        popoverClassName: "my-suggest"
       },
+      query,
       onItemSelect,
+      onQueryChange,
       itemRenderer,
       itemPredicate,
       selectedItem,
-      createNewItemRenderer,
-      createNewItemFromQuery,
-    }),
+      createNewItemRenderer: createNew ? createNewItemRenderer : null,
+      createNewItemFromQuery: createNew ? createNewItemFromQuery : null
+    })
   ]);
 }
 
@@ -76,7 +97,7 @@ export function MultipleSelectFilter({ items, sendQuery }) {
   const [state, setState] = useState({
     //items: items,
     selectedItems: [],
-    isItemSelected: false,
+    isItemSelected: false
   });
   //console.log(state.selectedItems);
   const itemRenderer = (item, itemProps) => {
@@ -88,7 +109,7 @@ export function MultipleSelectFilter({ items, sendQuery }) {
       intent: isSelected ? "primary" : null,
       text: item,
       onClick: itemProps.handleClick,
-      active: isSelected ? "active" : itemProps.modifiers.active,
+      active: isSelected ? "active" : itemProps.modifiers.active
     });
   };
 
@@ -101,7 +122,7 @@ export function MultipleSelectFilter({ items, sendQuery }) {
   // clicked yet and needs to remove Item from list if it is already
   // checked. We could convert list to a Set and easily use the .delete()
   // function. Or use an index to remove from the list.
-  const itemSelect = (item) => {
+  const itemSelect = item => {
     if (state.selectedItems.includes(item)) {
       let itemSet = new Set(state.selectedItems);
       itemSet.delete(item);
@@ -116,15 +137,15 @@ export function MultipleSelectFilter({ items, sendQuery }) {
 
   // This function removes the item from the list of Selected items held in state
   const removeTag = () => {
-    state.selectedItems.map((item) => {
+    state.selectedItems.map(item => {
       setState({
         ...state,
-        selectedItems: state.selectedItems.filter((t) => t !== item),
+        selectedItems: state.selectedItems.filter(t => t !== item)
       });
     });
   };
 
-  const tagRenderer = (item) => item;
+  const tagRenderer = item => item;
 
   return h(MultiSelect, {
     noResults: h(MenuItem, { disabled: true, text: "No Results" }),
@@ -135,6 +156,6 @@ export function MultipleSelectFilter({ items, sendQuery }) {
     onItemSelect: itemSelect,
     tagRenderer: tagRenderer,
     tagInputProps: { onRemove: removeTag },
-    selectedItems: state.selectedItems,
+    selectedItems: state.selectedItems
   });
 }

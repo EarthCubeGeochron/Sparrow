@@ -65,8 +65,9 @@ class BaseImporter(ImperativeImportHelperMixin):
         self.models = self.m
 
     def session_changes(self):
-        def changed(i): return self.db.session.is_modified(
-            i, include_collections=True)
+        def changed(i):
+            return self.db.session.is_modified(i, include_collections=True)
+
         # Bug: For some reason, changes on many-to-many links are not recorded.
         return dict(
             dirty=self.__dirty,
@@ -121,24 +122,26 @@ class BaseImporter(ImperativeImportHelperMixin):
         rec.file_mtime = mtime
         rec.basename = infile.name
 
+    def _find_existing_data_file(self, file_path=None, file_hash=None):
+        # Get data file record if it exists
+        ## TODO: First, get file with same hash (i.e., exact same file contents), attempting to relink if non-existant
+        return self.db.session.query(self.m.data_file).filter_by(file_path=file_path).first()
+
     def __create_data_file_record(self, fn):
 
         # Get the path location (this must be unique)
-        infile = Path(fn)
+        _infile = Path(fn)
         if self.basedir is not None:
-            infile = infile.relative_to(self.basedir)
+            infile = _infile.relative_to(self.basedir)
         file_path = str(infile)
 
         # Get file hash
         hash = md5hash(str(fn))
-        # Get data file record if it exists
-        rec = (
-            self.db.session.query(self.m.data_file).filter_by(
-                file_path=file_path)
-        ).first()
 
-        added = rec is None
-        if added:
+        rec = self._find_existing_data_file(file_path=file_path, file_hash=hash)
+
+        should_add_record = rec is None
+        if should_add_record:
             rec = self.m.data_file(file_path=file_path, file_hash=hash)
 
         updated = rec.file_hash != hash
@@ -149,8 +152,8 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         self.db.session.add(rec)
 
-        self.__set_file_info(infile, rec)
-        return rec, added
+        self.__set_file_info(_infile, rec)
+        return rec, should_add_record
 
     def __import_datafile(self, fn, rec=None, **kwargs):
         """
@@ -168,12 +171,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         m = self.m.data_file_link
         if kwargs.pop("fix_errors", False):
             err_filter = m.error.is_(None)
-        prev_imports = (
-            self.db.session.query(m)
-            .filter_by(file_hash=rec.file_hash)
-            .filter(err_filter)
-            .count()
-        )
+        prev_imports = self.db.session.query(m).filter_by(file_hash=rec.file_hash).filter(err_filter).count()
         if prev_imports > 0 and not added and not redo:
             secho("Already imported", fg="green", dim=True)
             return
@@ -266,12 +264,9 @@ class BaseImporter(ImperativeImportHelperMixin):
         elif isinstance(model, self.m.sample):
             params["_sample"] = model
         elif "error" not in defaults:
-            raise NotImplementedError(
-                "Only sessions, samples, and analyses "
-                "can be tracked independently on import."
-            )
+            raise NotImplementedError("Only sessions, samples, and analyses " "can be tracked independently on import.")
 
-        return self.m.data_file_link.get_or_create(**params)
+        return self.db.get_or_create(self.m.data_file_link, **params)
 
 
 class CloudImporter(BaseImporter):

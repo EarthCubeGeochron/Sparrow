@@ -1,3 +1,4 @@
+from sparrow.auth.api import UnauthorizedResponse
 from starlette.endpoints import HTTPEndpoint
 from webargs_starlette import parser
 from webargs.fields import DelimitedList, Str, Int, Boolean
@@ -5,7 +6,8 @@ from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
+from starlette.authentication import requires
 from yaml import safe_load
 
 from ...context import get_database
@@ -30,7 +32,6 @@ from ..filters import (
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
 from ...util import relative_path
-from .utils import location_check, material_check, commit_changes, commit_edits, collection_handler
 import json
 import copy
 
@@ -179,7 +180,12 @@ class ModelAPIEndpoint(HTTPEndpoint):
             schema = self.meta.schema(many=False, allowed_nests=args["nest"])
             # This needs to be wrapped in an error-handling block!
             q = db.session.query(schema.opts.model)
+
             res = q.get(id)
+            if not request.user.is_authenticated:
+                if res.embargo_date is not None:
+                    return UnauthorizedResponse()
+
             # https://github.com/djrobstep/sqlakeyset
             return APIResponse(res, schema=schema)
 
@@ -208,6 +214,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
     async def get(self, request):
         """Handler for all GET requests"""
+
         if request.path_params.get("id") is not None:
             # Pass off to the single-item handler
             return await self.get_single(request)
@@ -230,6 +237,9 @@ class ModelAPIEndpoint(HTTPEndpoint):
             for _filter in self._filters:
                 q = _filter(q, args)
 
+            if not request.user.is_authenticated and hasattr(schema.opts.model, "embargo_date"):
+                q = q.filter(schema.opts.model.embargo_date == None)
+
             q = q.options(*list(schema.query_options(max_depth=1)))
 
             if args["all"]:
@@ -248,6 +258,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
             return APIResponse(res, schema=schema, total_count=q.count())
 
+    @requires("admin")
     async def put(self, request):
         """Handler for all PUT requests"""
 
@@ -298,6 +309,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
             return JSONResponse({"Status": f"success to {self._model_name}", "data": return_data})
 
+    @requires("admin")
     async def post(self, request):
         """
         Handler for all POST requests. i.e, New rows for database
@@ -330,3 +342,25 @@ class ModelAPIEndpoint(HTTPEndpoint):
             return_data = schema.dump(new_row)
 
             return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "data": return_data})
+
+    async def delete(self, request):
+        """
+        handler of delete requests
+        """
+        db = self.meta.database
+
+        model = self.meta.schema.opts.model
+        schema = self.meta.schema()
+
+        id_ = request.path_params.get("id")
+        data_model = db.session.query(model).get(id_)
+
+        return_data = schema.dump(data_model)
+
+        db.session.delete(data_model)
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+
+        return JSONResponse({"Status": "Success", "DELETE": return_data})

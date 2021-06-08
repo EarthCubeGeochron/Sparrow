@@ -23,7 +23,7 @@ class AuthProvider extends StatefulComponent {
       login: false,
       username: null,
       isLoggingIn: false,
-      invalidAttempt: false,
+      invalidAttempt: false
     };
   }
 
@@ -52,10 +52,11 @@ class AuthProvider extends StatefulComponent {
     return this.setState({ isLoggingIn: v });
   }
 
-  doLogin = async (data) => {
+  doLogin = async data => {
     const { post } = APIActions(this.context);
     console.log(data);
     const { login, username } = await post("/auth/login", data);
+    console.log(login);
     let invalidAttempt = false;
     let isLoggingIn = false;
     if (!login) {
@@ -66,7 +67,7 @@ class AuthProvider extends StatefulComponent {
       login,
       username,
       isLoggingIn,
-      invalidAttempt,
+      invalidAttempt
     });
   };
 
@@ -76,7 +77,7 @@ class AuthProvider extends StatefulComponent {
     return this.setState({
       login,
       username: null,
-      isLoggingIn: false,
+      isLoggingIn: false
     });
   };
 

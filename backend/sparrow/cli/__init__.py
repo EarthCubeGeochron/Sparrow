@@ -93,7 +93,7 @@ def create_views(db):
     # Don't need to build the app just for this
     with working_directory(__file__):
         db.exec_sql("../database/fixtures/05-views.sql")
-        db.exec_sql("../database/fixtures/07-apiv2views.sql") 
+        db.exec_sql("../database/fixtures/07-apiv2views.sql")
 
 
 @cli.command(name="shell")
@@ -159,16 +159,18 @@ def plugins(app):
 @with_database
 @click.option("--safe", is_flag=True, default=True)
 @click.option("--apply", is_flag=True, default=False)
-def _db_migration(db, safe=True, apply=False):
+@click.option("--hide-view-changes", is_flag=True, default=False)
+def _db_migration(db, safe=True, apply=False, hide_view_changes=False):
     """Command to generate a basic migration."""
-    db_migration(db, safe=safe, apply=apply)
+    db_migration(db, safe=safe, apply=apply, hide_view_changes=hide_view_changes)
 
 
 @cli.command(name="db-update")
 @with_database
-def db_update(db):
+@click.option("--dry-run", is_flag=True, default=False)
+def db_update(db, dry_run=False):
     setup_stderr_logs(level=INFO)
-    db.update_schema(dry_run=True)
+    db.update_schema(dry_run=True, apply=not dry_run)
 
 
 def command_info(ctx, cli):

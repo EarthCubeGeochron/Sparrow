@@ -1,14 +1,14 @@
-from flask import current_app, request
-from flask_restful import Resource
-
+from starlette.endpoints import HTTPEndpoint
+from starlette.responses import JSONResponse, Response
+from sparrow.context import app_context
 from sparrow import get_logger
-from sparrow.legacy.api_v1 import APIResourceCollection
 from sparrow.plugins import SparrowCorePlugin
+from starlette.routing import Route, Router
+from starlette.authentication import requires
+
 from sparrow.util import get_qualified_name
 
 log = get_logger(__name__)
-
-ImportDataAPI = APIResourceCollection()
 
 
 def construct_error_response(err: Exception, code: int):
@@ -19,8 +19,8 @@ def construct_error_response(err: Exception, code: int):
     except AttributeError:
         msg = [str(err)]
 
-    return (
-        {
+    return JSONResponse(
+       content= {
             "error": {
                 "type": get_qualified_name(err),
                 "code": code,
@@ -30,34 +30,47 @@ def construct_error_response(err: Exception, code: int):
                 # (possibly large) datasets the client already has.
             }
         },
-        code,
+        status_code= code,
     )
 
 
-@ImportDataAPI.resource("/<string:model_name>")
-class ImportDataResource(Resource):
-    # We should enable authentication but that is tricky with scripts
-    # @jwt_required
+class ImportData(HTTPEndpoint):
+
+    # http://localhost:5002/api/v2/import-data/models/{model_name}
 
     # Raises a https://marshmallow.readthedocs.io/en/stable/api_reference.html#marshmallow.exceptions.ValidationError
     # when bad data is given
 
-    def put(self, model_name):
-        db = current_app.database
-        # TODO: lock this down so that login is required...!!!!
+    @requires("admin")
+    async def put(self, request):
+        db = app_context().database
         try:
-            req = request.get_json()
-            log.debug(req)
-            data = req.get("data")
+            model_name = request.path_params["model_name"]
+
+            req = await request.json()
+            data = req['data']
+            log.debug(data)
             res = db.load_data(model_name, data)
-            return res.id, 201
+
+            return JSONResponse({'status':'success', "model": f'{model_name}','id':res.id})
         except Exception as err:
             return construct_error_response(err, 400)
+    
+    async def get(self, request):
+        model_name = request.path_params["model_name"]
 
+
+        return JSONResponse({"Model": f"{model_name}"})
+
+ImportDataAPI = Router(
+      [
+        Route("/models/{model_name}", endpoint=ImportData, methods=["PUT","GET"]),
+    ]
+)
 
 class ImportDataPlugin(SparrowCorePlugin):
     name = "import-data"
     sparrow_version = ">=2.*"
 
-    def on_api_v1_initialized(self, api):
-        api.add_resource(ImportDataAPI, "/import-data")
+    def on_api_initialized_v2(self, api):
+        api.mount("/import-data", ImportDataAPI, name=self.name)

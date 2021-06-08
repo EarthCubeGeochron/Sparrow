@@ -5,7 +5,7 @@ import { DataFileMatch } from "../model-views/data-files/page";
 import { NoStateAdmin } from "./baseview";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
-import { DataFilesListComponent } from "../components/infinite-scroll/infinite-scroll";
+import { DataFilesListComponent } from "~/model-views";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -15,12 +15,12 @@ export function DataFilesMainPanel() {
   return h(Switch, [
     h(Route, {
       path: base + "/:file_hash",
-      component: () => h(DataFileMatch),
+      component: () => h(DataFileMatch)
     }),
     h(Route, {
       path: base,
-      component: () => h(NoStateAdmin, { name: "Data File" }),
-    }),
+      component: () => h(NoStateAdmin, { name: "Data File" })
+    })
   ]);
 }
 
@@ -31,7 +31,7 @@ export function DataFileAdminPage() {
 
   const [params, setParams] = useState(initialState);
 
-  const createParams = (params) => {
+  const createParams = params => {
     for (let [key, value] of Object.entries(params)) {
       if (value == null) {
         delete params[key];
@@ -45,8 +45,8 @@ export function DataFileAdminPage() {
       listComponent: h(DataFilesListComponent, { params }),
       possibleFilters,
       createParams,
-      initParams: params || {},
+      initParams: params || {}
     }),
-    mainPageComponent: h(DataFilesMainPanel),
+    mainPageComponent: h(DataFilesMainPanel)
   });
 }

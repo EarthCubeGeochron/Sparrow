@@ -1,9 +1,11 @@
 import yaml
 import json
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse, Response
-from starlette.exceptions import HTTPException, ExceptionMiddleware
+from starlette.exceptions import HTTPException
 from sparrow.logs import get_logger
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -11,6 +13,8 @@ from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
 from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, root_example, root_info, meta_info
+from .response import APIResponse
+import time
 
 log = get_logger(__name__)
 
@@ -61,6 +65,15 @@ def schema(request):
     return JSONResponse(s)
     # return OpenAPIResponse(s)
 
+class ServerTimings(BaseHTTPMiddleware):
+    
+    async def dispatch(self, request, call_next):
+        start = time.time()
+        response = await call_next(request)
+        dur = (time.time() - start)*1e3
+        response.headers['Server-Timing'] = f'total;dur={dur}'
+        return response
+
 
 class APIv2(Starlette):
     """
@@ -78,6 +91,10 @@ class APIv2(Starlette):
             openapi_version="3.0.0",
             info={"description": "An API for accessing geochemical data"},
             plugins=[MarshmallowPlugin()],
+        )
+
+        self.add_middleware(
+            ServerTimings,
         )
 
         self._add_routes()

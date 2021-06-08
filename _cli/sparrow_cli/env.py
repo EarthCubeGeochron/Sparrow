@@ -18,6 +18,11 @@ def prepare_docker_environment():
     environ.setdefault("SPARROW_BASE_URL", "/")
     environ.setdefault("SPARROW_LAB_NAME", "")
 
+    # Have to get rid of random printing to stdout in order to not break
+    # logging and container ID
+    # https://github.com/docker/scan-cli-plugin/issues/149
+    environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
+
     prepare_compose_overrides()
 
 
@@ -36,6 +41,12 @@ def prepare_compose_overrides():
 
     env = environ.get("SPARROW_ENV", "development")
     is_production = env == "production"
+
+    # Use the docker-compose profile tool to enable some services
+    # NOTE: this is a nicer way to do some things that needed to be handled by
+    # compose-file overrides in the past.
+    if is_production:
+        environ["COMPOSE_PROFILES"] = "production"
 
     # Use certbot for SSL if certain conditions are met
     use_certbot = is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
