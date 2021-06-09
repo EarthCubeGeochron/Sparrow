@@ -1,4 +1,3 @@
-from os import environ
 from subprocess import run, PIPE, STDOUT
 from shlex import split
 from typing import List
@@ -9,8 +8,6 @@ from json.decoder import JSONDecodeError
 from sparrow_utils.logs import get_logger
 from sparrow_utils.shell import cmd as cmd_
 from rich import print
-from compose.cli.main import main
-import sys
 
 log = get_logger(__name__)
 
@@ -31,7 +28,7 @@ def cmd(*v, **kwargs):
 
 
 def compose(*args, **kwargs):
-    return cmd("docker-compose", *args, **kwargs)
+    return cmd("sparrow compose", *args, **kwargs)
 
 
 def container_id(container):

@@ -69,7 +69,7 @@ coll = COLLECT(
     Tree(
         path.join(src_root, "frontend"),
         prefix="srcroot/frontend",
-        excludes=["node_modules"],
+        excludes=["node_modules", "examples", ".parcel-cache"],
     ),
     Tree(
         path.join(src_root, "_cli"), prefix="srcroot/_cli", excludes=["build", "dist"]
