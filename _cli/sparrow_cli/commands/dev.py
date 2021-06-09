@@ -31,6 +31,7 @@ def dev_reload():
 @sparrow_dev.command(name="sync-version-info")
 def sync_version_info():
     root_dir = environ.get("SPARROW_PATH")
+    # We should bail here if we are running a bundled Sparrow...
     chdir(root_dir)
     meta = run_path(path.join("backend", "sparrow", "meta.py"))
 
