@@ -1,4 +1,5 @@
-from subprocess import PIPE, STDOUT
+from subprocess import run, PIPE, STDOUT
+from shlex import split
 from typing import List
 from pathlib import Path
 from json import loads
