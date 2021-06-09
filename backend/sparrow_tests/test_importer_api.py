@@ -178,3 +178,45 @@ class TestDuplication:
         for a in res.analysis_collection:
             assert len(a.datum_collection) == 1
         assert len(db.session.query(db.model.datum).all()) == 2
+
+class TestSampleChange:
+    @mark.skip
+    def test_sample_name_change(self, client, db):
+        """Change name of sample in database"""
+        
+        Sample = db.model.sample
+
+        combined_name = "WI-STD-74"
+
+        data = {
+                "date": str(datetime.now()),
+                "name": "Session1",
+                "sample": {"name": "WI-STD-74 B"}
+                }
+
+        db.load_data("session", data)
+
+        data = {
+                "date": str(datetime.now()),
+                "name": "Session2",
+                "sample": {"name": "WI-STD-74 C"}
+                }
+
+        db.load_data("session", data)
+
+        data = {
+                "date": str(datetime.now()),
+                "name": "Session2",
+                "sample": {"name": "WI-STD-12"}
+                }
+        db.load_data("session", data)
+
+        existing = db.session.query(Sample).get(ele["name"])
+
+        # Somewhere here need to do the combination of Sample 1 and 2 into single sample...
+
+        # Two datum with unique analysis numbers should be created, but are not.
+        res = db.load_data("session", data)
+        # assert 1==0
+        # I think looking for 2 samples is the easiest way to check given the DB currently keeps unique keys.
+        assert len(db.session.query(Sample).all()) == 2

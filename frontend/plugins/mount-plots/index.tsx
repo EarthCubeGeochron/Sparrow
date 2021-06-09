@@ -82,18 +82,18 @@ function MountMapChartInner(props) {
             cy={yMid}
             r={110}
             fill={"blue"}
-            fill-opacity={0.1}
+            fillOpacity={0.1}
             stroke={"blue"}
-            stroke-width={2}
+            strokeWidth={2}
           />
           <circle
             cx={xMid}
             cy={yMid}
             r={60}
             fill={"red"}
-            fill-opacity={0.1}
+            fillOpacity={0.1}
             stroke={"red"}
-            stroke-width={2}
+            strokeWidth={2}
           />
           <AxisLeft
             scale={yScale}
