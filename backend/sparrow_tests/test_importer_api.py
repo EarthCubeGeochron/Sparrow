@@ -180,6 +180,7 @@ class TestDuplication:
         assert len(db.session.query(db.model.datum).all()) == 2
 
 class TestSampleChange:
+    @mark.skip
     def test_sample_name_change(self, client, db):
         """Change name of sample in database"""
         
