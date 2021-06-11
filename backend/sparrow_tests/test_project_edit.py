@@ -47,7 +47,7 @@ class TestProjectEdits:
 
         assert set([s.id for s in orig_sessions]) == set([1, 2])
 
-    @mark.xfail(reason="Updating does not work at the moment")
+   # @mark.xfail(reason="Updating does not work at the moment")
     def test_project_updates(self, db):
         # need a function like load_data but for edits..
         ## get interface and db model
