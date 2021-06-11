@@ -26,48 +26,11 @@
     }
   ],
   "og-project": {
-    "name": "Casey's Project",
-    "publication": [{ "title": "Fake title 1", "doi": "10.1224/toei90x" }],
-    "sample": [
-      { "name": "fake1", "material": "basalt" },
-      { "name": "fake3", "material": "granite" }
-    ],
-    "session": [
-      {
-        "id": 2,
-        "date": "2014-10-29 13:47:16",
-        "data": { "Irradiation": "UW114" },
-        "sample": { "name": "fake2", "material": "basalt" }
-      }
-    ]
+    "name": "Casey's Project"
   },
   "edit-project": {
     "id": 1,
     "name": "Casey's Project Edited name",
-    "description": "fake test description",
-    "publication": [
-      { "title": "Fake title 1", "doi": "10.1224/toei90x" },
-      { "title": "Fake title 2", "doi": "10.1224/txrt" },
-      { "title": "Fake title 3", "doi": "10.345/90pox" }
-    ],
-    "sample": [
-      { "name": "fake1", "material": "basalt" },
-      { "name": "fake3", "material": "granite" },
-      { "name": "fake2", "material": "basalt" }
-    ],
-    "session": [
-      {
-        "id": 2,
-        "date": "2014-10-29 13:47:16",
-        "data": { "Irradiation": "UW114" },
-        "sample": { "name": "Casey's FAKE SAMPLE", "material": "Lies" }
-      },
-      {
-        "id": 1,
-        "date": "2015-10-29 13:47:16",
-        "data": { "Irradiation": "UW114" },
-        "sample": { "name": "fake1", "material": "basalt" }
-      }
-    ]
+    "description": "fake test description"
   }
 }
