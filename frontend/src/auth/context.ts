@@ -1,17 +1,21 @@
-/*
- * decaffeinate suggestions:
- * DS001: Remove Babel/TypeScript constructor workaround
- * DS102: Remove unnecessary code created because of implicit returns
- * DS206: Consider reworking classes to avoid initClass
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 import h from "react-hyperscript";
 import { StatefulComponent, APIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { createContext, useContext } from "react";
 
-const AuthContext = createContext({});
+interface AuthCtx {
+  login: boolean;
+  username: string | null;
+  isLoggingIn: boolean;
+  invalidAttempt: boolean;
+}
+
+const AuthContext = createContext<AuthCtx>({
+  login: false,
+  username: null,
+  isLoggingIn: false,
+  invalidAttempt: false,
+});
 
 class AuthProvider extends StatefulComponent {
   static contextType = APIV2Context;
@@ -23,7 +27,7 @@ class AuthProvider extends StatefulComponent {
       login: false,
       username: null,
       isLoggingIn: false,
-      invalidAttempt: false
+      invalidAttempt: false,
     };
   }
 
@@ -44,31 +48,26 @@ class AuthProvider extends StatefulComponent {
     return this.setState({ login, username });
   };
 
-  requestLoginForm(v) {
-    console.log("Requesting login form");
-    if (v == null) {
-      v = true;
-    }
-    return this.setState({ isLoggingIn: v });
+  requestLoginForm(v = true) {
+    return this.setState({ isLoggingIn: v, invalidAttempt: false });
   }
 
-  doLogin = async data => {
+  doLogin = async (data) => {
     const { post } = APIActions(this.context);
-    console.log(data);
-    const { login, username } = await post("/auth/login", data);
-    console.log(login);
-    let invalidAttempt = false;
-    let isLoggingIn = false;
-    if (!login) {
-      invalidAttempt = true;
-      isLoggingIn = true;
+    try {
+      const res = await post("/auth/login", data);
+      const { login, username } = res;
+      return this.setState({
+        isLoggingIn: false,
+        invalidAttempt: false,
+        login,
+        username,
+      });
+    } catch (err) {
+      return this.setState({
+        invalidAttempt: true,
+      });
     }
-    return this.setState({
-      login,
-      username,
-      isLoggingIn,
-      invalidAttempt
-    });
   };
 
   doLogout = async () => {
@@ -77,16 +76,13 @@ class AuthProvider extends StatefulComponent {
     return this.setState({
       login,
       username: null,
-      isLoggingIn: false
+      isLoggingIn: false,
     });
   };
 
   render() {
-    const methods = (() => {
-      let doLogin, doLogout, requestLoginForm;
-      return ({ doLogin, doLogout, requestLoginForm } = this);
-    })();
-    const value = { ...methods, ...this.state };
+    const { doLogin, doLogout, requestLoginForm } = this;
+    const value = { doLogin, doLogout, requestLoginForm, ...this.state };
     return h(AuthContext.Provider, { value }, this.props.children);
   }
 }

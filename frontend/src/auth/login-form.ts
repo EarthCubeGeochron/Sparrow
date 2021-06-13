@@ -42,6 +42,8 @@ class LoginFormInner extends Component {
   }
 }
 
+const defaultState = { data: { username: "", password: "" } };
+
 class LoginForm extends StatefulComponent {
   static contextType = AuthContext;
   constructor() {
@@ -49,12 +51,11 @@ class LoginForm extends StatefulComponent {
     this.resetState = this.resetState.bind(this);
     this.isValid = this.isValid.bind(this);
     this.resetState();
+    this.state = defaultState;
   }
 
   resetState() {
-    return (this.state = {
-      data: { username: "", password: "" },
-    });
+    this.setState(defaultState);
   }
 
   isValid() {
