@@ -3,19 +3,37 @@ import { StatefulComponent, APIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { createContext, useContext } from "react";
 
+type GetStatus = { type: "get-status" };
+type RequestForm = { type: "request-form"; enabled: boolean };
+type LoginData = { username: string; password: string };
+type LoginSuccess = { type: "login" } & LoginData;
+type LogoutSuccess = { type: "logout" };
+
+type AuthAction = GetStatus | RequestForm | LoginSuccess | LogoutSuccess;
+
 interface AuthCtx {
   login: boolean;
   username: string | null;
   isLoggingIn: boolean;
   invalidAttempt: boolean;
+  dispatch(action: AuthAction): void;
 }
 
-const AuthContext = createContext<AuthCtx>({
+const authDefaultState = {
   login: false,
   username: null,
   isLoggingIn: false,
   invalidAttempt: false,
+};
+
+const AuthContext = createContext<AuthCtx>({
+  ...authDefaultState,
+  dispatch() {},
 });
+
+function authReducer(state = authDefaultState, action) {
+  return state;
+}
 
 class AuthProvider extends StatefulComponent {
   static contextType = APIV2Context;
