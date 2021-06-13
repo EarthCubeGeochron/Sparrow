@@ -1,31 +1,39 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useContext } from "react";
 import { NonIdealState, Button, Callout } from "@blueprintjs/core";
 
-import { AuthContext } from "./context";
+import { useAuth } from "./context";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
 const LoginButton = function (props) {
-  const { requestLoginForm: onClick } = useContext(AuthContext);
-  return h(Button, { onClick, className: "login-button", ...props }, "Login");
+  const { runAction } = useAuth();
+  return h(
+    Button,
+    {
+      onClick() {
+        runAction({ type: "request-form", enabled: true });
+      },
+      className: "login-button",
+      ...props,
+    },
+    "Login"
+  );
 };
 
 const LoginRequired = function (props) {
-  const { requestLoginForm: onClick, ...rest } = props;
   return h(NonIdealState, {
     title: "Not logged in",
     description:
       "You must be authenticated to use the administration interface.",
     icon: "blocked-person",
     action: h(LoginButton),
-    ...rest,
+    ...props,
   });
 };
 
 const LoginSuggest = function () {
-  const { login, requestLoginForm } = useContext(AuthContext);
+  const { login } = useAuth();
   if (login) {
     return null;
   }
