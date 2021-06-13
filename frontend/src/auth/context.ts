@@ -11,15 +11,31 @@ type LogoutSuccess = { type: "logout" };
 
 type AuthAction = GetStatus | RequestForm | LoginSuccess | LogoutSuccess;
 
-interface AuthCtx {
+function dispatchMiddleware(dispatch) {
+  return async (action) => {
+    switch (action.type) {
+      case "get-status":
+        await unlink(action.file, () => dispatch(action));
+        break;
+
+      default:
+        return dispatch(action);
+    }
+  };
+}
+
+interface AuthState {
   login: boolean;
   username: string | null;
   isLoggingIn: boolean;
   invalidAttempt: boolean;
+}
+
+interface AuthCtx extends AuthState {
   dispatch(action: AuthAction): void;
 }
 
-const authDefaultState = {
+const authDefaultState: AuthState = {
   login: false,
   username: null,
   isLoggingIn: false,
@@ -31,7 +47,10 @@ const AuthContext = createContext<AuthCtx>({
   dispatch() {},
 });
 
-function authReducer(state = authDefaultState, action) {
+function authReducer(state = authDefaultState, action: AuthAction) {
+  switch (action.type) {
+    case "get-status":
+  }
   return state;
 }
 
