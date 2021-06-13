@@ -32,12 +32,15 @@ def reset_password(db, username):
     db.session.commit()
 
 
+def _format_username(username):
+    return "Username {}".format(style(username, fg="cyan", bold=True))
+
+
 def create_user(db):
     username = prompt("Enter the desired username")
-    name = "Username {}".format(style(username, fg="cyan", bold=True))
     while db.session.query(User).get(username) is not None:
-        username = prompt(name + " is already taken. Choose another.")
-    echo(name + " is available!")
+        username = prompt(_format_username(username) + " is already taken. Choose another")
+    echo(_format_username(username) + " is available!")
 
     password = prompt("Create a password", hide_input=True, confirmation_prompt=True)
     _create_user(db, username, password)
