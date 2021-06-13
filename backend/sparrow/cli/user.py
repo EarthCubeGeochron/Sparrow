@@ -16,6 +16,12 @@ def _reset_password(db, user, password):
     return user
 
 
+def list_users(db):
+    users = db.session.query(User).all()
+    for user in users:
+        print(user.username)
+
+
 def reset_password(db, username):
     user = db.session.query(User).filter_by(username=username).first()
     if user is None:

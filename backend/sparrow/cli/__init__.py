@@ -5,7 +5,7 @@ from os import environ
 from json import dumps
 from click import pass_context
 from .util import with_database, with_app, with_full_app
-from .user import create_user, reset_password
+from .user import create_user, list_users, reset_password
 from ..util import working_directory
 from ..context import get_sparrow_app
 from ..database.migration import db_migration
@@ -143,6 +143,12 @@ def _create_user(db):
     Create an authorized user for the web frontend
     """
     create_user(db)
+
+
+@cli.command(name="list-users")
+@with_database
+def _list_users(db):
+    list_users(db)
 
 
 @cli.command(name="reset-password")
