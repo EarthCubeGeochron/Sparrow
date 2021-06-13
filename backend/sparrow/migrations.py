@@ -20,7 +20,7 @@ class InstrumentSessionMigration(SparrowMigration):
 
     def should_apply(self, source, target, migrator):
         pub = '"public"."instrument_session"'
-        return not has_table(source, pub) and has_table(target, pub)
+        return has_table(target, pub)
 
     def apply(self, db):
         ix = "data_file_link_file_hash_session_id_analysis_id_sample_id_key"
@@ -32,4 +32,5 @@ class InstrumentSessionMigration(SparrowMigration):
         ALTER TABLE data_file_link DROP CONSTRAINT data_file_link_check;
         DROP INDEX IF EXISTS {ix};
         """,
+            stop_on_error=True,
         )
