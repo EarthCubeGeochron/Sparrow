@@ -32,6 +32,7 @@ services:
       - SPARROW_LAB_NAME
       - SPARROW_ECHO_SQL
       - SPARROW_DATABASE=postgresql+psycopg2://postgres@db/sparrow
+      # Inside the container, the data directory is mapped to a standardized folder
       - SPARROW_DATA_DIR=/data
       # A cache for files that need to persist but can be rebuilt.
       - SPARROW_CACHE_DIR=/cache

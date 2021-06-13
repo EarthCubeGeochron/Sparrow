@@ -87,6 +87,7 @@ def run_sql_file(session, sql_file, params=None):
     sql = open(sql_file).read()
     run_sql(session, sql, params=params)
 
+
 def run_sql_query_file(session, sql_file, params=None):
     sql = open(sql_file).read()
     return session.execute(sql, params)

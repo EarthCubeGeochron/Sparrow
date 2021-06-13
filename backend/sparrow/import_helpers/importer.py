@@ -6,6 +6,7 @@ from os import environ
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import inspect
+from IPython import embed
 
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
@@ -103,7 +104,6 @@ class BaseImporter(ImperativeImportHelperMixin):
         if needed.
         """
         for fn in file_sequence:
-            secho(str(fn), dim=True)
             self.__import_datafile(fn, None, **kwargs)
 
     def iter_records(self, seq, **kwargs):
@@ -127,7 +127,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         ## TODO: First, get file with same hash (i.e., exact same file contents), attempting to relink if non-existant
         return self.db.session.query(self.m.data_file).filter_by(file_path=file_path).first()
 
-    def __create_data_file_record(self, fn):
+    def _create_data_file_record(self, fn):
 
         # Get the path location (this must be unique)
         _infile = Path(fn)
@@ -162,10 +162,11 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         :param fix_errors  Fix errors that have previously been ignored
         """
+        secho(str(fn), dim=True)
         redo = kwargs.pop("redo", False)
         added = False
         if rec is None:
-            rec, added = self.__create_data_file_record(fn)
+            rec, added = self._create_data_file_record(fn)
 
         err_filter = True
         m = self.m.data_file_link
@@ -189,6 +190,8 @@ class BaseImporter(ImperativeImportHelperMixin):
             items = ensure_sequence(self.import_datafile(fn, rec, **kwargs))
 
             for created_model in items:
+                if created_model is None:
+                    continue
                 # Track the import of the resulting models
                 df_link = self.__track_model(rec, created_model)
                 if df_link is not None:

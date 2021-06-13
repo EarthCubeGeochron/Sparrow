@@ -91,8 +91,6 @@ class SparrowDatabaseMapper:
             autoload_with=self.db.engine,
             **kwargs,
         )
-        log.info(f"Automapping table {tablename}")
-        # log.info([c.name for c in tables.columns])
         return tables
 
     def reflect_view(self, tablename, *column_args, **kwargs):
