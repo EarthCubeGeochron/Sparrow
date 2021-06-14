@@ -14,6 +14,7 @@ from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
 from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, root_example, root_info, meta_info
 from .response import APIResponse
+from .exceptions import SparrowAPIError
 import time
 
 log = get_logger(__name__)
@@ -29,7 +30,7 @@ async def http_exception(request, exc):
     )
 
 
-exception_handlers = {HTTPException: http_exception}
+exception_handlers = {HTTPException: http_exception, SparrowAPIError: http_exception}
 
 
 class OpenAPIResponse(Response):

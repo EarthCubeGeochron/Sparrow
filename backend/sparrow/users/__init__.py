@@ -4,7 +4,7 @@ An API for managing users
 from starlette.routing import Route, Router
 from starlette.exceptions import HTTPException
 from sparrow.plugins import SparrowCorePlugin
-from sparrow.api import APIResponse
+from sparrow.api import APIResponse, SparrowAPIError
 from sparrow.context import get_database
 from sparrow.auth.create_user import _create_user
 from sparrow.logs import get_logger
@@ -32,11 +32,11 @@ async def create_user(db, User, request):
         username = res["username"]
         password = res["password"]
     except IndexError:
-        return HTTPException(400, "Must provide both username and password")
+        raise SparrowAPIError("Must provide both username and password")
     if UserSchema.query(db.session).get(username) is not None:
-        return HTTPException(409, f"User {username} already exists")
+        raise SparrowAPIError(f"User {username} already exists", 409)
     if len(password) < 4:
-        return HTTPException(400, f"Password is too short")
+        raise SparrowAPIError("Password is too short")
     res = _create_user(db, username, password)
     return APIResponse(res, schema=UserSchema(many=False, exclude=("password",)))
 
