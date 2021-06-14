@@ -77,6 +77,10 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         super().__init__(*args, **kwargs)
 
+    @classmethod
+    def table_name(cls):
+        return cls.opts.model.__table__.name
+
     @property
     def _table(self):
         return self.opts.model.__table__

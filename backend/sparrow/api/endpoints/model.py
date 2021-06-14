@@ -335,13 +335,13 @@ class ModelAPIEndpoint(HTTPEndpoint):
                 new_row = db.load_data(self._model_name, ele)
                 new_row_json = schema.dump(new_row)
                 return_data.append(new_row_json)
-            return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "data": return_data})
+            return JSONResponse({"status": f"Successfully submitted to {self._model_name}", "data": return_data})
 
         else:
             new_row = db.load_data(self._model_name, data)
             return_data = schema.dump(new_row)
 
-            return JSONResponse({"Status": f"Successfully submitted to {self._model_name}", "data": return_data})
+            return JSONResponse({"status": f"Successfully submitted to {self._model_name}", "data": return_data})
 
     async def delete(self, request):
         """
@@ -363,4 +363,4 @@ class ModelAPIEndpoint(HTTPEndpoint):
         except:
             db.session.rollback()
 
-        return JSONResponse({"Status": "Success", "DELETE": return_data})
+        return JSONResponse({"status": "success", "DELETE": return_data})

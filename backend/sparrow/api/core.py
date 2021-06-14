@@ -65,13 +65,13 @@ def schema(request):
     return JSONResponse(s)
     # return OpenAPIResponse(s)
 
+
 class ServerTimings(BaseHTTPMiddleware):
-    
     async def dispatch(self, request, call_next):
         start = time.time()
         response = await call_next(request)
-        dur = (time.time() - start)*1e3
-        response.headers['Server-Timing'] = f'total;dur={dur}'
+        dur = (time.time() - start) * 1e3
+        response.headers["Server-Timing"] = f"total;dur={dur}"
         return response
 
 
@@ -127,7 +127,10 @@ class APIv2(Starlette):
 
         db = self._app.database
 
+        skip_list = [db.interface.user]
         for iface in db.interface:
+            if iface in skip_list:
+                continue
             self._add_model_route(iface)
 
         self.add_view_route(
