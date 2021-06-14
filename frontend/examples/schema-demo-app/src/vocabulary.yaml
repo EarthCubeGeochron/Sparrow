@@ -1,0 +1,109 @@
+- type: vocabulary
+  name: Arizona LaserChron Center
+  authority: Arizona LaserChron Center
+  description: Implicit vocabulary for data tracked within the LaserChron lab
+  private: true
+  terms:
+    - description: Uranium content
+      id: U
+      type: number
+    - description: Ratio of 206Pb to 204Pb
+      id: 206Pb_204Pb
+      type: number
+    - description: Uranium/Thorium ratio
+      id: U_Th
+      type: number
+    - description: Ratio of 206Pb to 207Pb
+      id: 206Pb_207Pb
+      type: number
+    - description: Ratio of 206Pb to 235U, using natural 235U/238U ratio
+      id: 207Pb_235U
+      type: number
+    - description: Ratio of 207Pb to 238U
+      id: 206Pb_238U
+      type: number
+    - description: Error correlation
+      id: error_corr
+      type: number
+    - description: Measured age in the 206Pb – 238U system
+      id: age_206Pb_238U
+      type: number
+    - description: Age in the 207Pb – 235U system, using natural 235U/238U ratio
+      id: age_207Pb_235U
+      type: number
+    - description:
+      id: age_206Pb_207Pb
+      type: number
+    - id: concordance
+      description: Concordance (%)
+      type: number
+    - id: best_age
+      computed: true
+      description: Best age system the U/Pb system
+
+- type: vocabulary
+  name: Detrital zircon
+  authority: Geochron.org
+  terms:
+    - id: 206Pb/238U age
+      type: number
+    - id: 207Pb/235U age
+      type: number
+    - id: 206Pb/207Pb age
+      type: number
+    - id: 206Pb/238U ratio
+      type: number
+    - id: 207Pb/235U ratio
+      type: number
+    - id: 206Pb/207Pb ratio
+      type: number
+    - id: Best age
+      type: number
+    - description: "Ages of all grains in a sedimentary rock"
+      id: "Detrital age spectrum"
+      members:
+        - id: Best age
+          list: true
+    - id: U/Pb system ages
+      description: Ages for the Uranium-Lead system
+      members:
+        - id: "206Pb/238U age"
+        - id: "207Pb/235U age"
+        - id: "206Pb/207Pb age"
+    - id: Concordia parameters
+      description: "An U-Pb age that can contribute to a concordia measurement"
+      members:
+        - id: "Error correlation"
+        - id: "206Pb/238U ratio"
+        - id: "207Pb/235U ratio"
+        - id: "206Pb/207Pb ratio"
+    - id: "Detrital zircon result set"
+      description: "Canonical result set for error analysis and concordia generation"
+      group_by: sample
+      members:
+        - id: Concordia age
+          list: true
+    - id: Concordia age
+      description: "An U-Pb age that can contribute to a concordia measurement"
+      members:
+        - id: "Concordia parameters"
+        - id: "U/Pb system ages"
+
+- authority: Macrostrat
+  name: Macrostrat
+  type: vocabulary
+  terms:
+    - description: "Crystallization age of a detrital mineral grain in sedimentary rock"
+      id: "Detrital grain age"
+      type: number
+    - description: "Duration of surface exposure to present"
+      id: "Surface exposure age"
+      type: number
+    - description": "Age of last surface exposure"
+      id: "Burial age"
+      type: number
+    - description: "Crystallization age of a volcanic or igneous rock"
+      id: "Igneous crystallization age"
+      type: number
+    - id: "Maximum depositional age"
+      description: "Maximum depositional age"

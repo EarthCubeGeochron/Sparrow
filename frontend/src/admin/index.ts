@@ -1,9 +1,9 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useContext, Suspense } from "react";
-import { Switch } from "react-router-dom";
-import { lazy } from "@loadable/component";
+import { useContext } from "react";
+import { Switch, Link } from "react-router-dom";
+import loadable from "@loadable/component";
 import { LinkCard } from "@macrostrat/ui-components";
-import { Spinner } from "@blueprintjs/core";
+import { Spinner, MenuItem, Menu } from "@blueprintjs/core";
 
 import { Frame } from "~/frame";
 import { LoginRequired } from "~/auth";
@@ -24,13 +24,15 @@ import { NewProjectForm } from "../model-views/project/new-project";
 import { NewSamplePage } from "~/model-views/sample/new-sample";
 import { TagManager } from "~/components/tags";
 
-const DataSheet = lazy(() => import("./data-sheet"));
-
-function DataSheetPage() {
-  return h(Suspense, { fallback: h(Spinner) }, h(DataSheet));
-}
-
 const h = hyperStyled(styles);
+
+const DataSheetPage = loadable(() => import("./data-sheet"), {
+  fallback: h(Spinner),
+});
+
+const ImporterPage = loadable(() => import("./importer"), {
+  fallback: h(Spinner),
+});
 
 function AdminDataModelLinks(props) {
   const { base = "/catalog" } = props;
@@ -42,7 +44,22 @@ function AdminDataModelLinks(props) {
   ]);
 }
 
-const AdminNavLinks = function ({ base }) {
+function SecondaryMenuItem(props) {
+  const { icon = null, to, children } = props;
+  return h(MenuItem, { icon, text: h(Link, { to }, children) });
+}
+
+function SecondaryPageLinks(props) {
+  const { base = "/admin" } = props;
+  return h(Menu, [
+    h(SecondaryMenuItem, { to: base + "/import" }, "Import"),
+    h(SecondaryMenuItem, { to: base + "/data-sheet" }, "Metadata"),
+    h(SecondaryMenuItem, { to: base + "/terms/parameter" }, "Terms"),
+    h(SecondaryMenuItem, { to: "/map" }, "Map"),
+  ]);
+}
+
+const AdminNavbarLinks = function ({ base }) {
   if (base == null) {
     base = "/catalog";
   }
@@ -56,17 +73,25 @@ const AdminNavLinks = function ({ base }) {
 
 const AdminNavbar = (props) => {
   const { base, ...rest } = props;
-  return h(AppNavbar, { ...rest, fullTitle: true, subtitle: "Admin" }, [
-    h(AdminNavLinks, { base }),
-    h(AppNavbar.Divider),
-    h(NavButton, { to: base + "/data-sheet" }, "Metadata"),
-    h(NavButton, { to: "/map" }, "Map"),
-    h(
-      NavButton,
-      { to: base + "/terms/parameter", icon: "data-lineage" },
-      "Terms"
-    ),
-  ]);
+  return h(
+    AppNavbar,
+    {
+      ...rest,
+      fullTitle: true,
+      subtitle: h(Link, { to: base }, "Admin"),
+    },
+    [
+      h(AdminNavbarLinks, { base }),
+      h(AppNavbar.Divider),
+      h(NavButton, { to: base + "/data-sheet" }, "Metadata"),
+      h(NavButton, { to: "/map" }, "Map"),
+      h(
+        NavButton,
+        { to: base + "/terms/parameter", icon: "data-lineage" },
+        "Terms"
+      ),
+    ]
+  );
 };
 
 const QuickLinks = ({ base }) => {
@@ -78,12 +103,21 @@ const QuickLinks = ({ base }) => {
 
 const AdminBody = ({ base, ...rest }) => {
   return h(Frame, { id: "adminBase", ...rest }, [
-    h("div", { style: { display: "flex", justifyContent: "space-between" } }, [
-      h("div", { style: { flexGrow: 1, marginRight: "50px", width: "28em" } }, [
-        h(OpenSearch),
-      ]),
-      h("div", { style: { flexGrow: 2 } }, [h(QuickLinks, { base })]),
-    ]),
+    h(
+      "div.admin-homepage",
+      { style: { display: "flex", justifyContent: "space-between" } },
+      [
+        h("div", { style: { flexGrow: 2 } }, [
+          h(QuickLinks, { base }),
+          h(SecondaryPageLinks, { base }),
+        ]),
+        h(
+          "div",
+          { style: { flexGrow: 1, marginRight: "50px", width: "28em" } },
+          [h(OpenSearch)]
+        ),
+      ]
+    ),
   ]);
 };
 
@@ -92,6 +126,10 @@ const AdminRouter = ({ base }) =>
     h(Route, {
       path: base + "/data-sheet",
       render: () => h(DataSheetPage),
+    }),
+    h(Route, {
+      path: base + "/import",
+      render: () => h(ImporterPage),
     }),
     h(Route, {
       path: base + "/session",

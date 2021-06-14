@@ -59,6 +59,7 @@
     "react-router-hash-link": "^1.2.2",
     "react-simple-maps": "^0.12.1",
     "react-table": "7.2.2",
+    "react-use-websocket": "^2.6.1",
     "react-virtualized": "^9.21.2",
     "store": "^2.0.12",
     "swagger-ui-react": "^3.34.0",

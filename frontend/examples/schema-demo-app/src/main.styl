@@ -2,8 +2,84 @@
   --text-color-muted: #aaa
   --text-color-dim: #444
 
+body
+  margin 0
+  padding 0
+
 .schema-linker-ui
   display flex
   flex-direction: row
   justify-content: space-between
-  margin 2
+  padding 1em
+  height 100vh
+  &>div
+    margin-right 1em
+    &:last-child
+      margin-right: 0
+
+h2
+  margin-top 0
+
+.term-list
+  display flex
+  flex-direction: column
+  margin-bottom -1em
+
+  .term-list-data
+    padding 2px
+    flex-grow 1
+    overflow-y: scroll
+
+.workspace
+  flex-grow 1
+  display flex
+  flex-direction: column
+
+.linker-ui-workspace
+  flex-grow 1
+
+.navbar
+  display flex
+  flex-direction: row
+  align-items: baseline
+  &>*
+    margin-right 1em
+  margin-right -1em
+  .spacer
+    flex-grow 1
+
+.tree-area
+  position relative
+  overflow hidden
+
+.node
+  color black
+  position relative
+  cursor move
+
+.node-content
+  position absolute
+  min-width 100%
+  min-height 100%
+  top 50%
+  left -50%
+  text-align center
+  cursor pointer
+  background: #ffffff
+  border-radius 6px
+  padding 3px
+  vertical-align: baseline
+  border 2px solid #eeeeee
+  &.schema
+    text-align left
+
+.node-name
+  font-weight bold
+  margin 3px
+
+.members
+  font-size 12px
+  color #888888
+  padding 0 3px 3px
+  .modifier
+    font-style italic
