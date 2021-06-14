@@ -1,6 +1,7 @@
 from starlette.routing import Mount, Route, RedirectResponse
 from sparrow.plugins import SparrowCorePlugin
 from .core import APIv2
+from .response import APIResponse
 
 # Shim redirect for root path.
 # TODO: clean this up
@@ -18,4 +19,3 @@ class APIv2Plugin(SparrowCorePlugin):
             Route("/api/v2", endpoint=redirect),
             Mount("/api/v2/", app=api_v2),
         ]
-        

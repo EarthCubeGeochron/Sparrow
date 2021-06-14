@@ -14,6 +14,7 @@ from ..import_helpers.api import ImportTrackerPlugin
 from ..web import WebPlugin
 from ..logs import get_logger
 from ..import_data import ImportDataPlugin
+from ..users import UserManagementPlugin
 
 log = get_logger(__name__)
 
@@ -37,6 +38,7 @@ def prepare_plugin_manager(app):
         ImportDataPlugin,
         OpenSearch,
         ImportTrackerPlugin,
+        UserManagementPlugin,
     )
     # GraphQL is disabled for now
     # self.plugins.add(GraphQLPlugin)
