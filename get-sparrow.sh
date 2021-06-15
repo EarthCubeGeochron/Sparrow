@@ -66,9 +66,13 @@ fi
 echo ""
 
 header "Installation prefix:\e[0m $install_path"
-say "The following locations will be written"
-say "- $dist_dir"
-say "- $symlink"
+say "\e[1m\e[2mTip:\e[0m \e[2mthe installation prefix can be controlled with the"
+say "\e[0mSPARROW_INSTALL_PATH\e[2m or \e[0mINSTALL_PATH\e[2m environment variables."
+echo -e "\e[0m"
+
+echo -e "The following locations will be written"
+echo -e "- $dist_dir"
+echo -e "- $symlink"
 say
 
 #check permissions
