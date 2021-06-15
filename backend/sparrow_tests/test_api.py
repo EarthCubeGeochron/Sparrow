@@ -47,11 +47,7 @@ class TestAPIV2:
         Sample = db.model.sample
 
         db.session.add_all(
-            [
-                Material(id="basalt"),
-                Material(id="dacite"),
-                Material(id="lava"),
-            ]
+            [Material(id="basalt"), Material(id="dacite"), Material(id="lava")]
         )
 
         db.session.commit()

@@ -94,7 +94,10 @@ def sparrow_test(ctx):
     PyTest."""
     pth = environ.get("SPARROW_PATH", None)
     if pth is None:
-        print("SPARROW_PATH not found. For now, tests can only be run when " "a source directory is available.")
+        print(
+            "SPARROW_PATH not found. For now, tests can only be run when "
+            "a source directory is available."
+        )
         ctx.exit()
     chdir(pth)
 
@@ -120,7 +123,9 @@ def cli_tests(ctx, pytest_args):
 @sparrow_test.command("app", context_settings=__ctx)
 @click.argument("pytest_args", nargs=-1, type=click.UNPROCESSED)
 @click.option("--help", is_flag=True, default=False, help="Print this page and exit")
-@click.option("--pytest-help", is_flag=True, default=False, help="Print the PyTest help")
+@click.option(
+    "--pytest-help", is_flag=True, default=False, help="Print the PyTest help"
+)
 @click.option(
     "--psql",
     is_flag=True,
@@ -134,10 +139,7 @@ def cli_tests(ctx, pytest_args):
     help="Shut down docker containers on exit",
 )
 @click.option(
-    "--quick",
-    is_flag=True,
-    default=False,
-    help="Keep databases and Docker containers",
+    "--quick", is_flag=True, default=False, help="Keep databases and Docker containers"
 )
 @click.pass_context
 def sparrow_test_main(
@@ -160,7 +162,10 @@ def sparrow_test_main(
 
     pth = environ.get("SPARROW_PATH", None)
     if pth is None:
-        print("SPARROW_PATH not found. For now, tests can " "only be run when a source directory is available.")
+        print(
+            "SPARROW_PATH not found. For now, tests can "
+            "only be run when a source directory is available."
+        )
         return
 
     print("Preparing [cyan]Sparrow[/cyan] application images")
@@ -184,8 +189,13 @@ def sparrow_test_main(
     res = compose("run --rm --service-ports backend", "pytest", "/app", *pytest_args)
     # if "--keep-database" not in args:
     if psql:
-        print("Initializing psql shell. " "The database is also available on localhost port 54322")
-        compose("run --rm --service-ports backend psql -h db -p 5432 -U postgres sparrow_test")
+        print(
+            "Initializing psql shell. "
+            "The database is also available on localhost port 54322"
+        )
+        compose(
+            "run --rm --service-ports backend psql -h db -p 5432 -U postgres sparrow_test"
+        )
 
     if quick:
         teardown = False

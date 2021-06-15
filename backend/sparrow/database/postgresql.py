@@ -38,7 +38,7 @@ def prefix_inserts(insert, compiler, **kw):
         }
         if vals:
             insert._post_values_clause = postgresql.dml.OnConflictDoUpdate(
-                index_elements=insert.table.primary_key, set_=vals,
+                index_elements=insert.table.primary_key, set_=vals
             )
         else:
             insert._post_values_clause = postgresql.dml.OnConflictDoNothing()

@@ -15,7 +15,9 @@ def get_backend():
 
 
 def UnauthorizedResponse(**kwargs):
-    return JSONResponse(dict(login=False, username=None, message="user is not authenticated"), **kwargs)
+    return JSONResponse(
+        dict(login=False, username=None, message="user is not authenticated"), **kwargs
+    )
 
 
 @use_annotations(location="json")

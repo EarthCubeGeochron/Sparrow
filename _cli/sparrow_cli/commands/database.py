@@ -44,7 +44,9 @@ def sparrow_db(ctx):
     pass
 
 
-@sparrow_db.command(name="migration", context_settings=dict(ignore_unknown_options=True))
+@sparrow_db.command(
+    name="migration", context_settings=dict(ignore_unknown_options=True)
+)
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def migration(args):
     """Generate a changeset against the optimal database schema"""

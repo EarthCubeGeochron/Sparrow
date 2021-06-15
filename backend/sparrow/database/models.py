@@ -79,4 +79,6 @@ class DatumType(BaseModel):
     unit = Column("unit", String, ForeignKey("vocabulary.unit.id"))
     error_unit = Column("error_unit", String, ForeignKey("vocabulary.unit.id"))
     _unit = relationship("vocabulary_unit", foreign_keys=[unit])
-    _error_unit = relationship("vocabulary_unit", foreign_keys=[error_unit], back_populates=None)
+    _error_unit = relationship(
+        "vocabulary_unit", foreign_keys=[error_unit], back_populates=None
+    )

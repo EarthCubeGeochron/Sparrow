@@ -85,4 +85,6 @@ class TestUserAPI:
         assert data["username"] == "Test"
         assert "password" not in data
 
-        verify_credentials(admin_client, {"username": "Test", "password": _new_password})
+        verify_credentials(
+            admin_client, {"username": "Test", "password": _new_password}
+        )
