@@ -1,3 +1,4 @@
 [tool.black]
 line-length = 88
+skip-magic-trailing-comma = true
 target-version = ['py38']
