@@ -38,7 +38,7 @@ def update_user(db, user, data):
     # We could probably use schemas nicely here, but we do things manually for now
     for field in ("username", "researcher"):
         try:
-            setattr(user, field=data.get(field))
+            setattr(user, field, data[field])
         except KeyError:
             pass
     db.session.add(user)
@@ -51,26 +51,25 @@ async def user(request):
     auth = get_backend()
     db = get_database()
     username = request.path_params["username"]
-    with db.session_scope(commit=False):
-        user = db.session.query(User).get(username)
-        if user is None:
-            raise SparrowAPIError("User {username} does not exist", 404)
-        if request.method == "GET":
-            return UserResponse(user)
-        elif request.method == "PUT":
-            data = await request.json()
-            return update_user(db, user, data)
-        elif request.method == "DELETE":
-            # Make sure we aren't trying to delete ourselves
-            if user.username == auth.get_identity(request):
-                raise SparrowAPIError("Cannot delete yourself", 403)
-            user.delete()
-            db.session.commit()
-            return APIResponse({"success": True, "deleted": [username]})
-        raise SparrowAPIError("Method not allowed", 405)
+    user = db.session.query(User).get(username)
+    if user is None:
+        raise SparrowAPIError(f"User {username} does not exist", 404)
+    if request.method == "GET":
+        return UserResponse(user)
+    elif request.method == "PUT":
+        data = await request.json()
+        return update_user(db, user, data)
+    elif request.method == "DELETE":
+        # Make sure we aren't trying to delete ourselves
+        if user.username == auth.get_identity(request):
+            raise SparrowAPIError("Cannot delete yourself", 403)
+        with db.session_scope():
+            db.session.delete(user)
+        return APIResponse({"success": True, "deleted": [username]})
+    raise SparrowAPIError("Method not allowed", 405)
 
 
-async def create_user(db, data):
+def create_user(db, data):
     db = get_database()
     try:
         username = data["username"]
@@ -86,7 +85,6 @@ async def create_user(db, data):
 @requires("admin")
 async def users(request):
     db = get_database()
-    User = db.model.user
     with db.session_scope(commit=False):
         if request.method == "POST":
             data = await request.json()
