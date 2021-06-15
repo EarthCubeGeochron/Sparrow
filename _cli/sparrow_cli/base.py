@@ -53,8 +53,12 @@ def env_flag(variable):
 console = Console(highlight=True)
 
 
-@click.group(name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True)
-@click.option("--verbose/--no-verbose", is_flag=True, default=env_flag("SPARROW_VERBOSE"))
+@click.group(
+    name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True
+)
+@click.option(
+    "--verbose/--no-verbose", is_flag=True, default=env_flag("SPARROW_VERBOSE")
+)
 @click.pass_context
 def cli(ctx, verbose=False):
     """Startup function that sets configuration environment variables. Much of the

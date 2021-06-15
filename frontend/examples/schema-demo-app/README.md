@@ -1,7 +1,8 @@
 # External schemas
 
 Externally controlled vocabularies
-+ schema definitions
+
+- schema definitions
 
 Schema definitions are collections of controlled fields
 corresponding to vocabulary terms.

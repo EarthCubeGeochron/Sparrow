@@ -16,8 +16,8 @@ export function Publication(props) {
         " – ",
         h("span.doi-info", [
           h("span.label", "DOI:"),
-          h("span.doi.bp3-monospace-text", doi)
-        ])
+          h("span.doi.bp3-monospace-text", doi),
+        ]),
       ];
     }
     return h("div.publication", [h("span.title", title), ...doiAddendum]);
@@ -38,7 +38,7 @@ export const PageViewPublications = ({ data, isEditing = false, onClick }) => {
   if (isEditing) {
     return h("div.publications", [
       h("div", { style: { display: "flex", alignItems: "baseline" } }, [
-        h("h4", "Publications")
+        h("h4", "Publications"),
       ]),
       h.if(data.length > 0)("div", [
         data.map((pub, i) => {
@@ -48,10 +48,10 @@ export const PageViewPublications = ({ data, isEditing = false, onClick }) => {
             id,
             title,
             content: h(Publication, { doi, title }),
-            onClick
+            onClick,
           });
-        })
-      ])
+        }),
+      ]),
     ]);
   }
   return h("div", [
@@ -59,13 +59,13 @@ export const PageViewPublications = ({ data, isEditing = false, onClick }) => {
       h("h4", "Publications"),
       (data || []).map((d, i) =>
         h(Publication, { key: i, doi: d.doi, title: d.title })
-      )
+      ),
     ]),
-    h.if(data == null)("div.publications", "No publications")
+    h.if(data == null)("div.publications", "No publications"),
   ]);
 };
 
-export const PubAdd = props => {
+export const PubAdd = (props) => {
   const { onClickDelete, onClickList, data, isEditing = true } = props;
   if (!isEditing && data == null) {
     return null;
@@ -75,12 +75,12 @@ export const PubAdd = props => {
       h(PageViewPublications, {
         data,
         isEditing,
-        onClick: onClickDelete
+        onClick: onClickDelete,
       }),
       h.if(isEditing)(AddCard, {
         model: "publication",
-        onClick: onClickList
-      })
-    ])
+        onClick: onClickList,
+      }),
+    ]),
   ]);
 };
