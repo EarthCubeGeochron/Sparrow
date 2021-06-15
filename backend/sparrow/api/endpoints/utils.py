@@ -99,43 +99,34 @@ def commit_edits(db, model, data, id_ = None):
         db.session.rollback()
 
 
-def collection_handler(db, data):
+def collection_handler(db, data, schema):
     '''
+    TODO: Make simpler by using schema._available_nests() to check if its a "collection"
     A function to handle creating new collections.
 
     db: database connection
     data: a python dictionary! Not list.
+    schema: the schema interface for the current model
 
-    NOTE: Right now it replaces the old collection with whatever is passed. 
+    returns: data, model_collections
+
+        model_collections will be a dictionary where keys correspond to what they would appear as in model
+
 
     '''
+    nests = schema._available_nests()
 
     names = [] # sample
     col_names = [] # sample_collection
-    plural_names = []
     for ele in data:
-        if type(data[ele]) is list: # collections will be lists
-            # check if it's plural
-            # TODO: need to check for analysis pluralization
-            if ele[-1] == 's' and ele != 'analysis':
-                names.append(ele[:-1])
-                col_names.append(ele[:-1] + "_collection")
-                plural_names.append(ele)
-            elif 'collection' in ele:
-                col_names.append(ele)
-                names.append(ele.replace("_collection", ""))
-            else:
-                names.append(ele)
-                col_names.append(ele + "_collection")
+        if data[ele] in nests: # collections will be lists
+            names.append(ele)
+            col_names.append(ele + "_collection")
 
     ## maybe there are no collections
     if len(col_names) == 0 or len(names) == 0:
         return data
 
-    # need to rename the key for plural keys
-    for name in plural_names:
-        data[name[:-1]] = data[name]
-        data.pop(name)
     for i, name in enumerate(names):
         data[col_names[i]] = data[name]
         data.pop(name)
