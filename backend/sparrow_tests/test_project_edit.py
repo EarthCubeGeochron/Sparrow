@@ -53,16 +53,26 @@ class TestProjectEdits:
         ## get interface and db model
         ProjectInterface = db.interface.project()
 
+        nests = ProjectInterface._available_nests()
+
+        inst = db.session.query(db.model.project).first()
+
         # get updates
         # data["edit-project"].pop("id")
         updates = self.data["edit-project"]
 
-        inst = db.session.query(db.model.project).first()
+        # for k,v in updates.items():
+        #     if k in nests:
+        #         if type(v) is list:
+        #             for id in v:
+
+
 
         sessions = db.session.query(db.model.session).all()
         samples = db.session.query(db.model.sample).all()
         publications= db.session.query(db.model.publication).all()
 
+        assert 0 == 1
 
 
         # load updates into the project_schema and assign the same id as the existing
@@ -71,6 +81,7 @@ class TestProjectEdits:
         new_proj.session_collection = sessions
         new_proj.sample_collection = samples
         new_proj.publication_collection = publications
+        
         new_proj.id = inst.id
 
         # NOTE: for some reason, i need to rollbakc before the merge.
