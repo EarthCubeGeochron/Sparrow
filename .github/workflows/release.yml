@@ -49,13 +49,18 @@ jobs:
           body: |
             The latest release of Sparrow can be installed using the following command:
             ```
+            bash -c $(curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh)
             curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh | bash -s -
             ```
 
-            If you want to install this release specifically, you can add it to the above command,
-            like so: `... | bash -s - ${{ github.ref }}`.
+            - If you want to install this release specifically, you can add it to the above command,
+              like so: `bash -c $(...) - ${{ github.ref }}`.
+            - You can also download the installation
+              script manually and run it using `bash get-sparrow.sh` or `bash get-sparrow.sh $${{ github.ref }}`.
+            - For complete control over the installation process, you can manually run the download and installation steps
+              encapsulated by the [install script](https://github.com/EarthCubeGeochron/Sparrow/blob/HEAD/get-sparrow.sh).
 
-            See the [Getting started documentation](https://sparrow-data.org/docs/getting-started)
+            See the [Getting started documentation](https://sparrow-data.org/docs/getting-started).
             for more information on how to set up Sparrow.
       - name: Upload Sparrow CLI for release
         id: upload-release-asset 
