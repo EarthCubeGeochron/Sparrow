@@ -27,46 +27,48 @@ build_dir=_cli/dist/sparrow
 dist_dir=$install_path/opt/sparrow
 symlink=$install_path/bin/sparrow
 executable=$dist_dir/sparrow
-TMPDIR=$install_path/sparrowtemp
+#TMPDIR=$install_path/sparrowtemp
 
 #check permissions
 # if permissions are needed it will notify and attempy a sudo login
-if ! [ -w $dist_dir ]
+SUDO=""
+if ! [ -w $install_path ]
 then
-    echo "To install to path elevated permissions are required!"
+    echo "To install to $install_path elevated permissions are required!"
     echo "If you choose to continue you will be prompted for your password."
     echo "Would you like to continue? (y/N)"
     read answer
     if [[ $answer == "y" || $answer == "Y" || $answer == "yes" || $answer == "Yes" ]]
     then
         echo "Please enter your password."
-        exec sudo bash "$0" "$@"
-        echo
-        echo
+        sudo bash -c "echo ''"
+        SUDO="sudo"
+        echo ""
+        echo ""
     else 
         abort "No permissions granted."
     fi
 fi
 
 
-rm -r $dist_dir
-mkdir -p $dist_dir
-
 ## create temporary directory using the TMPDIR environmental variable
 temp_dir=$(mktemp -d)
-
+if [ ! -d $temp_dir ]; then
+  echo "$temp_dir not created successfully"
+  exit 1
+fi
 
 ## check header to make sure url exists
-if [ `curl -I -s ${url} | grep -c "Not Found"` -eq 1 ]
+if [ $(curl -I -s ${url} | grep -c "Not Found") -eq 1 ]
 then 
     abort "${url} not found"
 fi
 
 ## download into temp directory to see if it downloaded correctly
 echo "Downloading Sparrow CLI $version"
-echo 
 echo
-curl -L -s ${url} | tar xzf - -C $temp_dir
+echo
+curl -L -s ${url} | $SUDO tar xzf - -C $temp_dir
 
 test_file=$temp_dir/sparrow
 
@@ -78,25 +80,27 @@ if [ -f "$test_file" ]; then
         abort "Download unsuccessful"
 fi
 
+$SUDO rm -rf $dist_dir
+$SUDO mkdir -p $dist_dir
 ## Move files to the correct directory
 # and test they have successfully moved
-mv $temp_dir/* $dist_dir
+$SUDO mv $temp_dir/* $dist_dir
 
 move_test_file=$dist_dir/sparrow
 
 if [ -f "$move_test_file" ]; 
 then
-    rm -R ${temp_dir}
+    rm -rf ${temp_dir}
 else
-    rm -R ${temp_dir}
+    rm -rf ${temp_dir}
     abort "Problem when copying files"
 fi
 
 
-
+$SUDO mkdir -p $install_path/bin
 # Link executable onto the path
 echo "Linking $symlink -> $executable"
-ln -sf "$executable" "$symlink"
+$SUDO ln -sf "$executable" "$symlink"
 
 echo "Sparrow executable installed!"
 echo "Check if you can run the 'sparrow' command. If not, you may need to add '$install_path/bin' to your PATH"
