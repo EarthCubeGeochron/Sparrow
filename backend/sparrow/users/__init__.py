@@ -2,6 +2,7 @@
 An API for managing users
 """
 from starlette.routing import Route, Router
+from starlette.authentication import requires
 from sparrow.plugins import SparrowCorePlugin
 from sparrow.database.models import User
 from sparrow.api import APIResponse, SparrowAPIError
@@ -18,6 +19,7 @@ def validate_password(password):
     return password
 
 
+@requires("admin")
 async def user(request):
     db = get_database()
     user_id = request.path_params["user_id"]
@@ -66,6 +68,7 @@ async def create_user(db, User, request):
     return APIResponse(res, schema=UserSchema(many=False, exclude=("password",)))
 
 
+@requires("admin")
 async def users(request):
     db = get_database()
     User = db.model.user
