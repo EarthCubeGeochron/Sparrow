@@ -1,7 +1,10 @@
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
 from sqlalchemy.ext.automap import generate_relationship
-from ...logs import get_logger
+from sqlalchemy.ext.declarative import declarative_base
+from os import path, makedirs
+from sparrow_utils.logs import get_logger
+from pickle import load, dump
 
 # Drag in geographic types for database reflection
 from geoalchemy2 import Geometry, Geography
@@ -45,13 +48,63 @@ class SparrowDatabaseMapper:
     automap_error = None
     _models = None
     _tables = None
+    metadata_pickle_filename = "sparrow_db_cache.pickle"
+    cache_path = path.join(path.expanduser("~"), ".sqlalchemy_cache")
 
     def __init__(self, db):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
         # TODO: add the process flow described below:
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
         self.db = db
+        self._reflect_database()
 
+    def _reflect_database(self):
+        cached_metadata = self._load_database_map()
+        if cached_metadata is None:
+            self.reflect_database()
+            log.info("Caching database models")
+            self._cache_database_map()
+
+        else:
+            log.info("Loading database models from cache")
+            self.automap_base = declarative_base(
+                bind=self.db.engine, metadata=cached_metadata
+            )
+
+        self._models = ModelCollection(self.automap_base.classes)
+        self._tables = TableCollection(self._models)
+
+    # https://stackoverflow.com/questions/41547778/sqlalchemy-automap-best-practices-for-performance/44607512
+    def _cache_database_map(self):
+        # save the metadata for future runs
+        try:
+            if not path.exists(self.cache_path):
+                makedirs(self.cache_path)
+            # make sure to open in binary mode - we're writing bytes, not str
+            with open(
+                path.join(self.cache_path, self.metadata_pickle_filename), "wb"
+            ) as cache_file:
+                dump(self.automap_base.metadata, cache_file)
+        except:
+            # couldn't write the file for some reason
+            pass
+
+    def _load_database_map(self):
+        # We have hard-coded the cache file for now
+        cached_metadata = None
+        if path.exists(self.cache_path):
+            try:
+                with open(
+                    path.join(self.cache_path, self.metadata_pickle_filename), "rb"
+                ) as cache_file:
+                    cached_metadata = load(file=cache_file)
+
+            except IOError:
+                # cache file not found - no problem
+                pass
+        return cached_metadata
+
+    def reflect_database(self):
         # This stuff should be placed outside of core (one likely extension point).
         reflection_kwargs = dict(
             name_for_scalar_relationship=name_for_scalar_relationship,
@@ -70,9 +123,6 @@ class SparrowDatabaseMapper:
         BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
 
         self.automap_base = BaseModel
-
-        self._models = ModelCollection(self.automap_base.classes)
-        self._tables = TableCollection(self._models)
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """
