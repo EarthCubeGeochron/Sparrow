@@ -41,7 +41,7 @@ function InfiniteAPIView({
   componentProps = {},
   context,
   filterParams,
-  errorHandler = ErrorCallout
+  errorHandler = ErrorCallout,
 }) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
@@ -77,7 +77,7 @@ function InfiniteAPIView({
   const dataFetch = (data, next = "") => {
     setNoResults(false);
     const initData = getNextPageAPI(next, url, params);
-    initData.then(res => {
+    initData.then((res) => {
       if (res.data.length == 0) {
         setNoResults(true);
       }
@@ -122,7 +122,7 @@ function InfiniteAPIView({
       fetch: fetchNewData,
       component,
       moreAfter,
-      componentProps
+      componentProps,
     });
   }
   return h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);

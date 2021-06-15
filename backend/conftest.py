@@ -120,7 +120,9 @@ def token(db, client):
         password = "test"
 
         _create_user(db, user, password)
-    res = client.post("/api/v2/auth/login", json={"username": "test", "password": "test"})
+    res = client.post(
+        "/api/v2/auth/login", json={"username": "test", "password": "test"}
+    )
 
     token = res.json()["token"]
 

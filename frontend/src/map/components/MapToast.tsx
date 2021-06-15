@@ -8,7 +8,7 @@ import {
   Dialog,
   NumericInput,
   FormGroup,
-  InputGroup
+  InputGroup,
 } from "@blueprintjs/core";
 import { useAPIResult, APIHelpers } from "@macrostrat/ui-components";
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
@@ -17,9 +17,9 @@ import { GeoContext } from "~/model-views/components";
 import { mapStyle } from "../MapStyle";
 import axios from "axios";
 
-const unwrapSamples = obj => {
+const unwrapSamples = (obj) => {
   const { data } = obj;
-  const names = data.map(sample => {
+  const names = data.map((sample) => {
     const { name, id, sample_geo_entity } = sample;
     return { name, id, sample_geo_entity };
   });
@@ -31,7 +31,7 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
   const [sampleState, setSampleState] = useState({
     name: "",
     id: null,
-    sample_geo_entity: []
+    sample_geo_entity: [],
   });
   const { buildURL } = APIHelpers(useContext(APIV2Context));
 
@@ -41,23 +41,23 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
     { unwrapResponse: unwrapSamples }
   );
 
-  const onChange = sampleName => {
+  const onChange = (sampleName) => {
     if (samples) {
       console.log(sampleName);
-      const sample = samples.filter(samp => samp.name == sampleName);
+      const sample = samples.filter((samp) => samp.name == sampleName);
       console.log(sample);
       setSampleState(sample[0]);
     }
   };
 
-  const setGeoEntity = en => {
+  const setGeoEntity = (en) => {
     // copy this from new-sample
     console.log(en);
     let SGE = [...sampleState.sample_geo_entity, ...new Array(en)];
-    setSampleState(prevState => {
+    setSampleState((prevState) => {
       return {
         ...prevState,
-        sample_geo_entity: SGE
+        sample_geo_entity: SGE,
       };
     });
   };
@@ -67,7 +67,7 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
     setSampleState({
       name: "",
       id: null,
-      sample_geo_entity: []
+      sample_geo_entity: [],
     });
     toggleOpen();
   };
@@ -81,9 +81,9 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
         type: "Point",
         coordinates: [
           parseFloat(Number(lng).toFixed(3)),
-          parseFloat(Number(lat).toFixed(3))
-        ]
-      }
+          parseFloat(Number(lat).toFixed(3)),
+        ],
+      },
     };
     console.log(updatedSample);
     const response = await axios.put(url, updatedSample);
@@ -92,7 +92,7 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
 
   let sampleNames = [];
   if (samples) {
-    sampleNames = samples.map(sample => sample.name);
+    sampleNames = samples.map((sample) => sample.name);
   }
   if (!samples) return null;
   return (
@@ -184,12 +184,12 @@ export function MapToast({ lng, lat, mapstyle, login }) {
 
   const rockdNearbyData = useAPIResult(RockdURL, {
     lat: lat,
-    lng: lng
+    lng: lng,
   });
 
   const MacostratData = useAPIResult(MacURl, {
     lng: lng,
-    lat: lat
+    lat: lat,
   });
 
   const NearByCity = () => {
@@ -234,7 +234,7 @@ export function MapToast({ lng, lat, mapstyle, login }) {
               <a href="https://macrostrat.org/">MacroStrat</a>
             </h5>
 
-            {MacostratData.success.data.map(object => {
+            {MacostratData.success.data.map((object) => {
               return (
                 <div>
                   <h4 style={{ color: "black" }}>

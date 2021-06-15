@@ -53,4 +53,3 @@ class ViewAPIEndpoint(HTTPEndpoint):
             raise ValidationError("Invalid page token.")
 
         return APIResponse(res, total_count=q.count(), to_dict=True)
-

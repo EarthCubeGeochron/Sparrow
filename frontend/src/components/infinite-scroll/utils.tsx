@@ -19,12 +19,12 @@ export function NoSearchResults() {
   const description = h("div", [
     "Your search didn't match any files",
     h("br"),
-    "Try searching for something else"
+    "Try searching for something else",
   ]);
   return h(NonIdealState, {
     icon: "search",
     title: "No Search Results",
-    description
+    description,
   });
 }
 

@@ -8,7 +8,7 @@ import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
 import {
   ProjectFilterList,
-  SessionFilterList
+  SessionFilterList,
 } from "../model-views/components/new-model";
 import styles from "./module.styl";
 
@@ -21,12 +21,12 @@ export function SampleMainPanel() {
       path: base + "/:id",
       render() {
         return h(SampleMatch, { Edit: true });
-      }
+      },
     }),
     h(Route, {
       path: base,
-      component: () => h(NoStateAdmin, { name: "Sample" })
-    })
+      component: () => h(NoStateAdmin, { name: "Sample" }),
+    }),
   ]);
 }
 
@@ -39,7 +39,7 @@ const MainFilterList = () => {
 
   const [params, setParams] = useState(initialState);
 
-  const createParams = params => {
+  const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
       if (value == null) {
         delete params[key];
@@ -52,7 +52,7 @@ const MainFilterList = () => {
     listComponent: h(SampleListComponent, { params }),
     possibleFilters,
     createParams,
-    initParams: params || {}
+    initParams: params || {},
   });
 };
 
@@ -61,7 +61,7 @@ function SampleAdminList() {
   return h("div", [
     h.if(listName == "main")(MainFilterList),
     h.if(listName == "project")(ProjectFilterList, { onClick: updateFunction }),
-    h.if(listName == "session")(SessionFilterList, { onClick: updateFunction })
+    h.if(listName == "session")(SessionFilterList, { onClick: updateFunction }),
   ]);
 }
 
@@ -72,7 +72,7 @@ export function SampleAdminPage() {
     console.log("add")
   );
 
-  const changeFunction = func => {
+  const changeFunction = (func) => {
     setUpdateFunction(() => func);
   };
 
@@ -82,8 +82,8 @@ export function SampleAdminPage() {
     [
       h(AdminPage, {
         listComponent: h(SampleAdminList),
-        mainPageComponent: h(SampleMainPanel)
-      })
+        mainPageComponent: h(SampleMainPanel),
+      }),
     ]
   );
 }

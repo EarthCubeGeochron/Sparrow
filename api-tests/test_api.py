@@ -4,15 +4,11 @@ from schema import Schema
 
 
 def get(url, *args, **kwargs):
-    uri = "http://backend:5000/api/v1"+url
+    uri = "http://backend:5000/api/v1" + url
     return requests.get(uri, *args, **kwargs)
 
 
-routes = [
-    '/session',
-    '/analysis',
-    '/datum'
-]
+routes = ["/session", "/analysis", "/datum"]
 
 
 @pytest.mark.parametrize("path", ["", "/"])
@@ -20,14 +16,10 @@ def test_api_base_exists(path):
     res = get(path)
     assert res.status_code == 200
     body = res.json()
-    assert 'routes' in body
+    assert "routes" in body
 
     # Test that routes info dict matches expected structure
-    Schema([{
-        'route': str,
-        'description': str,
-        str: object
-    }]).validate(body['routes'])
+    Schema([{"route": str, "description": str, str: object}]).validate(body["routes"])
 
 
 @pytest.mark.parametrize("route", routes)

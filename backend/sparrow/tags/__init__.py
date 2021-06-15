@@ -53,14 +53,24 @@ class TagsEdits(HTTPEndpoint):
                     db.session.commit()
                 except:
                     db.session.rollback()
-                    return JSONResponse({"Status": "Error", "message": f"cannot insert tag {tag_id}"}, status_code=404)
+                    return JSONResponse(
+                        {"Status": "Error", "message": f"cannot insert tag {tag_id}"},
+                        status_code=404,
+                    )
 
         return JSONResponse(
-            {"Status": "Success", "tag_ids": f"{tag_ids}", "model": f"{model_name}", "model_id": f"{model_id}"}
+            {
+                "Status": "Success",
+                "tag_ids": f"{tag_ids}",
+                "model": f"{model_name}",
+                "model_id": f"{model_id}",
+            }
         )
 
 
-TagsEditsRouter = Router([Route("/models/{model}", endpoint=TagsEdits, methods=["PUT"])])
+TagsEditsRouter = Router(
+    [Route("/models/{model}", endpoint=TagsEdits, methods=["PUT"])]
+)
 
 
 class Tags(SparrowCorePlugin):

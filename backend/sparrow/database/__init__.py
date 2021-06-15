@@ -100,7 +100,9 @@ class Database:
             iface = getattr(self.interface, model_name)
             return iface()
         except AttributeError as err:
-            raise DatabaseMappingError(f"Could not find schema interface for model '{model_name}'")
+            raise DatabaseMappingError(
+                f"Could not find schema interface for model '{model_name}'"
+            )
 
     def _flush_nested_objects(self, session):
         """
@@ -122,7 +124,9 @@ class Database:
         # Do an end-around for lack of creating interfaces on app startup
         model = getattr(self.model, model_name)
         if not hasattr(model, "__mapper__"):
-            raise DatabaseMappingError(f"Model {model} does not have appropriate field mapping")
+            raise DatabaseMappingError(
+                f"Model {model} does not have appropriate field mapping"
+            )
         schema = model_interface(model, session)()
 
         with on_conflict("do-nothing"):

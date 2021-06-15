@@ -8,20 +8,21 @@ import pandas as pd
 from pathlib import Path
 import json
 
+
 class MapGeoJSONEndpoint(SparrowCorePlugin):
 
-    name = 'map-geojson'
+    name = "map-geojson"
 
     def geojson_view(self):
 
         db = self.app.database
         p = Path(relative_path(__file__, "geojson.sql"))
-        
+
         ## returns array of objects, we don't want the key
         geojson = run_sql_query_file(db.session, p)
-        a = [v for v, in geojson.fetchall()] ## very strange tuple unpacking
+        a = [v for v, in geojson.fetchall()]  ## very strange tuple unpacking
 
-        return JSONResponse(a) # a is a list of geojson objects
+        return JSONResponse(a)  # a is a list of geojson objects
 
     def on_api_initialized_v2(self, api):
 
@@ -30,5 +31,10 @@ class MapGeoJSONEndpoint(SparrowCorePlugin):
             route="/core_view/all_samples",
             description="A GeoJSON route for all samples",
         )
-        api.add_route("/core_view/all_samples", self.geojson_view(), methods=["GET"], include_in_schema=False)
+        api.add_route(
+            "/core_view/all_samples",
+            self.geojson_view(),
+            methods=["GET"],
+            include_in_schema=False,
+        )
         api.route_descriptions[root_route].append(basic_info)

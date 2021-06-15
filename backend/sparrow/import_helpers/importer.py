@@ -125,7 +125,11 @@ class BaseImporter(ImperativeImportHelperMixin):
     def _find_existing_data_file(self, file_path=None, file_hash=None):
         # Get data file record if it exists
         ## TODO: First, get file with same hash (i.e., exact same file contents), attempting to relink if non-existant
-        return self.db.session.query(self.m.data_file).filter_by(file_path=file_path).first()
+        return (
+            self.db.session.query(self.m.data_file)
+            .filter_by(file_path=file_path)
+            .first()
+        )
 
     def _create_data_file_record(self, fn):
 
@@ -172,7 +176,12 @@ class BaseImporter(ImperativeImportHelperMixin):
         m = self.m.data_file_link
         if kwargs.pop("fix_errors", False):
             err_filter = m.error.is_(None)
-        prev_imports = self.db.session.query(m).filter_by(file_hash=rec.file_hash).filter(err_filter).count()
+        prev_imports = (
+            self.db.session.query(m)
+            .filter_by(file_hash=rec.file_hash)
+            .filter(err_filter)
+            .count()
+        )
         if prev_imports > 0 and not added and not redo:
             secho("Already imported", fg="green", dim=True)
             return
@@ -267,7 +276,10 @@ class BaseImporter(ImperativeImportHelperMixin):
         elif isinstance(model, self.m.sample):
             params["_sample"] = model
         elif "error" not in defaults:
-            raise NotImplementedError("Only sessions, samples, and analyses " "can be tracked independently on import.")
+            raise NotImplementedError(
+                "Only sessions, samples, and analyses "
+                "can be tracked independently on import."
+            )
 
         return self.db.get_or_create(self.m.data_file_link, **params)
 
