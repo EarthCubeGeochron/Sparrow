@@ -181,7 +181,7 @@ def sparrow_test_main(
     if quick:
         pytest_args.append(" --keep-database")
 
-    res = compose("run --rm --service-ports backend", "pytest", "/app/sparrow_tests", *pytest_args)
+    res = compose("run --rm --service-ports backend", "pytest", "/app", *pytest_args)
     # if "--keep-database" not in args:
     if psql:
         print("Initializing psql shell. " "The database is also available on localhost port 54322")

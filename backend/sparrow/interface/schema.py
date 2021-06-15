@@ -77,6 +77,17 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         super().__init__(*args, **kwargs)
 
+    @classmethod
+    def query(cls, session):
+        """A helper that allows query objects to be constructed:
+        `UserSchema.query(db.session).all()`
+        """
+        return session.query(cls.opts.model)
+
+    @classmethod
+    def table_name(cls):
+        return cls.opts.model.__table__.name
+
     @property
     def _table(self):
         return self.opts.model.__table__

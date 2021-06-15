@@ -14,6 +14,7 @@ from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
 from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, root_example, root_info, meta_info
 from .response import APIResponse
+from .exceptions import SparrowAPIError
 import time
 
 log = get_logger(__name__)
@@ -29,7 +30,7 @@ async def http_exception(request, exc):
     )
 
 
-exception_handlers = {HTTPException: http_exception}
+exception_handlers = {HTTPException: http_exception, SparrowAPIError: http_exception}
 
 
 class OpenAPIResponse(Response):
@@ -65,13 +66,13 @@ def schema(request):
     return JSONResponse(s)
     # return OpenAPIResponse(s)
 
+
 class ServerTimings(BaseHTTPMiddleware):
-    
     async def dispatch(self, request, call_next):
         start = time.time()
         response = await call_next(request)
-        dur = (time.time() - start)*1e3
-        response.headers['Server-Timing'] = f'total;dur={dur}'
+        dur = (time.time() - start) * 1e3
+        response.headers["Server-Timing"] = f"total;dur={dur}"
         return response
 
 
@@ -127,7 +128,10 @@ class APIv2(Starlette):
 
         db = self._app.database
 
+        skip_list = [db.interface.user]
         for iface in db.interface:
+            if iface in skip_list:
+                continue
             self._add_model_route(iface)
 
         self.add_view_route(
