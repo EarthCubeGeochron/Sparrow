@@ -24,11 +24,7 @@ class PyChronJSONImporter:
         e = analysis.pop(key + "_err", None)
         if v == 0 and e == 0:
             return None
-        return {
-            "value": v,
-            "error": e,
-            "type": self.datum_type_for(key),
-        }
+        return {"value": v, "error": e, "type": self.datum_type_for(key)}
 
     def transform_analysis(self, analysis, index=None):
         data = []

@@ -11,7 +11,11 @@ def auth_backend():
 
 def is_forbidden(res):
     data = res.json()["error"]
-    return res.status_code == 403 and data["detail"] == "Forbidden" and data["status_code"] == 403
+    return (
+        res.status_code == 403
+        and data["detail"] == "Forbidden"
+        and data["status_code"] == 403
+    )
 
 
 def get_access_cookie(response):
@@ -58,7 +62,9 @@ class TestSparrowAuth:
         assert is_forbidden(res)
 
     def test_login(self, client, auth_backend):
-        res = client.post("/api/v2/auth/login", json={"username": "Test", "password": "test"})
+        res = client.post(
+            "/api/v2/auth/login", json={"username": "Test", "password": "test"}
+        )
         data = res.json()
         assert "error" not in data
         assert data["username"] == "Test"
@@ -77,7 +83,9 @@ class TestSparrowAuth:
             assert not res.json()["login"]
 
     def test_invalid_token(self, client):
-        res = client.get("/api/v2/auth/secret", cookies={"access_token_cookie": "ekadqw4fw"})
+        res = client.get(
+            "/api/v2/auth/secret", cookies={"access_token_cookie": "ekadqw4fw"}
+        )
         assert is_forbidden(res)
 
     def test_v1_restricted(self, client):
@@ -101,14 +109,18 @@ class TestSparrowAuth:
 
     def test_invalid_login(self, client):
         try:
-            res = verify_credentials(client, {"username": "TestAAA", "password": "test"})
+            res = verify_credentials(
+                client, {"username": "TestAAA", "password": "test"}
+            )
         except AssertionError:
             # We expect an assertion error here...
             return
         assert False
 
     def test_access_token(self, client):
-        res = client.post("/api/v2/auth/login", json={"username": "Test", "password": "test"})
+        res = client.post(
+            "/api/v2/auth/login", json={"username": "Test", "password": "test"}
+        )
         data = res.json()
         assert "error" not in data
 

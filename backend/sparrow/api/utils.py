@@ -4,7 +4,7 @@ from ..interface.converter import allowed_collections
 
 def nested_collection_path(start, end, allowed_collections=allowed_collections):
     """
-    Function to return the path of nesting needed to get from one model to another. 
+    Function to return the path of nesting needed to get from one model to another.
 
     start (string) : Starting model
     end (string) : Ending model

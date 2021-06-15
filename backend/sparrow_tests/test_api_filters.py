@@ -37,11 +37,7 @@ class TestAPIV2_filters:
         Sample = get_db_model(db, "sample")
 
         db.session.add_all(
-            [
-                Material(id="basalt"),
-                Material(id="dacite"),
-                Material(id="lava"),
-            ]
+            [Material(id="basalt"), Material(id="dacite"), Material(id="lava")]
         )
 
         db.session.commit()
@@ -82,11 +78,7 @@ class TestAPIV2_filters:
         date2 = datetime.datetime(2014, 6, 3)
 
         db.session.add_all(
-            [
-                Session(date=date),
-                Session(date=date1),
-                Session(date=date2),
-            ]
+            [Session(date=date), Session(date=date1), Session(date=date2)]
         )
         db.session.commit()
 

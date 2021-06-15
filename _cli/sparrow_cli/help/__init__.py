@@ -130,8 +130,12 @@ class SparrowHelpFormatter(HelpFormatter):
         commands = get_backend_command_help()
         if commands is None:
             return
-        core_commands = {k: format_help(v) for k, v in commands.items() if not is_plugin_command(v)}
-        plugin_commands = {k: format_help(v) for k, v in commands.items() if is_plugin_command(v)}
+        core_commands = {
+            k: format_help(v) for k, v in commands.items() if not is_plugin_command(v)
+        }
+        plugin_commands = {
+            k: format_help(v) for k, v in commands.items() if is_plugin_command(v)
+        }
         self.write_section(
             "Core commands",
             core_commands,

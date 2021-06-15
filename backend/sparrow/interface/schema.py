@@ -154,7 +154,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
         for prop in self.opts.model.__mapper__.iterate_properties:
             columns = getattr(prop, "columns", False)
             if columns:
-                is_fully_defined = all([any([c.primary_key, c.unique]) for c in columns])
+                is_fully_defined = all(
+                    [any([c.primary_key, c.unique]) for c in columns]
+                )
                 # Shim for the fact that we don't correctly find Session.uuid as unique at the moment...
                 # TODO: fix this in general
                 # if self.opts.model.__name__ == "Session" and prop.key == "uuid":
@@ -239,7 +241,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
         try:
             assert len(pk) == len(pk_vals)
         except AssertionError:
-            raise SparrowSchemaError(f"Could not expand primary key for {self.opts.model.__name__} from {value}")
+            raise SparrowSchemaError(
+                f"Could not expand primary key for {self.opts.model.__name__} from {value}"
+            )
         return {col.key: val for col, val in zip(pk, pk_vals)}
 
     def _get_cached_instance(self, data):
@@ -249,7 +253,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
             cache_key = hash(frozenset(data.items()))
             match_ = self.__instance_cache.get(cache_key, None)
             if match_ is not None:
-                log.debug(f"Found {match_} in session cache for {data} (key: {cache_key})")
+                log.debug(
+                    f"Found {match_} in session cache for {data} (key: {cache_key})"
+                )
                 return match_, cache_key
         except TypeError:
             pass
