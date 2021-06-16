@@ -101,8 +101,10 @@ def commit_edits(db, model, data, id_ = None):
 
 def collection_handler(db, data, schema):
     '''
-    TODO: Make simpler by using schema._available_nests() to check if its a "collection"
+    Make simpler by using schema._available_nests() to check if its a "collection"
     A function to handle creating new collections.
+
+    This function will assume that collections passed will be as id's
 
     db: database connection
     data: a python dictionary! Not list.
@@ -111,59 +113,35 @@ def collection_handler(db, data, schema):
     returns: data, model_collections
 
         model_collections will be a dictionary where keys correspond to what they would appear as in model
-
-
     '''
     nests = schema._available_nests()
 
     names = [] # sample
-    col_names = [] # sample_collection
     for ele in data:
-        if data[ele] in nests: # collections will be lists
+        if ele in nests:
             names.append(ele)
-            col_names.append(ele + "_collection")
 
     ## maybe there are no collections
-    if len(col_names) == 0 or len(names) == 0:
+    if len(names) == 0:
         return data
 
-    for i, name in enumerate(names):
-        data[col_names[i]] = data[name]
-        data.pop(name)
+    # for each name that is a collection
+    # get the nested models by id and add them to model_collections -> to be added to the model later
+    model_collections = {}
+    for name in names:
 
-    ## Create a loop ability to go over the len of both name lists
-    # for each name and collection name we perform the same actions.
-    for i,val in enumerate(names):
-        # if type(data[col_names[i]]) is list:
-        #     data = collection_handler(db, data[col_names[i]])
-        db_model = getattr(db.model, val) ## the model for the collection.
+        db_model = getattr(db.model, name) ## the model for the collection.
+        ids = data[name]
 
-        ## will become a new column in data that says model_collection
         collection = []
-        for ele in data[col_names[i]]:
-            if 'id' not in ele: 
-                ## The data probably doesn't exsist in the db
-                # get model that matches or create a new one. 
-                # NOTE: **ele spreads everything, so theres a chance we could be duplicating data...
-                ele =location_check(ele,array=False) ## this workds
-                material_check(db, ele, array=False)
-                new_model = db_model.get_or_create(**ele) ## doesn't set location for sample
-                if 'location' in ele:
-                    new_model.location = ele['location']
-                
-                collection.append(new_model)
-            else:
-                # id is present in the object.
-                ele =location_check(ele,array=False)
-                material_check(db, ele, array=False)
-                existing_model = db_model.get_or_create(id=ele['id'])
-                if 'location' in ele:
-                    existing_model.location = ele['location']
+        for id in ids:
+            instance = db.session.query(db_model).get(id)
+            collection.append(instance)
 
-                # for k in ele:
-                #     setattr(existing_model, k, ele[k])
-                collection.append(existing_model)
-        data[col_names[i]] = collection
+        collection_name = name + "_collection"
+        model_collections[collection_name] = collection
+
+        data.pop(name)
         
 
-    return data
+    return data, model_collections
