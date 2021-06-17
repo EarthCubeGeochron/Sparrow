@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from sparrow.database.util import temp_database
 from sqlalchemy_utils import drop_database
 
+
 @contextmanager
 def testing_database(conn_string, drop=True):
     """Create a testing database and tear it down after tests."""

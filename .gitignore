@@ -8,3 +8,4 @@ _docker
 .DS_STORE
 .cache/
 .pytest_cache
+.parcel-cache

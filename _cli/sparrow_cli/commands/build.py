@@ -51,6 +51,11 @@ def sparrow_build(ctx, images, push=False):
         print(f"{image_name}: building image {name}")
         # Allow build to be used for layer cache
         # https://github.com/moby/moby/issues/39003
-        cmd("docker build -t", name, "--build-arg BUILDKIT_INLINE_CACHE=1", im["context"])
+        cmd(
+            "docker build -t",
+            name,
+            "--build-arg BUILDKIT_INLINE_CACHE=1",
+            im["context"],
+        )
         if push:
             cmd("docker push ", name)

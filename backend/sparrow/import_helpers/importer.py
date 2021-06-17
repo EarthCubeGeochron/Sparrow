@@ -6,6 +6,7 @@ from os import environ
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import inspect
+from IPython import embed
 
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
@@ -103,7 +104,6 @@ class BaseImporter(ImperativeImportHelperMixin):
         if needed.
         """
         for fn in file_sequence:
-            secho(str(fn), dim=True)
             self.__import_datafile(fn, None, **kwargs)
 
     def iter_records(self, seq, **kwargs):
@@ -125,9 +125,13 @@ class BaseImporter(ImperativeImportHelperMixin):
     def _find_existing_data_file(self, file_path=None, file_hash=None):
         # Get data file record if it exists
         ## TODO: First, get file with same hash (i.e., exact same file contents), attempting to relink if non-existant
-        return self.db.session.query(self.m.data_file).filter_by(file_path=file_path).first()
+        return (
+            self.db.session.query(self.m.data_file)
+            .filter_by(file_path=file_path)
+            .first()
+        )
 
-    def __create_data_file_record(self, fn):
+    def _create_data_file_record(self, fn):
 
         # Get the path location (this must be unique)
         _infile = Path(fn)
@@ -162,16 +166,22 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         :param fix_errors  Fix errors that have previously been ignored
         """
+        secho(str(fn), dim=True)
         redo = kwargs.pop("redo", False)
         added = False
         if rec is None:
-            rec, added = self.__create_data_file_record(fn)
+            rec, added = self._create_data_file_record(fn)
 
         err_filter = True
         m = self.m.data_file_link
         if kwargs.pop("fix_errors", False):
             err_filter = m.error.is_(None)
-        prev_imports = self.db.session.query(m).filter_by(file_hash=rec.file_hash).filter(err_filter).count()
+        prev_imports = (
+            self.db.session.query(m)
+            .filter_by(file_hash=rec.file_hash)
+            .filter(err_filter)
+            .count()
+        )
         if prev_imports > 0 and not added and not redo:
             secho("Already imported", fg="green", dim=True)
             return
@@ -189,6 +199,8 @@ class BaseImporter(ImperativeImportHelperMixin):
             items = ensure_sequence(self.import_datafile(fn, rec, **kwargs))
 
             for created_model in items:
+                if created_model is None:
+                    continue
                 # Track the import of the resulting models
                 df_link = self.__track_model(rec, created_model)
                 if df_link is not None:
@@ -264,7 +276,10 @@ class BaseImporter(ImperativeImportHelperMixin):
         elif isinstance(model, self.m.sample):
             params["_sample"] = model
         elif "error" not in defaults:
-            raise NotImplementedError("Only sessions, samples, and analyses " "can be tracked independently on import.")
+            raise NotImplementedError(
+                "Only sessions, samples, and analyses "
+                "can be tracked independently on import."
+            )
 
         return self.db.get_or_create(self.m.data_file_link, **params)
 

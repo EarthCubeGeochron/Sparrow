@@ -7,12 +7,20 @@ import sys
 
 
 class TestAPIImporter:
-    def test_api_import(self, client,token):
-        res = client.put("/api/v2/import-data/models/session", headers={"Authorization":token}, json={"filename": None, "data": basic_data})
+    def test_api_import(self, client, token):
+        res = client.put(
+            "/api/v2/import-data/models/session",
+            headers={"Authorization": token},
+            json={"filename": None, "data": basic_data},
+        )
         assert res.status_code == 200
 
     def test_basic_import(self, client, token):
-        res = client.put("/api/v2/import-data/models/session", headers={"Authorization":token},json=basic_d18O_data)
+        res = client.put(
+            "/api/v2/import-data/models/session",
+            headers={"Authorization": token},
+            json=basic_d18O_data,
+        )
         assert res.status_code == 200
 
     @mark.skip
@@ -31,7 +39,9 @@ class TestAPIImporter:
         db.load_data("session", complex_data["data"])
 
         a = db.model.analysis
-        q = db.session.query(a).filter(and_(a.session_index is not None, a.analysis_type == "d18O measurement"))
+        q = db.session.query(a).filter(
+            and_(a.session_index is not None, a.analysis_type == "d18O measurement")
+        )
         assert q.count() > 1
 
     def test_complex_single_row(self, client, db):
@@ -75,7 +85,11 @@ class TestAPIImporter:
             "analysis": analysis,
         }
 
-        res = client.put("/api/v2/import-data/models/session",headers={"Authorization":token}, json={"filename": None, "data": data})
+        res = client.put(
+            "/api/v2/import-data/models/session",
+            headers={"Authorization": token},
+            json={"filename": None, "data": data},
+        )
         assert res.status_code == 200
 
     def test_missing_field(self, client, db, token):
@@ -117,7 +131,11 @@ class TestAPIImporter:
             ],
         }
 
-        res = client.put("/api/v2/import-data/models/session", headers={"Authorization":token},json={"filename": None, "data": data})
+        res = client.put(
+            "/api/v2/import-data/models/session",
+            headers={"Authorization": token},
+            json={"filename": None, "data": data},
+        )
         assert res.status_code == 400
         err = res.json()["error"]
 
@@ -178,3 +196,46 @@ class TestDuplication:
         for a in res.analysis_collection:
             assert len(a.datum_collection) == 1
         assert len(db.session.query(db.model.datum).all()) == 2
+
+
+class TestSampleChange:
+    @mark.skip
+    def test_sample_name_change(self, client, db):
+        """Change name of sample in database"""
+
+        Sample = db.model.sample
+
+        combined_name = "WI-STD-74"
+
+        data = {
+            "date": str(datetime.now()),
+            "name": "Session1",
+            "sample": {"name": "WI-STD-74 B"},
+        }
+
+        db.load_data("session", data)
+
+        data = {
+            "date": str(datetime.now()),
+            "name": "Session2",
+            "sample": {"name": "WI-STD-74 C"},
+        }
+
+        db.load_data("session", data)
+
+        data = {
+            "date": str(datetime.now()),
+            "name": "Session2",
+            "sample": {"name": "WI-STD-12"},
+        }
+        db.load_data("session", data)
+
+        existing = db.session.query(Sample).get(ele["name"])
+
+        # Somewhere here need to do the combination of Sample 1 and 2 into single sample...
+
+        # Two datum with unique analysis numbers should be created, but are not.
+        res = db.load_data("session", data)
+        # assert 1==0
+        # I think looking for 2 samples is the easiest way to check given the DB currently keeps unique keys.
+        assert len(db.session.query(Sample).all()) == 2

@@ -60,7 +60,9 @@ class TestImperativeImport(object):
         db.session.add(a_type)
 
         # Material
-        mat = db.get_or_create(db.model.vocabulary_material, id="long-staple cotton", authority=authority)
+        mat = db.get_or_create(
+            db.model.vocabulary_material, id="long-staple cotton", authority=authority
+        )
         db.session.add(mat)
 
         # Analysis
@@ -97,7 +99,9 @@ class TestImperativeImport(object):
         db.session.flush()
 
         # Parameter
-        datum = db.get_or_create(db.model.datum, analysis=analysis.id, type=type.id, value=121, error=22)
+        datum = db.get_or_create(
+            db.model.datum, analysis=analysis.id, type=type.id, value=121, error=22
+        )
 
         db.session.add(datum)
         db.session.commit()
@@ -126,7 +130,9 @@ class TestImperativeImport(object):
         assert total_ops > 0
 
         res = db.session.execute(
-            "SELECT table_operation, table_name " "FROM pgmemento.table_event_log " "ORDER BY id DESC LIMIT 1"
+            "SELECT table_operation, table_name "
+            "FROM pgmemento.table_event_log "
+            "ORDER BY id DESC LIMIT 1"
         )
         (op, tbl) = res.first()
         assert op == "INSERT"
@@ -275,7 +281,11 @@ class TestDeclarativeImporter:
 
     def test_datum_type_accuracy(self, db):
         DatumType = db.model.datum_type
-        res = db.session.query(DatumType).filter_by(parameter="soil water content", unit="weight %").all()
+        res = (
+            db.session.query(DatumType)
+            .filter_by(parameter="soil water content", unit="weight %")
+            .all()
+        )
         assert len(res) == 1
         dt = res[0]
         assert dt.error_unit is None
@@ -312,7 +322,11 @@ class TestDeclarativeImporter:
     def test_datum_type_no_error_unit(self, db):
         """We haven't specified an error unit, so one should not be in the database"""
         DatumType = db.model.datum_type
-        res = db.session.query(DatumType).filter_by(parameter="soil water content", unit="weight %").all()
+        res = (
+            db.session.query(DatumType)
+            .filter_by(parameter="soil water content", unit="weight %")
+            .all()
+        )
         assert len(res) == 1
         dt = res[0]
         assert dt.error_unit is None
@@ -350,7 +364,11 @@ class TestDeclarativeImporter:
 
     def test_get_instance(self, db):
         data = dict(parameter="soil water content", unit="weight %")
-        dt = db.session.query(db.model.datum_type).filter_by(**data, error_unit=None).first()
+        dt = (
+            db.session.query(db.model.datum_type)
+            .filter_by(**data, error_unit=None)
+            .first()
+        )
 
         assert dt is not None
 
@@ -448,7 +466,10 @@ class TestDeclarativeImporter:
             db.load_data("project", invalid_project)
             assert False  # Did not raise
         except ValidationError as err:
-            assert err.messages["researcher"][0] == "Provided a single object for a collection field"
+            assert (
+                err.messages["researcher"][0]
+                == "Provided a single object for a collection field"
+            )
 
 
 class TestStagedImport:

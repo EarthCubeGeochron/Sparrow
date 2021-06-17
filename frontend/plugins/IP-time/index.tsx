@@ -15,8 +15,9 @@ import { MarkerCircle } from "@vx/marker";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { Card, Spinner } from "@blueprintjs/core";
 import ReactJSON from "react-json-view";
+import { timeParse } from "d3-time-format";
 
-const width = 400;
+const width = 800;
 const height = 400;
 
 const orange = "#ff9933";
@@ -31,35 +32,60 @@ const margin = {
 const xMax = width - margin.left - margin.right;
 const yMax = height - margin.top - margin.bottom;
 
-const xScale = scaleLinear({
-  range: [0, xMax],
-  domain: [0, 200],
-});
-
-const yScale = scaleLinear({
-  range: [yMax, 0],
-  domain: [0, 4],
-});
+function findDomain(xyData) {
+  // console.log(xyData);
+  return {
+    xDomain: extent(xyData, (d) => d.x),
+    yDomain: extent(xyData, (d) => d.y),
+  };
+}
 
 //These need to change to pull from parameters in Sparrow.
-const getX = (d) => d.stage_X;
-const getY = (d) => d.stage_Y;
+const getX = (d) => d.x;
+const getY = (d) => d.y;
+
+// define a function for repetitive operations
+function getDatum(analysis, parameter) {
+  // Gets a datum for an analysis if it exists
+  return analysis.data.find((d) => d.parameter == parameter);
+}
+
+const parseTime = timeParse("%Y%B%dT%H:%M:%S");
 
 function IPtimeChartInner(props) {
   const { session_id } = props;
   const data = useAPIResult("/analysis", { session_id }, null);
-  console.log(data);
+  //console.log(data);
   if (data == null) return h(Spinner);
-  const analysis_data = data.map((d) => {
-    const stage_X = d.data.find((d) => d.parameter == "INDEX");
+  const analysisData = data.map((d) => {
+    const stage_X = new Date(d.date); //.find((d) => d.parameter == "INDEX");
     const stage_Y = d.data.find((d) => d.parameter == "IPnA");
-    return { stage_X: stage_X?.value, stage_Y: stage_Y?.value };
+    return { x: stage_X, y: stage_Y?.value };
   });
+
+  //console.log(analysisData);
+
   //Culled nulls to see if it fixes the plot...
-  const culled_data = analysis_data.filter(
-    (d) => d.stage_X != null && d.stage_Y != null
-  );
-  // console.log(culled_data);
+  const culledData = analysisData.filter((d) => d.x != null && d.y != null);
+  // minor point but "camelCase" is standard for variables in JS.
+  // "snake_case" for python. I didn't make the rules I just follow them :)
+  // console.log(culledData);
+  // console.log("HEELO");
+
+  // now we have domains!
+  const { xDomain, yDomain } = findDomain(culledData);
+  // console.log(xDomain, yDomain);
+
+  // Move scale creation inside render function, so we can set domains
+  const xScale = scaleTime({
+    range: [0, xMax],
+    domain: xDomain,
+  });
+
+  const yScale = scaleLinear({
+    range: [yMax, 0],
+    domain: yDomain,
+  });
 
   return (
     <div>
@@ -68,7 +94,7 @@ function IPtimeChartInner(props) {
           <MarkerCircle id="marker-circle-2" fill="#333" size={5} refX={2} />
           // This portion makes the x-y points show up on the plot.
           <LinePath
-            data={culled_data}
+            data={culledData}
             x={(d) => xScale(getX(d))}
             y={(d) => yScale(getY(d))}
             markerMid="url(#marker-circle-2)"
@@ -85,7 +111,7 @@ function IPtimeChartInner(props) {
           <AxisBottom
             scale={xScale}
             top={yMax}
-            label={"Analysis Order"}
+            label={"Analysis Time and Date"}
             stroke={"#1b1a1e"}
             tickTextFill={"#1b1a1e"}
           />

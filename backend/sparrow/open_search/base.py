@@ -20,7 +20,7 @@ class OpenSearchEndpoint(HTTPEndpoint):
 
         db = app_context().database
         query_params = request.query_params
-        if 'query' not in query_params or 'model' not in query_params:
+        if "query" not in query_params or "model" not in query_params:
             return JSONResponse(
                 {
                     "Status": "Success",
@@ -31,7 +31,7 @@ class OpenSearchEndpoint(HTTPEndpoint):
 
         params = {"query": query_params["query"]}
         model = query_params["model"]
-        
+
         if model == "sample":
             sql_fn = search_sample
         elif model == "project":
@@ -39,7 +39,7 @@ class OpenSearchEndpoint(HTTPEndpoint):
         else:
             sql_fn = search_session
 
-        query_res = db.exec_sql_query(fn = sql_fn, params=params)
+        query_res = db.exec_sql_query(fn=sql_fn, params=params)
 
         json_res = [dict(r) for r in query_res]
 

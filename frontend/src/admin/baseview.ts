@@ -1,4 +1,3 @@
-import React from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import styles from "./module.styl";
 import { Icon, NonIdealState } from "@blueprintjs/core";

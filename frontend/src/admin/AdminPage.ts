@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Icon, Button } from "@blueprintjs/core";
 import { getQueryString } from "@macrostrat/ui-components";
+import classNames from "classnames";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -10,7 +11,7 @@ export function AdminPage(props) {
   const { listComponent, mainPageComponent } = props;
   const [hidden, setHidden] = useState(false);
 
-  const classname = hidden ? "left-panel.hidden" : "left-panel";
+  const className = classNames({ hidden });
 
   const handleClick = () => {
     setHidden(!hidden);
@@ -41,7 +42,7 @@ export function AdminPage(props) {
   };
   return h("div.admin-page-main", [
     h(SidebarButton),
-    h(`div.${classname}`, null, [listComponent]),
+    h("div.left-panel", { className }, [listComponent]),
     h("div.right-panel", null, [mainPageComponent]),
   ]);
 }

@@ -1,7 +1,7 @@
-from sparrow.auth.create_user import _create_user
-from sparrow.auth.backend import JWTBackend
 from os import environ
 from pytest import fixture, mark
+from .create_user import _create_user
+from .backend import JWTBackend
 
 
 @fixture(scope="class")
@@ -9,11 +9,13 @@ def auth_backend():
     return JWTBackend(environ.get("SPARROW_SECRET_KEY"))
 
 
-def check_forbidden(res):
-    assert res.status_code == 403
+def is_forbidden(res):
     data = res.json()["error"]
-    assert data["detail"] == "Forbidden"
-    assert data["status_code"] == 403
+    return (
+        res.status_code == 403
+        and data["detail"] == "Forbidden"
+        and data["status_code"] == 403
+    )
 
 
 def get_access_cookie(response):
@@ -57,7 +59,7 @@ class TestSparrowAuth:
 
     def test_forbidden(self, client):
         res = client.get("/api/v2/auth/secret")
-        check_forbidden(res)
+        assert is_forbidden(res)
 
     def test_login(self, client, auth_backend):
         res = client.post(
@@ -84,7 +86,7 @@ class TestSparrowAuth:
         res = client.get(
             "/api/v2/auth/secret", cookies={"access_token_cookie": "ekadqw4fw"}
         )
-        check_forbidden(res)
+        assert is_forbidden(res)
 
     def test_v1_restricted(self, client):
         res = client.get("/api/v1/sample", params={"all": True})
@@ -120,13 +122,11 @@ class TestSparrowAuth:
             "/api/v2/auth/login", json={"username": "Test", "password": "test"}
         )
         data = res.json()
-        assert 'error' not in data
+        assert "error" not in data
 
-        token = data['token']
+        token = data["token"]
 
-        res = client.get(
-            "/api/v2/auth/secret"
-        )
+        res = client.get("/api/v2/auth/secret")
         data = res.json()
-        assert 'error' not in data
-        assert data['answer'] == 42
+        assert "error" not in data
+        assert data["answer"] == 42
