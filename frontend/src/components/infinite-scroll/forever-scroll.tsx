@@ -29,7 +29,7 @@ const reducer = (state, action) => {
         loadingBottom: false,
         hasMoreAfter: action.newData.length == perPage,
         data: [...state.data, ...action.newData],
-        after: state.after + action.newData.length,
+        after: state.after + action.newData.length
       };
     default:
       throw new Error("Don't understand action");
@@ -50,13 +50,14 @@ function ForeverScroll({
   component,
   fetch,
   moreAfter = null,
-  componentProps = {},
+  modelName = null,
+  componentProps = {}
 }) {
   const initialState = {
     loadingBottom: false,
     data: [],
     hasMoreAfter: true,
-    after: 0,
+    after: 0
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -64,6 +65,7 @@ function ForeverScroll({
 
   // List of Data that the application references for indexes
   const totalData = initialData;
+  console.log(totalData);
 
   const loadBottom = () => {
     dispatch({ type: "startBottom" });
@@ -93,6 +95,13 @@ function ForeverScroll({
     moreToLoad = hasMoreAfter;
   }
 
+  let name;
+  if (data.length > 1) {
+    name = modelName + "s";
+  } else {
+    name = modelName;
+  }
+
   return (
     <div className="ForeverScroll" style={{ marginTop: "20px" }}>
       {data.map((d, i) =>
@@ -110,7 +119,7 @@ function ForeverScroll({
 
       {!moreToLoad && (
         <div className="no-results">
-          Results completed, there are {data.length} models
+          Results completed, there are {data.length} {name}
         </div>
       )}
     </div>
