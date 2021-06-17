@@ -65,7 +65,6 @@ function ForeverScroll({
 
   // List of Data that the application references for indexes
   const totalData = initialData;
-  console.log(totalData);
 
   const loadBottom = () => {
     dispatch({ type: "startBottom" });
