@@ -11,7 +11,7 @@ interface tagBody {
 enum tag_reducer {
   NAME,
   DESCRIPTION,
-  HEX_COLOR
+  HEX_COLOR,
 }
 
 export { tagBody, tag_reducer };

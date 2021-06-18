@@ -20,7 +20,7 @@ function TagBody(props: tagBody) {
     onClickDelete,
     isEditing = false,
     id = 10000,
-    disabled = false
+    disabled = false,
   } = props;
 
   const showName = name.length > 0 ? name : "Tag Preview";
@@ -35,7 +35,7 @@ function TagBody(props: tagBody) {
       "div.tag-body",
       { key: id, style: { backgroundColor: color, color: textColor } },
       [showName, h.if(isEditing)(TagDeleteButton, { onClickDelete, id })]
-    )
+    ),
   ]);
 }
 
@@ -46,7 +46,7 @@ function TagDeleteButton(props) {
     icon: "trash",
     minimal: true,
     intent: "danger",
-    onClick: () => onClickDelete(id)
+    onClick: () => onClickDelete(id),
   });
 }
 
