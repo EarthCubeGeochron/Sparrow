@@ -10,6 +10,8 @@ import {
   ProjectFilterList,
   SessionFilterList
 } from "../model-views/components/new-model";
+import { NewSamplePage } from "~/model-views/sample/new-sample";
+
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -17,7 +19,7 @@ const h = hyperStyled(styles);
 function SampleNoStateAdmin() {
   const content = h("h3", [
     "Or create a new sample",
-    h(Link, { to: "/admin/new-sample" }, [" here."])
+    h(Link, { to: "/admin/sample/new" }, [" here."])
   ]);
 
   return h(NoStateAdmin, { name: "Sample", content });
@@ -26,6 +28,10 @@ function SampleNoStateAdmin() {
 export function SampleMainPanel() {
   const base = "/admin/sample";
   return h(Switch, [
+    h(Route, {
+      path: base + "/new",
+      render: () => h(NewSamplePage)
+    }),
     h(Route, {
       path: base + "/:id",
       render() {

@@ -13,6 +13,7 @@ import {
   ProjectMatch,
   ProjectListComponent
 } from "~/model-views";
+import { NewProjectForm } from "../model-views/project/new-project";
 import { AdminFilter } from "../filter";
 
 const h = hyperStyled(styles);
@@ -20,7 +21,7 @@ const h = hyperStyled(styles);
 function ProjectNoStateAdmin() {
   const content = h("h3", [
     "Or create a new project",
-    h(Link, { to: "/admin/new-project" }, [" here."])
+    h(Link, { to: "/admin/project/new" }, [" here."])
   ]);
 
   return h(NoStateAdmin, { name: "Project", content });
@@ -30,6 +31,10 @@ export function ProjectMainPanel() {
   const base = "/admin/project";
   const Edit = true;
   return h(Switch, [
+    h(Route, {
+      path: base + "/new",
+      render: () => h(NewProjectForm)
+    }),
     h(Route, {
       path: base + "/:id",
       render: () => h(ProjectMatch, { Edit })

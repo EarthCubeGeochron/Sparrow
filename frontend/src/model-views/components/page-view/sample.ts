@@ -10,14 +10,14 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-export const SampleAdd = (props) => {
+export const SampleAdd = props => {
   const {
     onClickDelete,
     onClickList,
     data,
     draggable = true,
     isEditing = true,
-    setID = () => {},
+    setID = () => {}
   } = props;
 
   return h("div", [
@@ -27,13 +27,13 @@ export const SampleAdd = (props) => {
         isEditing,
         draggable,
         onClick: onClickDelete,
-        setID,
+        setID
       }),
       h.if(isEditing)(AddCard, {
         model: "sample",
-        onClick: onClickList,
-      }),
-    ]),
+        onClick: onClickList
+      })
+    ])
   ]);
 };
 
@@ -43,13 +43,13 @@ flex-flow: row wrap;
 margin: 0 -5px;\
 `;
 
-export const PageViewSamples = function ({
+export const PageViewSamples = function({
   data,
   isEditing,
   setID = () => {},
   link = true,
   onClick,
-  draggable = true,
+  draggable = true
 }) {
   let content = [h("p", "No samples")];
   if (data != null) {
@@ -57,7 +57,7 @@ export const PageViewSamples = function ({
       return h("div.sample-area", [
         h("h4", "Samples"),
         h(SampleContainer, [
-          data.map((d) => {
+          data.map(d => {
             const { material, id, name, location_name, session } = d;
             return h(SampleCard, {
               material,
@@ -66,18 +66,18 @@ export const PageViewSamples = function ({
               name,
               location_name,
               setID,
-              link,
+              link
             });
-          }),
-        ]),
+          })
+        ])
       ]);
     } else {
       return h("div.sample-area", [
         h("div", { style: { display: "flex", alignItems: "baseline" } }, [
-          h("h4", "Samples"),
+          h("h4", "Samples")
         ]),
         h(SampleContainer, [
-          data.map((d) => {
+          data.map(d => {
             const { id, name, session } = d;
             return h(DndChild, {
               id,
@@ -88,17 +88,17 @@ export const PageViewSamples = function ({
                 name,
                 session,
                 setID,
-                onClick,
-              }),
+                onClick
+              })
             });
-          }),
-        ]),
+          })
+        ])
       ]);
     }
   } else {
     if (isEditing) {
       return h("h4", { style: { display: "flex", alignItems: "baseline" } }, [
-        "No Samples",
+        "No Samples"
       ]);
     } else {
       return h("h4", "No Samples");
@@ -107,8 +107,8 @@ export const PageViewSamples = function ({
 };
 
 export function NewSamplePageButton() {
-  const to = useModelURL("/new-sample");
-  const handleClick = (e) => {
+  const to = useModelURL("/sample/new");
+  const handleClick = e => {
     e.preventDefault();
     window.location.href = to;
   };
