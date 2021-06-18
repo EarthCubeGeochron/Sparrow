@@ -62,8 +62,6 @@ function SecondaryPageLinks(props) {
 function NewModelLinks(props) {
   const { base = "/admin" } = props;
   return h(Menu, [
-    h(SecondaryMenuItem, { to: base + "/new-project" }, "New Project"),
-    h(SecondaryMenuItem, { to: base + "/new-sample" }, "New Sample"),
     h(SecondaryMenuItem, { to: base + "/tag-manager" }, "Tag Manager")
   ]);
 }

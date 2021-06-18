@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { APIHelpers } from "@macrostrat/ui-components";
 import { hyperStyled } from "@macrostrat/hyper";
-import { Button, Collapse } from "@blueprintjs/core";
+import { Button, ButtonGroup, Card, Callout } from "@blueprintjs/core";
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { randomHexColor } from "../misscel";
 import { TagBody } from "./tag-body";
@@ -23,19 +23,19 @@ function TagEditButtons(props) {
     onDelete(id);
   };
 
-  return h("div", [
+  return h(ButtonGroup, [
     h(Button, {
       icon: "edit",
       minimal: true,
       intent: "success",
-      onClick: onClickEdit,
+      onClick: onClickEdit
     }),
     h(Button, {
       icon: "trash",
       minimal: true,
       intent: "danger",
-      onClick: onClickDelete,
-    }),
+      onClick: onClickDelete
+    })
   ]);
 }
 
@@ -44,10 +44,10 @@ function TagRow(props) {
   const { buildURL } = APIHelpers(useContext(APIV2Context));
   const [isEditing, setIsEditing] = useState(false);
 
-  const onSubmit = async (editedTag) => {
+  const onSubmit = async editedTag => {
     console.log(editedTag);
     const route = buildURL(`/tags/tag/${tag.id}`);
-    const res = await Axios.put(route, editedTag).then((response) => {
+    const res = await Axios.put(route, editedTag).then(response => {
       return response;
     });
   };
@@ -59,33 +59,37 @@ function TagRow(props) {
 
   if (!tag) return null;
   if (isEditing) {
-    return h("div.tag-row", [
+    return h(Card, [
       h(TagEditor, {
         name: tag.name,
         description: tag.description,
         color: tag.color,
         onCancel: () => setIsEditing(false),
-        onSubmit,
-      }),
+        onSubmit
+      })
     ]);
   }
-  return h("div.tag-row.non-edit", [
-    h(TagBody, {
-      name: tag.name,
-      description: tag.description,
-      color: tag.color,
-      id: tag.id,
-    }),
-    h("p", [tag.description]),
-    h(TagEditButtons, {
-      id: tag.id,
-      onEdit: () => {
-        setIsEditing(!isEditing);
-      },
-      isEditing,
-      onDelete,
-    }),
-  ]);
+  return h(
+    Card,
+    { className: "tag-row", style: { padding: "20px", marginBottom: "1px" } },
+    [
+      h(TagBody, {
+        name: tag.name,
+        description: tag.description,
+        color: tag.color,
+        id: tag.id
+      }),
+      h("p", [tag.description]),
+      h(TagEditButtons, {
+        id: tag.id,
+        onEdit: () => {
+          setIsEditing(!isEditing);
+        },
+        isEditing,
+        onDelete
+      })
+    ]
+  );
 }
 
 function TagManager() {
@@ -97,12 +101,12 @@ function TagManager() {
 
   return h("div", [
     h("div.new-tag-btn", [h(NewTag)]),
-    h("div.tag-manager", [
+    h(Callout, [
       h("div.manager-header", [total_count + " Tags"]),
-      tags.map((tag) => {
+      tags.map(tag => {
         return h(TagRow, { key: tag["id"], tag });
-      }),
-    ]),
+      })
+    ])
   ]);
 }
 
@@ -112,12 +116,12 @@ function NewTag() {
   const initTag = {
     name: "",
     description: "",
-    color: randomHexColor(),
+    color: randomHexColor()
   };
 
-  const onSubmit = async (tag) => {
+  const onSubmit = async tag => {
     const url = buildURL("/tags/tag");
-    const res = await Axios.post(url, tag).then((response) => {
+    const res = await Axios.post(url, tag).then(response => {
       return response;
     });
   };
@@ -131,12 +135,12 @@ function NewTag() {
       {
         intent: "success",
         onClick: () => setOpen(!open),
-        style: { marginBottom: "10px" },
+        style: { marginBottom: "10px" }
       },
       ["New Tag"]
     ),
     h.if(open)(
-      "div.tag-manager",
+      Callout,
       { style: { padding: "15px", marginBottom: "10px", marginTop: "5px" } },
       [
         h(TagEditor, {
@@ -144,10 +148,10 @@ function NewTag() {
           description: initTag.description,
           color: initTag.color,
           onSubmit,
-          onCancel,
-        }),
+          onCancel
+        })
       ]
-    ),
+    )
   ]);
 }
 
