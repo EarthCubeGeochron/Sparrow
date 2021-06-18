@@ -102,10 +102,12 @@ function ForeverScroll({
   }
 
   return (
-    <div className="ForeverScroll" style={{ marginTop: "20px" }}>
-      {data.map((d, i) =>
-        h(component, { id: i, key: i, ...componentProps, ...d })
-      )}
+    <div className="ForeverScroll" style={{ marginTop: "10px" }}>
+      <ul>
+        {data.map((d, i) =>
+          h(component, { id: i, key: i, ...componentProps, ...d })
+        )}
+      </ul>
 
       {loadingBottom && h(Spinner)}
 
