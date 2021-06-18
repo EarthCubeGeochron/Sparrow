@@ -330,7 +330,8 @@ function SampleTagContainer() {
     isEditing,
     tags: model.tags_tag,
     onChange: onAdd,
-    onClickDelete: onDelete
+    onClickDelete: onDelete,
+    modelName: "sample"
   });
 }
 

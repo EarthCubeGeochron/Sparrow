@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TagBody, tagBody } from "~/components";
 import { Suggest } from "@blueprintjs/select";
-import { Button, Popover, MenuDivider } from "@blueprintjs/core";
+import { Button, Popover, MenuDivider, Card } from "@blueprintjs/core";
 import { useAPIv2Result } from "~/api-v2";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
@@ -14,10 +14,17 @@ interface tagContainer {
   isEditing: boolean;
   onChange: (e) => void;
   onClickDelete: (e) => void;
+  modelName: string;
 }
 
 export function TagContainer(props) {
-  const { tags, isEditing, onChange, onClickDelete }: tagContainer = props;
+  const {
+    tags,
+    isEditing,
+    onChange,
+    onClickDelete,
+    modelName
+  }: tagContainer = props;
 
   if (tags) {
     return h("div.tag-container", [
@@ -35,7 +42,7 @@ export function TagContainer(props) {
       h.if(isEditing)(
         Popover,
         {
-          content: h(TagSelect, { tags, onChange }),
+          content: h(TagPopover, { tags, onChange, modelName }),
           position: "bottom",
           minimal: true
         },
@@ -55,6 +62,23 @@ export function TagContainer(props) {
   } else {
     return h("div");
   }
+}
+
+function TagPopover(props) {
+  const { tags, onChange, modelName }: tagContainer = props;
+
+  const onClick = () => {
+    const goToRoute = process.env.BASE_URL + `admin/tag-manager`;
+    window.location.assign(goToRoute);
+  };
+
+  return h(Card, [
+    h("h4", [`Add a tag to this ${modelName}`]),
+    h(TagSelect, { tags, onChange }),
+    h(Button, { minimal: true, icon: "edit", onClick }, [
+      "Edit or create a tag"
+    ])
+  ]);
 }
 
 export function TagSelect(props) {
