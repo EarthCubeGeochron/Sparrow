@@ -6,14 +6,14 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-export const SessionAdd = (props) => {
+export const SessionAdd = props => {
   const {
     onClickDelete,
     onClickList,
     data,
     isEditing,
     sampleHoverID = null,
-    onDrop = () => {},
+    onDrop = () => {}
   } = props;
 
   return h("div", [
@@ -22,12 +22,12 @@ export const SessionAdd = (props) => {
       onClick: onClickDelete,
       sampleHoverID,
       onDrop,
-      isEditing,
+      isEditing
     }),
     h.if(isEditing)(AddCard, {
       model: "session",
-      onClick: onClickList,
-    }),
+      onClick: onClickList
+    })
   ]);
 };
 
@@ -37,7 +37,7 @@ export function PageViewSessions(props) {
     session,
     onClick,
     sampleHoverID = null,
-    onDrop = () => {},
+    onDrop = () => {}
   } = props;
 
   if (session == null && !isEditing) return null;
@@ -47,7 +47,7 @@ export function PageViewSessions(props) {
   return h("div.parameter", [
     h.if(session.length > 0 || isEditing)("h4.subtitle", "Sessions"),
     h("div.session-container", [
-      session.map((obj) => {
+      session.map(obj => {
         const {
           id: session_id,
           technique,
@@ -55,7 +55,7 @@ export function PageViewSessions(props) {
           date,
           analysis,
           data,
-          sample,
+          sample
         } = obj;
         const onHover =
           sampleHoverID && sample ? sample.id == sampleHoverID : false;
@@ -64,33 +64,34 @@ export function PageViewSessions(props) {
             DndContainer,
             {
               id: session_id,
-              onDrop,
+              onDrop
             },
             [
               h(SessionEditCard, {
                 session_id,
+                isEditing,
                 sample,
                 technique,
                 target,
                 date,
                 onClick,
-                onHover,
-              }),
+                onHover
+              })
             ]
           );
         } else {
-          return h(SessionPageViewModelCard, {
+          return h(SessionEditCard, {
             session_id,
+            isEditing,
+            sample,
             technique,
             target,
             date,
-            data,
-            analysis,
-            sample,
-            onHover,
+            onClick,
+            onHover
           });
         }
-      }),
-    ]),
+      })
+    ])
   ]);
 }

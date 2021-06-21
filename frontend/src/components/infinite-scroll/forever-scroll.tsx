@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useRef, useEffect } from "react";
+import { useEffect } from "react";
 import h from "@macrostrat/hyper";
 import { useReducer } from "react";
 import { useOnScreen } from "./utils";

@@ -3,43 +3,76 @@ import { Card } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
 import { parse, format } from "date-fns";
 import { useModelURL } from "~/util/router";
+import { ModelAttributeOneLiner } from "../components";
 
-export const Sample = (props) => {
+export const Sample = props => {
   const sampleTo = useModelURL(`/sample/${props.id}`);
   console.log(sampleTo);
   return h("div.sample", [
     h("h4.info", "Sample"),
     h("div.sample-id", [h("a", { href: sampleTo }, [props.name])]),
-    h("div.target", props.target),
+    h("div.target", props.target)
   ]);
 };
 
-export const Instrument = function (props) {
+
+export const SessionDate = props => {
+  const { date } = props;
+
+  if (!date) return null;
+
+  return h(ModelAttributeOneLiner, {
+    title: "Session Date:",
+    content: format(date, "MMMM D, YYYY")
+  });
+};
+
+export const Instrument = function(props) {
   const { instrument } = props;
   if (!instrument) return null;
 
   const { name, id } = instrument;
 
-  return h("div.instrument", [
-    h("h4.small-info", "Instrument"),
-    h("div", name),
-  ]);
+  return h(ModelAttributeOneLiner, {
+    title: "Instrument:",
+    content: name
+  });
 };
 
-export const Publication = (publication) => {
+export const Target = props => {
+  const { target } = props;
+
+  if (!target) return null;
+
+  return h(ModelAttributeOneLiner, {
+    title: "Target:",
+    content: target
+  });
+};
+
+export const AnalysisNumber = props => {
+  const { analysis } = props;
+
+  return h(ModelAttributeOneLiner, {
+    title: "Number of Analyses:",
+    content: analysis.length
+  });
+};
+
+export const Publication = publication => {
   if (!publication) return null;
 
   return;
 };
 
-export const Technique = function ({ technique }) {
+export const Technique = function({ technique }) {
   if (technique == null) {
     return null;
   }
-  return h("div.technique", [
-    h("h4.small-info", "Technique"),
-    h("div", technique),
-  ]);
+  return h(ModelAttributeOneLiner, {
+    title: "Technique:",
+    content: technique
+  });
 };
 
 // const MeasurementGroup = function({ measurement_group_id }) {
@@ -52,7 +85,7 @@ export const Technique = function ({ technique }) {
 //   ]);
 // };
 
-export const SessionProjects = (props) => {
+export const SessionProjects = props => {
   const { project } = props;
   console.log(project);
 
@@ -63,11 +96,11 @@ export const SessionProjects = (props) => {
 
   return h("div.project", [
     h("h4", "Project"),
-    h("div", null, [h("a", { href: projectTo }, name) || "—"]),
+    h("div", null, [h("a", { href: projectTo }, name) || "—"])
   ]);
 };
 
-const SessionInfoComponent = function (props) {
+const SessionInfoComponent = function(props) {
   // add some links to Project, sample, etc
   const { id, sample, target, project, date: sdate } = props;
   const date = parse(sdate);
@@ -79,19 +112,19 @@ const SessionInfoComponent = function (props) {
   return h([
     h("div.top", [
       h("h4.date", format(date, "MMMM D, YYYY")),
-      h("div.expander"),
+      h("div.expander")
     ]),
     h("div.session-info", [
-      h(Sample, { id: sampleId, name: sampleName, target }),
-      h(SessionProjects, { project }),
-      h(Instrument, props),
       h(Technique, props),
+      h(Instrument, props),
+      h(Sample, { id: sampleId, name: sampleName, target }),
+      h(SessionProjects, { project })
       //h(MeasurementGroup, props),
-    ]),
+    ])
   ]);
 };
 
-const SessionInfoLink = function (props) {
+const SessionInfoLink = function(props) {
   const { id } = props;
 
   const to = useModelURL(`/session/${id}`);
@@ -101,19 +134,19 @@ const SessionInfoLink = function (props) {
     {
       to,
       key: id,
-      className: "session-info-card",
+      className: "session-info-card"
     },
     h(SessionInfoComponent, props)
   );
 };
 
-const SessionInfoCard = function (props) {
+const SessionInfoCard = function(props) {
   const { id } = props;
   return h(
     Card,
     {
       key: id,
-      className: "session-info-card",
+      className: "session-info-card"
     },
     h(SessionInfoComponent, props)
   );

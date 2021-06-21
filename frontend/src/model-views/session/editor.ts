@@ -3,28 +3,32 @@ import { hyperStyled } from "@macrostrat/hyper";
 import {
   ModelEditor,
   useModelEditor,
-  APIHelpers,
+  APIHelpers
 } from "@macrostrat/ui-components";
 import { parse, format } from "date-fns";
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { useAuth } from "~/auth";
 import { put } from "axios";
 import { Link } from "react-router-dom";
-import { Breadcrumbs, Card } from "@blueprintjs/core";
+import { Breadcrumbs, Card, Callout } from "@blueprintjs/core";
 import { useModelURL, useModelURLBool } from "~/util/router";
 import {
   Instrument,
   Technique,
+  Target,
+  SessionDate,
+  AnalysisNumber,
   SessionProjects,
-  SessionInfoCard,
+  SessionInfoCard
 } from "./info-card";
 import {
   EditNavBar,
   SampleAdd,
   ProjectAdd,
   PubAdd,
+  ModelEditableText,
   EmbargoDatePick,
-  EditStatusButtons,
+  EditStatusButtons
 } from "../components";
 import { SessionAdminContext } from "~/admin/session";
 import styles from "./module.styl";
@@ -37,11 +41,11 @@ function CatalogSessionInfoCard(props) {
   return h("div.test", [h(SessionInfoCard, model)]);
 }
 
-const EmbargoEditor = function (props) {
+const EmbargoEditor = function(props) {
   const { model, actions, isEditing } = useModelEditor();
-  const onChange = (date) => {
+  const onChange = date => {
     actions.updateState({
-      model: { embargo_date: { $set: date } },
+      model: { embargo_date: { $set: date } }
     });
   };
   const embargo_date = model.embargo_date;
@@ -66,7 +70,7 @@ function EditStatusButtonsSess(props) {
     onClickCancel,
     onClickSubmit,
     hasChanges,
-    isEditing,
+    isEditing
   });
 }
 
@@ -76,7 +80,7 @@ function SessionEditsNavBar(props) {
   return h(EditNavBar, {
     header,
     editButtons: h(EditStatusButtonsSess),
-    embargoEditor: h(EmbargoEditor),
+    embargoEditor: h(EmbargoEditor)
   });
 }
 
@@ -86,13 +90,13 @@ function SessionPublication(props) {
 
   const onClickDelete = () => {
     actions.updateState({
-      model: { publication: { $set: null } },
+      model: { publication: { $set: null } }
     });
   };
 
   const onClickPub = (id, title, doi) => {
     actions.updateState({
-      model: { publication: { $set: { id, title, doi } } },
+      model: { publication: { $set: { id, title, doi } } }
     });
   };
 
@@ -107,7 +111,7 @@ function SessionPublication(props) {
     data,
     isEditing,
     onClickDelete,
-    onClickList,
+    onClickList
   });
 }
 
@@ -120,13 +124,13 @@ function EditableSessionInfoComponent(props) {
 
   const onProjectClick = (id, name) => {
     actions.updateState({
-      model: { project: { $set: { id, name } } },
+      model: { project: { $set: { id, name } } }
     });
   };
 
   const onProjectClickDelete = () => {
     actions.updateState({
-      model: { project: { $set: null } },
+      model: { project: { $set: null } }
     });
   };
 
@@ -135,15 +139,15 @@ function EditableSessionInfoComponent(props) {
     changeFunction(onProjectClick);
   };
 
-  const onSampleClick = (sample) => {
+  const onSampleClick = sample => {
     actions.updateState({
-      model: { sample: { $set: sample } },
+      model: { sample: { $set: sample } }
     });
   };
 
-  const onSampleClickDelete = (sample) => {
+  const onSampleClickDelete = sample => {
     actions.updateState({
-      model: { sample: { $set: null } },
+      model: { sample: { $set: null } }
     });
   };
 
@@ -154,29 +158,48 @@ function EditableSessionInfoComponent(props) {
 
   const data = model.sample ? [sample] : null;
 
-  return h(Card, { id, className: "session-info-card" }, [
-    h("div.top", [
-      h("h4.date", format(date, "MMMM D, YYYY")),
-      h("div.expander"),
-    ]),
-    h("div.session-info", [
-      h(SampleAdd, {
-        data,
-        isEditing,
-        onClickList: sampleListClick,
-        onClickDelete: onSampleClickDelete,
-      }),
-      h.if(isEditing)(ProjectAdd, {
-        isEditing,
-        data: { project: [project] },
-        onClickList: projectClickList,
-        onClickDelete: onProjectClickDelete,
-      }),
-      h.if(!isEditing)(SessionProjects, { project }),
-      h(Instrument, model),
-      h(Technique, model),
-      h(SessionPublication),
-    ]),
+  return h("div", [
+    h(
+      Callout,
+      { id, className: "session-info-card", title: "Session Information" },
+      [
+        h("div.session-info", [
+          h(ModelEditableText, {
+            is: "h4",
+            field: "name",
+            multiline: true
+          }),
+          h(SessionDate, model),
+          h(Technique, model),
+          h(Instrument, model),
+          h(Target, model),
+          h(AnalysisNumber, model)
+        ])
+      ]
+    ),
+    h(
+      Callout,
+      {
+        id,
+        className: "session-info-card",
+        title: "Session Links"
+      },
+      [
+        h(SampleAdd, {
+          data,
+          isEditing,
+          onClickList: sampleListClick,
+          onClickDelete: onSampleClickDelete
+        }),
+        h(ProjectAdd, {
+          isEditing,
+          data: { project: [project] },
+          onClickList: projectClickList,
+          onClickDelete: onProjectClickDelete
+        }),
+        h(SessionPublication)
+      ]
+    )
   ]);
 }
 
@@ -185,7 +208,7 @@ export function EditableSessionDetails(props) {
 
   const Edit = useModelURLBool();
   const res = useAPIv2Result(`/models/session/${id}`, {
-    nest: "sample,instrument,publication,project",
+    nest: "sample,instrument,publication,project"
   });
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
@@ -195,7 +218,7 @@ export function EditableSessionDetails(props) {
 
   const breadCrumbs = [
     { text: h(Link, { to }, "Sessions") },
-    { icon: "document", text: h("code.session-id", id) },
+    { icon: "document", text: h("code.session-id", id) }
   ];
 
   return h(
@@ -215,15 +238,15 @@ export function EditableSessionDetails(props) {
         const { data } = response;
         ({ id, ...rest } = data);
         return rest;
-      },
+      }
     },
     [
       h("div", [
         h.if(Edit)(SessionEditsNavBar, { header: "Manage Session Links" }),
         h(Breadcrumbs, { items: breadCrumbs }),
         h.if(Edit)(EditableSessionInfoComponent),
-        h.if(!Edit)(CatalogSessionInfoCard),
-      ]),
+        h.if(!Edit)(CatalogSessionInfoCard)
+      ])
     ]
   );
 }

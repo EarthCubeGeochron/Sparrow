@@ -23,7 +23,7 @@ interface SampleCardProps {
  *
  * @param props : name (string), id (number), link (boolean), material (string), location_name? (string)
  */
-const SampleCard = function (props: SampleCardProps) {
+const SampleCard = function(props: SampleCardProps) {
   let {
     material,
     id,
@@ -31,7 +31,7 @@ const SampleCard = function (props: SampleCardProps) {
     location_name,
     link = true,
     setID,
-    session = [],
+    session = []
   } = props;
 
   const onHover = () => {
@@ -45,13 +45,13 @@ const SampleCard = function (props: SampleCardProps) {
   };
 
   const sessionContent = h.if(session.length > 0)("div", [
-    session.map((ele) => {
+    session.map(ele => {
       return h.if(ele.date)("div", [
         ele.date.split("T")[0],
         ",     ",
-        ele.target,
+        ele.target
       ]);
-    }),
+    })
   ]);
 
   const component = link ? LinkCard : Card;
@@ -63,13 +63,13 @@ const SampleCard = function (props: SampleCardProps) {
       className: "sample-card",
       to,
       onMouseEnter: onHover,
-      onMouseLeave: onHoverLeave,
+      onMouseLeave: onHoverLeave
     },
     [
       h("h4.name", name),
       h("div.location-name", location_name),
       h.if(material != null)("div.material", material),
-      sessionContent,
+      sessionContent
     ]
   );
 };
@@ -78,17 +78,17 @@ const SampleCard = function (props: SampleCardProps) {
  * Component to allow for deletion of samples from Project.
  * @param props
  */
-const SampleEditCard = (props) => {
+const SampleEditCard = props => {
   const { id, name, onClick, session = [], setID = () => {} } = props;
 
   const sessionContent = h.if(session.length > 0)("div", [
-    session.map((ele) => {
+    session.map(ele => {
       return h.if(ele.date)("div", [
         ele.date.split("T")[0],
         ",     ",
-        ele.target,
+        ele.target
       ]);
-    }),
+    })
   ]);
 
   return h(
@@ -101,13 +101,13 @@ const SampleEditCard = (props) => {
         minimal: true,
         icon: "trash",
         intent: "danger",
-        onClick: () => onClick({ id, name }),
-      }),
+        onClick: () => onClick({ id, name })
+      })
     ]
   );
 };
 
-const PubEditCard = (props) => {
+const PubEditCard = props => {
   let { id, title, content, onClick } = props;
 
   return h("div.pub-edit-card", [
@@ -116,12 +116,12 @@ const PubEditCard = (props) => {
       minimal: true,
       icon: "trash",
       intent: "danger",
-      onClick: () => onClick({ id, title }),
-    }),
+      onClick: () => onClick({ id, title })
+    })
   ]);
 };
 
-const ResearcherEditCard = (props) => {
+const ResearcherEditCard = props => {
   let { id, name, onClick } = props;
 
   return h("div.sample-edit-card", [
@@ -131,14 +131,14 @@ const ResearcherEditCard = (props) => {
       minimal: true,
       icon: "trash",
       intent: "danger",
-      onClick: () => onClick({ id, name }),
-    }),
+      onClick: () => onClick({ id, name })
+    })
   ]);
 };
 
-export const ProjectEditCard = (props) => {
+export const ProjectEditCard = props => {
   const { d, onClick } = props;
-  const project = d.project.map((obj) => {
+  const project = d.project.map(obj => {
     if (obj) {
       const { name, id } = obj;
       return { name, id };
@@ -147,7 +147,7 @@ export const ProjectEditCard = (props) => {
   });
 
   return h("div", [
-    project.map((obj) => {
+    project.map(obj => {
       if (!obj) return null;
       const { name, id } = obj;
       return h("div.sample-edit-card", [
@@ -157,14 +157,14 @@ export const ProjectEditCard = (props) => {
           minimal: true,
           icon: "trash",
           intent: "danger",
-          onClick: () => onClick({ id, name }),
-        }),
+          onClick: () => onClick({ id, name })
+        })
       ]);
-    }),
+    })
   ]);
 };
 
-export const SessionEditCard = (props) => {
+export const SessionEditCard = props => {
   const {
     onClick,
     session_id,
@@ -173,25 +173,38 @@ export const SessionEditCard = (props) => {
     technique,
     sample = null,
     onHover = false,
+    isEditing
   } = props;
 
   const classname = onHover ? "sample-edit-card-samhover" : "sample-edit-card";
 
   const sampleName = sample ? sample.name : "";
 
+  const to = useModelURL(`/session/${session_id}`);
+
+  if (!isEditing) {
+    return h(LinkCard, { to, className: "sample-card" }, [
+      h("div.session-info", [
+        h("div", [date.split("T")[0], ",     ", target]),
+        h("div", technique),
+        h.if(sample)("div", [h("i", `Linked through ${sampleName}`)])
+      ])
+    ]);
+  }
+
   return h(`div.${classname}`, [
     h("div.session-info", [
       h("div", [date.split("T")[0], ",     ", target]),
       h("div", technique),
-      h.if(sample)("div", [h("i", `Linked through ${sampleName}`)]),
+      h.if(sample)("div", [h("i", `Linked through ${sampleName}`)])
     ]),
-    h(Button, {
+    h.if(isEditing)(Button, {
       id: session_id,
       minimal: true,
       icon: "trash",
       intent: "danger",
-      onClick: () => onClick({ session_id, date }),
-    }),
+      onClick: () => onClick({ session_id, date })
+    })
   ]);
 };
 
@@ -210,5 +223,5 @@ export {
   AddSampleCard,
   SampleEditCard,
   PubEditCard,
-  ResearcherEditCard,
+  ResearcherEditCard
 };
