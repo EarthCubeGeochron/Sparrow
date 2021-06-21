@@ -27,6 +27,7 @@ import {
   EditStatusButtons,
   DataSheetButton,
   NewSamplePageButton,
+  ModelAttributeOneLiner,
   TagContainer
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
@@ -69,6 +70,7 @@ const EditNavBarSample = () => {
   return h(EditNavBar, {
     header: "Manage Sample",
     editButtons: h("div", { style: { display: "flex" } }, [
+      h.if(isEditing)(DataSheetButton),
       h(NewSamplePageButton),
       h(EditStatusButtons, {
         onClickCancel,
@@ -132,9 +134,9 @@ const Material = function(props) {
   }
   if (!isEditing) {
     if (model.material == null) return null;
-    return h(Parameter, {
-      name: "Material",
-      value: model.material
+    return h(ModelAttributeOneLiner, {
+      title: "Material: ",
+      content: model.material
     });
   }
 };
@@ -144,18 +146,17 @@ const DepthElevation = props => {
 
   const { depth, elevation } = model;
 
-  return !isEditing
-    ? h.if(elevation != null || depth != null)("div.depth-elevation", [
-        h.if(depth != null)("div.parameter", [
-          h("h4.subtitle", "Depth"),
-          h("p.value", [depth])
-        ]),
-        h.if(elevation != null)("div.parameter", [
-          h("h4.subtitle", "Elevation"),
-          h("p.value", [elevation])
-        ])
-      ])
-    : null;
+  if (isEditing) return null;
+  return h.if(elevation != null || depth != null)("div.depth-elevation", [
+    h.if(depth != null)(ModelAttributeOneLiner, {
+      title: "Depth: ",
+      content: depth
+    }),
+    h.if(elevation != null)(ModelAttributeOneLiner, {
+      title: "Elevation: ",
+      content: elevation
+    })
+  ]);
 };
 
 const GeoEntity = props => {
