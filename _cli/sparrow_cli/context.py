@@ -80,8 +80,10 @@ class SparrowConfig:
     path_provided: bool
     is_frozen: bool
     version_info: typing.Optional[SparrowVersionMatch] = None
+    verbose: bool = False
 
-    def __init__(self):
+    def __init__(self, verbose=False):
+        self.verbose = verbose
         self.is_frozen = getattr(sys, "frozen", False)
         if self.is_frozen:
             self.bundle_dir = Path(sys._MEIPASS)
