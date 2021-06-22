@@ -16,8 +16,8 @@ export function HelpButton(props) {
       modifiers: {
         preventOverflow: { enabled: false },
         flip: { enabled: true },
-        hide: { enabled: false },
-      },
+        hide: { enabled: false }
+      }
     },
     [h(Button, { minimal: true, intent: "danger" }, ["Help"])]
   );
@@ -26,12 +26,12 @@ export function HelpButton(props) {
 export function DndContainer(props) {
   const {
     children,
-    onDrop = (data) => console.log(data),
+    onDrop = data => console.log(data),
     id,
-    data_id = "child_id",
+    data_id = "child_id"
   } = props;
 
-  const drop = (e) => {
+  const drop = e => {
     e.preventDefault();
     const child = JSON.parse(e.dataTransfer.getData(data_id));
 
@@ -39,7 +39,7 @@ export function DndContainer(props) {
     onDrop(child, id);
   };
 
-  const dragOver = (e) => {
+  const dragOver = e => {
     e.preventDefault();
   };
 
@@ -47,16 +47,16 @@ export function DndContainer(props) {
 }
 
 export function DndChild(props) {
-  const { childern, id, data, draggable = true, data_id = "child_id" } = props;
+  const { children, id, data, draggable = true, data_id = "child_id" } = props;
 
-  const dragStart = (e) => {
+  const dragStart = e => {
     const target = e.target;
     //console.log(data);
     const d = JSON.stringify(data);
     e.dataTransfer.setData(data_id, d);
   };
 
-  const dragOver = (e) => {
+  const dragOver = e => {
     e.stopPropagation();
   };
 
@@ -64,7 +64,7 @@ export function DndChild(props) {
     ? { id, onDragStart: dragStart, onDragOver: dragOver, draggable }
     : {};
 
-  return h("div", { ...dragProps }, [childern]);
+  return h("div", { ...dragProps }, [children]);
 }
 
 export function MySwitch(props) {

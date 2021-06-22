@@ -1,83 +1,67 @@
 import { Button } from "@blueprintjs/core";
-import { AddCard, ProjectModelCard, ProjectEditCard } from "../index";
-import { Tooltip } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useModelURL } from "~/util";
+import { PageViewModelCard, PageViewBlock } from "~/model-views";
 //@ts-ignore
 import styles from "./module.styl";
-import { useAPIv2Result } from "~/api-v2";
 
 const h = hyperStyled(styles);
 
 export const ProjectAdd = props => {
   const { onClickDelete, onClickList, data, isEditing } = props;
 
-  return h("div", [
-    h(PageViewProjects, {
-      onClick: onClickDelete,
-      isEditing,
-      data
-    }),
-    h.if(isEditing)(AddCard, {
-      model: "project",
-      onClick: onClickList
-    })
-  ]);
-};
-
-const ProjectLink = ({ d }) => {
-  const project = d.project.map(obj => {
-    if (obj) {
-      return obj;
-    }
-    return null;
-  });
-
-  const [test] = project;
-  if (test == null) return null;
-
-  return h("div", { style: { display: "flex", flexDirection: "column" } }, [
-    project.map(ele => {
-      if (!ele) return null;
-      return h(ProjectLinks, {
-        project: ele
-      });
-    })
-  ]);
-};
-
-export const ProjectLinks = props => {
-  const { project } = props;
-  console.log(project);
-
-  const projectTo = useModelURL(`/project/${project.id}`);
-
   return h(
-    Tooltip,
+    PageViewBlock,
     {
-      content: h("div", { style: { maxWidth: "400px" } }, [
-        h(ProjectModelCard, project)
-      ]),
-      position: "top"
+      model: "project",
+      onClick: onClickList,
+      isEditing,
+      title: "Projects",
+      modelLink: true,
+      hasData: data.project.length != 0
     },
     [
-      h("div.project", [
-        h("div", [h("a", { href: projectTo }, project.name) || "—"])
-      ])
+      h(PageViewProjects, {
+        onClick: onClickDelete,
+        isEditing,
+        data
+      })
     ]
   );
 };
 
 export const PageViewProjects = ({ data, isEditing, onClick }) => {
-  if (isEditing) {
-    return h("div.parameter", [
-      h("h4.subtitle", "Project"),
-      h("p.value", [h(ProjectEditCard, { d: data, onClick })])
-    ]);
-  }
-  return h("div.parameter", [
-    h.if(data.project.length > 0)("h4.subtitle", "Project"),
-    h("p.value", [h(ProjectLink, { d: data })])
+  return h("div", [h(ProjectCard, { d: data, onClick, isEditing })]);
+};
+
+const ProjectCard = props => {
+  const { d, onClick, isEditing } = props;
+  const project = d.project.map(obj => {
+    if (obj) {
+      const { name, id } = obj;
+      return { name, id };
+    }
+    return null;
+  });
+
+  return h("div", [
+    project.map(obj => {
+      if (!obj) return null;
+      const { name, id } = obj;
+      const to = useModelURL(`/project/${id}`);
+
+      return h(
+        PageViewModelCard,
+        {
+          isEditing,
+          styles: { minWidth: "500px" },
+          to,
+          link: true,
+          onClick: () => onClick({ id, name })
+        },
+        [h("h4.name", name)]
+      );
+    })
   ]);
 };
 

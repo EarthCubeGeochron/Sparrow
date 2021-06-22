@@ -7,7 +7,6 @@ import {
   ModelEditor,
   useModelEditor
 } from "@macrostrat/ui-components";
-import { Callout } from "@blueprintjs/core";
 import { APIV2Context } from "~/api-v2";
 import { put } from "axios";
 import { SampleContextMap } from "~/components";
@@ -387,31 +386,21 @@ function SamplePage(props) {
     [
       h("div.sample", [
         h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
-        h(
-          Callout,
-          { style: { marginBottom: "15px" }, title: "Sample Information" },
-          [
-            h(ModelEditableText, {
-              is: "h3",
-              field: "name",
-              multiline: true
-            }),
-            h.if(Edit)(SampleTagContainer),
-            h("div.flex-row", [
-              h("div.info-block", [
-                h(GeoEntity),
-                h(Material),
-                h(DepthElevation)
-              ]),
-              h("div", [h(LocationBlock)])
-            ])
-          ]
-        ),
-        h(Callout, { title: "Sample Links" }, [
-          h("div.basic-info", [h(SampleProjectAdd), h(SampleSessionAdd)])
-        ]),
-        h(Frame, { id: "samplePage", data: sample.data }, null)
-      ])
+        h(ModelEditableText, {
+          is: "h3",
+          field: "name",
+          multiline: true
+        }),
+        h.if(Edit)(SampleTagContainer),
+        h("div.flex-row", [
+          h("div.info-block", [h(Material), h(DepthElevation)]),
+          h("div", [h(LocationBlock)])
+        ])
+      ]),
+      h(GeoEntity),
+      h(SampleProjectAdd),
+      h(SampleSessionAdd),
+      h(Frame, { id: "samplePage", data: sample.data }, null)
     ]
   );
 }

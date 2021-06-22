@@ -6,7 +6,7 @@ import { DownloadButton } from "../session";
 import { Divider, Spinner } from "@blueprintjs/core";
 import { format } from "date-fns";
 import { LinkCard } from "@macrostrat/ui-components";
-import { SampleCard } from "../components/new-model/detail-card";
+import { SampleCard } from "~/model-views";
 import { Frame } from "~/frame";
 import { useAPIv2Result } from "~/api-v2";
 
@@ -23,7 +23,7 @@ const h = hyperStyled(styles);
  *  Session Link Cards,
  */
 
-const DetailPageHeader = (props) => {
+const DetailPageHeader = props => {
   const { date_upload, basename, type: file_type, file_hash } = props;
   return h(
     "div",
@@ -32,13 +32,13 @@ const DetailPageHeader = (props) => {
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "baseline",
-      },
+        alignItems: "baseline"
+      }
     },
     [
       h("h2", [basename]),
       h("h4", ["Uploaded " + format(date_upload, "MMMM D, YYYY")]),
-      h("div", [h(DownloadButton, { file_type, file_hash })]),
+      h("div", [h(DownloadButton, { file_type, file_hash })])
     ]
   );
 };
@@ -47,7 +47,7 @@ const DetailPageHeader = (props) => {
  *
  * @param props target, session_date, technique
  */
-export const SessionCardInfo = (props) => {
+export const SessionCardInfo = props => {
   const { session_id, target, date, technique } = props;
   return h(
     "div",
@@ -56,8 +56,8 @@ export const SessionCardInfo = (props) => {
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "baseline",
-      },
+        alignItems: "baseline"
+      }
     },
     [
       h(
@@ -66,12 +66,12 @@ export const SessionCardInfo = (props) => {
         ["Session Date: " + format(date, "MMMM D, YYYY")]
       ),
       h("h4", [technique]),
-      h("h4", { style: { fontStyle: "italic" } }, ["Target: " + target]),
+      h("h4", { style: { fontStyle: "italic" } }, ["Target: " + target])
     ]
   );
 };
 
-export const SessionLinkCard = function (props) {
+export const SessionLinkCard = function(props) {
   const { session_id } = props;
 
   const to = useModelURL(`/session/${session_id}`);
@@ -81,13 +81,13 @@ export const SessionLinkCard = function (props) {
     {
       to,
       key: session_id,
-      style: { marginBottom: "10px", maxHeight: "200px" },
+      style: { marginBottom: "10px", maxHeight: "200px" }
     },
     h(SessionCardInfo, props)
   );
 };
 
-export const Samples = (props) => {
+export const Samples = props => {
   const { samples } = props;
 
   if (samples.length == 0) return h("p", "No samples");
@@ -97,16 +97,16 @@ export const Samples = (props) => {
     h(
       "div.samples",
       { style: { display: "flex", flexFlow: "row wrap", margin: "0 -5px" } },
-      samples.map((d) => {
+      samples.map(d => {
         const { name, sample_id, sample_material } = d;
         return h(SampleCard, {
           name,
           id: sample_id,
           material: sample_material,
-          link: true,
+          link: true
         });
       })
-    ),
+    )
   ]);
 };
 
@@ -115,7 +115,7 @@ export function SessionInfo(props) {
     id,
     technique,
     target,
-    date,
+    date
     //analysis,
   } = props;
   return h(SessionLinkCard, { session_id: id, target, technique, date });
@@ -125,28 +125,28 @@ export function SessionInfo(props) {
  *
  * @param props sessions
  */
-const SessionList = (props) => {
+const SessionList = props => {
   const { sessions } = props;
   //const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
   return h("div.session-container", [
     h("h4", null, "Sessions"),
     h(
       "div.sessions",
-      sessions.map((d) => {
+      sessions.map(d => {
         return h(SessionInfo, d);
       })
-    ),
+    )
   ]);
 };
 
-const ProjectLinks = (props) => {
+const ProjectLinks = props => {
   const { project } = props;
   if (project !== null) {
     const projectTo = useModelURL(`/project/${project.id}`);
 
     return h("div.project", [
       h("h4.info", "Project"),
-      h("div", null, [h("a", { href: projectTo }, project.name) || "—"]),
+      h("div", null, [h("a", { href: projectTo }, project.name) || "—"])
     ]);
   }
   if (project == null) {
@@ -161,7 +161,7 @@ export function DataFilePage(props) {
   const dataFileURL = `/models/data_file/${file_hash}`;
 
   const res = useAPIv2Result(dataFileURL, {
-    nest: "data_file_link,session,sample",
+    nest: "data_file_link,session,sample"
   });
 
   const data = res?.data;
@@ -171,28 +171,26 @@ export function DataFilePage(props) {
   const {
     type,
     data_file_link, // is an array
-    basename,
+    basename
   } = data;
 
   // Get uploaded date from first link
   const { date } = data_file_link[0];
 
-  const sessions = data_file_link
-    .map((d) => d.session)
-    .filter((d) => d != null);
+  const sessions = data_file_link.map(d => d.session).filter(d => d != null);
 
-  const samples = data_file_link.map((d) => d.sample).filter((d) => d != null);
+  const samples = data_file_link.map(d => d.sample).filter(d => d != null);
 
   return h("div.data-page-container", [
     h("div.header", [
-      h(DetailPageHeader, { date_upload: date, basename, type, file_hash }),
+      h(DetailPageHeader, { date_upload: date, basename, type, file_hash })
     ]),
     h(Divider),
     h("div.info-container", [
       h(Samples, { samples }),
       h(SessionList, { sessions }),
-      h(Frame, { id: "datafilePage", data }, null),
-    ]),
+      h(Frame, { id: "datafilePage", data }, null)
+    ])
   ]);
 }
 

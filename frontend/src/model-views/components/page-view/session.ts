@@ -1,6 +1,7 @@
-import { AddCard, SessionPageViewModelCard, SessionEditCard } from "../index";
 import { DndContainer } from "~/components";
 import { hyperStyled } from "@macrostrat/hyper";
+import { useModelURL } from "~/util/router";
+import { PageViewModelCard, PageViewBlock } from "~/model-views";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -16,19 +17,26 @@ export const SessionAdd = props => {
     onDrop = () => {}
   } = props;
 
-  return h("div", [
-    h(PageViewSessions, {
-      session: data,
-      onClick: onClickDelete,
-      sampleHoverID,
-      onDrop,
-      isEditing
-    }),
-    h.if(isEditing)(AddCard, {
+  return h(
+    PageViewBlock,
+    {
+      modelLink: true,
+      onClick: onClickList,
+      isEditing,
+      title: "Sessions",
       model: "session",
-      onClick: onClickList
-    })
-  ]);
+      hasData: data.length != 0
+    },
+    [
+      h(PageViewSessions, {
+        session: data,
+        onClick: onClickDelete,
+        sampleHoverID,
+        onDrop,
+        isEditing
+      })
+    ]
+  );
 };
 
 export function PageViewSessions(props) {
@@ -40,12 +48,8 @@ export function PageViewSessions(props) {
     onDrop = () => {}
   } = props;
 
-  if (session == null && !isEditing) return null;
-  if (session == null && isEditing) {
-    return h("div.parameter", [h("h4.subtitle", "Sessions")]);
-  }
+  if (!session || session.length == 0) return null;
   return h("div.parameter", [
-    h.if(session.length > 0 || isEditing)("h4.subtitle", "Sessions"),
     h("div.session-container", [
       session.map(obj => {
         const {
@@ -59,39 +63,68 @@ export function PageViewSessions(props) {
         } = obj;
         const onHover =
           sampleHoverID && sample ? sample.id == sampleHoverID : false;
-        if (isEditing) {
-          return h(
-            DndContainer,
-            {
-              id: session_id,
-              onDrop
-            },
-            [
-              h(SessionEditCard, {
-                session_id,
-                isEditing,
-                sample,
-                technique,
-                target,
-                date,
-                onClick,
-                onHover
-              })
-            ]
-          );
-        } else {
-          return h(SessionEditCard, {
-            session_id,
-            isEditing,
-            sample,
-            technique,
-            target,
-            date,
-            onClick,
-            onHover
-          });
-        }
+        return h(
+          DndContainer,
+          {
+            id: session_id,
+            onDrop
+          },
+          [
+            h(SessionCard, {
+              session_id,
+              isEditing,
+              sample,
+              technique,
+              target,
+              date,
+              onClick,
+              onHover
+            })
+          ]
+        );
       })
     ])
   ]);
 }
+
+export const SessionCard = props => {
+  const {
+    onClick,
+    session_id,
+    target,
+    date,
+    technique,
+    sample = null,
+    onHover = false,
+    isEditing
+  } = props;
+
+  const classname = onHover ? "sample-edit-card-samhover" : "sample-edit-card";
+
+  const sampleName = sample ? sample.name : "";
+
+  const to = useModelURL(`/session/${session_id}`);
+
+  return h("div", [
+    h(
+      PageViewModelCard,
+      {
+        to,
+        isEditing,
+        onClick: () => onClick({ session_id, date }),
+        link: true
+      },
+      [
+        h("div", { className: classname }, [
+          h("div.session-info", [
+            h("div", [date.split("T")[0], ",     ", target]),
+            h("div", technique)
+          ])
+        ])
+      ]
+    ),
+    h.if(sample)("div", { style: { fontSize: "10px", marginLeft: "10px" } }, [
+      h("i", `Linked through ${sampleName}`)
+    ])
+  ]);
+};
