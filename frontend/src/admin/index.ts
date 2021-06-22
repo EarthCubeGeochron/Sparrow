@@ -15,12 +15,14 @@ import { OpenSearch } from "~/components";
 import { SampleAdminPage } from "./sample";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
 import { NavButton } from "~/components";
-import styles from "./module.styl";
 import { SessionAdminPage } from "./session";
 import { DataFileAdminPage } from "./data-file";
 import { VocabularyPage } from "./vocabulary";
 
 import { TagManager } from "~/components/tags";
+
+//@ts-ignore
+import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 

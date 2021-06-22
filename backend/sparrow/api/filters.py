@@ -209,7 +209,7 @@ class DOIFilter(BaseFilter):
     @property
     def params(self):
         d = "Search for field by DOI string, can be whole string or anypart of doi"
-        e = ["?doi=10.10", "?doi=10.1130/B31239.1"]
+        e = ["?doi_like=10.10", "?doi_like=10.1130/B31239.1"]
         des = create_params(d, e)
         return {self.key: Str(description=des)}
 
@@ -426,7 +426,7 @@ class TextSearchFilter(BaseFilter):
 
 class IdListFilter(BaseFilter):
     """
-    Function to return models with ID's corresponding those passed.
+    Class to return models with ID's corresponding those passed.
     """
 
     key = "ids"
@@ -449,6 +449,34 @@ class IdListFilter(BaseFilter):
 
         return query.filter(self.model.id.in_(ids))
 
+class TagsFilter(BaseFilter):
+    """ 
+    Class to filter models by their associated tags
+    """
+    key = 'tags'
+
+    @property
+    def params(self):
+        d = "A list of tag ids to filter by"
+        e = ["?tags=3,2,1"]
+        des = create_params(d, e)
+        return {self.key: DelimitedList(Int(), description=des)}
+
+    def should_apply(self):
+        return hasattr(self.model, "tags_tag_collection")
+    
+    def apply(self, args, query):
+        if self.key not in args:
+                return query
+        
+        if hasattr(self.model, "tags_tag_collection"):
+            db = app_context().database
+            tag = db.model.tags_tag
+            ids = args[self.key]
+            return query.join(self.model.tags_tag_collection).filter(tag.id.in_([*ids]))
+
+        return query
+        
 
 ## TODO: Open parameter i.e 'Plateua Ages', pass a number and operator?
 ## TODO: Define filter in plugin, i.e irradiation filter for WiscAr

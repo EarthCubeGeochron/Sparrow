@@ -87,15 +87,6 @@ const EditNavBarSample = () => {
   });
 };
 
-const Parameter = ({ name, value, ...rest }) => {
-  return h("div.parameter", rest, [
-    h("div", { style: { display: "flex", flexDirection: "row" } }, [
-      h("h4.subtitle", name)
-    ]),
-    h("p.value", null, value)
-  ]);
-};
-
 const LocationBlock = function(props) {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
 

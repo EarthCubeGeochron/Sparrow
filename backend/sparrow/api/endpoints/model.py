@@ -28,6 +28,7 @@ from ..filters import (
     TextSearchFilter,
     AgeRangeFilter,
     IdListFilter,
+    TagsFilter,
 )
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
@@ -130,6 +131,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self.register_filter(TextSearchFilter)
         self.register_filter(AgeRangeFilter)
         self.register_filter(IdListFilter)
+        self.register_filter(TagsFilter)
 
     @property
     def model(self):
