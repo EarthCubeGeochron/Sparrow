@@ -96,3 +96,8 @@ crossrefapi==1.5.0
 # NOTE: we should probably organize these internal
 # packages better...
 # -e ./utils
+
+# Task worker
+celery==5.1.1
+broadcaster==0.2.0
+redis==3.5.3
