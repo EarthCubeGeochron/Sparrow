@@ -73,7 +73,7 @@ class TestUserAPI:
     def test_delete(self, admin_client):
         res = admin_client.delete(self.route("/" + user2["username"]))
         assert res.status_code == 200
-        data = res.json()["data"]
+        data = res.json()
         assert data["success"]
         assert data["deleted"][0] == user2["username"]
 
