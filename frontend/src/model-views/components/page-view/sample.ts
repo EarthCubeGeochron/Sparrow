@@ -25,8 +25,11 @@ export const SampleAdd = props => {
     return h(
       PageViewBlock,
       {
+        isEditing: false,
+        modelLink: true,
         model: "sample",
-        title: "Samples"
+        title: "Samples",
+        hasData: data.length != 0
       },
       [
         h(PageViewSamples, {
@@ -75,9 +78,6 @@ export const PageViewSamples = function({
   onClick,
   draggable = true
 }) {
-  if (data != null && data.length == 0) {
-    return h("h4", "No Samples");
-  }
   if (data != null) {
     return h("div.sample-area", [
       h(SampleContainer, [
