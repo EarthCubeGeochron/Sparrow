@@ -39,7 +39,7 @@ const PubCard = props => {
       onClick: () => onClick({ id, title }),
       isEditing,
       link: false,
-      styles: { minWidth: "500px" }
+      styles: { maxWidth: "700px" }
     },
     [h(Publication, { doi, title })]
   );

@@ -268,7 +268,7 @@ const SessionListContent = props => {
   const analysisCount = analysis.length + " " + analysisName;
 
   return h(`div.${classname}`, [
-    h("div.card-header", [h("div", date.split("T")[0]), h("div", sampleName)]),
+    h("div.card-header", [h(PageViewDate, { date }), h("div", sampleName)]),
     h("div.bod", [
       h.if(FCS)("div", [FCS]),
       h("div", [h("span", technique)]),

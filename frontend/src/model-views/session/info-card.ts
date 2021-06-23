@@ -3,7 +3,7 @@ import { Card } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
 import { parse, format } from "date-fns";
 import { useModelURL } from "~/util/router";
-import { ModelAttributeOneLiner } from "../components";
+import { ModelAttributeOneLiner, PageViewDate } from "../components";
 
 export const Sample = props => {
   const sampleTo = useModelURL(`/sample/${props.id}`);
@@ -22,7 +22,7 @@ export const SessionDate = props => {
 
   return h(ModelAttributeOneLiner, {
     title: "Date:",
-    content: format(date, "MMMM D, YYYY")
+    content: h(PageViewDate, { date })
   });
 };
 
