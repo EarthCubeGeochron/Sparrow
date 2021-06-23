@@ -39,7 +39,9 @@ class DataFileListEndpoint(HTTPEndpoint):
 
             try:
                 DataFile = db.model.data_file
-                sel = select(DataFile.file_hash, DataFile.file_mtime, DataFile.basename).order_by(DataFile.file_mtime)
+                sel = select(
+                    DataFile.file_hash, DataFile.file_mtime, DataFile.basename
+                ).order_by(DataFile.file_mtime)
                 q = db.session.query(sel.subquery())
 
                 if args["all"]:
@@ -47,7 +49,9 @@ class DataFileListEndpoint(HTTPEndpoint):
                     return APIResponse(res, schema=self.schema, total_count=len(res))
 
                 try:
-                    res = select_page(db.session, sel, per_page=args["per_page"], page=args["page"])
+                    res = select_page(
+                        db.session, sel, per_page=args["per_page"], page=args["page"]
+                    )
                 except ValueError:
                     raise ValidationError("Invalid page token.")
 

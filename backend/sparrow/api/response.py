@@ -30,7 +30,9 @@ class APIResponse(JSONResponse):
             self.page["total_count"] = self.total_count
         if paging is not None:
             self.page["next_page"] = paging.bookmark_next if paging.has_next else None
-            self.page["previous_page"] = paging.bookmark_previous if paging.has_previous else None
+            self.page["previous_page"] = (
+                paging.bookmark_previous if paging.has_previous else None
+            )
 
         try:
             if self.schema is not None:
