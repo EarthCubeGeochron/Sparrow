@@ -64,17 +64,3 @@ const ProjectCard = props => {
     })
   ]);
 };
-
-export function NewProjectPageButton() {
-  const to = useModelURL("/project/new");
-  const handleClick = e => {
-    e.preventDefault();
-    window.location.href = to;
-  };
-
-  return h(
-    Button,
-    { minimal: true, intent: "success", onClick: handleClick, icon: "add" },
-    ["Create New Project"]
-  );
-}

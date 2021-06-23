@@ -20,8 +20,9 @@ import {
   EmbargoDatePick,
   EditStatusButtons,
   EditNavBar,
-  NewProjectPageButton,
-  TagContainer
+  NewModelButton,
+  TagContainer,
+  PageViewBlock
 } from "../components";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
@@ -227,8 +228,9 @@ function SampleMapComponent() {
   return h("div", [
     h("div", { style: { display: "flex", flexDirection: "row" } }, [
       h("div", { style: { paddingRight: "10px" } }, [
-        h("h4", "Location"),
-        h(ProjectMap, { samples: model.sample, hoverID: sampleHoverID })
+        h(PageViewBlock, { title: "Location" }, [
+          h(ProjectMap, { samples: model.sample, hoverID: sampleHoverID })
+        ])
       ]),
       h(EditableSamples)
     ])
@@ -289,8 +291,8 @@ const ProjEditNavBar = ({ header }) => {
   return h(EditNavBar, {
     header,
     editButtons: h("div", { style: { display: "flex" } }, [
-      h(NewProjectPageButton),
-      h(EditStatusButtonsProj)
+      h(EditStatusButtonsProj),
+      h(NewModelButton, { model: "project" })
     ]),
     embargoEditor: h(EmbargoEditor)
   });
@@ -394,17 +396,19 @@ const EditableProjectDetails = function(props) {
               h.if(Edit)(ProjEditNavBar, { header: "Manage Project" })
             ]),
             h("div.project-editor-content", [
-              h(ModelEditableText, {
-                is: "h3",
-                field: "name",
-                multiline: true
-              }),
-              h(ModelEditableText, {
-                is: "p",
-                field: "description",
-                multiline: true
-              }),
-              h(ProjectTagContainer),
+              h(PageViewBlock, [
+                h(ModelEditableText, {
+                  is: "h3",
+                  field: "name",
+                  multiline: true
+                }),
+                h(ModelEditableText, {
+                  is: "p",
+                  field: "description",
+                  multiline: true
+                }),
+                h(ProjectTagContainer)
+              ]),
               h(EditablePublications),
               h(EditResearchers),
               h(EditSessions),

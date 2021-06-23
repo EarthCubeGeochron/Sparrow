@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
 import { useAPIv2Result } from "~/api-v2";
+import { PageViewDate } from "~/model-views";
 
 const h = hyperStyled(styles);
 
@@ -394,18 +395,8 @@ const SessionPageViewModelCard = props => {
 const DataFileModelCard = props => {
   const { file_hash, basename, type, date, data_file_link: link } = props;
 
-  let sampleName = "";
-  if (link.length > 0) {
-    if (link[0].session) {
-      sampleName += link[0].session?.sample?.name ?? "";
-    }
-  }
-
   const content = h("div.session-card", [
-    h("div.card-header", [
-      h("div", [format(date, "MMMM D, YYYY")]),
-      sampleName
-    ]),
+    h("div.card-header", [h(PageViewDate, { date })]),
     h("div.bod", [h("div", [h("span", basename)]), h("div", [type])])
   ]);
 

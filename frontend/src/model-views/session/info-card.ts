@@ -15,14 +15,13 @@ export const Sample = props => {
   ]);
 };
 
-
 export const SessionDate = props => {
   const { date } = props;
 
   if (!date) return null;
 
   return h(ModelAttributeOneLiner, {
-    title: "Session Date:",
+    title: "Date:",
     content: format(date, "MMMM D, YYYY")
   });
 };

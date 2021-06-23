@@ -10,7 +10,7 @@ import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { useAuth } from "~/auth";
 import { put } from "axios";
 import { Link } from "react-router-dom";
-import { Breadcrumbs, Card, Callout } from "@blueprintjs/core";
+import { Breadcrumbs } from "@blueprintjs/core";
 import { useModelURL, useModelURLBool } from "~/util/router";
 import {
   Instrument,
@@ -29,7 +29,8 @@ import {
   ModelEditableText,
   EmbargoDatePick,
   EditStatusButtons,
-  TagContainer
+  TagContainer,
+  PageViewBlock
 } from "../components";
 import { SessionAdminContext } from "~/admin/session";
 import styles from "./module.styl";
@@ -111,6 +112,19 @@ function SessionTagContainer() {
     onChange: onAdd,
     onClickDelete: onDelete,
     modelName: "session"
+  });
+}
+
+function SessionName(props) {
+  const { model, isEditing, actions } = useModelEditor();
+
+  if (!isEditing && model["name"] == null) {
+    return h("h4", "No Name");
+  }
+  return h(ModelEditableText, {
+    is: "h4",
+    field: "name",
+    multiline: true
   });
 }
 
@@ -208,48 +222,31 @@ function EditableSessionInfoComponent(props) {
   const data = model.sample ? [sample] : null;
 
   return h("div", [
-    h(
-      Callout,
-      { id, className: "session-info-card", title: "Session Information" },
-      [
-        h("div.session-info", [
-          h(ModelEditableText, {
-            is: "h4",
-            field: "name",
-            multiline: true
-          }),
-          h(SessionDate, model),
-          h(Technique, model),
-          h(Instrument, model),
-          h(Target, model),
-          h(AnalysisNumber, model),
-          h(SessionTagContainer)
-        ])
-      ]
-    ),
-    h(
-      Callout,
-      {
-        id,
-        className: "session-info-card",
-        title: "Session Links"
-      },
-      [
-        h(SampleAdd, {
-          data,
-          isEditing,
-          onClickList: sampleListClick,
-          onClickDelete: onSampleClickDelete
-        }),
-        h(ProjectAdd, {
-          isEditing,
-          data: { project: [project] },
-          onClickList: projectClickList,
-          onClickDelete: onProjectClickDelete
-        }),
-        h(SessionPublication)
-      ]
-    )
+    h(PageViewBlock, [
+      h("div.session-info", [
+        h(SessionName),
+        h(SessionDate, model),
+        h(Technique, model),
+        h(Instrument, model),
+        h(Target, model),
+        h(AnalysisNumber, model),
+        h(SessionTagContainer)
+      ])
+    ]),
+
+    h(SampleAdd, {
+      data,
+      isEditing,
+      onClickList: sampleListClick,
+      onClickDelete: onSampleClickDelete
+    }),
+    h(ProjectAdd, {
+      isEditing,
+      data: { project: [project] },
+      onClickList: projectClickList,
+      onClickDelete: onProjectClickDelete
+    }),
+    h(SessionPublication)
   ]);
 }
 
@@ -262,14 +259,8 @@ export function EditableSessionDetails(props) {
   });
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
-  const to = useModelURL("/session");
 
   if (!res) return null;
-
-  const breadCrumbs = [
-    { text: h(Link, { to }, "Sessions") },
-    { icon: "document", text: h("code.session-id", id) }
-  ];
 
   return h(
     ModelEditor,
@@ -297,8 +288,7 @@ export function EditableSessionDetails(props) {
     },
     [
       h("div", [
-        h.if(Edit)(SessionEditsNavBar, { header: "Manage Session Links" }),
-        h(Breadcrumbs, { items: breadCrumbs }),
+        h.if(Edit)(SessionEditsNavBar, { header: `Manage Session #${id}` }),
         h.if(Edit)(EditableSessionInfoComponent),
         h.if(!Edit)(CatalogSessionInfoCard)
       ])

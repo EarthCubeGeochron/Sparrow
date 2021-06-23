@@ -9,13 +9,36 @@ const h = hyperStyled(styles);
 
 export const SessionAdd = props => {
   const {
-    onClickDelete,
-    onClickList,
+    onClickDelete = () => {},
+    onClickList = () => {},
     data,
-    isEditing,
+    isEditing = false,
     sampleHoverID = null,
-    onDrop = () => {}
+    onDrop = () => {},
+    editable = true
   } = props;
+
+  if (!editable) {
+    return h(
+      PageViewBlock,
+      {
+        onClick: onClickList,
+        isEditing: false,
+        title: "Sessions",
+        model: "session",
+        hasData: data.length != 0
+      },
+      [
+        h(PageViewSessions, {
+          session: data,
+          onClick: onClickDelete,
+          sampleHoverID,
+          onDrop,
+          isEditing
+        })
+      ]
+    );
+  }
 
   return h(
     PageViewBlock,

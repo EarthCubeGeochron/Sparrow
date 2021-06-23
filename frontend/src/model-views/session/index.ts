@@ -8,26 +8,6 @@ import { APIResultView } from "@macrostrat/ui-components";
 import { useRouteMatch } from "react-router-dom";
 import { Tab, Tabs } from "@blueprintjs/core";
 
-/**
- *
- * @param props : file_hash, type: as file_type
- */
-export function DownloadButton(props) {
-  const { file_hash, file_type } = props;
-
-  let text: any | React.ReactNode = "Data file";
-  if (file_type != null) {
-    text = h([h("b", file_type), " file"]);
-  }
-
-  const href = `${process.env.BASE_URL}api/v2/data_file/${file_hash}`;
-  return h(
-    AnchorButton,
-    { href, icon: "document", intent: Intent.PRIMARY },
-    text
-  );
-}
-
 interface TabDef {
   id: string;
   title: string;

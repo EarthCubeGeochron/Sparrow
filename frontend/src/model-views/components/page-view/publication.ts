@@ -71,6 +71,13 @@ export const PubAdd = props => {
   if (!isEditing && data == null) {
     return null;
   }
+
+  let dat;
+  if (data == null) {
+    dat = [];
+  } else {
+    dat = data;
+  }
   return h(
     PageViewBlock,
     {
@@ -79,7 +86,7 @@ export const PubAdd = props => {
       modelLink: true,
       isEditing,
       title: "Publications",
-      hasData: data.length != 0
+      hasData: dat.length != 0
     },
     [
       h(PageViewPublications, {

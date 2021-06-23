@@ -335,7 +335,7 @@ export function DataSheetButton() {
   };
 
   return h("div", { style: { padding: "0px 5px 5px 0px" } }, [
-    h(Button, { onClick: handleClick }, ["Data Sheet View"])
+    h(Button, { onClick: handleClick, minimal: true }, ["Data Sheet View"])
   ]);
 }
 

@@ -1,6 +1,7 @@
 import { Tooltip, Card, Button } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
-
+import { format } from "date-fns";
+import { useModelURL } from "~/util";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
 import styles from "./module.styl";
@@ -16,11 +17,42 @@ export const AddCard = props => {
   );
 };
 
+export const NewModelButton = props => {
+  const { model } = props;
+
+  const to = useModelURL(`/${model}/new`);
+  const handleClick = e => {
+    e.preventDefault();
+    window.location.href = to;
+  };
+
+  const string = model.charAt(0).toUpperCase() + model.slice(1);
+
+  return h(
+    Button,
+    {
+      minimal: true,
+      intent: "success",
+      onClick: handleClick
+    },
+    [`New ${string}`]
+  );
+};
+
 export const ModelAttributeOneLiner = props => {
+  const { title, content } = props;
+
+  let displayContent;
+  if (!content) {
+    displayContent = "None";
+  } else {
+    displayContent = content;
+  }
+
   return h("span", { style: { display: "flex", alignItems: "baseline" } }, [
-    h("h4", { style: { marginRight: "4px" } }, props.title),
+    h("h4", { style: { marginRight: "4px" } }, title),
     " ",
-    h("div", props.content)
+    displayContent
   ]);
 };
 
@@ -37,19 +69,28 @@ export const PageViewBlock = props => {
   } = props;
 
   if (modelLink) {
-    return h(Card, { elevation, style: { marginBottom: "15px" } }, [
-      h("div", { style: { display: "flex", alignItems: "baseline" } }, [
-        h("h3", [title]),
-        h.if(isEditing)(AddCard, { onClick, model })
-      ]),
-      h.if(!hasData)("h4", `No ${model}s`),
-      children
-    ]);
+    return h(
+      Card,
+      { elevation, style: { marginBottom: "15px", paddingTop: "0px" } },
+      [
+        h(
+          "div",
+          {
+            style: { display: "flex", alignItems: "baseline", marginTop: "0" }
+          },
+          [
+            h.if(title)("h3", [title]),
+            h.if(isEditing)(AddCard, { onClick, model })
+          ]
+        ),
+        h.if(!hasData)("h4", `No ${model}s`),
+        children
+      ]
+    );
   }
 
   return h(Card, { elevation, style: { marginBottom: "15px" } }, [
-    h("h2", [title]),
-    h.if(!hasData)("h4", `No ${model}s`),
+    h.if(title)("h3", [title]),
     children
   ]);
 };
@@ -80,18 +121,22 @@ export const PageViewModelCard = props => {
         onMouseEnter,
         onMouseLeave,
         draggable,
-        style: { ...styles }
+        style: { position: "relative", ...styles }
       },
       [
-        h("div", { style: { display: "flex" } }, [
-          h("div", [children]),
-          h(Button, {
-            icon: "small-cross",
-            minimal: true,
-            intent: "danger",
-            onClick
-          })
-        ])
+        h(Button, {
+          style: {
+            position: "absolute",
+            top: "0",
+            right: "0",
+            marginLeft: "5px"
+          },
+          icon: "small-cross",
+          minimal: true,
+          intent: "danger",
+          onClick
+        }),
+        h("div", { paddingRight: "15px" }, [children])
       ]
     );
   }
@@ -108,4 +153,11 @@ export const PageViewModelCard = props => {
     },
     [children]
   );
+};
+
+export const PageViewDate = props => {
+  const { date } = props;
+  console.log(date);
+
+  return h("div.page-view-date", [format(date, "MMMM D, YYYY")]);
 };

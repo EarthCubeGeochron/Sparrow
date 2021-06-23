@@ -6,7 +6,11 @@ import { useAPIv2Result } from "~/api-v2";
 import { sample_geo_entity } from "../../../sample/new-sample/types";
 import { MySuggest } from "../../../../components/blueprint.select";
 import { MyNumericInput } from "../../../../components/edit-sample";
-import { ModelAttributeOneLiner } from "~/model-views";
+import {
+  ModelAttributeOneLiner,
+  PageViewBlock,
+  PageViewModelCard
+} from "~/model-views";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -258,15 +262,11 @@ function GeoEntityTextContainer(props) {
     onClick: (entity) => void;
   } = props;
 
-  return h("div.entity-edit-card", [
-    h("h4", [geoEntityText]),
-    h(Button, {
-      minimal: true,
-      icon: "trash",
-      intent: "danger",
-      onClick: () => onClick(geoEntity)
-    })
-  ]);
+  return h(
+    PageViewModelCard,
+    { onClick: () => onClick(geoEntity), link: false, isEditing: true },
+    [h("h4", [geoEntityText])]
+  );
 }
 
 /**
@@ -396,23 +396,27 @@ export function GeoContext(props) {
       ]),
       h(GeoSpatialRef, { geoEntity, changeDistance, changeDatum, changeUnit })
     ]),
-    h(Button, { intent: "success", onClick: onSubmitClick }, ["Submit"])
+    h(Button, { intent: "success", onClick: onSubmitClick }, [
+      "Create Geologic Context"
+    ])
   ]);
 
   if (!isEditing) {
-    return h.if(sample_geo_entity.length > 0)("div", [
-      "Geologic Context",
-      h("div.geo-entity-card", [
-        h(GeoEntityText, {
-          sample_geo_entity,
-          isEditing: false
-        })
-      ])
-    ]);
+    return h.if(sample_geo_entity.length > 0)(
+      PageViewBlock,
+      { title: "Geologic Context" },
+      [
+        h("div.geo-entity-card", [
+          h(GeoEntityText, {
+            sample_geo_entity,
+            isEditing: false
+          })
+        ])
+      ]
+    );
   }
 
-  return h("div", [
-    "Geologic Context",
+  return h(PageViewBlock, { title: "Geologic Context" }, [
     h(HelpButton, { content: helpContent, position: "top" }),
     content,
     h(GeoEntityText, { sample_geo_entity, deleteGeoEntity })

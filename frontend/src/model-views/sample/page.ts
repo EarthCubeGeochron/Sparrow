@@ -25,9 +25,10 @@ import {
   EmbargoDatePick,
   EditStatusButtons,
   DataSheetButton,
-  NewSamplePageButton,
+  NewModelButton,
   ModelAttributeOneLiner,
-  TagContainer
+  TagContainer,
+  PageViewBlock
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
@@ -59,28 +60,19 @@ const EditNavBarSample = () => {
     return actions.persistChanges();
   };
 
-  const onChange = date => {
-    actions.updateState({
-      model: { embargo_date: { $set: date } }
-    });
-  };
-  const embargo_date = model.embargo_date;
-
   return h(EditNavBar, {
     header: "Manage Sample",
     editButtons: h("div", { style: { display: "flex" } }, [
       h.if(isEditing)(DataSheetButton),
-      h(NewSamplePageButton),
       h(EditStatusButtons, {
         onClickCancel,
         onClickSubmit,
         hasChanges,
         isEditing
-      })
+      }),
+      h(NewModelButton, { model: "sample" })
     ]),
     embargoEditor: h(EmbargoEditor, {
-      onChange,
-      embargo_date,
       active: isEditing
     })
   });
@@ -95,7 +87,10 @@ const LocationBlock = function(props) {
     return h(SampleLocationEleDepthEditor);
   }
   if (location == null) {
-    return null;
+    return h(ModelAttributeOneLiner, {
+      title: "Location: ",
+      content: location
+    });
   }
   const zoom = 8;
   const [longitude, latitude] = location.coordinates;
@@ -123,7 +118,6 @@ const Material = function(props) {
     return h(SampleMaterial, { changeMaterial, sample: model });
   }
   if (!isEditing) {
-    if (model.material == null) return null;
     return h(ModelAttributeOneLiner, {
       title: "Material: ",
       content: model.material
@@ -132,17 +126,34 @@ const Material = function(props) {
 };
 
 const DepthElevation = props => {
-  const { isEditing, model } = useModelEditor();
+  const { isEditing, actions, model } = useModelEditor();
 
   const { depth, elevation } = model;
 
-  if (isEditing) return null;
-  return h.if(elevation != null || depth != null)("div.depth-elevation", [
-    h.if(depth != null)(ModelAttributeOneLiner, {
+  const changeDepth = depth => {
+    actions.updateState({
+      model: { depth: { $set: depth } }
+    });
+  };
+
+  const changeElevation = elev => {
+    actions.updateState({
+      model: { elevation: { $set: elev } }
+    });
+  };
+
+  if (isEditing) {
+    return h("div", [
+      h(SampleDepth, { sample: model, changeDepth }),
+      h(SampleElevation, { sample: model, changeElevation })
+    ]);
+  }
+  return h("div.depth-elevation", [
+    h(ModelAttributeOneLiner, {
       title: "Depth: ",
       content: depth
     }),
-    h.if(elevation != null)(ModelAttributeOneLiner, {
+    h(ModelAttributeOneLiner, {
       title: "Elevation: ",
       content: elevation
     })
@@ -169,6 +180,17 @@ const GeoEntity = props => {
       model: { sample_geo_entity: { $set: currnetEntities } }
     });
   };
+
+  if(sample_geo_entity.length == 0){
+    return h(PageViewBlock,{
+      title: "Geologic Context"
+    }, [
+      h(ModelAttributeOneLiner,{
+        title: "Geologic Context",
+        content: 'None'
+      })
+    ])
+  }
 
   return h(GeoContext, {
     sample_geo_entity,
@@ -266,18 +288,6 @@ const SampleLocationEleDepthEditor = () => {
     });
   };
 
-  const changeDepth = depth => {
-    actions.updateState({
-      model: { depth: { $set: depth } }
-    });
-  };
-
-  const changeElevation = elev => {
-    actions.updateState({
-      model: { elevation: { $set: elev } }
-    });
-  };
-
   return h(
     "div",
     { style: { justifyContent: "flex-end", minWidth: "405px" } },
@@ -289,11 +299,7 @@ const SampleLocationEleDepthEditor = () => {
         changeCoordinates,
         sample: { longitude, latitude },
         stacked: false
-      }),
-      h("div", [
-        h(SampleElevation, { sample, changeElevation }),
-        h(SampleDepth, { sample, changeDepth })
-      ])
+      })
     ]
   );
 };
@@ -386,15 +392,17 @@ function SamplePage(props) {
     [
       h("div.sample", [
         h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
-        h(ModelEditableText, {
-          is: "h3",
-          field: "name",
-          multiline: true
-        }),
-        h.if(Edit)(SampleTagContainer),
-        h("div.flex-row", [
-          h("div.info-block", [h(Material), h(DepthElevation)]),
-          h("div", [h(LocationBlock)])
+        h(PageViewBlock, [
+          h(ModelEditableText, {
+            is: "h3",
+            field: "name",
+            multiline: true
+          }),
+          h("div.flex-row", [
+            h("div.info-block", [h(Material), h(DepthElevation)]),
+            h("div", [h(LocationBlock)])
+          ]),
+          h.if(Edit)(SampleTagContainer)
         ])
       ]),
       h(GeoEntity),

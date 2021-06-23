@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { TagBody, tagBody } from "~/components";
 import { Suggest } from "@blueprintjs/select";
 import { Button, Popover, MenuDivider, Card } from "@blueprintjs/core";
@@ -6,6 +5,7 @@ import { useAPIv2Result } from "~/api-v2";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
 import styles from "./module.styl";
+import { ModelAttributeOneLiner } from "./page-view";
 
 const h = hyperStyled(styles);
 
@@ -26,42 +26,45 @@ export function TagContainer(props) {
     modelName
   }: tagContainer = props;
 
-  if (tags) {
-    return h("div.tag-container", [
-      tags.map(tag => {
-        const { name, description, color, id } = tag;
-        return h(TagBody, {
-          name,
-          description,
-          color,
-          id,
-          isEditing,
-          onClickDelete
-        });
-      }),
-      h.if(isEditing)(
-        Popover,
-        {
-          content: h(TagPopover, { tags, onChange, modelName }),
-          position: "bottom",
-          minimal: true
-        },
-        [
-          h(
-            Button,
-            {
-              icon: "add",
-              intent: "success",
-              minimal: true
-            },
-            ["Add a Tag"]
-          )
-        ]
-      )
-    ]);
-  } else {
-    return h("div");
+  if (tags.length == 0) {
+    return h(ModelAttributeOneLiner, {
+      title: "Tags: ",
+      content: "None"
+    });
   }
+
+  return h("div.tag-container", [
+    tags.map(tag => {
+      const { name, description, color, id } = tag;
+      return h(TagBody, {
+        name,
+        description,
+        color,
+        id,
+        isEditing,
+        onClickDelete
+      });
+    }),
+    h.if(isEditing)(
+      Popover,
+      {
+        content: h(TagPopover, { tags, onChange, modelName }),
+        position: "bottom",
+        minimal: true
+      },
+      [
+        h(
+          Button,
+          {
+            icon: "add",
+            intent: "success",
+            minimal: true
+          },
+          ["Add a Tag"]
+        )
+      ]
+    )
+  ]);
 }
 
 function TagPopover(props) {

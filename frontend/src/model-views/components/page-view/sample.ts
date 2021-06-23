@@ -12,14 +12,33 @@ const h = hyperStyled(styles);
 
 export const SampleAdd = props => {
   const {
-    onClickDelete,
-    onClickList,
+    onClickDelete = () => {},
+    onClickList = () => {},
     data,
     draggable = true,
     isEditing = true,
-    setID = () => {}
+    setID = () => {},
+    editable = true
   } = props;
 
+  if (!editable) {
+    return h(
+      PageViewBlock,
+      {
+        model: "sample",
+        title: "Samples"
+      },
+      [
+        h(PageViewSamples, {
+          data,
+          isEditing: false,
+          draggable,
+          onClick: onClickDelete,
+          setID
+        })
+      ]
+    );
+  }
   return h(
     PageViewBlock,
     {
@@ -56,6 +75,9 @@ export const PageViewSamples = function({
   onClick,
   draggable = true
 }) {
+  if (data != null && data.length == 0) {
+    return h("h4", "No Samples");
+  }
   if (data != null) {
     return h("div.sample-area", [
       h(SampleContainer, [
@@ -149,17 +171,3 @@ export const SampleCard = function(props: SampleCardProps) {
     ]
   );
 };
-
-export function NewSamplePageButton() {
-  const to = useModelURL("/sample/new");
-  const handleClick = e => {
-    e.preventDefault();
-    window.location.href = to;
-  };
-
-  return h(
-    Button,
-    { minimal: true, intent: "success", onClick: handleClick, icon: "add" },
-    ["Create New Sample"]
-  );
-}
