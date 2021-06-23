@@ -49,7 +49,9 @@ def prepare_compose_overrides():
         environ["COMPOSE_PROFILES"] = "production"
 
     # Use certbot for SSL if certain conditions are met
-    use_certbot = is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
+    use_certbot = (
+        is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
+    )
 
     if use_certbot:
         # add_message("attempting to use Certbot for HTTPS")
@@ -83,5 +85,7 @@ def prepare_compose_overrides():
 def validate_environment():
     # Check for failing environment
     if environ.get("SPARROW_SECRET_KEY") is None:
-        print("[red]You [underline]must[/underline] set [bold]SPARROW_SECRET_KEY[/bold]. Exiting...")
+        print(
+            "[red]You [underline]must[/underline] set [bold]SPARROW_SECRET_KEY[/bold]. Exiting..."
+        )
         sys.exit(1)

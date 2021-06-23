@@ -15,7 +15,9 @@ def get_backend():
 
 
 def UnauthorizedResponse(**kwargs):
-    return JSONResponse(dict(login=False, username=None, message="user is not authenticated"), **kwargs)
+    return JSONResponse(
+        dict(login=False, username=None, message="user is not authenticated"), **kwargs
+    )
 
 
 @use_annotations(location="json")
@@ -28,7 +30,7 @@ async def login(request, username: str, password: str):
 
     if current_user is not None and current_user.is_correct_password(password):
         day = 24 * 60 * 60
-        token = backend.set_cookie(None, "access", max_age=day,identity=username)
+        token = backend.set_cookie(None, "access", max_age=day, identity=username)
         resp = JSONResponse(dict(login=True, username=username, token=token))
         return backend.set_login_cookies(resp, identity=username)
 

@@ -51,7 +51,5 @@ class ProjectEdits(HTTPEndpoint):
 
 
 Project_edits_api = Router(
-    [
-        Route("/edit/{id}", endpoint=ProjectEdits, methods=["PUT"]),
-    ]
+    [Route("/edit/{id}", endpoint=ProjectEdits, methods=["PUT"])]
 )

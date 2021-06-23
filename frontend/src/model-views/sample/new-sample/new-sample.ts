@@ -231,6 +231,9 @@ export function NewSamplePage() {
     const samplePost = { ...sample };
     delete samplePost.changeFunction;
     delete samplePost.listName;
+    if (!samplePost.location.coordinates[0]) {
+      samplePost.location = null;
+    }
     console.log(samplePost);
     const response = await Ax.post(route, samplePost).then((response) => {
       return response;

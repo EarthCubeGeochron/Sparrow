@@ -21,6 +21,17 @@ interface ProjectInfoLinkProps extends Project {
   minimal: boolean;
 }
 
+const ellipseAppend = (props) => {
+  const { data, attribute } = props;
+  if (data.length == 0) return null;
+
+  if (data.length > 1) {
+    return data[0][attribute] + "....";
+  } else {
+    return data[0][attribute];
+  }
+};
+
 function ProjectInfoLink(props: ProjectInfoLinkProps) {
   let {
     id,
@@ -32,12 +43,7 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
   } = props;
 
   const to = useModelURL(`/project/${id}`);
-  const pubData =
-    publication.length > 0
-      ? publication.length > 1
-        ? publication[0].title + "...."
-        : publication[0].title
-      : null;
+  const pubData = ellipseAppend({ data: publication, attribute: "title" });
 
   return h(
     LinkCard,
@@ -49,13 +55,11 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
     [
       h("h3", name),
       h("p.description", description),
-      samples
-        ? h(ContentArea, {
-            className: "samples",
-            data: samples.map((d) => d.name),
-            title: "sample",
-          })
-        : null,
+      h.if(samples.length > 0)(ContentArea, {
+        className: "samples",
+        data: samples.map((d) => d.name),
+        title: "sample",
+      }),
       h.if(publication.length > 0)("div.content-area", [
         h("h5", [
           h("span.count", [

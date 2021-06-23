@@ -337,7 +337,7 @@ const EditableProjectDetails = function (props) {
         [
           h("div.project-editor", [
             h("div", [
-              Edit ? h(ProjEditNavBar, { header: "Manage Project" }) : null,
+              h.if(Edit)(ProjEditNavBar, { header: "Manage Project" }),
             ]),
             h("div.project-editor-content", [
               h(ModelEditableText, {

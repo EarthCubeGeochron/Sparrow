@@ -3,7 +3,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
 import { NoStateAdmin } from "./baseview";
 import { SessionMatch } from "../model-views";
-import { SessionListComponent } from "../components/infinite-scroll/infinite-scroll";
+import { SessionListComponent } from "~/model-views";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
 import {

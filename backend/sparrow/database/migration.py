@@ -39,7 +39,9 @@ class AutoMigration(Migration):
         log.debug(f"Applying migration with {n} operations")
         for stmt in self.statements:
             self._exec(stmt, quiet=quiet)
-        self.changes.i_from = get_inspector(self.s_from, schema=self.schema, exclude_schema=self.exclude_schema)
+        self.changes.i_from = get_inspector(
+            self.s_from, schema=self.schema, exclude_schema=self.exclude_schema
+        )
 
         safety_on = self.statements.safe
         self.clear()
@@ -120,18 +122,14 @@ def db_migration(db, safe=True, apply=False, hide_view_changes=False):
 
 def dump_schema(engine):
     flags, dbname = connection_args(engine)
-    res = cmd(
-        "pg_dump",
-        "--schema-only",
-        flags,
-        dbname,
-        capture_output=True,
-    )
+    res = cmd("pg_dump", "--schema-only", flags, dbname, capture_output=True)
     return res.stdout
 
 
 @contextmanager
-def create_schema_clone(engine, db_url="postgresql://postgres@db:5432/sparrow_schema_clone"):
+def create_schema_clone(
+    engine, db_url="postgresql://postgres@db:5432/sparrow_schema_clone"
+):
     schema = dump_schema(engine)
     with temp_database(db_url) as clone_engine:
         # Not sure why we have to mess with this, but we do
@@ -196,7 +194,9 @@ class SparrowDatabaseMigrator:
     def apply_migrations(self, engine, target):
         """This is the magic function where an ordered changeset gets
         generated and applied"""
-        migrations = [m for m in self._migrations if m.should_apply(engine, target, self)]
+        migrations = [
+            m for m in self._migrations if m.should_apply(engine, target, self)
+        ]
         log.info("Applying manual migrations")
         if len(migrations) == 0:
             log.info(f"Found no migrations to apply")

@@ -135,7 +135,10 @@ class EmbargoFilter(BaseFilter):
             ## if arg is true, then public only
             ## embargo date is the date at which a datum becomes public
             return query.filter(
-                or_(self.model.embargo_date < datetime.datetime.today(), self.model.embargo_date == None)
+                or_(
+                    self.model.embargo_date < datetime.datetime.today(),
+                    self.model.embargo_date == None,
+                )
             )
         else:
             return query.filter(self.model.embargo_date > datetime.datetime.today())
@@ -187,7 +190,9 @@ class DateFilter(BaseFilter):
         end = datetime.datetime.strptime(end, format)
 
         if hasattr(self.model, "session_collection"):
-            return query.join(self.model.session_collection).filter(and_(Session.date > start, Session.date < end))
+            return query.join(self.model.session_collection).filter(
+                and_(Session.date > start, Session.date < end)
+            )
 
         path = nested_collection_path(model_name, "session")
         if path is not None and len(path) > 1:
@@ -228,7 +233,9 @@ class DOIFilter(BaseFilter):
         publication = db.model.publication
 
         if hasattr(self.model, "publication_collection"):
-            return query.join(self.model.publication_collection).filter(publication.doi.like(f"%{doi_string}%"))
+            return query.join(self.model.publication_collection).filter(
+                publication.doi.like(f"%{doi_string}%")
+            )
 
         path = nested_collection_path(model_name, "publication")
         if path is not None and len(path) > 1:
@@ -252,7 +259,10 @@ class CoordinateFilter(BaseFilter):
 
     def should_apply(self):
         model_name = create_model_name_string(self.model)
-        return hasattr(self.model, "location") or nested_collection_path(model_name, "sample") is not None
+        return (
+            hasattr(self.model, "location")
+            or nested_collection_path(model_name, "sample") is not None
+        )
 
     def apply(self, args, query):
         if self.key not in args:
@@ -261,7 +271,9 @@ class CoordinateFilter(BaseFilter):
         model_name = create_model_name_string(self.model)
         db = app_context().database
 
-        points = args["coordinates"]  # should be an array [minLong, minLat, maxLong, maxLat]
+        points = args[
+            "coordinates"
+        ]  # should be an array [minLong, minLat, maxLong, maxLat]
         pnts = [int(pnt) for pnt in points]
         bounding_shape = create_bound_shape(pnts)
 
@@ -270,10 +282,14 @@ class CoordinateFilter(BaseFilter):
             db_query = nested_collection_joins(path, query, db, self.model)
             sample = db.model.sample
 
-            return db_query.filter(bounding_shape.ST_Contains(func.ST_Transform(sample.location, 4326)))
+            return db_query.filter(
+                bounding_shape.ST_Contains(func.ST_Transform(sample.location, 4326))
+            )
 
         # Create issue about SRID (4326)
-        return query.filter(bounding_shape.ST_Contains(func.ST_Transform(self.model.location, 4326)))
+        return query.filter(
+            bounding_shape.ST_Contains(func.ST_Transform(self.model.location, 4326))
+        )
 
 
 class GeometryFilter(BaseFilter):
@@ -307,16 +323,26 @@ class GeometryFilter(BaseFilter):
 
         if hasattr(self.model, "sample_collection"):
             return query.join(self.model.sample_collection).filter(
-                func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_SetSRID(sample.location, 4326))
+                func.ST_GeomFromEWKT(WKT_query).ST_Contains(
+                    func.ST_SetSRID(sample.location, 4326)
+                )
             )
 
         path = nested_collection_path(model_name, "sample")
         if path is not None and len(path) > 1:
             db_query = nested_collection_joins(path, query, db, self.model)
 
-            return db_query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_SetSRID(sample.location, 4326)))
+            return db_query.filter(
+                func.ST_GeomFromEWKT(WKT_query).ST_Contains(
+                    func.ST_SetSRID(sample.location, 4326)
+                )
+            )
 
-        return query.filter(func.ST_GeomFromEWKT(WKT_query).ST_Contains(func.ST_SetSRID(self.model.location, 4326)))
+        return query.filter(
+            func.ST_GeomFromEWKT(WKT_query).ST_Contains(
+                func.ST_SetSRID(self.model.location, 4326)
+            )
+        )
 
 
 class AgeRangeFilter(BaseFilter):

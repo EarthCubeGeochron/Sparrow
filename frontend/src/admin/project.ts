@@ -1,8 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
 import { useState, createContext, useContext } from "react";
-import { ProjectMatch } from "~/model-views/project";
-import { ProjectListComponent } from "../components/infinite-scroll/infinite-scroll";
 //@ts-ignore
 import styles from "./module.styl";
 import { NoStateAdmin } from "./baseview";
@@ -12,7 +10,9 @@ import {
   PublicationFilterList,
   ResearcherFilterList,
   SessionFilterList,
-} from "~/model-views/components/new-model";
+  ProjectMatch,
+  ProjectListComponent,
+} from "~/model-views";
 import { AdminFilter } from "../filter";
 
 const h = hyperStyled(styles);

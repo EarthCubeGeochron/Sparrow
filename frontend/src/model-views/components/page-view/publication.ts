@@ -40,17 +40,18 @@ export const PageViewPublications = ({ data, isEditing = false, onClick }) => {
       h("div", { style: { display: "flex", alignItems: "baseline" } }, [
         h("h4", "Publications"),
       ]),
-      data.length > 0
-        ? data.map((pub) => {
-            const { id, title, doi } = pub;
-            return h(PubEditCard, {
-              id,
-              title,
-              content: h(Publication, { doi, title }),
-              onClick,
-            });
-          })
-        : null,
+      h.if(data.length > 0)("div", [
+        data.map((pub, i) => {
+          const { id, title, doi } = pub;
+          return h(PubEditCard, {
+            key: i,
+            id,
+            title,
+            content: h(Publication, { doi, title }),
+            onClick,
+          });
+        }),
+      ]),
     ]);
   }
   return h("div", [

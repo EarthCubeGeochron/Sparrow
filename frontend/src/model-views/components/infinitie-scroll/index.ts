@@ -6,8 +6,8 @@ import {
   DataFileModelCard,
   PublicationModelCard,
   ResearcherModelCard,
-} from "~/model-views/components/list-cards/utils";
-import { InfiniteAPIView } from "./infinite-api-view";
+} from "~/model-views";
+import { InfiniteAPIView } from "~/components/infinite-scroll";
 import { APIV2Context } from "~/api-v2";
 //@ts-ignore
 import styles from "./main.styl";
@@ -17,9 +17,8 @@ const h = hyperStyled(styles);
 // unwraps the data to be simpatico with the ProjectLink component, also gets the next page
 function unwrapProjectCardData(data) {
   const dataObj = data.data.map((obj) => {
-    const { id, name, description, publication, sample } = obj;
-    const samples = sample.map((ob) => ob);
-    return { id, name, description, publication, samples };
+    const { id, name, description, publication, sample, session } = obj;
+    return { id, name, description, publication, sample, session };
   });
   return dataObj;
 }
@@ -29,11 +28,12 @@ const ProjectListComponent = ({ params, componentProps = {} }) => {
     h(InfiniteAPIView, {
       url: "/models/project",
       unwrapData: unwrapProjectCardData,
-      params: { nest: "publication,session,sample" },
+      params: {},
       filterParams: { ...params },
       component: ProjectModelCard,
       componentProps,
       context: APIV2Context,
+      modelName: "Project",
     }),
   ]);
 };
@@ -51,10 +51,11 @@ function SampleListComponent({ params }) {
     h(InfiniteAPIView, {
       url: "/models/sample",
       unwrapData: unwrapSampleCardData,
-      params: { nest: "session,project" },
+      params: { nest: "session" },
       filterParams: { ...params },
       component: SampleModelCard,
       context: APIV2Context,
+      modelName: "Sample",
     }),
   ]);
 }
@@ -90,11 +91,12 @@ function SessionListComponent({ params, componentProps = {} }) {
     h(InfiniteAPIView, {
       url: "/models/session",
       unwrapData: unwrapSessionCardData,
-      params: { nest: "instrument,project,sample" },
+      params: { nest: "instrument,sample" },
       filterParams: { ...params },
       component: SessionListModelCard,
       componentProps,
       context: APIV2Context,
+      modelName: "Session",
     }),
   ]);
 }
@@ -129,6 +131,7 @@ function DataFilesListComponent({ params }) {
       filterParams: { ...params },
       component: DataFileModelCard,
       context: APIV2Context,
+      modelName: "Datafile",
     }),
   ]);
 }
@@ -138,11 +141,12 @@ function SampleAddList({ params, componentProps }) {
     h(InfiniteAPIView, {
       url: "/models/sample",
       unwrapData: unwrapSampleCardData,
-      params: { nest: "session,project" },
+      params: { nest: "session" },
       filterParams: { ...params },
       component: SampleModelCard,
       componentProps,
       context: APIV2Context,
+      modelName: "Sample",
     }),
   ]);
 }
@@ -165,6 +169,7 @@ function PublicationAddList({ params, componentProps }) {
       component: PublicationModelCard,
       componentProps,
       context: APIV2Context,
+      modelName: "Publication",
     }),
   ]);
 }
@@ -187,6 +192,7 @@ function ResearcherAddList({ params, componentProps }) {
       component: ResearcherModelCard,
       componentProps,
       context: APIV2Context,
+      modelName: "Researcher",
     }),
   ]);
 }

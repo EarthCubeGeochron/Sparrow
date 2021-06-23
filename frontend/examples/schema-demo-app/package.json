@@ -1,10 +1,11 @@
 {
   "name": "sparrow-schema-demo-app",
   "version": "1.0.0",
+  "private": true,
   "description": "Externally controlled vocabularies + schema definitions",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel index.html",
+    "dev": "parcel --no-autoinstall --no-cache index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -13,13 +14,25 @@
     "../../packages/*"
   ],
   "devDependencies": {
-    "typescript": "^4.2.3"
+    "@parcel/transformer-stylus": "^2.0.0-nightly.690",
+    "@parcel/transformer-yaml": "^2.0.0-nightly.690",
+    "parcel": "^2.0.0-nightly.688",
+    "typescript": "^3.9.9"
   },
   "dependencies": {
-    "@earthcube/schema-linker": "^1.0.0",
+    "@blueprintjs/popover2": "^0.10.0",
+    "@earthdata/schema-linker": "^1.0.0",
     "@macrostrat/hyper": "^1.2.11",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "@macrostrat/ui-components": "^0.5.2",
+    "@types/react": "^16.14.5",
+    "@visx/gradient": "^1.7.0",
+    "@visx/group": "^1.7.0",
+    "@visx/hierarchy": "^1.7.0",
+    "@visx/shape": "^1.8.0",
+    "d3-flextree": "^2.1.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-use-dimensions": "^1.2.1"
   },
   "prettier": {}
 }

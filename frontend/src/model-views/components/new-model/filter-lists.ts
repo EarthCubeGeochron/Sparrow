@@ -7,7 +7,7 @@ import {
   ResearcherAddList,
   ProjectListComponent,
   SessionListComponent,
-} from "../../../components/infinite-scroll/infinite-scroll";
+} from "~/model-views";
 import {
   EditProjNewPub,
   EditProjNewResearcher,

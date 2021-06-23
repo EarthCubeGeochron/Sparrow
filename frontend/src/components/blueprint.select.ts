@@ -1,17 +1,33 @@
 import { Suggest, MultiSelect } from "@blueprintjs/select";
 import { MenuItem, Icon } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./select.css";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
 export function MySuggest(props) {
-  const { items, onChange, onFilter = () => {} } = props;
+  const {
+    items,
+    onChange,
+    onFilter = () => {},
+    initialQuery,
+    createNew = true,
+  } = props;
   const [selectedItem, setSelectedItem] = useState("");
+  const [query, setQuery] = useState("");
+  console.log(query);
 
-  const itemz = [...items];
+  let itemz = [...items];
+
+  useEffect(() => {
+    if (initialQuery && initialQuery != "") {
+      setQuery(initialQuery);
+      itemz = [...itemz, initialQuery];
+      setSelectedItem(initialQuery);
+    }
+  }, [initialQuery]);
 
   const itemRenderer = (item, itemProps) => {
     const isSelected = item == selectedItem;
@@ -26,8 +42,11 @@ export function MySuggest(props) {
     });
   };
 
-  const itemPredicate = (query, item) => {
+  const onQueryChange = (query) => {
     onFilter(query);
+  };
+
+  const itemPredicate = (query, item) => {
     return item.toLowerCase().indexOf(query.toLowerCase()) >= 0;
   };
 
@@ -57,12 +76,14 @@ export function MySuggest(props) {
         minimal: true,
         popoverClassName: "my-suggest",
       },
+      query,
       onItemSelect,
+      onQueryChange,
       itemRenderer,
       itemPredicate,
       selectedItem,
-      createNewItemRenderer,
-      createNewItemFromQuery,
+      createNewItemRenderer: createNew ? createNewItemRenderer : null,
+      createNewItemFromQuery: createNew ? createNewItemFromQuery : null,
     }),
   ]);
 }

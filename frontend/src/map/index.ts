@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import styles from "./module.styl";
 import { useDarkMode } from "@macrostrat/ui-components";
 import { useEffect, useState } from "react";
+import { useAuth } from "~/auth";
 
 const h = hyperStyled(styles);
 
@@ -65,6 +66,9 @@ const MapPage = (props) => {
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/outdoors-v9";
 
+  const { login } = useAuth();
+  console.log(login);
+
   return h("div.map-page", [
     h(MapPanel, {
       on_map: true,
@@ -72,6 +76,7 @@ const MapPage = (props) => {
       width: "100vw",
       height: "100vh",
       mapstyle: StandMapMode,
+      login,
     }),
   ]);
 };

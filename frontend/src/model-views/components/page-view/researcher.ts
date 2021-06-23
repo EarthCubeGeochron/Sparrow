@@ -20,12 +20,12 @@ export const PageViewResearchers = function ({ data, isEditing, onClick }) {
       h("h4", { style: { display: "flex", alignItems: "baseline" } }, [
         "Researchers",
       ]),
-      data.length > 0
-        ? data.map((res) => {
-            const { id, name } = res;
-            return h(ResearcherEditCard, { id, name, onClick });
-          })
-        : null,
+      h.if(data.length > 0)("div", [
+        data.map((res) => {
+          const { id, name } = res;
+          return h(ResearcherEditCard, { id, name, onClick });
+        }),
+      ]),
     ]);
   } else {
     return h("div.researchers", content);

@@ -10,7 +10,7 @@ import {
   Sheet,
   useElementSize,
   apportionWidths,
-  VirtualizedSheet
+  VirtualizedSheet,
 } from "@earthdata/sheet/src/index.ts";
 import { SheetToolbar } from "./toolbar";
 import classNames from "classnames";
@@ -32,7 +32,7 @@ const columnSpec: ColumnData[] = [
   { name: "Publication ID", key: "publication_id", editable: false },
   { name: "DOI", key: "doi" },
   { name: "Project ID", key: "project_id", editable: false },
-  { name: "Project", key: "project_name" }
+  { name: "Project", key: "project_name" },
 ];
 
 function unwrapSampleData(sampleData) {
@@ -60,7 +60,7 @@ function unwrapSampleData(sampleData) {
     project_name,
     publication_id,
     doi,
-    ...rest
+    ...rest,
   };
 }
 
@@ -167,10 +167,10 @@ function DataSheet() {
       // Substitute empty strings for nulls
       const $set = value == "" ? null : value;
       // sets edits to the state index and the column name
-      setEdits(prevEdits => [{ row, key }, ...prevEdits]);
+      setEdits((prevEdits) => [{ row, key }, ...prevEdits]);
       spec[row] = {
         ...(spec[row] || {}),
-        [key]: { $set }
+        [key]: { $set },
       };
     });
     console.log(spec);
@@ -199,7 +199,7 @@ function DataSheet() {
     return {
       value,
       className,
-      readOnly
+      readOnly,
     };
   };
 
@@ -226,19 +226,19 @@ function DataSheet() {
       h(SheetToolbar, {
         onSubmit: handleSubmit,
         onUndo: handleUndo,
-        hasChanges: initialData != data
+        hasChanges: initialData != data,
       }),
       h("div.sheet", { ref }, [
         h(VirtualizedSheet, {
           data: cellData,
-          valueRenderer: cell => `${cell.value ?? ""}`,
+          valueRenderer: (cell) => `${cell.value ?? ""}`,
           sheetRenderer: Sheet,
           rowRenderer: Row,
           onCellsChanged,
           width: size?.width ?? 500,
-          dataEditor: DataEditor
-        })
-      ])
+          dataEditor: DataEditor,
+        }),
+      ]),
     ])
   );
 }

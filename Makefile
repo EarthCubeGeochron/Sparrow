@@ -67,3 +67,4 @@ install-hooks:
 
 format-code:
 	black backend/**/*.py _cli/**/*.py
+	prettier --ignore-path frontend/.prettierignore --write frontend

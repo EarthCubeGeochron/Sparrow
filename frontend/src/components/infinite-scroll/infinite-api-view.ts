@@ -5,6 +5,7 @@ import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
 import { Spinner } from "@blueprintjs/core";
 import { NoSearchResults } from "./utils";
 import { ErrorCallout } from "~/util";
+//@ts-ignore
 import styles from "./main.styl";
 
 const h = hyperStyled(styles);
@@ -41,12 +42,16 @@ function InfiniteAPIView({
   context,
   filterParams,
   errorHandler = ErrorCallout,
+  modelName,
 }) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
   const [nextPage, setNextPage] = useState("");
+  const [moreAfter, setMoreAfter] = useState(true);
   const { get } = useAPIActions(context);
+
+  console.log(moreAfter);
 
   async function getNextPageAPI(nextPage, url, params) {
     const constParams =
@@ -67,6 +72,7 @@ function InfiniteAPIView({
 
   useEffect(() => {
     dataFetch(data);
+    console.log("RERENDERED");
   }, []);
 
   const dataFetch = (data, next = "") => {
@@ -79,6 +85,10 @@ function InfiniteAPIView({
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
       const next_page = res.next_page;
+      console.log("next page", next_page);
+      if (next_page == null) {
+        setMoreAfter(false);
+      }
       setNextPage(next_page);
       setData(newState);
     });
@@ -89,8 +99,9 @@ function InfiniteAPIView({
     dataFetch([]);
   }, [JSON.stringify(filterParams)]);
 
-  const fetchNewData = () => {
+  const fetchNewData = async () => {
     if (!nextPage) return;
+    console.log("FETCH TRIGGERED");
     dataFetch(data, nextPage);
   };
 
@@ -98,16 +109,21 @@ function InfiniteAPIView({
     return h(errorHandler, { error, title: "An API error has occured" });
   }
 
-  return data.length > 0
-    ? h(ForeverScroll, {
-        initialData: data,
-        fetch: fetchNewData,
-        component,
-        componentProps,
-      })
-    : noResults
-    ? h(NoSearchResults)
-    : h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
+  if (noResults) {
+    return h(NoSearchResults);
+  }
+
+  if (data.length > 0) {
+    return h(ForeverScroll, {
+      initialData: data,
+      fetch: fetchNewData,
+      modelName,
+      component,
+      moreAfter,
+      componentProps,
+    });
+  }
+  return h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 }
 
 export { InfiniteAPIView };

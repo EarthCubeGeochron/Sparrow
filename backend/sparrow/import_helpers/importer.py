@@ -6,6 +6,7 @@ from os import environ
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import inspect
+from IPython import embed
 
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
@@ -65,8 +66,9 @@ class BaseImporter(ImperativeImportHelperMixin):
         self.models = self.m
 
     def session_changes(self):
-        def changed(i): return self.db.session.is_modified(
-            i, include_collections=True)
+        def changed(i):
+            return self.db.session.is_modified(i, include_collections=True)
+
         # Bug: For some reason, changes on many-to-many links are not recorded.
         return dict(
             dirty=self.__dirty,
@@ -102,7 +104,6 @@ class BaseImporter(ImperativeImportHelperMixin):
         if needed.
         """
         for fn in file_sequence:
-            secho(str(fn), dim=True)
             self.__import_datafile(fn, None, **kwargs)
 
     def iter_records(self, seq, **kwargs):
@@ -121,24 +122,30 @@ class BaseImporter(ImperativeImportHelperMixin):
         rec.file_mtime = mtime
         rec.basename = infile.name
 
-    def __create_data_file_record(self, fn):
+    def _find_existing_data_file(self, file_path=None, file_hash=None):
+        # Get data file record if it exists
+        ## TODO: First, get file with same hash (i.e., exact same file contents), attempting to relink if non-existant
+        return (
+            self.db.session.query(self.m.data_file)
+            .filter_by(file_path=file_path)
+            .first()
+        )
+
+    def _create_data_file_record(self, fn):
 
         # Get the path location (this must be unique)
-        infile = Path(fn)
+        _infile = Path(fn)
         if self.basedir is not None:
-            infile = infile.relative_to(self.basedir)
+            infile = _infile.relative_to(self.basedir)
         file_path = str(infile)
 
         # Get file hash
         hash = md5hash(str(fn))
-        # Get data file record if it exists
-        rec = (
-            self.db.session.query(self.m.data_file).filter_by(
-                file_path=file_path)
-        ).first()
 
-        added = rec is None
-        if added:
+        rec = self._find_existing_data_file(file_path=file_path, file_hash=hash)
+
+        should_add_record = rec is None
+        if should_add_record:
             rec = self.m.data_file(file_path=file_path, file_hash=hash)
 
         updated = rec.file_hash != hash
@@ -149,8 +156,8 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         self.db.session.add(rec)
 
-        self.__set_file_info(infile, rec)
-        return rec, added
+        self.__set_file_info(_infile, rec)
+        return rec, should_add_record
 
     def __import_datafile(self, fn, rec=None, **kwargs):
         """
@@ -159,10 +166,11 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         :param fix_errors  Fix errors that have previously been ignored
         """
+        secho(str(fn), dim=True)
         redo = kwargs.pop("redo", False)
         added = False
         if rec is None:
-            rec, added = self.__create_data_file_record(fn)
+            rec, added = self._create_data_file_record(fn)
 
         err_filter = True
         m = self.m.data_file_link
@@ -191,6 +199,8 @@ class BaseImporter(ImperativeImportHelperMixin):
             items = ensure_sequence(self.import_datafile(fn, rec, **kwargs))
 
             for created_model in items:
+                if created_model is None:
+                    continue
                 # Track the import of the resulting models
                 df_link = self.__track_model(rec, created_model)
                 if df_link is not None:

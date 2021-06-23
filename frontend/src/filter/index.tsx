@@ -243,7 +243,7 @@ function AdminFilter(props) {
   }
 
   return h("div", { style: { position: "relative" } }, [
-    h("div.listcomponent", [
+    h("div.list-component", [
       h(SearchInput, {
         leftElement: h(Button, {
           icon: "filter",

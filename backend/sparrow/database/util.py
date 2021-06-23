@@ -47,7 +47,7 @@ def pretty_print(sql, **kwargs):
             return
 
 
-def run_sql(session, sql, params=None):
+def run_sql(session, sql, params=None, stop_on_error=False):
     queries = split(sql)
     for q in queries:
         sql = format(q, strip_comments=True).strip()
@@ -67,6 +67,8 @@ def run_sql(session, sql, params=None):
             if dim:
                 err = "  " + err
             secho(err, fg="red", dim=dim)
+            if stop_on_error:
+                return
 
 
 def _exec_raw_sql(engine, sql):
@@ -87,6 +89,7 @@ def run_sql_file(session, sql_file, params=None):
     sql = open(sql_file).read()
     run_sql(session, sql, params=params)
 
+
 def run_sql_query_file(session, sql_file, params=None):
     sql = open(sql_file).read()
     return session.execute(sql, params)
@@ -104,7 +107,9 @@ def get_or_create(session, model, defaults=None, **kwargs):
         instance._created = False
         return instance
     else:
-        params = dict((k, v) for k, v in kwargs.items() if not isinstance(v, ClauseElement))
+        params = dict(
+            (k, v) for k, v in kwargs.items() if not isinstance(v, ClauseElement)
+        )
         params.update(defaults or {})
         instance = model(**params)
         session.add(instance)

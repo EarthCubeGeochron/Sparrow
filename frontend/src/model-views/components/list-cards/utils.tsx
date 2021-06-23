@@ -6,8 +6,18 @@ import { pluralize } from "../new-model";
 import { format } from "date-fns";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
+import { useAPIv2Result } from "~/api-v2";
 
 const h = hyperStyled(styles);
+
+function clickedClassname(props) {
+  const { clicked, id } = props;
+  if (clicked == `${id}`) {
+    return "model-card.clicked";
+  } else {
+    return "model-card";
+  }
+}
 
 export function ModelCard(props) {
   const { content, id, model, link = true, onClick = () => {} } = props;
@@ -23,11 +33,8 @@ export function ModelCard(props) {
 
   const to = useModelURL(`/${model}/${id}`);
 
-  const classname = clicked
-    ? clicked == `${id}`
-      ? "model-card.clicked"
-      : "model-card"
-    : "model-card";
+  const classname = clickedClassname({ clicked, id });
+
   if (link) {
     return h(Link, { to, style: { textDecoration: "none" } }, [
       h(`div.${classname}`, [content]),
@@ -43,6 +50,16 @@ export function ModelCard(props) {
       ),
     ]);
   }
+}
+
+function sessionDates({ session }) {
+  if (session.lenght == 0) return [];
+
+  const dates = session.map((ss) => {
+    const date = ss.date.split("T")[0];
+  });
+
+  return dates;
 }
 
 export const sampleContent = (props) => {
@@ -63,28 +80,23 @@ export const sampleContent = (props) => {
     h("span", name),
   ]);
 
-  const Material =
-    material != null
-      ? h("div", { style: { marginBottom: "5px" } }, ["Material: ", material])
-      : h("div", { style: { marginBottom: "5px" } }, "No material");
+  const Material = h.if(material)("div", { style: { marginBottom: "5px" } }, [
+    "Material: ",
+    material,
+  ]);
 
-  const sessionDate =
-    session.length > 0
-      ? session.map((ss) => {
-          return ss.date.split("T")[0];
-        })
-      : null;
+  const sessionDate = sessionDates({ session });
 
   return h("div.sample-content", [
     h("div.card-header", [h("div", id), Location]),
     h("div.bod", [
       sampleName,
       Material,
-      sessionDate
-        ? sessionDate.map((date) => {
-            return h("div", date);
-          })
-        : null,
+      sessionDate.map((date) => {
+        if (sessionDate.lenght > 0) {
+          return h("div", date);
+        }
+      }),
     ]),
   ]);
 };
@@ -155,35 +167,51 @@ export const ResearcherModelCard = (props) => {
   });
 };
 
+const unwrapPubTitles = (obj) => {
+  return obj.data.title;
+};
+
+function pubTitles({ publication }) {
+  if (publication.length > 0) {
+    const data = useAPIv2Result(
+      `/models/publication/${publication[0]}`,
+      {},
+      {
+        unwrapResponse: unwrapPubTitles,
+      }
+    );
+    if (data == null) return null;
+    if (publication.lenght > 1) {
+      return data + "....";
+    }
+    return data;
+  }
+  return null;
+}
+
 const ProjectModelCard = (props) => {
   const {
     id,
     name,
     description,
-    samples = [],
+    sample = [],
+    session = [],
     publication = [],
     link,
     onClick,
     minimal = false,
   } = props;
 
-  const pubData =
-    publication.length > 0
-      ? publication.length > 1
-        ? publication[0].title + "...."
-        : publication[0].title
-      : null;
+  const pubData = pubTitles({ publication });
 
   const content = h("div.project-card", [
     h("h4", name),
     h("p.description", description),
-    samples.length > 0
-      ? h(ContentOverFlow, {
-          className: "samples",
-          data: samples.map((d) => d.name),
-          title: "sample",
-        })
-      : null,
+    h.if(sample.length > 0)("div.content-area", [
+      h("h5", [
+        h("span.count", [sample.length + " " + pluralize("Sample", sample)]),
+      ]),
+    ]),
     h.if(publication.length > 0)("div.content-area", [
       h("h5", [
         h("span.count", [
@@ -192,13 +220,18 @@ const ProjectModelCard = (props) => {
         h("h5", [pubData]),
       ]),
     ]),
+    h.if(session.length > 0)("div.content-area", [
+      h("h5", [
+        h("span.count", [session.length + " " + pluralize("Session", session)]),
+      ]),
+    ]),
   ]);
 
   const cardContent = h(
     Frame,
     {
       id: "projectCardContent",
-      data: { id, name, description, samples, publication },
+      data: { id, name, description, sample, session, publication },
     },
     content
   );
@@ -245,38 +278,6 @@ const SessionListContent = (props) => {
       h.if(analysis.length > 1)("div", analysisCount),
       h("div", ["Target: " + target]),
     ]),
-  ]);
-};
-
-const SessionPageViewContent = (props) => {
-  const {
-    classname,
-    target,
-    date,
-    technique,
-    instrument,
-    analysis,
-    sample,
-    data,
-  } = props;
-  const instruName = instrument ? instrument.name : "";
-  const sampleName = sample ? `Linked through ${sample.name}` : "";
-
-  const Irradiation = data && data.Irradiation ? data.Irradiation : null;
-  const FCS = data && data.FCS ? data.FCS : null;
-
-  const analysisName = analysis.length > 1 ? "Analyses" : "Analysis";
-  const analysisCount = analysis.length + " " + analysisName;
-
-  return h(`div.${classname}`, [
-    h("div.card-header", [h("div", date.split("T")[0]), h("div", sampleName)]),
-    h("div.bod", [
-      h.if(FCS)("div", [FCS]),
-      h("div", [h("span", technique)]),
-      h("div", ["Instrument: " + instruName]),
-      h.if(Irradiation)("div", [Irradiation]),
-    ]),
-    h("div.footer", [h("div", analysisCount), h("div", ["Target: " + target])]),
   ]);
 };
 
@@ -352,7 +353,7 @@ const SessionPageViewModelCard = (props) => {
 
   const classname = onHover ? "session-card-hover" : "session-card";
 
-  const content = h(SessionPageViewContent, {
+  const content = h(SessionListContent, {
     classname,
     target,
     date,

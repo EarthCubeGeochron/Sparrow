@@ -12,10 +12,18 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
-from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint, model_description, root_example, root_info, meta_info
 from .endpoints.data_file import DataFileListEndpoint
-from .response import APIResponse
 
+from .endpoints import (
+    ModelAPIEndpoint,
+    ViewAPIEndpoint,
+    model_description,
+    root_example,
+    root_info,
+    meta_info,
+)
+from .response import APIResponse
+from .exceptions import SparrowAPIError
 import time
 
 log = get_logger(__name__)
@@ -31,7 +39,7 @@ async def http_exception(request, exc):
     )
 
 
-exception_handlers = {HTTPException: http_exception}
+exception_handlers = {HTTPException: http_exception, SparrowAPIError: http_exception}
 
 
 class OpenAPIResponse(Response):
@@ -59,7 +67,9 @@ class APIEntry(HTTPEndpoint):
             else:
                 desc = {d["route"]: d["description"] for d in v}
                 routes[k] = desc
-        return JSONResponse({**root_info(), "routes": routes, "examples": root_example()})
+        return JSONResponse(
+            {**root_info(), "routes": routes, "examples": root_example()}
+        )
 
 
 def schema(request):
@@ -95,9 +105,7 @@ class APIv2(Starlette):
             plugins=[MarshmallowPlugin()],
         )
 
-        self.add_middleware(
-            ServerTimings,
-        )
+        self.add_middleware(ServerTimings)
 
         self._add_routes()
         self._app.run_hook("api-initialized-v2", self)
@@ -129,13 +137,20 @@ class APIv2(Starlette):
 
         db = self._app.database
 
+        skip_list = [db.interface.user]
         for iface in db.interface:
+            if iface in skip_list:
+                continue
             self._add_model_route(iface)
 
         self.add_view_route(
-            "authority", schema="vocabulary", description="Route to view authorities for technical descriptions"
+            "authority",
+            schema="vocabulary",
+            description="Route to view authorities for technical descriptions",
         )
-        self.add_view_route("age_context", description="Ages directly connected to geologic context")
+        self.add_view_route(
+            "age_context", description="Ages directly connected to geologic context"
+        )
 
         self.add_schema_route()
         self.add_meta_route()
@@ -160,16 +175,21 @@ class APIv2(Starlette):
 
         self.spec.path(
             path=endpoint,
-            operations=dict(get=dict(responses={"200": {"content": {"application/json": {"schema": iface.__name__}}}})),
+            operations=dict(
+                get=dict(
+                    responses={
+                        "200": {
+                            "content": {"application/json": {"schema": iface.__name__}}
+                        }
+                    }
+                )
+            ),
         )
 
         tbl = iface.opts.model.__table__
         desc = model_description(iface)
         basic_info = dict(
-            route=endpoint,
-            table=tbl.name,
-            schema=tbl.schema,
-            description=str(desc),
+            route=endpoint, table=tbl.name, schema=tbl.schema, description=str(desc)
         )
         self.route_descriptions[root_route].append(basic_info)
 
@@ -187,9 +207,6 @@ class APIv2(Starlette):
         self.add_route(endpoint, cls, include_in_schema=False)
 
         basic_info = dict(
-            route=endpoint,
-            table=_tbl.name,
-            schema=schema,
-            description=description,
+            route=endpoint, table=_tbl.name, schema=schema, description=description
         )
         self.route_descriptions[root_route].append(basic_info)

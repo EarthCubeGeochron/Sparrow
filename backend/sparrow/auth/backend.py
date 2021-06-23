@@ -3,10 +3,7 @@ JSON Web Token authentication.
 
 """
 import time
-from typing import (
-    Tuple,
-    Any,
-)
+from typing import Tuple, Any
 
 import jwt
 from starlette.authentication import (
@@ -86,10 +83,10 @@ class JWTBackend(AuthenticationBackend):
                 if "Authorization" not in request.headers:
                     raise AuthenticationError(f"Could not find {name} on request")
                 else:
-                    value = self._decode(request.headers['Authorization'])
+                    value = self._decode(request.headers["Authorization"])
             else:
                 value = self._decode(cookie)
-            
+
             identity = value.get("identity")
             if identity is None:
                 raise AuthenticationError(f"{name} has no key identity")

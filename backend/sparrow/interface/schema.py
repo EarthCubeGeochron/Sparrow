@@ -4,13 +4,12 @@ from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
-from sqlalchemy.exc import StatementError, IntegrityError, InvalidRequestError
-from sqlalchemy.orm.exc import FlushError
 from sqlalchemy.orm import RelationshipProperty, joinedload
 from collections.abc import Mapping
 from sqlalchemy import inspect
 
 from .fields import SmartNested
+from ..exceptions import SparrowSchemaError
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter, allow_nest
 
@@ -78,6 +77,17 @@ class ModelSchema(SQLAlchemyAutoSchema):
 
         super().__init__(*args, **kwargs)
 
+    @classmethod
+    def query(cls, session):
+        """A helper that allows query objects to be constructed:
+        `UserSchema.query(db.session).all()`
+        """
+        return session.query(cls.opts.model)
+
+    @classmethod
+    def table_name(cls):
+        return cls.opts.model.__table__.name
+
     @property
     def _table(self):
         return self.opts.model.__table__
@@ -144,7 +154,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
         for prop in self.opts.model.__mapper__.iterate_properties:
             columns = getattr(prop, "columns", False)
             if columns:
-                is_fully_defined = all([any([c.primary_key, c.unique]) for c in columns])
+                is_fully_defined = all(
+                    [any([c.primary_key, c.unique]) for c in columns]
+                )
                 # Shim for the fact that we don't correctly find Session.uuid as unique at the moment...
                 # TODO: fix this in general
                 # if self.opts.model.__name__ == "Session" and prop.key == "uuid":
@@ -226,7 +238,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # log.debug("Expanding keys " + str(pk_vals))
 
         pk = get_primary_keys(self.opts.model)
-        assert len(pk) == len(pk_vals)
+        try:
+            assert len(pk) == len(pk_vals)
+        except AssertionError:
+            raise SparrowSchemaError(
+                f"Could not expand primary key for {self.opts.model.__name__} from {value}"
+            )
         return {col.key: val for col, val in zip(pk, pk_vals)}
 
     def _get_cached_instance(self, data):
@@ -236,7 +253,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
             cache_key = hash(frozenset(data.items()))
             match_ = self.__instance_cache.get(cache_key, None)
             if match_ is not None:
-                log.debug(f"Found {match_} in session cache for {data} (key: {cache_key})")
+                log.debug(
+                    f"Found {match_} in session cache for {data} (key: {cache_key})"
+                )
                 return match_, cache_key
         except TypeError:
             pass

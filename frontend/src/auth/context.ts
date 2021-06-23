@@ -1,93 +1,142 @@
-/*
- * decaffeinate suggestions:
- * DS001: Remove Babel/TypeScript constructor workaround
- * DS102: Remove unnecessary code created because of implicit returns
- * DS206: Consider reworking classes to avoid initClass
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 import h from "react-hyperscript";
-import { StatefulComponent, APIActions } from "@macrostrat/ui-components";
+import { useAPIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
 
-const AuthContext = createContext({});
+type RequestForm = { type: "request-form"; enabled?: boolean };
+type LoginData = { username: string; password: string };
+type LoginStatus = { username: string; login: boolean };
 
-class AuthProvider extends StatefulComponent {
-  static contextType = APIV2Context;
-  constructor(props) {
-    super(props);
-    this.requestLoginForm = this.requestLoginForm.bind(this);
-    this.render = this.render.bind(this);
-    this.state = {
-      login: false,
-      username: null,
-      isLoggingIn: false,
-      invalidAttempt: false,
-    };
-  }
+type UpdateStatus = {
+  type: "update-status";
+  payload: LoginStatus;
+};
+type AuthSuccess = {
+  type: "auth-form-success";
+  payload: LoginStatus;
+};
 
-  componentDidMount() {
-    return this.getStatus();
-  }
+type AuthFailure = { type: "auth-form-failure" };
 
-  getStatus = async () => {
-    // Right now, we get login status from the
-    // /auth/refresh endpoint, which refreshes access
-    // tokens allowing us to extend our session.
-    // It could be desirable for security (especially
-    // when editing information becomes a factor) to
-    // only refresh tokens when access is proactively
-    // granted by the application.
-    const { get } = APIActions(this.context);
-    const { login, username } = await get("/auth/status");
-    return this.setState({ login, username });
-  };
+type AuthAction = RequestForm | UpdateStatus | AuthSuccess | AuthFailure;
 
-  requestLoginForm(v) {
-    console.log("Requesting login form");
-    if (v == null) {
-      v = true;
+type GetStatus = { type: "get-status" };
+type Login = { type: "login"; payload: LoginData };
+type Logout = { type: "logout" };
+
+type AsyncAuthAction = GetStatus | Login | Logout;
+
+function useAuthActions(dispatch) {
+  const { get, post } = useAPIActions(APIV2Context);
+  return async (action: AuthAction | AsyncAuthAction) => {
+    switch (action.type) {
+      case "get-status": {
+        // Right now, we get login status from the
+        // /auth/refresh endpoint, which refreshes access
+        // tokens allowing us to extend our session.
+        // It could be desirable for security (especially
+        // when editing information becomes a factor) to
+        // only refresh tokens when access is proactively
+        // granted by the application.
+        const { login, username } = await get("/auth/status");
+        return dispatch({
+          type: "update-status",
+          payload: { login, username },
+        });
+      }
+      case "login":
+        try {
+          const res = await post("/auth/login", action.payload);
+          const { login, username } = res;
+          return dispatch({
+            type: "auth-form-success",
+            payload: { username, login },
+          });
+        } catch (err) {
+          console.error(err);
+          return dispatch({ type: "auth-form-failure" });
+        }
+      case "logout": {
+        const { login } = await post("/auth/logout", {});
+        const payload = {
+          login,
+          username: null,
+        };
+        return dispatch({ type: "auth-form-success", payload });
+      }
+      default:
+        return dispatch(action);
     }
-    return this.setState({ isLoggingIn: v });
-  }
+  };
+}
 
-  doLogin = async (data) => {
-    const { post } = APIActions(this.context);
-    console.log(data);
-    const { login, username } = await post("/auth/login", data);
-    let invalidAttempt = false;
-    let isLoggingIn = false;
-    if (!login) {
-      invalidAttempt = true;
-      isLoggingIn = true;
+interface AuthState {
+  login: boolean;
+  username: string | null;
+  isLoggingIn: boolean;
+  invalidAttempt: boolean;
+}
+
+interface AuthCtx extends AuthState {
+  runAction(action: AuthAction | AsyncAuthAction): Promise<void>;
+}
+
+const authDefaultState: AuthState = {
+  login: false,
+  username: null,
+  isLoggingIn: false,
+  invalidAttempt: false,
+};
+
+const AuthContext = createContext<AuthCtx>({
+  ...authDefaultState,
+  async runAction() {},
+});
+
+function authReducer(state = authDefaultState, action: AuthAction) {
+  switch (action.type) {
+    case "update-status": {
+      return {
+        ...state,
+        ...action.payload,
+      };
     }
-    return this.setState({
-      login,
-      username,
-      isLoggingIn,
-      invalidAttempt,
-    });
-  };
-
-  doLogout = async () => {
-    const { post } = APIActions(this.context);
-    const { login } = await post("/auth/logout", {});
-    return this.setState({
-      login,
-      username: null,
-      isLoggingIn: false,
-    });
-  };
-
-  render() {
-    const methods = (() => {
-      let doLogin, doLogout, requestLoginForm;
-      return ({ doLogin, doLogout, requestLoginForm } = this);
-    })();
-    const value = { ...methods, ...this.state };
-    return h(AuthContext.Provider, { value }, this.props.children);
+    case "auth-form-success": {
+      return {
+        ...action.payload,
+        isLoggingIn: false,
+        invalidAttempt: false,
+      };
+    }
+    case "auth-form-failure":
+      return {
+        ...state,
+        isLoggingIn: true,
+        invalidAttempt: true,
+        login: false,
+      };
+    case "request-form":
+      return {
+        ...state,
+        isLoggingIn: action.enabled ?? true,
+        invalidAttempt: false,
+      };
+    default:
+      return state;
   }
+}
+
+function AuthProvider(props) {
+  const [state, dispatch] = useReducer(authReducer, authDefaultState);
+  const runAction = useAuthActions(dispatch);
+  useEffect(() => {
+    runAction({ type: "get-status" });
+  }, []);
+  return h(
+    AuthContext.Provider,
+    { value: { ...state, runAction } },
+    props.children
+  );
 }
 
 const useAuth = () => useContext(AuthContext);
