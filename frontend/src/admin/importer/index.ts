@@ -17,7 +17,8 @@ const statusOptions = {
   [ReadyState.UNINSTANTIATED]: "Uninstantiated",
 };
 
-function ImporterMain({ pipeline = "laserchron-data" }) {
+function ImporterMain() {
+  const pipeline = "test";
   const helpers = useAPIHelpers(APIV2Context);
   //const url = helpers.buildURL("/import-tracker");
   const url = `ws://localhost:5002/api/v2/import-tracker/pipeline/${pipeline}`;
@@ -31,6 +32,7 @@ function ImporterMain({ pipeline = "laserchron-data" }) {
   const connectionStatus = statusOptions[readyState];
 
   messageHistory.current = useMemo(() => {
+    console.log(lastMessage);
     let message = null;
     if (lastMessage?.data != null) {
       try {

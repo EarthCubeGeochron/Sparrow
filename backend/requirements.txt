@@ -99,5 +99,8 @@ crossrefapi==1.5.0
 
 # Task worker
 celery==5.1.1
-broadcaster==0.2.0
 redis==3.5.3
+broadcaster[redis]==0.2.0
+# For worker auto-reloading in development
+watchdog==2.1.2
+argh==0.26.2

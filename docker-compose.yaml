@@ -86,6 +86,12 @@ services:
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend: 
     <<: *x-backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     expose:
       - 5000
     ports:
