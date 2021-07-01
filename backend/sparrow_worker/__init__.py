@@ -1,4 +1,7 @@
 from celery import Celery
+from celery.signals import after_setup_logger
+from sparrow_utils import setup_stderr_logs
+
 import redis
 import json
 import time
@@ -10,6 +13,11 @@ celery.conf.result_expires = 60
 
 queue = redis.StrictRedis(host="broker", port=6379, db=0)
 channel = queue.pubsub()
+
+
+# @after_setup_logger.connect()
+# def logger_setup_handler(logger, **kwargs):
+#     setup_stderr_logs("sparrow_worker", "sparrow", "celery.task")
 
 
 @celery.task(bind=True)
@@ -25,11 +33,17 @@ def import_task(name):
     from sparrow.context import get_sparrow_app
 
     app = get_sparrow_app()
-    plugin = app.plugins.get("import-tracker")
-    if plugin is None:
-        return
-    pipeline = plugin.pipelines.get(name, None)
-    if pipeline is None:
-        return
-    pipeline.message_queue = queue
-    pipeline.import_all()
+
+    try:
+        plugin = app.plugins.get("import-tracker")
+        if plugin is None:
+            raise Exception("Could not find plugin")
+        pipeline = plugin.pipelines.get(name, None)
+        if pipeline is None:
+            raise Exception("Could not find task named " + name)
+        queue.publish("sparrow:task:" + name, json.dumps({"text": "Starting task"}))
+        pipeline.message_queue = queue
+        pipeline.run_task()
+    except Exception as exc:
+        queue.publish("sparrow:task:" + name, json.dumps({"text": str(exc)}))
+        raise exc

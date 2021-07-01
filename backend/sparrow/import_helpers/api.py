@@ -64,10 +64,10 @@ class ImporterEndpoint(WebSocketEndpoint):
                     log.info("Message: " + body)
                     create_task(session.send_json({"text": body}))
 
+                log.info("Starting task")
                 task = import_task.delay(name)
                 # task.get(on_message=on_message, propagate=False)
                 self.task = task
-                print("Starting importer")
 
                 # print(task.id)
                 message["task_id"] = task.id
@@ -75,7 +75,7 @@ class ImporterEndpoint(WebSocketEndpoint):
                 await session.send_json({"text": str(exc)})
         if action == "stop" and self.task is not None:
             # print("Stopping importer")
-            self.task.revoke()
+            self.task.revoke(terminate=True)
         await session.send_json(message)
 
     async def on_disconnect(self, session):
@@ -113,7 +113,7 @@ class ImporterEndpoint(WebSocketEndpoint):
                     channel="sparrow:task:" + name
                 ) as subscriber:
                     async for event in subscriber:
-                        await session.send_json({"text": event.message})
+                        await session.send_json(loads(event.message))
                     await session.send_json({"text": f"Closing subscription"})
             except Exception as exc:
                 await session.send_json({"text": str(exc)})
@@ -124,11 +124,6 @@ class ImporterEndpoint(WebSocketEndpoint):
             await session.send_json({"text": f"Hello, planet {self.counter}!"})
             await sleep(5)
             self.counter += 1
-
-    async def websocket_import(self, session):
-        importer = self.get_importer(session)
-        importer.run_loop = self.get_loop()
-        await importer.import_data()
 
 
 class ImportTrackerPlugin(SparrowCorePlugin):
@@ -153,7 +148,10 @@ class ImportTrackerPlugin(SparrowCorePlugin):
 
     async def connect(self):
         log.debug("Setting up Redis connection")
-        # await self.broadcast.connect()
+        await self.broadcast.connect()
+
+    def on_plugins_initialized(self):
+        self.register_tasks()
 
     def on_api_initialized_v2(self, api):
         def import_pipelines(req):
@@ -162,8 +160,6 @@ class ImportTrackerPlugin(SparrowCorePlugin):
         # This breaks silently if we can't connect
         self.broadcast = Broadcast("redis://broker:6379")
         log.debug("Setting up pipelines API")
-
-        self.register_tasks()
 
         app = Starlette(
             routes=[

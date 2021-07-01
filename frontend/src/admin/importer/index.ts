@@ -17,8 +17,7 @@ const statusOptions = {
   [ReadyState.UNINSTANTIATED]: "Uninstantiated",
 };
 
-function ImporterMain() {
-  const pipeline = "test";
+function ImporterMain({ pipeline }) {
   const helpers = useAPIHelpers(APIV2Context);
   //const url = helpers.buildURL("/import-tracker");
   const url = `ws://localhost:5002/api/v2/import-tracker/pipeline/${pipeline}`;
@@ -104,7 +103,7 @@ function PipelinesList() {
 function ImporterPage() {
   return h("div.importer-page", [
     h("div.left-column", null, h(PipelinesList)),
-    h(ImporterMain),
+    h(ImporterMain, { pipeline: "laserchron-data" }),
   ]);
 }
 

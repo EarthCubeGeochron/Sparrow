@@ -32,6 +32,10 @@ x-backend:
     - SPARROW_S3_BUCKET
     - SPARROW_S3_KEY
     - SPARROW_S3_SECRET
+    # This is really for celery workers, but we include it here to not be reptitive
+    - CELERY_BROKER_URL=redis://broker:6379/0
+    - CELERY_RESULT_BACKEND=redis://broker:6379/0
+    - C_FORCE_ROOT=true
   volumes:
     # Volume for scripts to make things like
     # migrations work...
@@ -186,10 +190,6 @@ services:
     depends_on:
       - broker
     command: celery --app=sparrow_worker worker --loglevel=info
-    environment:
-      - CELERY_BROKER_URL=redis://broker:6379/0
-      - CELERY_RESULT_BACKEND=redis://broker:6379/0
-      - C_FORCE_ROOT=true
 volumes:
   frontend_build:
   # Anonymous volume to preserve `sparrow shell` history

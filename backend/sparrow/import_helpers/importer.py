@@ -172,7 +172,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         for fn in file_sequence:
             self.__import_datafile(fn, None, **kwargs)
 
-    async def iter_records(self, seq, **kwargs):
+    def iter_records(self, seq, **kwargs):
         """
         This is kind of outmoded by the new version of iterfiles
         """
@@ -180,12 +180,9 @@ class BaseImporter(ImperativeImportHelperMixin):
             if rec is None:
                 continue
             self.log(str(rec.file_path), dim=True)
-            await run_in_threadpool(self.__import_datafile, None, rec, **kwargs)
+            self.__import_datafile(None, rec, **kwargs)
             # else:
             #    self.__import_datafile(None, rec, **kwargs)
-
-    async def import_data(self, *args, **kwargs):
-        pass
 
     def __set_file_info(self, infile, rec):
         _ = infile.stat().st_mtime
@@ -296,10 +293,8 @@ class BaseImporter(ImperativeImportHelperMixin):
     def log(self, *args, **kwargs):
         text = " ".join([str(a) for a in args])
         secho(text, **kwargs)
-        loop = self.run_loop
-        if loop is None:
-            loop = get_running_loop()
         if self.message_queue is not None:
+            _log.info(text)
             self.message_queue.publish(
                 "sparrow:task:" + self.id, dumps(dict(text=text, **kwargs))
             )
