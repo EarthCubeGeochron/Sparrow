@@ -14,7 +14,7 @@ from starlette.endpoints import WebSocketEndpoint
 from contextlib import redirect_stdout
 from click._compat import _force_correct_text_writer
 from starlette.concurrency import run_until_first_complete
-from sparrow_worker import background_task
+from sparrow_worker import import_task
 from broadcaster import Broadcast
 from starlette.applications import Starlette
 from starlette.routing import Route, WebSocketRoute
@@ -52,18 +52,30 @@ class ImporterEndpoint(WebSocketEndpoint):
         return plugin.loop
 
     async def on_receive(self, session, message):
+
         log.debug(f"Received message {message}")
         action = message.get("action", None)
+        name = session.path_params["pipeline"]
+
         if action == "start":
-            task = background_task.delay(5, 5)
-            self.task = task
-            print("Starting importer")
-            # print(task.id)
-            message["task_id"] = task.id
+            try:
+
+                def on_message(body):
+                    log.info("Message: " + body)
+                    create_task(session.send_json({"text": body}))
+
+                task = import_task.delay(name)
+                # task.get(on_message=on_message, propagate=False)
+                self.task = task
+                print("Starting importer")
+
+                # print(task.id)
+                message["task_id"] = task.id
+            except Exception as exc:
+                await session.send_json({"text": str(exc)})
         if action == "stop" and self.task is not None:
             # print("Stopping importer")
             self.task.revoke()
-            pass
         await session.send_json(message)
 
     async def on_disconnect(self, session):
@@ -85,20 +97,20 @@ class ImporterEndpoint(WebSocketEndpoint):
         # importer.websocket = session
         # self.task = create_task()
 
-        tasks = [self.send_periodically(session), self.listen(session)]
-        create_task(wait(tasks))
+        create_task(self.listen(session))
         # self.send_periodically(session)
         # loop = get_event_loop()
         # counter = create_task(self.send_periodically(session))
 
     async def listen(self, session):
         plugin = get_sparrow_app().plugins.get("import-tracker")
+        name = session.path_params["pipeline"]
         while True:
             await session.send_json({"text": f"Trying to connect"})
             await plugin.broadcast.connect()
             try:
                 async with plugin.broadcast.subscribe(
-                    channel="task:background_task:progress"
+                    channel="sparrow:task:" + name
                 ) as subscriber:
                     async for event in subscriber:
                         await session.send_json({"text": event.message})
@@ -123,10 +135,11 @@ class ImportTrackerPlugin(SparrowCorePlugin):
     name = "import-tracker"
     _loop = None
 
-    pipelines = {"test": None}
+    pipelines = {}
     broadcast = None
 
     def register_pipeline(self, name, importer):
+        log.info("Registering pipeline " + name)
         self.pipelines[name] = importer
 
     @property

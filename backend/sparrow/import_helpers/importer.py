@@ -12,6 +12,7 @@ from sqlalchemy import inspect
 from IPython import embed
 from sys import stdout
 from io import TextIOBase
+from json import dumps
 
 import typing
 from .util import md5hash, SparrowImportError, ensure_sequence
@@ -40,11 +41,15 @@ class WebSocketLogger(TextIOBase):
 def log(*args, **kwargs):
     importer = get_running_importer()
     if importer is None:
-        raise SparrowContextError("Cannot use importer logger outside of a running importer")
+        raise SparrowContextError(
+            "Cannot use importer logger outside of a running importer"
+        )
     importer.log(*args, **kwargs)
 
 
-_importer_context: ContextVar[typing.Any] = ContextVar("sparrow-importer-context", default=None)
+_importer_context: ContextVar[typing.Any] = ContextVar(
+    "sparrow-importer-context", default=None
+)
 
 
 def get_running_importer() -> typing.Any:
@@ -56,16 +61,21 @@ class BaseImporter(ImperativeImportHelperMixin):
     A basic Sparrow importer to be subclassed.
     """
 
+    id = None
     authority = None
     file_type = None
     run_loop = get_event_loop()
-    websocket = None
+    message_queue = None
     _task = None
 
     def __init__(self, app, **kwargs):
         self.app = app
         self.db = self.app.database
         _importer_context.set(self)
+
+        # Register import pipeline
+        # self._register()
+
         self.m = self.db.model
         print_sql = kwargs.pop("print_sql", False)
         self.verbose = kwargs.pop("verbose", False)
@@ -107,6 +117,14 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         # Deprecated
         self.models = self.m
+
+    def _register(self):
+        if self.id is None:
+            return
+        plugin = self.app.plugins.get("import-tracker")
+        if plugin is None:
+            return
+        plugin.register_pipeline(self.id, self)
 
     def session_changes(self):
         def changed(i):
@@ -161,10 +179,9 @@ class BaseImporter(ImperativeImportHelperMixin):
             if rec is None:
                 continue
             self.log(str(rec.file_path), dim=True)
-            if self.websocket is not None:
-                await run_in_threadpool(self.__import_datafile, None, rec, **kwargs)
-            else:
-                self.__import_datafile(None, rec, **kwargs)
+            await run_in_threadpool(self.__import_datafile, None, rec, **kwargs)
+            # else:
+            #    self.__import_datafile(None, rec, **kwargs)
 
     async def import_data(self, *args, **kwargs):
         pass
@@ -281,8 +298,10 @@ class BaseImporter(ImperativeImportHelperMixin):
         loop = self.run_loop
         if loop is None:
             loop = get_running_loop()
-        if self.websocket is not None:
-            run_coroutine_threadsafe(self.websocket.send_json(dict(text=text, **kwargs)), loop)
+        if self.message_queue is not None:
+            self.message_queue.publish(
+                "sparrow:task:" + self.id, dumps(dict(text=text, **kwargs))
+            )
 
     def __track_changes(self):
         new_changed = set(i for i in self.__new if self.__has_changes(i))
