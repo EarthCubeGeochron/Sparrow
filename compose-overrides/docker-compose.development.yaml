@@ -16,7 +16,7 @@ services:
       - ${SPARROW_UI_COMPONENTS:-placeholder}:/app/_local_modules/@macrostrat/ui-components:ro
       - ./frontend:/app
   worker:
-    command: watchmedo auto-restart -d . -p '*.py' -- celery --app=sparrow_worker worker --loglevel=inf
+    command: watchmedo auto-restart -d /app -p '*.py' -- celery --app=sparrow_worker worker --loglevel=info
 volumes:
   frontend_node_modules:
   placeholder:

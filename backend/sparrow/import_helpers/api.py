@@ -97,7 +97,9 @@ class ImporterEndpoint(WebSocketEndpoint):
             await session.send_json({"text": f"Trying to connect"})
             await plugin.broadcast.connect()
             try:
-                async with plugin.broadcast.subscribe(channel="celery") as subscriber:
+                async with plugin.broadcast.subscribe(
+                    channel="task:background_task:progress"
+                ) as subscriber:
                     async for event in subscriber:
                         await session.send_json({"text": event.message})
                     await session.send_json({"text": f"Closing subscription"})
