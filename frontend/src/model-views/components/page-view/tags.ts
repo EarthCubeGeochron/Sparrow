@@ -26,7 +26,7 @@ export function TagContainer(props) {
     modelName
   }: tagContainer = props;
 
-  if (tags.length == 0) {
+  if (tags.length == 0 && !isEditing) {
     return h(ModelAttributeOneLiner, {
       title: "Tags: ",
       content: "None"
