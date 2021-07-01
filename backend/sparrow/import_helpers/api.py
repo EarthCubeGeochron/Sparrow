@@ -138,9 +138,12 @@ class ImportTrackerPlugin(SparrowCorePlugin):
     pipelines = {}
     broadcast = None
 
-    def register_pipeline(self, name, importer):
-        log.info("Registering pipeline " + name)
+    def register_task(self, name, importer):
+        log.info("Registering task " + name)
         self.pipelines[name] = importer
+
+    def register_tasks(self):
+        self.app.run_hook("register-tasks", self)
 
     @property
     def loop(self):
@@ -159,6 +162,8 @@ class ImportTrackerPlugin(SparrowCorePlugin):
         # This breaks silently if we can't connect
         self.broadcast = Broadcast("redis://broker:6379")
         log.debug("Setting up pipelines API")
+
+        self.register_tasks()
 
         app = Starlette(
             routes=[

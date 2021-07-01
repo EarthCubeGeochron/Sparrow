@@ -21,6 +21,9 @@ from .imperative_helpers import ImperativeImportHelperMixin
 from contextvars import ContextVar
 from rich import print
 from starlette.concurrency import run_in_threadpool
+from sparrow_utils import get_logger
+
+_log = get_logger(__name__)
 
 
 class SparrowContextError(Exception):
@@ -73,9 +76,6 @@ class BaseImporter(ImperativeImportHelperMixin):
         self.db = self.app.database
         _importer_context.set(self)
 
-        # Register import pipeline
-        # self._register()
-
         self.m = self.db.model
         print_sql = kwargs.pop("print_sql", False)
         self.verbose = kwargs.pop("verbose", False)
@@ -119,6 +119,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         self.models = self.m
 
     def _register(self):
+        _log.info("Attempting to register importer")
         if self.id is None:
             return
         plugin = self.app.plugins.get("import-tracker")
