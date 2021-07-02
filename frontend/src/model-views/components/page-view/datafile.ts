@@ -86,3 +86,7 @@ export function DownloadButton(props) {
     )
   ]);
 }
+
+export function DatafilePageView(props){
+  
+}
