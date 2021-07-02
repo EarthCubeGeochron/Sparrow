@@ -25,15 +25,10 @@ import {
   EmbargoDatePick,
   EditStatusButtons,
   DataSheetButton,
-<<<<<<< HEAD
   NewModelButton,
   ModelAttributeOneLiner,
   TagContainer,
   PageViewBlock
-=======
-  NewSamplePageButton,
-  TagContainer,
->>>>>>> develop
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
@@ -65,16 +60,6 @@ const EditNavBarSample = () => {
     return actions.persistChanges();
   };
 
-<<<<<<< HEAD
-=======
-  const onChange = (date) => {
-    actions.updateState({
-      model: { embargo_date: { $set: date } },
-    });
-  };
-  const embargo_date = model.embargo_date;
-
->>>>>>> develop
   return h(EditNavBar, {
     header: "Manage Sample",
     editButtons: h("div", { style: { display: "flex" } }, [
@@ -83,7 +68,6 @@ const EditNavBarSample = () => {
         onClickCancel,
         onClickSubmit,
         hasChanges,
-<<<<<<< HEAD
         isEditing
       }),
       h(NewModelButton, { model: "sample" })
@@ -95,29 +79,6 @@ const EditNavBarSample = () => {
 };
 
 const LocationBlock = function(props) {
-=======
-        isEditing,
-      }),
-    ]),
-    embargoEditor: h(EmbargoEditor, {
-      onChange,
-      embargo_date,
-      active: isEditing,
-    }),
-  });
-};
-
-const Parameter = ({ name, value, ...rest }) => {
-  return h("div.parameter", rest, [
-    h("div", { style: { display: "flex", flexDirection: "row" } }, [
-      h("h4.subtitle", name),
-    ]),
-    h("p.value", null, value),
-  ]);
-};
-
-const LocationBlock = function (props) {
->>>>>>> develop
   const { isEditing, hasChanges, actions, model } = useModelEditor();
 
   const { location, location_name } = model;
@@ -327,21 +288,6 @@ const SampleLocationEleDepthEditor = () => {
     });
   };
 
-<<<<<<< HEAD
-=======
-  const changeDepth = (depth) => {
-    actions.updateState({
-      model: { depth: { $set: depth } },
-    });
-  };
-
-  const changeElevation = (elev) => {
-    actions.updateState({
-      model: { elevation: { $set: elev } },
-    });
-  };
-
->>>>>>> develop
   return h(
     "div",
     { style: { justifyContent: "flex-end", minWidth: "405px" } },
@@ -352,17 +298,8 @@ const SampleLocationEleDepthEditor = () => {
       h(SampleLocation, {
         changeCoordinates,
         sample: { longitude, latitude },
-<<<<<<< HEAD
         stacked: false
       })
-=======
-        stacked: false,
-      }),
-      h("div", [
-        h(SampleElevation, { sample, changeElevation }),
-        h(SampleDepth, { sample, changeDepth }),
-      ]),
->>>>>>> develop
     ]
   );
 };
@@ -392,10 +329,7 @@ function SampleTagContainer() {
     tags: model.tags_tag,
     onChange: onAdd,
     onClickDelete: onDelete,
-<<<<<<< HEAD
     modelName: "sample"
-=======
->>>>>>> develop
   });
 }
 
@@ -458,7 +392,6 @@ function SamplePage(props) {
     [
       h("div.sample", [
         h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
-<<<<<<< HEAD
         h(PageViewBlock, [
           h(ModelEditableText, {
             is: "h3",
@@ -476,27 +409,6 @@ function SamplePage(props) {
       h(SampleProjectAdd),
       h(SampleSessionAdd),
       h(Frame, { id: "samplePage", data: sample.data }, null)
-=======
-        h(ModelEditableText, {
-          is: "h3",
-          field: "name",
-          multiline: true,
-        }),
-        h.if(Edit)(SampleTagContainer),
-        h("div.flex-row", [
-          h("div.info-block", [
-            Edit ? h(DataSheetButton) : null,
-
-            h(GeoEntity),
-            h(Material),
-            h(DepthElevation),
-            h("div.basic-info", [h(SampleProjectAdd), h(SampleSessionAdd)]),
-            h(Frame, { id: "samplePage", data: sample.data }, null),
-          ]),
-          h("div", [h(LocationBlock)]),
-        ]),
-      ]),
->>>>>>> develop
     ]
   );
 }
