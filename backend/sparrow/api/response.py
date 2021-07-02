@@ -16,7 +16,6 @@ class APIResponse(JSONResponse):
     def __init__(self, *args, **kwargs):
         self.schema = kwargs.pop("schema", None)
         self.total_count = kwargs.pop("total_count", None)
-        self.to_dict = kwargs.pop("to_dict", False)
         self.page = {}
         super().__init__(*args, **kwargs)
 
@@ -26,6 +25,7 @@ class APIResponse(JSONResponse):
         # Use output schema to validate and format data
 
         paging = getattr(content, "paging", None)
+        log.debug(paging)
         if self.total_count is not None:
             self.page["total_count"] = self.total_count
         if paging is not None:
@@ -37,7 +37,7 @@ class APIResponse(JSONResponse):
         try:
             if self.schema is not None:
                 content = self.schema.dump(content)
-            if self.to_dict:
+            else:
                 # This helps us deal with sequence rows
                 content = [c._asdict() for c in content]
         except Exception:
