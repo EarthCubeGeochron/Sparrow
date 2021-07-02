@@ -31,7 +31,6 @@ function ImporterMain({ pipeline }) {
   const connectionStatus = statusOptions[readyState];
 
   messageHistory.current = useMemo(() => {
-    console.log(lastMessage);
     let message = null;
     if (lastMessage?.data != null) {
       try {
