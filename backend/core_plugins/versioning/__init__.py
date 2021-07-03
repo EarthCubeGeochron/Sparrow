@@ -7,16 +7,10 @@ import click
 from sparrow.database.util import run_sql
 
 exclude_tables = ["spatial_ref_sys"]
-audit_schemas = ["public", "vocabulary"]
+audit_schemas = ["public", "vocabulary", "tags"]
 
 # Tables in the pg_memento schema
-memento_tables = [
-    "audit_column_log",
-    "audit_table_log",
-    "table_event_log",
-    "transaction_log",
-    "row_log",
-]
+memento_tables = ["audit_column_log", "audit_table_log", "table_event_log", "transaction_log", "row_log"]
 
 
 def has_audit_id(db, schema, table):
@@ -91,14 +85,7 @@ class VersioningPlugin(SparrowCorePlugin):
             procedures.append("SCHEMA")
 
         # Basic setup procedures
-        procedures += [
-            "SETUP",
-            "LOG_UTIL",
-            "DDL_LOG",
-            "RESTORE",
-            "REVERT",
-            "SCHEMA_MANAGEMENT",
-        ]
+        procedures += ["SETUP", "LOG_UTIL", "DDL_LOG", "RESTORE", "REVERT", "SCHEMA_MANAGEMENT"]
 
         for id in procedures:
             fp = relative_path(__file__, "pg-memento", "src", id + ".sql")
