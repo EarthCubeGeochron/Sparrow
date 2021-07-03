@@ -9,7 +9,7 @@ import json
 
 class TestAPIV2_filters:
     def test_join_functions(self, client, db):
-        '''some sanity checks'''
+        """some sanity checks"""
         start = "sample"
         end = "datum"
 
@@ -17,7 +17,7 @@ class TestAPIV2_filters:
 
         path = nested_collection_path(start, end)
 
-        assert path == ['sample', 'session', 'analysis', 'datum']
+        assert path == ["sample", "session", "analysis", "datum"]
 
         query = db.session.query(Sample)
 
@@ -29,17 +29,15 @@ class TestAPIV2_filters:
         for model in path:
             assert model in sql_string
 
-    @mark.skip(reason="For some reason, this breaks project_import tests later in the sequence")
+    @mark.skip(
+        reason="For some reason, this breaks project_import tests later in the sequence"
+    )
     def test_load_data(self, client, db):
         Material = get_db_model(db, "vocabulary_material")
         Sample = get_db_model(db, "sample")
 
         db.session.add_all(
-            [
-                Material(id="basalt"),
-                Material(id="dacite"),
-                Material(id="lava"),
-            ]
+            [Material(id="basalt"), Material(id="dacite"), Material(id="lava")]
         )
 
         db.session.commit()
@@ -80,11 +78,7 @@ class TestAPIV2_filters:
         date2 = datetime.datetime(2014, 6, 3)
 
         db.session.add_all(
-            [
-                Session(date=date),
-                Session(date=date1),
-                Session(date=date2),
-            ]
+            [Session(date=date), Session(date=date1), Session(date=date2)]
         )
         db.session.commit()
 
@@ -103,7 +97,9 @@ class TestAPIV2_filters:
         coord_data = coord_response.json()
         assert coord_data["total_count"] != 0
 
-        geometry_response = client.get("/api/v2/models/sample?geometry=POLYGON((0 0 ,180 90, 0 90, 180 0, 0 0))")
+        geometry_response = client.get(
+            "/api/v2/models/sample?geometry=POLYGON((0 0 ,180 90, 0 90, 180 0, 0 0))"
+        )
         geom_data = geometry_response.json()
 
         assert geom_data["total_count"] != 0

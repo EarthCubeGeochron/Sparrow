@@ -1,29 +1,133 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { Component } from "react";
-import { StatefulComponent } from "@macrostrat/ui-components";
-import { AuthContext } from "./context";
+import React, { useState } from "react";
+import { useAuth } from "./context";
 import { Button, Dialog, Callout, Intent, Classes } from "@blueprintjs/core";
 import classNames from "classnames";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-class LoginFormInner extends Component {
-  render() {
-    const className = classNames(Classes.INPUT, "bp3-large");
-    const { data, onChange, submitForm } = this.props;
-    const onKeyUp = function (e) {
-      if (e.key !== "Enter") {
-        return;
-      }
-      return submitForm();
-    };
+function InvalidCredentialsError() {
+  return h(
+    Callout,
+    {
+      className: "login-info",
+      title: "Invalid credentials",
+      intent: Intent.DANGER,
+    },
+    "Invalid credentials were provided"
+  );
+}
 
-    return h("form.login-form", [
+type LoginFormState = {
+  username: string;
+  password: string;
+};
+
+function isValid({ username, password }: LoginFormState): boolean {
+  if (username == null) {
+    return false;
+  }
+  if (password == null) {
+    return false;
+  }
+  if (password.length < 4) {
+    return false;
+  }
+  if (username.length < 4) {
+    return false;
+  }
+  return true;
+}
+
+function CredentialsDialog({
+  actionButtons,
+  children,
+}: {
+  actionButtons: React.ReactNode;
+  children?: React.ReactNode;
+}) {
+  const { runAction, isLoggingIn: isOpen } = useAuth();
+  const title = "Credentials";
+  return h(
+    Dialog,
+    {
+      isOpen,
+      title,
+      onClose() {
+        runAction({ type: "request-form", enabled: false });
+      },
+      icon: "key",
+    },
+    [
+      h("div.login-form-outer", { className: Classes.DIALOG_BODY }, children),
+      h("div", { className: Classes.DIALOG_FOOTER }, [
+        h("div", { className: Classes.DIALOG_FOOTER_ACTIONS }, actionButtons),
+      ]),
+    ]
+  );
+}
+
+function LogoutForm() {
+  const { runAction, username } = useAuth();
+  const actionButtons = h(
+    Button,
+    {
+      large: true,
+      onClick: () => runAction({ type: "logout" }),
+    },
+    "Log out"
+  );
+  return h(CredentialsDialog, { actionButtons }, [
+    h(
+      Callout,
+      {
+        className: "login-info",
+        title: username,
+        intent: Intent.SUCCESS,
+        icon: "person",
+      },
+      h("p", ["Logged in as user ", h("em", username)])
+    ),
+  ]);
+}
+
+const defaultState = { username: "", password: "" };
+
+function _LoginForm() {
+  const [state, setState] = useState<LoginFormState>(defaultState);
+  const { runAction, invalidAttempt } = useAuth();
+
+  const submitForm = () => runAction({ type: "login", payload: state });
+
+  const onChange = (e) => {
+    if (e.target == null) {
+      return;
+    }
+    setState({ ...state, [e.target.name]: e.target.value });
+  };
+
+  const actionButtons = h(
+    Button,
+    {
+      intent: Intent.PRIMARY,
+      large: true,
+      onClick: submitForm,
+      disabled: !isValid(state),
+    },
+    "Login"
+  );
+
+  const className = classNames(Classes.INPUT, "bp3-large");
+  const onKeyUp = function (e) {};
+
+  return h(CredentialsDialog, { actionButtons }, [
+    h.if(invalidAttempt)(InvalidCredentialsError),
+    h("form.login-form", [
       h("input", {
         type: "text",
         name: "username",
-        value: data.username,
+        value: state.username,
         onChange,
         className,
         onKeyUp,
@@ -32,166 +136,22 @@ class LoginFormInner extends Component {
       h("input", {
         type: "password",
         name: "password",
-        value: data.password,
+        value: state.password,
         onChange,
         className,
-        onKeyUp,
+        onKeyUp(e) {
+          if (e.key !== "Enter") return;
+          submitForm();
+        },
         placeholder: "Password",
       }),
-    ]);
-  }
+    ]),
+  ]);
 }
 
-class LoginForm extends StatefulComponent {
-  static contextType = AuthContext;
-  constructor() {
-    super(...arguments);
-    this.resetState = this.resetState.bind(this);
-    this.isValid = this.isValid.bind(this);
-    this.resetState();
-  }
-
-  resetState() {
-    return (this.state = {
-      data: { username: "", password: "" },
-    });
-  }
-
-  isValid() {
-    const { data } = this.state;
-    const { username, password } = data;
-    if (username == null) {
-      return false;
-    }
-    if (password == null) {
-      return false;
-    }
-    if (password.length < 4) {
-      return false;
-    }
-    if (username.length < 4) {
-      return false;
-    }
-    return true;
-  }
-
-  renderCallout() {
-    const { invalidAttempt, login, username } = this.context;
-    if (invalidAttempt) {
-      return h(
-        Callout,
-        {
-          className: "login-info",
-          title: "Invalid credentials",
-          intent: Intent.DANGER,
-        },
-        "Invalid credentials were provided"
-      );
-    }
-  }
-
-  renderLoginForm() {
-    const {
-      doLogin,
-      login,
-      isLoggingIn: isOpen,
-      requestLoginForm,
-    } = this.context;
-    const { data } = this.state;
-
-    const submitForm = () => doLogin(data);
-
-    const onChange = (e) => {
-      if (e.target == null) {
-        return;
-      }
-      return this.updateState({
-        data: { [e.target.name]: { $set: e.target.value } },
-      });
-    };
-
-    return [
-      h("div.login-form-outer", { className: Classes.DIALOG_BODY }, [
-        this.renderCallout(),
-        h(LoginFormInner, { data, onChange, submitForm }),
-      ]),
-      h("div", { className: Classes.DIALOG_FOOTER }, [
-        h("div", { className: Classes.DIALOG_FOOTER_ACTIONS }, [
-          h(
-            Button,
-            {
-              intent: Intent.PRIMARY,
-              large: true,
-              onClick: submitForm,
-              disabled: !this.isValid(),
-            },
-            "Login"
-          ),
-        ]),
-      ]),
-    ];
-  }
-
-  renderLogoutForm() {
-    const { doLogout, username } = this.context;
-    return [
-      h("div.login-form-outer", { className: Classes.DIALOG_BODY }, [
-        h(
-          Callout,
-          {
-            className: "login-info",
-            title: username,
-            intent: Intent.SUCCESS,
-            icon: "person",
-          },
-          h("p", ["Logged in as user ", h("em", username)])
-        ),
-      ]),
-      h("div", { className: Classes.DIALOG_FOOTER }, [
-        h("div", { className: Classes.DIALOG_FOOTER_ACTIONS }, [
-          h(
-            Button,
-            {
-              large: true,
-              onClick: () => doLogout(),
-            },
-            "Log out"
-          ),
-        ]),
-      ]),
-    ];
-  }
-
-  render() {
-    const {
-      doLogin,
-      login,
-      isLoggingIn: isOpen,
-      requestLoginForm,
-    } = this.context;
-    const { data } = this.state;
-
-    const onChange = (e) => {
-      if (e.target == null) {
-        return;
-      }
-      return this.updateState({
-        data: { [e.target.name]: { $set: e.target.value } },
-      });
-    };
-
-    const onClose = () => {
-      this.resetState();
-      return requestLoginForm(false);
-    };
-
-    const title = "Credentials";
-    return h(
-      Dialog,
-      { isOpen, title, onClose, icon: "key" },
-      login ? this.renderLogoutForm() : this.renderLoginForm()
-    );
-  }
+function LoginForm() {
+  const { login } = useAuth();
+  return login ? h(LogoutForm) : h(_LoginForm);
 }
 
 export { LoginForm };

@@ -22,7 +22,9 @@ class DataFileAPI(HTTPEndpoint):
 
         datafile = db.session.query(DataFile).get(uuid)
         if datafile is None:
-            return JSONResponse({"error": f"Data file with UUID {uuid} not found"}, status_code=404)
+            return JSONResponse(
+                {"error": f"Data file with UUID {uuid} not found"}, status_code=404
+            )
 
         key = datafile.file_path
 
@@ -52,4 +54,9 @@ class DataFilePlugin(SparrowCorePlugin):
     name = "data-file"
 
     def on_api_initialized_v2(self, api):
-        api.mount("/data_file/{uuid}", DataFileAPI, name="data_file_api", help="Download a data file by URL")
+        api.mount(
+            "/data_file/{uuid}",
+            DataFileAPI,
+            name="data_file_api",
+            help="Download a data file by URL",
+        )

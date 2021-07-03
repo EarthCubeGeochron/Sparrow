@@ -5,9 +5,9 @@ from sparrow.app import Sparrow
 from sparrow.context import _setup_context
 from sparrow.database.util import wait_for_database
 from sparrow.auth.create_user import _create_user
+from sparrow_tests.helpers.database import testing_database
 from sqlalchemy.orm import Session
 from sqlalchemy import event
-from .helpers.database import testing_database
 
 # Slow tests are opt-in
 
@@ -112,6 +112,7 @@ def client(app, db):
     _client = TestClient(app)
     yield _client
 
+
 @fixture(scope="class")
 def token(db, client):
     if db.session.query(db.model.user).get("test") == None:
@@ -120,11 +121,9 @@ def token(db, client):
 
         _create_user(db, user, password)
     res = client.post(
-            "/api/v2/auth/login", json={"username": "test", "password": "test"}
-        )
+        "/api/v2/auth/login", json={"username": "test", "password": "test"}
+    )
 
-    token = res.json()['token']
+    token = res.json()["token"]
 
     return token
-
-    

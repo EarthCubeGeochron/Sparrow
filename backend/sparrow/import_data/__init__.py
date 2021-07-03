@@ -20,7 +20,7 @@ def construct_error_response(err: Exception, code: int):
         msg = [str(err)]
 
     return JSONResponse(
-       content= {
+        content={
             "error": {
                 "type": get_qualified_name(err),
                 "code": code,
@@ -30,7 +30,7 @@ def construct_error_response(err: Exception, code: int):
                 # (possibly large) datasets the client already has.
             }
         },
-        status_code= code,
+        status_code=code,
     )
 
 
@@ -48,25 +48,26 @@ class ImportData(HTTPEndpoint):
             model_name = request.path_params["model_name"]
 
             req = await request.json()
-            data = req['data']
+            data = req["data"]
             log.debug(data)
             res = db.load_data(model_name, data)
 
-            return JSONResponse({'status':'success', "model": f'{model_name}','id':res.id})
+            return JSONResponse(
+                {"status": "success", "model": f"{model_name}", "id": res.id}
+            )
         except Exception as err:
             return construct_error_response(err, 400)
-    
+
     async def get(self, request):
         model_name = request.path_params["model_name"]
 
-
         return JSONResponse({"Model": f"{model_name}"})
 
+
 ImportDataAPI = Router(
-      [
-        Route("/models/{model_name}", endpoint=ImportData, methods=["PUT","GET"]),
-    ]
+    [Route("/models/{model_name}", endpoint=ImportData, methods=["PUT", "GET"])]
 )
+
 
 class ImportDataPlugin(SparrowCorePlugin):
     name = "import-data"

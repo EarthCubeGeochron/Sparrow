@@ -39,17 +39,15 @@ class TestAPIV2:
         res = client.get(route)
         assert res.status_code == 200
 
-    @mark.skip(reason="For some reason, this breaks project_import tests later in the sequence")
+    @mark.skip(
+        reason="For some reason, this breaks project_import tests later in the sequence"
+    )
     def test_load_data(self, client, db):
         Material = db.model.vocabulary_material
         Sample = db.model.sample
 
         db.session.add_all(
-            [
-                Material(id="basalt"),
-                Material(id="dacite"),
-                Material(id="lava"),
-            ]
+            [Material(id="basalt"), Material(id="dacite"), Material(id="lava")]
         )
 
         db.session.commit()
@@ -116,7 +114,9 @@ class TestAPIV2:
         res = client.get("/api/v2/models/session")
         assert res.status_code == 200
         data = res.json()
-        assert data["total_count"] == 1  ## it fails here because theres no data. db.load_data isn't working
+        assert (
+            data["total_count"] == 1
+        )  ## it fails here because theres no data. db.load_data isn't working
         assert data["data"][0]["name"] == "Declarative import test"
 
     def test_model_analysis(self, client, db):
@@ -130,7 +130,9 @@ class TestAPIV2:
         assert res.status_code == 200
 
     def test_api_nesting(self, client):
-        res = client.get("/api/v2/models/sample", params={"nest": "session", "all": True})
+        res = client.get(
+            "/api/v2/models/sample", params={"nest": "session", "all": True}
+        )
         assert res.status_code == 200
 
     def test_api_server_timing(self, client):

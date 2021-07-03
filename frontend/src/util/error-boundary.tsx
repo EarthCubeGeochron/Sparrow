@@ -52,7 +52,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-const ErrorBoundaryRoute = function(props) {
+const ErrorBoundaryRoute = function (props) {
   const { component, render: baseRender, ...rest } = props;
 
   // Use render function unless component is provided

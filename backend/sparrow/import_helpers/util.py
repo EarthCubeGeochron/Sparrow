@@ -12,7 +12,7 @@ class SparrowImportError(Exception):
 
 def get_file_object(name_or_obj, mode="rb"):
     """Get a reference to a data file if passed a file name, or pass through
-        a file-like object unmodified.
+    a file-like object unmodified.
     """
     if isinstance(name_or_obj, IOBase):
         return name_or_obj

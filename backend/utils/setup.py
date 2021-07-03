@@ -6,7 +6,5 @@ setup(
     # Currently these package directories don't appear to be used
     # to actually install the files.
     packages=["sparrow_utils"],
-    package_dir={
-        "sparrow_utils": "sparrow_utils",
-    },
+    package_dir={"sparrow_utils": "sparrow_utils"},
 )

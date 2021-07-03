@@ -1,4 +1,3 @@
-from os import environ
 from subprocess import run, PIPE, STDOUT
 from shlex import split
 from typing import List
@@ -9,8 +8,6 @@ from json.decoder import JSONDecodeError
 from sparrow_utils.logs import get_logger
 from sparrow_utils.shell import cmd as cmd_
 from rich import print
-from compose.cli.main import main
-import sys
 
 log = get_logger(__name__)
 
@@ -31,7 +28,7 @@ def cmd(*v, **kwargs):
 
 
 def compose(*args, **kwargs):
-    return cmd("docker-compose", *args, **kwargs)
+    return cmd("sparrow compose", *args, **kwargs)
 
 
 def container_id(container):
@@ -46,7 +43,9 @@ def container_is_running(name):
     return res.returncode == 0
 
 
-def exec_or_run(container, *args, log_level=None, run_args=("--rm",), tty=True, **popen_kwargs):
+def exec_or_run(
+    container, *args, log_level=None, run_args=("--rm",), tty=True, **popen_kwargs
+):
     """Run a command against sparrow within a docker container
     This `exec`/`run` switch is added because there are apparently
     database/locking issues caused by spinning up arbitrary
@@ -61,9 +60,13 @@ def exec_or_run(container, *args, log_level=None, run_args=("--rm",), tty=True, 
         tty_args = ["-T"]
 
     if container_is_running(container):
-        return compose(*compose_args, "exec", *tty_args, container, *args, **popen_kwargs)
+        return compose(
+            *compose_args, "exec", *tty_args, container, *args, **popen_kwargs
+        )
     else:
-        return compose(*compose_args, "run", *tty_args, *run_args, container, *args, **popen_kwargs)
+        return compose(
+            *compose_args, "run", *tty_args, *run_args, container, *args, **popen_kwargs
+        )
 
 
 def exec_sparrow(*args, **kwargs):
@@ -74,7 +77,9 @@ def fail_without_docker():
     try:
         res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
     except FileNotFoundError:
-        raise SparrowCommandError("Cannot find the docker command. Is docker installed?")
+        raise SparrowCommandError(
+            "Cannot find the docker command. Is docker installed?"
+        )
     try:
         errors = loads(str(res.stdout, "utf-8"))
     except JSONDecodeError:

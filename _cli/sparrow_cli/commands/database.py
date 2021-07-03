@@ -1,6 +1,7 @@
 import click
 from ..group import CommandGroup
-from ..util import container_id, container_is_running, run, compose, exec_sparrow
+from ..util import container_id, container_is_running, compose, exec_sparrow
+from sparrow_utils.shell import cmd
 
 
 def dump_database(dbname, out_file):
@@ -8,7 +9,7 @@ def dump_database(dbname, out_file):
         compose("up db")
     _id = container_id("db")
     with open(out_file, "w") as f:
-        run("docker exec", _id, "pg_dump -Fc -C -Upostgres", dbname, stdout=f)
+        cmd("docker exec", _id, "pg_dump -Fc -C -Upostgres", dbname, stdout=f)
 
 
 # container_id=$(sparrow compose ps -q db 2>/dev/null)
@@ -43,7 +44,9 @@ def sparrow_db(ctx):
     pass
 
 
-@sparrow_db.command(name="migration", context_settings=dict(ignore_unknown_options=True))
+@sparrow_db.command(
+    name="migration", context_settings=dict(ignore_unknown_options=True)
+)
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def migration(args):
     """Generate a changeset against the optimal database schema"""

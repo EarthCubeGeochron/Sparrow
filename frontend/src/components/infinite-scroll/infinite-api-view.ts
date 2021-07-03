@@ -41,7 +41,8 @@ function InfiniteAPIView({
   componentProps = {},
   context,
   filterParams,
-  errorHandler = ErrorCallout
+  errorHandler = ErrorCallout,
+  modelName,
 }) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
@@ -70,14 +71,14 @@ function InfiniteAPIView({
   }
 
   useEffect(() => {
-    //dataFetch(data);
+    dataFetch(data);
     console.log("RERENDERED");
   }, []);
 
   const dataFetch = (data, next = "") => {
     setNoResults(false);
     const initData = getNextPageAPI(next, url, params);
-    initData.then(res => {
+    initData.then((res) => {
       if (res.data.length == 0) {
         setNoResults(true);
       }
@@ -94,13 +95,9 @@ function InfiniteAPIView({
   };
 
   useEffect(() => {
-    console.log("filter changes");
     setData([]);
     dataFetch([]);
-    return () => {
-      setData([]);
-    };
-  }, [filterParams]);
+  }, [JSON.stringify(filterParams)]);
 
   const fetchNewData = async () => {
     if (!nextPage) return;
@@ -120,9 +117,10 @@ function InfiniteAPIView({
     return h(ForeverScroll, {
       initialData: data,
       fetch: fetchNewData,
+      modelName,
       component,
       moreAfter,
-      componentProps
+      componentProps,
     });
   }
   return h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);

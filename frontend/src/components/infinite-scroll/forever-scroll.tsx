@@ -24,12 +24,12 @@ const reducer = (state, action) => {
     case "startBottom":
       return { ...state, loadingBottom: true };
     case "loadedBottom":
-    return {
+      return {
         ...state,
         loadingBottom: false,
         hasMoreAfter: action.newData.length == perPage,
         data: [...state.data, ...action.newData],
-        after: state.after + action.newData.length
+        after: state.after + action.newData.length,
       };
     default:
       throw new Error("Don't understand action");
@@ -50,13 +50,14 @@ function ForeverScroll({
   component,
   fetch,
   moreAfter = null,
-  componentProps = {}
+  modelName = null,
+  componentProps = {},
 }) {
   const initialState = {
     loadingBottom: false,
     data: [],
     hasMoreAfter: true,
-    after: 0
+    after: 0,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -64,7 +65,6 @@ function ForeverScroll({
 
   // List of Data that the application references for indexes
   const totalData = initialData;
-
 
   const loadBottom = () => {
     dispatch({ type: "startBottom" });
@@ -80,7 +80,6 @@ function ForeverScroll({
 
   const { loadingBottom, data, after, hasMoreAfter } = state;
 
-
   useEffect(() => {
     if (visibleBottom) {
       fetch();
@@ -93,6 +92,13 @@ function ForeverScroll({
     moreToLoad = hasMoreAfter || moreAfter;
   } else {
     moreToLoad = hasMoreAfter;
+  }
+
+  let name;
+  if (data.length > 1) {
+    name = modelName + "s";
+  } else {
+    name = modelName;
   }
 
   return (
@@ -112,7 +118,7 @@ function ForeverScroll({
 
       {!moreToLoad && (
         <div className="no-results">
-          Results completed, there are {data.length} models
+          Results completed, there are {data.length} {name}
         </div>
       )}
     </div>

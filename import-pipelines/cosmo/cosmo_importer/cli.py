@@ -5,6 +5,7 @@ from sparrow import Database
 from sparrow.import_helpers import SparrowImportError, working_directory
 from .import_data import import_datafile
 
+
 @command()
 def cli(stop_on_error=False, verbose=False):
     """
@@ -13,9 +14,9 @@ def cli(stop_on_error=False, verbose=False):
     varname = "SPARROW_DATA_DIR"
     env = environ.get(varname, None)
     if env is None:
-        v = style(varname, fg='cyan', bold=True)
+        v = style(varname, fg="cyan", bold=True)
         echo(f"Environment variable {v} is not set.")
-        secho("Aborting", fg='red', bold=True)
+        secho("Aborting", fg="red", bold=True)
         return
     path = Path(env)
     assert path.is_dir()
@@ -30,6 +31,6 @@ def cli(stop_on_error=False, verbose=False):
     db.engine.execute("TRUNCATE TABLE sample CASCADE;")
 
     files = path.glob("**/*_simplified.xlsx")
-    files = (i for i in files if not i.stem.startswith('~$'))
+    files = (i for i in files if not i.stem.startswith("~$"))
     for f in files:
-        import_datafile(db,f)
+        import_datafile(db, f)

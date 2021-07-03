@@ -1,14 +1,20 @@
 import h from "react-hyperscript";
 import { Frame } from "sparrow/frame";
-import { Markdown } from "@macrostrat/ui-components";
-import { InsetText } from "app/components/layout";
-import footerText from "./footer-text.md";
+import { ServerStatus } from "../components";
 
-const PageFooter = (props) =>
-  h(
-    Frame,
-    { id: "pageFooter" },
-    h(InsetText, null, h(Markdown, { src: footerText }))
-  );
+const PageFooter = (props) => {
+  return h("footer", [
+    h(Frame, { id: "pageFooter" }, h("div")),
+    h("div.powered-by.flex-container", [
+      h("p", [
+        "Powered by ",
+        h("b", null, h("a", { href: "https://sparrow-data.org" }, "Sparrow")),
+        " ",
+      ]),
+      h("div.status", null, h(ServerStatus)),
+      h("div.spacer"),
+    ]),
+  ]);
+};
 
 export { PageFooter };

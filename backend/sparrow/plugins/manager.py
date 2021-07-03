@@ -69,7 +69,9 @@ class SparrowPluginManager(object):
         try:
             self.__init_store.append(plugin)
         except AttributeError:
-            raise SparrowPluginError("Cannot add plugins after Sparrow is finished loading.")
+            raise SparrowPluginError(
+                "Cannot add plugins after Sparrow is finished loading."
+            )
         except Exception as err:
             handle_load_error(plugin, err)
 
@@ -93,7 +95,9 @@ class SparrowPluginManager(object):
         store = store or self.__store
         for p in store:
             if getattr(p, "name") is None:
-                raise SparrowPluginError(f"Sparrow plugin '{p}' must have a name attribute.")
+                raise SparrowPluginError(
+                    f"Sparrow plugin '{p}' must have a name attribute."
+                )
         struct = {p.name: set(p.dependencies) for p in store}
         map_ = {p.name: p for p in store}
         res = toposort_flatten(struct, sort=True)
@@ -101,7 +105,9 @@ class SparrowPluginManager(object):
 
     def __load_plugin(self, plugin_class, app):
         if not issubclass(plugin_class, SparrowPlugin):
-            raise SparrowPluginError("Sparrow plugins must be a subclass of SparrowPlugin")
+            raise SparrowPluginError(
+                "Sparrow plugins must be a subclass of SparrowPlugin"
+            )
         return plugin_class(app)
 
     def finalize(self, app):

@@ -84,13 +84,15 @@
   min-height: 2em
   padding 1em
 
-.listcomponent
-  position webkit sticky 
+// TODO: This is super sketchy with the width
+.list-component
+  position -webkit-sticky 
   position sticky
+  width 100%
   top 0px
-  min-width 364px
+  //min-width 364px
   padding-top 10px
-  background-color white
+  background-color var(--background-color)
 
 .vertical
   transform rotate(90deg)

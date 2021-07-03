@@ -35,10 +35,10 @@ export function postData(data) {
 
   axios
     .post(url, post_data)
-    .then(function(response) {
+    .then(function (response) {
       console.log(response);
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error);
     });
 }

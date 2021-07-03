@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from os import path
 from sparrow_utils.shell import git_revision_info
+from importlib import import_module
 
 block_cipher = None
 
@@ -13,7 +14,16 @@ with open(revfile, "w") as f:
     # https://stackoverflow.com/questions/21017300/git-command-to-get-head-sha1-with-dirty-suffix-if-workspace-is-not-clean
     git_revision_info(stdout=f)
 
+
 data_files = {revfile: "."}
+
+# Add data files needed by docker-compose
+_compose_files = ["config/config_schema_v1.json", "config/compose_spec.json"]
+compose_root = path.dirname(import_module("compose").__file__)
+for fn in _compose_files:
+    fullpath = path.join(compose_root, fn)
+    data_files[fullpath] = "compose/config"
+
 
 a = Analysis(
     ["sparrow_cli/__main__.py"],
@@ -69,11 +79,9 @@ coll = COLLECT(
     Tree(
         path.join(src_root, "frontend"),
         prefix="srcroot/frontend",
-        excludes=["node_modules"],
+        excludes=["node_modules", "examples", ".parcel-cache"],
     ),
-    Tree(
-        path.join(src_root, "_cli"), prefix="srcroot/_cli", excludes=["build", "dist"]
-    ),
+    Tree(path.join(src_root, "_cli"), prefix="srcroot/_cli", excludes=["build", "dist"]),
     strip=False,
     upx=True,
     upx_exclude=[],

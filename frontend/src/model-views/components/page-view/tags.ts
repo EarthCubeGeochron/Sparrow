@@ -13,23 +13,31 @@ interface tagContainer {
   tags: tagBody[];
   isEditing: boolean;
   onChange: (e) => void;
+  onClickDelete: (e) => void;
 }
 
 export function TagContainer(props) {
-  const { tags, isEditing, onChange }: tagContainer = props;
+  const { tags, isEditing, onChange, onClickDelete }: tagContainer = props;
 
   if (tags) {
     return h("div.tag-container", [
-      tags.map(tag => {
+      tags.map((tag) => {
         const { name, description, color, id } = tag;
-        return h(TagBody, { name, description, color, id });
+        return h(TagBody, {
+          name,
+          description,
+          color,
+          id,
+          isEditing,
+          onClickDelete,
+        });
       }),
       h.if(isEditing)(
         Popover,
         {
           content: h(TagSelect, { tags, onChange }),
           position: "bottom",
-          minimal: true
+          minimal: true,
         },
         [
           h(
@@ -37,12 +45,12 @@ export function TagContainer(props) {
             {
               icon: "add",
               intent: "success",
-              minimal: true
+              minimal: true,
             },
             ["Add a Tag"]
-          )
+          ),
         ]
-      )
+      ),
     ]);
   } else {
     return h("div");
@@ -56,9 +64,9 @@ export function TagSelect(props) {
   const allTags = useAPIv2Result("/tags/tag", { all: true });
   if (allTags == null) return null;
 
-  const currentIds = tags.map(tag => tag.id);
+  const currentIds = tags.map((tag) => tag.id);
 
-  const tagSet = allTags.data.filter(tag => !currentIds.includes(tag.id));
+  const tagSet = allTags.data.filter((tag) => !currentIds.includes(tag.id));
 
   const itemRenderer = (item, itemProps) => {
     const { name, description, color, id } = item;
@@ -66,11 +74,11 @@ export function TagSelect(props) {
       "div",
       {
         onClick: itemProps.handleClick,
-        style: { marginBottom: "5px", cursor: "pointer" }
+        style: { marginBottom: "5px", cursor: "pointer" },
       },
       [
         h(TagBody, { name, description, color, id, disabled: true }),
-        h(MenuDivider)
+        h(MenuDivider),
       ]
     );
   };
@@ -79,22 +87,22 @@ export function TagSelect(props) {
     return item.name.toLowerCase().indexOf(query.toLowerCase()) >= 0;
   };
 
-  const onItemSelect = item => {
+  const onItemSelect = (item) => {
     onChange(item);
   };
 
   return h("div", [
     h(Suggest, {
-      inputValueRenderer: item => item.name,
+      inputValueRenderer: (item) => item.name,
       items: tagSet,
       popoverProps: {
         minimal: true,
-        popoverClassName: "my-suggest"
+        popoverClassName: "my-suggest",
       },
       onItemSelect,
       itemRenderer,
       itemPredicate,
-      closeOnSelect: true
-    })
+      closeOnSelect: true,
+    }),
   ]);
 }

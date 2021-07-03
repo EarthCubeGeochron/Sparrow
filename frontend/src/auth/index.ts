@@ -1,20 +1,16 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useContext } from "react";
-import { Button } from "@blueprintjs/core";
+import { Button, IconName } from "@blueprintjs/core";
 import { LoginForm } from "./login-form";
-import { AuthProvider, AuthContext, useAuth } from "./context";
+import { AuthProvider, useAuth } from "./context";
 import styles from "./module.styl";
 const h = hyperStyled(styles);
 
 function AuthStatus(props) {
-  const { requestLoginForm, username } = useContext(AuthContext);
-  let { className, large, ...rest } = props;
-  if (large == null) {
-    large = true;
-  }
+  const { runAction, username } = useAuth();
+  let { className, large = true } = props;
 
   let text = "Not logged in";
-  let icon = "blocked-person";
+  let icon: IconName = "blocked-person";
   if (username != null) {
     text = username;
     icon = "person";
@@ -27,7 +23,7 @@ function AuthStatus(props) {
         minimal: true,
         large,
         icon,
-        onClick: requestLoginForm,
+        onClick: () => runAction({ type: "request-form" }),
       },
       text
     ),

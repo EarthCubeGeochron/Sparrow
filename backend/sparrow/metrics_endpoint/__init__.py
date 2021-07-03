@@ -37,8 +37,12 @@ class MetricsEndpoint(SparrowCorePlugin):
 
         root_route = "core_view"
         basic_info = dict(
-            route="/core_view/metrics",
-            description="A metrics route for Sparrow",
+            route="/core_view/metrics", description="A metrics route for Sparrow"
         )
-        api.add_route("/core_view/metrics", self.metrics_view(), methods=["GET"], include_in_schema=False)
+        api.add_route(
+            "/core_view/metrics",
+            self.metrics_view(),
+            methods=["GET"],
+            include_in_schema=False,
+        )
         api.route_descriptions[root_route].append(basic_info)

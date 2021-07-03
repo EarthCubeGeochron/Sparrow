@@ -4,6 +4,8 @@ import json
 from pytest import mark
 from bs4 import BeautifulSoup as soup
 from pathlib import Path
+
+
 class TestSIMSImport:
     @mark.slow
     def test_large_sims_dataset(self, db):
@@ -11,6 +13,7 @@ class TestSIMSImport:
         with gzip.open(fn, "rb") as zipfile:
             data = json.loads(zipfile.read())
         db.load_data("session", data)
+
 
 class TestSIMSWebscraper:
     def test_webscrape_app_sims(self, db, client, token):
@@ -48,9 +51,11 @@ class TestSIMSWebscraper:
 
         proj_titles = []
         for i, title in enumerate(title_list):
-            proj_titles.append({"name": title, "publications": [{"title": title, "doi": doi_list[i]}]})
+            proj_titles.append(
+                {"name": title, "publications": [{"title": title, "doi": doi_list[i]}]}
+            )
 
-        res = client.post(route, headers={"Authorization":token}, json=proj_titles)
+        res = client.post(route, headers={"Authorization": token}, json=proj_titles)
 
         up_json = res.json()
         assert len(up_json["data"]) > 0
