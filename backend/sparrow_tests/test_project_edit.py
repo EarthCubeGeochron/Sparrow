@@ -3,8 +3,9 @@ from .helpers import json_fixture
 from pytest import mark, fixture
 import json
 
+
 def get_all_ids(db, model_name):
-    """ return all id's of model from database """
+    """return all id's of model from database"""
 
     model = getattr(db.model, model_name)
 
@@ -12,7 +13,7 @@ def get_all_ids(db, model_name):
 
     ids = [m.id for m in models]
     return ids
-    
+
 
 class TestProjectEdits:
     """
@@ -58,7 +59,7 @@ class TestProjectEdits:
 
         assert set([s.id for s in orig_sessions]) == set([1, 2])
 
-   # @mark.xfail(reason="Updating does not work at the moment")
+    # @mark.xfail(reason="Updating does not work at the moment")
     def test_project_updates(self, db):
         # need a function like load_data but for edits..
         ## get interface and db model
@@ -74,16 +75,17 @@ class TestProjectEdits:
 
         sessions = db.session.query(db.model.session).all()
         samples = db.session.query(db.model.sample).all()
-        publications= db.session.query(db.model.publication).all()
-
+        publications = db.session.query(db.model.publication).all()
 
         # load updates into the project_schema and assign the same id as the existing
-        new_proj = ProjectInterface.load(updates, session=db.session, instance=inst,partial=True)
+        new_proj = ProjectInterface.load(
+            updates, session=db.session, instance=inst, partial=True
+        )
 
         new_proj.session_collection = sessions
         new_proj.sample_collection = samples
         new_proj.publication_collection = publications
-        
+
         new_proj.id = inst.id
 
         # NOTE: for some reason, i need to rollbakc before the merge.
@@ -126,7 +128,7 @@ class TestProjectEdits:
         assert len(projects[0].publication_collection) == 0
 
     def test_collection_handler(self, db):
-        change_project_name = 'test change #3'
+        change_project_name = "test change #3"
         schema = db.interface.project()
 
         projects = db.session.query(db.model.project).all()
@@ -134,19 +136,21 @@ class TestProjectEdits:
 
         instance = projects[0]
 
-        data={'name':change_project_name}
-        data['sample']=get_all_ids(db, 'sample')
-        data['session'] = get_all_ids(db, 'session')
-        data['publication']=get_all_ids(db, 'publication')
+        data = {"name": change_project_name}
+        data["sample"] = get_all_ids(db, "sample")
+        data["session"] = get_all_ids(db, "session")
+        data["publication"] = get_all_ids(db, "publication")
 
-        assert len(data['sample']) == 3
+        assert len(data["sample"]) == 3
 
         data, model_collection = collection_handler(db, data, schema)
-        assert 'sample_collection' in  model_collection
+        assert "sample_collection" in model_collection
 
-        new_proj = schema.load(data,session=db.session, instance=instance,partial=True)
+        new_proj = schema.load(
+            data, session=db.session, instance=instance, partial=True
+        )
 
-        for k,v in model_collection.items():
+        for k, v in model_collection.items():
             setattr(new_proj, k, v)
 
         new_proj.id = instance.id
@@ -155,7 +159,7 @@ class TestProjectEdits:
         db.session.merge(new_proj)
 
         db.session.commit()
-        
+
         assert db.session.query(db.model.project).count() == 1
 
         # the updates will have lengthened the publication collection
