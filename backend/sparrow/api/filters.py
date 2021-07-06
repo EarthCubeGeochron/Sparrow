@@ -449,11 +449,13 @@ class IdListFilter(BaseFilter):
 
         return query.filter(self.model.id.in_(ids))
 
+
 class TagsFilter(BaseFilter):
-    """ 
+    """
     Class to filter models by their associated tags
     """
-    key = 'tags'
+
+    key = "tags"
 
     @property
     def params(self):
@@ -464,11 +466,11 @@ class TagsFilter(BaseFilter):
 
     def should_apply(self):
         return hasattr(self.model, "tags_tag_collection")
-    
+
     def apply(self, args, query):
         if self.key not in args:
-                return query
-        
+            return query
+
         if hasattr(self.model, "tags_tag_collection"):
             db = app_context().database
             tag = db.model.tags_tag
@@ -476,7 +478,7 @@ class TagsFilter(BaseFilter):
             return query.join(self.model.tags_tag_collection).filter(tag.id.in_([*ids]))
 
         return query
-        
+
 
 ## TODO: Open parameter i.e 'Plateua Ages', pass a number and operator?
 ## TODO: Define filter in plugin, i.e irradiation filter for WiscAr

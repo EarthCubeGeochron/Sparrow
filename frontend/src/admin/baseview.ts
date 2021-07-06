@@ -6,7 +6,7 @@ const h = hyperStyled(styles);
 
 export const AnimatedArrow = () => {
   return h("div.animatedarrow", [
-    h(Icon, { icon: "arrow-left", iconSize: 70 })
+    h(Icon, { icon: "arrow-left", iconSize: 70 }),
   ]);
 };
 /**

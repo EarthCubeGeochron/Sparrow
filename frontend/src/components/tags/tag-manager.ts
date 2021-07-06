@@ -28,14 +28,14 @@ function TagEditButtons(props) {
       icon: "edit",
       minimal: true,
       intent: "success",
-      onClick: onClickEdit
+      onClick: onClickEdit,
     }),
     h(Button, {
       icon: "trash",
       minimal: true,
       intent: "danger",
-      onClick: onClickDelete
-    })
+      onClick: onClickDelete,
+    }),
   ]);
 }
 
@@ -44,10 +44,10 @@ function TagRow(props) {
   const { buildURL } = APIHelpers(useContext(APIV2Context));
   const [isEditing, setIsEditing] = useState(false);
 
-  const onSubmit = async editedTag => {
+  const onSubmit = async (editedTag) => {
     console.log(editedTag);
     const route = buildURL(`/tags/tag/${tag.id}`);
-    const res = await Axios.put(route, editedTag).then(response => {
+    const res = await Axios.put(route, editedTag).then((response) => {
       return response;
     });
   };
@@ -65,8 +65,8 @@ function TagRow(props) {
         description: tag.description,
         color: tag.color,
         onCancel: () => setIsEditing(false),
-        onSubmit
-      })
+        onSubmit,
+      }),
     ]);
   }
   return h(
@@ -77,7 +77,7 @@ function TagRow(props) {
         name: tag.name,
         description: tag.description,
         color: tag.color,
-        id: tag.id
+        id: tag.id,
       }),
       h("p", [tag.description]),
       h(TagEditButtons, {
@@ -86,8 +86,8 @@ function TagRow(props) {
           setIsEditing(!isEditing);
         },
         isEditing,
-        onDelete
-      })
+        onDelete,
+      }),
     ]
   );
 }
@@ -103,10 +103,10 @@ function TagManager() {
     h("div.new-tag-btn", [h(NewTag)]),
     h(Callout, [
       h("div.manager-header", [total_count + " Tags"]),
-      tags.map(tag => {
+      tags.map((tag) => {
         return h(TagRow, { key: tag["id"], tag });
-      })
-    ])
+      }),
+    ]),
   ]);
 }
 
@@ -116,12 +116,12 @@ function NewTag() {
   const initTag = {
     name: "",
     description: "",
-    color: randomHexColor()
+    color: randomHexColor(),
   };
 
-  const onSubmit = async tag => {
+  const onSubmit = async (tag) => {
     const url = buildURL("/tags/tag");
-    const res = await Axios.post(url, tag).then(response => {
+    const res = await Axios.post(url, tag).then((response) => {
       return response;
     });
   };
@@ -135,7 +135,7 @@ function NewTag() {
       {
         intent: "success",
         onClick: () => setOpen(!open),
-        style: { marginBottom: "10px" }
+        style: { marginBottom: "10px" },
       },
       ["New Tag"]
     ),
@@ -148,10 +148,10 @@ function NewTag() {
           description: initTag.description,
           color: initTag.color,
           onSubmit,
-          onCancel
-        })
+          onCancel,
+        }),
       ]
-    )
+    ),
   ]);
 }
 

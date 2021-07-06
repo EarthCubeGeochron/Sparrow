@@ -27,11 +27,11 @@ import styles from "./module.styl";
 const h = hyperStyled(styles);
 
 const DataSheetPage = loadable(() => import("./data-sheet"), {
-  fallback: h(Spinner)
+  fallback: h(Spinner),
 });
 
 const ImporterPage = loadable(() => import("./importer"), {
-  fallback: h(Spinner)
+  fallback: h(Spinner),
 });
 
 function AdminDataModelLinks(props) {
@@ -40,7 +40,7 @@ function AdminDataModelLinks(props) {
     h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
     h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
     h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
-    h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files"))
+    h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
   ]);
 }
 
@@ -55,18 +55,18 @@ function SecondaryPageLinks(props) {
     h(SecondaryMenuItem, { to: base + "/import" }, "Import"),
     h(SecondaryMenuItem, { to: base + "/data-sheet" }, "Metadata"),
     h(SecondaryMenuItem, { to: base + "/terms/parameter" }, "Terms"),
-    h(SecondaryMenuItem, { to: "/map" }, "Map")
+    h(SecondaryMenuItem, { to: "/map" }, "Map"),
   ]);
 }
 
 function NewModelLinks(props) {
   const { base = "/admin" } = props;
   return h(Menu, [
-    h(SecondaryMenuItem, { to: base + "/tag-manager" }, "Tag Manager")
+    h(SecondaryMenuItem, { to: base + "/tag-manager" }, "Tag Manager"),
   ]);
 }
 
-const AdminNavbarLinks = function({ base }) {
+const AdminNavbarLinks = function ({ base }) {
   if (base == null) {
     base = "/catalog";
   }
@@ -74,18 +74,18 @@ const AdminNavbarLinks = function({ base }) {
     h(NavButton, { to: base + "/project" }, "Projects"),
     h(NavButton, { to: base + "/sample" }, "Samples"),
     h(NavButton, { to: base + "/session" }, "Sessions"),
-    h(NavButton, { to: base + "/data-file" }, "Data Files")
+    h(NavButton, { to: base + "/data-file" }, "Data Files"),
   ]);
 };
 
-const AdminNavbar = props => {
+const AdminNavbar = (props) => {
   const { base, ...rest } = props;
   return h(
     AppNavbar,
     {
       ...rest,
       fullTitle: true,
-      subtitle: h(Link, { to: base }, "Admin")
+      subtitle: h(Link, { to: base }, "Admin"),
     },
     [
       h(AdminNavbarLinks, { base }),
@@ -96,7 +96,7 @@ const AdminNavbar = props => {
         NavButton,
         { to: base + "/terms/parameter", icon: "data-lineage" },
         "Terms"
-      )
+      ),
     ]
   );
 };
@@ -104,11 +104,11 @@ const AdminNavbar = props => {
 const QuickLinks = ({ base }) => {
   return h("div", { style: { position: "sticky", top: "0px" } }, [
     h(QuickHeader, { text: "Quick Links" }),
-    h(AdminDataModelLinks, { base })
+    h(AdminDataModelLinks, { base }),
   ]);
 };
 
-const QuickHeader = props => {
+const QuickHeader = (props) => {
   const { text } = props;
 
   return h(
@@ -116,7 +116,7 @@ const QuickHeader = props => {
     { style: { marginBottom: "20px", position: "sticky", top: "0px" } },
     [
       h("h2", { style: { marginTop: "0px", marginBottom: "0px" } }, text),
-      h(Divider)
+      h(Divider),
     ]
   );
 };
@@ -135,17 +135,17 @@ const AdminBody = ({ base, ...rest }) => {
               flexGrow: 1,
               marginRight: "50px",
               width: "28em",
-              marginLeft: "15px"
-            }
+              marginLeft: "15px",
+            },
           },
           [h(QuickHeader, { text: "Quick Search" }), h(OpenSearch)]
-        )
+        ),
       ]
     ),
     h("div", { style: { position: "fixed", bottom: 70, display: "flex" } }, [
       h(SecondaryPageLinks, { base }),
-      h(NewModelLinks, { base })
-    ])
+      h(NewModelLinks, { base }),
+    ]),
   ]);
 };
 
@@ -153,43 +153,43 @@ const AdminRouter = ({ base }) =>
   h(Switch, [
     h(Route, {
       path: base + "/data-sheet",
-      render: () => h(DataSheetPage)
+      render: () => h(DataSheetPage),
     }),
     h(Route, {
       path: base + "/import",
-      render: () => h(ImporterPage)
+      render: () => h(ImporterPage),
     }),
     h(Route, {
       path: base + "/session",
-      render: () => h(SessionAdminPage)
+      render: () => h(SessionAdminPage),
     }),
     h(Route, {
       path: base + "/project",
-      render: () => h(ProjectAdminPage)
+      render: () => h(ProjectAdminPage),
     }),
     h(Route, {
       path: base + "/sample",
-      render: () => h(SampleAdminPage)
+      render: () => h(SampleAdminPage),
     }),
     h(Route, {
       path: base + "/tag-manager",
-      render: () => h(TagManager)
+      render: () => h(TagManager),
     }),
     h(Route, {
       path: base + "/terms",
-      render: () => h(VocabularyPage)
+      render: () => h(VocabularyPage),
     }),
     h(PageRoute, {
       path: base + "/data-file",
       style: PageStyle.WIDE,
-      render: () => h(DataFileAdminPage)
+      render: () => h(DataFileAdminPage),
     }),
     h(Route, {
       path: base,
       render: () => h(AdminBody, { base }),
-      exact: true
+      exact: true,
     }),
-    h(Route, { path: "*", component: NoMatchPage })
+    h(Route, { path: "*", component: NoMatchPage }),
   ]);
 
 function AdminPage(props) {
@@ -208,7 +208,7 @@ function AdminRoute({ path }) {
     path,
     style: PageStyle.WIDE,
     navComponent: () => h(AdminNavbar, { base }),
-    render: () => h(AdminPage, { base })
+    render: () => h(AdminPage, { base }),
   });
 }
 

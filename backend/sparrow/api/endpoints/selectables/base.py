@@ -10,7 +10,7 @@ from sparrow.api.response import APIResponse
 
 
 class BaseSelectableAPI(HTTPEndpoint):
-    """ A base class for all selectable endpoints """
+    """A base class for all selectable endpoints"""
 
     def __init__(self) -> None:
         super().__init__()
@@ -18,7 +18,7 @@ class BaseSelectableAPI(HTTPEndpoint):
             page=Str(missing=None, description="Page"),
             per_page=Int(missing=20, description="Number to show"),
             all=Boolean(missing=False, description="Return all results."),
-            )
+        )
         self.fields = {}
         self.basic_info = {}
         self.schema = None
@@ -28,15 +28,11 @@ class BaseSelectableAPI(HTTPEndpoint):
         if self.basic_info is not None:
             api.route_descriptions[root_route].append(self.basic_info)
 
-    
     async def api_docs(self):
         return JSONResponse(
             {
                 "license": "CC-BY 4.0",
                 "description": str(self.description),
-                "fields": {
-                    k: v
-                    for k, v in self.fields.items()
-                },
+                "fields": {k: v for k, v in self.fields.items()},
             }
         )

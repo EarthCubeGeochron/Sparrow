@@ -7,7 +7,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-export const SessionAdd = props => {
+export const SessionAdd = (props) => {
   const {
     onClickDelete = () => {},
     onClickList = () => {},
@@ -15,7 +15,7 @@ export const SessionAdd = props => {
     isEditing = false,
     sampleHoverID = null,
     onDrop = () => {},
-    editable = true
+    editable = true,
   } = props;
 
   if (!editable) {
@@ -26,7 +26,7 @@ export const SessionAdd = props => {
         isEditing: false,
         title: "Sessions",
         model: "session",
-        hasData: data.length != 0
+        hasData: data.length != 0,
       },
       [
         h(PageViewSessions, {
@@ -34,8 +34,8 @@ export const SessionAdd = props => {
           onClick: onClickDelete,
           sampleHoverID,
           onDrop,
-          isEditing
-        })
+          isEditing,
+        }),
       ]
     );
   }
@@ -48,7 +48,7 @@ export const SessionAdd = props => {
       isEditing,
       title: "Sessions",
       model: "session",
-      hasData: data.length != 0
+      hasData: data.length != 0,
     },
     [
       h(PageViewSessions, {
@@ -56,8 +56,8 @@ export const SessionAdd = props => {
         onClick: onClickDelete,
         sampleHoverID,
         onDrop,
-        isEditing
-      })
+        isEditing,
+      }),
     ]
   );
 };
@@ -68,13 +68,13 @@ export function PageViewSessions(props) {
     session,
     onClick,
     sampleHoverID = null,
-    onDrop = () => {}
+    onDrop = () => {},
   } = props;
 
   if (!session || session.length == 0) return null;
   return h("div.parameter", [
     h("div.session-container", [
-      session.map(obj => {
+      session.map((obj) => {
         const {
           id: session_id,
           technique,
@@ -82,7 +82,7 @@ export function PageViewSessions(props) {
           date,
           analysis,
           data,
-          sample
+          sample,
         } = obj;
         const onHover =
           sampleHoverID && sample ? sample.id == sampleHoverID : false;
@@ -90,7 +90,7 @@ export function PageViewSessions(props) {
           DndContainer,
           {
             id: session_id,
-            onDrop
+            onDrop,
           },
           [
             h(SessionCard, {
@@ -101,16 +101,16 @@ export function PageViewSessions(props) {
               target,
               date,
               onClick,
-              onHover
-            })
+              onHover,
+            }),
           ]
         );
-      })
-    ])
+      }),
+    ]),
   ]);
 }
 
-export const SessionCard = props => {
+export const SessionCard = (props) => {
   const {
     onClick,
     session_id,
@@ -119,7 +119,7 @@ export const SessionCard = props => {
     technique,
     sample = null,
     onHover = false,
-    isEditing
+    isEditing,
   } = props;
 
   const classname = onHover ? "sample-edit-card-samhover" : "sample-edit-card";
@@ -135,16 +135,16 @@ export const SessionCard = props => {
         to,
         isEditing,
         onClick: () => onClick({ session_id, date }),
-        link: true
+        link: true,
       },
       [
         h("div", { className: classname }, [
           h("div.session-info", [
             h("div", [h(PageViewDate, { date }), technique]),
-            h("div", target)
-          ])
-        ])
+            h("div", target),
+          ]),
+        ]),
       ]
-    )
+    ),
   ]);
 };

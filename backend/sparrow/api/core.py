@@ -12,13 +12,13 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
-from .endpoints.selectables.data_file import DataFileListEndpoint, DataFileFilterByModelID
-
-from .endpoints import (
-    ModelAPIEndpoint,
-    ViewAPIEndpoint
+from .endpoints.selectables.data_file import (
+    DataFileListEndpoint,
+    DataFileFilterByModelID,
 )
-from .api_info import  model_description, root_example, root_info, meta_info
+
+from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint
+from .api_info import model_description, root_example, root_info, meta_info
 from .response import APIResponse
 from .exceptions import SparrowAPIError
 import time
