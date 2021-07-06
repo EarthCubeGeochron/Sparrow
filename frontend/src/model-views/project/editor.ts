@@ -22,7 +22,8 @@ import {
   EditNavBar,
   NewModelButton,
   TagContainer,
-  PageViewBlock
+  PageViewBlock,
+  DatafilePageView
 } from "../components";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
@@ -346,6 +347,15 @@ async function TagsChangeSet(changeset, updatedModel, url) {
   return "no tags";
 }
 
+const ProjectDataFiles = () => {
+  const { model } = useModelEditor();
+
+  const sample_ids = model.sample.map(obj => obj.id);
+  const session_ids = model.session.map(obj => obj.id);
+
+  return h(DatafilePageView, { sample_ids, session_ids, model: "project" });
+};
+
 const SampleHoverIDContext = createContext({});
 
 const EditableProjectDetails = function(props) {
@@ -413,6 +423,7 @@ const EditableProjectDetails = function(props) {
               h(EditResearchers),
               h(EditSessions),
               h(SampleMapComponent),
+              h(ProjectDataFiles),
               h(Frame, { id: "projectPage", data: project.data }, null)
             ])
           ])

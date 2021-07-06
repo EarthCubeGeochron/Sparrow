@@ -101,6 +101,8 @@ export const PageViewModelCard = props => {
     className,
     to,
     link,
+    indirect = false,
+    linkedThrough = "",
     isEditing = false,
     children,
     onMouseEnter,
@@ -112,11 +114,13 @@ export const PageViewModelCard = props => {
 
   const component = link && !isEditing ? LinkCard : Card;
 
+  const cardClassName = indirect ? "indirect-link" : "sample-card";
+
   if (isEditing) {
     return h(
       component,
       {
-        className: "sample-card",
+        className: cardClassName,
         to,
         onMouseEnter,
         onMouseLeave,
@@ -141,23 +145,29 @@ export const PageViewModelCard = props => {
     );
   }
 
-  return h(
-    component,
-    {
-      className: "sample-card",
-      to,
-      onMouseEnter,
-      onMouseLeave,
-      draggable,
-      style: { ...styles }
-    },
-    [children]
-  );
+  return h("div", [
+    h(
+      component,
+      {
+        className: cardClassName,
+        to,
+        onMouseEnter,
+        onMouseLeave,
+        draggable,
+        style: { ...styles }
+      },
+      [children]
+    ),
+    h.if(indirect)(
+      "div",
+      { style: { fontSize: "10px", marginLeft: "10px", fontStyle: "italic" } },
+      ["Linked through ", linkedThrough]
+    )
+  ]);
 };
 
 export const PageViewDate = props => {
   const { date } = props;
-  console.log(date);
 
   return h("div.page-view-date", [format(date, "MMMM D, YYYY")]);
 };

@@ -140,14 +140,11 @@ export const SessionCard = props => {
       [
         h("div", { className: classname }, [
           h("div.session-info", [
-            h("div", [h(PageViewDate, { date }), target]),
-            h("div", technique)
+            h("div", [h(PageViewDate, { date }), technique]),
+            h("div", target)
           ])
         ])
       ]
-    ),
-    h.if(sample)("div", { style: { fontSize: "10px", marginLeft: "10px" } }, [
-      h("i", `Linked through ${sampleName}`)
-    ])
+    )
   ]);
 };

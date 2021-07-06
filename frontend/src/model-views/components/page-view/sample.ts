@@ -1,8 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import styled from "@emotion/styled";
-import { Button } from "@blueprintjs/core";
-import { AddCard } from "./page-view";
-import { PageViewModelCard, PageViewBlock } from "../index";
+import { PageViewModelCard, PageViewBlock, PageViewDate } from "../index";
 import { DndChild } from "~/components";
 import { useModelURL } from "~/util";
 //@ts-ignore
@@ -102,6 +100,23 @@ export const PageViewSamples = function({
   }
 };
 
+function SessionContent(props) {
+  const { session } = props;
+
+  if (session.length == 0) {
+    return null;
+  } else if (session.length > 1) {
+    return h("div", [session.length, " Sessions"]);
+  } else {
+    return session.map(ele => {
+      return h.if(ele.date)("div", [
+        h(PageViewDate, { date: ele.date }),
+        ele.technique
+      ]);
+    });
+  }
+}
+
 interface SampleCardProps {
   name: string;
   id: number;
@@ -143,9 +158,8 @@ export const SampleCard = function(props: SampleCardProps) {
   const sessionContent = h.if(session.length > 0)("div", [
     session.map(ele => {
       return h.if(ele.date)("div", [
-        ele.date.split("T")[0],
-        ",     ",
-        ele.target
+        h(PageViewDate, { date: ele.date }),
+        ele.technique
       ]);
     })
   ]);
@@ -167,7 +181,7 @@ export const SampleCard = function(props: SampleCardProps) {
       h("h4.name", name),
       h("div.location-name", location_name),
       h.if(material != null)("div.material", material),
-      sessionContent
+      h(SessionContent, { session })
     ]
   );
 };

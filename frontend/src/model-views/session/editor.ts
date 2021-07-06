@@ -30,7 +30,8 @@ import {
   EmbargoDatePick,
   EditStatusButtons,
   TagContainer,
-  PageViewBlock
+  PageViewBlock,
+  DatafilePageView
 } from "../components";
 import { SessionAdminContext } from "~/admin/session";
 import styles from "./module.styl";
@@ -54,6 +55,12 @@ const EmbargoEditor = function(props) {
 
   return h(EmbargoDatePick, { onChange, embargo_date, active: isEditing });
 };
+
+function SessionDataFiles(props) {
+  const { model } = useModelEditor();
+
+  return h(DatafilePageView, { session_ids: [model.id], model: "session" });
+}
 
 function EditStatusButtonsSess(props) {
   const { isEditing, hasChanges, actions } = useModelEditor();
@@ -246,7 +253,8 @@ function EditableSessionInfoComponent(props) {
       onClickList: projectClickList,
       onClickDelete: onProjectClickDelete
     }),
-    h(SessionPublication)
+    h(SessionPublication),
+    h(SessionDataFiles)
   ]);
 }
 
