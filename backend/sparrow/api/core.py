@@ -12,16 +12,13 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
-from .endpoints.data_file import DataFileListEndpoint
+from .endpoints.selectables.data_file import DataFileListEndpoint, DataFileFilterByModelID
 
 from .endpoints import (
     ModelAPIEndpoint,
-    ViewAPIEndpoint,
-    model_description,
-    root_example,
-    root_info,
-    meta_info,
+    ViewAPIEndpoint
 )
+from .api_info import  model_description, root_example, root_info, meta_info
 from .response import APIResponse
 from .exceptions import SparrowAPIError
 import time
@@ -155,6 +152,7 @@ class APIv2(Starlette):
         self.add_schema_route()
         self.add_meta_route()
         self.add_route("/data_file/list", DataFileListEndpoint)
+        self.add_route("/data_file/filter", DataFileFilterByModelID)
 
     def _add_model_route(self, iface):
         class Meta:
