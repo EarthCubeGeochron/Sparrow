@@ -7,7 +7,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-export const ProjectAdd = props => {
+export const ProjectAdd = (props) => {
   const { onClickDelete, onClickList, data, isEditing } = props;
 
   return h(
@@ -18,14 +18,14 @@ export const ProjectAdd = props => {
       isEditing,
       title: "Projects",
       modelLink: true,
-      hasData: data.project.length != 0
+      hasData: data.project.length != 0,
     },
     [
       h(PageViewProjects, {
         onClick: onClickDelete,
         isEditing,
-        data
-      })
+        data,
+      }),
     ]
   );
 };
@@ -34,9 +34,9 @@ export const PageViewProjects = ({ data, isEditing, onClick }) => {
   return h("div", [h(ProjectCard, { d: data, onClick, isEditing })]);
 };
 
-const ProjectCard = props => {
+const ProjectCard = (props) => {
   const { d, onClick, isEditing } = props;
-  const project = d.project.map(obj => {
+  const project = d.project.map((obj) => {
     if (obj) {
       const { name, id } = obj;
       return { name, id };
@@ -45,7 +45,7 @@ const ProjectCard = props => {
   });
 
   return h("div", [
-    project.map(obj => {
+    project.map((obj) => {
       if (!obj) return null;
       const { name, id } = obj;
       const to = useModelURL(`/project/${id}`);
@@ -57,10 +57,10 @@ const ProjectCard = props => {
           styles: { minWidth: "500px" },
           to,
           link: true,
-          onClick: () => onClick({ id, name })
+          onClick: () => onClick({ id, name }),
         },
         [h("h4.name", name)]
       );
-    })
+    }),
   ]);
 };

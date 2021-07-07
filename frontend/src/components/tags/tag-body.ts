@@ -20,7 +20,7 @@ function TagBody(props: tagBody) {
     onClickDelete,
     isEditing = false,
     id = 10000,
-    disabled = false
+    disabled = false,
   } = props;
 
   const showName = name.length > 0 ? name : "Tag Preview";
@@ -40,10 +40,10 @@ function TagBody(props: tagBody) {
         large: true,
         round: true,
         onRemove: isEditing && onRemove,
-        style: { backgroundColor: color, color: textColor }
+        style: { backgroundColor: color, color: textColor },
       },
       [showName]
-    )
+    ),
   ]);
 }
 

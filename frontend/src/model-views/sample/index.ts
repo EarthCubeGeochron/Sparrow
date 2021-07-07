@@ -12,7 +12,7 @@ function SampleMain(props) {
     h(
       Route,
       {
-        path: base + "/:id"
+        path: base + "/:id",
       },
       [h(SampleMatch, { Edit })]
     ),
@@ -21,8 +21,8 @@ function SampleMain(props) {
       render() {
         return h(SampleList);
       },
-      exact: true
-    })
+      exact: true,
+    }),
   ]);
 }
 

@@ -33,7 +33,13 @@ from ..filters import (
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
 from ...util import relative_path
-from ..api_info import model_description, model_examples, root_example, root_info, meta_info
+from ..api_info import (
+    model_description,
+    model_examples,
+    root_example,
+    root_info,
+    meta_info,
+)
 
 log = get_logger(__name__)
 
@@ -50,6 +56,7 @@ def _field_description(schema, field):
             name += "[]"
         return name
     return field.__class__.__name__
+
 
 class ModelAPIEndpoint(HTTPEndpoint):
     class Meta:

@@ -23,18 +23,18 @@ export function TagContainer(props) {
     isEditing,
     onChange,
     onClickDelete,
-    modelName
+    modelName,
   }: tagContainer = props;
 
   if (tags.length == 0 && !isEditing) {
     return h(ModelAttributeOneLiner, {
       title: "Tags: ",
-      content: "None"
+      content: "None",
     });
   }
 
   return h("div.tag-container", [
-    tags.map(tag => {
+    tags.map((tag) => {
       const { name, description, color, id } = tag;
       return h(TagBody, {
         name,
@@ -42,7 +42,7 @@ export function TagContainer(props) {
         color,
         id,
         isEditing,
-        onClickDelete
+        onClickDelete,
       });
     }),
     h.if(isEditing)(
@@ -50,7 +50,7 @@ export function TagContainer(props) {
       {
         content: h(TagPopover, { tags, onChange, modelName }),
         position: "bottom",
-        minimal: true
+        minimal: true,
       },
       [
         h(
@@ -58,12 +58,12 @@ export function TagContainer(props) {
           {
             icon: "add",
             intent: "success",
-            minimal: true
+            minimal: true,
           },
           ["Add a Tag"]
-        )
+        ),
       ]
-    )
+    ),
   ]);
 }
 
@@ -79,8 +79,8 @@ function TagPopover(props) {
     h("h4", [`Add a tag to this ${modelName}`]),
     h(TagSelect, { tags, onChange }),
     h(Button, { minimal: true, icon: "edit", onClick }, [
-      "Edit or create a tag"
-    ])
+      "Edit or create a tag",
+    ]),
   ]);
 }
 

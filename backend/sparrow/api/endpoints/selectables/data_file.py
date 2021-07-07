@@ -61,18 +61,21 @@ class DataFileListEndpoint(HTTPEndpoint):
             except Exception as err:
                 return JSONResponse({"error": str(err)})
 
+
 class DataFileFilterByModelID(HTTPEndpoint):
-    """ 
-    A filterable datafile endpoint to find related models 
-    
+    """
+    A filterable datafile endpoint to find related models
+
     creates a custom json serialization that returns the model with id of the link
     """
 
     args_schema = dict(
-            sample_id =DelimitedList(Int(),description="sample id to filter datafile by"),
-            session_id =DelimitedList(Int(),description="session id to filter datafile by"),
-            analysis_id =DelimitedList(Int(),description="analysis id to filter datafile by")
-            )
+        sample_id=DelimitedList(Int(), description="sample id to filter datafile by"),
+        session_id=DelimitedList(Int(), description="session id to filter datafile by"),
+        analysis_id=DelimitedList(
+            Int(), description="analysis id to filter datafile by"
+        ),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -89,14 +92,16 @@ class DataFileFilterByModelID(HTTPEndpoint):
             return JSONResponse({})
 
         model_name = None
-        possible_ids = ['sample_id', 'session_id', 'analysis_id']
+        possible_ids = ["sample_id", "session_id", "analysis_id"]
         for id_ in possible_ids:
             if id_ in args:
                 model_name = id_
                 model_ids = args[id_]
-        
+
         if model_name is None:
-            return JSONResponse({"error": "no model name or incorrect model name was passed"})
+            return JSONResponse(
+                {"error": "no model name or incorrect model name was passed"}
+            )
 
         # Wrap entire query infrastructure in error-handling block.
         # We should probably make this a "with" statement or something
@@ -106,31 +111,35 @@ class DataFileFilterByModelID(HTTPEndpoint):
             try:
                 DataFile = db.model.data_file
                 DFL = db.model.data_file_link
-         
+
                 q = db.session.query(
-                    DataFile.file_hash, DataFile.file_mtime, DataFile.basename, DataFile.type_id, getattr(DFL, model_name)
-                    ).order_by(DataFile.file_mtime)
+                    DataFile.file_hash,
+                    DataFile.file_mtime,
+                    DataFile.basename,
+                    DataFile.type_id,
+                    getattr(DFL, model_name),
+                ).order_by(DataFile.file_mtime)
 
-                q = q.join(DataFile.data_file_link_collection).filter(getattr(DFL, model_name).in_([*model_ids]))
+                q = q.join(DataFile.data_file_link_collection).filter(
+                    getattr(DFL, model_name).in_([*model_ids])
+                )
 
-             
                 res = q.all()
-                
+
                 # slightly messy way to create a custom json serialization
                 data = []
                 for row in res:
                     row_obj = {}
                     file_hash, file_mtime, basename, type_id, model_id = row
-                    row_obj['file_hash'] = file_hash
-                    row_obj['file_mtime'] = file_mtime.isoformat()
-                    row_obj['basename'] = basename
-                    row_obj['type'] = type_id
-                    row_obj['model'] = model_name[:-3]
-                    row_obj['model_id'] = model_id
+                    row_obj["file_hash"] = file_hash
+                    row_obj["file_mtime"] = file_mtime.isoformat()
+                    row_obj["basename"] = basename
+                    row_obj["type"] = type_id
+                    row_obj["model"] = model_name[:-3]
+                    row_obj["model_id"] = model_id
                     data.append(row_obj)
 
                 return JSONResponse(dict(data=data, total_count=len(res)))
 
             except Exception as err:
                 return JSONResponse({"error": str(err)})
-

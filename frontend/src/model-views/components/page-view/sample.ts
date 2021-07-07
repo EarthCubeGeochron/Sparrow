@@ -9,7 +9,7 @@ import { useAPIv2Result } from "~/api-v2";
 
 const h = hyperStyled(styles);
 
-export const SampleAdd = props => {
+export const SampleAdd = (props) => {
   const {
     onClickDelete = () => {},
     onClickList = () => {},
@@ -17,7 +17,7 @@ export const SampleAdd = props => {
     draggable = true,
     isEditing = true,
     setID = () => {},
-    editable = true
+    editable = true,
   } = props;
 
   if (!editable) {
@@ -28,7 +28,7 @@ export const SampleAdd = props => {
         modelLink: true,
         model: "sample",
         title: "Samples",
-        hasData: data.length != 0
+        hasData: data.length != 0,
       },
       [
         h(PageViewSamples, {
@@ -36,8 +36,8 @@ export const SampleAdd = props => {
           isEditing: false,
           draggable,
           onClick: onClickDelete,
-          setID
-        })
+          setID,
+        }),
       ]
     );
   }
@@ -49,7 +49,7 @@ export const SampleAdd = props => {
       onClick: onClickList,
       model: "sample",
       title: "Samples",
-      hasData: data.length != 0
+      hasData: data.length != 0,
     },
     [
       h(PageViewSamples, {
@@ -57,8 +57,8 @@ export const SampleAdd = props => {
         isEditing,
         draggable,
         onClick: onClickDelete,
-        setID
-      })
+        setID,
+      }),
     ]
   );
 };
@@ -69,18 +69,18 @@ flex-flow: row wrap;
 margin: 0 -5px;\
 `;
 
-export const PageViewSamples = function({
+export const PageViewSamples = function ({
   data,
   isEditing,
   setID = () => {},
   link = true,
   onClick,
-  draggable = true
+  draggable = true,
 }) {
   if (data != null) {
     return h("div.sample-area", [
       h(SampleContainer, [
-        data.map(d => {
+        data.map((d) => {
           const { material, id, name, location_name, session } = d;
           return h(DndChild, { id, data: d, draggable }, [
             h(SampleCard, {
@@ -92,11 +92,11 @@ export const PageViewSamples = function({
               setID,
               link,
               onClick: () => onClick({ id, name }),
-              isEditing
-            })
+              isEditing,
+            }),
           ]);
-        })
-      ])
+        }),
+      ]),
     ]);
   }
 };
@@ -109,10 +109,10 @@ function SessionContent(props) {
   } else if (session.length > 1) {
     return h("div", [session.length, " Sessions"]);
   } else {
-    return session.map(ele => {
+    return session.map((ele) => {
       return h.if(ele.date)("div", [
         h(PageViewDate, { date: ele.date }),
-        ele.technique
+        ele.technique,
       ]);
     });
   }
@@ -133,7 +133,7 @@ interface SampleCardProps {
  *
  * @param props : name (string), id (number), link (boolean), material (string), location_name? (string)
  */
-export const SampleCard = function(props: SampleCardProps) {
+export const SampleCard = function (props: SampleCardProps) {
   let {
     material,
     id,
@@ -143,7 +143,7 @@ export const SampleCard = function(props: SampleCardProps) {
     setID,
     session = [],
     isEditing = false,
-    onClick
+    onClick,
   } = props;
 
   const onHover = () => {
@@ -157,12 +157,12 @@ export const SampleCard = function(props: SampleCardProps) {
   };
 
   const sessionContent = h.if(session.length > 0)("div", [
-    session.map(ele => {
+    session.map((ele) => {
       return h.if(ele.date)("div", [
         h(PageViewDate, { date: ele.date }),
-        ele.technique
+        ele.technique,
       ]);
-    })
+    }),
   ]);
 
   const to = useModelURL(`/sample/${id}`);
@@ -176,13 +176,13 @@ export const SampleCard = function(props: SampleCardProps) {
       isEditing,
       onMouseEnter: onHover,
       onMouseLeave: onHoverLeave,
-      onClick
+      onClick,
     },
     [
       h("h4.name", name),
       h("div.location-name", location_name),
       h.if(material != null)("div.material", material),
-      h(SessionContent, { session })
+      h(SessionContent, { session }),
     ]
   );
 };

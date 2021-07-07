@@ -19,7 +19,9 @@ from .endpoints import (
     ModelAPIEndpoint,
     ViewAPIEndpoint
 )
-from .api_info import  model_description, root_example, root_info, meta_info
+
+from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint
+from .api_info import model_description, root_example, root_info, meta_info
 from .response import APIResponse
 from .exceptions import SparrowAPIError
 import time

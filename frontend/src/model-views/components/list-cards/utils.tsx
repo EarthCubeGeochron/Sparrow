@@ -397,7 +397,7 @@ const DataFileModelCard = (props) => {
 
   const content = h("div.session-card", [
     h("div.card-header", [h(PageViewDate, { date })]),
-    h("div.bod", [h("div", [h("span", basename)]), h("div", [type])])
+    h("div.bod", [h("div", [h("span", basename)]), h("div", [type])]),
   ]);
 
   const cardContent = h(

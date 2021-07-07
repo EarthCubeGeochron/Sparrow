@@ -20,6 +20,6 @@ export function TagFilter(props) {
     isEditing: true,
     onChange: onAdd,
     onClickDelete: onDelete,
-    modelName: "filter"
+    modelName: "filter",
   });
 }
