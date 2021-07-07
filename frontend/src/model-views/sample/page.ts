@@ -29,10 +29,12 @@ import {
   ModelAttributeOneLiner,
   TagContainer,
   PageViewBlock,
-  DatafilePageView
+  DatafilePageView,
+  SubSamplePageView
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
+import { useModelURL } from "~/util";
 
 const h = hyper.styled(styles);
 
@@ -124,6 +126,31 @@ const Material = function(props) {
       content: model.material
     });
   }
+};
+
+const MemberOf = function(props) {
+  const { isEditing, hasChanges, actions, model } = useModelEditor();
+
+  const memberOf = model.member_of;
+
+  const content = memberOf
+    ? h("a", { href: useModelURL(`/sample/${memberOf}`) }, [
+        `Sample ${memberOf}`
+      ])
+    : null;
+
+  console.log(model);
+
+  return h(ModelAttributeOneLiner, {
+    title: "Member of:",
+    content
+  });
+};
+
+const SubSamples = function() {
+  const { isEditing, hasChanges, actions, model } = useModelEditor();
+
+  return h(SubSamplePageView, { sample_id: model.id, isEditing });
 };
 
 const DepthElevation = props => {
@@ -361,8 +388,11 @@ async function TagsChangeSet(changeset, updatedModel, url) {
 const SamplePageDataFiles = () => {
   const { model } = useModelEditor();
 
-  const session_ids = model.session.map(obj => obj.id);
+  let session_ids = model.session.map(obj => obj.id);
   console.log(session_ids);
+  if (session_ids.length == 0) {
+    session_ids = [0];
+  }
 
   return h(DatafilePageView, { model: "sample", session_ids });
 };
@@ -413,13 +443,14 @@ function SamplePage(props) {
             multiline: true
           }),
           h("div.flex-row", [
-            h("div.info-block", [h(Material), h(DepthElevation)]),
+            h("div.info-block", [h(MemberOf), h(Material), h(DepthElevation)]),
             h("div", [h(LocationBlock)])
           ]),
           h.if(Edit)(SampleTagContainer)
         ])
       ]),
       h(GeoEntity),
+      h(SubSamples),
       h(SampleProjectAdd),
       h(SampleSessionAdd),
       h(SamplePageDataFiles),

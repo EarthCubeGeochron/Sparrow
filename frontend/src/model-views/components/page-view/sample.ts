@@ -5,6 +5,7 @@ import { DndChild } from "~/components";
 import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
+import { useAPIv2Result } from "~/api-v2";
 
 const h = hyperStyled(styles);
 
@@ -185,3 +186,33 @@ export const SampleCard = function(props: SampleCardProps) {
     ]
   );
 };
+
+export function SubSamplePageView(props) {
+  const { sample_id, isEditing } = props;
+
+  let data = useAPIv2Result(
+    `/sub-sample/${sample_id}`,
+    {},
+    { unwrapResponse: data => data.sample_collection }
+  );
+
+  if (data == undefined) data = [];
+
+  return h(
+    PageViewBlock,
+    {
+      isEditing,
+      title: "Sub-Samples",
+      model: "sample",
+      hasData: data.length > 0
+    },
+    [
+      h(PageViewSamples, {
+        data,
+        isEditing,
+        onClick: () => {},
+        draggable: false
+      })
+    ]
+  );
+}
