@@ -13,6 +13,7 @@ from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
 from ..database.mapper.util import classname_for_table
 from .endpoints.selectables.data_file import DataFileListEndpoint, DataFileFilterByModelID
+from .endpoints.selectables.sample import SubSamples
 
 from .endpoints import (
     ModelAPIEndpoint,
@@ -153,6 +154,7 @@ class APIv2(Starlette):
         self.add_meta_route()
         self.add_route("/data_file/list", DataFileListEndpoint)
         self.add_route("/data_file/filter", DataFileFilterByModelID)
+        self.add_route("/sub-sample/{id}", SubSamples, methods=['GET'])
 
     def _add_model_route(self, iface):
         class Meta:
