@@ -14,7 +14,7 @@ import {
   SubmitButton,
   EmbargoDatePick,
   ProjectAdd,
-  SessionAdd
+  SessionAdd,
 } from "../../components";
 import { sampleReducer } from "./reducer";
 import { MinimalNavbar } from "~/components";
@@ -22,7 +22,7 @@ import {
   modelEditList,
   sample_reducer,
   sampleFormState,
-  sampleContext
+  sampleContext,
 } from "./types";
 // @ts-ignore
 import styles from "./module.styl";
@@ -39,14 +39,14 @@ const NewSampleProjectAdd = () => {
   const onAddProject = (id, name) => {
     dispatch({
       type: sample_reducer.ADD_PROJECT,
-      payload: { project: { id, name } }
+      payload: { project: { id, name } },
     });
   };
 
   const onDeleteProject = ({ id, name }) => {
     dispatch({
       type: sample_reducer.REMOVE_PROJECT,
-      payload: { project: { id, name } }
+      payload: { project: { id, name } },
     });
   };
 
@@ -59,7 +59,7 @@ const NewSampleProjectAdd = () => {
     onClickDelete: onDeleteProject,
     onClickList,
     data: sample,
-    isEditing: true
+    isEditing: true,
   });
 };
 
@@ -75,7 +75,7 @@ const NewSampleSessionAdd = () => {
   const onClickDelete = ({ session_id: id, date }) => {
     dispatch({
       type: sample_reducer.REMOVE_SESSION,
-      payload: { session: { id, date } }
+      payload: { session: { id, date } },
     });
   };
 
@@ -88,75 +88,75 @@ const NewSampleSessionAdd = () => {
     onClickDelete,
     onClickList,
     data: sample.session,
-    isEditing: true
+    isEditing: true,
   });
 };
 
 const EmbargoDate = () => {
   const { sample, dispatch } = useContext(NewSampleFormContext);
 
-  const onChange = date => {
+  const onChange = (date) => {
     dispatch({ type: sample_reducer.EMBARGO, payload: { embargo_date: date } });
   };
   const embargo_date = sample.embargo_date;
   return h("div", [h(EmbargoDatePick, { onChange, embargo_date })]);
 };
 
-const NewSampleNavBar = props => {
+const NewSampleNavBar = (props) => {
   return h(MinimalNavbar, { className: "project-editor-navbar" }, [
     h("h4", props.header),
-    h(EmbargoDate)
+    h(EmbargoDate),
   ]);
 };
 
 function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
   const { sample, dispatch } = useContext(NewSampleFormContext);
 
-  const changeCoordinates = coords => {
+  const changeCoordinates = (coords) => {
     dispatch({
       type: sample_reducer.LOCATION,
-      payload: { coordinates: coords }
+      payload: { coordinates: coords },
     });
   };
 
-  const changeName = name => {
+  const changeName = (name) => {
     dispatch({ type: sample_reducer.NAME, payload: { name } });
   };
 
-  const changeDepth = depth => {
+  const changeDepth = (depth) => {
     dispatch({ type: sample_reducer.DEPTH, payload: { depth } });
   };
 
-  const changeElevation = elevation => {
+  const changeElevation = (elevation) => {
     dispatch({
       type: sample_reducer.ELEVATION,
-      payload: { elevation }
+      payload: { elevation },
     });
   };
-  const changeMaterial = material => {
+  const changeMaterial = (material) => {
     dispatch({
       type: sample_reducer.MATERIAL,
-      payload: { material }
+      payload: { material },
     });
   };
 
-  const changeGeoEntity = geo_entity => {
+  const changeGeoEntity = (geo_entity) => {
     dispatch({
       type: sample_reducer.GEO_ENTITY,
-      payload: { geo_entity: geo_entity }
+      payload: { geo_entity: geo_entity },
     });
   };
 
-  const deleteGeoEntity = index => {
+  const deleteGeoEntity = (index) => {
     dispatch({
       type: sample_reducer.REMOVE_GEO_ENTITY,
-      payload: { index }
+      payload: { index },
     });
   };
 
   const { sample_geo_entity, location } = sample;
   const {
-    coordinates: [longitude, latitude]
+    coordinates: [longitude, latitude],
   } = location;
 
   return h("div.drawer-body", [
@@ -166,24 +166,24 @@ function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
       h("div", [
         h(SampleLocation, {
           changeCoordinates,
-          sample: { longitude, latitude }
+          sample: { longitude, latitude },
         }),
         h(SampleDepth, { sample, changeDepth }),
-        h(SampleElevation, { sample, changeElevation })
+        h(SampleElevation, { sample, changeElevation }),
       ]),
-      h("div.sample-map", [h(NewSampleMap, { changeCoordinates, sample })])
+      h("div.sample-map", [h(NewSampleMap, { changeCoordinates, sample })]),
     ]),
     h(SampleMaterial, { changeMaterial, sample }),
     h("div.metadata-body", [
       h(GeoContext, {
         sample_geo_entity: sample_geo_entity == null ? null : sample_geo_entity,
         changeGeoEntity,
-        deleteGeoEntity
-      })
+        deleteGeoEntity,
+      }),
     ]),
     h(NewSampleProjectAdd),
     h(NewSampleSessionAdd),
-    h(SubmitButton, { postData: onSubmit, modelName: "Sample" })
+    h(SubmitButton, { postData: onSubmit, modelName: "Sample" }),
   ]);
 }
 
@@ -198,7 +198,7 @@ const initialState: sampleFormState = {
   location: { type: "Point", coordinates: [null, null] },
   sample_geo_entity: [],
   changeFunction: () => {},
-  listName: modelEditList.MAIN
+  listName: modelEditList.MAIN,
 };
 
 export function NewSamplePage() {
@@ -213,13 +213,13 @@ export function NewSamplePage() {
     if (!samplePost.location.coordinates[0]) {
       samplePost.location = null;
     }
-    const response = await Ax.post(route, samplePost).then(response => {
+    const response = await Ax.post(route, samplePost).then((response) => {
       return response;
     });
     const { id } = response.data.data;
     dispatch({
       type: sample_reducer.LIST_NAME,
-      payload: { listName: modelEditList.MAIN }
+      payload: { listName: modelEditList.MAIN },
     });
     const goToRoute = process.env.BASE_URL + `admin/sample/${id}`;
     window.location.assign(goToRoute);
@@ -230,8 +230,8 @@ export function NewSamplePage() {
     {
       value: {
         sample,
-        dispatch
-      }
+        dispatch,
+      },
     },
     [h(NewSamplePageMainComponent, { onSubmit })]
   );

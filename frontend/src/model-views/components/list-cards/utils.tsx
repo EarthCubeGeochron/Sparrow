@@ -141,21 +141,21 @@ const interior = ({ doi, title }) => {
       " – ",
       h("span.doi-info", [
         h("span.label", "DOI:"),
-        h("span.doi.bp3-monospace-text", doi)
-      ])
+        h("span.doi.bp3-monospace-text", doi),
+      ]),
     ];
   }
   return h("div", { style: { margin: "10px" } }, [
     h("span.title", title),
-    ...doiAddendum
+    ...doiAddendum,
   ]);
 };
 
-const PublicationModelCard = props => {
+const PublicationModelCard = (props) => {
   const { year, id, title, doi, author, journal, onClick, link } = props;
 
   const content = h(Frame, { id: "publicationCardContent" }, [
-    h(interior, { title, doi })
+    h(interior, { title, doi }),
   ]);
 
   return h(ModelCard, {
