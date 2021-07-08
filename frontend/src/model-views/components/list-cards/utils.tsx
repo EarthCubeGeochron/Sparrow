@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { pluralize } from "../new-model";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
-import { PageViewDate, ProjectCardContent } from "~/model-views";
+import { PageViewDate, ProjectCardContent, Publication } from "~/model-views";
 
 const h = hyperStyled(styles);
 
@@ -134,10 +134,29 @@ const SampleModelCard = props => {
   });
 };
 
+const interior = ({ doi, title }) => {
+  let doiAddendum = [];
+  if (doi != null) {
+    doiAddendum = [
+      " – ",
+      h("span.doi-info", [
+        h("span.label", "DOI:"),
+        h("span.doi.bp3-monospace-text", doi)
+      ])
+    ];
+  }
+  return h("div", { style: { margin: "10px" } }, [
+    h("span.title", title),
+    ...doiAddendum
+  ]);
+};
+
 const PublicationModelCard = props => {
   const { year, id, title, doi, author, journal, onClick, link } = props;
 
-  const content = h(Frame, { id: "publicationCardContent" }, h("div", [title]));
+  const content = h(Frame, { id: "publicationCardContent" }, [
+    h(interior, { title, doi })
+  ]);
 
   return h(ModelCard, {
     id,
@@ -154,7 +173,7 @@ export const ResearcherModelCard = props => {
   const content = h(
     Frame,
     { id: "researcherCardContent", data: { id, name } },
-    h("div", [name])
+    h("h4", { style: { margin: "10px" } }, name)
   );
 
   return h(ModelCard, {

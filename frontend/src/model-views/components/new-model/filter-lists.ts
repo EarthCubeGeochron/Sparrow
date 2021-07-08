@@ -13,7 +13,6 @@ import {
   EditProjNewResearcher,
   EditProjNewSample
 } from "./index";
-import { modelEditList } from "../../sample/new-sample";
 //@ts-ignore
 import styles from "./module.styl";
 
