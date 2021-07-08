@@ -1,6 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route, Link } from "react-router-dom";
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 //@ts-ignore
 import styles from "./module.styl";
 import { NoStateAdmin } from "./baseview";
@@ -11,7 +11,7 @@ import {
   ResearcherFilterList,
   SessionFilterList,
   ProjectMatch,
-  ProjectListComponent,
+  ProjectListComponent
 } from "~/model-views";
 import { NewProjectForm } from "../model-views/project/new-project";
 import { AdminFilter } from "../filter";
@@ -19,10 +19,15 @@ import { AdminFilter } from "../filter";
 const h = hyperStyled(styles);
 
 function ProjectNoStateAdmin() {
+  const { setListName } = useContext(ProjectAdminContext);
   const content = h("h3", [
     "Or create a new project",
-    h(Link, { to: "/admin/project/new" }, [" here."]),
+    h(Link, { to: "/admin/project/new" }, [" here."])
   ]);
+
+  useEffect(() => {
+    setListName("main");
+  }, []);
 
   return h(NoStateAdmin, { name: "Project", content });
 }
@@ -33,29 +38,29 @@ export function ProjectMainPanel() {
   return h(Switch, [
     h(Route, {
       path: base + "/new",
-      render: () => h(NewProjectForm),
+      render: () => h(NewProjectForm)
     }),
     h(Route, {
       path: base + "/:id",
-      render: () => h(ProjectMatch, { Edit }),
+      render: () => h(ProjectMatch, { Edit })
     }),
     h(Route, {
       path: base,
-      render: () => h(ProjectNoStateAdmin, { name: "Project" }),
-    }),
+      render: () => h(ProjectNoStateAdmin, { name: "Project" })
+    })
   ]);
 }
 
 export const ProjectAdminContext = createContext({});
 
-const mainFilterList = (props) => {
+const mainFilterList = props => {
   const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
 
   const initialState = createParamsFromURL(possibleFilters);
 
   const [params, setParams] = useState(initialState);
 
-  const createParams = (params) => {
+  const createParams = params => {
     for (let [key, value] of Object.entries(params)) {
       if (value == null) {
         delete params[key];
@@ -68,27 +73,27 @@ const mainFilterList = (props) => {
     listComponent: h(ProjectListComponent, { params }),
     possibleFilters,
     createParams,
-    initParams: params || {},
+    initParams: params || {}
   });
 };
 
-const ProjectAdminList = (props) => {
+const ProjectAdminList = props => {
   const { listName, updateFunction } = useContext(ProjectAdminContext);
 
   return h("div", [
     h.if(listName == "main")(mainFilterList),
     h.if(listName == "sample")(SampleFilterList, {
-      onClick: updateFunction,
+      onClick: updateFunction
     }),
     h.if(listName == "publication")(PublicationFilterList, {
-      onClick: updateFunction,
+      onClick: updateFunction
     }),
     h.if(listName == "researcher")(ResearcherFilterList, {
-      onClick: updateFunction,
+      onClick: updateFunction
     }),
     h.if(listName == "session")(SessionFilterList, {
-      onClick: updateFunction,
-    }),
+      onClick: updateFunction
+    })
   ]);
 };
 
@@ -99,7 +104,7 @@ export function ProjectAdminPage() {
     console.log("add")
   );
 
-  const changeFunction = (func) => {
+  const changeFunction = func => {
     setUpdateFunction(() => func);
   };
 
@@ -109,8 +114,8 @@ export function ProjectAdminPage() {
     [
       h(AdminPage, {
         listComponent: h(ProjectAdminList),
-        mainPageComponent: h(ProjectMainPanel),
-      }),
+        mainPageComponent: h(ProjectMainPanel)
+      })
     ]
   );
 }
