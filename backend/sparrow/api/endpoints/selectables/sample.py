@@ -10,10 +10,11 @@ from sparrow.context import get_database
 from ...exceptions import ValidationError
 from ...response import APIResponse
 
+
 class SubSamples(HTTPEndpoint):
-    """ 
+    """
     Endpoint to retrieve subsamples, i.e sample collections
-    
+
     sample_collection not coming through in normal api for sample model
     """
 
@@ -22,16 +23,16 @@ class SubSamples(HTTPEndpoint):
         sample = db.model.sample
         sampleSchema = db.interface.sample(many=True)
 
-        if 'id' not in request.path_params:
+        if "id" not in request.path_params:
             return JSONResponse({})
 
-        id_ = request.path_params['id']
+        id_ = request.path_params["id"]
 
         sample_ = db.session.query(sample).get(id_)
 
         if len(sample_.sample_collection) == 0:
-            return JSONResponse({'id':id_, 'sample_collection': []})
+            return JSONResponse({"id": id_, "sample_collection": []})
 
         sample_collection = sampleSchema.dump(sample_.sample_collection)
 
-        return JSONResponse({'id':id_, 'sample_collection': sample_collection})
+        return JSONResponse({"id": id_, "sample_collection": sample_collection})

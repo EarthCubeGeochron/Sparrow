@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { pluralize } from "../new-model";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
-import { useAPIv2Result } from "~/api-v2";
 import { PageViewDate, ProjectCardContent } from "~/model-views";
 
 const h = hyperStyled(styles);
