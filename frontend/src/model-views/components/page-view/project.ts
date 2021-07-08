@@ -9,7 +9,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-export const ProjectAdd = props => {
+export const ProjectAdd = (props) => {
   const { onClickDelete, onClickList, data, isEditing } = props;
 
   return h(
@@ -20,14 +20,14 @@ export const ProjectAdd = props => {
       isEditing,
       title: "Projects",
       modelLink: true,
-      hasData: data.project.length != 0
+      hasData: data.project.length != 0,
     },
     [
       h(PageViewProjects, {
         onClick: onClickDelete,
         isEditing,
-        data
-      })
+        data,
+      }),
     ]
   );
 };
@@ -36,10 +36,10 @@ export const PageViewProjects = ({ data, isEditing, onClick }) => {
   return h("div", [h(ProjectCard, { d: data, onClick, isEditing })]);
 };
 
-const ProjectCard = props => {
+const ProjectCard = (props) => {
   const { d, onClick, isEditing } = props;
 
-  const project = d.project.map(obj => {
+  const project = d.project.map((obj) => {
     if (obj) {
       const { name, id, session, publication, description, sample } = obj;
       return { name, id, session, publication, description, sample };
@@ -48,7 +48,7 @@ const ProjectCard = props => {
   });
 
   return h("div", [
-    project.map(obj => {
+    project.map((obj) => {
       if (!obj) return null;
       const { name, id } = obj;
       const to = useModelURL(`/project/${id}`);
@@ -61,15 +61,15 @@ const ProjectCard = props => {
           styles: { minWidth: "500px" },
           to,
           link: true,
-          onClick: () => onClick({ id, name })
+          onClick: () => onClick({ id, name }),
         },
         [h(ProjectCardContent, { ...obj, long: false })]
       );
-    })
+    }),
   ]);
 };
 
-const unwrapPubTitles = obj => {
+const unwrapPubTitles = (obj) => {
   return obj.data.title;
 };
 
@@ -79,7 +79,7 @@ export function pubTitles({ publication }) {
       `/models/publication/${publication[0]}`,
       {},
       {
-        unwrapResponse: unwrapPubTitles
+        unwrapResponse: unwrapPubTitles,
       }
     );
     if (data == null) return null;
@@ -100,7 +100,7 @@ export function ProjectCardContent(props) {
     sample = [],
     session = [],
     publication = [],
-    long = true
+    long = true,
   } = props;
 
   const pubData = pubTitles({ publication });
@@ -111,13 +111,13 @@ export function ProjectCardContent(props) {
       h("p.description", description),
       h.if(sample.length > 0)("div.content-area", [
         h("h5", [
-          h("span.count", [sample.length + " " + pluralize("Sample", sample)])
-        ])
+          h("span.count", [sample.length + " " + pluralize("Sample", sample)]),
+        ]),
       ]),
       h.if(publication.length > 0)("div.content-area", [
         h("h5", [
           h("span.count", [
-            publication.length + " " + pluralize("Publication", publication)
+            publication.length + " " + pluralize("Publication", publication),
           ]),
           pubData
         ])
@@ -125,10 +125,10 @@ export function ProjectCardContent(props) {
       h.if(session.length > 0)("div.content-area", [
         h("h5", [
           h("span.count", [
-            session.length + " " + pluralize("Session", session)
-          ])
-        ])
-      ])
+            session.length + " " + pluralize("Session", session),
+          ]),
+        ]),
+      ]),
     ]);
   } else {
     return h("div.project-card", { style: { margin: 0 } }, [
@@ -136,23 +136,23 @@ export function ProjectCardContent(props) {
       h("p.description", description),
       h.if(sample.length > 0)("div.content-area", [
         h("h5", [
-          h("span.count", [sample.length + " " + pluralize("Sample", sample)])
-        ])
+          h("span.count", [sample.length + " " + pluralize("Sample", sample)]),
+        ]),
       ]),
       h.if(publication.length > 0)("div.content-area", [
         h("h5", [
           h("span.count", [
-            publication.length + " " + pluralize("Publication", publication)
-          ])
-        ])
+            publication.length + " " + pluralize("Publication", publication),
+          ]),
+        ]),
       ]),
       h.if(session.length > 0)("div.content-area", [
         h("h5", [
           h("span.count", [
-            session.length + " " + pluralize("Session", session)
-          ])
-        ])
-      ])
+            session.length + " " + pluralize("Session", session),
+          ]),
+        ]),
+      ]),
     ]);
   }
 }
