@@ -4,7 +4,7 @@ import { AnchorButton, Intent } from "@blueprintjs/core";
 import { Frame, useFrameOverride } from "~/frame";
 import { EditableSessionDetails } from "./editor";
 import { SessionDetailPanel } from "./detail-panel";
-import { APIResultView } from "@macrostrat/ui-components";
+import { APIResultView, useAPIResult } from "@macrostrat/ui-components";
 import { useRouteMatch } from "react-router-dom";
 import { Tab, Tabs } from "@blueprintjs/core";
 
@@ -24,7 +24,7 @@ function SessionPageTabs(props) {
   return h(
     Tabs,
     {
-      id: "sessionDetailTabs",
+      id: "sessionDetailTabs"
     },
     [
       extraTabs.map(({ title, component, id }) =>
@@ -34,7 +34,7 @@ function SessionPageTabs(props) {
         Tab,
         { id: "analysisDetails", panel: coreComponent },
         "Analysis details"
-      ),
+      )
     ]
   );
 }
@@ -46,42 +46,27 @@ function SessionComponent(props) {
   }
 
   return h("div.data-view#session", [
+    h(EditableSessionDetails, { id }),
+    h("div.data-files", [
+      h("h3", "Data sources")
+      // h(Frame, { id: "dataFileDownloadButton", ...rest }, (props) => {
+      //   return h(DownloadButton, props);
+      // }),
+    ]),
     h(
-      APIResultView,
+      Frame,
       {
-        route: "/session",
-        params: { id },
+        id: "sessionDetail",
+        session_id: id
       },
-      (data) => {
-        let rest, sample_name;
-        const res = data[0];
-        ({ sample_name, id, ...rest } = res);
-        return h("div", [
-          h(EditableSessionDetails, { id }),
-          //h(SessionInfoCard, res),
-          h("div.data-files", [
-            h("h3", "Data sources"),
-            // h(Frame, { id: "dataFileDownloadButton", ...rest }, (props) => {
-            //   return h(DownloadButton, props);
-            // }),
-          ]),
-          h(
-            Frame,
-            {
-              id: "sessionDetail",
-              session_id: id,
-            },
-            SessionPageTabs
-          ),
-        ]);
-      }
-    ),
+      [SessionPageTabs]
+    )
   ]);
 }
 
 function SessionMatch(props) {
   const {
-    params: { id },
+    params: { id }
   } = useRouteMatch();
   return h(SessionComponent, { id });
 }

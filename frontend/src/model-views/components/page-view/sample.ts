@@ -82,8 +82,9 @@ export const PageViewSamples = function({
       h(SampleContainer, [
         data.map(d => {
           const { material, id, name, location_name, session, location } = d;
-          return h(DndChild, { id, data: d, draggable }, [
+          return h(DndChild, { key: id, id, data: d, draggable }, [
             h(SampleCard, {
+              key: id,
               material,
               session,
               id,
@@ -110,8 +111,8 @@ function SessionContent(props) {
   } else if (session.length > 1) {
     return h("div", [session.length, " Sessions"]);
   } else {
-    return session.map(ele => {
-      return h.if(ele.date)("div", [
+    return session.map((ele, i) => {
+      return h.if(ele.date)("div", { key: i }, [
         h(PageViewDate, { date: ele.date }),
         ele.technique
       ]);
@@ -201,7 +202,7 @@ export function SubSamplePageView(props) {
   let data = useAPIv2Result(
     `/sub-sample/${sample_id}`,
     {},
-    { unwrapResponse: (data) => data.sample_collection }
+    { unwrapResponse: data => data.sample_collection }
   );
 
   if (data == undefined) data = [];
@@ -212,15 +213,15 @@ export function SubSamplePageView(props) {
       isEditing,
       title: "Sub-Samples",
       model: "sample",
-      hasData: data.length > 0,
+      hasData: data.length > 0
     },
     [
       h(PageViewSamples, {
         data,
         isEditing,
         onClick: () => {},
-        draggable: false,
-      }),
+        draggable: false
+      })
     ]
   );
 }

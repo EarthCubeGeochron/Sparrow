@@ -42,7 +42,7 @@ function InfiniteAPIView({
   context,
   filterParams,
   errorHandler = ErrorCallout,
-  modelName,
+  modelName
 }) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
@@ -50,8 +50,6 @@ function InfiniteAPIView({
   const [nextPage, setNextPage] = useState("");
   const [moreAfter, setMoreAfter] = useState(true);
   const { get } = useAPIActions(context);
-
-  console.log(moreAfter);
 
   async function getNextPageAPI(nextPage, url, params) {
     const constParams =
@@ -72,20 +70,18 @@ function InfiniteAPIView({
 
   useEffect(() => {
     dataFetch(data);
-    console.log("RERENDERED");
   }, []);
 
   const dataFetch = (data, next = "") => {
     setNoResults(false);
     const initData = getNextPageAPI(next, url, params);
-    initData.then((res) => {
+    initData.then(res => {
       if (res.data.length == 0) {
         setNoResults(true);
       }
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
       const next_page = res.next_page;
-      console.log("next page", next_page);
       if (next_page == null) {
         setMoreAfter(false);
       }
@@ -101,7 +97,6 @@ function InfiniteAPIView({
 
   const fetchNewData = async () => {
     if (!nextPage) return;
-    console.log("FETCH TRIGGERED");
     dataFetch(data, nextPage);
   };
 
@@ -120,7 +115,7 @@ function InfiniteAPIView({
       modelName,
       component,
       moreAfter,
-      componentProps,
+      componentProps
     });
   }
   return h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);

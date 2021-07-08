@@ -408,7 +408,7 @@ const EditableProjectDetails = function(props) {
                   multiline: true
                 }),
                 h(ModelEditableText, {
-                  is: "p",
+                  is: "div",
                   field: "description",
                   multiline: true
                 }),

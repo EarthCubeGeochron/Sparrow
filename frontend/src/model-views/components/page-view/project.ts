@@ -38,7 +38,6 @@ export const PageViewProjects = ({ data, isEditing, onClick }) => {
 
 const ProjectCard = props => {
   const { d, onClick, isEditing } = props;
-  console.log(d);
 
   const project = d.project.map(obj => {
     if (obj) {
@@ -57,6 +56,7 @@ const ProjectCard = props => {
       return h(
         PageViewModelCard,
         {
+          key: id,
           isEditing,
           styles: { minWidth: "500px" },
           to,
@@ -86,6 +86,7 @@ export function pubTitles({ publication }) {
     if (publication.lenght > 1) {
       return data + "....";
     }
+
     return data;
   }
   return null;
@@ -118,7 +119,7 @@ export function ProjectCardContent(props) {
           h("span.count", [
             publication.length + " " + pluralize("Publication", publication)
           ]),
-          h("h5", [pubData])
+          pubData
         ])
       ]),
       h.if(session.length > 0)("div.content-area", [

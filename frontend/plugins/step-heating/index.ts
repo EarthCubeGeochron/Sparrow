@@ -13,14 +13,14 @@ background: purple;
 margin-bottom: 1em;\
 `;
 
-const errorExtent = function (arr) {
-  const mn = min(arr, (d) => d.value - d.error);
-  const mx = max(arr, (d) => d.value + d.error);
+const errorExtent = function(arr) {
+  const mn = min(arr, d => d.value - d.error);
+  const mx = max(arr, d => d.value + d.error);
   return [mn, mx];
 };
 
 function findPlateauAge(data) {
-  const interpretedAges = data.filter((d) => d.session_index == null);
+  const interpretedAges = data.filter(d => d.session_index == null);
   // Find plateau age
   for (let a of Array.from(interpretedAges)) {
     for (let datum of Array.from(a.data)) {
@@ -37,6 +37,10 @@ function StepHeatingChartInner(props) {
 
   if (data == null) return h(Spinner);
 
+  if (data.length == 0) {
+    return h("h2", ["No analyses associated"]);
+  }
+
   const width = 800;
   const height = 450;
 
@@ -45,13 +49,13 @@ function StepHeatingChartInner(props) {
   const innerHeight = height - 2 * margin;
 
   const heatingSteps = data.filter(
-    (d) => d.session_index != null || d.analysis_type == "Heating step"
+    d => d.session_index != null || d.analysis_type == "Heating step"
   );
   heatingSteps.sort((a, b) => b.session_index - a.session_index);
 
-  const ages = heatingSteps.map((d) => ({
+  const ages = heatingSteps.map(d => ({
     in_plateau: !d.is_bad,
-    age: d.data.find((v) => v.parameter === "step_age"),
+    age: d.data.find(v => v.parameter === "step_age")
   }));
   const plateauAge = findPlateauAge(data);
   let plateauIx = [];
@@ -63,16 +67,16 @@ function StepHeatingChartInner(props) {
   }
   plateauIx = extent(plateauIx);
 
-  const yExtent = errorExtent(ages.map((d) => d.age));
+  const yExtent = errorExtent(ages.map(d => d.age));
 
   const xScale = scaleLinear({
     range: [0, innerWidth],
-    domain: [0, heatingSteps.length],
+    domain: [0, heatingSteps.length]
   });
 
   const yScale = scaleLinear({
     range: [innerHeight, 0],
-    domain: yExtent,
+    domain: yExtent
   });
 
   const deltaX = xScale(1) - xScale(0);
@@ -81,19 +85,19 @@ function StepHeatingChartInner(props) {
     "svg.step-heating-chart",
     {
       width: 900,
-      height,
+      height
     },
     [
       h(
         "g.chart-main",
         {
-          transform: `translate(${margin},${margin})`,
+          transform: `translate(${margin},${margin})`
         },
         [
           h("g.data-area", [
             h(
               "g.heating-steps",
-              ages.map(function (d, i) {
+              ages.map(function(d, i) {
                 const { age, in_plateau } = d;
                 const mn = age.value - age.error;
                 const mx = age.value + age.error;
@@ -104,7 +108,7 @@ function StepHeatingChartInner(props) {
                   y,
                   width: deltaX,
                   height: yScale(mn) - y,
-                  fill: in_plateau ? "#444" : "#aaa",
+                  fill: in_plateau ? "#444" : "#aaa"
                 });
               })
             ),
@@ -115,26 +119,26 @@ function StepHeatingChartInner(props) {
                 width: deltaX * (1 + plateauIx[1] - plateauIx[0]),
                 height: yScale(0) - yScale(2 * plateauAge.error),
                 stroke: "#222",
-                "stroke-width": "2px",
-                fill: "transparent",
-              }),
-            ]),
+                strokeWidth: "2px",
+                fill: "transparent"
+              })
+            ])
           ]),
           h(AxisBottom, {
             scale: xScale,
             numTicks: 10,
             top: innerHeight,
             label: "Heating step",
-            labelOffset: 15,
+            labelOffset: 15
           }),
           h(AxisLeft, {
             scale: yScale,
             numTicks: 10,
             label: "Age (Ma)",
-            labelOffset: 30,
-          }),
+            labelOffset: 30
+          })
         ]
-      ),
+      )
     ]
   );
 }

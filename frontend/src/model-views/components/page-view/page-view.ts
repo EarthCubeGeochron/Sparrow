@@ -8,7 +8,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-export const AddCard = (props) => {
+export const AddCard = props => {
   const { onClick, model } = props;
   return h(
     Tooltip,
@@ -17,11 +17,11 @@ export const AddCard = (props) => {
   );
 };
 
-export const NewModelButton = (props) => {
+export const NewModelButton = props => {
   const { model } = props;
 
   const to = useModelURL(`/${model}/new`);
-  const handleClick = (e) => {
+  const handleClick = e => {
     e.preventDefault();
     window.location.href = to;
   };
@@ -33,13 +33,13 @@ export const NewModelButton = (props) => {
     {
       minimal: true,
       intent: "success",
-      onClick: handleClick,
+      onClick: handleClick
     },
     [`New ${string}`]
   );
 };
 
-export const ModelAttributeOneLiner = (props) => {
+export const ModelAttributeOneLiner = props => {
   const { title, content } = props;
 
   let displayContent;
@@ -52,11 +52,11 @@ export const ModelAttributeOneLiner = (props) => {
   return h("span", { style: { display: "flex", alignItems: "baseline" } }, [
     h("h4", { style: { marginRight: "4px" } }, title),
     " ",
-    displayContent,
+    displayContent
   ]);
 };
 
-export const PageViewBlock = (props) => {
+export const PageViewBlock = props => {
   const {
     elevation = 1,
     title,
@@ -65,7 +65,7 @@ export const PageViewBlock = (props) => {
     modelLink = false,
     onClick = () => {},
     hasData = true,
-    model = "model",
+    model = "model"
   } = props;
 
   if (modelLink) {
@@ -76,26 +76,26 @@ export const PageViewBlock = (props) => {
         h(
           "div",
           {
-            style: { display: "flex", alignItems: "baseline", marginTop: "0" },
+            style: { display: "flex", alignItems: "baseline", marginTop: "0" }
           },
           [
             h.if(title)("h3", [title]),
-            h.if(isEditing)(AddCard, { onClick, model }),
+            h.if(isEditing)(AddCard, { onClick, model })
           ]
         ),
         h.if(!hasData)("h4", `No ${model}s`),
-        children,
+        children
       ]
     );
   }
 
   return h(Card, { elevation, style: { marginBottom: "15px" } }, [
     h.if(title)("h3", [title]),
-    children,
+    children
   ]);
 };
 
-export const PageViewModelCard = (props) => {
+export const PageViewModelCard = props => {
   const {
     minimal = true,
     className,
@@ -109,7 +109,7 @@ export const PageViewModelCard = (props) => {
     onMouseLeave,
     draggable = false,
     styles = {},
-    onClick,
+    onClick
   } = props;
 
   const component = link && !isEditing ? LinkCard : Card;
@@ -125,7 +125,7 @@ export const PageViewModelCard = (props) => {
         onMouseEnter,
         onMouseLeave,
         draggable,
-        style: { position: "relative", ...styles },
+        style: { position: "relative", ...styles }
       },
       [
         h(Button, {
@@ -133,14 +133,14 @@ export const PageViewModelCard = (props) => {
             position: "absolute",
             top: "0",
             right: "0",
-            marginLeft: "5px",
+            marginLeft: "5px"
           },
           icon: "small-cross",
           minimal: true,
           intent: "danger",
-          onClick,
+          onClick
         }),
-        h("div", { paddingRight: "15px" }, [children]),
+        h("div", [children])
       ]
     );
   }
@@ -154,7 +154,7 @@ export const PageViewModelCard = (props) => {
         onMouseEnter,
         onMouseLeave,
         draggable,
-        style: { ...styles },
+        style: { ...styles }
       },
       [children]
     ),
@@ -162,11 +162,11 @@ export const PageViewModelCard = (props) => {
       "div",
       { style: { fontSize: "10px", marginLeft: "10px", fontStyle: "italic" } },
       ["Linked through ", linkedThrough]
-    ),
+    )
   ]);
 };
 
-export const PageViewDate = (props) => {
+export const PageViewDate = props => {
   const { date } = props;
 
   return h("div.page-view-date", [format(date, "MMMM D, YYYY")]);

@@ -3,7 +3,6 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { APIHelpers } from "@macrostrat/ui-components";
 import Ax from "axios";
 import { APIV2Context } from "~/api-v2";
-import { AdminPage } from "~/admin/AdminPage";
 import {
   NewSampleMap,
   SampleLocation,
@@ -14,7 +13,6 @@ import {
   SampleName,
   SubmitButton,
   EmbargoDatePick,
-  ModelAddFilterLists,
   ProjectAdd,
   SessionAdd
 } from "../../components";
@@ -114,9 +112,7 @@ const NewSampleNavBar = props => {
 function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
   const { sample, dispatch } = useContext(NewSampleFormContext);
 
-  console.log(sample);
   const changeCoordinates = coords => {
-    console.log(coords);
     dispatch({
       type: sample_reducer.LOCATION,
       payload: { coordinates: coords }
@@ -145,7 +141,6 @@ function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
   };
 
   const changeGeoEntity = geo_entity => {
-    console.log(geo_entity);
     dispatch({
       type: sample_reducer.GEO_ENTITY,
       payload: { geo_entity: geo_entity }
@@ -153,7 +148,6 @@ function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
   };
 
   const deleteGeoEntity = index => {
-    console.log(index);
     dispatch({
       type: sample_reducer.REMOVE_GEO_ENTITY,
       payload: { index }

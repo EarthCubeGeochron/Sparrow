@@ -8,7 +8,7 @@ import {
   EditableText,
   ButtonGroup,
   Intent,
-  Popover,
+  Popover
 } from "@blueprintjs/core";
 import { DatePicker } from "@blueprintjs/datetime";
 import {
@@ -16,7 +16,7 @@ import {
   ModelEditorContext,
   ModelEditButton,
   CancelButton,
-  SaveButton,
+  SaveButton
 } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { MySwitch, MinimalNavbar } from "~/components";
@@ -31,7 +31,7 @@ export async function getfunc(props) {
   try {
     const data = await get(url, params, {});
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -56,10 +56,10 @@ export function FormSlider(props) {
           onClick: changeOpen,
           minimal: true,
           icon: "plus",
-          intent: "success",
+          intent: "success"
         },
         [`Create a New ${model}`]
-      ),
+      )
     ]),
     h(
       Drawer,
@@ -69,10 +69,10 @@ export function FormSlider(props) {
         title: `Add a new ${model}`,
         isOpen,
         onClose: close,
-        isCloseButtonShown: true,
+        isCloseButtonShown: true
       },
       [content, h(Button, { onClick: close, intent: "danger" }, ["Cancel"])]
-    ),
+    )
   ]);
 }
 
@@ -84,7 +84,7 @@ function isLetter(char) {
   }
 }
 
-export const isTitle = (search) => {
+export const isTitle = search => {
   let i = 0;
   for (let char of search) {
     if (isLetter(char)) {
@@ -98,7 +98,7 @@ export const isTitle = (search) => {
   }
 };
 
-export const SubmitDialog = (props) => {
+export const SubmitDialog = props => {
   const { open, changeOpen, goToModel, modelName } = props;
 
   return h(Dialog, { isOpen: open, style: { maxWidth: "300px" } }, [
@@ -108,8 +108,8 @@ export const SubmitDialog = (props) => {
         style: {
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-        },
+          alignItems: "center"
+        }
       },
       [
         h("h4", ["Are you sure you want to submit?"]),
@@ -119,18 +119,18 @@ export const SubmitDialog = (props) => {
             {
               intent: "success",
               onClick: goToModel,
-              style: { marginRight: "5px" },
+              style: { marginRight: "5px" }
             },
             [`Create New ${modelName}`]
           ),
-          h(Button, { intent: "danger", onClick: changeOpen }, ["Cancel"]),
-        ]),
+          h(Button, { intent: "danger", onClick: changeOpen }, ["Cancel"])
+        ])
       ]
-    ),
+    )
   ]);
 };
 
-export const SubmitButton = (props) => {
+export const SubmitButton = props => {
   const { postData, modelName } = props;
   const [open, setOpen] = useState(false);
 
@@ -148,10 +148,10 @@ export const SubmitButton = (props) => {
       Button,
       {
         onClick: changeOpen,
-        intent: "primary",
+        intent: "primary"
       },
       ["Done"]
-    ),
+    )
   ]);
 };
 
@@ -185,9 +185,9 @@ export function ModelEditableText(props) {
         placeholder,
         intent,
         onChange: actions.onChange(field),
-        value: model[field],
+        value: model[field]
       }),
-      h.if(!isEditing)("span", model[field]),
+      h.if(!isEditing)("span", model[field])
     ]);
   }
   const { id, onConfirm } = rest;
@@ -199,19 +199,19 @@ export function ModelEditableText(props) {
       onChange,
       value,
       id,
-      onConfirm,
-    }),
+      onConfirm
+    })
   ]);
 }
 
-const ToInfinityDate = (date) => {
+const ToInfinityDate = date => {
   const newYear = date.getFullYear() + 3000;
   const month = date.getMonth();
   const day = date.getDay();
   return new Date(newYear, month, day);
 };
 
-export const EmbargoDatePick = (props) => {
+export const EmbargoDatePick = props => {
   const { onChange, embargo_date, active = true } = props;
   // need to add an un-embargo if data is embargoed. And an infinite embargo
   const embargoDate = embargo_date ? new Date(embargo_date) : null;
@@ -235,9 +235,6 @@ export const EmbargoDatePick = (props) => {
       : "Public";
   const icon = embargoDate != null ? "lock" : "unlock";
 
-  console.log(embargoed);
-  console.log(infinite);
-
   const switchChange = () => {
     if (infinite) {
       onChange(null);
@@ -246,34 +243,32 @@ export const EmbargoDatePick = (props) => {
     }
   };
 
-  console.log(tomorrow);
-
   const Content = () => {
     return h(Card, [
       h(DatePicker, {
         minDate: new Date(),
         maxDate: new Date(2050, 1, 1),
-        onChange: (e) => {
+        onChange: e => {
           let date = e.toISOString().split("T")[0];
           onChange(e);
-        },
+        }
       }),
       h("div", [
         "Emargo Forever: ",
         h(MySwitch, {
           checked: infinite,
-          onChange: switchChange,
-        }),
+          onChange: switchChange
+        })
       ]),
       h(
         Button,
         {
           disabled: !embargoed,
           onClick: () => onChange(null),
-          minimal: true,
+          minimal: true
         },
         ["Make Public"]
-      ),
+      )
     ]);
   };
 
@@ -282,16 +277,15 @@ export const EmbargoDatePick = (props) => {
       h(Button, {
         text,
         minimal: true,
-        interactive: false,
         rightIcon: icon,
         intent: Intent.SUCCESS,
-        disabled: !active,
-      }),
-    ]),
+        disabled: !active
+      })
+    ])
   ]);
 };
 
-export const EditStatusButtons = function (props) {
+export const EditStatusButtons = function(props) {
   const { hasChanges, isEditing, onClickCancel, onClickSubmit } = props;
 
   const changed = hasChanges();
@@ -302,7 +296,7 @@ export const EditStatusButtons = function (props) {
         SaveButton,
         {
           disabled: !changed,
-          onClick: onClickSubmit,
+          onClick: onClickSubmit
         },
         "Save"
       ),
@@ -310,36 +304,36 @@ export const EditStatusButtons = function (props) {
         CancelButton,
         {
           intent: changed ? "warning" : "none",
-          onClick: onClickCancel,
+          onClick: onClickCancel
         },
         "Done"
-      ),
-    ]),
+      )
+    ])
   ]);
 };
 
-export const EditNavBar = function (props) {
+export const EditNavBar = function(props) {
   const { editButtons, embargoEditor, header } = props;
   return h(MinimalNavbar, { className: "project-editor-navbar" }, [
     h("h4", header),
     editButtons,
-    embargoEditor,
+    embargoEditor
   ]);
 };
 
 export function DataSheetButton() {
   const url = "/admin/data-sheet";
-  const handleClick = (e) => {
+  const handleClick = e => {
     e.preventDefault();
     window.location.href = url;
   };
 
   return h("div", { style: { padding: "0px 5px 5px 0px" } }, [
-    h(Button, { onClick: handleClick, minimal: true }, ["Data Sheet View"]),
+    h(Button, { onClick: handleClick, minimal: true }, ["Data Sheet View"])
   ]);
 }
 
-export const pluralize = function (term, arrayOrNumber) {
+export const pluralize = function(term, arrayOrNumber) {
   let count = arrayOrNumber;
   if (Array.isArray(arrayOrNumber)) {
     count = arrayOrNumber.length;

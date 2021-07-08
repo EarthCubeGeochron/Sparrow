@@ -88,9 +88,7 @@ function SampleAdminList() {
 export function SampleAdminPage() {
   const [listName, setListName] = useState("main");
 
-  const [updateFunction, setUpdateFunction] = useState(() =>
-    console.log("add")
-  );
+  const [updateFunction, setUpdateFunction] = useState(() => {});
 
   const changeFunction = func => {
     setUpdateFunction(() => func);

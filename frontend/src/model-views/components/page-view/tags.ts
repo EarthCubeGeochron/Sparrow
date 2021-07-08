@@ -23,26 +23,27 @@ export function TagContainer(props) {
     isEditing,
     onChange,
     onClickDelete,
-    modelName,
+    modelName
   }: tagContainer = props;
 
   if (tags.length == 0 && !isEditing) {
     return h(ModelAttributeOneLiner, {
       title: "Tags: ",
-      content: "None",
+      content: "None"
     });
   }
 
   return h("div.tag-container", [
-    tags.map((tag) => {
+    tags.map(tag => {
       const { name, description, color, id } = tag;
       return h(TagBody, {
+        key: id,
         name,
         description,
         color,
         id,
         isEditing,
-        onClickDelete,
+        onClickDelete
       });
     }),
     h.if(isEditing)(
@@ -50,7 +51,7 @@ export function TagContainer(props) {
       {
         content: h(TagPopover, { tags, onChange, modelName }),
         position: "bottom",
-        minimal: true,
+        minimal: true
       },
       [
         h(
@@ -58,12 +59,12 @@ export function TagContainer(props) {
           {
             icon: "add",
             intent: "success",
-            minimal: true,
+            minimal: true
           },
           ["Add a Tag"]
-        ),
+        )
       ]
-    ),
+    )
   ]);
 }
 
@@ -79,8 +80,8 @@ function TagPopover(props) {
     h("h4", [`Add a tag to this ${modelName}`]),
     h(TagSelect, { tags, onChange }),
     h(Button, { minimal: true, icon: "edit", onClick }, [
-      "Edit or create a tag",
-    ]),
+      "Edit or create a tag"
+    ])
   ]);
 }
 
@@ -91,9 +92,9 @@ export function TagSelect(props) {
   const allTags = useAPIv2Result("/tags/tag", { all: true });
   if (allTags == null) return null;
 
-  const currentIds = tags.map((tag) => tag.id);
+  const currentIds = tags.map(tag => tag.id);
 
-  const tagSet = allTags.data.filter((tag) => !currentIds.includes(tag.id));
+  const tagSet = allTags.data.filter(tag => !currentIds.includes(tag.id));
 
   const itemRenderer = (item, itemProps) => {
     const { name, description, color, id } = item;
@@ -102,10 +103,11 @@ export function TagSelect(props) {
       {
         onClick: itemProps.handleClick,
         style: { marginBottom: "5px", cursor: "pointer" },
+        key: id
       },
       [
         h(TagBody, { name, description, color, id, disabled: true }),
-        h(MenuDivider),
+        h(MenuDivider)
       ]
     );
   };
@@ -114,22 +116,22 @@ export function TagSelect(props) {
     return item.name.toLowerCase().indexOf(query.toLowerCase()) >= 0;
   };
 
-  const onItemSelect = (item) => {
+  const onItemSelect = item => {
     onChange(item);
   };
 
   return h("div", [
     h(Suggest, {
-      inputValueRenderer: (item) => item.name,
+      inputValueRenderer: item => item.name,
       items: tagSet,
       popoverProps: {
         minimal: true,
-        popoverClassName: "my-suggest",
+        popoverClassName: "my-suggest"
       },
       onItemSelect,
       itemRenderer,
       itemPredicate,
-      closeOnSelect: true,
-    }),
+      closeOnSelect: true
+    })
   ]);
 }

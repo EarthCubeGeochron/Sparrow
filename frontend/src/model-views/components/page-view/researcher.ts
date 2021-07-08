@@ -5,7 +5,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const ResearcherCard = (props) => {
+const ResearcherCard = props => {
   let { id, name, onClick, isEditing } = props;
 
   return h(
@@ -15,20 +15,20 @@ const ResearcherCard = (props) => {
   );
 };
 
-export const PageViewResearchers = function ({ data, isEditing, onClick }) {
+export const PageViewResearchers = function({ data, isEditing, onClick }) {
   if (!data) return null;
 
   return h("div.researchers", [
     h.if(data.length > 0)("div", [
-      data.map((res) => {
+      data.map(res => {
         const { id, name } = res;
-        return h(ResearcherCard, { id, isEditing, name, onClick });
-      }),
-    ]),
+        return h(ResearcherCard, { key: id, id, isEditing, name, onClick });
+      })
+    ])
   ]);
 };
 
-export const ResearcherAdd = (props) => {
+export const ResearcherAdd = props => {
   const { onClickDelete, onClickList, data, isEditing = true } = props;
 
   return h(
@@ -39,14 +39,14 @@ export const ResearcherAdd = (props) => {
       isEditing,
       modelLink: true,
       title: "Researchers",
-      hasData: data.length != 0,
+      hasData: data.length != 0
     },
     [
       h(PageViewResearchers, {
         onClick: onClickDelete,
         data,
-        isEditing,
-      }),
+        isEditing
+      })
     ]
   );
 };

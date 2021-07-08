@@ -29,19 +29,19 @@ export function NewSampleMap(props) {
         properties: {},
         geometry: {
           coordinates: [longitude, latitude],
-          type: "Point",
-        },
-      },
-    ],
+          type: "Point"
+        }
+      }
+    ]
   });
 
-  const handleChange = (data) => {
+  const handleChange = data => {
     const { features } = data;
     const { geometry } = features.slice(-1)[0];
-    setPoint((prevPoint) => {
+    setPoint(prevPoint => {
       return {
         ...prevPoint,
-        features: features.slice(-1),
+        features: features.slice(-1)
       };
     });
     const { coordinates } = geometry;
@@ -60,7 +60,7 @@ export function NewSampleMap(props) {
       accessToken: process.env.MAPBOX_API_TOKEN,
       latitude: 0,
       longitude: 0,
-      zoom: 0,
+      zoom: 0
     },
     [
       h(Draw, {
@@ -69,18 +69,18 @@ export function NewSampleMap(props) {
         polygonControl: false,
         lineStringControl: false,
         uncombineFeaturesControl: false,
-        combineFeaturesControl: false,
-      }),
+        combineFeaturesControl: false
+      })
     ]
   );
 }
 
-export const SampleLocation = (props) => {
+export const SampleLocation = props => {
   const { sample, changeCoordinates, stacked = true } = props;
   const { longitude, latitude } = sample;
   const [loc, setLoc] = useState({
     longitude: longitude,
-    latitude: latitude,
+    latitude: latitude
   });
 
   const classname = stacked ? "sample-loc-inputs" : "sample-loc-inputs-long";
@@ -88,25 +88,25 @@ export const SampleLocation = (props) => {
   useEffect(() => {
     setLoc({
       longitude,
-      latitude,
+      latitude
     });
   }, [longitude == loc.longitude]);
 
-  const onChangeLat = (value) => {
-    setLoc((prevLoc) => {
+  const onChangeLat = value => {
+    setLoc(prevLoc => {
       return {
         ...prevLoc,
-        latitude: value,
+        latitude: value
       };
     });
     changeCoordinates({ lon: loc.longitude, lat: value });
   };
-  const onChangeLon = (value) => {
+  const onChangeLon = value => {
     let lon = value;
-    setLoc((prevLoc) => {
+    setLoc(prevLoc => {
       return {
         ...prevLoc,
-        longitude: lon,
+        longitude: lon
       };
     });
     changeCoordinates({ lon: value, lat: loc.latitude });
@@ -119,8 +119,9 @@ export const SampleLocation = (props) => {
       onChange: onChangeLat,
       helperText: "-90 to 90",
       placeholder: "Enter latitude",
+      minorStepSize: 0.00001,
       min: -90,
-      max: 90,
+      max: 90
     }),
     h(MyNumericInput, {
       label: "Longitude",
@@ -128,13 +129,14 @@ export const SampleLocation = (props) => {
       onChange: onChangeLon,
       helperText: "-180 to 180",
       placeholder: "Enter longitude",
+      minorStepSize: 0.00001,
       min: -180,
-      max: 180,
-    }),
+      max: 180
+    })
   ]);
 };
 
-export const SampleDepth = (props) => {
+export const SampleDepth = props => {
   const { sample, changeDepth } = props;
   const { depth } = sample;
   const [disabled, setDisabled] = useState(depth == null);
@@ -150,22 +152,22 @@ export const SampleDepth = (props) => {
       "Depth (m): ",
       h(MySwitch, {
         checked: !disabled,
-        onChange: () => setDisabled(!disabled),
-      }),
+        onChange: () => setDisabled(!disabled)
+      })
     ]),
     h.if(!disabled)(MyNumericInput, {
       value: depth,
-      onChange: changeDepth,
-    }),
+      onChange: changeDepth
+    })
   ]);
 };
 
-const unwrapElevation = (obj) => {
+const unwrapElevation = obj => {
   const { success } = obj;
   return success.data.elevation;
 };
 
-export const SampleElevation = (props) => {
+export const SampleElevation = props => {
   const { sample, changeElevation } = props;
   const [disabled, setDisabled] = useState(sample.elevation == null);
   const { elevation, longitude, latitude } = sample;
@@ -175,10 +177,10 @@ export const SampleElevation = (props) => {
     {
       lng: longitude || 0,
       lat: latitude || 0,
-      z: 3,
+      z: 3
     },
     {
-      unwrapResponse: unwrapElevation,
+      unwrapResponse: unwrapElevation
     }
   );
   useEffect(() => {
@@ -201,38 +203,38 @@ export const SampleElevation = (props) => {
         "Elevation (m): ",
         h(MySwitch, {
           checked: !disabled,
-          onChange: () => setDisabled(!disabled),
-        }),
+          onChange: () => setDisabled(!disabled)
+        })
       ]),
       value: elevation,
       onChange: changeElevation,
-      disabled,
-    }),
+      disabled
+    })
   ]);
 };
 
-const unwrapMaterialDataSp = (obj) => {
+const unwrapMaterialDataSp = obj => {
   const { data } = obj;
-  const materials = data.map((ele) => ele.id);
+  const materials = data.map(ele => ele.id);
   return materials;
 };
-const unwrapMacroMaterials = (obj) => {
+const unwrapMacroMaterials = obj => {
   const { success } = obj;
-  const materials = success.data.map((ele) => ele.name);
+  const materials = success.data.map(ele => ele.name);
   return materials;
 };
 /**
  * Will use materials from sparrow and macrostrat
  *
  */
-export const SampleMaterial = (props) => {
+export const SampleMaterial = props => {
   const { sample, changeMaterial } = props;
   const { material } = sample;
   const [query, setQuery] = useState("");
   const initMaterials = useAPIv2Result(
     "/vocabulary/material",
     {
-      like: query,
+      like: query
     },
     { unwrapResponse: unwrapMaterialDataSp }
   );
@@ -258,12 +260,12 @@ export const SampleMaterial = (props) => {
       h(MySuggest, {
         items: materials,
         onChange: changeMaterial,
-        onFilter: (query) => {
+        onFilter: query => {
           setQuery(query);
-        },
-      }),
+        }
+      })
     ]),
-    h("h4", ["Currently: ", material ? material : "No Material"]),
+    h("h4", ["Currently: ", material ? material : "No Material"])
   ]);
 };
 
@@ -272,17 +274,17 @@ const PoweredByMacroSparrow = () => {
     "Powered by ",
     h("a", { href: "https://macrostrat.org/" }, ["Macrostrat"]),
     " and ",
-    h("a", { href: "https://macrostrat.org/" }, ["Sparrow"]),
+    h("a", { href: "https://macrostrat.org/" }, ["Sparrow"])
   ]);
 
   return h(Tooltip, { content }, [h(Icon, { icon: "info-sign" })]);
 };
 
-export const SampleName = (props) => {
+export const SampleName = props => {
   const [name, setName] = useState("");
   const { changeName } = props;
 
-  const onChange = (e) => {
+  const onChange = e => {
     setName(e);
     changeName(e);
   };
@@ -294,7 +296,7 @@ export const SampleName = (props) => {
     editOn: true,
     onChange,
     value: name,
-    multiline: true,
+    multiline: true
   });
 };
 
@@ -319,64 +321,64 @@ export function NewSampleForm({ onSubmit }: onSubmit): React.ReactElement {
   const [sample, setSample] = useState({});
 
   console.log(sample);
-  const changeCoordinates = (coords) => {
+  const changeCoordinates = coords => {
     const { lat, lon } = coords;
 
-    setSample((prevSample) => {
+    setSample(prevSample => {
       return {
         ...prevSample,
         latitude: lat,
-        longitude: lon,
+        longitude: lon
       };
     });
   };
 
-  const changeName = (name) => {
-    setSample((prevSample) => {
+  const changeName = name => {
+    setSample(prevSample => {
       return {
         ...prevSample,
-        name,
+        name
       };
     });
   };
 
-  const changeDepth = (depth) => {
-    setSample((prevSample) => {
+  const changeDepth = depth => {
+    setSample(prevSample => {
       return {
         ...prevSample,
-        depth,
+        depth
       };
     });
   };
-  const changeElevation = (elevation) => {
-    setSample((prevSample) => {
+  const changeElevation = elevation => {
+    setSample(prevSample => {
       return {
         ...prevSample,
-        elevation,
+        elevation
       };
     });
   };
-  const changeMaterial = (material) => {
-    setSample((prevSample) => {
+  const changeMaterial = material => {
+    setSample(prevSample => {
       return {
         ...prevSample,
-        material,
+        material
       };
     });
   };
 
-  const changeGeoEntity = (entity) => {
-    setSample((prevSample) => {
+  const changeGeoEntity = entity => {
+    setSample(prevSample => {
       return {
         ...prevSample,
-        sample_geo_entity: entity,
+        sample_geo_entity: entity
       };
     });
   };
 
   const SubmitButton = () => {
     return h(Button, { onClick: () => onSubmit(sample), intent: "success" }, [
-      "Create New Sample",
+      "Create New Sample"
     ]);
   };
 
@@ -386,16 +388,16 @@ export function NewSampleForm({ onSubmit }: onSubmit): React.ReactElement {
       h("div", [
         h(SampleLocation, { changeCoordinates, sample }),
         h(SampleDepth, { sample, changeDepth }),
-        h(SampleElevation, { sample, changeElevation }),
+        h(SampleElevation, { sample, changeElevation })
       ]),
-      h("div.sample-map", [h(NewSampleMap, { changeCoordinates, sample })]),
+      h("div.sample-map", [h(NewSampleMap, { changeCoordinates, sample })])
     ]),
     h(SampleMaterial, { changeMaterial, sample }),
     h("div.metadata-body", [
       h(GeoContext, { sample, changeGeoEntity }),
-      h(PoweredByMacroSparrow),
+      h(PoweredByMacroSparrow)
     ]),
-    h(SubmitButton),
+    h(SubmitButton)
   ]);
 }
 
@@ -403,15 +405,15 @@ export function NewSampleToModel({ onSubmit }) {
   return h("div", [
     h(FormSlider, {
       content: h(NewSampleForm, { onSubmit }),
-      model: "sample",
-    }),
+      model: "sample"
+    })
   ]);
 }
 
 export function NewProjNewSample() {
   const { dispatch } = useContext(ProjectFormContext);
 
-  const onSubmit = (sample) => {
+  const onSubmit = sample => {
     dispatch({ type: "add_sample", payload: { sample_collection: [sample] } });
   };
 

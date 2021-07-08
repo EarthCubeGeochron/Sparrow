@@ -23,10 +23,10 @@ export function Publication(props) {
   };
 
   if (doi == null) {
-    return h("div.publication", h(interior));
+    return h("div.publication", [h(interior)]);
   } else {
     const href = `https://dx.doi.org/${doi}`;
-    return h("a.publication", { href, target: "_blank" }, h(interior));
+    return h("a.publication", { href, target: "_blank" }, [h(interior)]);
   }
 }
 
