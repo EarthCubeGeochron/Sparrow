@@ -139,8 +139,6 @@ const MemberOf = function(props) {
       ])
     : null;
 
-  console.log(model);
-
   return h(ModelAttributeOneLiner, {
     title: "Member of:",
     content
@@ -342,7 +340,6 @@ function SampleTagContainer() {
   const onAdd = item => {
     const currentTags = [...model.tags_tag];
     currentTags.push(item);
-    console.log(currentTags);
     actions.updateState({
       model: { tags_tag: { $set: currentTags } }
     });
@@ -389,7 +386,6 @@ const SamplePageDataFiles = () => {
   const { model } = useModelEditor();
 
   let session_ids = model.session.map(obj => obj.id);
-  console.log(session_ids);
   if (session_ids.length == 0) {
     session_ids = [0];
   }
