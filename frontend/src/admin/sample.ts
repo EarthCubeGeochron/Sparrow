@@ -8,7 +8,8 @@ import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
 import {
   ProjectFilterList,
-  SessionFilterList
+  SessionFilterList,
+  SampleFilterList
 } from "../model-views/components/new-model";
 import { NewSamplePage } from "~/model-views/sample/new-sample";
 
@@ -81,7 +82,8 @@ function SampleAdminList() {
   return h("div", [
     h.if(listName == "main")(MainFilterList),
     h.if(listName == "project")(ProjectFilterList, { onClick: updateFunction }),
-    h.if(listName == "session")(SessionFilterList, { onClick: updateFunction })
+    h.if(listName == "session")(SessionFilterList, { onClick: updateFunction }),
+    h.if(listName == "sample")(SampleFilterList, { onClick: updateFunction })
   ]);
 }
 

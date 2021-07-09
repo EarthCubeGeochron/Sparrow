@@ -1,7 +1,8 @@
 from starlette.endpoints import HTTPEndpoint
 from starlette.routing import Route, Router
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 from sqlakeyset import select_page
+from webargs.fields import Str, Int, Boolean, DelimitedList
 from pathlib import Path
 import json
 
@@ -15,7 +16,18 @@ search_sample = queries / "open-search-sample.sql"
 search_session = queries / "open-search-session.sql"
 
 
+
 class OpenSearchEndpoint(HTTPEndpoint):
+
+    args_schema = dict(
+        page=Str(missing=None, description="Page"),
+        per_page=Int(missing=20, description="Number to show"),
+        all=Boolean(missing=False, description="Return all results."),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     async def get(self, request):
 
         db = app_context().database
@@ -34,18 +46,19 @@ class OpenSearchEndpoint(HTTPEndpoint):
 
         if model == "sample":
             sql_fn = search_sample
+            schema = db.interface.sample(many=True)
         elif model == "project":
             sql_fn = search_project
+            schema = db.interface.project(many=True)
         else:
             sql_fn = search_session
+            schema = db.interface.session(many=True)
 
         query_res = db.exec_sql_query(fn=sql_fn, params=params)
 
         json_res = [dict(r) for r in query_res]
 
-        # res = select_page(db.session, text(sql).selectable, 15)
-
-        return APIResponse(json_res, total_count=len(json_res))
+        return APIResponse(json_res, total_count=len(json_res), schema=schema)
 
 
 OpenSearchAPI = Router([Route("/query", endpoint=OpenSearchEndpoint, methods=["GET"])])

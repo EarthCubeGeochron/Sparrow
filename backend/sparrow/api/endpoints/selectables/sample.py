@@ -36,3 +36,24 @@ class SubSamples(HTTPEndpoint):
         sample_collection = sampleSchema.dump(sample_.sample_collection)
 
         return JSONResponse({"id": id_, "sample_collection": sample_collection})
+
+
+class MapSamples(HTTPEndpoint):
+    """
+    Endpoint for quick loading of samples for locations, on maps specifically
+
+    returns: id, name, location 
+    """
+
+    async def get(self, request):
+
+        db = get_database()
+        sample = db.model.sample
+        sampleSchema = db.interface.sample(many=True)
+
+        data = db.session.query(sample.id, sample.name, sample.location).filter(sample.location != None).all()
+
+        json_data = sampleSchema.dump(data)
+
+        return JSONResponse({"data": json_data, "total_count": len(json_data)})
+        

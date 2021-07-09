@@ -9,7 +9,7 @@ import {
   VscFilePdf,
   VscFileMedia,
   VscJson,
-  VscFileCode,
+  VscFileCode
 } from "react-icons/vsc";
 
 import { PageViewBlock, PageViewModelCard, PageViewDate } from "~/model-views";
@@ -53,7 +53,9 @@ function DownloadButtonContent(props) {
 
   let text: any | React.ReactNode = "Data file";
   if (file_type != null) {
-    text = h([h("b", { style: { marginLeft: "15px" } }, file_type)]);
+    text = h([
+      h("b", { style: { fontSize: "17px", marginLeft: "22px" } }, file_type)
+    ]);
   }
 
   return h(
@@ -61,15 +63,20 @@ function DownloadButtonContent(props) {
     {
       style: {
         display: "flex",
-        position: "relative",
-      },
+        position: "relative"
+      }
     },
     [
       h(DownloadButtonIcon, {
         basename,
-        styles: { position: "absolute", bottom: "2px", left: "0" },
+        styles: {
+          position: "absolute",
+          bottom: "2px",
+          left: "0",
+          fontSize: "17px"
+        }
       }),
-      text,
+      text
     ]
   );
 }
@@ -83,11 +90,9 @@ export function DownloadButton(props) {
 
   const href = `${process.env.BASE_URL}api/v2/data_file/${file_hash}`;
   return h(Tooltip, { content: `Download ${file_type} file` }, [
-    h(
-      AnchorButton,
-      { href, rightIcon: "download", intent: Intent.PRIMARY, minimal: true },
-      [h(DownloadButtonContent, { basename, file_hash, file_type })]
-    ),
+    h(AnchorButton, { href, rightIcon: "download", intent: Intent.PRIMARY }, [
+      h(DownloadButtonContent, { basename, file_hash, file_type })
+    ])
   ]);
 }
 
@@ -129,7 +134,7 @@ function DataFileCard(props) {
 
   const content = h("div", [
     h("div", [h(PageViewDate, { date })]),
-    h("div", [h("div", [h("h4", basename)])]),
+    h("div", [h("div", [h("h4", basename)])])
   ]);
 
   const linkedThrough = h(
@@ -143,7 +148,7 @@ function DataFileCard(props) {
       PageViewModelCard,
       {
         link: true,
-        to: useModelURL(`/data-file/${file_hash}`),
+        to: useModelURL(`/data-file/${file_hash}`)
       },
       [content]
     );
@@ -155,7 +160,7 @@ function DataFileCard(props) {
         indirect: true,
         linkedThrough,
         styles: { maxWidth: "700px" },
-        to: useModelURL(`/data-file/${file_hash}`),
+        to: useModelURL(`/data-file/${file_hash}`)
       },
       [content]
     );
@@ -173,7 +178,7 @@ function DataFilePageCards(props) {
         file_mtime: date,
         file_hash,
         model: current_model,
-        model_id,
+        model_id
       } = obj;
       return h(DataFileCard, {
         basename,
@@ -182,9 +187,9 @@ function DataFilePageCards(props) {
         file_hash,
         model: model,
         current_model,
-        model_id,
+        model_id
       });
-    }),
+    })
   ]);
 }
 
@@ -193,7 +198,7 @@ export function DatafilePageView(props) {
     sample_ids = [0],
     session_ids = [0],
     analysis_ids = [0],
-    model,
+    model
   } = props;
 
   const data = getDataFileData({ sample_ids, session_ids, analysis_ids });
@@ -204,7 +209,7 @@ export function DatafilePageView(props) {
       model: "data_file",
       modelLink: true,
       title: "Datafiles",
-      hasData: true,
+      hasData: data.length > 0
     },
     [h(DataFilePageCards, { data, model })]
   );

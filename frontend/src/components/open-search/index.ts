@@ -5,7 +5,7 @@ import { useAPIv2Result } from "~/api-v2";
 import {
   ProjectModelCard,
   SessionListModelCard,
-  SampleModelCard,
+  SampleModelCard
 } from "~/model-views/components";
 import ForeverScroll from "~/components/infinite-scroll/forever-scroll";
 import { SearchInput } from "~/filter/components";
@@ -19,21 +19,21 @@ const h = hyperStyled(styles);
  */
 function OpenSearch() {
   const [query, setQuery] = useState("");
-  const [model, setModel] = useState("sample");
+  const [model, setModel] = useState("project");
   const [scrollData, setScrollData] = useState<any>([]);
   const url = "/api/v2/search/query";
 
   const unwrapData =
     model == "session"
-      ? (data) => {
-          const dataObj = data.data.map((obj) => {
+      ? data => {
+          const dataObj = data.data.map(obj => {
             const {
               id: session_id,
               technique,
               target,
               date,
               instrument,
-              data,
+              data
             } = obj;
             return {
               session_id,
@@ -41,12 +41,12 @@ function OpenSearch() {
               target,
               date,
               data,
-              instrument,
+              instrument
             };
           });
           return { data: dataObj };
         }
-      : (data) => data;
+      : data => data;
 
   const data = useAPIv2Result(
     url,
@@ -78,10 +78,10 @@ function OpenSearch() {
     setQuery(value);
   };
 
-  const possibleModels = ["project", "sample", "session"];
+  const possibleModels = ["project", "session"];
 
   const content = h(Menu, [
-    possibleModels.map((model) => {
+    possibleModels.map(model => {
       return h(
         Button,
         {
@@ -90,15 +90,15 @@ function OpenSearch() {
           onClick: () => {
             setScrollData([]);
             setModel(model);
-          },
+          }
         },
         [model]
       );
-    }),
+    })
   ]);
 
   const rightElement = h(Popover, { content, position: "bottom-right" }, [
-    h(Button, { minimal: true, rightIcon: "caret-down" }, model),
+    h(Button, { minimal: true, rightIcon: "caret-down" }, model)
   ]);
 
   return h("div", [
@@ -107,8 +107,8 @@ function OpenSearch() {
         leftElement: h(Icon, { icon: "search" }),
         updateParams: onChange,
         value: query,
-        rightElement: rightElement,
-      }),
+        rightElement: rightElement
+      })
     ]),
     h("div.results", [
       h.if(scrollData.length > 0)(ForeverScroll, {
@@ -119,9 +119,9 @@ function OpenSearch() {
             : model == "project"
             ? ProjectModelCard
             : SessionListModelCard,
-        fetch: () => {},
-      }),
-    ]),
+        fetch: () => {}
+      })
+    ])
   ]);
 }
 

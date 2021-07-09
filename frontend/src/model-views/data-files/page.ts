@@ -50,15 +50,8 @@ const EditNavBarDataFile = () => {
   };
 
   return h(EditNavBar, {
-    header: `Download Datafile ${model.basename}`,
+    header: `Datafile ${model.basename}`,
     editButtons: h("div", { style: { display: "flex" } }, [
-      h("div", [
-        h(DownloadButton, {
-          file_type: model.type,
-          file_hash: model.file_hash,
-          basename: model.basename
-        })
-      ])
       // h(EditStatusButtons, {
       //   onClickCancel,
       //   onClickSubmit,
@@ -102,19 +95,28 @@ const DatafileDetails = props => {
   const dateUploaded = model.data_file_link[0].date;
 
   return h(PageViewBlock, [
-    h("h3", { style: { margin: "0" } }, [model.basename]),
-    h(ModelAttributeOneLiner, {
-      title: "Uploaded: ",
-      content: h(PageViewDate, { date: dateUploaded })
-    }),
-    h(ModelAttributeOneLiner, {
-      title: "Last Modified: ",
-      content: h(PageViewDate, { date: lastModifiedDate })
-    }),
-    h(ModelAttributeOneLiner, {
-      title: "Type: ",
-      content: model.type
-    })
+    h("div", { style: { display: "flex", justifyContent: "space-between" } }, [
+      h("div", [
+        h("h3", { style: { margin: "0" } }, [model.basename]),
+        h(ModelAttributeOneLiner, {
+          title: "Uploaded: ",
+          content: h(PageViewDate, { date: dateUploaded })
+        }),
+        h(ModelAttributeOneLiner, {
+          title: "Last Modified: ",
+          content: h(PageViewDate, { date: lastModifiedDate })
+        }),
+        h(ModelAttributeOneLiner, {
+          title: "Type: ",
+          content: model.type
+        })
+      ]),
+      h(DownloadButton, {
+        file_type: model.type,
+        file_hash: model.file_hash,
+        basename: model.basename
+      })
+    ])
   ]);
 };
 

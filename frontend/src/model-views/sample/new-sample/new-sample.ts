@@ -197,8 +197,7 @@ const initialState: sampleFormState = {
   session: [],
   location: { type: "Point", coordinates: [null, null] },
   sample_geo_entity: [],
-  changeFunction: () => {},
-  listName: modelEditList.MAIN
+  changeFunction: () => {}
 };
 
 export function NewSamplePage() {
@@ -209,7 +208,6 @@ export function NewSamplePage() {
     const route = buildURL("/models/sample");
     const samplePost = { ...sample };
     delete samplePost.changeFunction;
-    delete samplePost.listName;
     if (!samplePost.location.coordinates[0]) {
       samplePost.location = null;
     }
@@ -217,10 +215,6 @@ export function NewSamplePage() {
       return response;
     });
     const { id } = response.data.data;
-    dispatch({
-      type: sample_reducer.LIST_NAME,
-      payload: { listName: modelEditList.MAIN }
-    });
     const goToRoute = process.env.BASE_URL + `admin/sample/${id}`;
     window.location.assign(goToRoute);
   };

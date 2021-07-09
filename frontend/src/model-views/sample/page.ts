@@ -5,7 +5,7 @@ import hyper from "@macrostrat/hyper";
 import {
   APIHelpers,
   ModelEditor,
-  useModelEditor,
+  useModelEditor
 } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { put } from "axios";
@@ -30,19 +30,20 @@ import {
   TagContainer,
   PageViewBlock,
   DatafilePageView,
-  SubSamplePageView,
+  SubSamplePageView
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
 import { useModelURL } from "~/util";
+import { Button } from "@blueprintjs/core";
 
 const h = hyper.styled(styles);
 
-const EmbargoEditor = function (props) {
+const EmbargoEditor = function(props) {
   const { model, actions, isEditing } = useModelEditor();
-  const onChange = (date) => {
+  const onChange = date => {
     actions.updateState({
-      model: { embargo_date: { $set: date } },
+      model: { embargo_date: { $set: date } }
     });
   };
   const embargo_date = model.embargo_date;
@@ -71,17 +72,17 @@ const EditNavBarSample = () => {
         onClickCancel,
         onClickSubmit,
         hasChanges,
-        isEditing,
+        isEditing
       }),
-      h(NewModelButton, { model: "sample" }),
+      h(NewModelButton, { model: "sample" })
     ]),
     embargoEditor: h(EmbargoEditor, {
-      active: isEditing,
-    }),
+      active: isEditing
+    })
   });
 };
 
-const LocationBlock = function (props) {
+const LocationBlock = function(props) {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
 
   const { location, location_name } = model;
@@ -92,7 +93,7 @@ const LocationBlock = function (props) {
   if (location == null) {
     return h(ModelAttributeOneLiner, {
       title: "Location: ",
-      content: location,
+      content: location
     });
   }
   const zoom = 8;
@@ -102,19 +103,19 @@ const LocationBlock = function (props) {
     h(MapLink, { zoom, latitude, longitude }, [
       h(SampleContextMap, {
         center: location.coordinates,
-        zoom,
-      }),
+        zoom
+      })
     ]),
-    h.if(location_name)("h5.location-name", location_name),
+    h.if(location_name)("h5.location-name", location_name)
   ]);
 };
 
-const Material = function (props) {
+const Material = function(props) {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
 
-  const changeMaterial = (material) => {
+  const changeMaterial = material => {
     actions.updateState({
-      model: { material: { $set: material } },
+      model: { material: { $set: material } }
     });
   };
   if (isEditing) {
@@ -123,87 +124,109 @@ const Material = function (props) {
   if (!isEditing) {
     return h(ModelAttributeOneLiner, {
       title: "Material: ",
-      content: model.material,
+      content: model.material
     });
   }
 };
 
-const MemberOf = function (props) {
+const MemberOf = function(props) {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
+  const { setListName, changeFunction } = useContext(SampleAdminContext);
 
   const memberOf = model.member_of;
 
-  const content = memberOf
-    ? h("a", { href: useModelURL(`/sample/${memberOf}`) }, [
-        `Sample ${memberOf}`,
+  const onClickSample = sample => {
+    const { id } = sample;
+    actions.updateState({
+      model: { member_of: { $set: id } }
+    });
+  };
+
+  const onClickList = () => {
+    setListName("sample");
+    changeFunction(onClickSample);
+  };
+
+  let content;
+  if (isEditing) {
+    content = h("div", [
+      h(Button, { onClick: onClickList, minimal: true, intent: "primary" }, [
+        memberOf ? `Change from Sample ${memberOf}` : "Choose Parent Sample"
       ])
-    : null;
+    ]);
+  } else {
+    content = memberOf
+      ? h("a", { href: useModelURL(`/sample/${memberOf}`) }, [
+          `Sample ${memberOf}`
+        ])
+      : null;
+  }
 
   return h(ModelAttributeOneLiner, {
     title: "Member of:",
-    content,
+    content
   });
 };
 
-const SubSamples = function () {
+const SubSamples = function() {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
 
   return h(SubSamplePageView, { sample_id: model.id, isEditing });
 };
 
-const DepthElevation = (props) => {
+const DepthElevation = props => {
   const { isEditing, actions, model } = useModelEditor();
 
   const { depth, elevation } = model;
 
-  const changeDepth = (depth) => {
+  const changeDepth = depth => {
     actions.updateState({
-      model: { depth: { $set: depth } },
+      model: { depth: { $set: depth } }
     });
   };
 
-  const changeElevation = (elev) => {
+  const changeElevation = elev => {
     actions.updateState({
-      model: { elevation: { $set: elev } },
+      model: { elevation: { $set: elev } }
     });
   };
 
   if (isEditing) {
     return h("div", [
       h(SampleDepth, { sample: model, changeDepth }),
-      h(SampleElevation, { sample: model, changeElevation }),
+      h(SampleElevation, { sample: model, changeElevation })
     ]);
   }
   return h("div.depth-elevation", [
     h(ModelAttributeOneLiner, {
       title: "Depth: ",
-      content: depth,
+      content: depth
     }),
     h(ModelAttributeOneLiner, {
       title: "Elevation: ",
-      content: elevation,
-    }),
+      content: elevation
+    })
   ]);
 };
 
-const GeoEntity = (props) => {
+const GeoEntity = props => {
   const { isEditing, model, actions } = useModelEditor();
 
   const { sample_geo_entity } = model;
 
-  const changeGeoEntity = (entity) => {
+  const changeGeoEntity = entity => {
     const currnetEntities = [...sample_geo_entity];
     const newEntities = [...currnetEntities, ...new Array(entity)];
     actions.updateState({
-      model: { sample_geo_entity: { $set: newEntities } },
+      model: { sample_geo_entity: { $set: newEntities } }
     });
   };
 
-  const deleteGeoEntity = (index) => {
+  const deleteGeoEntity = index => {
     const currnetEntities = [...sample_geo_entity];
     currnetEntities.splice(index, 1);
     actions.updateState({
-      model: { sample_geo_entity: { $set: currnetEntities } },
+      model: { sample_geo_entity: { $set: currnetEntities } }
     });
   };
 
@@ -211,13 +234,13 @@ const GeoEntity = (props) => {
     return h(
       PageViewBlock,
       {
-        title: "Geologic Context",
+        title: "Geologic Context"
       },
       [
         h(ModelAttributeOneLiner, {
           title: "Geologic Context",
-          content: "None",
-        }),
+          content: "None"
+        })
       ]
     );
   }
@@ -226,7 +249,7 @@ const GeoEntity = (props) => {
     sample_geo_entity,
     isEditing,
     changeGeoEntity,
-    deleteGeoEntity,
+    deleteGeoEntity
   });
 };
 
@@ -236,9 +259,9 @@ const SampleProjectAdd = () => {
 
   const onClickDelete = ({ id, name }) => {
     const ps = [...model.project];
-    const newPs = ps.filter((ele) => ele.id != id);
+    const newPs = ps.filter(ele => ele.id != id);
     actions.updateState({
-      model: { project: { $set: newPs } },
+      model: { project: { $set: newPs } }
     });
   };
 
@@ -247,7 +270,7 @@ const SampleProjectAdd = () => {
     const proj = new Array({ id, name });
     const newProjs = [...projects, ...proj];
     actions.updateState({
-      model: { project: { $set: newProjs } },
+      model: { project: { $set: newProjs } }
     });
   };
 
@@ -274,15 +297,15 @@ const SampleSessionAdd = () => {
     const newSess = new Array({ id, date, target, technique });
     const newSessions = [...currentSessions, ...newSess];
     actions.updateState({
-      model: { session: { $set: newSessions } },
+      model: { session: { $set: newSessions } }
     });
   };
 
   const onClickDelete = ({ session_id: id, date }) => {
     const ss = [...model.session];
-    const newSs = ss.filter((ele) => ele.id != id);
+    const newSs = ss.filter(ele => ele.id != id);
     actions.updateState({
-      model: { session: { $set: newSs } },
+      model: { session: { $set: newSs } }
     });
   };
 
@@ -295,7 +318,7 @@ const SampleSessionAdd = () => {
     data: model.session,
     isEditing,
     onClickList,
-    onClickDelete,
+    onClickDelete
   });
 };
 
@@ -307,14 +330,14 @@ const SampleLocationEleDepthEditor = () => {
 
   const sample = { ...model, longitude, latitude };
 
-  const changeCoordinates = (coords) => {
+  const changeCoordinates = coords => {
     const { lat, lon } = coords;
     const newLoc = {
       type: "Point",
-      coordinates: [parseFloat(lon), parseFloat(lat)],
+      coordinates: [parseFloat(lon), parseFloat(lat)]
     };
     actions.updateState({
-      model: { location: { $set: newLoc } },
+      model: { location: { $set: newLoc } }
     });
   };
 
@@ -323,13 +346,13 @@ const SampleLocationEleDepthEditor = () => {
     { style: { justifyContent: "flex-end", minWidth: "405px" } },
     [
       h("div.sample-map", { style: { maxWidth: "455px" } }, [
-        h(NewSampleMap, { changeCoordinates, sample: { longitude, latitude } }),
+        h(NewSampleMap, { changeCoordinates, sample: { longitude, latitude } })
       ]),
       h(SampleLocation, {
         changeCoordinates,
         sample: { longitude, latitude },
-        stacked: false,
-      }),
+        stacked: false
+      })
     ]
   );
 };
@@ -337,19 +360,19 @@ const SampleLocationEleDepthEditor = () => {
 function SampleTagContainer() {
   const { model, actions, isEditing } = useModelEditor();
 
-  const onAdd = (item) => {
+  const onAdd = item => {
     const currentTags = [...model.tags_tag];
     currentTags.push(item);
     actions.updateState({
-      model: { tags_tag: { $set: currentTags } },
+      model: { tags_tag: { $set: currentTags } }
     });
   };
 
-  const onDelete = (id) => {
+  const onDelete = id => {
     const currentTags = [...model.tags_tag];
-    const newTags = currentTags.filter((tag) => tag.id != id);
+    const newTags = currentTags.filter(tag => tag.id != id);
     actions.updateState({
-      model: { tags_tag: { $set: newTags } },
+      model: { tags_tag: { $set: newTags } }
     });
   };
 
@@ -358,7 +381,7 @@ function SampleTagContainer() {
     tags: model.tags_tag,
     onChange: onAdd,
     onClickDelete: onDelete,
-    modelName: "sample",
+    modelName: "sample"
   });
 }
 
@@ -373,7 +396,7 @@ async function TagsChangeSet(changeset, updatedModel, url) {
     let { id } = updatedModel;
     const model_id = id;
     const tags = changeset.tags_tag;
-    const tag_ids = tags.map((tag) => tag.id);
+    const tag_ids = tags.map(tag => tag.id);
     const body = { model_id: model_id, tag_ids: tag_ids };
     const res = await put(url, body);
     const { data } = res;
@@ -385,7 +408,7 @@ async function TagsChangeSet(changeset, updatedModel, url) {
 const SamplePageDataFiles = () => {
   const { model } = useModelEditor();
 
-  let session_ids = model.session.map((obj) => obj.id);
+  let session_ids = model.session.map(obj => obj.id);
   if (session_ids.length == 0) {
     session_ids = [0];
   }
@@ -426,8 +449,7 @@ function SamplePage(props) {
           updatedModel
         );
         const { data } = response;
-        console.log(data);
-      },
+      }
     },
     [
       h("div.sample", [
@@ -436,21 +458,21 @@ function SamplePage(props) {
           h(ModelEditableText, {
             is: "h3",
             field: "name",
-            multiline: true,
+            multiline: true
           }),
           h("div.flex-row", [
             h("div.info-block", [h(MemberOf), h(Material), h(DepthElevation)]),
-            h("div", [h(LocationBlock)]),
+            h("div", [h(LocationBlock)])
           ]),
-          h.if(Edit)(SampleTagContainer),
-        ]),
+          h.if(Edit)(SampleTagContainer)
+        ])
       ]),
       h(GeoEntity),
       h(SubSamples),
       h(SampleProjectAdd),
       h(SampleSessionAdd),
       h(SamplePageDataFiles),
-      h(Frame, { id: "samplePage", data: sample.data }, null),
+      h(Frame, { id: "samplePage", data: sample.data }, null)
     ]
   );
 }
