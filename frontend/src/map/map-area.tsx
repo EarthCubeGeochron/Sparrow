@@ -73,7 +73,7 @@ export function MapPanel({
   }, []);
 
   const [params, setParams] = useState({ all: "true", has: "location" });
-  const initialData = useAPIv2Result("/models/sample", params);
+  const initialData = useAPIv2Result("/map-samples", params);
 
   const [data, setData] = useState(initialData);
 

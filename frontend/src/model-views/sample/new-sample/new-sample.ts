@@ -3,7 +3,6 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { APIHelpers } from "@macrostrat/ui-components";
 import Ax from "axios";
 import { APIV2Context } from "~/api-v2";
-import { AdminPage } from "~/admin/AdminPage";
 import {
   NewSampleMap,
   SampleLocation,
@@ -14,7 +13,6 @@ import {
   SampleName,
   SubmitButton,
   EmbargoDatePick,
-  ModelAddFilterLists,
   ProjectAdd,
   SessionAdd,
 } from "../../components";
@@ -28,6 +26,7 @@ import {
 } from "./types";
 // @ts-ignore
 import styles from "./module.styl";
+import { SampleAdminContext } from "~/admin/sample";
 
 const h = hyperStyled(styles);
 
@@ -35,6 +34,7 @@ const NewSampleFormContext = createContext<Partial<sampleContext>>({});
 
 const NewSampleProjectAdd = () => {
   const { sample, dispatch } = useContext(NewSampleFormContext);
+  const { setListName, changeFunction } = useContext(SampleAdminContext);
 
   const onAddProject = (id, name) => {
     dispatch({
@@ -51,14 +51,8 @@ const NewSampleProjectAdd = () => {
   };
 
   const onClickList = () => {
-    dispatch({
-      type: sample_reducer.LIST_NAME,
-      payload: { listName: modelEditList.PROJECT },
-    });
-    dispatch({
-      type: sample_reducer.CHANGE_FUNCTION,
-      payload: { changeFunction: onAddProject },
-    });
+    setListName("project");
+    changeFunction(onAddProject);
   };
 
   return h(ProjectAdd, {
@@ -71,6 +65,7 @@ const NewSampleProjectAdd = () => {
 
 const NewSampleSessionAdd = () => {
   const { sample, dispatch } = useContext(NewSampleFormContext);
+  const { setListName, changeFunction } = useContext(SampleAdminContext);
 
   const onSessionAdd = (id, date, target, technique) => {
     const session = { id, date, target, technique };
@@ -85,14 +80,8 @@ const NewSampleSessionAdd = () => {
   };
 
   const onClickList = () => {
-    dispatch({
-      type: sample_reducer.LIST_NAME,
-      payload: { listName: modelEditList.SESSION },
-    });
-    dispatch({
-      type: sample_reducer.CHANGE_FUNCTION,
-      payload: { changeFunction: onSessionAdd },
-    });
+    setListName("session");
+    changeFunction(onSessionAdd);
   };
 
   return h(SessionAdd, {
@@ -123,9 +112,7 @@ const NewSampleNavBar = (props) => {
 function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
   const { sample, dispatch } = useContext(NewSampleFormContext);
 
-  console.log(sample);
   const changeCoordinates = (coords) => {
-    console.log(coords);
     dispatch({
       type: sample_reducer.LOCATION,
       payload: { coordinates: coords },
@@ -154,7 +141,6 @@ function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
   };
 
   const changeGeoEntity = (geo_entity) => {
-    console.log(geo_entity);
     dispatch({
       type: sample_reducer.GEO_ENTITY,
       payload: { geo_entity: geo_entity },
@@ -162,7 +148,6 @@ function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
   };
 
   const deleteGeoEntity = (index) => {
-    console.log(index);
     dispatch({
       type: sample_reducer.REMOVE_GEO_ENTITY,
       payload: { index },
@@ -198,14 +183,8 @@ function NewSamplePageMainComponent({ onSubmit }): React.ReactElement {
     ]),
     h(NewSampleProjectAdd),
     h(NewSampleSessionAdd),
-    h(SubmitButton, { postData: onSubmit }),
+    h(SubmitButton, { postData: onSubmit, modelName: "Sample" }),
   ]);
-}
-
-function NewSampleListComponent(): React.ReactElement {
-  const { sample } = useContext(NewSampleFormContext);
-  const { listName, changeFunction } = sample;
-  return h(ModelAddFilterLists, { listName, onClick: changeFunction });
 }
 
 const initialState: sampleFormState = {
@@ -219,7 +198,6 @@ const initialState: sampleFormState = {
   location: { type: "Point", coordinates: [null, null] },
   sample_geo_entity: [],
   changeFunction: () => {},
-  listName: modelEditList.MAIN,
 };
 
 export function NewSamplePage() {
@@ -230,22 +208,15 @@ export function NewSamplePage() {
     const route = buildURL("/models/sample");
     const samplePost = { ...sample };
     delete samplePost.changeFunction;
-    delete samplePost.listName;
     if (!samplePost.location.coordinates[0]) {
       samplePost.location = null;
     }
-    console.log(samplePost);
     const response = await Ax.post(route, samplePost).then((response) => {
       return response;
     });
-    console.log(response);
-    dispatch({
-      type: sample_reducer.LIST_NAME,
-      payload: { listName: modelEditList.MAIN },
-    });
-    const goToRoute = process.env.BASE_URL + "admin/sample";
-    console.log(goToRoute);
-    //window.location.assign(goToRoute);
+    const { id } = response.data.data;
+    const goToRoute = process.env.BASE_URL + `admin/sample/${id}`;
+    window.location.assign(goToRoute);
   };
 
   return h(
@@ -256,11 +227,6 @@ export function NewSamplePage() {
         dispatch,
       },
     },
-    [
-      h(AdminPage, {
-        mainPageComponent: h(NewSamplePageMainComponent, { onSubmit }),
-        listComponent: h(NewSampleListComponent),
-      }),
-    ]
+    [h(NewSamplePageMainComponent, { onSubmit })]
   );
 }

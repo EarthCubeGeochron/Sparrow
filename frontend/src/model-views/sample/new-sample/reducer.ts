@@ -84,11 +84,6 @@ const sampleReducer = (state, action) => {
         ...state,
         changeFunction: action.payload.changeFunction,
       };
-    case sample_reducer.LIST_NAME:
-      return {
-        ...state,
-        listName: action.payload.listName,
-      };
     default:
       throw new Error("What does this mean?");
   }

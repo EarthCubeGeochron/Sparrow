@@ -6,9 +6,8 @@
  */
 import hyper from "@macrostrat/hyper";
 import styles from "./module.styl";
-import { Component } from "react";
 import { Card, Breadcrumbs } from "@blueprintjs/core";
-import { APIResultView } from "@macrostrat/ui-components";
+import { useAPIResult } from "@macrostrat/ui-components";
 import ReactJson from "react-json-view";
 import { format } from "d3-format";
 import { group } from "d3-array";
@@ -38,32 +37,33 @@ const Material = function (props) {
   ]);
 };
 
+function analysisAttributeUnwrap(data) {
+  if (data == null || data.length === 0) {
+    return [];
+  }
+  return group(data, (d) => d.parameter);
+}
+
 const AnalysisAttributes = function (props) {
   const { analysis_id } = props;
+  const data = useAPIResult(
+    "/attribute",
+    { analysis_id },
+    { unwrapResponse: analysisAttributeUnwrap }
+  );
+  if (!data || data.length == 0) {
+    return h("div");
+  }
   return h(
-    APIResultView,
-    { route: "/attribute", params: { analysis_id }, placeholder: null },
-    (data) => {
-      if (data == null) {
-        return null;
-      }
-      if (data.length === 0) {
-        return null;
-      }
-      const groupedData = group(data, (d) => d.parameter);
-
-      return h(
-        Array.from(groupedData, ([k, v]) =>
-          h("li.attribute", [
-            h("span.parameter", `${k}:`),
-            h(
-              "ul.values",
-              v.map((d) => h("li.value", d.value))
-            ),
-          ])
-        )
-      );
-    }
+    Array.from(data, ([k, v]) =>
+      h("li.attribute", [
+        h("span.parameter", `${k}:`),
+        h(
+          "ul.values",
+          v.map((d) => h("li.value", d.value))
+        ),
+      ])
+    )
   );
 };
 
@@ -100,6 +100,10 @@ const AnalysisDetails = function (props) {
   const { data: a } = props;
   const { analysis_id } = a;
 
+  if (a.analysis_id == null) {
+    return h("h2", ["No analyses associated"]);
+  }
+
   return h(Card, { className: "analysis-details" }, [
     h.if(a.analysis_type != null)(
       "h3.analysis-type",
@@ -122,22 +126,17 @@ const SessionDetails = function (props) {
   }
   return h("div.session-details", [
     h.if(showTitle)("h2", "Analysis details"),
-    data.map((d) => h(AnalysisDetails, { data: d })),
+    data.map((d, i) => h(AnalysisDetails, { key: i, data: d })),
   ]);
 };
 
 const SessionDetailPanel = function (props) {
   const { session_id } = props;
-  return h(
-    APIResultView,
-    {
-      route: "/analysis",
-      params: { session_id },
-    },
-    (data) => {
-      return h(SessionDetails, { data });
-    }
-  );
+  const data = useAPIResult("/analysis", { session_id });
+
+  if (!data) return h("div");
+
+  return h(SessionDetails, { data });
 };
 
 export { SessionDetailPanel };

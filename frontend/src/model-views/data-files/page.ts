@@ -1,157 +1,123 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useParams } from "react-router-dom";
-import { useModelURL } from "~/util/router";
 import styles from "./module.styl";
-import { DownloadButton } from "../session";
+import { DownloadButton, SampleAdd } from "~/model-views";
 import { Divider, Spinner } from "@blueprintjs/core";
 import { format } from "date-fns";
-import { LinkCard } from "@macrostrat/ui-components";
-import { SampleCard } from "../components/new-model/detail-card";
+import {
+  useModelEditor,
+  ModelEditor,
+  APIHelpers,
+} from "@macrostrat/ui-components";
+import { useAuth } from "~/auth";
+import { SampleCard } from "~/model-views";
 import { Frame } from "~/frame";
 import { useAPIv2Result } from "~/api-v2";
+import {
+  EditNavBar,
+  ModelEditableText,
+  SessionAdd,
+  EmbargoDatePick,
+  EditStatusButtons,
+  ModelAttributeOneLiner,
+  TagContainer,
+  PageViewDate,
+  PageViewBlock,
+} from "../components";
 
 const h = hyperStyled(styles);
 
-/**
- * http://localhost:5002/api/v2/models/data_file?nest=data_file_link,sample,session
- * Things to display on the data-files page
- *  Date of Upload to Sparrow
- *  Basename
- *  type
- *  Sample Link Cards,
- *  Project Link Cards,
- *  Session Link Cards,
- */
+const EmbargoEditor = function (props) {
+  const { model, actions, isEditing } = useModelEditor();
+  const onChange = (date) => {
+    actions.updateState({
+      model: { embargo_date: { $set: date } },
+    });
+  };
+  const embargo_date = model.embargo_date;
 
-const DetailPageHeader = (props) => {
-  const { date_upload, basename, type: file_type, file_hash } = props;
-  return h(
-    "div",
-    {
-      style: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "baseline",
-      },
-    },
-    [
-      h("h2", [basename]),
-      h("h4", ["Uploaded " + format(date_upload, "MMMM D, YYYY")]),
-      h("div", [h(DownloadButton, { file_type, file_hash })]),
-    ]
-  );
+  return h(EmbargoDatePick, { onChange, embargo_date, active: isEditing });
 };
 
-/**
- *
- * @param props target, session_date, technique
- */
-export const SessionCardInfo = (props) => {
-  const { session_id, target, date, technique } = props;
-  return h(
-    "div",
-    {
-      style: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "baseline",
-      },
-    },
-    [
-      h(
-        "h5",
-        { style: { color: "#1CBAFF", fontStyle: "italic", padding: "0px" } },
-        ["Session Date: " + format(date, "MMMM D, YYYY")]
-      ),
-      h("h4", [technique]),
-      h("h4", { style: { fontStyle: "italic" } }, ["Target: " + target]),
-    ]
-  );
+const EditNavBarDataFile = () => {
+  const { hasChanges, actions, isEditing, model } = useModelEditor();
+
+  const onClickCancel = () => {
+    actions.toggleEditing();
+  };
+  const onClickSubmit = () => {
+    return actions.persistChanges();
+  };
+
+  return h(EditNavBar, {
+    header: `Datafile ${model.basename}`,
+    editButtons: h("div", { style: { display: "flex" } }, [
+      // h(EditStatusButtons, {
+      //   onClickCancel,
+      //   onClickSubmit,
+      //   hasChanges,
+      //   isEditing
+      // })
+    ]),
+  });
 };
 
-export const SessionLinkCard = function (props) {
-  const { session_id } = props;
+const DataFileSamples = (props) => {
+  const { actions, isEditing, model } = useModelEditor();
 
-  const to = useModelURL(`/session/${session_id}`);
+  const sample_links = model.data_file_link.filter((obj) => obj.sample != null);
+  const samples = sample_links.map((obj) => obj.sample);
 
-  return h(
-    LinkCard,
-    {
-      to,
-      key: session_id,
-      style: { marginBottom: "10px", maxHeight: "200px" },
-    },
-    h(SessionCardInfo, props)
-  );
+  return h(SampleAdd, { editable: false, data: samples });
 };
 
-export const Samples = (props) => {
-  const { samples } = props;
+const DataFileSessions = (props) => {
+  const { actions, isEditing, model } = useModelEditor();
 
-  if (samples.length == 0) return h("p", "No samples");
+  const sessions_links = model.data_file_link.filter(
+    (obj) => obj.session != null
+  );
+  const sessions = sessions_links.map((obj) => {
+    const session = obj.session;
+    delete session.sample;
 
-  return h("div.sample-container", [
-    h("h4", "Samples"),
-    h(
-      "div.samples",
-      { style: { display: "flex", flexFlow: "row wrap", margin: "0 -5px" } },
-      samples.map((d) => {
-        const { name, sample_id, sample_material } = d;
-        return h(SampleCard, {
-          name,
-          id: sample_id,
-          material: sample_material,
-          link: true,
-        });
-      })
-    ),
+    return session;
+  });
+
+  return h(SessionAdd, { editable: false, data: sessions });
+};
+
+const DatafileDetails = (props) => {
+  const { actions, isEditing, model } = useModelEditor();
+
+  const lastModifiedDate = model.file_mtime;
+
+  const dateUploaded = model.data_file_link[0].date;
+
+  return h(PageViewBlock, [
+    h("div", { style: { display: "flex", justifyContent: "space-between" } }, [
+      h("div", [
+        h("h3", { style: { margin: "0" } }, [model.basename]),
+        h(ModelAttributeOneLiner, {
+          title: "Uploaded: ",
+          content: h(PageViewDate, { date: dateUploaded }),
+        }),
+        h(ModelAttributeOneLiner, {
+          title: "Last Modified: ",
+          content: h(PageViewDate, { date: lastModifiedDate }),
+        }),
+        h(ModelAttributeOneLiner, {
+          title: "Type: ",
+          content: model.type,
+        }),
+      ]),
+      h(DownloadButton, {
+        file_type: model.type,
+        file_hash: model.file_hash,
+        basename: model.basename,
+      }),
+    ]),
   ]);
-};
-
-export function SessionInfo(props) {
-  const {
-    id,
-    technique,
-    target,
-    date,
-    //analysis,
-  } = props;
-  return h(SessionLinkCard, { session_id: id, target, technique, date });
-}
-
-/**
- *
- * @param props sessions
- */
-const SessionList = (props) => {
-  const { sessions } = props;
-  //const analysisList = analysis.length > 1 ? " Analyses" : "Analysis";
-  return h("div.session-container", [
-    h("h4", null, "Sessions"),
-    h(
-      "div.sessions",
-      sessions.map((d) => {
-        return h(SessionInfo, d);
-      })
-    ),
-  ]);
-};
-
-const ProjectLinks = (props) => {
-  const { project } = props;
-  if (project !== null) {
-    const projectTo = useModelURL(`/project/${project.id}`);
-
-    return h("div.project", [
-      h("h4.info", "Project"),
-      h("div", null, [h("a", { href: projectTo }, project.name) || "—"]),
-    ]);
-  }
-  if (project == null) {
-    return null;
-  }
 };
 
 export function DataFilePage(props) {
@@ -164,36 +130,30 @@ export function DataFilePage(props) {
     nest: "data_file_link,session,sample",
   });
 
+  const { login } = useAuth();
+
   const data = res?.data;
 
   if (data == null) return h(Spinner);
 
-  const {
-    type,
-    data_file_link, // is an array
-    basename,
-  } = data;
-
-  // Get uploaded date from first link
-  const { date } = data_file_link[0];
-
-  const sessions = data_file_link
-    .map((d) => d.session)
-    .filter((d) => d != null);
-
-  const samples = data_file_link.map((d) => d.sample).filter((d) => d != null);
-
-  return h("div.data-page-container", [
-    h("div.header", [
-      h(DetailPageHeader, { date_upload: date, basename, type, file_hash }),
-    ]),
-    h(Divider),
-    h("div.info-container", [
-      h(Samples, { samples }),
-      h(SessionList, { sessions }),
-      h(Frame, { id: "datafilePage", data }, null),
-    ]),
-  ]);
+  return h(
+    ModelEditor,
+    {
+      model: data,
+      canEdit: login,
+    },
+    [
+      h("div.data-page-container", [
+        h("div.header", [h.if(login)(EditNavBarDataFile)]),
+        h("div.info-container", [
+          h(DatafileDetails),
+          h(DataFileSamples),
+          h(DataFileSessions),
+          h(Frame, { id: "datafilePage", data }, null),
+        ]),
+      ]),
+    ]
+  );
 }
 
 export function DataFileMatch() {
