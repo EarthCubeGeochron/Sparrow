@@ -92,7 +92,7 @@ const ProjectComponent = function (props: ProjectProps) {
   const data = useAPIv2Result(
     `/models/project/${id}`,
     {
-      nest: "publication,session,sample,researcher",
+      nest: "publication,session,sample,researcher,tag",
     },
     {}
   );

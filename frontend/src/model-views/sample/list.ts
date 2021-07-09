@@ -81,8 +81,6 @@ const SampleComponent = function (props: SampleProps) {
     return null;
   }
 
-  console.log(data);
-
   return h("div.data-view.sample", null, h(SamplePage, { id, data, Edit }));
 };
 

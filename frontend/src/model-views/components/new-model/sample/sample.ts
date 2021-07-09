@@ -119,6 +119,7 @@ export const SampleLocation = (props) => {
       onChange: onChangeLat,
       helperText: "-90 to 90",
       placeholder: "Enter latitude",
+      minorStepSize: 0.00001,
       min: -90,
       max: 90,
     }),
@@ -128,6 +129,7 @@ export const SampleLocation = (props) => {
       onChange: onChangeLon,
       helperText: "-180 to 180",
       placeholder: "Enter longitude",
+      minorStepSize: 0.00001,
       min: -180,
       max: 180,
     }),
@@ -135,9 +137,9 @@ export const SampleLocation = (props) => {
 };
 
 export const SampleDepth = (props) => {
-  const [disabled, setDisabled] = useState(true);
   const { sample, changeDepth } = props;
   const { depth } = sample;
+  const [disabled, setDisabled] = useState(depth == null);
 
   useEffect(() => {
     if (disabled) {
@@ -166,8 +168,8 @@ const unwrapElevation = (obj) => {
 };
 
 export const SampleElevation = (props) => {
-  const [disabled, setDisabled] = useState(true);
   const { sample, changeElevation } = props;
+  const [disabled, setDisabled] = useState(sample.elevation == null);
   const { elevation, longitude, latitude } = sample;
 
   const elev = useAPIv2Result(

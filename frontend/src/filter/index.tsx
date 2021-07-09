@@ -7,6 +7,7 @@ import {
   DoiFilter,
   SearchInput,
   GeologicFormationSelector,
+  TagFilter,
 } from "./components";
 import { useToggle } from "~/components";
 import { hyperStyled } from "@macrostrat/hyper";
@@ -190,6 +191,9 @@ function AdminFilter(props) {
       h("div", [
         h.if(possibleFilters.includes("public"))(EmabrgoSwitch, {
           updateEmbargoFilter: updateParams,
+        }),
+        h.if(possibleFilters.includes("tag"))(TagFilter, {
+          updateParams,
         }),
         h("div", [
           h.if(possibleFilters.includes("date_range"))(DatePicker, {

@@ -27,4 +27,3 @@ function SampleMain(props) {
 }
 
 export { SampleMain, SamplePage, SampleList };
-export * from "../components/new-model/detail-card";

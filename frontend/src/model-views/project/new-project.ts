@@ -13,6 +13,7 @@ import {
   ResearcherFilterList,
   SampleFilterList,
 } from "../components";
+import { ProjectAdminContext } from "~/admin/project";
 import { MinimalNavbar } from "~/components";
 import { APIV2Context } from "../../api-v2";
 import axios from "axios";
@@ -124,21 +125,22 @@ export function NewProjectFormMain() {
   async function postData() {
     const route = buildURL("/models/project", {});
 
-    const projectPost = [
-      {
-        name: project.name,
-        description: project.description,
-        samples: project.sample_collection,
-        publications: project.publication_collection,
-        researchers: project.researcher_collection,
-      },
-    ];
+    const projectPost = {
+      name: project.name,
+      description: project.description,
+      sample: project.sample_collection,
+      publication: project.publication_collection,
+      researcher: project.researcher_collection,
+    };
 
     const response = await axios.post(route, projectPost).then((response) => {
       return response;
     });
     const { data } = response;
     console.log(data);
+    const { id } = data.data;
+    const goToRoute = process.env.BASE_URL + `admin/project/${id}`;
+    window.location.assign(goToRoute);
   }
 
   const NewProjectNavBar = (props) => {
@@ -171,6 +173,8 @@ export function NewProjectFormMain() {
   };
 
   const SampleAddProj = () => {
+    const { setListName, changeFunction } = useContext(ProjectAdminContext);
+
     const onClickDelete = ({ id, name }) => {
       let sample;
       if (id) {
@@ -180,11 +184,17 @@ export function NewProjectFormMain() {
       }
       dispatch({ type: "remove_sample", payload: { sample: sample } });
     };
-    const onClickList = () => {
+
+    const onClickSam = (sample) => {
       dispatch({
-        type: "filter-list",
-        payload: { filter_list: "sample" },
+        type: "add_sample",
+        payload: { sample_collection: [sample] },
       });
+    };
+
+    const onClickList = () => {
+      setListName("sample");
+      changeFunction(onClickSam);
     };
 
     return h(SampleAdd, {
@@ -196,12 +206,25 @@ export function NewProjectFormMain() {
 
   // this should look like normal project page
   const PubAddProj = () => {
+    const { setListName, changeFunction } = useContext(ProjectAdminContext);
+
     const onClickDelete = ({ id, title }) => {
       dispatch({ type: "remove_pub", payload: { pub_title: title } });
       console.log("Remove", title);
     };
+
+    const onClickPub = (id, title, doi) => {
+      dispatch({
+        type: "add_pub",
+        payload: {
+          publication_collection: [{ id, title, doi }],
+        },
+      });
+    };
+
     const onClickList = () => {
-      dispatch({ type: "filter-list", payload: { filter_list: "pub" } });
+      setListName("publication");
+      changeFunction(onClickPub);
     };
 
     return h(PubAdd, {
@@ -212,12 +235,23 @@ export function NewProjectFormMain() {
   };
 
   const ResearcherAddProj = () => {
+    const { setListName, changeFunction } = useContext(ProjectAdminContext);
+
     const onClickDelete = ({ id, name }) => {
       dispatch({ type: "remove_res", payload: { res_name: name } });
       console.log(id);
     };
+    const onClickRes = (id, name) => {
+      dispatch({
+        type: "add_researcher",
+        payload: {
+          researcher_collection: [{ id, name }],
+        },
+      });
+    };
     const onClickList = () => {
-      dispatch({ type: "filter-list", payload: { filter_list: "res" } });
+      setListName("researcher");
+      changeFunction(onClickRes);
     };
     return h(ResearcherAdd, {
       onClickDelete,
@@ -261,50 +295,9 @@ export function NewProjectFormMain() {
     h(ResearcherAddProj),
     h(PubAddProj),
     h(SampleAddProj),
-    h(SubmitButton, { postData }),
+    h(SubmitButton, { postData, modelName: "Project" }),
   ]);
 }
-
-const ProjectEditListComponent = () => {
-  const { project, dispatch } = useContext(ProjectFormContext);
-
-  const onClickRes = (id, name) => {
-    dispatch({
-      type: "add_researcher",
-      payload: {
-        researcher_collection: [{ id, name }],
-      },
-    });
-  };
-
-  const onClickPub = (id, title, doi) => {
-    dispatch({
-      type: "add_pub",
-      payload: {
-        publication_collection: [{ id, title, doi }],
-      },
-    });
-  };
-
-  const onClickSam = (sample) => {
-    dispatch({
-      type: "add_sample",
-      payload: { sample_collection: [sample] },
-    });
-  };
-
-  return h("div", [
-    h.if(project.filter_list == "sample")(SampleFilterList, {
-      onClick: onClickSam,
-    }),
-    h.if(project.filter_list == "pub")(PublicationFilterList, {
-      onClick: onClickPub,
-    }),
-    h.if(project.filter_list == "res")(ResearcherFilterList, {
-      onClick: onClickRes,
-    }),
-  ]);
-};
 
 /**
  * Need ability to change the list component based on what editing component, specifically for collections
@@ -324,13 +317,9 @@ export function NewProjectForm() {
     sample_collection: [],
     publication_collection: [],
     researcher_collection: [],
-    filter_list: "Na",
   });
 
   return h(ProjectFormContext.Provider, { value: { project, dispatch } }, [
-    h(AdminPage, {
-      mainPageComponent: h(NewProjectFormMain),
-      listComponent: h(ProjectEditListComponent),
-    }),
+    h(NewProjectFormMain),
   ]);
 }

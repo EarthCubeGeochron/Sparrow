@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { Switch, Link } from "react-router-dom";
 import loadable from "@loadable/component";
 import { LinkCard } from "@macrostrat/ui-components";
-import { Spinner, MenuItem, Menu } from "@blueprintjs/core";
+import { Spinner, MenuItem, Menu, Divider } from "@blueprintjs/core";
 
 import { Frame } from "~/frame";
 import { LoginRequired } from "~/auth";
@@ -15,14 +15,14 @@ import { OpenSearch } from "~/components";
 import { SampleAdminPage } from "./sample";
 import { PageRoute, PageStyle, AppNavbar } from "~/components/page-skeleton";
 import { NavButton } from "~/components";
-import styles from "./module.styl";
 import { SessionAdminPage } from "./session";
 import { DataFileAdminPage } from "./data-file";
 import { VocabularyPage } from "./vocabulary";
 
-import { NewProjectForm } from "../model-views/project/new-project";
-import { NewSamplePage } from "~/model-views/sample/new-sample";
 import { TagManager } from "~/components/tags";
+
+//@ts-ignore
+import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
@@ -56,6 +56,13 @@ function SecondaryPageLinks(props) {
     h(SecondaryMenuItem, { to: base + "/data-sheet" }, "Metadata"),
     h(SecondaryMenuItem, { to: base + "/terms/parameter" }, "Terms"),
     h(SecondaryMenuItem, { to: "/map" }, "Map"),
+  ]);
+}
+
+function NewModelLinks(props) {
+  const { base = "/admin" } = props;
+  return h(Menu, [
+    h(SecondaryMenuItem, { to: base + "/tag-manager" }, "Tag Manager"),
   ]);
 }
 
@@ -96,9 +103,22 @@ const AdminNavbar = (props) => {
 
 const QuickLinks = ({ base }) => {
   return h("div", { style: { position: "sticky", top: "0px" } }, [
-    h("h2", { style: { marginTop: "0px" } }, "Quick Links"),
+    h(QuickHeader, { text: "Quick Links" }),
     h(AdminDataModelLinks, { base }),
   ]);
+};
+
+const QuickHeader = (props) => {
+  const { text } = props;
+
+  return h(
+    "div",
+    { style: { marginBottom: "20px", position: "sticky", top: "0px" } },
+    [
+      h("h2", { style: { marginTop: "0px", marginBottom: "0px" } }, text),
+      h(Divider),
+    ]
+  );
 };
 
 const AdminBody = ({ base, ...rest }) => {
@@ -107,17 +127,25 @@ const AdminBody = ({ base, ...rest }) => {
       "div.admin-homepage",
       { style: { display: "flex", justifyContent: "space-between" } },
       [
-        h("div", { style: { flexGrow: 2 } }, [
-          h(QuickLinks, { base }),
-          h(SecondaryPageLinks, { base }),
-        ]),
+        h("div", { style: { flexGrow: 2 } }, [h(QuickLinks, { base })]),
         h(
           "div",
-          { style: { flexGrow: 1, marginRight: "50px", width: "28em" } },
-          [h(OpenSearch)]
+          {
+            style: {
+              flexGrow: 1,
+              marginRight: "50px",
+              width: "28em",
+              marginLeft: "15px",
+            },
+          },
+          [h(QuickHeader, { text: "Quick Search" }), h(OpenSearch)]
         ),
       ]
     ),
+    h("div", { style: { position: "fixed", bottom: 70, display: "flex" } }, [
+      h(SecondaryPageLinks, { base }),
+      h(NewModelLinks, { base }),
+    ]),
   ]);
 };
 
@@ -138,14 +166,6 @@ const AdminRouter = ({ base }) =>
     h(Route, {
       path: base + "/project",
       render: () => h(ProjectAdminPage),
-    }),
-    h(Route, {
-      path: base + "/new-project",
-      render: () => h(NewProjectForm),
-    }),
-    h(Route, {
-      path: base + "/new-sample",
-      render: () => h(NewSamplePage),
     }),
     h(Route, {
       path: base + "/sample",

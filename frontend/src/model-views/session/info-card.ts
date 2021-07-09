@@ -3,6 +3,7 @@ import { Card } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
 import { parse, format } from "date-fns";
 import { useModelURL } from "~/util/router";
+import { ModelAttributeOneLiner, PageViewDate } from "../components";
 
 export const Sample = (props) => {
   const sampleTo = useModelURL(`/sample/${props.id}`);
@@ -14,16 +15,47 @@ export const Sample = (props) => {
   ]);
 };
 
+export const SessionDate = (props) => {
+  const { date } = props;
+
+  if (!date) return null;
+
+  return h(ModelAttributeOneLiner, {
+    title: "Date:",
+    content: h(PageViewDate, { date }),
+  });
+};
+
 export const Instrument = function (props) {
   const { instrument } = props;
   if (!instrument) return null;
 
   const { name, id } = instrument;
 
-  return h("div.instrument", [
-    h("h4.small-info", "Instrument"),
-    h("div", name),
-  ]);
+  return h(ModelAttributeOneLiner, {
+    title: "Instrument:",
+    content: name,
+  });
+};
+
+export const Target = (props) => {
+  const { target } = props;
+
+  if (!target) return null;
+
+  return h(ModelAttributeOneLiner, {
+    title: "Target:",
+    content: target,
+  });
+};
+
+export const AnalysisNumber = (props) => {
+  const { analysis } = props;
+
+  return h(ModelAttributeOneLiner, {
+    title: "Number of Analyses:",
+    content: analysis.length,
+  });
 };
 
 export const Publication = (publication) => {
@@ -36,10 +68,10 @@ export const Technique = function ({ technique }) {
   if (technique == null) {
     return null;
   }
-  return h("div.technique", [
-    h("h4.small-info", "Technique"),
-    h("div", technique),
-  ]);
+  return h(ModelAttributeOneLiner, {
+    title: "Technique:",
+    content: technique,
+  });
 };
 
 // const MeasurementGroup = function({ measurement_group_id }) {
@@ -82,10 +114,10 @@ const SessionInfoComponent = function (props) {
       h("div.expander"),
     ]),
     h("div.session-info", [
+      h(Technique, props),
+      h(Instrument, props),
       h(Sample, { id: sampleId, name: sampleName, target }),
       h(SessionProjects, { project }),
-      h(Instrument, props),
-      h(Technique, props),
       //h(MeasurementGroup, props),
     ]),
   ]);

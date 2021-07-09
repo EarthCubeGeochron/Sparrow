@@ -37,6 +37,10 @@ function StepHeatingChartInner(props) {
 
   if (data == null) return h(Spinner);
 
+  if (data.length == 0) {
+    return h("h2", ["No analyses associated"]);
+  }
+
   const width = 800;
   const height = 450;
 
@@ -115,7 +119,7 @@ function StepHeatingChartInner(props) {
                 width: deltaX * (1 + plateauIx[1] - plateauIx[0]),
                 height: yScale(0) - yScale(2 * plateauAge.error),
                 stroke: "#222",
-                "stroke-width": "2px",
+                strokeWidth: "2px",
                 fill: "transparent",
               }),
             ]),
