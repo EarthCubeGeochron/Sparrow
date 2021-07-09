@@ -202,7 +202,7 @@ export function SubSamplePageView(props) {
   let data = useAPIv2Result(
     `/sub-sample/${sample_id}`,
     {},
-    { unwrapResponse: data => data.sample_collection }
+    { unwrapResponse: (data) => data.sample_collection }
   );
 
   if (data == undefined) data = [];
@@ -221,8 +221,8 @@ export function SubSamplePageView(props) {
         data,
         isEditing,
         onClick: () => {},
-        draggable: false
-      })
+        draggable: false,
+      }),
     ]
   );
 }

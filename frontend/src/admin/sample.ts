@@ -21,7 +21,7 @@ function SampleNoStateAdmin() {
   const { setListName } = useContext(SampleAdminContext);
   const content = h("h3", [
     "Or create a new sample",
-    h(Link, { to: "/admin/sample/new" }, [" here."])
+    h(Link, { to: "/admin/sample/new" }, [" here."]),
   ]);
 
   useEffect(() => {
@@ -36,18 +36,18 @@ export function SampleMainPanel() {
   return h(Switch, [
     h(Route, {
       path: base + "/new",
-      render: () => h(NewSamplePage)
+      render: () => h(NewSamplePage),
     }),
     h(Route, {
       path: base + "/:id",
       render() {
         return h(SampleMatch, { Edit: true });
-      }
+      },
     }),
     h(Route, {
       path: base,
-      component: () => h(SampleNoStateAdmin, { name: "Sample" })
-    })
+      component: () => h(SampleNoStateAdmin, { name: "Sample" }),
+    }),
   ]);
 }
 
@@ -60,7 +60,7 @@ const MainFilterList = () => {
 
   const [params, setParams] = useState(initialState);
 
-  const createParams = params => {
+  const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
       if (value == null) {
         delete params[key];
@@ -73,7 +73,7 @@ const MainFilterList = () => {
     listComponent: h(SampleListComponent, { params }),
     possibleFilters,
     createParams,
-    initParams: params || {}
+    initParams: params || {},
   });
 };
 
@@ -92,7 +92,7 @@ export function SampleAdminPage() {
 
   const [updateFunction, setUpdateFunction] = useState(() => {});
 
-  const changeFunction = func => {
+  const changeFunction = (func) => {
     setUpdateFunction(() => func);
   };
 
@@ -102,8 +102,8 @@ export function SampleAdminPage() {
     [
       h(AdminPage, {
         listComponent: h(SampleAdminList),
-        mainPageComponent: h(SampleMainPanel)
-      })
+        mainPageComponent: h(SampleMainPanel),
+      }),
     ]
   );
 }

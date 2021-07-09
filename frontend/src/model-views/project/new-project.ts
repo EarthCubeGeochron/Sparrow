@@ -11,7 +11,7 @@ import {
   EmbargoDatePick,
   PublicationFilterList,
   ResearcherFilterList,
-  SampleFilterList
+  SampleFilterList,
 } from "../components";
 import { ProjectAdminContext } from "~/admin/project";
 import { MinimalNavbar } from "~/components";
@@ -29,73 +29,73 @@ const projectReducer = (state, action) => {
     case "embargo_date":
       return {
         ...state,
-        embargo_date: action.payload.embargo_date
+        embargo_date: action.payload.embargo_date,
       };
     case "name":
       return {
         ...state,
-        name: action.payload.name
+        name: action.payload.name,
       };
     case "description":
       return {
         ...state,
-        description: action.payload.description
+        description: action.payload.description,
       };
     case "tags":
       return {
         ...state,
-        tags: action.payload.tags
+        tags: action.payload.tags,
       };
     case "add_sample":
       const currentS = [...state.sample_collection];
       const newCol = [...currentS, ...action.payload.sample_collection];
       return {
         ...state,
-        sample_collection: newCol
+        sample_collection: newCol,
       };
     case "remove_sample":
       const currentSa = [...state.sample_collection];
       const remove = action.payload.sample;
-      const samples = currentSa.filter(ele => ele.name != remove.name);
+      const samples = currentSa.filter((ele) => ele.name != remove.name);
       console.log(samples);
       return {
         ...state,
-        sample_collection: samples
+        sample_collection: samples,
       };
     case "add_pub":
       const currentP = [...state.publication_collection];
       const newColP = [...currentP, ...action.payload.publication_collection];
       return {
         ...state,
-        publication_collection: newColP
+        publication_collection: newColP,
       };
     case "remove_pub":
       const currentPu = [...state.publication_collection];
       const removeP_title = action.payload.pub_title;
-      const pubs = currentPu.filter(el => el.title != removeP_title);
+      const pubs = currentPu.filter((el) => el.title != removeP_title);
       return {
         ...state,
-        publication_collection: pubs
+        publication_collection: pubs,
       };
     case "add_researcher":
       const currentR = [...state.researcher_collection];
       const newColR = [...currentR, ...action.payload.researcher_collection];
       return {
         ...state,
-        researcher_collection: newColR
+        researcher_collection: newColR,
       };
     case "remove_res":
       const currentRes = [...state.researcher_collection];
       const removeRes_name = action.payload.res_name;
-      const researchers = currentRes.filter(el => el.name != removeRes_name);
+      const researchers = currentRes.filter((el) => el.name != removeRes_name);
       return {
         ...state,
-        researcher_collection: researchers
+        researcher_collection: researchers,
       };
     case "filter-list":
       return {
         ...state,
-        filter_list: action.payload.filter_list
+        filter_list: action.payload.filter_list,
       };
     default:
       throw new Error("What does this mean?");
@@ -133,7 +133,7 @@ export function NewProjectFormMain() {
       researcher: project.researcher_collection
     };
 
-    const response = await axios.post(route, projectPost).then(response => {
+    const response = await axios.post(route, projectPost).then((response) => {
       return response;
     });
     const { data } = response;
@@ -143,10 +143,10 @@ export function NewProjectFormMain() {
     window.location.assign(goToRoute);
   }
 
-  const NewProjectNavBar = props => {
+  const NewProjectNavBar = (props) => {
     return h(MinimalNavbar, { className: "project-editor-navbar" }, [
       h("h4", props.header),
-      h(EmbargoDate)
+      h(EmbargoDate),
     ]);
   };
 
@@ -155,7 +155,7 @@ export function NewProjectFormMain() {
     const onConfirm = () => {
       dispatch({ type: "description", payload: { description } });
     };
-    const onChange = value => {
+    const onChange = (value) => {
       setDescription(value);
     };
     return h("div", [
@@ -167,8 +167,8 @@ export function NewProjectFormMain() {
         onChange,
         value: description,
         multiline: true,
-        onConfirm
-      })
+        onConfirm,
+      }),
     ]);
   };
 
@@ -185,10 +185,10 @@ export function NewProjectFormMain() {
       dispatch({ type: "remove_sample", payload: { sample: sample } });
     };
 
-    const onClickSam = sample => {
+    const onClickSam = (sample) => {
       dispatch({
         type: "add_sample",
-        payload: { sample_collection: [sample] }
+        payload: { sample_collection: [sample] },
       });
     };
 
@@ -200,7 +200,7 @@ export function NewProjectFormMain() {
     return h(SampleAdd, {
       onClickDelete,
       onClickList,
-      data: project.sample_collection
+      data: project.sample_collection,
     });
   };
 
@@ -217,8 +217,8 @@ export function NewProjectFormMain() {
       dispatch({
         type: "add_pub",
         payload: {
-          publication_collection: [{ id, title, doi }]
-        }
+          publication_collection: [{ id, title, doi }],
+        },
       });
     };
 
@@ -230,7 +230,7 @@ export function NewProjectFormMain() {
     return h(PubAdd, {
       data: project.publication_collection,
       onClickDelete,
-      onClickList
+      onClickList,
     });
   };
 
@@ -245,8 +245,8 @@ export function NewProjectFormMain() {
       dispatch({
         type: "add_researcher",
         payload: {
-          researcher_collection: [{ id, name }]
-        }
+          researcher_collection: [{ id, name }],
+        },
       });
     };
     const onClickList = () => {
@@ -256,12 +256,12 @@ export function NewProjectFormMain() {
     return h(ResearcherAdd, {
       onClickDelete,
       onClickList,
-      data: project.researcher_collection
+      data: project.researcher_collection,
     });
   };
 
   const EmbargoDate = () => {
-    const onChange = date => {
+    const onChange = (date) => {
       dispatch({ type: "embargo_date", payload: { embargo_date: date } });
     };
     const embargo_date = project.embargo_date;
@@ -270,7 +270,7 @@ export function NewProjectFormMain() {
 
   const ProjectName = () => {
     const [name, setName] = useState(project.name); // This is to make it look like it's real time edi
-    const onChange = e => {
+    const onChange = (e) => {
       setName(e);
     };
     const onConfirm = () => {
@@ -285,7 +285,7 @@ export function NewProjectFormMain() {
       onChange,
       value: name,
       multiline: true,
-      onConfirm
+      onConfirm,
     });
   };
 
@@ -295,7 +295,7 @@ export function NewProjectFormMain() {
     h(ResearcherAddProj),
     h(PubAddProj),
     h(SampleAddProj),
-    h(SubmitButton, { postData, modelName: "Project" })
+    h(SubmitButton, { postData, modelName: "Project" }),
   ]);
 }
 
@@ -320,6 +320,6 @@ export function NewProjectForm() {
   });
 
   return h(ProjectFormContext.Provider, { value: { project, dispatch } }, [
-    h(NewProjectFormMain)
+    h(NewProjectFormMain),
   ]);
 }

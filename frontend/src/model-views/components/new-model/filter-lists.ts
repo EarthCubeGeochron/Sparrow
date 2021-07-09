@@ -6,12 +6,12 @@ import {
   PublicationAddList,
   ResearcherAddList,
   ProjectListComponent,
-  SessionListComponent
+  SessionListComponent,
 } from "~/model-views";
 import {
   EditProjNewPub,
   EditProjNewResearcher,
-  EditProjNewSample
+  EditProjNewSample,
 } from "./index";
 //@ts-ignore
 import styles from "./module.styl";
@@ -23,7 +23,7 @@ export function SampleFilterList({ onClick }) {
 
   const [params, setParams] = useState({});
 
-  const createParams = params => {
+  const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
       if (value == null) {
         delete params[key];
@@ -34,18 +34,18 @@ export function SampleFilterList({ onClick }) {
 
   return h(AdminFilter, {
     addModelButton: h("div.add-button-top", [
-      h(EditProjNewSample, { onSubmit: onClick })
+      h(EditProjNewSample, { onSubmit: onClick }),
     ]),
     listComponent: h(SampleAddList, {
       params,
       componentProps: {
         link: false,
-        onClick
-      }
+        onClick,
+      },
     }),
     createParams,
     possibleFilters,
-    initParams: params || {}
+    initParams: params || {},
   });
 }
 
@@ -54,7 +54,7 @@ export function PublicationFilterList({ onClick }) {
 
   const [params, setParams] = useState({});
 
-  const createParams = params => {
+  const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
       if (value == null) {
         delete params[key];
@@ -64,19 +64,19 @@ export function PublicationFilterList({ onClick }) {
   };
   return h(AdminFilter, {
     addModelButton: h("div.add-button-top", [
-      h(EditProjNewPub, { onSubmit: onClick })
+      h(EditProjNewPub, { onSubmit: onClick }),
     ]),
 
     listComponent: h(PublicationAddList, {
       params,
       componentProps: {
         link: false,
-        onClick
-      }
+        onClick,
+      },
     }),
     createParams,
     possibleFilters,
-    initParams: params || {}
+    initParams: params || {},
   });
 }
 
@@ -84,7 +84,7 @@ export function ResearcherFilterList({ onClick }) {
   const possibleFilters = [];
   const [params, setParams] = useState({});
 
-  const createParams = params => {
+  const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
       if (value == null) {
         delete params[key];
@@ -94,18 +94,18 @@ export function ResearcherFilterList({ onClick }) {
   };
   return h(AdminFilter, {
     addModelButton: h("div.add-button-top", [
-      h(EditProjNewResearcher, { onSubmit: onClick })
+      h(EditProjNewResearcher, { onSubmit: onClick }),
     ]),
     listComponent: h(ResearcherAddList, {
       params,
       componentProps: {
         link: false,
-        onClick
-      }
+        onClick,
+      },
     }),
     createParams,
     possibleFilters,
-    initParams: params || {}
+    initParams: params || {},
   });
 }
 
@@ -113,7 +113,7 @@ export function ProjectFilterList({ onClick }) {
   const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
   const [params, setParams] = useState({});
 
-  const createParams = params => {
+  const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
       if (value == null) {
         delete params[key];
@@ -126,12 +126,12 @@ export function ProjectFilterList({ onClick }) {
       params,
       componentProps: {
         link: false,
-        onClick
-      }
+        onClick,
+      },
     }),
     createParams,
     possibleFilters,
-    initParams: params || {}
+    initParams: params || {},
   });
 }
 
@@ -140,7 +140,7 @@ export function SessionFilterList({ onClick }) {
 
   const [params, setParams] = useState({});
 
-  const createParams = params => {
+  const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
       if (value == null) {
         delete params[key];
@@ -154,12 +154,12 @@ export function SessionFilterList({ onClick }) {
       params,
       componentProps: {
         link: false,
-        onClick
-      }
+        onClick,
+      },
     }),
     createParams,
     possibleFilters,
-    initParams: params || {}
+    initParams: params || {},
   });
 }
 
@@ -171,10 +171,10 @@ export function ModelFilterLists(props) {
     h.if(listName === "sample")(SampleFilterList, { onClick }),
     h.if(listName === "session")(SessionFilterList, { onClick }),
     h.if(listName === "publication")(PublicationFilterList, {
-      onClick
+      onClick,
     }),
     h.if(listName === "researcher")(ResearcherFilterList, {
-      onClick
-    })
+      onClick,
+    }),
   ]);
 }

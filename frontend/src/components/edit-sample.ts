@@ -31,9 +31,9 @@ export function MyTextInput(props) {
         onChange: props.onChange,
         intent: "primary",
         leftIcon: props.leftIcon,
-        rightElement: props.rightElement
-      })
-    ])
+        rightElement: props.rightElement,
+      }),
+    ]),
   ]);
 }
 
@@ -75,7 +75,7 @@ export function MyNumericInput(props: MyInputNum) {
       {
         labelInfo: props.helperText,
         label: props.label,
-        labelFor: props.label + "-input"
+        labelFor: props.label + "-input",
       },
       [
         h.if(!props.disabled)(NumericInput, {
@@ -88,9 +88,9 @@ export function MyNumericInput(props: MyInputNum) {
           rightElement: props.rightElement,
           allowNumericCharactersOnly: false,
           clampValueOnBlur: true,
-          ...rest
-        })
+          ...rest,
+        }),
       ]
-    )
+    ),
   ]);
 }

@@ -24,7 +24,7 @@ function SessionPageTabs(props) {
   return h(
     Tabs,
     {
-      id: "sessionDetailTabs"
+      id: "sessionDetailTabs",
     },
     [
       extraTabs.map(({ title, component, id }) =>
@@ -34,7 +34,7 @@ function SessionPageTabs(props) {
         Tab,
         { id: "analysisDetails", panel: coreComponent },
         "Analysis details"
-      )
+      ),
     ]
   );
 }
@@ -48,7 +48,7 @@ function SessionComponent(props) {
   return h("div.data-view#session", [
     h(EditableSessionDetails, { id }),
     h("div.data-files", [
-      h("h3", "Data sources")
+      h("h3", "Data sources"),
       // h(Frame, { id: "dataFileDownloadButton", ...rest }, (props) => {
       //   return h(DownloadButton, props);
       // }),
@@ -57,16 +57,16 @@ function SessionComponent(props) {
       Frame,
       {
         id: "sessionDetail",
-        session_id: id
+        session_id: id,
       },
       [SessionPageTabs]
-    )
+    ),
   ]);
 }
 
 function SessionMatch(props) {
   const {
-    params: { id }
+    params: { id },
   } = useRouteMatch();
   return h(SessionComponent, { id });
 }

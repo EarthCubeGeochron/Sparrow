@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import {
   useModelEditor,
   ModelEditor,
-  APIHelpers
+  APIHelpers,
 } from "@macrostrat/ui-components";
 import { useAuth } from "~/auth";
 import { SampleCard } from "~/model-views";
@@ -22,16 +22,16 @@ import {
   ModelAttributeOneLiner,
   TagContainer,
   PageViewDate,
-  PageViewBlock
+  PageViewBlock,
 } from "../components";
 
 const h = hyperStyled(styles);
 
-const EmbargoEditor = function(props) {
+const EmbargoEditor = function (props) {
   const { model, actions, isEditing } = useModelEditor();
-  const onChange = date => {
+  const onChange = (date) => {
     actions.updateState({
-      model: { embargo_date: { $set: date } }
+      model: { embargo_date: { $set: date } },
     });
   };
   const embargo_date = model.embargo_date;
@@ -58,26 +58,26 @@ const EditNavBarDataFile = () => {
       //   hasChanges,
       //   isEditing
       // })
-    ])
+    ]),
   });
 };
 
-const DataFileSamples = props => {
+const DataFileSamples = (props) => {
   const { actions, isEditing, model } = useModelEditor();
 
-  const sample_links = model.data_file_link.filter(obj => obj.sample != null);
-  const samples = sample_links.map(obj => obj.sample);
+  const sample_links = model.data_file_link.filter((obj) => obj.sample != null);
+  const samples = sample_links.map((obj) => obj.sample);
 
   return h(SampleAdd, { editable: false, data: samples });
 };
 
-const DataFileSessions = props => {
+const DataFileSessions = (props) => {
   const { actions, isEditing, model } = useModelEditor();
 
   const sessions_links = model.data_file_link.filter(
-    obj => obj.session != null
+    (obj) => obj.session != null
   );
-  const sessions = sessions_links.map(obj => {
+  const sessions = sessions_links.map((obj) => {
     const session = obj.session;
     delete session.sample;
 
@@ -87,7 +87,7 @@ const DataFileSessions = props => {
   return h(SessionAdd, { editable: false, data: sessions });
 };
 
-const DatafileDetails = props => {
+const DatafileDetails = (props) => {
   const { actions, isEditing, model } = useModelEditor();
 
   const lastModifiedDate = model.file_mtime;
@@ -127,7 +127,7 @@ export function DataFilePage(props) {
   const dataFileURL = `/models/data_file/${file_hash}`;
 
   const res = useAPIv2Result(dataFileURL, {
-    nest: "data_file_link,session,sample"
+    nest: "data_file_link,session,sample",
   });
 
   const { login } = useAuth();
@@ -140,7 +140,7 @@ export function DataFilePage(props) {
     ModelEditor,
     {
       model: data,
-      canEdit: login
+      canEdit: login,
     },
     [
       h("div.data-page-container", [
@@ -149,9 +149,9 @@ export function DataFilePage(props) {
           h(DatafileDetails),
           h(DataFileSamples),
           h(DataFileSessions),
-          h(Frame, { id: "datafilePage", data }, null)
-        ])
-      ])
+          h(Frame, { id: "datafilePage", data }, null),
+        ]),
+      ]),
     ]
   );
 }

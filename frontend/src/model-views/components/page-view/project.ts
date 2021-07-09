@@ -119,8 +119,8 @@ export function ProjectCardContent(props) {
           h("span.count", [
             publication.length + " " + pluralize("Publication", publication),
           ]),
-          pubData
-        ])
+          pubData,
+        ]),
       ]),
       h.if(session.length > 0)("div.content-area", [
         h("h5", [

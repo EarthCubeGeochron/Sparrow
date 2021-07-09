@@ -15,8 +15,8 @@ export function Publication(props) {
         " – ",
         h("span.doi-info", [
           h("span.label", "DOI:"),
-          h("span.doi.bp3-monospace-text", doi)
-        ])
+          h("span.doi.bp3-monospace-text", doi),
+        ]),
       ];
     }
     return h("div.publication", [h("span.title", title), ...doiAddendum]);
@@ -30,7 +30,7 @@ export function Publication(props) {
   }
 }
 
-const PubCard = props => {
+const PubCard = (props) => {
   let { id, title, onClick, isEditing, doi } = props;
 
   return h(
@@ -39,7 +39,7 @@ const PubCard = props => {
       onClick: () => onClick({ id, title }),
       isEditing,
       link: false,
-      styles: { maxWidth: "700px" }
+      styles: { maxWidth: "700px" },
     },
     [h(Publication, { doi, title })]
   );
@@ -59,14 +59,14 @@ export const PageViewPublications = ({ data, isEditing = false, onClick }) => {
           doi,
           title,
           isEditing,
-          onClick
+          onClick,
         });
-      })
-    ])
+      }),
+    ]),
   ]);
 };
 
-export const PubAdd = props => {
+export const PubAdd = (props) => {
   const { onClickDelete, onClickList, data, isEditing = true } = props;
   if (!isEditing && data == null) {
     return null;
@@ -86,14 +86,14 @@ export const PubAdd = props => {
       modelLink: true,
       isEditing,
       title: "Publications",
-      hasData: dat.length != 0
+      hasData: dat.length != 0,
     },
     [
       h(PageViewPublications, {
         data,
         isEditing,
-        onClick: onClickDelete
-      })
+        onClick: onClickDelete,
+      }),
     ]
   );
 };
