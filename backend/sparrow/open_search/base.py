@@ -16,7 +16,6 @@ search_sample = queries / "open-search-sample.sql"
 search_session = queries / "open-search-session.sql"
 
 
-
 class OpenSearchEndpoint(HTTPEndpoint):
 
     args_schema = dict(

@@ -52,7 +52,7 @@ enum sample_reducer {
   ADD_PROJECT,
   REMOVE_PROJECT,
   CHANGE_FUNCTION,
-  LIST_NAME
+  LIST_NAME,
 }
 enum modelEditList {
   MAIN,
@@ -60,7 +60,7 @@ enum modelEditList {
   SAMPLE,
   PUBLICATION,
   RESEARCHER,
-  SESSION
+  SESSION,
 }
 
 export {
@@ -71,5 +71,5 @@ export {
   geo_entity,
   LOC,
   sampleContext,
-  sampleFormState
+  sampleFormState,
 };

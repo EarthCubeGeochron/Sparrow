@@ -100,23 +100,23 @@ const DatafileDetails = (props) => {
         h("h3", { style: { margin: "0" } }, [model.basename]),
         h(ModelAttributeOneLiner, {
           title: "Uploaded: ",
-          content: h(PageViewDate, { date: dateUploaded })
+          content: h(PageViewDate, { date: dateUploaded }),
         }),
         h(ModelAttributeOneLiner, {
           title: "Last Modified: ",
-          content: h(PageViewDate, { date: lastModifiedDate })
+          content: h(PageViewDate, { date: lastModifiedDate }),
         }),
         h(ModelAttributeOneLiner, {
           title: "Type: ",
-          content: model.type
-        })
+          content: model.type,
+        }),
       ]),
       h(DownloadButton, {
         file_type: model.type,
         file_hash: model.file_hash,
-        basename: model.basename
-      })
-    ])
+        basename: model.basename,
+      }),
+    ]),
   ]);
 };
 

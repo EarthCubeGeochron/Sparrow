@@ -42,7 +42,7 @@ class MapSamples(HTTPEndpoint):
     """
     Endpoint for quick loading of samples for locations, on maps specifically
 
-    returns: id, name, location 
+    returns: id, name, location
     """
 
     async def get(self, request):
@@ -51,9 +51,12 @@ class MapSamples(HTTPEndpoint):
         sample = db.model.sample
         sampleSchema = db.interface.sample(many=True)
 
-        data = db.session.query(sample.id, sample.name, sample.location).filter(sample.location != None).all()
+        data = (
+            db.session.query(sample.id, sample.name, sample.location)
+            .filter(sample.location != None)
+            .all()
+        )
 
         json_data = sampleSchema.dump(data)
 
         return JSONResponse({"data": json_data, "total_count": len(json_data)})
-        

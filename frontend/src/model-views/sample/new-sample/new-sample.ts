@@ -197,7 +197,7 @@ const initialState: sampleFormState = {
   session: [],
   location: { type: "Point", coordinates: [null, null] },
   sample_geo_entity: [],
-  changeFunction: () => {}
+  changeFunction: () => {},
 };
 
 export function NewSamplePage() {

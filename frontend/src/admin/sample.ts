@@ -9,7 +9,7 @@ import { AdminFilter } from "../filter";
 import {
   ProjectFilterList,
   SessionFilterList,
-  SampleFilterList
+  SampleFilterList,
 } from "../model-views/components/new-model";
 import { NewSamplePage } from "~/model-views/sample/new-sample";
 
@@ -83,7 +83,7 @@ function SampleAdminList() {
     h.if(listName == "main")(MainFilterList),
     h.if(listName == "project")(ProjectFilterList, { onClick: updateFunction }),
     h.if(listName == "session")(SessionFilterList, { onClick: updateFunction }),
-    h.if(listName == "sample")(SampleFilterList, { onClick: updateFunction })
+    h.if(listName == "sample")(SampleFilterList, { onClick: updateFunction }),
   ]);
 }
 

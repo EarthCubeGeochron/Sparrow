@@ -130,7 +130,7 @@ export function NewProjectFormMain() {
       description: project.description,
       sample: project.sample_collection,
       publication: project.publication_collection,
-      researcher: project.researcher_collection
+      researcher: project.researcher_collection,
     };
 
     const response = await axios.post(route, projectPost).then((response) => {
@@ -316,7 +316,7 @@ export function NewProjectForm() {
     embargo_date: null,
     sample_collection: [],
     publication_collection: [],
-    researcher_collection: []
+    researcher_collection: [],
   });
 
   return h(ProjectFormContext.Provider, { value: { project, dispatch } }, [
