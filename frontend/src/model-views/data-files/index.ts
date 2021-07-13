@@ -11,26 +11,24 @@ import styles from "./module.styl";
 const h = hyperStyled(styles);
 
 export function DataFilesList(props) {
-  const res =
-    useAPIv2Result("/models/data_file", { per_page: 100 })?.data ?? [];
-  if (!res) return;
-  const data = res.map((d) => d);
+  const res = useAPIv2Result("/models/data_file", { per_page: 100 });
 
-  return data.length > 0
-    ? h(
-        "div.data-files",
-        data.map((d) => {
-          return h(
-            LinkCard,
-            { to: useModelURL(`/data-file/${d.file_hash}`) },
-            h("div", { className: "data-file-card" }, [
-              h("h2", d.basename),
-              h("div.type", d.type),
-            ])
-          );
-        })
-      )
-    : h(Spinner);
+  const data = res?.data ?? [];
+  if (!data || data.length <= 0) return h(Spinner);
+
+  return h(
+    "div.data-files",
+    data.map((d) => {
+      return h(
+        LinkCard,
+        { to: useModelURL(`/data-file/${d.file_hash}`) },
+        h("div", { className: "data-file-card" }, [
+          h("h2", d.basename),
+          h("div.type", d.type),
+        ])
+      );
+    })
+  );
 }
 
 // This is for the Infinite Scroll, had to change the structure of data being passed
@@ -41,25 +39,14 @@ export function DataFilesCard(data) {
     h(
       LinkCard,
       { to: useModelURL(`/data-file/${file_hash}`) },
-      h("div", { className: "data-file-card" }, [
-        h(
-          "div",
-          {
-            style: {
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "flex-start",
-              alignContent: "center",
-            },
-          },
-          [
-            h.if(date !== null)("h4", { style: { padding: "0px" } }, [
-              format(date, "MMMM D, YYYY"),
-            ]),
-            h("h2", basename),
-            h("div.type", type),
-          ]
-        ),
+      h("div.data-file-card", [
+        h("div.content", [
+          h.if(date !== null)("h4", { style: { padding: "0px" } }, [
+            format(date, "MMMM D, YYYY"),
+          ]),
+          h("h2", basename),
+          h("div.type", type),
+        ]),
       ])
     ),
   ]);
