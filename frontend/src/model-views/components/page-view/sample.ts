@@ -62,13 +62,6 @@ export const SampleAdd = (props) => {
     ]
   );
 };
-
-const SampleContainer = styled.div`\
-display: flex;
-flex-flow: row wrap;
-margin: 0 -5px;\
-`;
-
 export const PageViewSamples = function ({
   data,
   isEditing,
@@ -77,30 +70,28 @@ export const PageViewSamples = function ({
   onClick,
   draggable = true,
 }) {
-  if (data != null) {
-    return h("div.sample-area", [
-      h(SampleContainer, [
-        data.map((d) => {
-          const { material, id, name, location_name, session, location } = d;
-          return h(DndChild, { key: id, id, data: d, draggable }, [
-            h(SampleCard, {
-              key: id,
-              material,
-              session,
-              id,
-              location,
-              name,
-              location_name,
-              setID,
-              link,
-              onClick: () => onClick({ id, name }),
-              isEditing,
-            }),
-          ]);
+  if (data == null) return null;
+  return h(
+    "div.sample-area",
+    data.map((d) => {
+      const { material, id, name, location_name, session, location } = d;
+      return h(DndChild, { key: id, id, data: d, draggable }, [
+        h(SampleCard, {
+          key: id,
+          material,
+          session,
+          id,
+          location,
+          name,
+          location_name,
+          setID,
+          link,
+          onClick: () => onClick({ id, name }),
+          isEditing,
         }),
-      ]),
-    ]);
-  }
+      ]);
+    })
+  );
 };
 
 function SessionContent(props) {
@@ -205,7 +196,7 @@ export function SubSamplePageView(props) {
     { unwrapResponse: (data) => data.sample_collection }
   );
 
-  if (data == undefined) data = [];
+  if (data == null) data = [];
 
   return h(
     PageViewBlock,
@@ -216,13 +207,11 @@ export function SubSamplePageView(props) {
       modelLink: true,
       hasData: data.length > 0,
     },
-    [
-      h(PageViewSamples, {
-        data,
-        isEditing,
-        onClick: () => {},
-        draggable: false,
-      }),
-    ]
+    h(PageViewSamples, {
+      data,
+      isEditing,
+      onClick: () => {},
+      draggable: false,
+    })
   );
 }

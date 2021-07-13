@@ -5,7 +5,6 @@ import { useModelURL } from "~/util";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
 import styles from "./module.styl";
-import { ModelLinkCard } from "./model-card";
 
 const h = hyperStyled(styles);
 
@@ -57,49 +56,73 @@ export const ModelAttributeOneLiner = (props) => {
   ]);
 };
 
-export const PageViewBlock = (props) => {
+export const ModelLinkCard = (props) => {
   const {
-    elevation = 1,
-    title,
-    children,
+    minimal = true,
+    className,
+    to,
+    link,
+    indirect = false,
+    linkedThrough = "",
     isEditing = false,
-    modelLink = false,
-    onClick = () => {},
-    hasData = true,
-    model = "model",
+    children,
+    onMouseEnter,
+    onMouseLeave,
+    draggable = false,
+    styles = {},
+    onClick,
   } = props;
 
-  if (modelLink) {
+  const component = link && !isEditing ? LinkCard : Card;
+
+  const cardClassName = indirect ? "indirect-link" : "sample-card";
+
+  if (isEditing) {
     return h(
-      Card,
-      { elevation, style: { marginBottom: "15px", paddingTop: "0px" } },
+      component,
+      {
+        className: cardClassName,
+        to,
+        onMouseEnter,
+        onMouseLeave,
+        draggable,
+        style: { position: "relative", ...styles },
+      },
       [
-        h(
-          "div",
-          {
-            style: { display: "flex", alignItems: "baseline", marginTop: "0" },
+        h(Button, {
+          style: {
+            position: "absolute",
+            top: "0",
+            right: "0",
+            marginLeft: "5px",
           },
-          [
-            h.if(title)("h3", [title]),
-            h.if(isEditing)(AddCard, { onClick, model }),
-          ]
-        ),
-        h.if(!hasData)("h4", `No ${model}s`),
-        children,
+          icon: "small-cross",
+          minimal: true,
+          intent: "danger",
+          onClick,
+        }),
+        h("div", [children]),
       ]
     );
   }
 
-  return h(Card, { elevation, style: { marginBottom: "15px" } }, [
-    h.if(title)("h3", [title]),
-    children,
+  return h("div", [
+    h(
+      component,
+      {
+        className: cardClassName,
+        to,
+        onMouseEnter,
+        onMouseLeave,
+        draggable,
+        style: { ...styles },
+      },
+      [children]
+    ),
+    h.if(indirect)(
+      "div",
+      { style: { fontSize: "10px", marginLeft: "10px", fontStyle: "italic" } },
+      ["Linked through ", linkedThrough]
+    ),
   ]);
-};
-
-export const PageViewModelCard = ModelLinkCard;
-
-export const PageViewDate = (props) => {
-  const { date } = props;
-
-  return h("div.page-view-date", [format(date, "MMMM D, YYYY")]);
 };

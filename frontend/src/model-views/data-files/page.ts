@@ -4,11 +4,7 @@ import styles from "./module.styl";
 import { DownloadButton, SampleAdd } from "~/model-views";
 import { Divider, Spinner } from "@blueprintjs/core";
 import { format } from "date-fns";
-import {
-  useModelEditor,
-  ModelEditor,
-  APIHelpers,
-} from "@macrostrat/ui-components";
+import { useModelEditor, ModelEditor } from "@macrostrat/ui-components";
 import { useAuth } from "~/auth";
 import { SampleCard } from "~/model-views";
 import { Frame } from "~/frame";
@@ -62,14 +58,23 @@ const EditNavBarDataFile = () => {
   });
 };
 
-const DataFileSamples = (props) => {
-  const { actions, isEditing, model } = useModelEditor();
+function getSample(link) {
+  if (link.sample != null) return link.sample;
+  return link.session?.sample;
+}
 
-  const sample_links = model.data_file_link.filter((obj) => obj.sample != null);
-  const samples = sample_links.map((obj) => obj.sample);
+function DataFileSamples(props) {
+  const { model } = useModelEditor();
+  let samples = [];
 
+  for (const link of model.data_file_link) {
+    let sample = getSample(link);
+    if (sample != null && !samples.find(({ id }) => id === sample.id)) {
+      samples.push(sample);
+    }
+  }
   return h(SampleAdd, { editable: false, data: samples });
-};
+}
 
 const DataFileSessions = (props) => {
   const { actions, isEditing, model } = useModelEditor();
@@ -87,7 +92,7 @@ const DataFileSessions = (props) => {
   return h(SessionAdd, { editable: false, data: sessions });
 };
 
-const DatafileDetails = (props) => {
+function DataFileDetails(props) {
   const { actions, isEditing, model } = useModelEditor();
 
   const lastModifiedDate = model.file_mtime;
@@ -118,7 +123,7 @@ const DatafileDetails = (props) => {
       }),
     ]),
   ]);
-};
+}
 
 export function DataFilePage(props) {
   const { file_hash } = props;
@@ -146,7 +151,7 @@ export function DataFilePage(props) {
       h("div.data-page-container", [
         h("div.header", [h.if(login)(EditNavBarDataFile)]),
         h("div.info-container", [
-          h(DatafileDetails),
+          h(DataFileDetails),
           h(DataFileSamples),
           h(DataFileSessions),
           h(Frame, { id: "datafilePage", data }, null),
