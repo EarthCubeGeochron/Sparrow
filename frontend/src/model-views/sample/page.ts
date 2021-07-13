@@ -25,11 +25,17 @@ import {
   EmbargoDatePick,
   EditStatusButtons,
   DataSheetButton,
-  NewSamplePageButton,
+  NewModelButton,
+  ModelAttributeOneLiner,
   TagContainer,
+  PageViewBlock,
+  DatafilePageView,
+  SubSamplePageView,
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
+import { useModelURL } from "~/util";
+import { Button } from "@blueprintjs/core";
 
 const h = hyper.styled(styles);
 
@@ -58,39 +64,22 @@ const EditNavBarSample = () => {
     return actions.persistChanges();
   };
 
-  const onChange = (date) => {
-    actions.updateState({
-      model: { embargo_date: { $set: date } },
-    });
-  };
-  const embargo_date = model.embargo_date;
-
   return h(EditNavBar, {
     header: "Manage Sample",
     editButtons: h("div", { style: { display: "flex" } }, [
-      h(NewSamplePageButton),
+      h.if(isEditing)(DataSheetButton),
       h(EditStatusButtons, {
         onClickCancel,
         onClickSubmit,
         hasChanges,
         isEditing,
       }),
+      h(NewModelButton, { model: "sample" }),
     ]),
     embargoEditor: h(EmbargoEditor, {
-      onChange,
-      embargo_date,
       active: isEditing,
     }),
   });
-};
-
-const Parameter = ({ name, value, ...rest }) => {
-  return h("div.parameter", rest, [
-    h("div", { style: { display: "flex", flexDirection: "row" } }, [
-      h("h4.subtitle", name),
-    ]),
-    h("p.value", null, value),
-  ]);
 };
 
 const LocationBlock = function (props) {
@@ -102,7 +91,10 @@ const LocationBlock = function (props) {
     return h(SampleLocationEleDepthEditor);
   }
   if (location == null) {
-    return null;
+    return h(ModelAttributeOneLiner, {
+      title: "Location: ",
+      content: location,
+    });
   }
   const zoom = 8;
   const [longitude, latitude] = location.coordinates;
@@ -130,31 +122,91 @@ const Material = function (props) {
     return h(SampleMaterial, { changeMaterial, sample: model });
   }
   if (!isEditing) {
-    if (model.material == null) return null;
-    return h(Parameter, {
-      name: "Material",
-      value: model.material,
+    return h(ModelAttributeOneLiner, {
+      title: "Material: ",
+      content: model.material,
     });
   }
 };
 
+const MemberOf = function (props) {
+  const { isEditing, hasChanges, actions, model } = useModelEditor();
+  const { setListName, changeFunction } = useContext(SampleAdminContext);
+
+  const memberOf = model.member_of;
+
+  const onClickSample = (sample) => {
+    const { id } = sample;
+    actions.updateState({
+      model: { member_of: { $set: id } },
+    });
+  };
+
+  const onClickList = () => {
+    setListName("sample");
+    changeFunction(onClickSample);
+  };
+
+  let content;
+  if (isEditing) {
+    content = h("div", [
+      h(Button, { onClick: onClickList, minimal: true, intent: "primary" }, [
+        memberOf ? `Change from Sample ${memberOf}` : "Choose Parent Sample",
+      ]),
+    ]);
+  } else {
+    content = memberOf
+      ? h("a", { href: useModelURL(`/sample/${memberOf}`) }, [
+          `Sample ${memberOf}`,
+        ])
+      : null;
+  }
+
+  return h(ModelAttributeOneLiner, {
+    title: "Member of:",
+    content,
+  });
+};
+
+const SubSamples = function () {
+  const { isEditing, hasChanges, actions, model } = useModelEditor();
+
+  return h(SubSamplePageView, { sample_id: model.id, isEditing });
+};
+
 const DepthElevation = (props) => {
-  const { isEditing, model } = useModelEditor();
+  const { isEditing, actions, model } = useModelEditor();
 
   const { depth, elevation } = model;
 
-  return !isEditing
-    ? h.if(elevation != null || depth != null)("div.depth-elevation", [
-        h.if(depth != null)("div.parameter", [
-          h("h4.subtitle", "Depth"),
-          h("p.value", [depth]),
-        ]),
-        h.if(elevation != null)("div.parameter", [
-          h("h4.subtitle", "Elevation"),
-          h("p.value", [elevation]),
-        ]),
-      ])
-    : null;
+  const changeDepth = (depth) => {
+    actions.updateState({
+      model: { depth: { $set: depth } },
+    });
+  };
+
+  const changeElevation = (elev) => {
+    actions.updateState({
+      model: { elevation: { $set: elev } },
+    });
+  };
+
+  if (isEditing) {
+    return h("div", [
+      h(SampleDepth, { sample: model, changeDepth }),
+      h(SampleElevation, { sample: model, changeElevation }),
+    ]);
+  }
+  return h("div.depth-elevation", [
+    h(ModelAttributeOneLiner, {
+      title: "Depth: ",
+      content: depth,
+    }),
+    h(ModelAttributeOneLiner, {
+      title: "Elevation: ",
+      content: elevation,
+    }),
+  ]);
 };
 
 const GeoEntity = (props) => {
@@ -177,6 +229,21 @@ const GeoEntity = (props) => {
       model: { sample_geo_entity: { $set: currnetEntities } },
     });
   };
+
+  if (sample_geo_entity.length == 0) {
+    return h(
+      PageViewBlock,
+      {
+        title: "Geologic Context",
+      },
+      [
+        h(ModelAttributeOneLiner, {
+          title: "Geologic Context",
+          content: "None",
+        }),
+      ]
+    );
+  }
 
   return h(GeoContext, {
     sample_geo_entity,
@@ -274,18 +341,6 @@ const SampleLocationEleDepthEditor = () => {
     });
   };
 
-  const changeDepth = (depth) => {
-    actions.updateState({
-      model: { depth: { $set: depth } },
-    });
-  };
-
-  const changeElevation = (elev) => {
-    actions.updateState({
-      model: { elevation: { $set: elev } },
-    });
-  };
-
   return h(
     "div",
     { style: { justifyContent: "flex-end", minWidth: "405px" } },
@@ -298,10 +353,6 @@ const SampleLocationEleDepthEditor = () => {
         sample: { longitude, latitude },
         stacked: false,
       }),
-      h("div", [
-        h(SampleElevation, { sample, changeElevation }),
-        h(SampleDepth, { sample, changeDepth }),
-      ]),
     ]
   );
 };
@@ -312,13 +363,26 @@ function SampleTagContainer() {
   const onAdd = (item) => {
     const currentTags = [...model.tags_tag];
     currentTags.push(item);
-    console.log(currentTags);
     actions.updateState({
       model: { tags_tag: { $set: currentTags } },
     });
   };
 
-  return h(TagContainer, { isEditing, tags: model.tags_tag, onChange: onAdd });
+  const onDelete = (id) => {
+    const currentTags = [...model.tags_tag];
+    const newTags = currentTags.filter((tag) => tag.id != id);
+    actions.updateState({
+      model: { tags_tag: { $set: newTags } },
+    });
+  };
+
+  return h(TagContainer, {
+    isEditing,
+    tags: model.tags_tag,
+    onChange: onAdd,
+    onClickDelete: onDelete,
+    modelName: "sample",
+  });
 }
 
 async function TagsChangeSet(changeset, updatedModel, url) {
@@ -340,6 +404,17 @@ async function TagsChangeSet(changeset, updatedModel, url) {
   }
   return "no tags";
 }
+
+const SamplePageDataFiles = () => {
+  const { model } = useModelEditor();
+
+  let session_ids = model.session.map((obj) => obj.id);
+  if (session_ids.length == 0) {
+    session_ids = [0];
+  }
+
+  return h(DatafilePageView, { model: "sample", session_ids });
+};
 
 function SamplePage(props) {
   const { data: sample, Edit } = props;
@@ -374,31 +449,30 @@ function SamplePage(props) {
           updatedModel
         );
         const { data } = response;
-        console.log(data);
       },
     },
     [
       h("div.sample", [
         h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
-        h(ModelEditableText, {
-          is: "h3",
-          field: "name",
-          multiline: true,
-        }),
-        h.if(Edit)(SampleTagContainer),
-        h("div.flex-row", [
-          h("div.info-block", [
-            Edit ? h(DataSheetButton) : null,
-
-            h(GeoEntity),
-            h(Material),
-            h(DepthElevation),
-            h("div.basic-info", [h(SampleProjectAdd), h(SampleSessionAdd)]),
-            h(Frame, { id: "samplePage", data: sample.data }, null),
+        h(PageViewBlock, [
+          h(ModelEditableText, {
+            is: "h3",
+            field: "name",
+            multiline: true,
+          }),
+          h("div.flex-row", [
+            h("div.info-block", [h(MemberOf), h(Material), h(DepthElevation)]),
+            h("div", [h(LocationBlock)]),
           ]),
-          h("div", [h(LocationBlock)]),
+          h.if(Edit)(SampleTagContainer),
         ]),
       ]),
+      h(GeoEntity),
+      h(SubSamples),
+      h(SampleProjectAdd),
+      h(SampleSessionAdd),
+      h(SamplePageDataFiles),
+      h(Frame, { id: "samplePage", data: sample.data }, null),
     ]
   );
 }

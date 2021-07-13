@@ -47,7 +47,7 @@ export function DndContainer(props) {
 }
 
 export function DndChild(props) {
-  const { childern, id, data, draggable = true, data_id = "child_id" } = props;
+  const { children, id, data, draggable = true, data_id = "child_id" } = props;
 
   const dragStart = (e) => {
     const target = e.target;
@@ -64,7 +64,7 @@ export function DndChild(props) {
     ? { id, onDragStart: dragStart, onDragOver: dragOver, draggable }
     : {};
 
-  return h("div", { ...dragProps }, [childern]);
+  return h("div", { ...dragProps }, [children]);
 }
 
 export function MySwitch(props) {

@@ -29,7 +29,6 @@ interface sampleState {
 
 interface sampleFormState extends sampleState {
   changeFunction: stateFunc;
-  listName: modelEditList;
 }
 
 type stateFunc = (e) => void;

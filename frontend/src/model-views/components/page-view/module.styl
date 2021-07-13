@@ -8,6 +8,12 @@
   padding: 10px 15px
   flex-grow: 1
 
+.lon-lat
+  margin 0
+  display flex
+  font-style italic
+  color #394B59
+
 .drawer-body
   display flex
   flex-direction column
@@ -92,38 +98,27 @@
 
 .sample-edit-card
   display flex
-  justify-content space-between
-  background-color: $light-gray4
-  border-radius: 5px
-  margin: 5px
-  padding: 5px 10px
-  flex-grow: 1
-  max-width: 20em
-  .location-name
-    color: $indigo3
-  .material
-    font-style italic
-  .samhover
-    background-color yellow
-  h4
-    margin-top: 0em
-    margin-bottom: 0em
+
 
 .sample-edit-card-samhover
-  display flex
-  justify-content space-between
   background-color: yellow
+
+.indirect-link
+  background-color: $light-gray5
   border-radius: 5px
+  border-style: dashed
+  border-color $light-gray2
+  border-width: 2px
   margin: 5px
   padding: 5px 10px
   flex-grow: 1
-  max-width: 20em
+  max-width: 15em
+  :hover
+    background-color: $light-gray4
   .location-name
     color: $indigo3
   .material
     font-style italic
-  .samhover
-    background-color yellow
   h4
     margin-top: 0em
     margin-bottom: 0em
@@ -145,6 +140,8 @@
 
 .project-card
   margin-bottom 1em
+  color #202B33
+  margin 20px 
   h3
     margin-top 0
   h5
@@ -166,3 +163,14 @@
 .my-suggest
   overflow scroll
   max-height 200px
+
+.session-container
+  display flex
+  flex-wrap wrap
+
+.tag-container
+  margin 10px 0px 10px 0px
+
+.page-view-date
+  color $indigo3
+  font-style italic

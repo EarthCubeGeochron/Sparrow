@@ -13,7 +13,6 @@ import {
   EditProjNewResearcher,
   EditProjNewSample,
 } from "./index";
-import { modelEditList } from "../../sample/new-sample";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -164,18 +163,17 @@ export function SessionFilterList({ onClick }) {
   });
 }
 
-export function ModelAddFilterLists(props) {
-  const { mainList = "div", listName, onClick } = props;
+export function ModelFilterLists(props) {
+  const { listName, onClick } = props;
 
   return h("div", [
-    h.if(listName === modelEditList.MAIN)(mainList),
-    h.if(listName === modelEditList.PROJECT)(ProjectFilterList, { onClick }),
-    h.if(listName === modelEditList.SAMPLE)(SampleFilterList, { onClick }),
-    h.if(listName === modelEditList.SESSION)(SessionFilterList, { onClick }),
-    h.if(listName === modelEditList.PUBLICATION)(PublicationFilterList, {
+    h.if(listName === "project")(ProjectFilterList, { onClick }),
+    h.if(listName === "sample")(SampleFilterList, { onClick }),
+    h.if(listName === "session")(SessionFilterList, { onClick }),
+    h.if(listName === "publication")(PublicationFilterList, {
       onClick,
     }),
-    h.if(listName === modelEditList.RESEARCHER)(ResearcherFilterList, {
+    h.if(listName === "researcher")(ResearcherFilterList, {
       onClick,
     }),
   ]);

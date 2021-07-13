@@ -11,6 +11,7 @@ import {
 } from "react-simple-maps";
 import worldMap from "./assets/land-110m.json";
 import { APIResultView } from "@macrostrat/ui-components";
+import { useAPIv2Result } from "~/api-v2";
 import { Colors, H1, Tooltip } from "@blueprintjs/core";
 import { useHistory } from "react-router-dom";
 
@@ -106,28 +107,37 @@ function MapComponent(props) {
   );
 }
 
-class SampleMap extends Component {
-  render() {
-    const route = "/sample";
-    const params = { geometry: "%", all: true };
-    return h(APIResultView, { route, params }, (data) => {
-      const markers = data
-        .filter((d) => d.geometry != null)
-        .map((d) => ({
-          coordinates: d.geometry.coordinates,
-          id: d.id,
-          name: d.name,
-        }));
-
-      return h("div", [
-        h(
-          "h4",
-          `${markers.length} measurements have been linked to their geologic metadata`
-        ),
-        h(MapComponent, { markers }),
-      ]);
-    });
+function getMarkers() {
+  const data = useAPIv2Result(
+    "/map-samples",
+    {},
+    {
+      unwrapResponse: (data) => {
+        const markers = data.data.map((d) => {
+          const { id, name, location } = d;
+          const { coordinates } = location;
+          return { id, name, coordinates };
+        });
+        return markers;
+      },
+    }
+  );
+  if (!data) {
+    return [];
   }
+  return data;
+}
+
+function SampleMap() {
+  let markers = getMarkers();
+
+  return h("div", [
+    h(
+      "h4",
+      `${markers.length} measurements have been linked to their geologic metadata`
+    ),
+    h(MapComponent, { markers }),
+  ]);
 }
 
 export { MapComponent, SampleMap };

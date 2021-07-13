@@ -1,6 +1,12 @@
 import { useReducer } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import { Button, InputGroup, FormGroup, Popover } from "@blueprintjs/core";
+import {
+  Button,
+  InputGroup,
+  FormGroup,
+  Popover,
+  ButtonGroup,
+} from "@blueprintjs/core";
 import { TwitterPicker } from "react-color";
 import { randomHexColor } from "../misscel";
 import { tag_reducer, tagBody } from "./types";
@@ -126,7 +132,7 @@ function TagEditor(props: tagEditor) {
           [h(InputGroup, { value: tag.color, onChange: () => {} })]
         ),
       ]),
-      h("div", [
+      h(ButtonGroup, [
         h(
           Button,
           { onClick: clickCancel, style: { marginRight: "10px" } },

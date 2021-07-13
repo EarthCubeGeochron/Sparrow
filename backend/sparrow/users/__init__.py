@@ -3,6 +3,7 @@ An API for managing users
 """
 from starlette.routing import Route, Router
 from starlette.authentication import requires
+from starlette.responses import JSONResponse
 from sparrow.plugins import SparrowCorePlugin
 from sparrow.database.models import User
 from sparrow.api import APIResponse, SparrowAPIError
@@ -65,7 +66,7 @@ async def user(request):
             raise SparrowAPIError("Cannot delete yourself", 403)
         with db.session_scope():
             db.session.delete(user)
-        return APIResponse({"success": True, "deleted": [username]})
+        return JSONResponse({"success": "True", "deleted": [username]})
     raise SparrowAPIError("Method not allowed", 405)
 
 

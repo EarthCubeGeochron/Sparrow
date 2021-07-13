@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { APIHelpers } from "@macrostrat/ui-components";
 import { hyperStyled } from "@macrostrat/hyper";
-import { Button, Collapse } from "@blueprintjs/core";
+import { Button, ButtonGroup, Card, Callout } from "@blueprintjs/core";
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { randomHexColor } from "../misscel";
 import { TagBody } from "./tag-body";
@@ -23,7 +23,7 @@ function TagEditButtons(props) {
     onDelete(id);
   };
 
-  return h("div", [
+  return h(ButtonGroup, [
     h(Button, {
       icon: "edit",
       minimal: true,
@@ -59,7 +59,7 @@ function TagRow(props) {
 
   if (!tag) return null;
   if (isEditing) {
-    return h("div.tag-row", [
+    return h(Card, [
       h(TagEditor, {
         name: tag.name,
         description: tag.description,
@@ -69,23 +69,27 @@ function TagRow(props) {
       }),
     ]);
   }
-  return h("div.tag-row.non-edit", [
-    h(TagBody, {
-      name: tag.name,
-      description: tag.description,
-      color: tag.color,
-      id: tag.id,
-    }),
-    h("p", [tag.description]),
-    h(TagEditButtons, {
-      id: tag.id,
-      onEdit: () => {
-        setIsEditing(!isEditing);
-      },
-      isEditing,
-      onDelete,
-    }),
-  ]);
+  return h(
+    Card,
+    { className: "tag-row", style: { padding: "20px", marginBottom: "1px" } },
+    [
+      h(TagBody, {
+        name: tag.name,
+        description: tag.description,
+        color: tag.color,
+        id: tag.id,
+      }),
+      h("p", [tag.description]),
+      h(TagEditButtons, {
+        id: tag.id,
+        onEdit: () => {
+          setIsEditing(!isEditing);
+        },
+        isEditing,
+        onDelete,
+      }),
+    ]
+  );
 }
 
 function TagManager() {
@@ -97,7 +101,7 @@ function TagManager() {
 
   return h("div", [
     h("div.new-tag-btn", [h(NewTag)]),
-    h("div.tag-manager", [
+    h(Callout, [
       h("div.manager-header", [total_count + " Tags"]),
       tags.map((tag) => {
         return h(TagRow, { key: tag["id"], tag });
@@ -136,7 +140,7 @@ function NewTag() {
       ["New Tag"]
     ),
     h.if(open)(
-      "div.tag-manager",
+      Callout,
       { style: { padding: "15px", marginBottom: "10px", marginTop: "5px" } },
       [
         h(TagEditor, {

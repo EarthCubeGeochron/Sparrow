@@ -6,6 +6,7 @@ from ..auth import AuthPlugin
 from ..ext.pychron import PyChronImportPlugin
 from ..datasheet import DatasheetPlugin
 from ..project_edits import ProjectEdits
+from ..ext import HeartbeatPlugin
 from ..ext.data_validation import DataValidationPlugin
 from ..metrics_endpoint import MetricsEndpoint
 from ..tags import Tags
@@ -28,6 +29,7 @@ def prepare_plugin_manager(app):
         APIv2Plugin,
         AuthPlugin,
         WebPlugin,
+        HeartbeatPlugin,
         InterfacePlugin,
         PyChronImportPlugin,
         DatasheetPlugin,

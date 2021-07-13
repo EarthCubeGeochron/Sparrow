@@ -1,6 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useAPIv2Result } from "~/api-v2";
-import { Tooltip } from "@blueprintjs/core";
+import { Tooltip, Button, Tag } from "@blueprintjs/core";
 import { isTooDark } from "../misscel";
 import { tagBody } from "./types";
 //@ts-ignore
@@ -14,17 +13,35 @@ const h = hyperStyled(styles);
  * @returns
  */
 function TagBody(props: tagBody) {
-  const { name, description, color, id = 10000, disabled = false } = props;
+  const {
+    name,
+    description,
+    color,
+    onClickDelete,
+    isEditing = false,
+    id = 10000,
+    disabled = false,
+  } = props;
 
   const showName = name.length > 0 ? name : "Tag Preview";
   const darkTag = isTooDark(color);
 
   const textColor = darkTag ? "white" : "black";
 
+  const onRemove = () => {
+    onClickDelete(id);
+  };
+
   return h(Tooltip, { content: description, disabled }, [
     h(
-      "div.tag-body",
-      { key: id, style: { backgroundColor: color, color: textColor } },
+      Tag,
+      {
+        key: id,
+        large: true,
+        round: true,
+        onRemove: isEditing && onRemove,
+        style: { backgroundColor: color, color: textColor },
+      },
       [showName]
     ),
   ]);

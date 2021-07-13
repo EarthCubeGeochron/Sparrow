@@ -42,6 +42,7 @@ function InfiniteAPIView({
   context,
   filterParams,
   errorHandler = ErrorCallout,
+  modelName,
 }) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
@@ -49,8 +50,6 @@ function InfiniteAPIView({
   const [nextPage, setNextPage] = useState("");
   const [moreAfter, setMoreAfter] = useState(true);
   const { get } = useAPIActions(context);
-
-  console.log(moreAfter);
 
   async function getNextPageAPI(nextPage, url, params) {
     const constParams =
@@ -70,8 +69,7 @@ function InfiniteAPIView({
   }
 
   useEffect(() => {
-    //dataFetch(data);
-    console.log("RERENDERED");
+    dataFetch(data);
   }, []);
 
   const dataFetch = (data, next = "") => {
@@ -84,7 +82,6 @@ function InfiniteAPIView({
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
       const next_page = res.next_page;
-      console.log("next page", next_page);
       if (next_page == null) {
         setMoreAfter(false);
       }
@@ -94,17 +91,12 @@ function InfiniteAPIView({
   };
 
   useEffect(() => {
-    console.log("filter changes");
     setData([]);
     dataFetch([]);
-    return () => {
-      setData([]);
-    };
-  }, [filterParams]);
+  }, [JSON.stringify(filterParams)]);
 
   const fetchNewData = async () => {
     if (!nextPage) return;
-    console.log("FETCH TRIGGERED");
     dataFetch(data, nextPage);
   };
 
@@ -120,6 +112,7 @@ function InfiniteAPIView({
     return h(ForeverScroll, {
       initialData: data,
       fetch: fetchNewData,
+      modelName,
       component,
       moreAfter,
       componentProps,

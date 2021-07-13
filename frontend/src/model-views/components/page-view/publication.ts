@@ -1,6 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { AddCard } from "./page-view";
-import { PubEditCard } from "../index";
+import { AddCard, PageViewModelCard, PageViewBlock } from "./page-view";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -24,44 +23,46 @@ export function Publication(props) {
   };
 
   if (doi == null) {
-    return h("div.publication", interior);
+    return h("div.publication", [h(interior)]);
   } else {
     const href = `https://dx.doi.org/${doi}`;
-    return h("a.publication", { href, target: "_blank" }, h(interior));
+    return h("a.publication", { href, target: "_blank" }, [h(interior)]);
   }
 }
+
+const PubCard = (props) => {
+  let { id, title, onClick, isEditing, doi } = props;
+
+  return h(
+    PageViewModelCard,
+    {
+      onClick: () => onClick({ id, title }),
+      isEditing,
+      link: false,
+      styles: { maxWidth: "700px" },
+    },
+    [h(Publication, { doi, title })]
+  );
+};
 
 export const PageViewPublications = ({ data, isEditing = false, onClick }) => {
   if (data == null) {
     data = [];
   }
-  if (isEditing) {
-    return h("div.publications", [
-      h("div", { style: { display: "flex", alignItems: "baseline" } }, [
-        h("h4", "Publications"),
-      ]),
-      h.if(data.length > 0)("div", [
-        data.map((pub, i) => {
-          const { id, title, doi } = pub;
-          return h(PubEditCard, {
-            key: i,
-            id,
-            title,
-            content: h(Publication, { doi, title }),
-            onClick,
-          });
-        }),
-      ]),
-    ]);
-  }
-  return h("div", [
-    h.if(data.length)("div.publications", [
-      h("h4", "Publications"),
-      (data || []).map((d, i) =>
-        h(Publication, { key: i, doi: d.doi, title: d.title })
-      ),
+  return h("div.publications", [
+    h.if(data.length > 0)("div", [
+      data.map((pub, i) => {
+        const { id, title, doi } = pub;
+        return h(PubCard, {
+          key: i,
+          id,
+          doi,
+          title,
+          isEditing,
+          onClick,
+        });
+      }),
     ]),
-    h.if(data == null)("div.publications", "No publications"),
   ]);
 };
 
@@ -70,17 +71,29 @@ export const PubAdd = (props) => {
   if (!isEditing && data == null) {
     return null;
   }
-  return h("div", [
-    h("div", [
+
+  let dat;
+  if (data == null) {
+    dat = [];
+  } else {
+    dat = data;
+  }
+  return h(
+    PageViewBlock,
+    {
+      model: "publication",
+      onClick: onClickList,
+      modelLink: true,
+      isEditing,
+      title: "Publications",
+      hasData: dat.length != 0,
+    },
+    [
       h(PageViewPublications, {
         data,
         isEditing,
         onClick: onClickDelete,
       }),
-      h.if(isEditing)(AddCard, {
-        model: "publication",
-        onClick: onClickList,
-      }),
-    ]),
-  ]);
+    ]
+  );
 };

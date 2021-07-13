@@ -6,6 +6,11 @@ import { useAPIv2Result } from "~/api-v2";
 import { sample_geo_entity } from "../../../sample/new-sample/types";
 import { MySuggest } from "../../../../components/blueprint.select";
 import { MyNumericInput } from "../../../../components/edit-sample";
+import {
+  ModelAttributeOneLiner,
+  PageViewBlock,
+  PageViewModelCard,
+} from "~/model-views";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -169,6 +174,41 @@ function geoEntityString(props) {
   }
 }
 
+export function GeoEntityInterpretation(props) {
+  const { entities } = props;
+  return h("div", [
+    entities.map((ent, i) => {
+      const { type, name, fullString, ref_datum, ref_distance, ref_unit } = ent;
+      return h("div", { key: i }, [
+        h("div.attributes", [
+          h.if(name)(ModelAttributeOneLiner, {
+            title: "Geologic Entity Name:",
+            content: name,
+          }),
+          h.if(type)(ModelAttributeOneLiner, {
+            title: "Geologic Entity Type:",
+            content: type,
+          }),
+          h.if(ref_datum)(ModelAttributeOneLiner, {
+            title: "Reference Datum:",
+            content: ref_datum,
+          }),
+          h.if(ref_distance)(ModelAttributeOneLiner, {
+            title: "Reference Distance:",
+            content: `${ref_distance} ${ref_unit}`,
+          }),
+        ]),
+        h("div.interp", [
+          h.if(fullString)(ModelAttributeOneLiner, {
+            title: "Interpretation:",
+            content: fullString,
+          }),
+        ]),
+      ]);
+    }),
+  ]);
+}
+
 export function GeoEntityText(props) {
   const {
     sample_geo_entity,
@@ -194,20 +234,20 @@ export function GeoEntityText(props) {
       type,
     });
 
-    return fullString;
+    return { type, name, fullString, ref_datum, ref_distance, ref_unit };
   });
   if (isEditing) {
     return h("div", [
       listofEntityStrings.map((string, index) => {
         return h(GeoEntityTextContainer, {
-          geoEntityText: string,
+          geoEntityText: string.fullString,
           geoEntity: sample_geo_entity,
           onClick: () => deleteGeoEntity(index),
         });
       }),
     ]);
   } else {
-    return h("div", [listofEntityStrings.map((string) => string)]);
+    return h(GeoEntityInterpretation, { entities: listofEntityStrings });
   }
 }
 
@@ -222,15 +262,11 @@ function GeoEntityTextContainer(props) {
     onClick: (entity) => void;
   } = props;
 
-  return h("div.entity-edit-card", [
-    h("h4", [geoEntityText]),
-    h(Button, {
-      minimal: true,
-      icon: "trash",
-      intent: "danger",
-      onClick: () => onClick(geoEntity),
-    }),
-  ]);
+  return h(
+    PageViewModelCard,
+    { onClick: () => onClick(geoEntity), link: false, isEditing: true },
+    [h("h4", [geoEntityText])]
+  );
 }
 
 /**
@@ -360,20 +396,27 @@ export function GeoContext(props) {
       ]),
       h(GeoSpatialRef, { geoEntity, changeDistance, changeDatum, changeUnit }),
     ]),
-    h(Button, { intent: "success", onClick: onSubmitClick }, ["Submit"]),
+    h(Button, { intent: "success", onClick: onSubmitClick }, [
+      "Create Geologic Context",
+    ]),
   ]);
 
   if (!isEditing) {
-    return h("div", [
-      h.if(sample_geo_entity.length > 0)(GeoEntityText, {
-        sample_geo_entity,
-        isEditing: false,
-      }),
-    ]);
+    return h.if(sample_geo_entity.length > 0)(
+      PageViewBlock,
+      { title: "Geologic Context" },
+      [
+        h("div.geo-entity-card", [
+          h(GeoEntityText, {
+            sample_geo_entity,
+            isEditing: false,
+          }),
+        ]),
+      ]
+    );
   }
 
-  return h("div", [
-    "Geologic Context",
+  return h(PageViewBlock, { title: "Geologic Context" }, [
     h(HelpButton, { content: helpContent, position: "top" }),
     content,
     h(GeoEntityText, { sample_geo_entity, deleteGeoEntity }),

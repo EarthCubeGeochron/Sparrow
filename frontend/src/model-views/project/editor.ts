@@ -20,7 +20,10 @@ import {
   EmbargoDatePick,
   EditStatusButtons,
   EditNavBar,
-  NewProjectPageButton,
+  NewModelButton,
+  TagContainer,
+  PageViewBlock,
+  DatafilePageView,
 } from "../components";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
@@ -78,7 +81,6 @@ function EditSessions(props) {
   };
 
   const onClickDelete = ({ session_id: id, date }) => {
-    console.log(id, date);
     const ss = [...model.session];
     const newSs = ss.filter((ele) => ele.id != id);
     actions.updateState({
@@ -103,7 +105,6 @@ function EditSessions(props) {
     const sess = [...model.session];
     const samp = [...model.sample];
     const { id: sample_id, name } = sample;
-    console.log(sample_id, name); // this works
     const dropSession = sess.filter((ss) => ss.id == session_id);
     const otherSessions = sess.filter((ss) => ss.id != session_id);
     dropSession[0].sample = { id: sample_id, name };
@@ -226,8 +227,9 @@ function SampleMapComponent() {
   return h("div", [
     h("div", { style: { display: "flex", flexDirection: "row" } }, [
       h("div", { style: { paddingRight: "10px" } }, [
-        h("h4", "Location"),
-        h(ProjectMap, { samples: model.sample, hoverID: sampleHoverID }),
+        h(PageViewBlock, { title: "Location" }, [
+          h(ProjectMap, { samples: model.sample, hoverID: sampleHoverID }),
+        ]),
       ]),
       h(EditableSamples),
     ]),
@@ -288,11 +290,67 @@ const ProjEditNavBar = ({ header }) => {
   return h(EditNavBar, {
     header,
     editButtons: h("div", { style: { display: "flex" } }, [
-      h(NewProjectPageButton),
       h(EditStatusButtonsProj),
+      h(NewModelButton, { model: "project" }),
     ]),
     embargoEditor: h(EmbargoEditor),
   });
+};
+
+function ProjectTagContainer() {
+  const { model, actions, isEditing } = useModelEditor();
+
+  const onAdd = (item) => {
+    const currentTags = [...model.tags_tag];
+    currentTags.push(item);
+    actions.updateState({
+      model: { tags_tag: { $set: currentTags } },
+    });
+  };
+
+  const onDelete = (id) => {
+    const currentTags = [...model.tags_tag];
+    const newTags = currentTags.filter((tag) => tag.id != id);
+    actions.updateState({
+      model: { tags_tag: { $set: newTags } },
+    });
+  };
+
+  return h(TagContainer, {
+    isEditing,
+    tags: model.tags_tag,
+    onChange: onAdd,
+    onClickDelete: onDelete,
+    modelName: "project",
+  });
+}
+async function TagsChangeSet(changeset, updatedModel, url) {
+  /**
+   * tag_ids = data['tag_ids']
+        for tag_id in tag_ids:
+            params = {"jointable":f"tags.{model}_tag", "model_id_column":f"{model}_id",\
+            "model_id": data['model_d'], "tag_id":tag_id}
+   */
+  if (changeset.tags_tag) {
+    let { id } = updatedModel;
+    const model_id = id;
+    const tags = changeset.tags_tag;
+    const tag_ids = tags.map((tag) => tag.id);
+    const body = { model_id: model_id, tag_ids: tag_ids };
+    const res = await put(url, body);
+    const { data } = res;
+    return data;
+  }
+  return "no tags";
+}
+
+const ProjectDataFiles = () => {
+  const { model } = useModelEditor();
+
+  const sample_ids = model.sample.map((obj) => obj.id);
+  const session_ids = model.session.map((obj) => obj.id);
+
+  return h(DatafilePageView, { sample_ids, session_ids, model: "project" });
 };
 
 const SampleHoverIDContext = createContext({});
@@ -308,8 +366,6 @@ const EditableProjectDetails = function (props) {
     setSampleHoverID(id);
   };
 
-  console.log(project.data);
-
   return h(
     ModelEditor,
     {
@@ -318,10 +374,15 @@ const EditableProjectDetails = function (props) {
       persistChanges: async (updatedModel, changeset) => {
         console.log(changeset);
         console.log(updatedModel);
+        TagsChangeSet(
+          changeset,
+          updatedModel,
+          buildURL("/tags/models/project", {})
+        );
         let rest;
         let { id } = updatedModel;
         const response = await put(
-          buildURL(`/project/edit/${id}`, {}),
+          buildURL(`/models/project/${id}`, {}),
           updatedModel
         );
         const { data } = response;
@@ -340,20 +401,24 @@ const EditableProjectDetails = function (props) {
               h.if(Edit)(ProjEditNavBar, { header: "Manage Project" }),
             ]),
             h("div.project-editor-content", [
-              h(ModelEditableText, {
-                is: "h3",
-                field: "name",
-                multiline: true,
-              }),
-              h(ModelEditableText, {
-                is: "p",
-                field: "description",
-                multiline: true,
-              }),
+              h(PageViewBlock, [
+                h(ModelEditableText, {
+                  is: "h3",
+                  field: "name",
+                  multiline: true,
+                }),
+                h(ModelEditableText, {
+                  is: "div",
+                  field: "description",
+                  multiline: true,
+                }),
+                h(ProjectTagContainer),
+              ]),
               h(EditablePublications),
               h(EditResearchers),
               h(EditSessions),
               h(SampleMapComponent),
+              h(ProjectDataFiles),
               h(Frame, { id: "projectPage", data: project.data }, null),
             ]),
           ]),
