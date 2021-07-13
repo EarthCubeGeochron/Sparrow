@@ -1,10 +1,26 @@
 import { Card, Button } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
 import { hyperStyled } from "@macrostrat/hyper";
+import classNames from "classnames";
 //@ts-ignore
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
+
+function RemoveButton({ onClick }) {
+  return h(Button, {
+    style: {
+      position: "absolute",
+      top: "0",
+      right: "0",
+      marginLeft: "5px",
+    },
+    icon: "small-cross",
+    minimal: true,
+    intent: "danger",
+    onClick,
+  });
+}
 
 export const ModelLinkCard = (props) => {
   /** A model link card for administration pages */
@@ -14,7 +30,7 @@ export const ModelLinkCard = (props) => {
     to,
     link,
     indirect = false,
-    linkedThrough = "",
+    linkedThrough,
     isEditing = false,
     children,
     onMouseEnter,
@@ -26,13 +42,15 @@ export const ModelLinkCard = (props) => {
 
   const component = link && !isEditing ? LinkCard : Card;
 
-  const cardClassName = indirect ? "indirect-link" : "sample-card";
-
-  if (isEditing) {
-    return h(
+  return h("div.model-link-container", [
+    h(
       component,
       {
-        className: cardClassName,
+        className: classNames(
+          { "indirect-link": indirect },
+          "model-card",
+          className
+        ),
         to,
         onMouseEnter,
         onMouseLeave,
@@ -40,40 +58,15 @@ export const ModelLinkCard = (props) => {
         style: { position: "relative", ...styles },
       },
       [
-        h(Button, {
-          style: {
-            position: "absolute",
-            top: "0",
-            right: "0",
-            marginLeft: "5px",
-          },
-          icon: "small-cross",
-          minimal: true,
-          intent: "danger",
+        h.if(isEditing && linkedThrough == null)(RemoveButton, {
           onClick,
         }),
-        h("div", [children]),
+        children,
       ]
-    );
-  }
-
-  return h("div", [
-    h(
-      component,
-      {
-        className: cardClassName,
-        to,
-        onMouseEnter,
-        onMouseLeave,
-        draggable,
-        style: { ...styles },
-      },
-      [children]
     ),
-    h.if(indirect)(
-      "div",
-      { style: { fontSize: "10px", marginLeft: "10px", fontStyle: "italic" } },
-      ["Linked through ", linkedThrough]
-    ),
+    h.if(linkedThrough != null)("div.model-card-link", [
+      "Linked through ",
+      linkedThrough,
+    ]),
   ]);
 };
