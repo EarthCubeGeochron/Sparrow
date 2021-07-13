@@ -5,7 +5,6 @@ import { useModelURL } from "~/util";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
 import styles from "./module.styl";
-import { ModelLinkCard } from "./model-card";
 
 const h = hyperStyled(styles);
 
@@ -95,8 +94,6 @@ export const PageViewBlock = (props) => {
     children,
   ]);
 };
-
-export const PageViewModelCard = ModelLinkCard;
 
 export const PageViewDate = (props) => {
   const { date } = props;

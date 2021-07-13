@@ -1,6 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import styled from "@emotion/styled";
-import { PageViewModelCard, PageViewBlock, PageViewDate } from "../index";
+import { ModelLinkCard, PageViewBlock, PageViewDate } from "~/model-views";
 import { DndChild } from "~/components";
 import { useModelURL } from "~/util";
 //@ts-ignore
@@ -167,7 +167,7 @@ export const SampleCard = function (props: SampleCardProps) {
 
   const to = useModelURL(`/sample/${id}`);
   return h(
-    PageViewModelCard,
+    ModelLinkCard,
     {
       link,
       draggable: false,

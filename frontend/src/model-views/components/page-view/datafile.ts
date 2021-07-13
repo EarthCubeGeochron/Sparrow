@@ -12,7 +12,7 @@ import {
   VscFileCode,
 } from "react-icons/vsc";
 
-import { PageViewBlock, PageViewModelCard, PageViewDate } from "~/model-views";
+import { PageViewBlock, ModelLinkCard, PageViewDate } from "~/model-views";
 import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
@@ -145,7 +145,7 @@ function DataFileCard(props) {
 
   if (current_model == model) {
     return h(
-      PageViewModelCard,
+      ModelLinkCard,
       {
         link: true,
         to: useModelURL(`/data-file/${file_hash}`),
@@ -154,7 +154,7 @@ function DataFileCard(props) {
     );
   } else {
     return h(
-      PageViewModelCard,
+      ModelLinkCard,
       {
         link: true,
         indirect: true,

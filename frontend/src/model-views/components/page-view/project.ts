@@ -3,7 +3,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { useModelURL } from "~/util";
 import { useAPIv2Result } from "~/api-v2";
 import { pluralize } from "../new-model";
-import { PageViewModelCard, PageViewBlock } from "~/model-views";
+import { ModelLinkCard, PageViewBlock } from "~/model-views";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -54,7 +54,7 @@ const ProjectCard = (props) => {
       const to = useModelURL(`/project/${id}`);
 
       return h(
-        PageViewModelCard,
+        ModelLinkCard,
         {
           key: id,
           isEditing,

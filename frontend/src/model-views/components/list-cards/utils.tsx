@@ -315,7 +315,7 @@ const SessionListModelCard = (props) => {
   });
 };
 
-const SessionPageViewModelCard = (props) => {
+const SessionModelLinkCard = (props) => {
   const {
     session_id,
     target,
@@ -409,7 +409,7 @@ const ContentOverFlow = ({ data, title, className, minimal = false }) =>
 export {
   SampleModelCard,
   ProjectModelCard,
-  SessionPageViewModelCard,
+  SessionModelLinkCard,
   SessionListModelCard,
   DataFileModelCard,
   PublicationModelCard,
