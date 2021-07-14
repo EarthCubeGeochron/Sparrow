@@ -192,7 +192,7 @@ export function DataFilePage(props) {
     {
       model: "data_file",
       modelLink: true,
-      title: "Datafiles",
+      title: "Data files",
       hasData: data.length > 0,
     },
     [h(DataFilePageCards, { data, model })]

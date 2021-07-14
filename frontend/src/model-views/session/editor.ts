@@ -257,7 +257,7 @@ export function EditableSessionDetails(props) {
 
   const Edit = useModelURLBool();
   const res = useAPIv2Result(`/models/session/${id}`, {
-    nest: "sample,instrument,project,tag",
+    nest: "sample,instrument,project,tag,publication",
   });
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
