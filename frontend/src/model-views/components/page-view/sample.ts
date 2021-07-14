@@ -20,33 +20,12 @@ export const SampleAdd = (props) => {
     editable = true,
   } = props;
 
-  if (!editable) {
-    return h(
-      PageViewBlock,
-      {
-        isEditing: false,
-        modelLink: true,
-        model: "sample",
-        title: "Samples",
-        hasData: data.length != 0,
-      },
-      [
-        h(PageViewSamples, {
-          data,
-          isEditing: false,
-          draggable,
-          onClick: onClickDelete,
-          setID,
-        }),
-      ]
-    );
-  }
   return h(
     PageViewBlock,
     {
-      isEditing,
+      isEditing: editable,
       modelLink: true,
-      onClick: onClickList,
+      onClick: editable ? onClickList : null,
       model: "sample",
       title: "Samples",
       hasData: data.length != 0,
@@ -62,6 +41,7 @@ export const SampleAdd = (props) => {
     ]
   );
 };
+
 export const PageViewSamples = function ({
   data,
   isEditing,
