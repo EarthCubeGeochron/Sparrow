@@ -136,13 +136,11 @@ function DataFileCard(props) {
     h("div", [h("div", [h("h4", basename)])]),
   ]);
 
-  //let linkedThrough: LinkedThroughModel | null = null;
+  let linkedThrough: LinkedThroughModel | null = null;
 
-  const linkedThrough = h(
-    "a",
-    { href: useModelURL(`/${current_model}/${model_id}`) },
-    [`${current_model} ${model_id}`]
-  );
+  if (current_model != model) {
+    linkedThrough = { model: current_model, id: model_id };
+  }
 
   if (current_model == model) {
     return h(
@@ -194,7 +192,7 @@ function DataFilePageCards(props) {
   ]);
 }
 
-export function DatafilePageView(props) {
+export function DataFilePage(props) {
   const {
     sample_ids = [0],
     session_ids = [0],
