@@ -4,6 +4,8 @@ import { hyperStyled } from "@macrostrat/hyper";
 import classNames from "classnames";
 //@ts-ignore
 import styles from "./module.styl";
+import React from "react";
+import { useModelURL } from "~/util";
 
 const h = hyperStyled(styles);
 
@@ -22,14 +24,33 @@ function RemoveButton({ onClick }) {
   });
 }
 
-export const ModelLinkCard = (props) => {
+export interface LinkedThroughModel {
+  model: string;
+  id: string;
+}
+
+interface ModelLinkCardProps {
+  to: string;
+  className?: string;
+  children?: React.ReactNode;
+  draggable?: boolean;
+  styles: React.StyleHTMLAttributes<HTMLElement>;
+  linkedThrough: LinkedThroughModel | null;
+}
+
+function LinkedThrough(props: { data: LinkedThroughModel }) {
+  const { model, id } = props.data;
+  return h("div.model-card-link", [
+    "Linked through ",
+    h("a", { href: useModelURL(`/${model}/${id}`) }, `${model} ${id}`),
+  ]);
+}
+
+export const ModelLinkCard = (props: ModelLinkCardProps) => {
   /** A model link card for administration pages */
   const {
-    minimal = true,
     className,
     to,
-    link,
-    indirect = false,
     linkedThrough,
     isEditing = false,
     children,
@@ -40,7 +61,9 @@ export const ModelLinkCard = (props) => {
     onClick,
   } = props;
 
-  const component = link && !isEditing ? LinkCard : Card;
+  const isLink = to != null;
+  const indirect = linkedThrough != null;
+  const component = isLink && !isEditing ? LinkCard : Card;
 
   return h("div.model-link-container", [
     h(
@@ -64,9 +87,6 @@ export const ModelLinkCard = (props) => {
         children,
       ]
     ),
-    h.if(linkedThrough != null)("div.model-card-link", [
-      "Linked through ",
-      linkedThrough,
-    ]),
+    h.if(linkedThrough != null)(LinkedThrough, { data: linkedThrough }),
   ]);
 };
