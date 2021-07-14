@@ -131,39 +131,24 @@ function getDataFileData(props) {
 function DataFileCard(props) {
   const { date, basename, file_hash, model, current_model, model_id } = props;
 
-  const content = h("div", [
-    h("div", [h(PageViewDate, { date })]),
-    h("div", [h("div", [h("h4", basename)])]),
-  ]);
-
   let linkedThrough: LinkedThroughModel | null = null;
 
   if (current_model != model) {
     linkedThrough = { model: current_model, id: model_id };
   }
 
-  if (current_model == model) {
-    return h(
-      ModelLinkCard,
-      {
-        link: true,
-        to: useModelURL(`/data-file/${file_hash}`),
-      },
-      [content]
-    );
-  } else {
-    return h(
-      ModelLinkCard,
-      {
-        link: true,
-        indirect: true,
-        linkedThrough,
-        styles: { maxWidth: "700px" },
-        to: useModelURL(`/data-file/${file_hash}`),
-      },
-      [content]
-    );
-  }
+  return h(
+    ModelLinkCard,
+    {
+      link: true,
+      linkedThrough,
+      to: useModelURL(`/data-file/${file_hash}`),
+    },
+    h("div", [
+      h("div", [h(PageViewDate, { date })]),
+      h("div", [h("div", [h("h4", basename)])]),
+    ])
+  );
 }
 
 function DataFilePageCards(props) {

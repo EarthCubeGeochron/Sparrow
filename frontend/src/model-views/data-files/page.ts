@@ -59,8 +59,16 @@ const EditNavBarDataFile = () => {
 };
 
 function getSample(link) {
+  // We have a direct match
   if (link.sample != null) return link.sample;
-  return link.session?.sample;
+  // We are linked through a session...
+  if (link.session?.sample != null) {
+    return {
+      ...link.session.sample,
+      linkedThrough: { model: "session", id: link.session.id },
+    };
+  }
+  return null;
 }
 
 function DataFileSamples(props) {
@@ -73,7 +81,7 @@ function DataFileSamples(props) {
       samples.push(sample);
     }
   }
-  return h(SampleAdd, { editable: false, data: samples });
+  return h(SampleAdd, { isEditing: false, data: samples });
 }
 
 const DataFileSessions = (props) => {
