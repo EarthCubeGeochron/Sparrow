@@ -47,12 +47,6 @@ function SessionComponent(props) {
 
   return h("div.data-view#session", [
     h(EditableSessionDetails, { id }),
-    h("div.data-files", [
-      h("h3", "Data sources"),
-      // h(Frame, { id: "dataFileDownloadButton", ...rest }, (props) => {
-      //   return h(DownloadButton, props);
-      // }),
-    ]),
     h(
       Frame,
       {

@@ -5,4 +5,4 @@ export * from "./sample";
 export * from "./session";
 export * from "./researcher";
 export * from "./tags";
-export * from "./datafile";
+export * from "./data-file";

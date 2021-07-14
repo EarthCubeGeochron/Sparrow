@@ -1,5 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { PageViewModelCard, AddCard, PageViewBlock } from "../index";
+import { ModelLinkCard, AddCard, PageViewBlock } from "~/model-views";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -9,7 +9,7 @@ const ResearcherCard = (props) => {
   let { id, name, onClick, isEditing } = props;
 
   return h(
-    PageViewModelCard,
+    ModelLinkCard,
     { isEditing, link: false, onClick: () => onClick({ id, name }) },
     [h("h4.name", name)]
   );

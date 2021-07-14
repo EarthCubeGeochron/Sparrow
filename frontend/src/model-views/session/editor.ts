@@ -27,7 +27,7 @@ import {
   EditStatusButtons,
   TagContainer,
   PageViewBlock,
-  DatafilePageView,
+  DataFilePage,
 } from "../components";
 import { SessionAdminContext } from "~/admin/session";
 import styles from "./module.styl";
@@ -55,7 +55,7 @@ const EmbargoEditor = function (props) {
 function SessionDataFiles(props) {
   const { model } = useModelEditor();
 
-  return h(DatafilePageView, { session_ids: [model.id], model: "session" });
+  return h(DataFilePage, { session_ids: [model.id], model: "session" });
 }
 
 function EditStatusButtonsSess(props) {
@@ -257,7 +257,7 @@ export function EditableSessionDetails(props) {
 
   const Edit = useModelURLBool();
   const res = useAPIv2Result(`/models/session/${id}`, {
-    nest: "sample,instrument,project,tag",
+    nest: "sample,instrument,project,tag,publication",
   });
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));

@@ -29,7 +29,7 @@ import {
   ModelAttributeOneLiner,
   TagContainer,
   PageViewBlock,
-  DatafilePageView,
+  DataFilePage,
   SubSamplePageView,
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
@@ -413,7 +413,7 @@ const SamplePageDataFiles = () => {
     session_ids = [0];
   }
 
-  return h(DatafilePageView, { model: "sample", session_ids });
+  return h(DataFilePage, { model: "sample", session_ids });
 };
 
 function SamplePage(props) {

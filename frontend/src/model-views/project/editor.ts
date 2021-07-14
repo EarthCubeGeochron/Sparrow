@@ -23,7 +23,7 @@ import {
   NewModelButton,
   TagContainer,
   PageViewBlock,
-  DatafilePageView,
+  DataFilePage,
 } from "../components";
 import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
@@ -350,7 +350,7 @@ const ProjectDataFiles = () => {
   const sample_ids = model.sample.map((obj) => obj.id);
   const session_ids = model.session.map((obj) => obj.id);
 
-  return h(DatafilePageView, { sample_ids, session_ids, model: "project" });
+  return h(DataFilePage, { sample_ids, session_ids, model: "project" });
 };
 
 const SampleHoverIDContext = createContext({});
