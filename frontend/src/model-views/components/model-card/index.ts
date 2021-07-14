@@ -2,6 +2,7 @@ import { Card, Button } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
 import { hyperStyled } from "@macrostrat/hyper";
 import classNames from "classnames";
+import { Link } from "react-router-dom";
 //@ts-ignore
 import styles from "./module.styl";
 import React from "react";
@@ -42,7 +43,7 @@ function LinkedThrough(props: { data: LinkedThroughModel }) {
   const { model, id } = props.data;
   return h("div.model-card-link", [
     "Linked through ",
-    h("a", { href: useModelURL(`/${model}/${id}`) }, `${model} ${id}`),
+    h(Link, { to: useModelURL(`/${model}/${id}`) }, `${model} ${id}`),
   ]);
 }
 
