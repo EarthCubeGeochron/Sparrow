@@ -1,6 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import styled from "@emotion/styled";
-import { PageViewModelCard, PageViewBlock, PageViewDate } from "../index";
+import { ModelLinkCard, PageViewBlock, PageViewDate } from "~/model-views";
 import { DndChild } from "~/components";
 import { useModelURL } from "~/util";
 //@ts-ignore
@@ -15,61 +14,31 @@ export const SampleAdd = (props) => {
     onClickList = () => {},
     data,
     draggable = true,
-    isEditing = true,
     setID = () => {},
-    editable = true,
+    isEditing = false,
   } = props;
 
-  if (!editable) {
-    return h(
-      PageViewBlock,
-      {
-        isEditing: false,
-        modelLink: true,
-        model: "sample",
-        title: "Samples",
-        hasData: data.length != 0,
-      },
-      [
-        h(PageViewSamples, {
-          data,
-          isEditing: false,
-          draggable,
-          onClick: onClickDelete,
-          setID,
-        }),
-      ]
-    );
-  }
   return h(
     PageViewBlock,
     {
       isEditing,
       modelLink: true,
-      onClick: onClickList,
+      onClick: isEditing ? onClickList : null,
       model: "sample",
       title: "Samples",
       hasData: data.length != 0,
     },
-    [
-      h(PageViewSamples, {
-        data,
-        isEditing,
-        draggable,
-        onClick: onClickDelete,
-        setID,
-      }),
-    ]
+    h(PageViewSamples, {
+      data,
+      isEditing,
+      draggable,
+      onClick: onClickDelete,
+      setID,
+    })
   );
 };
 
-const SampleContainer = styled.div`\
-display: flex;
-flex-flow: row wrap;
-margin: 0 -5px;\
-`;
-
-export const PageViewSamples = function ({
+export function PageViewSamples({
   data,
   isEditing,
   setID = () => {},
@@ -77,31 +46,38 @@ export const PageViewSamples = function ({
   onClick,
   draggable = true,
 }) {
-  if (data != null) {
-    return h("div.sample-area", [
-      h(SampleContainer, [
-        data.map((d) => {
-          const { material, id, name, location_name, session, location } = d;
-          return h(DndChild, { key: id, id, data: d, draggable }, [
-            h(SampleCard, {
-              key: id,
-              material,
-              session,
-              id,
-              location,
-              name,
-              location_name,
-              setID,
-              link,
-              onClick: () => onClick({ id, name }),
-              isEditing,
-            }),
-          ]);
+  if (data == null) return null;
+  return h(
+    "div.sample-area",
+    data.map((d) => {
+      const {
+        material,
+        id,
+        name,
+        location_name,
+        session,
+        location,
+        linkedThrough,
+      } = d;
+      return h(DndChild, { key: id, id, data: d, draggable }, [
+        h(SampleCard, {
+          key: id,
+          material,
+          session,
+          id,
+          location,
+          name,
+          location_name,
+          setID,
+          link,
+          linkedThrough,
+          onClick: () => onClick({ id, name }),
+          isEditing,
         }),
-      ]),
-    ]);
-  }
-};
+      ]);
+    })
+  );
+}
 
 function SessionContent(props) {
   const { session } = props;
@@ -150,7 +126,7 @@ interface SampleCardProps {
  *
  * @param props : name (string), id (number), link (boolean), material (string), location_name? (string)
  */
-export const SampleCard = function (props: SampleCardProps) {
+export function SampleCard(props: SampleCardProps) {
   let {
     material,
     id,
@@ -162,6 +138,7 @@ export const SampleCard = function (props: SampleCardProps) {
     session = [],
     isEditing = false,
     onClick,
+    ...rest
   } = props;
 
   const onHover = () => {
@@ -176,9 +153,8 @@ export const SampleCard = function (props: SampleCardProps) {
 
   const to = useModelURL(`/sample/${id}`);
   return h(
-    PageViewModelCard,
+    ModelLinkCard,
     {
-      link,
       draggable: false,
       className: "sample-card",
       to,
@@ -186,6 +162,7 @@ export const SampleCard = function (props: SampleCardProps) {
       onMouseEnter: onHover,
       onMouseLeave: onHoverLeave,
       onClick,
+      ...rest,
     },
     [
       h("h4.name", name),
@@ -194,7 +171,7 @@ export const SampleCard = function (props: SampleCardProps) {
       h(SessionContent, { session }),
     ]
   );
-};
+}
 
 export function SubSamplePageView(props) {
   const { sample_id, isEditing } = props;
@@ -205,7 +182,7 @@ export function SubSamplePageView(props) {
     { unwrapResponse: (data) => data.sample_collection }
   );
 
-  if (data == undefined) data = [];
+  if (data == null) data = [];
 
   return h(
     PageViewBlock,
@@ -216,13 +193,11 @@ export function SubSamplePageView(props) {
       modelLink: true,
       hasData: data.length > 0,
     },
-    [
-      h(PageViewSamples, {
-        data,
-        isEditing,
-        onClick: () => {},
-        draggable: false,
-      }),
-    ]
+    h(PageViewSamples, {
+      data,
+      isEditing,
+      onClick: () => {},
+      draggable: false,
+    })
   );
 }

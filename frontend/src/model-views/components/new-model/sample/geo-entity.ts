@@ -9,7 +9,7 @@ import { MyNumericInput } from "../../../../components/edit-sample";
 import {
   ModelAttributeOneLiner,
   PageViewBlock,
-  PageViewModelCard,
+  ModelLinkCard,
 } from "~/model-views";
 //@ts-ignore
 import styles from "./module.styl";
@@ -263,7 +263,7 @@ function GeoEntityTextContainer(props) {
   } = props;
 
   return h(
-    PageViewModelCard,
+    ModelLinkCard,
     { onClick: () => onClick(geoEntity), link: false, isEditing: true },
     [h("h4", [geoEntityText])]
   );
