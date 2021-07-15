@@ -11,9 +11,8 @@ from sparrow_utils.logs import get_logger
 from .base import cli
 from .help import echo_help
 from .util import cmd, exec_or_run, find_subcommand, container_id
-from .containers import sparrow_up, sparrow_logs
 from .context import SparrowConfig
-from .commands import add_commands
+from .commands import _commands
 from .meta import __version__
 
 log = get_logger(__name__)
@@ -94,7 +93,5 @@ def shell(container):
     exec_or_run("backend", "/app/sparrow/__main__.py shell")
 
 
-cli.add_command(sparrow_up, name="up")
-cli.add_command(sparrow_logs, name="logs")
-
-add_commands(cli)
+for name, cmd in _commands.items():
+    cli.add_command(cmd, name)
