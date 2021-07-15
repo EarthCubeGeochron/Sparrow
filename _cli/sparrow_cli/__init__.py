@@ -12,7 +12,7 @@ from .base import cli
 from .help import echo_help
 from .util import cmd, exec_or_run, find_subcommand, container_id
 from .context import SparrowConfig
-from .commands import _commands
+from .commands import add_commands
 from .meta import __version__
 
 log = get_logger(__name__)
@@ -93,5 +93,4 @@ def shell(container):
     exec_or_run("backend", "/app/sparrow/__main__.py shell")
 
 
-for name, cmd in _commands.items():
-    cli.add_command(cmd, name)
+add_commands(cli)

@@ -10,6 +10,8 @@ from .logs import sparrow_logs
 from .up import sparrow_up
 
 _commands = {
+    "db": sparrow_db,
+    "docs": sparrow_docs,
     "up": sparrow_up,
     "test": sparrow_test,
     "build": sparrow_build,
@@ -18,6 +20,9 @@ _commands = {
     "dev": sparrow_dev,
     "info": sparrow_info,
     "create-test-lab": sparrow_test_lab,
-    "db": sparrow_db,
-    "docs": sparrow_docs,
 }
+
+
+def add_commands(cli):
+    for name, command in _commands.items():
+        cli.add_command(command, name=name)
