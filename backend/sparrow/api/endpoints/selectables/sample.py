@@ -4,11 +4,7 @@ from starlette.routing import Route, Router
 from webargs_starlette import parser
 from sqlakeyset import select_page
 from starlette.responses import JSONResponse
-from webargs.fields import Str, Int, Boolean, DelimitedList
-from sqlalchemy.sql import text, select
 from sparrow.context import get_database
-from ...exceptions import ValidationError
-from ...response import APIResponse
 
 
 class SubSamples(HTTPEndpoint):
@@ -36,6 +32,28 @@ class SubSamples(HTTPEndpoint):
         sample_collection = sampleSchema.dump(sample_.sample_collection)
 
         return JSONResponse({"id": id_, "sample_collection": sample_collection})
+
+    async def put(self, request):
+        db = get_database()
+        sample = db.model.sample
+
+        id_ = request.path_params["id"]
+
+        sample_ = db.session.query(sample).get(id_)
+
+        data = await request.json()
+
+        if "member_of" in data:
+            member_id = data["member_of"]
+
+            sample_.member_of = member_id
+
+            try:
+                db.session.commit()
+                return JSONResponse({"id": id_, "member_of": member_id})
+            except:
+                db.session.rollback()
+                return JSONResponse({"error": "something went wrong"}, status_code=500)
 
 
 class MapSamples(HTTPEndpoint):
