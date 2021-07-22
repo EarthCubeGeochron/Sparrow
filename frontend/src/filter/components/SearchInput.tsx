@@ -5,17 +5,21 @@ import { InputGroup } from "@blueprintjs/core";
 export function SearchInput(props) {
   const { rightElement, updateParams, leftElement, text } = props;
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     updateParams("like", e.target.value);
   };
 
-  return h("form", [
+  const onSubmit = e => {
+    e.preventDefault();
+  };
+
+  return h("form", { onSubmit }, [
     h(InputGroup, {
       leftElement,
       placeholder: "Search for anything...",
       value: text,
       onChange: handleChange,
-      rightElement,
-    }),
+      rightElement
+    })
   ]);
 }

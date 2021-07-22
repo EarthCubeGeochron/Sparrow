@@ -14,6 +14,7 @@ queries = here / "queries"
 search_project = queries / "open-search-project.sql"
 search_sample = queries / "open-search-sample.sql"
 search_session = queries / "open-search-session.sql"
+search_total = queries / "open-search.sql"
 
 
 class OpenSearchEndpoint(HTTPEndpoint):
@@ -43,15 +44,24 @@ class OpenSearchEndpoint(HTTPEndpoint):
         params = {"query": query_params["query"]}
         model = query_params["model"]
 
-        if model == "sample":
-            sql_fn = search_sample
-            schema = db.interface.sample(many=True)
-        elif model == "project":
-            sql_fn = search_project
-            schema = db.interface.project(many=True)
+        models = {
+            "sample": search_sample,
+            "project": search_project,
+            "session": search_session,
+        }
+        if model == "all":
+            sql_fn = search_total
+            query_res = db.exec_sql_query(fn=sql_fn, params=params)
+
+            json_res = [dict(model=x, data=y) for x, y in query_res]
+            json_res.reverse()
+
+            return JSONResponse(json_res)
         else:
-            sql_fn = search_session
-            schema = db.interface.session(many=True)
+            for key, value in models.items():
+                if model == key:
+                    sql_fn = value
+                    schema = getattr(db.interface, key)(many=True)
 
         query_res = db.exec_sql_query(fn=sql_fn, params=params)
 

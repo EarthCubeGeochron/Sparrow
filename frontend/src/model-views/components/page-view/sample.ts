@@ -5,17 +5,18 @@ import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
 import { useAPIv2Result } from "~/api-v2";
+import { PageViewLngLat } from "./page-view";
 
 const h = hyperStyled(styles);
 
-export const SampleAdd = (props) => {
+export const SampleAdd = props => {
   const {
     onClickDelete = () => {},
     onClickList = () => {},
     data,
     draggable = true,
     setID = () => {},
-    isEditing = false,
+    isEditing = false
   } = props;
 
   return h(
@@ -26,14 +27,14 @@ export const SampleAdd = (props) => {
       onClick: isEditing ? onClickList : null,
       model: "sample",
       title: "Samples",
-      hasData: data.length != 0,
+      hasData: data.length != 0
     },
     h(PageViewSamples, {
       data,
       isEditing,
       draggable,
       onClick: onClickDelete,
-      setID,
+      setID
     })
   );
 };
@@ -44,12 +45,12 @@ export function PageViewSamples({
   setID = () => {},
   link = true,
   onClick,
-  draggable = true,
+  draggable = true
 }) {
   if (data == null) return null;
   return h(
     "div.sample-area",
-    data.map((d) => {
+    data.map(d => {
       const {
         material,
         id,
@@ -57,7 +58,7 @@ export function PageViewSamples({
         location_name,
         session,
         location,
-        linkedThrough,
+        linkedThrough
       } = d;
       return h(DndChild, { key: id, id, data: d, draggable }, [
         h(SampleCard, {
@@ -72,8 +73,8 @@ export function PageViewSamples({
           link,
           linkedThrough,
           onClick: () => onClick({ id, name }),
-          isEditing,
-        }),
+          isEditing
+        })
       ]);
     })
   );
@@ -90,7 +91,7 @@ function SessionContent(props) {
     return session.map((ele, i) => {
       return h.if(ele.date)("div", { key: i }, [
         h(PageViewDate, { date: ele.date }),
-        ele.technique,
+        ele.technique
       ]);
     });
   }
@@ -162,13 +163,13 @@ export function SampleCard(props: SampleCardProps) {
       onMouseEnter: onHover,
       onMouseLeave: onHoverLeave,
       onClick,
-      ...rest,
+      ...rest
     },
     [
       h("h4.name", name),
-      h(Location, { location }),
+      h(PageViewLngLat, { location }),
       h.if(material != null)("div.material", material),
-      h(SessionContent, { session }),
+      h(SessionContent, { session })
     ]
   );
 }
@@ -179,7 +180,7 @@ export function SubSamplePageView(props) {
   let data = useAPIv2Result(
     `/sub-sample/${sample_id}`,
     {},
-    { unwrapResponse: (data) => data.sample_collection }
+    { unwrapResponse: data => data.sample_collection }
   );
 
   if (data == null) data = [];
@@ -191,13 +192,13 @@ export function SubSamplePageView(props) {
       title: "Sub-Samples",
       model: "sample",
       modelLink: true,
-      hasData: data.length > 0,
+      hasData: data.length > 0
     },
     h(PageViewSamples, {
       data,
       isEditing,
       onClick: () => {},
-      draggable: false,
+      draggable: false
     })
   );
 }

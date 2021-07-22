@@ -30,7 +30,8 @@ import {
   TagContainer,
   PageViewBlock,
   DataFilePage,
-  SubSamplePageView
+  SubSamplePageView,
+  PageViewLngLat
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
@@ -99,13 +100,13 @@ const LocationBlock = function(props) {
   const zoom = 8;
   const [longitude, latitude] = location.coordinates;
   return h("div.location", [
-    h("h5.lon-lat", `[${longitude} , ${latitude}]`),
     h(MapLink, { zoom, latitude, longitude }, [
       h(SampleContextMap, {
         center: location.coordinates,
         zoom
       })
     ]),
+    h(PageViewLngLat, { location }),
     h.if(location_name)("h5.location-name", location_name)
   ]);
 };
