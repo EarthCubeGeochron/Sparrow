@@ -30,6 +30,7 @@ from ..filters import (
     IdListFilter,
     TagsFilter,
 )
+from sparrow.open_search.filter import OpenSearchFilter
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
 from ...util import relative_path
@@ -107,6 +108,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self.register_filter(AgeRangeFilter)
         self.register_filter(IdListFilter)
         self.register_filter(TagsFilter)
+        self.register_filter(OpenSearchFilter)
 
     @property
     def model(self):
