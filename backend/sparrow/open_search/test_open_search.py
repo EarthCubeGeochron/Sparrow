@@ -1,27 +1,12 @@
 from sparrow_tests.helpers import json_fixture
 from sqlalchemy import text, Table, or_
-
-
-def get_document_tables(db):
-    """returns array of document tables
-    [project, sample, session]
-    """
-    document_names = ["project", "sample", "session"]
-
-    doc_tables = []
-    for name in document_names:
-        doc_table = Table(
-            f"{name}_document", db.meta, autoload_with=db.engine, schema="documents"
-        )
-        doc_tables.append(doc_table)
-    return doc_tables
+from .filter import get_document_tables
 
 
 class TestOpenSearch:
     """
     A testing suite to build upon the
     open search functionality.
-
     """
 
     data = json_fixture("project-edits.json")
@@ -121,13 +106,13 @@ class TestOpenSearch:
 
         # assemble joins
         q = db.session.query(sample)
-        q = q.join(sample_doc, sample.id == sample_doc.c.sample_id)
+        q = q.join(sample_doc, sample.id == sample_doc.c.sample_id, isouter=True)
         q = q.join(sample.project_collection).join(
-            project_doc, project.id == project_doc.c.project_id
+            project_doc, project.id == project_doc.c.project_id, isouter=True
         )
 
         q = q.join(sample.session_collection).join(
-            session_doc, session.id == session_doc.c.session_id
+            session_doc, session.id == session_doc.c.session_id, isouter=True
         )
 
         # # apply search text searching
@@ -142,3 +127,15 @@ class TestOpenSearch:
 
         assert q.count() > 0
         assert q.first().name == "fake1"
+
+    def test_open_search_api(self, client, db):
+        """ test filter api """
+
+        models = {"project": "casey", "sample": "fake1", "session": "UW114"}
+
+        for k, v in models.items():
+            route = f"/api/v2/models/{k}?search={v}"
+
+            res = client.get(route)
+            data = res.json()
+            assert data["total_count"] != 0
