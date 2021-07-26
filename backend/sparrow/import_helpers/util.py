@@ -52,8 +52,11 @@ def is_number(s):
 
 
 def coalesce_nan(value):
-    if isnan(value):
-        return None
+    try:
+        if isnan(value):
+            return None
+    except TypeError:
+        return value
     return value
 
 
