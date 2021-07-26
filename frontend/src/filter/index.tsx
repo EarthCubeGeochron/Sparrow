@@ -95,7 +95,7 @@ const TagContainer = (props) => {
         const name =
           key == "public"
             ? natLang[key][value]
-            : key == "like"
+            : key == "search"
             ? value
             : natLang[key];
         return h(
@@ -137,8 +137,8 @@ function AdminFilter(props) {
     if (field == "geometry") {
       dispatch({ type: "geometry", payload: { geometry: data } });
     }
-    if (field == "like") {
-      dispatch({ type: "like", payload: { like: data } });
+    if (field == "search") {
+      dispatch({ type: "search", payload: { search: data } });
     }
   };
   const removeParam = (key) => {
@@ -261,7 +261,7 @@ function AdminFilter(props) {
           minimal: true,
           type: "submit",
         }),
-        text: params.like || "",
+        text: params.search || "",
       }),
       h(TagContainer, { params: tags, removeParam, createParams }),
       addModelButton,
