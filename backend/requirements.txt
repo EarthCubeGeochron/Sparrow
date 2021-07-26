@@ -104,3 +104,5 @@ broadcaster[redis]==0.2.0
 # For worker auto-reloading in development
 watchdog==2.1.2
 argh==0.26.2
+
+typer==0.3.2

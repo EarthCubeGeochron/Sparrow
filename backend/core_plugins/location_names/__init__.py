@@ -36,7 +36,7 @@ class LocationNamesPlugin(SparrowPlugin):
 
         cli.add_command(cmd)
 
-    def update_location_names(self, overwrite=False):
+    def update_location_names(self, overwrite: bool = False):
         db = self.app.database
         s = db.model.sample
         # Get unnamed locations
