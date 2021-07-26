@@ -29,7 +29,7 @@ const reducer = (state, action) => {
         loadingBottom: false,
         hasMoreAfter: action.newData.length == perPage,
         data: [...state.data, ...action.newData],
-        after: state.after + action.newData.length
+        after: state.after + action.newData.length,
       };
     default:
       throw new Error("Don't understand action");
@@ -51,13 +51,13 @@ function ForeverScroll({
   fetch,
   moreAfter = null,
   modelName = "result",
-  componentProps = {}
+  componentProps = {},
 }) {
   const initialState = {
     loadingBottom: false,
     data: [],
     hasMoreAfter: true,
-    after: 0
+    after: 0,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);

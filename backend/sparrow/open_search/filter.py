@@ -38,7 +38,7 @@ def session_joins(db, query):
 
 
 def sample_joins(db, query):
-    """ make sample_doc joins to query """
+    """make sample_doc joins to query"""
     project_doc, sample_doc, session_doc = get_document_tables(db)
 
     sample = db.model.sample
@@ -75,7 +75,7 @@ def project_joins(db, query):
 
 
 def construct_query(db, model, search):
-    """ creates a query to the documents table """
+    """creates a query to the documents table"""
     project_doc, sample_doc, session_doc = get_document_tables(db)
 
     query = db.session.query(model)
