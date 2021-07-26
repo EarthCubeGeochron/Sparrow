@@ -8,6 +8,12 @@
   padding: 10px 15px
   flex-grow: 1
 
+.lon-lat
+  margin 0
+  display flex
+  font-style italic
+  color #394B59
+
 .drawer-body
   display flex
   flex-direction column
@@ -38,6 +44,11 @@
 
 .drawer-add
   overflow-y scroll
+
+.sample-area
+  display: flex
+  flex-flow: row wrap
+  margin: 0 -5px
 
 .sample-loc-inputs
   display flex 
@@ -92,59 +103,15 @@
 
 .sample-edit-card
   display flex
-  justify-content space-between
-  background-color: $light-gray4
-  border-radius: 5px
-  margin: 5px
-  padding: 5px 10px
-  flex-grow: 1
-  max-width: 20em
-  .location-name
-    color: $indigo3
-  .material
-    font-style italic
-  .samhover
-    background-color yellow
-  h4
-    margin-top: 0em
-    margin-bottom: 0em
+
 
 .sample-edit-card-samhover
-  display flex
-  justify-content space-between
   background-color: yellow
-  border-radius: 5px
-  margin: 5px
-  padding: 5px 10px
-  flex-grow: 1
-  max-width: 20em
-  .location-name
-    color: $indigo3
-  .material
-    font-style italic
-  .samhover
-    background-color yellow
-  h4
-    margin-top: 0em
-    margin-bottom: 0em
-
-.sample-card
-  background-color: $light-gray4
-  border-radius: 5px
-  margin: 5px
-  padding: 5px 10px
-  flex-grow: 1
-  max-width: 15em
-  .location-name
-    color: $indigo3
-  .material
-    font-style italic
-  h4
-    margin-top: 0em
-    margin-bottom: 0em
 
 .project-card
   margin-bottom 1em
+  color #202B33
+  margin 20px 
   h3
     margin-top 0
   h5
@@ -167,5 +134,13 @@
   overflow scroll
   max-height 200px
 
+.session-container
+  display flex
+  flex-wrap wrap
+
 .tag-container
-  margin 10px 0px 10px 0px;
+  margin 10px 0px 10px 0px
+
+.page-view-date
+  color $indigo3
+  font-style italic

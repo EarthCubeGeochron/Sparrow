@@ -51,8 +51,6 @@ function InfiniteAPIView({
   const [moreAfter, setMoreAfter] = useState(true);
   const { get } = useAPIActions(context);
 
-  console.log(moreAfter);
-
   async function getNextPageAPI(nextPage, url, params) {
     const constParams =
       nextPage == "" ? { per_page: 15 } : { per_page: 15, page: nextPage };
@@ -72,7 +70,6 @@ function InfiniteAPIView({
 
   useEffect(() => {
     dataFetch(data);
-    console.log("RERENDERED");
   }, []);
 
   const dataFetch = (data, next = "") => {
@@ -85,7 +82,6 @@ function InfiniteAPIView({
       const dataObj = unwrapData(res);
       const newState = [...data, ...dataObj];
       const next_page = res.next_page;
-      console.log("next page", next_page);
       if (next_page == null) {
         setMoreAfter(false);
       }
@@ -101,7 +97,6 @@ function InfiniteAPIView({
 
   const fetchNewData = async () => {
     if (!nextPage) return;
-    console.log("FETCH TRIGGERED");
     dataFetch(data, nextPage);
   };
 

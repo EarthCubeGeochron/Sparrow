@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useRef, useEffect } from "react";
+import { useEffect } from "react";
 import h from "@macrostrat/hyper";
 import { useReducer } from "react";
 import { useOnScreen } from "./utils";
@@ -102,10 +102,12 @@ function ForeverScroll({
   }
 
   return (
-    <div className="ForeverScroll" style={{ marginTop: "20px" }}>
-      {data.map((d, i) =>
-        h(component, { id: i, key: i, ...componentProps, ...d })
-      )}
+    <div className="ForeverScroll" style={{ marginTop: "10px" }}>
+      <ul>
+        {data.map((d, i) =>
+          h(component, { id: i, key: i, ...componentProps, ...d })
+        )}
+      </ul>
 
       {loadingBottom && h(Spinner)}
 

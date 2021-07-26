@@ -4,3 +4,4 @@ export { DoiFilter } from "./Doi";
 export { SearchInput } from "./SearchInput";
 export { GeologicFormationSelector } from "./MultiSelect";
 export { MapPolygon } from "./MapSelector";
+export * from "./tag-filter";

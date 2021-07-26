@@ -3,10 +3,9 @@ import { Frame } from "~/frame";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Link } from "react-router-dom";
 import { pluralize } from "../new-model";
-import { format } from "date-fns";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
-import { useAPIv2Result } from "~/api-v2";
+import { PageViewDate, ProjectCardContent, Publication } from "~/model-views";
 
 const h = hyperStyled(styles);
 
@@ -135,10 +134,29 @@ const SampleModelCard = (props) => {
   });
 };
 
+const interior = ({ doi, title }) => {
+  let doiAddendum = [];
+  if (doi != null) {
+    doiAddendum = [
+      " – ",
+      h("span.doi-info", [
+        h("span.label", "DOI:"),
+        h("span.doi.bp3-monospace-text", doi),
+      ]),
+    ];
+  }
+  return h("div", { style: { margin: "10px" } }, [
+    h("span.title", title),
+    ...doiAddendum,
+  ]);
+};
+
 const PublicationModelCard = (props) => {
   const { year, id, title, doi, author, journal, onClick, link } = props;
 
-  const content = h(Frame, { id: "publicationCardContent" }, h("div", [title]));
+  const content = h(Frame, { id: "publicationCardContent" }, [
+    h(interior, { title, doi }),
+  ]);
 
   return h(ModelCard, {
     id,
@@ -155,7 +173,7 @@ export const ResearcherModelCard = (props) => {
   const content = h(
     Frame,
     { id: "researcherCardContent", data: { id, name } },
-    h("div", [name])
+    h("h4", { style: { margin: "10px" } }, name)
   );
 
   return h(ModelCard, {
@@ -166,28 +184,6 @@ export const ResearcherModelCard = (props) => {
     onClick: () => onClick(id, name),
   });
 };
-
-const unwrapPubTitles = (obj) => {
-  return obj.data.title;
-};
-
-function pubTitles({ publication }) {
-  if (publication.length > 0) {
-    const data = useAPIv2Result(
-      `/models/publication/${publication[0]}`,
-      {},
-      {
-        unwrapResponse: unwrapPubTitles,
-      }
-    );
-    if (data == null) return null;
-    if (publication.lenght > 1) {
-      return data + "....";
-    }
-    return data;
-  }
-  return null;
-}
 
 const ProjectModelCard = (props) => {
   const {
@@ -202,30 +198,13 @@ const ProjectModelCard = (props) => {
     minimal = false,
   } = props;
 
-  const pubData = pubTitles({ publication });
-
-  const content = h("div.project-card", [
-    h("h4", name),
-    h("p.description", description),
-    h.if(sample.length > 0)("div.content-area", [
-      h("h5", [
-        h("span.count", [sample.length + " " + pluralize("Sample", sample)]),
-      ]),
-    ]),
-    h.if(publication.length > 0)("div.content-area", [
-      h("h5", [
-        h("span.count", [
-          publication.length + " " + pluralize("Publication", publication),
-        ]),
-        h("h5", [pubData]),
-      ]),
-    ]),
-    h.if(session.length > 0)("div.content-area", [
-      h("h5", [
-        h("span.count", [session.length + " " + pluralize("Session", session)]),
-      ]),
-    ]),
-  ]);
+  const content = h(ProjectCardContent, {
+    name,
+    description,
+    sample,
+    session,
+    publication,
+  });
 
   const cardContent = h(
     Frame,
@@ -267,7 +246,7 @@ const SessionListContent = (props) => {
   const analysisCount = analysis.length + " " + analysisName;
 
   return h(`div.${classname}`, [
-    h("div.card-header", [h("div", date.split("T")[0]), h("div", sampleName)]),
+    h("div.card-header", [h(PageViewDate, { date }), h("div", sampleName)]),
     h("div.bod", [
       h.if(FCS)("div", [FCS]),
       h("div", [h("span", technique)]),
@@ -336,7 +315,7 @@ const SessionListModelCard = (props) => {
   });
 };
 
-const SessionPageViewModelCard = (props) => {
+const SessionModelLinkCard = (props) => {
   const {
     session_id,
     target,
@@ -394,18 +373,8 @@ const SessionPageViewModelCard = (props) => {
 const DataFileModelCard = (props) => {
   const { file_hash, basename, type, date, data_file_link: link } = props;
 
-  let sampleName = "";
-  if (link.length > 0) {
-    if (link[0].session) {
-      sampleName += link[0].session?.sample?.name ?? "";
-    }
-  }
-
   const content = h("div.session-card", [
-    h("div.card-header", [
-      h("div", [format(date, "MMMM D, YYYY")]),
-      sampleName,
-    ]),
+    h("div.card-header", [h(PageViewDate, { date })]),
     h("div.bod", [h("div", [h("span", basename)]), h("div", [type])]),
   ]);
 
@@ -440,7 +409,7 @@ const ContentOverFlow = ({ data, title, className, minimal = false }) =>
 export {
   SampleModelCard,
   ProjectModelCard,
-  SessionPageViewModelCard,
+  SessionModelLinkCard,
   SessionListModelCard,
   DataFileModelCard,
   PublicationModelCard,

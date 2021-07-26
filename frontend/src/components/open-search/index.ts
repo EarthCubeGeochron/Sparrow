@@ -19,7 +19,7 @@ const h = hyperStyled(styles);
  */
 function OpenSearch() {
   const [query, setQuery] = useState("");
-  const [model, setModel] = useState("sample");
+  const [model, setModel] = useState("project");
   const [scrollData, setScrollData] = useState<any>([]);
   const url = "/api/v2/search/query";
 
@@ -78,7 +78,7 @@ function OpenSearch() {
     setQuery(value);
   };
 
-  const possibleModels = ["project", "sample", "session"];
+  const possibleModels = ["project", "session"];
 
   const content = h(Menu, [
     possibleModels.map((model) => {

@@ -6,7 +6,7 @@ WITH search AS (
     SELECT to_tsquery(string_agg(lexeme || ':*', ' & ' order by positions)) AS query
     FROM unnest(to_tsvector(:query))
 )
-SELECT DISTINCT s.id, s.name, s.material, location_name, ST_AsGEOJSON(s.location)::jsonb as location, s.elevation, s.embargo_date
+SELECT DISTINCT s.id, s.name, s.material, location_name, ST_AsEWKT(s.location) as location, s.elevation, s.embargo_date
 FROM search, sample s
 LEFT JOIN documents.sample_document sd
 ON sd.sample_id=s.id

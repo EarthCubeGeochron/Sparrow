@@ -31,7 +31,7 @@ export async function getfunc(props) {
   try {
     const data = await get(url, params, {});
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -99,20 +99,39 @@ export const isTitle = (search) => {
 };
 
 export const SubmitDialog = (props) => {
-  const { open, changeOpen, goToModel } = props;
+  const { open, changeOpen, goToModel, modelName } = props;
 
-  return h(Dialog, { isOpen: open }, [
-    //h(Link, { to: url }, [
-    h(Button, { intent: "success", onClick: goToModel }, [
-      "Create New Project",
-    ]),
-    // ]),
-    h(Button, { intent: "danger", onClick: changeOpen }, ["Cancel"]),
+  return h(Dialog, { isOpen: open, style: { maxWidth: "300px" } }, [
+    h(
+      "div",
+      {
+        style: {
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        },
+      },
+      [
+        h("h4", ["Are you sure you want to submit?"]),
+        h("div", [
+          h(
+            Button,
+            {
+              intent: "success",
+              onClick: goToModel,
+              style: { marginRight: "5px" },
+            },
+            [`Create New ${modelName}`]
+          ),
+          h(Button, { intent: "danger", onClick: changeOpen }, ["Cancel"]),
+        ]),
+      ]
+    ),
   ]);
 };
 
 export const SubmitButton = (props) => {
-  const { postData } = props;
+  const { postData, modelName } = props;
   const [open, setOpen] = useState(false);
 
   const changeOpen = () => {
@@ -123,8 +142,8 @@ export const SubmitButton = (props) => {
     postData();
   };
 
-  return h("div", [
-    h(SubmitDialog, { open, changeOpen, goToModel }),
+  return h("div", { style: { marginTop: "5px" } }, [
+    h(SubmitDialog, { open, changeOpen, goToModel, modelName }),
     h(
       Button,
       {
@@ -216,9 +235,6 @@ export const EmbargoDatePick = (props) => {
       : "Public";
   const icon = embargoDate != null ? "lock" : "unlock";
 
-  console.log(embargoed);
-  console.log(infinite);
-
   const switchChange = () => {
     if (infinite) {
       onChange(null);
@@ -226,8 +242,6 @@ export const EmbargoDatePick = (props) => {
       onChange(ToInfinityDate(today));
     }
   };
-
-  console.log(tomorrow);
 
   const Content = () => {
     return h(Card, [
@@ -263,7 +277,6 @@ export const EmbargoDatePick = (props) => {
       h(Button, {
         text,
         minimal: true,
-        interactive: false,
         rightIcon: icon,
         intent: Intent.SUCCESS,
         disabled: !active,
@@ -316,7 +329,7 @@ export function DataSheetButton() {
   };
 
   return h("div", { style: { padding: "0px 5px 5px 0px" } }, [
-    h(Button, { onClick: handleClick }, ["Data Sheet View"]),
+    h(Button, { onClick: handleClick, minimal: true }, ["Data Sheet View"]),
   ]);
 }
 

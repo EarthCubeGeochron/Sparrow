@@ -48,6 +48,7 @@ interface MyInputNum {
   rightElement?: any;
   leftIcon?: any;
   disabled?: boolean;
+  minorStepSize: number;
 }
 
 /** Numeric Input that has intent validation
@@ -61,9 +62,11 @@ interface MyInputNum {
  * @param rightElement: (Optional)An icon, button or react element that can have additional actions. i.e dropdown menu
  * @param min {number}: The minimum value that can be accepted as a valid data type.
  * @param max {number}: The maximum value that can be accepted as a valid data type.
+ * @param minorStepSize {number}: Minimum stepsize for numeric precision
  *
  */
 export function MyNumericInput(props: MyInputNum) {
+  const { helperText, ...rest } = props;
   const intent =
     props.value < props.min || props.value > props.max ? "Danger" : null;
   return h("div", [
@@ -85,7 +88,7 @@ export function MyNumericInput(props: MyInputNum) {
           rightElement: props.rightElement,
           allowNumericCharactersOnly: false,
           clampValueOnBlur: true,
-          ...props,
+          ...rest,
         }),
       ]
     ),

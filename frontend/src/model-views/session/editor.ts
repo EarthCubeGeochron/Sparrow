@@ -5,17 +5,16 @@ import {
   useModelEditor,
   APIHelpers,
 } from "@macrostrat/ui-components";
-import { parse, format } from "date-fns";
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { useAuth } from "~/auth";
 import { put } from "axios";
-import { Link } from "react-router-dom";
-import { Breadcrumbs, Card } from "@blueprintjs/core";
 import { useModelURL, useModelURLBool } from "~/util/router";
 import {
   Instrument,
   Technique,
-  SessionProjects,
+  Target,
+  SessionDate,
+  AnalysisNumber,
   SessionInfoCard,
 } from "./info-card";
 import {
@@ -23,8 +22,12 @@ import {
   SampleAdd,
   ProjectAdd,
   PubAdd,
+  ModelEditableText,
   EmbargoDatePick,
   EditStatusButtons,
+  TagContainer,
+  PageViewBlock,
+  DataFilePage,
 } from "../components";
 import { SessionAdminContext } from "~/admin/session";
 import styles from "./module.styl";
@@ -48,6 +51,12 @@ const EmbargoEditor = function (props) {
 
   return h(EmbargoDatePick, { onChange, embargo_date, active: isEditing });
 };
+
+function SessionDataFiles(props) {
+  const { model } = useModelEditor();
+
+  return h(DataFilePage, { session_ids: [model.id], model: "session" });
+}
 
 function EditStatusButtonsSess(props) {
   const { isEditing, hasChanges, actions } = useModelEditor();
@@ -77,6 +86,47 @@ function SessionEditsNavBar(props) {
     header,
     editButtons: h(EditStatusButtonsSess),
     embargoEditor: h(EmbargoEditor),
+  });
+}
+
+function SessionTagContainer() {
+  const { model, actions, isEditing } = useModelEditor();
+
+  const onAdd = (item) => {
+    const currentTags = [...model.tags_tag];
+    currentTags.push(item);
+    actions.updateState({
+      model: { tags_tag: { $set: currentTags } },
+    });
+  };
+
+  const onDelete = (id) => {
+    const currentTags = [...model.tags_tag];
+    const newTags = currentTags.filter((tag) => tag.id != id);
+    actions.updateState({
+      model: { tags_tag: { $set: newTags } },
+    });
+  };
+
+  return h(TagContainer, {
+    isEditing,
+    tags: model.tags_tag,
+    onChange: onAdd,
+    onClickDelete: onDelete,
+    modelName: "session",
+  });
+}
+
+function SessionName(props) {
+  const { model, isEditing, actions } = useModelEditor();
+
+  if (!isEditing && model["name"] == null) {
+    return h("h4", "No Name");
+  }
+  return h(ModelEditableText, {
+    is: "h4",
+    field: "name",
+    multiline: true,
   });
 }
 
@@ -111,13 +161,31 @@ function SessionPublication(props) {
   });
 }
 
+async function TagsChangeSet(changeset, updatedModel, url) {
+  /**
+   * tag_ids = data['tag_ids']
+        for tag_id in tag_ids:
+            params = {"jointable":f"tags.{model}_tag", "model_id_column":f"{model}_id",\
+            "model_id": data['model_d'], "tag_id":tag_id}
+   */
+  if (changeset.tags_tag) {
+    let { id } = updatedModel;
+    const model_id = id;
+    const tags = changeset.tags_tag;
+    const tag_ids = tags.map((tag) => tag.id);
+    const body = { model_id: model_id, tag_ids: tag_ids };
+    const res = await put(url, body);
+    const { data } = res;
+    return data;
+  }
+  return "no tags";
+}
+
 function EditableSessionInfoComponent(props) {
   const { model, isEditing, actions } = useModelEditor();
   const { setListName, changeFunction } = useContext(SessionAdminContext);
 
-  const { id, sample, project, date: sdate } = model;
-  const date = parse(sdate);
-
+  const { id, sample, project, date } = model;
   const onProjectClick = (id, name) => {
     actions.updateState({
       model: { project: { $set: { id, name } } },
@@ -154,29 +222,33 @@ function EditableSessionInfoComponent(props) {
 
   const data = model.sample ? [sample] : null;
 
-  return h(Card, { id, className: "session-info-card" }, [
-    h("div.top", [
-      h("h4.date", format(date, "MMMM D, YYYY")),
-      h("div.expander"),
+  return h("div", [
+    h(PageViewBlock, [
+      h("div.session-info", [
+        h(SessionName),
+        h(SessionDate, model),
+        h(Technique, model),
+        h(Instrument, model),
+        h(Target, model),
+        h(AnalysisNumber, model),
+        h(SessionTagContainer),
+      ]),
     ]),
-    h("div.session-info", [
-      h(SampleAdd, {
-        data,
-        isEditing,
-        onClickList: sampleListClick,
-        onClickDelete: onSampleClickDelete,
-      }),
-      h.if(isEditing)(ProjectAdd, {
-        isEditing,
-        data: { project: [project] },
-        onClickList: projectClickList,
-        onClickDelete: onProjectClickDelete,
-      }),
-      h.if(!isEditing)(SessionProjects, { project }),
-      h(Instrument, model),
-      h(Technique, model),
-      h(SessionPublication),
-    ]),
+
+    h(SampleAdd, {
+      data,
+      isEditing,
+      onClickList: sampleListClick,
+      onClickDelete: onSampleClickDelete,
+    }),
+    h(ProjectAdd, {
+      isEditing,
+      data: { project: [project] },
+      onClickList: projectClickList,
+      onClickDelete: onProjectClickDelete,
+    }),
+    h(SessionPublication),
+    h(SessionDataFiles),
   ]);
 }
 
@@ -185,18 +257,12 @@ export function EditableSessionDetails(props) {
 
   const Edit = useModelURLBool();
   const res = useAPIv2Result(`/models/session/${id}`, {
-    nest: "sample,instrument,publication,project",
+    nest: "sample,instrument,project,tag,publication",
   });
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
-  const to = useModelURL("/session");
 
   if (!res) return null;
-
-  const breadCrumbs = [
-    { text: h(Link, { to }, "Sessions") },
-    { icon: "document", text: h("code.session-id", id) },
-  ];
 
   return h(
     ModelEditor,
@@ -206,6 +272,11 @@ export function EditableSessionDetails(props) {
       persistChanges: async (updatedModel, changeset) => {
         console.log(updatedModel);
         console.log(changeset);
+        TagsChangeSet(
+          changeset,
+          updatedModel,
+          buildURL("/tags/models/session", {})
+        );
         let rest;
         let { id } = updatedModel;
         const response = await put(
@@ -219,8 +290,7 @@ export function EditableSessionDetails(props) {
     },
     [
       h("div", [
-        h.if(Edit)(SessionEditsNavBar, { header: "Manage Session Links" }),
-        h(Breadcrumbs, { items: breadCrumbs }),
+        h.if(Edit)(SessionEditsNavBar, { header: `Manage Session #${id}` }),
         h.if(Edit)(EditableSessionInfoComponent),
         h.if(!Edit)(CatalogSessionInfoCard),
       ]),

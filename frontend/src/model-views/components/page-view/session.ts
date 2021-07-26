@@ -1,6 +1,7 @@
-import { AddCard, SessionPageViewModelCard, SessionEditCard } from "../index";
 import { DndContainer } from "~/components";
 import { hyperStyled } from "@macrostrat/hyper";
+import { useModelURL } from "~/util/router";
+import { ModelLinkCard, PageViewBlock, PageViewDate } from "~/model-views";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -8,27 +9,57 @@ const h = hyperStyled(styles);
 
 export const SessionAdd = (props) => {
   const {
-    onClickDelete,
-    onClickList,
+    onClickDelete = () => {},
+    onClickList = () => {},
     data,
-    isEditing,
+    isEditing = false,
     sampleHoverID = null,
     onDrop = () => {},
+    editable = true,
   } = props;
 
-  return h("div", [
-    h(PageViewSessions, {
-      session: data,
-      onClick: onClickDelete,
-      sampleHoverID,
-      onDrop,
-      isEditing,
-    }),
-    h.if(isEditing)(AddCard, {
-      model: "session",
+  if (!editable) {
+    return h(
+      PageViewBlock,
+      {
+        onClick: onClickList,
+        isEditing: false,
+        title: "Sessions",
+        model: "session",
+        hasData: data.length != 0,
+      },
+      [
+        h(PageViewSessions, {
+          session: data,
+          onClick: onClickDelete,
+          sampleHoverID,
+          onDrop,
+          isEditing,
+        }),
+      ]
+    );
+  }
+
+  return h(
+    PageViewBlock,
+    {
+      modelLink: true,
       onClick: onClickList,
-    }),
-  ]);
+      isEditing,
+      title: "Sessions",
+      model: "session",
+      hasData: data.length != 0,
+    },
+    [
+      h(PageViewSessions, {
+        session: data,
+        onClick: onClickDelete,
+        sampleHoverID,
+        onDrop,
+        isEditing,
+      }),
+    ]
+  );
 };
 
 export function PageViewSessions(props) {
@@ -40,12 +71,8 @@ export function PageViewSessions(props) {
     onDrop = () => {},
   } = props;
 
-  if (session == null && !isEditing) return null;
-  if (session == null && isEditing) {
-    return h("div.parameter", [h("h4.subtitle", "Sessions")]);
-  }
+  if (!session || session.length == 0) return null;
   return h("div.parameter", [
-    h.if(session.length > 0 || isEditing)("h4.subtitle", "Sessions"),
     h("div.session-container", [
       session.map((obj) => {
         const {
@@ -59,38 +86,67 @@ export function PageViewSessions(props) {
         } = obj;
         const onHover =
           sampleHoverID && sample ? sample.id == sampleHoverID : false;
-        if (isEditing) {
-          return h(
-            DndContainer,
-            {
-              id: session_id,
-              onDrop,
-            },
-            [
-              h(SessionEditCard, {
-                session_id,
-                sample,
-                technique,
-                target,
-                date,
-                onClick,
-                onHover,
-              }),
-            ]
-          );
-        } else {
-          return h(SessionPageViewModelCard, {
-            session_id,
-            technique,
-            target,
-            date,
-            data,
-            analysis,
-            sample,
-            onHover,
-          });
-        }
+        return h(
+          DndContainer,
+          {
+            key: session_id,
+            id: session_id,
+            onDrop,
+          },
+          [
+            h(SessionCard, {
+              key: session_id,
+              session_id,
+              isEditing,
+              sample,
+              technique,
+              target,
+              date,
+              onClick,
+              onHover,
+            }),
+          ]
+        );
       }),
     ]),
   ]);
 }
+
+export const SessionCard = (props) => {
+  const {
+    onClick,
+    session_id,
+    target,
+    date,
+    technique,
+    sample = null,
+    onHover = false,
+    isEditing,
+  } = props;
+
+  const classname = onHover ? "sample-edit-card-samhover" : "sample-edit-card";
+
+  const sampleName = sample ? sample.name : "";
+
+  const to = useModelURL(`/session/${session_id}`);
+
+  return h("div", [
+    h(
+      ModelLinkCard,
+      {
+        to,
+        isEditing,
+        onClick: () => onClick({ session_id, date }),
+        link: true,
+      },
+      [
+        h("div", { className: classname }, [
+          h("div.session-info", [
+            h("div", [h(PageViewDate, { date }), technique]),
+            h("div", target),
+          ]),
+        ]),
+      ]
+    ),
+  ]);
+};

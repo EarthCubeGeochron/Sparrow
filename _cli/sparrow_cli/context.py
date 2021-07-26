@@ -118,8 +118,8 @@ class SparrowConfig:
         # Enable native builds and layer caching
         # https://docs.docker.com/develop/develop-images/build_enhancements/
         # This is kind of experimental
-        environ["COMPOSE_DOCKER_CLI_BUILD"] = "1"
-        environ["DOCKER_BUILDKIT"] = "1"
+        environ.setdefault("COMPOSE_DOCKER_CLI_BUILD", "1")
+        environ.setdefault("DOCKER_BUILDKIT", "1")
 
         prepare_docker_environment()
 
