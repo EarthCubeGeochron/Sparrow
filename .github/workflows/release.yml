@@ -49,8 +49,7 @@ jobs:
           body: |
             The latest release of Sparrow can be installed using the following command:
             ```
-            bash -c $(curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh)
-            curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh | bash -s -
+            bash -c "$(curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh)"
             ```
 
             - If you want to install this release specifically, you can add it to the above command,

@@ -1,12 +1,12 @@
 import sys
 import click
-from subprocess import Popen, PIPE
+from subprocess import Popen
 from rich import print
 from time import sleep
 
-from .env import validate_environment
-from .util import compose, container_id, cmd, log
-from .help.backend import get_backend_help_info
+from ..env import validate_environment
+from ..util import compose, cmd, log
+from ..help.backend import get_backend_help_info
 
 
 @click.command()
@@ -44,13 +44,3 @@ def sparrow_up(container, force_recreate=False):
     get_backend_help_info(cache=True)
 
     p.wait()
-
-
-@click.command(name="logs")
-@click.argument("container", type=str, required=False, default=None)
-def sparrow_logs(container):
-    if container is None:
-        compose("logs --tail=0 --follow")
-    else:
-        id = container_id(container)
-        cmd("docker logs -f", str(id))
