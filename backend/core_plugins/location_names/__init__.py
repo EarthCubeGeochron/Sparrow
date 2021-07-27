@@ -25,6 +25,10 @@ def get_location_name(coords):
 class LocationNamesPlugin(SparrowPlugin):
     name = "location-names"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        sparrow_task(name="location-names")(self.update_location_names)
+
     def on_setup_cli(self, cli):
         @click.command(name="update-location-names")
         @click.option("--overwrite", is_flag=True, default=False)
@@ -36,8 +40,9 @@ class LocationNamesPlugin(SparrowPlugin):
 
         cli.add_command(cmd)
 
-    # @sparrow_task(name="location-names")
     def update_location_names(self, overwrite: bool = False):
+        """Updates location names in the Sparrow database"""
+        click.echo("Updating location names")
         db = self.app.database
         s = db.model.sample
         # Get unnamed locations

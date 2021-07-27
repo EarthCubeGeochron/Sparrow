@@ -11,7 +11,7 @@ Tasks have
 
 """
 from sparrow.plugins import SparrowCorePlugin
-from celery import Task, Celery
+from celery import Task, Celery, current_app
 from sparrow.logs import get_logger
 from click import echo
 from sparrow.plugins import SparrowCorePlugin
@@ -55,6 +55,22 @@ cli_app = typer.Typer()
 _typer_commands = []
 
 
+class task_method(object):
+    def __init__(self, task, *args, **kwargs):
+        self.task = task
+
+    def __get__(self, obj, type=None):
+        if obj is None:
+            return self.task
+        task = self.task.__class__()
+        task.__self__ = obj
+        return task
+
+
+def celery_task(*args, **kwargs):
+    return current_app.task(*args, **dict(kwargs, filter=task_method))
+
+
 def sparrow_task(*args, **kwargs):
     kwargs.setdefault("base", SparrowTask)
 
@@ -68,8 +84,8 @@ def sparrow_task(*args, **kwargs):
         # Apply decorators
 
         # mgr = app.plugins.get("task-manager")
-        func = celery.task(*args, **kwargs)(func)
         func = cli_app.command(name=name)(func)
+        func = celery_task(*args, **kwargs)(func)
 
         _typer_commands.append(name)
         log.debug(f"Registering task {name}")
@@ -95,5 +111,4 @@ def hello_task(name: str):
 
 def add_typer_commands(cli):
     typer_click_object = typer.main.get_command(cli_app)
-    for name in _typer_commands:
-        cli.add_command(typer_click_object, name)
+    cli.add_command(typer_click_object, "tasks")
