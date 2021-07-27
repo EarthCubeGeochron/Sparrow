@@ -49,7 +49,7 @@ class TestOpenSearch:
             assert len(res.all()) > 0
 
     def test_query_document(self, db):
-        """ test query the document table using orm methods """
+        """test query the document table using orm methods"""
         document_names = ["project", "sample", "session"]
 
         for name in document_names:
@@ -60,7 +60,7 @@ class TestOpenSearch:
             assert res.count() > 0
 
     def test_sample_search(self, db):
-        """ Use the match operator from sqlalchemy to search a document """
+        """Use the match operator from sqlalchemy to search a document"""
         term = "granite"
 
         sample_doc = Table(
@@ -129,7 +129,7 @@ class TestOpenSearch:
         assert q.first().name == "fake1"
 
     def test_open_search_api(self, client, db):
-        """ test filter api """
+        """test filter api"""
 
         models = {"project": "casey", "sample": "fake1", "session": "UW114"}
 
