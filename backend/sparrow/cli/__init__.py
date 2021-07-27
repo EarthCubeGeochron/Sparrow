@@ -13,6 +13,7 @@ from sparrow_utils.logs import setup_stderr_logs
 from typing import Optional
 from ..plugins import SparrowPlugin
 from logging import INFO
+from ..task_manager import add_typer_commands
 
 
 def _build_app_context(config):
@@ -204,3 +205,6 @@ def command_info(ctx, cli):
 @pass_context
 def _get_cli_info(ctx):
     print(dumps({k: v for k, v in command_info(ctx, cli)}))
+
+
+add_typer_commands(cli)

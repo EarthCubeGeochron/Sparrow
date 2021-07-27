@@ -11,9 +11,13 @@ Tasks have
 
 """
 from click import echo
+from sparrow import plugins
 from sparrow.plugins import SparrowCorePlugin
 from celery import Task, Celery
 from sparrow.context import get_sparrow_app
+from sparrow.plugins import SparrowPlugin
+import typer
+from inspect import ismethod
 
 
 class SparrowTaskError(Exception):
@@ -42,7 +46,7 @@ class SparrowTask(Task):
         pass
 
 
-def sparrow_task(self, *args, **kwargs):
+def sparrow_task(*args, **kwargs):
     kwargs.setdefault("base", SparrowTask)
 
     def wrapper(func):
@@ -51,15 +55,33 @@ def sparrow_task(self, *args, **kwargs):
         if mgr is None:
             raise SparrowTaskError("Cannot find task manager")
 
-        @mgr.celery.task(*args, **kwargs)
-        def inner(*_args, **_kwargs):
-            func(*_args, **_kwargs)
+        # Get plugin name
+        name = func.__name__
+        # Apply decorators
+        func = mgr.celery.task(*args, **kwargs)(func)
+        # func = cli_app.command(name=name)(func)
 
-        return inner
+        # typer_click_object = typer.main.get_command(cli_app)
+        # if plugin is not None:
+        #     typer_click_object._plugin = plugin.name
+
+        # from sparrow.cli import cli
+
+        # cli.add_command(typer_click_object, name)
+
+        return func
 
     return wrapper
 
 
-@sparrow_task
+cli_app = typer.Typer()
+
+
+@cli_app.command(name="hello")
 def hello_task(name: str):
-    echo("Hello world")
+    echo(f"Hello {name}")
+
+
+def add_typer_commands(cli):
+    typer_click_object = typer.main.get_command(cli_app)
+    cli.add_command(typer_click_object, "hello")

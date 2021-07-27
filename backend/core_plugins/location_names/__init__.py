@@ -3,6 +3,7 @@ from sparrow.plugins import SparrowPlugin
 from sqlalchemy import func
 from json import loads
 from requests import get
+from sparrow.task_manager import sparrow_task
 
 # TODO: add geoalchemy to base docker image
 # ..tricky because we are using Alpine
@@ -36,6 +37,7 @@ class LocationNamesPlugin(SparrowPlugin):
 
         cli.add_command(cmd)
 
+    # @sparrow_task(name="location-names")
     def update_location_names(self, overwrite: bool = False):
         db = self.app.database
         s = db.model.sample
