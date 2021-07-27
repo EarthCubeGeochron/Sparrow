@@ -33,7 +33,7 @@ END;
 $$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION project_doc_update() 
+CREATE OR REPLACE FUNCTION project_doc_trigger() 
 	RETURNS TRIGGER 
 	AS
 $$
@@ -56,7 +56,7 @@ DROP TRIGGER IF EXISTS project_doc ON project;
 CREATE TRIGGER project_doc
 	AFTER INSERT OR UPDATE ON project
 	FOR EACH ROW
-	EXECUTE PROCEDURE project_doc_update();
+	EXECUTE PROCEDURE project_doc_trigger();
 
 CREATE OR REPLACE FUNCTION sample_doc_insert(sample_id_ int)
 	RETURNS BOOLEAN AS
@@ -87,7 +87,7 @@ END;
 $$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION sample_doc_update() 
+CREATE OR REPLACE FUNCTION sample_doc_trigger() 
 	RETURNS TRIGGER 
 	AS
 $$
@@ -110,7 +110,7 @@ DROP TRIGGER IF EXISTS sample_doc ON sample;
 CREATE TRIGGER sample_doc
 	AFTER INSERT OR UPDATE ON sample
 	FOR EACH ROW
-	EXECUTE PROCEDURE sample_doc_update();
+	EXECUTE PROCEDURE sample_doc_trigger();
 
 CREATE OR REPLACE FUNCTION session_doc_insert(session_id_ int)
 	RETURNS BOOLEAN AS
@@ -137,7 +137,7 @@ END;
 $$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION session_doc_update() 
+CREATE OR REPLACE FUNCTION session_doc_trigger() 
 	RETURNS TRIGGER 
 	AS
 $$
@@ -159,6 +159,6 @@ DROP TRIGGER IF EXISTS session_doc ON session;
 CREATE TRIGGER session_doc
 	AFTER INSERT OR UPDATE ON session
 	FOR EACH ROW
-	EXECUTE PROCEDURE session_doc_update();
+	EXECUTE PROCEDURE session_doc_trigger();
 
 
