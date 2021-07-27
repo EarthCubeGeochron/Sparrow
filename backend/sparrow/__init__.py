@@ -7,6 +7,8 @@ if not sys.warnoptions:
 
 from .logs import get_logger
 from .app import Sparrow
+from .task_manager import sparrow_task
+from .plugins import SparrowPlugin
 from .database import Database
 from .context import get_sparrow_app
 from .meta import __version__

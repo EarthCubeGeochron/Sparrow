@@ -10,14 +10,17 @@ Tasks have
 - Optional stdout redirection
 
 """
-from click import echo
-from sparrow import plugins
 from sparrow.plugins import SparrowCorePlugin
 from celery import Task, Celery
+from sparrow.logs import get_logger
+from click import echo
+from sparrow.plugins import SparrowCorePlugin
 from sparrow.context import get_sparrow_app
-from sparrow.plugins import SparrowPlugin
 import typer
-from inspect import ismethod
+
+log = get_logger(__name__)
+
+celery = Celery("tasks", broker="redis://broker//")
 
 
 class SparrowTaskError(Exception):
@@ -29,7 +32,7 @@ class SparrowTaskManager(SparrowCorePlugin):
     celery: Celery
 
     def __init__(self):
-        self.celery = Celery("tasks", broker="redis://broker//")
+        self.celery = celery
 
     def __call__(self, fn):
         pass
@@ -46,20 +49,30 @@ class SparrowTask(Task):
         pass
 
 
+log = get_logger(__name__)
+
+cli_app = typer.Typer()
+_typer_commands = []
+
+
 def sparrow_task(*args, **kwargs):
     kwargs.setdefault("base", SparrowTask)
 
     def wrapper(func):
-        app = get_sparrow_app()
-        mgr = app.plugins.get("task-manager")
-        if mgr is None:
-            raise SparrowTaskError("Cannot find task manager")
+        # app = get_sparrow_app()
+        # if mgr is None:
+        #    raise SparrowTaskError("Cannot find task manager")
 
         # Get plugin name
-        name = func.__name__
+        name = kwargs.get("name", func.__name__)
         # Apply decorators
-        func = mgr.celery.task(*args, **kwargs)(func)
-        # func = cli_app.command(name=name)(func)
+
+        # mgr = app.plugins.get("task-manager")
+        func = celery.task(*args, **kwargs)(func)
+        func = cli_app.command(name=name)(func)
+
+        _typer_commands.append(name)
+        log.debug(f"Registering task {name}")
 
         # typer_click_object = typer.main.get_command(cli_app)
         # if plugin is not None:
@@ -74,14 +87,13 @@ def sparrow_task(*args, **kwargs):
     return wrapper
 
 
-cli_app = typer.Typer()
-
-
-@cli_app.command(name="hello")
+@sparrow_task(name="hello")
 def hello_task(name: str):
+    """Say hello!"""
     echo(f"Hello {name}")
 
 
 def add_typer_commands(cli):
     typer_click_object = typer.main.get_command(cli_app)
-    cli.add_command(typer_click_object, "hello")
+    for name in _typer_commands:
+        cli.add_command(typer_click_object, name)
