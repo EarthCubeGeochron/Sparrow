@@ -96,6 +96,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         )
 
         self._filters = []
+        self.register_filter(OpenSearchFilter)
         self.register_filter(AuthorityFilter)
         self.register_filter(FieldExistsFilter)
         self.register_filter(FieldNotExistsFilter)
@@ -108,7 +109,6 @@ class ModelAPIEndpoint(HTTPEndpoint):
         self.register_filter(AgeRangeFilter)
         self.register_filter(IdListFilter)
         self.register_filter(TagsFilter)
-        self.register_filter(OpenSearchFilter)
 
     @property
     def model(self):
