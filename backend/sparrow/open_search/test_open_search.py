@@ -106,13 +106,13 @@ class TestOpenSearch:
 
         # assemble joins
         q = db.session.query(sample)
-        q = q.join(sample_doc, sample.id == sample_doc.c.sample_id, isouter=True)
-        q = q.join(sample.project_collection).join(
-            project_doc, project.id == project_doc.c.project_id, isouter=True
+        q = q.outerjoin(sample_doc, sample.id == sample_doc.c.sample_id)
+        q = q.outerjoin(sample.project_collection).join(
+            project_doc, project.id == project_doc.c.project_id
         )
 
-        q = q.join(sample.session_collection).join(
-            session_doc, session.id == session_doc.c.session_id, isouter=True
+        q = q.outerjoin(sample.session_collection).join(
+            session_doc, session.id == session_doc.c.session_id
         )
 
         # # apply search text searching

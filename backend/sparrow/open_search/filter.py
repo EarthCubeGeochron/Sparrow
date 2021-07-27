@@ -19,14 +19,14 @@ def get_document_tables(db):
     return doc_tables
 
 
-def session_joins(db, query):
+def session_joins(db, query, document_tables):
     """make session joins to query
 
     join session_doc
     join project_doc
     join sample_doc
     """
-    project_doc, sample_doc, session_doc = get_document_tables(db)
+    project_doc, sample_doc, session_doc = document_tables
 
     session = db.model.session
 
@@ -37,9 +37,9 @@ def session_joins(db, query):
     return query
 
 
-def sample_joins(db, query):
+def sample_joins(db, query, document_tables):
     """ make sample_doc joins to query """
-    project_doc, sample_doc, session_doc = get_document_tables(db)
+    project_doc, sample_doc, session_doc = document_tables
 
     sample = db.model.sample
     project = db.model.project
@@ -56,8 +56,8 @@ def sample_joins(db, query):
     return query
 
 
-def project_joins(db, query):
-    project_doc, sample_doc, session_doc = get_document_tables(db)
+def project_joins(db, query, document_tables):
+    project_doc, sample_doc, session_doc = document_tables
 
     sample = db.model.sample
     project = db.model.project
@@ -74,18 +74,18 @@ def project_joins(db, query):
     return query
 
 
-def construct_query(db, model, search):
+def construct_query(db, model, search, document_tables):
     """ creates a query to the documents table """
-    project_doc, sample_doc, session_doc = get_document_tables(db)
+    project_doc, sample_doc, session_doc = document_tables
 
     query = db.session.query(model)
 
     if model == getattr(db.model, "session"):
-        query = session_joins(db, query)
+        query = session_joins(db, query, document_tables)
     elif model == getattr(db.model, "sample"):
-        query = sample_joins(db, query)
+        query = sample_joins(db, query, document_tables)
     else:
-        query = project_joins(db, query)
+        query = project_joins(db, query, document_tables)
 
     # construct filter using the match operator
     query = query.filter(
@@ -106,6 +106,19 @@ class OpenSearchFilter(BaseFilter):
 
     key = "search"
     possible_models = ["project", "sample", "session"]
+
+    def __init__(self, model, schema):
+        self.project_document = None
+        self.sample_document = None
+        self.session_document = None
+        super().__init__(model, schema=schema)
+
+    def check_document_tables(self, db):
+        if self.project_document is None:
+            project, sample, session = get_document_tables(db)
+            self.project_document = project
+            self.sample_document = sample
+            self.session_document = session
 
     @property
     def params(self):
@@ -132,4 +145,11 @@ class OpenSearchFilter(BaseFilter):
         search_query = " & ".join(search_query.split())  ## breaks sentences into words
         db = app_context().database
 
-        return construct_query(db, self.model, search_query)
+        self.check_document_tables(db)
+        document_tables = [
+            self.project_document,
+            self.sample_document,
+            self.session_document,
+        ]
+
+        return construct_query(db, self.model, search_query, document_tables)
