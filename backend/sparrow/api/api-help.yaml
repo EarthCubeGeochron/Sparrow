@@ -33,3 +33,7 @@ examples:
       "/api/v2/models/project?nest=sample,session&date_range=2000-03-23,2013-05-01&per_page=25",
       "/api/v2/models/project",
     ]
+
+fields:
+  member_of: "A parent sample that this sample belongs too."
+  material: "The geologic material this sample is classified as."

@@ -1,5 +1,63 @@
 from shapely.geometry import mapping, Point
 from geoalchemy2.shape import from_shape
+from ..api_info import get_field_description
+
+
+def construct_schema_fields_object(schema):
+    """func to create schema field documentation for the API
+    field.required
+    field.dump_only == id, audit_id
+    field.allow_none
+    """
+    fields = schema.fields
+    fields_object = {}
+    for f in fields:
+        field = fields[f]
+        name = getattr(field, "data_key", f)
+        if nested_schema := getattr(field, "schema", None):
+            # nested model
+            type_ = nested_schema.__class__.__name__
+            if nested_schema.many:
+                type_ += "[]"
+            fields_object[name] = {
+                "type": type_,
+                **nested_model_link(field),
+                **get_field_description(name),
+                **construct_field_info(field),
+            }
+        else:
+            type_ = field.__class__.__name__
+            fields_object[name] = {
+                "type": type_,
+                **get_field_description(name),
+                **construct_field_info(field),
+            }
+    return fields_object
+
+
+def nested_model_link(field):
+    """ generate api route for nested model """
+    model_name = field.schema.opts.model.__name__
+    route = ""
+    if "vocabulary" in model_name or "tags" in model_name:
+        schema, model = model_name.split("_", 1)
+        route = f"/api/v2/{schema}/{model}"
+    else:
+        route = f"/api/v2/models/{model_name}"
+    return {"link": route}
+
+
+def construct_field_info(field):
+    attributes = {
+        "required": "required",
+        "dump_only": "read_only",
+        "allow_none": "nullable",
+    }
+
+    obj = {}
+    for param, laymans in attributes.items():
+        obj[laymans] = getattr(field, param)
+    return obj
 
 
 def create_location_from_coordinates(longitude, latitude):
