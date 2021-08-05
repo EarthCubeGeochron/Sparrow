@@ -10,11 +10,10 @@ Tasks have
 - Optional stdout redirection
 
 """
-from sparrow.plugins import SparrowCorePlugin
 from celery import Task, Celery, current_app
 from sparrow.logs import get_logger
-from click import echo
 from sparrow.plugins import SparrowCorePlugin
+from click import echo
 from sparrow.context import get_sparrow_app
 import typer
 
@@ -83,9 +82,13 @@ def sparrow_task(*args, **kwargs):
         name = kwargs.get("name", func.__name__)
         # Apply decorators
 
+        # # Copy docstring and annotations to task
+        # _func.__doc__ = func.__doc__
+        # _func.__annotations__ = func.__annotations__
+
         # mgr = app.plugins.get("task-manager")
-        func = cli_app.command(name=name)(func)
-        func = celery_task(*args, **kwargs)(func)
+        cli_app.command(name=name)(func)
+        celery_task(*args, **kwargs)(func)
 
         _typer_commands.append(name)
         log.debug(f"Registering task {name}")
@@ -98,6 +101,7 @@ def sparrow_task(*args, **kwargs):
 
         # cli.add_command(typer_click_object, name)
 
+        func._is_sparrow_task = True
         return func
 
     return wrapper
@@ -110,5 +114,6 @@ def hello_task(name: str):
 
 
 def add_typer_commands(cli):
+    cli_app._add_completion = False
     typer_click_object = typer.main.get_command(cli_app)
     cli.add_command(typer_click_object, "tasks")

@@ -1,4 +1,5 @@
 from contextvars import ContextVar
+from os import name
 from .logs import get_logger
 
 log = get_logger(__name__)
@@ -50,3 +51,7 @@ def get_sparrow_app():
 
 def get_database():
     return get_sparrow_app().database
+
+
+def get_plugin(name: str):
+    return get_sparrow_app().plugins.get(name)

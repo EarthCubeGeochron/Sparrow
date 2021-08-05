@@ -10,5 +10,5 @@ from .app import Sparrow
 from .task_manager import sparrow_task
 from .plugins import SparrowPlugin
 from .database import Database
-from .context import get_sparrow_app
+from .context import get_sparrow_app, get_plugin
 from .meta import __version__
