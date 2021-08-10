@@ -12,3 +12,7 @@ class TestEndpointUtils:
             except:
                 continue
         assert worked == len(db.interface)
+
+    def test_schema_fields_description(self, db):
+        sample = db.interface.sample(many=True)
+        

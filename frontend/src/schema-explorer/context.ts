@@ -11,6 +11,7 @@ const h = hyperStyled(styles);
 ///////////////////// Misscel Data Types //////////////////////
 
 type PossModelObj = { name: string; route: string };
+type NestedModelNamespaces = { namespace: string[]; route: string };
 
 ///////////////////// sync action types ///////////////////////////
 type SwitchModel = { type: "switch-model"; payload: { model: string } };
@@ -33,7 +34,7 @@ type AsyncSchemaActions = GetPossibleModels | GetModelFields;
 
 /////////////////// Async Actions /////////////////////
 function useSchemaActions(dispatch) {
-  const { get, post } = useAPIActions(APIV2Context);
+  const { get } = useAPIActions(APIV2Context);
   return async (action: SchemaActions | AsyncSchemaActions) => {
     switch (action.type) {
       case "get-possible-models": {
@@ -56,7 +57,7 @@ function useSchemaActions(dispatch) {
   };
 }
 
-/////////////// Schema Reduced ///////////////
+/////////////// Schema Reducer ///////////////
 function schemaExplorerReducer(
   state = schemaExplorerDefaultState,
   action: SchemaActions

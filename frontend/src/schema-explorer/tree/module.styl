@@ -1,0 +1,75 @@
+@require "~app/shared/colors"
+
+/* the tree node's style */
+.tree-view 
+  overflow-y hidden
+  max-width 50vw
+  margin-bottom 20px
+
+.tree-view_item 
+  /* immediate child of .tree-view, for styling convenience */
+  display flex
+  margin 10px
+
+/* style for the children nodes container */
+.tree-view_children 
+  margin-left 30px
+  width 90%
+
+.tree-view_children-collapsed 
+  height 0px
+
+.placeholder
+  width 30px
+
+.node-label
+    display flex
+    align-items baseline
+
+.read-only
+  color $gray4
+
+.type-schema
+  font-family "Lucida Console", Monospace
+
+.string
+  color $indigo3
+
+.boolean
+  color $turquoise4
+
+.integer
+  color $cobalt1
+
+.decimal
+  color $cobalt3
+
+.default
+  color $violet4
+
+.geom, .decimal, .integer, .boolean, .string, .read-only, .default
+  font-style italic
+  font-size 15px
+  margin-left 5px
+
+.geom
+  color $green3
+
+.legend
+  font-style bold
+
+.legend-card
+  width 300px
+  height 300px
+  margin 20px
+  
+.legend-field
+  display flex
+
+.description 
+  display flex
+  white-space pre-wrap
+  align-items baseline
+  width 80%
+  flex-wrap wrap
+  font-style italic

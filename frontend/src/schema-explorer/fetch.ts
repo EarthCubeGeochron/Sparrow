@@ -47,4 +47,21 @@ async function getPossibleModels(get) {
   return unwrapModels(data);
 }
 
+/**
+ * Function to dynamically index a dictionary with multiple nests
+ * @param dict Dictionary to index
+ * @param list List of keys to index down to
+ */
+function dynamicDictIndexer(dict: object, list: []) {
+  let listCopy = [...list];
+  if (listCopy.length == 0) {
+    // finished recursion
+  }
+
+  let newDict = dict[listCopy[0]];
+  delete listCopy[0];
+}
+
+//obj[list[1]][list[2]] = fields;
+
 export { fetchFields, getPossibleModels };

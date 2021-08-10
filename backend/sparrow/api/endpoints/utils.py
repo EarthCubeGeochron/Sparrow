@@ -22,14 +22,14 @@ def construct_schema_fields_object(schema):
             fields_object[name] = {
                 "type": type_,
                 **nested_model_link(field),
-                **get_field_description(name),
+                **get_field_description(type_, name),
                 **construct_field_info(field),
             }
         else:
             type_ = field.__class__.__name__
             fields_object[name] = {
                 "type": type_,
-                **get_field_description(name),
+                **get_field_description(type_, name),
                 **construct_field_info(field),
             }
     return fields_object
@@ -44,7 +44,7 @@ def nested_model_link(field):
         route = f"/api/v2/{schema}/{model}"
     else:
         route = f"/api/v2/models/{model_name}"
-    return {"link": route}
+    return {"link": route.lower()}
 
 
 def construct_field_info(field):

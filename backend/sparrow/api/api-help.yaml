@@ -35,5 +35,7 @@ examples:
     ]
 
 fields:
-  member_of: "A parent sample that this sample belongs too."
-  material: "The geologic material this sample is classified as."
+  string: "A word(s) describing the "
+  boolean: "A true or false value describing the state of "
+  integer: "A whole number ascribing value to "
+  decimal: "A whole or decimal number ascribing value to "
