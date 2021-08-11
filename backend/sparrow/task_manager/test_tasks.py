@@ -1,5 +1,6 @@
 from .. import task
 from click import echo
+from ..users.test_user_api import admin_client
 
 
 @task(name="hello")
@@ -18,3 +19,9 @@ class TestSparrowTaskManager:
         assert hello_task is not None
         assert hello_task._is_sparrow_task
         assert hello_task("Sparrow") == "Hello, Sparrow"
+
+    def test_task_manager_api(self, admin_client):
+        res = admin_client.get("/api/v2/tasks/")
+        assert res.status_code == 200
+        data = res.json()["data"]
+        assert False

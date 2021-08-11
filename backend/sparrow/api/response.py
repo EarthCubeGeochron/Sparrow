@@ -39,7 +39,10 @@ class APIResponse(JSONResponse):
                 content = self.schema.dump(content)
             else:
                 # This helps us deal with sequence rows
-                content = [c._asdict() for c in content]
+                try:
+                    content = [c._asdict() for c in content]
+                except AttributeError:
+                    pass
         except Exception:
             raise SerializationError(status_code=500)
 
