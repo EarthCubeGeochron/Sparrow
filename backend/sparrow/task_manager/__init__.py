@@ -10,17 +10,15 @@ Tasks have
 - Optional stdout redirection
 
 """
-import celery
-from celery import Task, Celery, current_app
+from celery import Task, Celery
 from sparrow.logs import get_logger
 from sparrow.plugins import SparrowCorePlugin
-from click import decorators, echo
+from click import echo
 from sparrow.context import get_plugin
+from sparrow.settings import TASK_BROKER
 import typer
 
 log = get_logger(__name__)
-
-celery = Celery("tasks", broker="redis://broker//")
 
 
 class SparrowTaskError(Exception):
@@ -39,7 +37,7 @@ class SparrowTaskManager(SparrowCorePlugin):
     _tasks = {}
 
     def __init__(self, app):
-        self.celery = celery
+        self.celery = Celery("tasks", broker=TASK_BROKER)
         super().__init__(app)
 
     def register_task(self, func, *args, **kwargs):
@@ -49,27 +47,13 @@ class SparrowTaskManager(SparrowCorePlugin):
         cli_only = kwargs.get("cli_only", False)
         if destructive:
             cli_only = True
-        # Apply decorators
 
-        # # Copy docstring and annotations to task
-        # _func.__doc__ = func.__doc__
-        # _func.__annotations__ = func.__annotations__
-
-        # mgr = app.plugins.get("task-manager")
         self._cli_app.command(name=name)(func)
         if not cli_only:
             self.celery.task(*args, **kwargs)(func)
 
         self._task_commands.append(name)
         log.debug(f"Registering task {name}")
-
-        # typer_click_object = typer.main.get_command(cli_app)
-        # if plugin is not None:
-        #     typer_click_object._plugin = plugin.name
-
-        # from sparrow.cli import cli
-
-        # cli.add_command(typer_click_object, name)
 
         func._is_sparrow_task = True
         self._tasks[name] = func
@@ -94,19 +78,13 @@ class SparrowTaskManager(SparrowCorePlugin):
 
 class SparrowTask(Task):
     def __call__(self, *args, **kwargs):
-        """In celery task this function calls the run method, here you can
+        """In a celery task this function calls the run method, here you can
         set some environment variable before the run of the task"""
         return self.run(*args, **kwargs)
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         # exit point of the task whatever is the state
         pass
-
-
-log = get_logger(__name__)
-
-cli_app = typer.Typer()
-_typer_commands = []
 
 
 def sparrow_task(*args, **kwargs):
@@ -122,6 +100,7 @@ def sparrow_task(*args, **kwargs):
             _tasks_to_register[task_name] = (func, args, kwargs)
 
         def _run_task(*args, **kwargs):
+            """Function to run a task that is already registered to the running Sparrow application."""
             mgr = get_plugin("task-manager")
             func = mgr.get_task(task_name)
             return func(*args, **kwargs)
