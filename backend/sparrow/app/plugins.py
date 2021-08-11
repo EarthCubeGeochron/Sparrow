@@ -1,3 +1,4 @@
+from ..task_manager import SparrowTaskManager
 from ..api import APIv2Plugin
 from ..legacy.api_v1 import APIv1Plugin
 from ..plugins import SparrowPluginManager
@@ -10,7 +11,7 @@ from ..ext import HeartbeatPlugin
 from ..ext.data_validation import DataValidationPlugin
 from ..metrics_endpoint import MetricsEndpoint
 from ..tags import Tags
-from sparrow.open_search import OpenSearch
+from ..open_search import OpenSearch
 from ..import_helpers.api import ImportTrackerPlugin
 from ..web import WebPlugin
 from ..logs import get_logger
@@ -41,6 +42,7 @@ def prepare_plugin_manager(app):
         OpenSearch,
         ImportTrackerPlugin,
         UserManagementPlugin,
+        SparrowTaskManager,
     )
     # GraphQL is disabled for now
     # self.plugins.add(GraphQLPlugin)

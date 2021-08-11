@@ -10,11 +10,12 @@ Tasks have
 - Optional stdout redirection
 
 """
+import celery
 from celery import Task, Celery, current_app
 from sparrow.logs import get_logger
 from sparrow.plugins import SparrowCorePlugin
-from click import echo
-from sparrow.context import get_sparrow_app
+from click import decorators, echo
+from sparrow.context import get_plugin
 import typer
 
 log = get_logger(__name__)
@@ -26,20 +27,74 @@ class SparrowTaskError(Exception):
     ...
 
 
+_tasks_to_register = {}
+
+
 class SparrowTaskManager(SparrowCorePlugin):
     name = "task-manager"
     celery: Celery
 
-    def __init__(self):
-        self.celery = celery
+    _cli_app = typer.Typer()
+    _task_commands = []
+    _tasks = {}
 
-    def __call__(self, fn):
-        pass
+    def __init__(self, app):
+        self.celery = celery
+        super().__init__(app)
+
+    def register_task(self, func, *args, **kwargs):
+        # Get plugin name
+        name = kwargs.get("name", func.__name__)
+        destructive = kwargs.get("destructive", False)
+        cli_only = kwargs.get("cli_only", False)
+        if destructive:
+            cli_only = True
+        # Apply decorators
+
+        # # Copy docstring and annotations to task
+        # _func.__doc__ = func.__doc__
+        # _func.__annotations__ = func.__annotations__
+
+        # mgr = app.plugins.get("task-manager")
+        self._cli_app.command(name=name)(func)
+        if not cli_only:
+            self.celery.task(*args, **kwargs)(func)
+
+        self._task_commands.append(name)
+        log.debug(f"Registering task {name}")
+
+        # typer_click_object = typer.main.get_command(cli_app)
+        # if plugin is not None:
+        #     typer_click_object._plugin = plugin.name
+
+        # from sparrow.cli import cli
+
+        # cli.add_command(typer_click_object, name)
+
+        func._is_sparrow_task = True
+        self._tasks[name] = func
+        return func
+
+    def get_task(self, name):
+        return self._tasks[name]
+
+    def on_plugins_initialized(self):
+        global _tasks_to_register
+        for k, v in _tasks_to_register.items():
+            (func, args, kwargs) = v
+            kwargs["name"] = k
+            self.register_task(func, *args, **kwargs)
+        _tasks_to_register = {}
+
+    def on_setup_cli(self, cli):
+        self._cli_app._add_completion = False
+        typer_click_object = typer.main.get_command(self._cli_app)
+        cli.add_command(typer_click_object, "tasks")
 
 
 class SparrowTask(Task):
     def __call__(self, *args, **kwargs):
-        """In celery task this function call the run method, here you can
+        """In celery task this function calls the run method, here you can
         set some environment variable before the run of the task"""
         return self.run(*args, **kwargs)
 
@@ -54,55 +109,24 @@ cli_app = typer.Typer()
 _typer_commands = []
 
 
-class task_method(object):
-    def __init__(self, task, *args, **kwargs):
-        self.task = task
-
-    def __get__(self, obj, type=None):
-        if obj is None:
-            return self.task
-        task = self.task.__class__()
-        task.__self__ = obj
-        return task
-
-
-def celery_task(*args, **kwargs):
-    return current_app.task(*args, **dict(kwargs, filter=task_method))
-
-
 def sparrow_task(*args, **kwargs):
+    """A decorator to define a sparrow task."""
     kwargs.setdefault("base", SparrowTask)
 
     def wrapper(func):
-        # app = get_sparrow_app()
-        # if mgr is None:
-        #    raise SparrowTaskError("Cannot find task manager")
+        task_name = kwargs.get("name", func.__name__)
+        try:
+            mgr = get_plugin("task-manager")
+            mgr.register_task(func, *args, **kwargs)
+        except (ImportError, AttributeError, ValueError):
+            _tasks_to_register[task_name] = (func, args, kwargs)
 
-        # Get plugin name
-        name = kwargs.get("name", func.__name__)
-        # Apply decorators
+        def _run_task(*args, **kwargs):
+            mgr = get_plugin("task-manager")
+            func = mgr.get_task(task_name)
+            return func(*args, **kwargs)
 
-        # # Copy docstring and annotations to task
-        # _func.__doc__ = func.__doc__
-        # _func.__annotations__ = func.__annotations__
-
-        # mgr = app.plugins.get("task-manager")
-        cli_app.command(name=name)(func)
-        celery_task(*args, **kwargs)(func)
-
-        _typer_commands.append(name)
-        log.debug(f"Registering task {name}")
-
-        # typer_click_object = typer.main.get_command(cli_app)
-        # if plugin is not None:
-        #     typer_click_object._plugin = plugin.name
-
-        # from sparrow.cli import cli
-
-        # cli.add_command(typer_click_object, name)
-
-        func._is_sparrow_task = True
-        return func
+        return _run_task
 
     return wrapper
 
@@ -111,9 +135,3 @@ def sparrow_task(*args, **kwargs):
 def hello_task(name: str):
     """Say hello!"""
     echo(f"Hello {name}")
-
-
-def add_typer_commands(cli):
-    cli_app._add_completion = False
-    typer_click_object = typer.main.get_command(cli_app)
-    cli.add_command(typer_click_object, "tasks")
