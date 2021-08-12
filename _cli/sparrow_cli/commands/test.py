@@ -43,7 +43,7 @@ class TestGroup(DefaultGroup):
         [cyan]sparrow test -k test_incomplete_import_excluded[/cyan]
     > Only PyChron tests:
         [cyan]sparrow test --quick -k pychron[/cyan]
-    > Run previously failed tests first:
+    > Run previously failed tests first, and stop on failure:
         [cyan]sparrow test --ff -x[/cyan]
 
     [bold]Other subcommands[/bold]:
@@ -183,8 +183,6 @@ def sparrow_test_main(
     # if container_is_running("backend") and not standalone:
     #     res = compose("exec backend", "/bin/run-tests", *args, flag)
     # else:
-    if quick:
-        pytest_args.append(" --keep-database")
 
     res = compose("run --rm --service-ports backend", "pytest", "/app", *pytest_args)
     # if "--keep-database" not in args:
