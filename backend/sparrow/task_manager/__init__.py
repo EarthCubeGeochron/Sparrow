@@ -30,10 +30,12 @@ class SparrowTaskError(Exception):
 @requires("admin")
 async def tasks(request):
     mgr = get_plugin("task-manager")
-    return APIResponse([{"name": k, "description": v} for k, v in mgr._tasks.items()])
+    return APIResponse(
+        [{"name": k, "description": v.__doc__.strip()} for k, v in mgr._tasks.items()]
+    )
 
 
-TasksAPI = Router([Route("/", endpoint=tasks, methods=["GET", "POST"])])
+TasksAPI = Router([Route("/", endpoint=tasks, methods=["GET"])])
 
 _tasks_to_register = {}
 
