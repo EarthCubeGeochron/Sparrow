@@ -16,7 +16,7 @@ from sparrow.plugins import SparrowCorePlugin
 from sparrow.context import get_plugin
 from sparrow.settings import TASK_BROKER
 import typer
-from .task_api import TasksAPI
+from .task_api import build_tasks_api
 from time import sleep
 import redis
 import sys
@@ -91,7 +91,7 @@ class SparrowTaskManager(SparrowCorePlugin):
 
     def on_api_initialized_v2(self, api):
         self.broadcast = Broadcast(TASK_BROKER)
-        api.mount("/tasks", TasksAPI, name="tasks")
+        api.mount("/tasks", build_tasks_api(self), name="tasks")
 
 
 class RedisFileObject(object):

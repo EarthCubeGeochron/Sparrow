@@ -8,6 +8,7 @@ from sparrow.context import get_plugin
 from starlette.endpoints import WebSocketEndpoint
 from starlette.routing import Route, WebSocketRoute
 from sparrow_utils import get_logger
+from starlette.applications import Starlette
 
 log = get_logger(__name__)
 
@@ -15,6 +16,8 @@ log = get_logger(__name__)
 class TaskEndpoint(WebSocketEndpoint):
     counter = 0
     encoding = "json"
+    _running_task = None
+    _listener = None
 
     def start_task(self, name: str):
         log.debug("Starting task " + name)
@@ -27,10 +30,10 @@ class TaskEndpoint(WebSocketEndpoint):
         kwargs = {}
         if name == "location-names":
             kwargs = dict(overwrite=True)
-        res = task.delay(**kwargs)
-        log.debug(res)
-        log.debug(f"Started task with id {res.id}")
-        return res
+        self._running_task = task.delay(**kwargs)
+        log.debug(self._running_task)
+        log.debug(f"Started task with id {self._running_task.id}")
+        return self._running_task
 
     async def on_receive(self, session, message):
 
@@ -43,21 +46,25 @@ class TaskEndpoint(WebSocketEndpoint):
                 self.start_task(task_name)
             except Exception as exc:
                 await session.send_json({"text": str(exc)})
-        if action == "stop":
-            pass
+        if action == "stop" and self._running_task is not None:
+            # print("Stopping importer")
+            self._running_task.revoke(terminate=True)
         await session.send_json(message)
         log.debug(f"Sent message {message}")
 
     async def on_disconnect(self, session):
-        pass
-        # importer = self.get_importer(session)
-        # if importer._task is not None:
-        #     importer._task.cancel()
+        if self._listener is not None:
+            self._listener.cancel()
 
     async def on_connect(self, session):
         await session.accept()
         await session.send_json({"text": "Bienvenue sur le websocket!"})
-        create_task(self.listen(session))
+        await self.start_listener(session)
+
+    async def start_listener(self, session):
+        if self._listener is not None:
+            self._listener.cancel()
+        self._listener = create_task(self.listen(session))
 
     async def listen(self, session):
         plugin = get_plugin("task-manager")
@@ -68,7 +75,8 @@ class TaskEndpoint(WebSocketEndpoint):
                 await session.send_json(
                     {"text": f"Trying to connect to channel {channel_name}"}
                 )
-                await plugin.broadcast.connect()
+                if not hasattr(plugin.broadcast._backend, "_subscriber"):
+                    await plugin.broadcast.connect()
                 try:
                     async with plugin.broadcast.subscribe(
                         channel=channel_name
@@ -81,6 +89,7 @@ class TaskEndpoint(WebSocketEndpoint):
                         await session.send_json({"text": f"Closing subscription"})
                 except Exception as exc:
                     await session.send_json({"text": str(exc)})
+            await session.send_json({"text": f"Trying to reconnect"})
             await sleep(1)
 
     async def send_periodically(self, session):
@@ -101,9 +110,12 @@ async def tasks(request):
     )
 
 
-TasksAPI = Router(
-    [
-        Route("/", endpoint=tasks, methods=["GET"]),
-        WebSocketRoute("/{task}", TaskEndpoint, name="task_manager_api"),
-    ]
-)
+def build_tasks_api(manager):
+    return Starlette(
+        routes=[
+            Route("/", endpoint=tasks, methods=["GET"]),
+            WebSocketRoute("/{task}", TaskEndpoint, name="task_manager_api"),
+        ],
+        on_startup=[manager.broadcast.connect],
+        on_shutdown=[manager.broadcast.disconnect],
+    )
