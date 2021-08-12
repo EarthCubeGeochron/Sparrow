@@ -34,7 +34,7 @@ class SparrowTaskManager(SparrowCorePlugin):
 
     _cli_app = typer.Typer()
     _task_commands = []
-    _tasks = {}
+    _celery_tasks = {}
 
     def __init__(self, app):
         self.celery = Celery("tasks", broker=TASK_BROKER)
@@ -58,8 +58,8 @@ class SparrowTaskManager(SparrowCorePlugin):
 
         self._cli_app.command(name=name)(func)
         if not cli_only:
-            self.celery.task(*args, **kwargs)(func)
-            self._tasks[name] = func
+            task = self.celery.task(*args, **kwargs)(func)
+            self._celery_tasks[name] = task
 
         self._task_commands.append(name)
         log.debug(f"Registering task {name}")
@@ -68,7 +68,7 @@ class SparrowTaskManager(SparrowCorePlugin):
         return func
 
     def get_task(self, name):
-        return self._tasks[name]
+        return self._celery_tasks[name]
 
     def on_plugins_initialized(self):
         global _tasks_to_register

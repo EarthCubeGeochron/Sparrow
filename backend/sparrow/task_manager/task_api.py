@@ -87,7 +87,10 @@ class TaskEndpoint(WebSocketEndpoint):
 async def tasks(request):
     mgr = get_plugin("task-manager")
     return APIResponse(
-        [{"name": k, "description": v.__doc__.strip()} for k, v in mgr._tasks.items()]
+        [
+            {"name": k, "description": v.__doc__.strip()}
+            for k, v in mgr._celery_tasks.items()
+        ]
     )
 
 
