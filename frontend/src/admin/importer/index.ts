@@ -1,6 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useRef, useMemo, useEffect, useState } from "react";
-import { useAPIHelpers } from "@macrostrat/ui-components";
+import { ControlledSlider, useAPIHelpers } from "@macrostrat/ui-components";
 import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { MinimalNavbar } from "~/components";
@@ -17,10 +17,12 @@ const statusOptions = {
   [ReadyState.UNINSTANTIATED]: "Uninstantiated",
 };
 
-function ImporterMain({ pipeline }) {
+function ImporterMain({ task }) {
+  if (task == null) return null;
+
   const helpers = useAPIHelpers(APIV2Context);
   //const url = helpers.buildURL("/import-tracker");
-  const url = `ws://localhost:5002/api/v2/import-tracker/pipeline/${pipeline}`;
+  const url = `ws://localhost:5002/api/v2/tasks/${task}`;
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(url, {
     shouldReconnect: (closeEvent) => true,
@@ -56,7 +58,7 @@ function ImporterMain({ pipeline }) {
 
   return h("div.importer-main", [
     h(MinimalNavbar, { className: "navbar" }, [
-      h("h3", pipeline),
+      h("h3", task),
       h(ButtonGroup, { minimal: true }, [
         h(
           Button,
@@ -87,22 +89,34 @@ function ImporterMain({ pipeline }) {
   ]);
 }
 
-function PipelinesList() {
-  const pipelines: any[] | null = useAPIv2Result("/import-tracker/pipelines");
-
+function TaskList({ tasks, selectedTask, onSelect }) {
   return h("div.pipelines-list", [
     h("h3", "Pipelines"),
     h(
       Menu,
-      (pipelines ?? []).map((d) => h(MenuItem, { text: d }))
+      (tasks ?? []).map((d) =>
+        h(MenuItem, {
+          text: d.name,
+          active: selectedTask == d,
+          onClick() {
+            onSelect(d);
+          },
+        })
+      )
     ),
   ]);
 }
 
 function ImporterPage() {
+  const tasks: any[] = useAPIv2Result("/tasks/")?.data ?? [];
+  const [task, setTask] = useState(null);
   return h("div.importer-page", [
-    h("div.left-column", null, h(PipelinesList)),
-    h(ImporterMain, { pipeline: "laserchron-data" }),
+    h(
+      "div.left-column",
+      null,
+      h(TaskList, { tasks, selectedTask: task, onSelect: setTask })
+    ),
+    h(ImporterMain, { task: task?.name }),
   ]);
 }
 
