@@ -13,12 +13,10 @@ Tasks have
 from celery import Task, Celery
 from sparrow.logs import get_logger
 from sparrow.plugins import SparrowCorePlugin
-from sparrow.api import APIResponse
 from sparrow.context import get_plugin
 from sparrow.settings import TASK_BROKER
 import typer
-from starlette.routing import Route, Router
-from starlette.authentication import requires
+from .task_api import TasksAPI
 
 log = get_logger(__name__)
 
@@ -26,16 +24,6 @@ log = get_logger(__name__)
 class SparrowTaskError(Exception):
     ...
 
-
-@requires("admin")
-async def tasks(request):
-    mgr = get_plugin("task-manager")
-    return APIResponse(
-        [{"name": k, "description": v.__doc__.strip()} for k, v in mgr._tasks.items()]
-    )
-
-
-TasksAPI = Router([Route("/", endpoint=tasks, methods=["GET"])])
 
 _tasks_to_register = {}
 

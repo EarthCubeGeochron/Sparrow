@@ -24,4 +24,5 @@ class TestSparrowTaskManager:
         res = admin_client.get("/api/v2/tasks/")
         assert res.status_code == 200
         data = res.json()["data"]
-        assert False
+        task_names = [t["name"] for t in data]
+        assert "hello" in task_names
