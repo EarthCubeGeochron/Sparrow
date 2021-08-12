@@ -53,6 +53,7 @@ class LocationNamesPlugin(SparrowPlugin):
         if not overwrite:
             q = q.filter(s.location_name == None)
 
+        i = 0
         for (s, json_string) in q:
             # Get point coordinate
             coord = loads(json_string)["coordinates"]
@@ -63,6 +64,8 @@ class LocationNamesPlugin(SparrowPlugin):
             db.session.add(s)
             db.session.commit()
             print(name)
+            i += 1
+        print(f"{i} locations updated")
 
 
 @sparrow_task(name="location-names")

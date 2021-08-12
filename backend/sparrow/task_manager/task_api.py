@@ -24,7 +24,10 @@ class TaskEndpoint(WebSocketEndpoint):
         availability = i.ping()
         log.debug(availability)
         assert availability is not None
-        res = task.delay()
+        kwargs = {}
+        if name == "location-names":
+            kwargs = dict(overwrite=True)
+        res = task.delay(**kwargs)
         log.debug(res)
         log.debug(f"Started task with id {res.id}")
         return res
@@ -61,19 +64,23 @@ class TaskEndpoint(WebSocketEndpoint):
         name = session.path_params["task"]
         channel_name = "sparrow:task:" + name
         while True:
-            await session.send_json(
-                {"text": f"Trying to connect to channel {channel_name}"}
-            )
-            await plugin.broadcast.connect()
-            try:
-                async with plugin.broadcast.subscribe(
-                    channel=channel_name
-                ) as subscriber:
-                    async for event in subscriber:
-                        await session.send_json(loads(event.message))
-                    await session.send_json({"text": f"Closing subscription"})
-            except Exception as exc:
-                await session.send_json({"text": str(exc)})
+            if plugin.broadcast is not None:
+                await session.send_json(
+                    {"text": f"Trying to connect to channel {channel_name}"}
+                )
+                await plugin.broadcast.connect()
+                try:
+                    async with plugin.broadcast.subscribe(
+                        channel=channel_name
+                    ) as subscriber:
+                        await session.send_json(
+                            {"text": f"Subscribed to channel {channel_name}"}
+                        )
+                        async for event in subscriber:
+                            await session.send_json(loads(event.message))
+                        await session.send_json({"text": f"Closing subscription"})
+                except Exception as exc:
+                    await session.send_json({"text": str(exc)})
             await sleep(1)
 
     async def send_periodically(self, session):

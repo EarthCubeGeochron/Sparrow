@@ -17,6 +17,11 @@ from sparrow.context import get_plugin
 from sparrow.settings import TASK_BROKER
 import typer
 from .task_api import TasksAPI
+from time import sleep
+import redis
+import sys
+from json import dumps
+from broadcaster import Broadcast
 
 log = get_logger(__name__)
 
@@ -31,6 +36,7 @@ _tasks_to_register = {}
 class SparrowTaskManager(SparrowCorePlugin):
     name = "task-manager"
     celery: Celery
+    broadcast = None
 
     _cli_app = typer.Typer()
     _task_commands = []
@@ -84,14 +90,44 @@ class SparrowTaskManager(SparrowCorePlugin):
         cli.add_command(typer_click_object, "tasks")
 
     def on_api_initialized_v2(self, api):
+        self.broadcast = Broadcast(TASK_BROKER)
         api.mount("/tasks", TasksAPI, name="tasks")
+
+
+class RedisFileObject(object):
+    def __init__(self, connection, _key):
+        self.key = _key
+        self.connection = connection
+
+    def write(self, data):
+        self.connection.publish(self.key, dumps({"text": str(data)}))
+
+    def flush(self):
+        self.write("")
+
+    def close(self):
+        pass
+
+
+queue = redis.StrictRedis(host="broker", port=6379, db=0)
+# channel = queue.pubsub()
 
 
 class SparrowTask(Task):
     def __call__(self, *args, **kwargs):
         """In a celery task this function calls the run method, here you can
         set some environment variable before the run of the task"""
-        return self.run(*args, **kwargs)
+        _old_stdout = sys.stdout
+        try:
+            sys.stdout = RedisFileObject(queue, "sparrow:task:" + self.name)
+            queue.publish("sparrow:task:" + self.name, dumps({"text": "Starting task"}))
+            return self.run(*args, **kwargs)
+        except Exception as exc:
+            queue.publish("sparrow:task:" + self.name, dumps({"text": str(exc)}))
+            raise exc
+        finally:
+            sys.stdout = _old_stdout
+            queue.publish("sparrow:task:" + self.name, dumps({"text": "Task finished"}))
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         # exit point of the task whatever is the state
@@ -119,3 +155,13 @@ def sparrow_task(*args, **kwargs):
         return _run_task
 
     return wrapper
+
+
+@sparrow_task(name="test-task")
+def update_location_names(overwrite: bool = False):
+    """
+    Test the tasks interface
+    """
+    for i in range(10):
+        print(i)
+        sleep(1)
