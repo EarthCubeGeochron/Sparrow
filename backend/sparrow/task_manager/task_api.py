@@ -18,44 +18,34 @@ log = get_logger(__name__)
 class TaskEndpoint(WebSocketEndpoint):
     counter = 0
     encoding = "json"
-    is_running = False
-    task = None
 
-    def get_importer(self, session):
-        name = session.path_params["pipeline"]
-        plugin = get_plugin("import-tracker")
-        return plugin.pipelines[name]
-
-    def get_loop(self):
-        plugin = get_plugin("import-tracker")
-        return plugin.loop
+    def start_task(self, name: str):
+        log.debug("Starting task " + name)
+        mgr = get_plugin("task-manager")
+        task = mgr.get_task(name)
+        i = mgr.celery.control.inspect()
+        availability = i.ping()
+        log.debug(availability)
+        assert availability is not None
+        res = task.delay()
+        log.debug(f"Started task with id {res.id}")
+        return res
 
     async def on_receive(self, session, message):
 
-        log.debug(f"Received message {message}")
         action = message.get("action", None)
-        name = session.path_params["pipeline"]
+        task_name = session.path_params["task"]
+        log.debug(f"Received message {message} for task {task_name}")
 
         if action == "start":
             try:
-
-                def on_message(body):
-                    log.info("Message: " + body)
-                    create_task(session.send_json({"text": body}))
-
-                log.info("Starting task")
-                task = import_task.delay(name)
-                # task.get(on_message=on_message, propagate=False)
-                self.task = task
-
-                # print(task.id)
-                message["task_id"] = task.id
+                self.start_task(task_name)
             except Exception as exc:
                 await session.send_json({"text": str(exc)})
-        if action == "stop" and self.task is not None:
-            # print("Stopping importer")
-            self.task.revoke(terminate=True)
+        if action == "stop":
+            pass
         await session.send_json(message)
+        log.debug(f"Sent message {message}")
 
     async def on_disconnect(self, session):
         pass
@@ -66,30 +56,20 @@ class TaskEndpoint(WebSocketEndpoint):
     async def on_connect(self, session):
         await session.accept()
         await session.send_json({"text": "Bienvenue sur le websocket!"})
-
-        # await run_until_first_complete(
-        #     (self.listen, {"session": session}),
-        #     (self.send_periodically, {"session": session}),
-        # )
-
-        # importer = self.get_importer(session)
-        # importer.websocket = session
-        # self.task = create_task()
-
         create_task(self.listen(session))
-        # self.send_periodically(session)
-        # loop = get_event_loop()
-        # counter = create_task(self.send_periodically(session))
 
     async def listen(self, session):
         plugin = get_plugin("task-manager")
         name = session.path_params["task"]
+        channel_name = "sparrow:task:" + name
         while True:
-            await session.send_json({"text": f"Trying to connect"})
+            await session.send_json(
+                {"text": f"Trying to connect to channel {channel_name}"}
+            )
             await plugin.broadcast.connect()
             try:
                 async with plugin.broadcast.subscribe(
-                    channel="sparrow:task:" + name
+                    channel=channel_name
                 ) as subscriber:
                     async for event in subscriber:
                         await session.send_json(loads(event.message))

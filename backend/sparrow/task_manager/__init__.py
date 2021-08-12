@@ -38,6 +38,14 @@ class SparrowTaskManager(SparrowCorePlugin):
 
     def __init__(self, app):
         self.celery = Celery("tasks", broker=TASK_BROKER)
+
+        self.celery.conf["broker_transport_options"] = {
+            "max_retries": 3,
+            "interval_start": 0,
+            "interval_step": 0.2,
+            "interval_max": 0.5,
+        }
+
         super().__init__(app)
 
     def register_task(self, func, *args, **kwargs):
@@ -51,12 +59,12 @@ class SparrowTaskManager(SparrowCorePlugin):
         self._cli_app.command(name=name)(func)
         if not cli_only:
             self.celery.task(*args, **kwargs)(func)
+            self._tasks[name] = func
 
         self._task_commands.append(name)
         log.debug(f"Registering task {name}")
 
         func._is_sparrow_task = True
-        self._tasks[name] = func
         return func
 
     def get_task(self, name):
