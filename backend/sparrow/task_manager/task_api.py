@@ -6,11 +6,8 @@ from asyncio import sleep, create_task
 from json import loads
 from sparrow.context import get_plugin
 from starlette.endpoints import WebSocketEndpoint
-from sparrow_worker import import_task
 from starlette.routing import Route, WebSocketRoute
 from sparrow_utils import get_logger
-
-started = False
 
 log = get_logger(__name__)
 
@@ -28,6 +25,7 @@ class TaskEndpoint(WebSocketEndpoint):
         log.debug(availability)
         assert availability is not None
         res = task.delay()
+        log.debug(res)
         log.debug(f"Started task with id {res.id}")
         return res
 

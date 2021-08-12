@@ -8,6 +8,10 @@ x-backend:
       - sparrowdata/backend:${SPARROW_BACKEND_VERSION:-latest}
     target: main
   command: /bin/run
+  # We need a liberal restart policy even in development, unfortunately,
+  # because the server dies on out-of-memory errors in some configurations.
+  # We should really attempt to avoid this, but having the policy is good I think.
+  restart: unless-stopped
   # Make sure we get colorized terminal output
   tty: true
   depends_on:
@@ -189,7 +193,7 @@ services:
     <<: *x-backend
     depends_on:
       - broker
-    command: celery --app=sparrow_worker worker --loglevel=info
+    command: celery -A sparrow_worker worker -E
 volumes:
   frontend_build:
   # Anonymous volume to preserve `sparrow shell` history
