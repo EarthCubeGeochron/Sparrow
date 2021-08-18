@@ -113,7 +113,7 @@ function ForeverScroll({
 
       {moreToLoad && (
         //@ts-ignore
-        <div ref={setBottom} style={{ marginTop: "50px" }}>
+        <div ref={setBottom} style={{ marginTop: "50px", height: "500px" }}>
           <Spinner />
         </div>
       )}
