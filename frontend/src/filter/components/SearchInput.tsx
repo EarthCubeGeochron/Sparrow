@@ -6,10 +6,14 @@ export function SearchInput(props) {
   const { rightElement, updateParams, leftElement, text } = props;
 
   const handleChange = (e) => {
-    updateParams("like", e.target.value);
+    updateParams("search", e.target.value);
   };
 
-  return h("form", [
+  const onSubmit = (e) => {
+    e.preventDefault();
+  };
+
+  return h("form", { onSubmit }, [
     h(InputGroup, {
       leftElement,
       placeholder: "Search for anything...",
