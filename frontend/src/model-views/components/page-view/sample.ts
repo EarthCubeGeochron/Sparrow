@@ -13,7 +13,7 @@ export const SampleAdd = (props) => {
   const {
     onClickDelete = () => {},
     onClickList = () => {},
-    data,
+    data = [],
     draggable = true,
     setID = () => {},
     isEditing = false,

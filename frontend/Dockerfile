@@ -1,6 +1,7 @@
 FROM node:14 AS base
 
-RUN npm install -g npm@7 webpack webpack-cli lerna
+# Yarn is already installed
+RUN npm install -g webpack webpack-cli
 WORKDIR /app
 
 CMD npm run dev
@@ -11,6 +12,6 @@ FROM base AS frontend
 COPY packages/schema-linker/package.json /app/packages/schema-linker/
 COPY packages/sheet/package.json /app/packages/sheet/
 COPY package.json lerna.json .npmrc /app/
-RUN lerna bootstrap --hoist
+RUN yarn install
 COPY ./ /app/
 CMD webpack

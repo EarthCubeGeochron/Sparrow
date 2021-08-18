@@ -103,18 +103,8 @@ function SessionListComponent({ params, componentProps = {} }) {
 
 function unwrapDataFileCardData(data) {
   const dataObj = data.data.map((obj) => {
-    if (obj.data_file_link.length > 0) {
-      const {
-        basename,
-        file_hash,
-        type,
-        data_file_link: [{ date }],
-        data_file_link,
-      } = obj;
-      return { basename, file_hash, type, date, data_file_link };
-    }
-    const { basename, file_hash, type } = obj;
-    return { basename, file_hash, type };
+    const { basename, file_hash, type, file_mtime: date } = obj;
+    return { basename, file_hash, type, date };
   });
   return dataObj;
 }
@@ -122,12 +112,9 @@ function unwrapDataFileCardData(data) {
 function DataFilesListComponent({ params }) {
   return h("div", { style: { padding: "1px" } }, [
     h(InfiniteAPIView, {
-      url: "/models/data_file",
+      url: "/data_file/list",
       unwrapData: unwrapDataFileCardData,
-      params: {
-        nest: "data_file_link,sample,session",
-        has: "data_file_link",
-      },
+      params: {},
       filterParams: { ...params },
       component: DataFileModelCard,
       context: APIV2Context,
