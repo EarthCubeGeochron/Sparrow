@@ -62,16 +62,8 @@ function SampleListComponent({ params }) {
 
 function unwrapSessionCardData(data) {
   const dataObj = data.data.map((obj) => {
-    const {
-      id,
-      technique,
-      target,
-      date,
-      instrument,
-      data,
-      analysis,
-      sample,
-    } = obj;
+    const { id, technique, target, date, instrument, data, analysis, sample } =
+      obj;
     return {
       id,
       technique,
