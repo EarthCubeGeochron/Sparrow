@@ -86,8 +86,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
 
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def query(cls, session):
         """A helper that allows query objects to be constructed:
