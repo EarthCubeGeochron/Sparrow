@@ -63,6 +63,9 @@ allowed_collections = {
     "datum_type": ["parameter", "unit", "error_unit", "error_metric"],
 }
 
+# This field exclusion only makes sense for LaserChron right now
+exclude_fields = {"data_file": ["csv_data"]}
+
 
 def allow_nest(outer, inner):
     if outer == inner:
@@ -133,19 +136,24 @@ class SparrowConverter(ModelConverter):
         if exclude and prop.key in fields:
             return True
 
+        # Get the name of this table
+        this_table = prop.parent.tables[0]
+
+        # Exclude fields referenced in our `exclude_fields` dict
+        if prop.key in exclude_fields.get(this_table.name, []):
+            return True
+
         if not isinstance(prop, RelationshipProperty):
             return False
 
         # ## Deal with relationships here #
-
+        other_table = prop.target
         # if prop.target.name == "data_file_link":
         #     # Data files are currently exclusively dealt with internally...
         #     # (this may change)
         #     return True
 
         # # Exclude field based on table name
-        this_table = prop.parent.tables[0]
-        other_table = prop.target
 
         if other_table == this_table and prop.uselist:
             # Don't allow self-referential collections
