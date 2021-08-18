@@ -47,7 +47,7 @@ class TaskEndpoint(WebSocketEndpoint):
             except Exception as exc:
                 await session.send_json({"text": str(exc)})
         if action == "stop" and self._running_task is not None:
-            # print("Stopping importer")
+            log.debug(f"Stopping task with id {self._running_task.id}")
             self._running_task.revoke(terminate=True)
         await session.send_json(message)
         log.debug(f"Sent message {message}")

@@ -39,7 +39,6 @@ function ImporterMain({ task }) {
         message = JSON.parse(lastMessage.data);
       } catch (error) {}
     }
-    console.log(message);
     if (message?.action == "start") {
       setIsRunning(true);
       return [];
@@ -48,7 +47,7 @@ function ImporterMain({ task }) {
     }
     const text = message?.text;
     if (text != null) {
-      if (messageHistory.current?.length > 500) {
+      if (messageHistory.current?.length > 100) {
         messageHistory.current?.pop();
       }
       messageHistory.current?.unshift(message);
@@ -66,7 +65,6 @@ function ImporterMain({ task }) {
             rightIcon: isRunning ? "stop" : "play",
             disabled: readyState != ReadyState.OPEN,
             onClick() {
-              console.log("Sending message");
               sendMessage(
                 JSON.stringify({ action: isRunning ? "stop" : "start" })
               );
@@ -80,10 +78,14 @@ function ImporterMain({ task }) {
     h(
       "div.message-history",
       messageHistory.current?.map((d) => {
-        if (d == null) return null;
+        //if (d == null || i < messageHistory.current?.length - 500) return null;
         let color = d.fg ?? "black";
         let opacity = d.dim ?? false ? 0.5 : 1;
-        return h("div.message", { style: { color, opacity } }, d.text);
+        return h(
+          "div.message",
+          { key: d.time, style: { color, opacity } },
+          d.text
+        );
       })
     ),
   ]);

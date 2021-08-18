@@ -21,6 +21,7 @@ from time import sleep
 import redis
 import sys
 from json import dumps
+from time import time
 from broadcaster import Broadcast
 
 log = get_logger(__name__)
@@ -94,16 +95,24 @@ class SparrowTaskManager(SparrowCorePlugin):
         api.mount("/tasks", build_tasks_api(self), name="tasks")
 
 
+def create_message(**kwargs):
+    return dumps(dict(time=time(), **kwargs))
+
+
 class RedisFileObject(object):
-    def __init__(self, connection, _key):
+    def __init__(self, connection, _key, type="stdout"):
         self.key = _key
+        self.type = type
         self.connection = connection
 
     def write(self, data):
-        self.connection.publish(self.key, dumps({"text": str(data)}))
+        self.send_message(data)
+
+    def send_message(self, data):
+        self.connection.publish(self.key, create_message(text=data, type=self.type))
 
     def flush(self):
-        self.write("")
+        pass
 
     def close(self):
         pass
@@ -118,16 +127,31 @@ class SparrowTask(Task):
         """In a celery task this function calls the run method, here you can
         set some environment variable before the run of the task"""
         _old_stdout = sys.stdout
+        _old_stderr = sys.stderr
         try:
-            sys.stdout = RedisFileObject(queue, "sparrow:task:" + self.name)
-            queue.publish("sparrow:task:" + self.name, dumps({"text": "Starting task"}))
+            sys.stdout = RedisFileObject(
+                queue, "sparrow:task:" + self.name, type="stdout"
+            )
+            sys.stderr = RedisFileObject(
+                queue, "sparrow:task:" + self.name, type="stdout"
+            )
+            queue.publish(
+                "sparrow:task:" + self.name, create_message(text="Starting task")
+            )
             return self.run(*args, **kwargs)
         except Exception as exc:
-            queue.publish("sparrow:task:" + self.name, dumps({"text": str(exc)}))
+            queue.publish(
+                "sparrow:task:" + self.name,
+                create_message(text=str(exc), type="control"),
+            )
             raise exc
         finally:
             sys.stdout = _old_stdout
-            queue.publish("sparrow:task:" + self.name, dumps({"text": "Task finished"}))
+            sys.stderr = _old_stderr
+            queue.publish(
+                "sparrow:task:" + self.name,
+                create_message(text="Task finished", type="control"),
+            )
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         # exit point of the task whatever is the state
@@ -158,7 +182,7 @@ def sparrow_task(*args, **kwargs):
 
 
 @sparrow_task(name="test-task")
-def update_location_names(overwrite: bool = False):
+def test_task(overwrite: bool = False):
     """
     Test the tasks interface
     """
