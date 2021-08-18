@@ -371,7 +371,7 @@ const SessionModelLinkCard = (props) => {
 };
 
 const DataFileModelCard = (props) => {
-  const { file_hash, basename, type, date, data_file_link: link } = props;
+  const { file_hash, basename, type, date } = props;
 
   const content = h("div.session-card", [
     h("div.card-header", [h(PageViewDate, { date })]),
@@ -382,7 +382,7 @@ const DataFileModelCard = (props) => {
     Frame,
     {
       id: "datafileCardContent",
-      data: { file_hash, basename, type, date, link },
+      data: { file_hash, basename, type, date },
     },
     content
   );

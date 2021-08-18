@@ -11,7 +11,7 @@ import styles from "./module.styl";
 const h = hyperStyled(styles);
 
 export function DataFilesList(props) {
-  const res = useAPIv2Result("/models/data_file", { per_page: 100 });
+  const res = useAPIv2Result("/data_file/list", { per_page: 100 });
 
   const data = res?.data ?? [];
   if (!data || data.length <= 0) return h(Spinner);
