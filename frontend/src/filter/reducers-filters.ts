@@ -32,10 +32,10 @@ export function reducer(state, action) {
         ...state,
         geometry: action.payload.geometry,
       };
-    case "like":
+    case "search":
       return {
         ...state,
-        like: action.payload.like,
+        search: action.payload.search,
       };
     case "removeSingle":
       let param = action.payload.field;

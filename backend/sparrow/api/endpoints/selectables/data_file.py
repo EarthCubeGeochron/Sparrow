@@ -1,13 +1,23 @@
-from os import RTLD_NOW, error
 from starlette.endpoints import HTTPEndpoint
 from webargs_starlette import parser
-from sqlakeyset import select_page
+from sqlakeyset import get_page
 from starlette.responses import JSONResponse
 from webargs.fields import Str, Int, Boolean, DelimitedList
-from sqlalchemy.sql import text, select
 from sparrow.context import get_database
-from ...exceptions import ValidationError
+from ...exceptions import ValidationError, ApplicationError
 from ...response import APIResponse
+from ...filters import (
+    BaseFilter,
+    AuthorityFilter,
+    FieldExistsFilter,
+    FieldNotExistsFilter,
+    EmbargoFilter,
+    DateFilter,
+    TextSearchFilter,
+    AgeRangeFilter,
+    IdListFilter,
+    TagsFilter,
+)
 
 
 class DataFileListEndpoint(HTTPEndpoint):
@@ -21,7 +31,29 @@ class DataFileListEndpoint(HTTPEndpoint):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.schema = get_database().interface.data_file(many=True)
+        self.schema = get_database().interface.data_file
+        self.model = get_database().model.data_file
+
+        self._filters = []
+        self.register_filter(AuthorityFilter)
+        self.register_filter(FieldExistsFilter)
+        self.register_filter(FieldNotExistsFilter)
+        self.register_filter(EmbargoFilter)
+        self.register_filter(DateFilter)
+        self.register_filter(TextSearchFilter)
+        self.register_filter(AgeRangeFilter)
+        self.register_filter(IdListFilter)
+        self.register_filter(TagsFilter)
+
+    def register_filter(self, _filter: BaseFilter):
+        """Register a filter specification to control parametrization of the
+        model query"""
+        f = _filter(self.model, schema=self.schema)
+        if not f.should_apply():
+            return
+        if params := getattr(f, "params"):
+            self.args_schema.update(**params)
+        self._filters.append(f)
 
     async def get(self, request):
         """Handler for all GET requests"""
@@ -39,27 +71,34 @@ class DataFileListEndpoint(HTTPEndpoint):
         with db.session_scope(commit=False):
 
             try:
-                DataFile = db.model.data_file
-                sel = select(
-                    DataFile.file_hash, DataFile.file_mtime, DataFile.basename
+                DataFile = self.model
+
+                q = db.session.query(
+                    DataFile.file_hash,
+                    DataFile.file_mtime,
+                    DataFile.basename,
+                    DataFile.type_id,
                 ).order_by(DataFile.file_mtime)
-                q = db.session.query(sel.subquery())
 
                 if args["all"]:
                     res = q.all()
-                    return APIResponse(res, schema=self.schema, total_count=len(res))
+                    return APIResponse(
+                        res, schema=self.schema(many=True), total_count=len(res)
+                    )
+
+                for _filter in self._filters:
+                    q = _filter(q, args)
 
                 try:
-                    res = select_page(
-                        db.session, sel, per_page=args["per_page"], page=args["page"]
-                    )
+                    res = get_page(q, per_page=args["per_page"], page=args["page"])
+
                 except ValueError:
                     raise ValidationError("Invalid page token.")
 
                 # Note: we don't need to use a schema to serialize here. but it is nice if we have it
-                return APIResponse(res, schema=self.schema)
+                return APIResponse(res, schema=self.schema(many=True))
             except Exception as err:
-                return JSONResponse({"error": str(err)})
+                raise ApplicationError(str(err))
 
 
 class DataFileFilterByModelID(HTTPEndpoint):

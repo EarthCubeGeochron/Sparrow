@@ -321,7 +321,7 @@ class GeometryFilter(BaseFilter):
         sample = db.model.sample
         model_name = create_model_name_string(self.model)
 
-        if hasattr(self.model, "sample_collection"):
+        if hasattr(self.model, "sample_collection") and self.model != sample:
             return query.join(self.model.sample_collection).filter(
                 func.ST_GeomFromEWKT(WKT_query).ST_Contains(
                     func.ST_SetSRID(sample.location, 4326)

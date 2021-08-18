@@ -25,7 +25,7 @@ export function DataFilesMainPanel() {
 }
 
 export function DataFileAdminPage() {
-  const possibleFilters = ["public", "date_range"];
+  const possibleFilters = ["date_range"];
 
   const initialState = createParamsFromURL(possibleFilters);
 

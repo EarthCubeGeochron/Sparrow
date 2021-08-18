@@ -50,7 +50,7 @@ function ForeverScroll({
   component,
   fetch,
   moreAfter = null,
-  modelName = null,
+  modelName = "result",
   componentProps = {},
 }) {
   const initialState = {
@@ -120,7 +120,7 @@ function ForeverScroll({
 
       {!moreToLoad && (
         <div className="no-results">
-          Results completed, there are {data.length} {name}
+          Completed, there are {data.length} {name}
         </div>
       )}
     </div>
