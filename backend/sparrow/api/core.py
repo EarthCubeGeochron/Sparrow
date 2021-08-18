@@ -156,7 +156,9 @@ class APIv2(Starlette):
         self.add_meta_route()
         self.add_route("/data_file/list", DataFileListEndpoint)
         self.add_route("/data_file/filter", DataFileFilterByModelID)
-        self.add_route("/sub-sample/{id}", SubSamples, methods=["GET", "PUT"])
+        self.add_route(
+            "/models/sample/sub-sample/{id}", SubSamples, methods=["GET", "PUT"]
+        )
         self.add_route("/map-samples", MapSamples)
 
     def _add_model_route(self, iface):

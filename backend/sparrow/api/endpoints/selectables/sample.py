@@ -1,10 +1,7 @@
-from os import RTLD_NOW, error
 from starlette.endpoints import HTTPEndpoint
-from starlette.routing import Route, Router
-from webargs_starlette import parser
-from sqlakeyset import select_page
 from starlette.responses import JSONResponse
 from sparrow.context import get_database
+from ...exceptions import ApplicationError
 
 
 class SubSamples(HTTPEndpoint):
@@ -51,9 +48,9 @@ class SubSamples(HTTPEndpoint):
             try:
                 db.session.commit()
                 return JSONResponse({"id": id_, "member_of": member_id})
-            except:
+            except Exception as err:
                 db.session.rollback()
-                return JSONResponse({"error": "something went wrong"}, status_code=500)
+                raise ApplicationError(str(err))
 
 
 class MapSamples(HTTPEndpoint):
