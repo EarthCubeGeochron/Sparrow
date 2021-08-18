@@ -22,7 +22,6 @@ const Row = ({ data, index, style }) => {
 const LogWindow = ({ messages }) => {
   const ref = useRef<List>();
   useEffect(() => {
-    console.log("Scrolling to bottom");
     ref.current?.scrollToItem(messages.length - 1);
   }, [messages.length]);
   return h(
@@ -34,6 +33,7 @@ const LogWindow = ({ messages }) => {
       itemSize: 18,
       itemData: messages,
       width: 1200,
+      className: "message-history",
     },
     Row
   );
