@@ -21,7 +21,7 @@ import { VocabularyPage } from "./vocabulary";
 
 import { TagManager } from "~/components/tags";
 
-import SchemaExplorer from "~/schema-explorer";
+import { SchemaExplorerMainPanel } from "./schema-explorer";
 
 //@ts-ignore
 import styles from "./module.styl";
@@ -179,7 +179,7 @@ const AdminRouter = ({ base }) =>
     }),
     h(Route, {
       path: base + "/schema-explorer",
-      render: () => h(SchemaExplorer)
+      render: () => h(SchemaExplorerMainPanel)
     }),
     h(Route, {
       path: base + "/terms",

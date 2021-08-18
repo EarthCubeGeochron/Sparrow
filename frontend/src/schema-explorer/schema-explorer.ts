@@ -2,8 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Button, Collapse, Tab, Tabs, TextArea } from "@blueprintjs/core";
 import { SchemaExplorerContext } from "./context";
-import ReactJson from "react-json-view";
 import { MinimalNavbar } from "~/components";
+import { Link } from "react-router-dom";
 import { SchemaTree } from "./schema-tree";
 //@ts-ignore
 import styles from "./module.styl";
@@ -12,25 +12,20 @@ const h = hyperStyled(styles);
 
 function SchemaModelButtons() {
   const { state, runAction } = useContext(SchemaExplorerContext);
-
-  const onModelButtonClick = model => {
-    runAction({
-      type: "switch-model",
-      payload: { model }
-    });
-  };
+  let path = "/admin/schema-explorer/";
 
   return h("div.button-container", [
-    Object.keys(state.possibleModels).map((key, i) => {
+    state.modelsToShow.map((key, i) => {
       return h("div.model-button", { key: i }, [
-        h(
-          Button,
-          {
-            key: i,
-            onClick: () => onModelButtonClick(key)
-          },
-          [key]
-        )
+        h(Link, { to: path + key }, [
+          h(
+            Button,
+            {
+              key: i
+            },
+            [key]
+          )
+        ])
       ]);
     })
   ]);
@@ -38,7 +33,14 @@ function SchemaModelButtons() {
 
 function SchemaNavBar() {
   const { state } = useContext(SchemaExplorerContext);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(state.model == null);
+
+  useEffect(() => {
+    if (state.model != null) {
+      setOpen(false);
+    }
+  }, [state.model]);
+
   return h("div", [
     h(MinimalNavbar, [
       h("h2", "Schema Explorer"),
@@ -95,12 +97,18 @@ function SchemaTabs() {
   ]);
 }
 
-function SchemaExplorer() {
+function SchemaExplorer({ model }) {
   const { state, runAction } = useContext(SchemaExplorerContext);
+  console.log(state, model);
+  useEffect(() => {
+    if (state.possibleModels) {
+      runAction({ type: "switch-model", payload: { model } });
+    }
+  }, [state.possibleModels, model]);
 
   return h("div", [
     h(SchemaNavBar),
-    h("div.body", [h(SchemaTree), h(SchemaTabs)])
+    h.if(state.model != null)("div.body", [h(SchemaTree), h(SchemaTabs)])
   ]);
 }
 

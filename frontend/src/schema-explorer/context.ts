@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useReducer } from "react";
 //@ts-ignore
 import styles from "./module.styl";
 import { fetchFields, getPossibleModels } from "./fetch";
+import { useRouteMatch } from "react-router";
 
 const h = hyperStyled(styles);
 
@@ -27,10 +28,13 @@ type GetModelFields = {
   type: "get-model-fields";
   payload: { model_route: string };
 };
+type GetModelFromPath = {
+  type: "get-model-from-path";
+};
 
 ///////////////// union types ////////////////////////
 type SchemaActions = SwitchModel | PossibleModels | ModelFields;
-type AsyncSchemaActions = GetPossibleModels | GetModelFields;
+type AsyncSchemaActions = GetPossibleModels | GetModelFields | GetModelFromPath;
 
 /////////////////// Async Actions /////////////////////
 function useSchemaActions(dispatch) {
@@ -50,6 +54,8 @@ function useSchemaActions(dispatch) {
           type: "model-fields",
           payload: { fields }
         });
+      }
+      case "get-model-from-path": {
       }
       default:
         return dispatch(action);
@@ -96,13 +102,28 @@ interface schemaState {
   route: string;
   possibleModels: object;
   fields: object;
+  modelsToShow: string[];
 }
 
 const schemaExplorerDefaultState: schemaState = {
-  model: "sample",
-  route: "/models/sample",
+  model: null,
+  route: null,
   possibleModels: [],
-  fields: {}
+  fields: {},
+  modelsToShow: [
+    "project",
+    "sample",
+    "sample_geo_entity",
+    "geo_entity",
+    "analysis",
+    "datum",
+    "data_file",
+    "material",
+    "instrument",
+    "researcher",
+    "publication",
+    "tag"
+  ]
 };
 
 interface SchemaCtx {

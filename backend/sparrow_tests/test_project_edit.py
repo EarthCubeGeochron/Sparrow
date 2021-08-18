@@ -32,7 +32,14 @@ class TestProjectEdits:
 
         # Load data (replaces load_data_loop)
         for model, spec_list in self.data.items():
-            if model in ["og-project", "edit-project"]:
+            if model in [
+                "og-project",
+                "edit-project",
+                "geojson",
+                "wkt",
+                "schema-sample-wkt",
+                "schema-sample-geojson",
+            ]:
                 continue
             for spec in spec_list:
                 db.load_data(model, spec)
@@ -46,6 +53,33 @@ class TestProjectEdits:
         assert len(orig_sessions) == 2
 
         assert set([s.id for s in orig_sessions]) == set([1, 2])
+
+    def test_add_location(self, db):
+        """ geojson geometry must be passed """
+        sample = db.model.sample
+
+        sample_ = db.session.query(sample).first()
+
+        assert sample_.location is None
+
+        loc = self.data["wkt"]
+
+        sample_.location = loc
+        assert len(db.session.dirty) > 0
+
+        db.session.commit()
+
+        sample_2 = db.session.query(sample).get(sample_.id)
+
+        assert sample_2.location is not None
+
+        Sample = db.interface.sample()
+
+        sample_geojson = self.data["schema-sample-geojson"]
+
+        samp = Sample.load(sample_geojson)
+
+        assert samp.location is not None
 
     @mark.xfail(reason="Updating does not work at the moment")
     def test_project_updates(self, db):

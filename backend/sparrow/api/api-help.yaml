@@ -39,3 +39,5 @@ fields:
   boolean: "A true or false value describing the state of "
   integer: "A whole number ascribing value to "
   decimal: "A whole or decimal number ascribing value to "
+  geometry: "A vaild GeoJSON geometry "
+  related: "A unique ID number to link a "

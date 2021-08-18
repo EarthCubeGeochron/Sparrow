@@ -3,13 +3,19 @@
 /* the tree node's style */
 .tree-view 
   overflow-y hidden
-  max-width 50vw
-  margin-bottom 20px
+  min-width 400px
+  //margin-bottom 20px
 
 .tree-view_item 
   /* immediate child of .tree-view, for styling convenience */
   display flex
-  margin 10px
+  width 100%
+
+  :hover
+    background-color $light-gray4
+    cursor pointer
+  :active
+    background-color $light-gray2
 
 /* style for the children nodes container */
 .tree-view_children 
@@ -20,11 +26,23 @@
   height 0px
 
 .placeholder
-  width 30px
+  width 15px
+
+.node 
+  width 100%  
+  padding-top 1px
+  padding-bottom 4px
+  border-radius 6px
 
 .node-label
     display flex
     align-items baseline
+    width 100%
+    justify-content space-between
+
+.node-left, .node-right
+  display flex 
+  align-items baseline
 
 .read-only
   color $gray4
@@ -46,11 +64,12 @@
 
 .default
   color $violet4
+.required
+  color $red1
 
-.geom, .decimal, .integer, .boolean, .string, .read-only, .default
+.geom, .decimal, .integer, .boolean, .string, .read-only, .default, .required
   font-style italic
   font-size 15px
-  margin-left 5px
 
 .geom
   color $green3
@@ -70,6 +89,9 @@
   display flex
   white-space pre-wrap
   align-items baseline
-  width 80%
+  max-width 300px
   flex-wrap wrap
   font-style italic
+  margin-left 15px
+.des-items
+  margin-top 5px
