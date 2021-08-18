@@ -20,6 +20,7 @@ from .task_api import build_tasks_api
 from time import sleep
 import redis
 import sys
+import traceback
 from json import dumps
 from time import time
 from broadcaster import Broadcast
@@ -104,18 +105,27 @@ class RedisFileObject(object):
         self.key = _key
         self.type = type
         self.connection = connection
+        self._time = time()
+        self._buffer = ""
 
     def write(self, data):
-        self.send_message(data)
+        try:
+            self._buffer += data + "\n"
+        except TypeError:
+            self._buffer += str(data, "utf-8") + "\n"
+        if time() - self._time > 1:
+            self.send_message(self._buffer)
 
     def send_message(self, data):
         self.connection.publish(self.key, create_message(text=data, type=self.type))
+        self._buffer = ""
+        self._time = time()
 
     def flush(self):
         pass
 
     def close(self):
-        pass
+        self.send_message(self._buffer)
 
 
 queue = redis.StrictRedis(host="broker", port=6379, db=0)
@@ -140,9 +150,10 @@ class SparrowTask(Task):
             )
             return self.run(*args, **kwargs)
         except Exception as exc:
+            l1 = traceback.format_exception(*sys.exc_info())
             queue.publish(
                 "sparrow:task:" + self.name,
-                create_message(text=str(exc), type="control"),
+                create_message(text="".join(l1), type="control"),
             )
             raise exc
         finally:

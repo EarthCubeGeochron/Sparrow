@@ -6,8 +6,38 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import { MinimalNavbar } from "~/components";
 import { Button, ButtonGroup, Menu, MenuItem } from "@blueprintjs/core";
 import styles from "./module.styl";
-
+import { FixedSizeList as List } from "react-window";
 const h = hyperStyled(styles);
+
+const Row = ({ data, index, style }) => {
+  return h(
+    "div.message",
+    {
+      style: style,
+    },
+    data[index]
+  );
+};
+
+const LogWindow = ({ messages }) => {
+  const ref = useRef<List>();
+  useEffect(() => {
+    console.log("Scrolling to bottom");
+    ref.current?.scrollToItem(messages.length - 1);
+  }, [messages.length]);
+  return h(
+    List,
+    {
+      ref,
+      height: 600,
+      itemCount: messages.length,
+      itemSize: 18,
+      itemData: messages,
+      width: 1200,
+    },
+    Row
+  );
+};
 
 const statusOptions = {
   [ReadyState.CONNECTING]: "Connecting",
@@ -47,10 +77,8 @@ function ImporterMain({ task }) {
     }
     const text = message?.text;
     if (text != null) {
-      if (messageHistory.current?.length > 100) {
-        messageHistory.current?.pop();
-      }
-      messageHistory.current?.unshift(message);
+      const lines = text.split("\n").filter((line) => line.length > 0);
+      messageHistory.current?.push(...lines);
     }
     return messageHistory.current;
   }, [lastMessage]);
@@ -75,19 +103,7 @@ function ImporterMain({ task }) {
       ]),
       h("div.status", "WebSocket connection: " + connectionStatus),
     ]),
-    h(
-      "div.message-history",
-      messageHistory.current?.map((d) => {
-        //if (d == null || i < messageHistory.current?.length - 500) return null;
-        let color = d.fg ?? "black";
-        let opacity = d.dim ?? false ? 0.5 : 1;
-        return h(
-          "div.message",
-          { key: d.time, style: { color, opacity } },
-          d.text
-        );
-      })
-    ),
+    h(LogWindow, { messages: messageHistory.current }),
   ]);
 }
 

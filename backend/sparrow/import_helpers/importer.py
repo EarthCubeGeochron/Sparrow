@@ -178,9 +178,11 @@ class BaseImporter(ImperativeImportHelperMixin):
         """
         for rec in seq:
             if rec is None:
+                sleep(0.01)
                 continue
             self.log(str(rec.file_path), dim=True)
             self.__import_datafile(None, rec, **kwargs)
+            sleep(0.01)
             # else:
             #    self.__import_datafile(None, rec, **kwargs)
 
