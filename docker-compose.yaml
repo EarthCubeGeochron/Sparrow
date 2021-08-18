@@ -193,7 +193,7 @@ services:
     <<: *x-backend
     depends_on:
       - broker
-    command: celery -A sparrow_worker worker -E
+    command: /bin/run-worker
 volumes:
   frontend_build:
   # Anonymous volume to preserve `sparrow shell` history
