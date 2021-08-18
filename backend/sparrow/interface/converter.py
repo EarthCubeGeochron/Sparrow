@@ -147,13 +147,14 @@ class SparrowConverter(ModelConverter):
             return False
 
         # ## Deal with relationships here #
-        other_table = prop.target
+
         # if prop.target.name == "data_file_link":
         #     # Data files are currently exclusively dealt with internally...
         #     # (this may change)
         #     return True
 
         # # Exclude field based on table name
+        other_table = prop.target
 
         if other_table == this_table and prop.uselist:
             # Don't allow self-referential collections
