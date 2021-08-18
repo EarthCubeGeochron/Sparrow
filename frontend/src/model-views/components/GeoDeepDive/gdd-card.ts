@@ -21,15 +21,8 @@ const Snippet = function ({ html }) {
 };
 
 const SnippetResult = function (props) {
-  const {
-    title,
-    pubname,
-    publisher,
-    coverDate,
-    authors,
-    highlight,
-    URL,
-  } = props;
+  const { title, pubname, publisher, coverDate, authors, highlight, URL } =
+    props;
   return h(
     LinkCard,
     { href: URL, target: "_blank", className: "snippet-result" },

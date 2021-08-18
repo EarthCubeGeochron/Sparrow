@@ -37,14 +37,8 @@ const columnSpec: ColumnData[] = [
 
 function unwrapSampleData(sampleData) {
   /** Unwrap samples from API response to a flattened version */
-  const {
-    geometry,
-    project_id,
-    project_name,
-    publication_id,
-    doi,
-    ...rest
-  } = sampleData;
+  const { geometry, project_id, project_name, publication_id, doi, ...rest } =
+    sampleData;
   let longitude: number, latitude: number;
   if (geometry != null) {
     [longitude, latitude] = geometry?.coordinates;
