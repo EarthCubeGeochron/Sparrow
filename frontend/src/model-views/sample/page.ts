@@ -31,7 +31,7 @@ import {
   PageViewBlock,
   DataFilePage,
   SubSamplePageView,
-  PageViewLngLat
+  FormattedLngLat
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
@@ -106,7 +106,7 @@ const LocationBlock = function(props) {
         zoom
       })
     ]),
-    h(PageViewLngLat, { location }),
+    h(FormattedLngLat, { location }),
     h.if(location_name)("h5.location-name", location_name)
   ]);
 };

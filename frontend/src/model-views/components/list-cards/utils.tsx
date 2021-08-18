@@ -2,7 +2,7 @@ import { useState, useEffect, ReactNode } from "react";
 import { Frame } from "~/frame";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Link } from "react-router-dom";
-import { PageViewLngLat, pluralize } from "../new-model";
+import { FormattedLngLat, pluralize } from "../new-model";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
 import { PageViewDate, ProjectCardContent, Publication } from "~/model-views";
@@ -99,7 +99,7 @@ export const sampleContent = (props) => {
   return h("div.sample-content", [
     h("div.card-header", [
       h("div.bod", [sampleName]),
-      h(PageViewLngLat, { location }),
+      h(FormattedLngLat, { location }),
     ]),
     h("div.bod", [
       Material,

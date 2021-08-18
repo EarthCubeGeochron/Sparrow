@@ -5,7 +5,7 @@ import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
 import { useAPIv2Result } from "~/api-v2";
-import { PageViewLngLat } from "./page-view";
+import { FormattedLngLat } from "./page-view";
 
 const h = hyperStyled(styles);
 
@@ -167,7 +167,7 @@ export function SampleCard(props: SampleCardProps) {
     },
     [
       h("h4.name", name),
-      h(PageViewLngLat, { location }),
+      h(FormattedLngLat, { location }),
       h.if(material != null)("div.material", material),
       h(SessionContent, { session })
     ]
