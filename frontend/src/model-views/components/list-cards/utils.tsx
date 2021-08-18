@@ -166,17 +166,8 @@ const interior = ({ doi, title }) => {
 };
 
 const PublicationModelCard = (props) => {
-  const {
-    year,
-    id,
-    title,
-    doi,
-    author,
-    journal,
-    onClick,
-    link,
-    showIdentity,
-  } = props;
+  const { year, id, title, doi, author, journal, onClick, link, showIdentity } =
+    props;
 
   const content = h(Frame, { id: "publicationCardContent" }, [
     h(interior, { title, doi }),
