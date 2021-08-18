@@ -18,13 +18,8 @@ interface tagContainer {
 }
 
 export function TagContainer(props) {
-  const {
-    tags,
-    isEditing,
-    onChange,
-    onClickDelete,
-    modelName,
-  }: tagContainer = props;
+  const { tags, isEditing, onChange, onClickDelete, modelName }: tagContainer =
+    props;
 
   if (tags.length == 0 && !isEditing) {
     return h(ModelAttributeOneLiner, {
