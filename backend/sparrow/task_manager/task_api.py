@@ -103,19 +103,26 @@ class TaskEndpoint(WebSocketEndpoint):
 async def tasks(request):
     mgr = get_plugin("task-manager")
     return APIResponse(
-        [
-            {"name": k, "description": v.__doc__.strip()}
-            for k, v in mgr._celery_tasks.items()
-        ]
+        {
+            "tasks": [
+                {"name": k, "description": v.__doc__.strip()}
+                for k, v in mgr._celery_tasks.items()
+            ],
+            "enabled": mgr._task_worker_enabled,
+        }
     )
 
 
 def build_tasks_api(manager):
+    routes = [Route("/", endpoint=tasks, methods=["GET"])]
+    if manager._task_worker_enabled:
+        task_socket_route = WebSocketRoute(
+            "/{task}", TaskEndpoint, name="task_manager_api"
+        )
+        routes.append(task_socket_route)
+
     return Starlette(
-        routes=[
-            Route("/", endpoint=tasks, methods=["GET"]),
-            WebSocketRoute("/{task}", TaskEndpoint, name="task_manager_api"),
-        ],
+        routes=routes,
         on_startup=[manager.broadcast.connect],
         on_shutdown=[manager.broadcast.disconnect],
     )

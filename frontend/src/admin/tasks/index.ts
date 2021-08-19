@@ -161,7 +161,20 @@ function TaskList({ tasks, base, task }) {
 }
 
 function TasksPage() {
-  const tasks: any[] = useAPIv2Result("/tasks/")?.data ?? [];
+  const res: { enabled: boolean; tasks: any[] } = useAPIv2Result("/tasks/")
+    ?.data ?? { enabled: false, tasks: [] };
+  if (!res.enabled) {
+    return h(
+      "div.tasks-page",
+      null,
+      h(NonIdealState, {
+        message: "A tasks worker is not available for this Sparrow instance.",
+        icon: "warning",
+      })
+    );
+  }
+
+  const tasks = res.tasks;
   const task = useParams().task ?? null;
   const base = "/admin/tasks";
   return h("div.tasks-page", [

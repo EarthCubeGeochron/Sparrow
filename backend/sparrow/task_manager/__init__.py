@@ -12,9 +12,10 @@ Tasks have
 """
 from celery import Task, Celery
 from sparrow.logs import get_logger
+from os import environ
 from sparrow.plugins import SparrowCorePlugin
 from sparrow.context import get_plugin
-from sparrow.settings import TASK_BROKER
+from sparrow.settings import TASK_BROKER, TASK_WORKER_ENABLED
 import typer
 from .task_api import build_tasks_api
 from time import sleep
@@ -37,16 +38,25 @@ _tasks_to_register = {}
 
 class SparrowTaskManager(SparrowCorePlugin):
     name = "task-manager"
-    celery: Celery
+    celery: Celery = None
     broadcast = None
 
+    _task_worker_enabled = False
     _cli_app = typer.Typer()
     _task_commands = []
     _celery_tasks = {}
 
     def __init__(self, app):
-        self.celery = Celery("tasks", broker=TASK_BROKER)
+        if TASK_BROKER is not None and TASK_WORKER_ENABLED:
+            self._setup_celery()
+        super().__init__(app)
 
+    def _setup_celery(self):
+        environ.setdefault("CELERY_BROKER_URL", TASK_BROKER)
+        environ.setdefault("CELERY_RESULT_BACKEND", TASK_BROKER)
+        environ["C_FORCE_ROOT"] = "true"
+        self._task_worker_enabled = True
+        self.celery = Celery("tasks", broker=TASK_BROKER)
         self.celery.conf["broker_transport_options"] = {
             "max_retries": 3,
             "interval_start": 0,
@@ -54,14 +64,12 @@ class SparrowTaskManager(SparrowCorePlugin):
             "interval_max": 0.5,
         }
 
-        super().__init__(app)
-
     def register_task(self, func, *args, **kwargs):
         # Get plugin name
         name = kwargs.get("name", func.__name__)
         destructive = kwargs.get("destructive", False)
         cli_only = kwargs.get("cli_only", False)
-        if destructive:
+        if destructive or self.celery is None:
             cli_only = True
 
         self._cli_app.command(name=name)(func)

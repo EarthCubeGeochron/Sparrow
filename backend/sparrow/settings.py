@@ -7,6 +7,7 @@ DATABASE = config("SPARROW_DATABASE", default="postgresql+psycopg2:///sparrow")
 BASE_URL = config("SPARROW_BASE_URL", default="/")
 ECHO_SQL = config("SPARROW_ECHO_SQL", cast=bool, default=False)
 TASK_BROKER = config("SPARROW_TASK_BROKER", default="redis://broker:6379/0/")
+TASK_WORKER_ENABLED = config("SPARROW_TASK_WORKER", cast=bool, default=False)
 
 SECRET_KEY = config("SPARROW_SECRET_KEY", None)
 if SECRET_KEY is None:

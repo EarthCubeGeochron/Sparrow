@@ -36,10 +36,10 @@ x-backend:
     - SPARROW_S3_BUCKET
     - SPARROW_S3_KEY
     - SPARROW_S3_SECRET
-    # This is really for celery workers, but we include it here to not be reptitive
-    - CELERY_BROKER_URL=redis://broker:6379/0
-    - CELERY_RESULT_BACKEND=redis://broker:6379/0
-    - C_FORCE_ROOT=true
+    # Whether we should enable a worker pool for running tasks. If we don't,
+    # tasks must be run via the command line.
+    - SPARROW_TASK_WORKER=1
+    - SPARROW_TASK_BROKER=redis://broker:6379/0
   volumes:
     # Volume for scripts to make things like
     # migrations work...
@@ -184,8 +184,10 @@ services:
       - ${SPARROW_BACKUP_DIR:-placeholder}:/local-backups
   # The broker and worker containers create an architecture
   # for running import and processing tasks on a separate thread
-  # from the web server
+  # from the web server. These only run in "worker" profile.
   broker:
+    profiles:
+      - task-worker
     image: redis:latest
     ports:
       - 6379:6379
@@ -193,6 +195,8 @@ services:
     <<: *x-backend
     depends_on:
       - broker
+    profiles:
+      - task-worker
     command: /bin/run-worker
 volumes:
   frontend_build:
