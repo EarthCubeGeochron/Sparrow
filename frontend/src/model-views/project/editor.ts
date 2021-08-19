@@ -230,14 +230,19 @@ function SampleMapComponent() {
     model.session == null || model.session == [] ? [] : [...model.session];
 
   const sampleData = getProjectSamples(samples, sessions);
+  const locatedSamples = sampleData.filter(d => d.location != null);
 
   return h("div", [
     h("div", { style: { display: "flex", flexDirection: "row" } }, [
-      h("div", { style: { paddingRight: "10px" } }, [
-        h(PageViewBlock, { title: "Location" }, [
-          h(ProjectMap, { samples: sampleData, hoverID: sampleHoverID })
-        ])
-      ]),
+      h.if(locatedSamples.length > 0)(
+        "div",
+        { style: { paddingRight: "10px" } },
+        [
+          h(PageViewBlock, { title: "Location" }, [
+            h(ProjectMap, { samples: sampleData, hoverID: sampleHoverID })
+          ])
+        ]
+      ),
       h(EditableSamples, { samples: sampleData })
     ])
   ]);
@@ -253,7 +258,7 @@ function getSessionSample(session) {
 }
 
 function getProjectSamples(samples, sessions) {
-  const finalSamples = [];
+  let finalSamples = [];
 
   for (let session of sessions) {
     let sample = getSessionSample(session);
@@ -261,16 +266,21 @@ function getProjectSamples(samples, sessions) {
       finalSamples.push(sample);
     }
   }
+  finalSamples = [...samples, ...finalSamples];
   return finalSamples;
 }
 
-export function EditableSamples({ samples }) {
+export function EditableSamples() {
   const { setHoverID } = useContext(SampleHoverIDContext);
   const { model, actions, isEditing } = useModelEditor();
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
+  const samples =
+    model.sample == null || model.sample == [] ? [] : [...model.sample];
   const sessions =
     model.session == null || model.session == [] ? [] : [...model.session];
+
+  const sampleData = getProjectSamples(samples, sessions);
 
   const onClickDelete = ({ id, name }) => {
     const newSamples = id
@@ -303,7 +313,7 @@ export function EditableSamples({ samples }) {
   const draggable = isEditing && sessions.length > 0;
 
   return h(SampleAdd, {
-    data: samples,
+    data: sampleData,
     setID: setHoverID,
     draggable,
     isEditing,
@@ -375,9 +385,6 @@ const ProjectDataFiles = () => {
 
   const sample_ids = model.sample.map(obj => obj.id);
   const session_ids = model.session.map(obj => obj.id);
-
-  console.log("samples", sample_ids);
-  console.log("sessions", session_ids);
 
   return h(DataFilePage, { sample_ids, session_ids, model: "project" });
 };

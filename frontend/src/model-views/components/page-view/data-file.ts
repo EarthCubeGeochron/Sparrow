@@ -116,13 +116,11 @@ function getDataFileData(props) {
     {},
     { unwrapResponse: unwrapDataFile }
   );
-  console.log(session);
   let analysis = useAPIv2Result(
     baseUrl + `?analysis_id=${analysis_ids}`,
     {},
     { unwrapResponse: unwrapDataFile }
   );
-  console.log(analysis);
   if (analysis == null) analysis = [];
   if (session == null) session = [];
   if (sample == null) sample = [];
@@ -155,7 +153,6 @@ function DataFileCard(props) {
 
 function DataFilePageCards(props) {
   const { data, model } = props;
-  console.log("datafile data", data);
   if (data.length == 0) return h("div");
 
   return h("div", { style: { display: "flex", flexFlow: "row wrap" } }, [

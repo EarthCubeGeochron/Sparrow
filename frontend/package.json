@@ -41,6 +41,7 @@
     "emotion": "^10.0.7",
     "html2canvas": "^1.0.0-rc.7",
     "immutability-helper": "^2.9.0",
+    "isomorphic-form-data": "^2.0.0",
     "leaflet": "^1.7.1",
     "mapbox-gl": "^2.0.1",
     "react": "^16.14.0",
