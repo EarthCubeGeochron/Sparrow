@@ -1,6 +1,8 @@
 from .. import task
 from click import echo
 from ..users.test_user_api import admin_client
+from inspect import signature
+from typing import get_type_hints
 
 
 @task(name="hello")
@@ -11,9 +13,21 @@ def hello_task(name: str):
     return text
 
 
+@task(name="really-real")
+def really_real(name: str, check_real: bool = True):
+    """Say hello!"""
+    if check_real:
+        text = f"Hello, {name}"
+    else:
+        text = "You're a ghost!"
+    echo(text)
+    return text
+
+
 class TestSparrowTaskManager:
     def test_task_manager_exists(self, app):
         mgr = app.plugins.get("task-manager")
+        mgr.celery.conf.task_always_eager = True
         assert mgr is not None
         hello_task = mgr.get_task("hello")
         assert hello_task is not None

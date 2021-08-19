@@ -25,6 +25,7 @@ import traceback
 from json import dumps
 from time import time
 from broadcaster import Broadcast
+import inspect
 
 log = get_logger(__name__)
 
@@ -67,6 +68,8 @@ class SparrowTaskManager(SparrowCorePlugin):
     def register_task(self, func, *args, **kwargs):
         # Get plugin name
         name = kwargs.get("name", func.__name__)
+        signature = inspect.signature(func)
+
         destructive = kwargs.get("destructive", False)
         cli_only = kwargs.get("cli_only", False)
         if destructive or self.celery is None:
@@ -176,6 +179,8 @@ queue = Redis.from_url(TASK_BROKER)
 
 
 class SparrowTask(Task):
+    _is_sparrow_task = True
+
     def __call__(self, *args, **kwargs):
         """In a celery task this function calls the run method, here you can
         set some environment variable before the run of the task"""

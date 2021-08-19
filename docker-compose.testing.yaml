@@ -1,18 +1,26 @@
 # Standalone docker-compose file for backend testing.
 # Only spins up backend and database, not frontend.
 version: "3.6"
+x-backend:
+  &x-backend
+  build:
+    context: ./backend
+    target: testing
+  # Make sure we get colorized terminal output
+  depends_on:
+    - db
+    - broker
+  environment:
+    - SPARROW_SECRET_KEY=test_secret
+    # Whether we should enable a worker pool for running tasks. If we don't,
+    # tasks must be run via the command line.
+    - SPARROW_TASK_WORKER=1
+    - SPARROW_TASK_BROKER=redis://broker:6379/
 services:
   backend:
-    build:
-      context: ./backend
-      target: testing
+    <<: *x-backend
     command: pytest /app/sparrow_tests --teardown 
-    # Make sure we get colorized terminal output
     tty: true
-    depends_on:
-      - db
-    environment:
-      - SPARROW_SECRET_KEY=test_secret
     volumes:
       - pytest_cache:/run/.pytest_cache
   db:
@@ -26,5 +34,14 @@ services:
       - 5432
     environment:
       - POSTGRES_DB=sparrow
+  # Broker and worker are for testing task-based functionality
+  # We should see if we can disable this sometimes for minimal tests.
+  broker:
+    image: redis:latest
+    expose:
+      - 6379
+  worker:
+    <<: *x-backend
+    command: /bin/run-worker
 volumes:
   pytest_cache:
