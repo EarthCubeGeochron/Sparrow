@@ -18,6 +18,7 @@
 .message-history
   font-family: monospace
   font-size 14px
+  background-color: #222
 
 .left-column
   max-width 20em
@@ -26,3 +27,28 @@
 .log-window
   flex-grow 1
   overflow-y hidden
+
+ansi($color)
+  color: $color
+  &.dim
+    color: darken($color, 50%)
+
+.message-history .message
+  span
+    &.bold
+      font-weight bold
+    ansi(rgb(255, 255, 255))
+    &.dark-gray
+      ansi(rgb(128, 128, 128))
+    &.red
+      ansi(rgb(255, 0, 0))
+    &.green
+      ansi(rgb(0, 255, 0))
+    &.yellow
+      ansi(rgb(255, 255, 0))
+    &.blue
+      ansi(rgb(0, 0, 255))
+    &.magenta
+      ansi(rgb(255, 0, 255))
+    &.cyan
+      ansi(rgb(0, 255, 255))

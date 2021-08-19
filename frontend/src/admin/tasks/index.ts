@@ -17,14 +17,33 @@ const h = hyperStyled(styles);
 import { useParams, Switch, Route } from "react-router";
 import { Link } from "react-router-dom";
 import { useElementSize } from "@earthdata/sheet/src";
+import { parse } from "ansicolor";
+import classNames from "classnames";
 
 const Row = ({ data, index, style }) => {
+  const txt = data[index];
+  const spans = parse(txt).spans;
+
   return h(
     "div.message",
     {
       style: style,
     },
-    data[index]
+    spans.map((d) => {
+      const { italic, bold, text, color, bgColor } = d;
+      const bg = bgColor?.name != null ? `bg-${bgColor.name}` : null;
+      const className = classNames(
+        {
+          italic,
+          bold,
+          dim: color?.dim,
+          "bg-dim": bgColor?.dim,
+        },
+        color?.name,
+        bg
+      );
+      return h("span", { className }, text);
+    })
   );
 };
 
@@ -163,6 +182,8 @@ function TaskList({ tasks, base, task }) {
 function TasksPage() {
   const res: { enabled: boolean; tasks: any[] } = useAPIv2Result("/tasks/")
     ?.data ?? { enabled: false, tasks: [] };
+  const task = useParams().task ?? null;
+
   if (!res.enabled) {
     return h(
       "div.tasks-page",
@@ -177,7 +198,6 @@ function TasksPage() {
   }
 
   const tasks = res.tasks;
-  const task = useParams().task ?? null;
   const base = "/admin/tasks";
   return h("div.tasks-page", [
     h("div.left-column", null, h(TaskList, { tasks, base, task })),

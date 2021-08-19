@@ -116,6 +116,9 @@ class RedisFileObject(object):
         self._time = time()
         self._buffer = ""
 
+    def isatty(self):
+        return True
+
     def write(self, data):
         try:
             self._buffer += data + "\n"
@@ -137,6 +140,39 @@ class RedisFileObject(object):
 
 
 queue = Redis.from_url(TASK_BROKER)
+
+
+# class SparrowContextError(Exception):
+#     pass
+
+
+# class WebSocketLogger(TextIOBase):
+#     def __init__(self, session, loop=None, **kwargs):
+#         self.session = session
+#         self.loop = kwargs.get("loop", get_running_loop())
+
+#     def write(self, __s: str) -> int:
+#         # print(__s)
+#         run_coroutine_threadsafe(self.session.send_json({"text": __s}), self.loop)
+#         # return super().write(__s)
+
+
+# def log(*args, **kwargs):
+#     importer = get_running_importer()
+#     if importer is None:
+#         raise SparrowContextError(
+#             "Cannot use importer logger outside of a running importer"
+#         )
+#     importer.log(*args, **kwargs)
+
+
+# _importer_context: ContextVar[typing.Any] = ContextVar(
+#     "sparrow-importer-context", default=None
+# )
+
+
+# def get_running_importer() -> typing.Any:
+#     return _importer_context.get()
 
 
 class SparrowTask(Task):

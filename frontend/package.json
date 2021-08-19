@@ -34,6 +34,7 @@
     "@vx/marker": "0.0.199",
     "@vx/scale": "0.0.182",
     "@vx/shape": "0.0.183",
+    "ansicolor": "^1.1.95",
     "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
     "d3-array": "^2.0.3",
