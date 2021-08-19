@@ -21,7 +21,8 @@ import { parse } from "ansicolor";
 import classNames from "classnames";
 
 const Row = ({ data, index, style }) => {
-  const txt = data[index];
+  const lineno = index - 1;
+  const txt = data[lineno] ?? "";
   const spans = parse(txt).spans;
 
   return h(
@@ -29,21 +30,30 @@ const Row = ({ data, index, style }) => {
     {
       style: style,
     },
-    spans.map((d) => {
-      const { italic, bold, text, color, bgColor } = d;
-      const bg = bgColor?.name != null ? `bg-${bgColor.name}` : null;
-      const className = classNames(
-        {
-          italic,
-          bold,
-          dim: color?.dim,
-          "bg-dim": bgColor?.dim,
-        },
-        color?.name,
-        bg
-      );
-      return h("span", { className }, text);
-    })
+    [
+      h.if(lineno >= 0 && lineno < data.length)(
+        "span.lineno.dark-gray",
+        `${lineno + 1}`
+      ),
+      h(
+        "span.message-text",
+        spans.map((d) => {
+          const { italic, bold, text, color, bgColor } = d;
+          const bg = bgColor?.name != null ? `bg-${bgColor.name}` : null;
+          const className = classNames(
+            {
+              italic,
+              bold,
+              dim: color?.dim,
+              "bg-dim": bgColor?.dim,
+            },
+            color?.name,
+            bg
+          );
+          return h("span", { className }, text);
+        })
+      ),
+    ]
   );
 };
 
@@ -52,7 +62,7 @@ const LogWindow = ({ messages }) => {
   const containerRef = useRef<HTMLElement>();
   const extraLines = 2;
   useEffect(() => {
-    ref.current?.scrollToItem(messages.length + extraLines - 1);
+    ref.current?.scrollToItem(messages.length + extraLines);
   }, [messages.length]);
 
   const { width, height } = useElementSize(containerRef, true) ?? {
