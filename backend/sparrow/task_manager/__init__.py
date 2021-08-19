@@ -25,6 +25,8 @@ import traceback
 from json import dumps
 from time import time
 from broadcaster import Broadcast
+from typing import get_type_hints
+from contextlib import contextmanager
 import inspect
 
 log = get_logger(__name__)
@@ -68,7 +70,7 @@ class SparrowTaskManager(SparrowCorePlugin):
     def register_task(self, func, *args, **kwargs):
         # Get plugin name
         name = kwargs.get("name", func.__name__)
-        signature = inspect.signature(func)
+        hints = get_type_hints(func)
 
         destructive = kwargs.get("destructive", False)
         cli_only = kwargs.get("cli_only", False)
@@ -141,6 +143,12 @@ class RedisFileObject(object):
     def close(self):
         self.send_message(self._buffer)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
 
 queue = Redis.from_url(TASK_BROKER)
 
@@ -178,25 +186,32 @@ queue = Redis.from_url(TASK_BROKER)
 #     return _importer_context.get()
 
 
+@contextmanager
+def redirect_output_to_redis(queue, task_name):
+    _old_stdout = sys.stdout
+    _old_stderr = sys.stderr
+    with RedisFileObject(queue, task_name, type="stdout") as stdout, RedisFileObject(
+        queue, task_name, type="stderr"
+    ) as stderr:
+        sys.stdout = stdout
+        sys.stderr = stderr
+        yield
+    sys.stdout = _old_stdout
+    sys.stderr = _old_stderr
+
+
 class SparrowTask(Task):
     _is_sparrow_task = True
 
     def __call__(self, *args, **kwargs):
         """In a celery task this function calls the run method, here you can
         set some environment variable before the run of the task"""
-        _old_stdout = sys.stdout
-        _old_stderr = sys.stderr
         try:
-            sys.stdout = RedisFileObject(
-                queue, "sparrow:task:" + self.name, type="stdout"
-            )
-            sys.stderr = RedisFileObject(
-                queue, "sparrow:task:" + self.name, type="stdout"
-            )
-            queue.publish(
-                "sparrow:task:" + self.name, create_message(text="Starting task")
-            )
-            return self.run(*args, **kwargs)
+            with redirect_output_to_redis(queue, "sparrow:task:" + self.name):
+                queue.publish(
+                    "sparrow:task:" + self.name, create_message(text="Starting task")
+                )
+                return self.run(*args, **kwargs)
         except Exception as exc:
             l1 = traceback.format_exception(*sys.exc_info())
             queue.publish(
@@ -205,8 +220,6 @@ class SparrowTask(Task):
             )
             raise exc
         finally:
-            sys.stdout = _old_stdout
-            sys.stderr = _old_stderr
             queue.publish(
                 "sparrow:task:" + self.name,
                 create_message(text="Task finished", type="control"),

@@ -31,9 +31,9 @@
   padding: 0 0.25em
 
 ansi($color)
-  color: darken($color, 60%)
+  color: $color
   &.dim
-    color: $color
+    color: lighten($color, 40%)
 
 .message-history
   background-color: #f0f0f0
@@ -48,21 +48,21 @@ ansi($color)
         font-weight bold
       &.italic
         font-style italic
-      ansi(lighten(#1a1b27, 70%))
+      ansi(lighten(#1a1b27, 20%))
       &.dark-gray
-        ansi(lighten(#1a1b27, 20%))
+        ansi(lighten(#1a1b27, 60%))
       &.red
-        ansi(#ff6c8d)
+        ansi(darken(#ff6c8d, 60%))
       &.green
-        ansi(#8dcd5a)
+        ansi(darken(#8dcd5a, 60%))
       &.yellow
-        ansi(#ee8951)
+        ansi(darken(#ee8951, 60%))
       &.blue
-        ansi(#71a1fe)
+        ansi(darken(#71a1fe, 60%))
       &.magenta
-        ansi(#c296fe)
+        ansi(darken(#c296fe, 60%))
       &.cyan
-        ansi(#00a2bf)
+        ansi(darken(#00a2bf, 60%))
 
 :global(.bp3-dark)
   ansi($color)
