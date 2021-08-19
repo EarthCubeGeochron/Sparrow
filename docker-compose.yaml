@@ -147,12 +147,13 @@ services:
       # Javascript library that will be linked into the container at runtime
       # to support tandem development within Docker
       - ${SPARROW_UI_COMPONENTS:-placeholder}:/app/_local_modules/@macrostrat/ui-components:ro
-  api-tests:
-    build: api-tests
-    # A placeholder command
-    command: echo
-    depends_on:
-      - backend
+  # API TESTS container is disabled for now
+  # api-tests:
+  #   build: api-tests
+  #   # A placeholder command
+  #   command: echo
+  #   depends_on:
+  #     - backend
   database_backup:
     # This service backs up the database periodically
     # to a remote S3 bucket or a local directory on the server.

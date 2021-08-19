@@ -19,7 +19,7 @@ from sparrow.settings import TASK_BROKER, TASK_WORKER_ENABLED
 import typer
 from .task_api import build_tasks_api
 from time import sleep
-import redis
+from redis import Redis
 import sys
 import traceback
 from json import dumps
@@ -136,8 +136,7 @@ class RedisFileObject(object):
         self.send_message(self._buffer)
 
 
-queue = redis.StrictRedis(host="broker", port=6379, db=0)
-# channel = queue.pubsub()
+queue = Redis.from_url(TASK_BROKER)
 
 
 class SparrowTask(Task):
