@@ -138,7 +138,7 @@ const TasksRouter = ({ base }) => {
     h(Route, {
       path: base,
       render: () =>
-        h(NonIdealState, { message: "No task selected", icon: "warning" }),
+        h(NonIdealState, { title: "No task selected", icon: "applications" }),
       exact: true,
     }),
   ]);
@@ -168,8 +168,10 @@ function TasksPage() {
       "div.tasks-page",
       null,
       h(NonIdealState, {
-        message: "A tasks worker is not available for this Sparrow instance.",
-        icon: "warning",
+        title: "Tasks disabled",
+        description:
+          "A tasks worker is not available for this Sparrow instance. Use the Sparrow command-line application to run tasks.",
+        icon: "console",
       })
     );
   }

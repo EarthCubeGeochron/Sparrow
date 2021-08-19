@@ -38,7 +38,7 @@ x-backend:
     - SPARROW_S3_SECRET
     # Whether we should enable a worker pool for running tasks. If we don't,
     # tasks must be run via the command line.
-    - SPARROW_TASK_WORKER=1
+    - SPARROW_TASK_WORKER
     - SPARROW_TASK_BROKER=redis://broker:6379/0
   volumes:
     # Volume for scripts to make things like
