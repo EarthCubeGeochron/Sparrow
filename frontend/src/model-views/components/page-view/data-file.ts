@@ -9,14 +9,14 @@ import {
   VscFilePdf,
   VscFileMedia,
   VscJson,
-  VscFileCode
+  VscFileCode,
 } from "react-icons/vsc";
 
 import {
   PageViewBlock,
   ModelLinkCard,
   PageViewDate,
-  LinkedThroughModel
+  LinkedThroughModel,
 } from "~/model-views";
 import { useModelURL } from "~/util";
 //@ts-ignore
@@ -34,7 +34,7 @@ const iconIndex = {
   ".jpeg": VscFileMedia,
   ".png": VscFileMedia,
   ".jpg": VscFileMedia,
-  ".tiff": VscFileMedia
+  ".tiff": VscFileMedia,
 };
 
 function DownloadButtonIcon(props) {
@@ -53,7 +53,7 @@ function DownloadButtonContent(props) {
   let text: any | React.ReactNode = "Data file";
   if (file_type != null) {
     text = h([
-      h("b", { style: { fontSize: "17px", marginLeft: "22px" } }, file_type)
+      h("b", { style: { fontSize: "17px", marginLeft: "22px" } }, file_type),
     ]);
   }
 
@@ -62,8 +62,8 @@ function DownloadButtonContent(props) {
     {
       style: {
         display: "flex",
-        position: "relative"
-      }
+        position: "relative",
+      },
     },
     [
       h(DownloadButtonIcon, {
@@ -72,10 +72,10 @@ function DownloadButtonContent(props) {
           position: "absolute",
           bottom: "2px",
           left: "0",
-          fontSize: "17px"
-        }
+          fontSize: "17px",
+        },
       }),
-      text
+      text,
     ]
   );
 }
@@ -90,8 +90,8 @@ export function DownloadButton(props) {
   const href = `${process.env.BASE_URL}api/v2/data_file/${file_hash}`;
   return h(Tooltip, { content: `Download ${file_type} file` }, [
     h(AnchorButton, { href, rightIcon: "download", intent: Intent.PRIMARY }, [
-      h(DownloadButtonContent, { basename, file_hash, file_type })
-    ])
+      h(DownloadButtonContent, { basename, file_hash, file_type }),
+    ]),
   ]);
 }
 
@@ -142,11 +142,11 @@ function DataFileCard(props) {
     {
       link: true,
       linkedThrough,
-      to: useModelURL(`/data-file/${file_hash}`)
+      to: useModelURL(`/data-file/${file_hash}`),
     },
     h("div", [
       h("div", [h(PageViewDate, { date })]),
-      h("div", [h("div", [h("h4", basename)])])
+      h("div", [h("div", [h("h4", basename)])]),
     ])
   );
 }
@@ -162,7 +162,7 @@ function DataFilePageCards(props) {
         file_mtime: date,
         file_hash,
         model: current_model,
-        model_id
+        model_id,
       } = obj;
       return h(DataFileCard, {
         basename,
@@ -171,9 +171,9 @@ function DataFilePageCards(props) {
         file_hash,
         model: model,
         current_model,
-        model_id
+        model_id,
       });
-    })
+    }),
   ]);
 }
 
@@ -182,7 +182,7 @@ export function DataFilePage(props) {
     sample_ids = [0],
     session_ids = [0],
     analysis_ids = [0],
-    model
+    model,
   } = props;
 
   const data = getDataFileData({ sample_ids, session_ids, analysis_ids });
@@ -192,7 +192,7 @@ export function DataFilePage(props) {
       model: "data_file",
       modelLink: true,
       title: "Data files",
-      hasData: data.length > 0
+      hasData: data.length > 0,
     },
     [h(DataFilePageCards, { data, model })]
   );
