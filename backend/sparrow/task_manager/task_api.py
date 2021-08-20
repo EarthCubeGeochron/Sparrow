@@ -56,7 +56,7 @@ class TaskEndpoint(WebSocketEndpoint):
 
     async def on_connect(self, session):
         await session.accept()
-        await session.send_json({"text": "Bienvenue sur le websocket!"})
+        await session.send_json({"info": "Bienvenue sur le websocket!"})
         await self.start_listener(session)
 
     async def start_listener(self, session):
@@ -71,7 +71,7 @@ class TaskEndpoint(WebSocketEndpoint):
         while True:
             if plugin.broadcast is not None:
                 await session.send_json(
-                    {"text": f"Trying to connect to channel {channel_name}"}
+                    {"info": f"Trying to connect to channel {channel_name}"}
                 )
                 if not hasattr(plugin.broadcast._backend, "_subscriber"):
                     await plugin.broadcast.connect()
@@ -80,21 +80,15 @@ class TaskEndpoint(WebSocketEndpoint):
                         channel=channel_name
                     ) as subscriber:
                         await session.send_json(
-                            {"text": f"Subscribed to channel {channel_name}"}
+                            {"info": f"Subscribed to channel {channel_name}"}
                         )
                         async for event in subscriber:
                             await session.send_json(loads(event.message))
-                        await session.send_json({"text": f"Closing subscription"})
+                        await session.send_json({"info": f"Closing subscription"})
                 except Exception as exc:
                     await session.send_json({"text": str(exc)})
-            await session.send_json({"text": f"Trying to reconnect"})
+            await session.send_json({"info": f"Trying to reconnect"})
             await sleep(1)
-
-    async def send_periodically(self, session):
-        while True:
-            await session.send_json({"text": f"Hello, planet {self.counter}!"})
-            await sleep(5)
-            self.counter += 1
 
 
 @requires("admin")

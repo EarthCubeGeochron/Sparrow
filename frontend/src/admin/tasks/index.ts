@@ -1,14 +1,9 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useRef, useMemo, useEffect, useState } from "react";
-import {
-  useAPIHelpers,
-  CollapseCard,
-  useElementSize,
-} from "@macrostrat/ui-components";
-import { APIV2Context, useAPIv2Result } from "~/api-v2";
-import useWebSocket, { ReadyState } from "react-use-websocket";
+import { CollapseCard } from "@macrostrat/ui-components";
+import { useAPIv2Result } from "~/api-v2";
 import useResizeObserver from "use-resize-observer";
-import { MinimalNavbar } from "~/components";
+import { MinimalNavbar, ServerStatus } from "~/components";
 import {
   Button,
   ButtonGroup,
@@ -24,6 +19,7 @@ import { Link } from "react-router-dom";
 import { parse } from "ansicolor";
 import classNames from "classnames";
 import Form from "@rjsf/core";
+import { useSparrowWebSocket } from "~/api-v2";
 
 const Row = ({ data, index, style }) => {
   const lineno = index - 1;
@@ -93,14 +89,6 @@ const LogWindow = ({ messages }) => {
   );
 };
 
-const statusOptions = {
-  [ReadyState.CONNECTING]: "Connecting",
-  [ReadyState.OPEN]: "Open",
-  [ReadyState.CLOSING]: "Closing",
-  [ReadyState.CLOSED]: "Closed",
-  [ReadyState.UNINSTANTIATED]: "Uninstantiated",
-};
-
 function getDefaultsForSchema(schema) {
   let defaults = {};
   for (const key of Object.keys(schema)) {
@@ -109,28 +97,19 @@ function getDefaultsForSchema(schema) {
   return defaults;
 }
 
-function TaskMain({ tasks }) {
-  const task = useParams().task;
-  console.log(tasks, task);
+function TaskMain({ tasks, task }) {
   if (task == null) return null;
-  console.log(tasks);
   const schema = tasks.find((d) => d.name == task).params;
   console.log(schema);
   const baseParams = getDefaultsForSchema(schema);
   const [params, setParams] = useState(baseParams);
 
-  const helpers = useAPIHelpers(APIV2Context);
-  //const url = helpers.buildURL("/import-tracker");
-  const url = `ws://localhost:5002/api/v2/tasks/${task}`;
+  const ws = useSparrowWebSocket(`/tasks/${task}`);
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(url, {
-    shouldReconnect: (closeEvent) => true,
-  });
+  const { sendMessage, lastMessage, isOpen } = ws;
   const messageHistory = useRef([]);
   const [isRunning, setIsRunning] = useState(false);
   const [showParameters, setShowParameters] = useState(false);
-
-  const connectionStatus = statusOptions[readyState];
 
   messageHistory.current = useMemo(() => {
     let message = null;
@@ -139,13 +118,23 @@ function TaskMain({ tasks }) {
         message = JSON.parse(lastMessage.data);
       } catch (error) {}
     }
-    if (message?.action == "start") {
+    if (message == null) return messageHistory.current;
+    const { action, text, info, type } = message;
+    if (action == "start") {
       setIsRunning(true);
       return [];
-    } else if (message?.action == "stop") {
+    } else if (
+      action == "stop" ||
+      (type == "control" && text == "Task finished")
+    ) {
       setIsRunning(false);
     }
-    const text = message?.text;
+    if (info != null) {
+      console.log(info);
+    }
+
+    console.log(message);
+
     if (text != null) {
       const lines = text.split("\n").filter((line) => line.length > 0);
       messageHistory.current?.push(...lines);
@@ -157,31 +146,34 @@ function TaskMain({ tasks }) {
     h("div.task-control-ui", [
       h(MinimalNavbar, { className: "navbar" }, [
         h("h3", task),
-        h(ButtonGroup, { minimal: true }, [
-          h(
-            Button,
-            {
-              rightIcon: isRunning ? "stop" : "play",
-              disabled: readyState != ReadyState.OPEN,
-              onClick() {
-                let act = { action: isRunning ? "stop" : "start" };
-                if (act.action == "start") act.params = params;
-                sendMessage(JSON.stringify(act));
-              },
+        h(
+          Button,
+          {
+            onClick() {
+              setShowParameters(!showParameters);
             },
-            isRunning ? "Stop" : "Start"
-          ),
-          h(
-            Button,
-            {
-              onClick() {
-                setShowParameters(!showParameters);
-              },
+            active: showParameters,
+            rightIcon: showParameters ? "chevron-up" : "chevron-down",
+            minimal: true,
+          },
+          `Options`
+        ),
+        h(
+          Button,
+          {
+            rightIcon: isRunning ? "stop" : "play",
+            disabled: !isOpen,
+            minimal: true,
+            onClick() {
+              let act = { action: isRunning ? "stop" : "start" };
+              if (act.action == "start") act.params = params;
+              sendMessage(JSON.stringify(act));
             },
-            `${showParameters ? "Hide" : "Show"} parameters`
-          ),
-        ]),
-        h("div.status", "WebSocket connection: " + connectionStatus),
+          },
+          isRunning ? "Stop" : "Start"
+        ),
+        h("div.spacer", { style: { flexGrow: 1 } }),
+        h(ServerStatus, { socket: ws, small: false }),
       ]),
       h(
         CollapseCard,
@@ -207,11 +199,16 @@ function TaskMain({ tasks }) {
   ]);
 }
 
+const TaskRoute = ({ tasks }) => {
+  const task = useParams().task;
+  return h(TaskMain, { tasks, task });
+};
+
 const TasksRouter = ({ base, tasks }) => {
   return h(Switch, [
     h(Route, {
       path: base + "/:task",
-      render: () => h(TaskMain, { tasks }),
+      render: () => h(TaskRoute, { tasks }),
     }),
     h(Route, {
       path: base,
