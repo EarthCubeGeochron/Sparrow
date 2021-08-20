@@ -1,8 +1,13 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useRef, useMemo, useEffect, useState } from "react";
-import { useAPIHelpers, CollapseCard } from "@macrostrat/ui-components";
+import {
+  useAPIHelpers,
+  CollapseCard,
+  useElementSize,
+} from "@macrostrat/ui-components";
 import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import useResizeObserver from "use-resize-observer";
 import { MinimalNavbar } from "~/components";
 import {
   Button,
@@ -16,7 +21,6 @@ import { FixedSizeList as List } from "react-window";
 const h = hyperStyled(styles);
 import { useParams, Switch, Route } from "react-router";
 import { Link } from "react-router-dom";
-import { useElementSize } from "@earthdata/sheet/src";
 import { parse } from "ansicolor";
 import classNames from "classnames";
 import Form from "@rjsf/core";
@@ -60,16 +64,15 @@ const Row = ({ data, index, style }) => {
 
 const LogWindow = ({ messages }) => {
   const ref = useRef<List>();
-  const containerRef = useRef<HTMLElement>();
+  const {
+    ref: containerRef,
+    width = 1,
+    height = 1,
+  } = useResizeObserver<HTMLDivElement>();
   const extraLines = 2;
   useEffect(() => {
     ref.current?.scrollToItem(messages.length + extraLines);
   }, [messages.length]);
-
-  const { width, height } = useElementSize(containerRef, true) ?? {
-    width: 0,
-    height: 0,
-  };
 
   return h(
     "div.log-window",
@@ -98,12 +101,23 @@ const statusOptions = {
   [ReadyState.UNINSTANTIATED]: "Uninstantiated",
 };
 
+function getDefaultsForSchema(schema) {
+  let defaults = {};
+  for (const key of Object.keys(schema)) {
+    defaults[key] = schema[key].default;
+  }
+  return defaults;
+}
+
 function TaskMain({ tasks }) {
   const task = useParams().task;
   console.log(tasks, task);
   if (task == null) return null;
   console.log(tasks);
   const schema = tasks.find((d) => d.name == task).params;
+  console.log(schema);
+  const baseParams = getDefaultsForSchema(schema);
+  const [params, setParams] = useState(baseParams);
 
   const helpers = useAPIHelpers(APIV2Context);
   //const url = helpers.buildURL("/import-tracker");
@@ -114,6 +128,7 @@ function TaskMain({ tasks }) {
   });
   const messageHistory = useRef([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [showParameters, setShowParameters] = useState(false);
 
   const connectionStatus = statusOptions[readyState];
 
@@ -139,26 +154,55 @@ function TaskMain({ tasks }) {
   }, [lastMessage]);
 
   return h("div.tasks-main", [
-    h(MinimalNavbar, { className: "navbar" }, [
-      h("h3", task),
-      h(ButtonGroup, { minimal: true }, [
+    h("div.task-control-ui", [
+      h(MinimalNavbar, { className: "navbar" }, [
+        h("h3", task),
+        h(ButtonGroup, { minimal: true }, [
+          h(
+            Button,
+            {
+              rightIcon: isRunning ? "stop" : "play",
+              disabled: readyState != ReadyState.OPEN,
+              onClick() {
+                let act = { action: isRunning ? "stop" : "start" };
+                if (act.action == "start") act.params = params;
+                sendMessage(JSON.stringify(act));
+              },
+            },
+            isRunning ? "Stop" : "Start"
+          ),
+          h(
+            Button,
+            {
+              onClick() {
+                setShowParameters(!showParameters);
+              },
+            },
+            `${showParameters ? "Hide" : "Show"} parameters`
+          ),
+        ]),
+        h("div.status", "WebSocket connection: " + connectionStatus),
+      ]),
+      h(
+        CollapseCard,
+        { isOpen: showParameters },
         h(
-          Button,
+          Form,
           {
-            rightIcon: isRunning ? "stop" : "play",
-            disabled: readyState != ReadyState.OPEN,
-            onClick() {
-              sendMessage(
-                JSON.stringify({ action: isRunning ? "stop" : "start" })
-              );
+            schema,
+            className: "params-form",
+            formData: params,
+            liveValidate: true,
+            omitExtraData: true,
+            liveOmit: true,
+            onChange(e) {
+              setParams(e.formData);
             },
           },
-          isRunning ? "Stop" : "Start"
-        ),
-      ]),
-      h("div.status", "WebSocket connection: " + connectionStatus),
+          h("div")
+        )
+      ),
     ]),
-    h(CollapseCard, { isOpen: true }, [h(Form, { schema })]),
     h(LogWindow, { messages: messageHistory.current }),
   ]);
 }

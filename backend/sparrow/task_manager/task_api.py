@@ -19,7 +19,7 @@ class TaskEndpoint(WebSocketEndpoint):
     _running_task = None
     _listener = None
 
-    def start_task(self, name: str):
+    def start_task(self, name: str, params: object = {}):
         log.debug("Starting task " + name)
         mgr = get_plugin("task-manager")
         task = mgr.get_task(name)
@@ -27,10 +27,7 @@ class TaskEndpoint(WebSocketEndpoint):
         availability = i.ping()
         log.debug(availability)
         assert availability is not None
-        kwargs = {}
-        if name == "location-names":
-            kwargs = dict(overwrite=True)
-        self._running_task = task.delay(**kwargs)
+        self._running_task = task.delay(**params)
         log.debug(self._running_task)
         log.debug(f"Started task with id {self._running_task.id}")
         return self._running_task
@@ -43,7 +40,8 @@ class TaskEndpoint(WebSocketEndpoint):
 
         if action == "start":
             try:
-                self.start_task(task_name)
+                params = message.get("params", {})
+                self.start_task(task_name, params)
             except Exception as exc:
                 await session.send_json({"text": str(exc)})
         if action == "stop" and self._running_task is not None:

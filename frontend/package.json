@@ -23,7 +23,7 @@
     "@emotion/styled": "^10.0.7",
     "@loadable/component": "^5.10.2",
     "@macrostrat/hyper": "^1.2.14",
-    "@macrostrat/ui-components": "^0.6.7",
+    "@macrostrat/ui-components": "^0.6.8",
     "@mapbox/mapbox-gl-draw": "^1.2.0",
     "@rjsf/core": "^3.1.0",
     "@turf/bbox": "^6.0.1",
@@ -68,6 +68,7 @@
     "react-window": "^1.8.6",
     "store": "^2.0.12",
     "swagger-ui-react": "^3.34.0",
+    "use-resize-observer": "^7.0.1",
     "use-supercluster": "0.2.8",
     "viewport-mercator-project": "^6.2.2"
   },

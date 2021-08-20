@@ -1986,10 +1986,10 @@
     classnames "^2.3.1"
     react-hyperscript "^3.2.0"
 
-"@macrostrat/ui-components@^0.6.7":
-  version "0.6.7"
-  resolved "https://registry.yarnpkg.com/@macrostrat/ui-components/-/ui-components-0.6.7.tgz#e6d4733c861658d075b178b028879a59946959eb"
-  integrity sha512-SXVeUqU+9urbvZwPExR3uzRIZiyiN8LtNHPmQpvwh8qRmQGXMvWiV+lU0efw9j6rKQtJWK8mGm0N4lc3mXpwNw==
+"@macrostrat/ui-components@^0.6.8":
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/@macrostrat/ui-components/-/ui-components-0.6.8.tgz#b351dc34ba1ce44b95b68ffd5cc4d43c765e95a3"
+  integrity sha512-VzBhMr6T0qRLhaoBdWjuUjIjlmWojvjH1Ok/qsqkaS9ObP7UB3p2+B5COBdGFvsBRvVTU2AVxEqvQdj6VMHY0w==
   dependencies:
     "@babel/polyfill" "^7.4.4"
     "@blueprintjs/core" "^3.31.0"
@@ -13027,6 +13027,13 @@ use-latest@^1.0.0:
   integrity sha512-d2TEuG6nSLKQLAfW3By8mKr8HurOlTkul0sOpxbClIv4SQ4iOd7BYr7VIzdbktUCnv7dua/60xzd8igMU6jmyw==
   dependencies:
     use-isomorphic-layout-effect "^1.0.0"
+
+use-resize-observer@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/use-resize-observer/-/use-resize-observer-7.0.1.tgz#82b13d462e7fb5e3ec953bde48d6e02b9aae660d"
+  integrity sha512-tJESENDoVXfzkv1Cl9dJ13ySgENcKjvEKSU7QwjckjxjXg/MV2zW1CjEUtLpmXY084womIxJROUR3L1SuqlvOw==
+  dependencies:
+    resize-observer-polyfill "^1.5.1"
 
 use-supercluster@0.2.8:
   version "0.2.8"
