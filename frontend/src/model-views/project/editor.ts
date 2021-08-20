@@ -224,16 +224,50 @@ function SampleMapComponent() {
   const { model, actions, isEditing } = useModelEditor();
   const { sampleHoverID } = useContext(SampleHoverIDContext);
 
+  const samples =
+    model.sample == null || model.sample == [] ? [] : [...model.sample];
+  const sessions =
+    model.session == null || model.session == [] ? [] : [...model.session];
+
+  const sampleData = getProjectSamples(samples, sessions);
+  const locatedSamples = sampleData.filter((d) => d.location != null);
+
   return h("div", [
     h("div", { style: { display: "flex", flexDirection: "row" } }, [
-      h("div", { style: { paddingRight: "10px" } }, [
-        h(PageViewBlock, { title: "Location" }, [
-          h(ProjectMap, { samples: model.sample, hoverID: sampleHoverID }),
-        ]),
-      ]),
-      h(EditableSamples),
+      h.if(locatedSamples.length > 0)(
+        "div",
+        { style: { paddingRight: "10px" } },
+        [
+          h(PageViewBlock, { title: "Location" }, [
+            h(ProjectMap, { samples: sampleData, hoverID: sampleHoverID }),
+          ]),
+        ]
+      ),
+      h(EditableSamples, { samples: sampleData }),
     ]),
   ]);
+}
+
+function getSessionSample(session) {
+  if (session.sample != null) {
+    return {
+      ...session.sample,
+      linkedThrough: { model: "session", id: session.id },
+    };
+  }
+}
+
+function getProjectSamples(samples, sessions) {
+  let finalSamples = [];
+
+  for (let session of sessions) {
+    let sample = getSessionSample(session);
+    if (sample != null && !samples.find(({ id }) => id === sample.id)) {
+      finalSamples.push(sample);
+    }
+  }
+  finalSamples = [...samples, ...finalSamples];
+  return finalSamples;
 }
 
 export function EditableSamples() {
@@ -245,6 +279,8 @@ export function EditableSamples() {
     model.sample == null || model.sample == [] ? [] : [...model.sample];
   const sessions =
     model.session == null || model.session == [] ? [] : [...model.session];
+
+  const sampleData = getProjectSamples(samples, sessions);
 
   const onClickDelete = ({ id, name }) => {
     const newSamples = id
@@ -277,7 +313,7 @@ export function EditableSamples() {
   const draggable = isEditing && sessions.length > 0;
 
   return h(SampleAdd, {
-    data: model.sample,
+    data: sampleData,
     setID: setHoverID,
     draggable,
     isEditing,
