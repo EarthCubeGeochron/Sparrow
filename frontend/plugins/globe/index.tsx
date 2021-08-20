@@ -12,7 +12,7 @@ import {
 import worldMap from "./assets/land-110m.json";
 import { APIResultView } from "@macrostrat/ui-components";
 import { useAPIv2Result } from "~/api-v2";
-import { Colors, H1, Tooltip } from "@blueprintjs/core";
+import { Colors, H1, Spinner, Tooltip } from "@blueprintjs/core";
 import { useHistory } from "react-router-dom";
 
 function MapComponent(props) {
@@ -109,7 +109,7 @@ function MapComponent(props) {
 
 function getMarkers() {
   const data = useAPIv2Result(
-    "/map-samples",
+    "/map-samples?all=true",
     {},
     {
       unwrapResponse: (data) => {
@@ -130,6 +130,9 @@ function getMarkers() {
 
 function SampleMap() {
   let markers = getMarkers();
+  if (markers.length == 0) {
+    return h(Spinner);
+  }
 
   return h("div", [
     h(

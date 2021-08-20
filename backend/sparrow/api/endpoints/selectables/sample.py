@@ -2,14 +2,20 @@ from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 from sparrow.context import get_database
 from ...exceptions import ApplicationError
+from ..base import BaseEndpoint
 
 
-class SubSamples(HTTPEndpoint):
+class SubSamples(BaseEndpoint):
     """
     Endpoint to retrieve subsamples, i.e sample collections
 
     sample_collection not coming through in normal api for sample model
     """
+
+    def __init__(self, *args, **kwargs):
+        self.model = get_database().model.sample
+        self.schema = get_database().interface.sample
+        super().__init__(*args, **kwargs)
 
     async def get(self, request):
         db = get_database()
@@ -53,25 +59,25 @@ class SubSamples(HTTPEndpoint):
                 raise ApplicationError(str(err))
 
 
-class MapSamples(HTTPEndpoint):
+class MapSamples(BaseEndpoint):
     """
     Endpoint for quick loading of samples for locations, on maps specifically
 
     returns: id, name, location
     """
 
-    async def get(self, request):
+    def __init__(self, *args, **kwargs):
+        self.model = get_database().model.sample
+        self.schema = get_database().interface.sample
+        super().__init__(*args, **kwargs)
 
-        db = get_database()
-        sample = db.model.sample
-        sampleSchema = db.interface.sample(many=True)
+    def form_query(self, db):
+        sample = self.model
 
-        data = (
+        q = (
             db.session.query(sample.id, sample.name, sample.location)
             .filter(sample.location != None)
-            .all()
+            .order_by(sample.id)
         )
 
-        json_data = sampleSchema.dump(data)
-
-        return JSONResponse({"data": json_data, "total_count": len(json_data)})
+        return q
