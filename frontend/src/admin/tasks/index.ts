@@ -1,10 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useRef, useMemo, useEffect, useState } from "react";
-import {
-  ControlledSlider,
-  useAPIHelpers,
-  CollapsePanel,
-} from "@macrostrat/ui-components";
+import { useAPIHelpers, CollapseCard } from "@macrostrat/ui-components";
 import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { MinimalNavbar } from "~/components";
@@ -162,9 +158,7 @@ function TaskMain({ tasks }) {
       ]),
       h("div.status", "WebSocket connection: " + connectionStatus),
     ]),
-    h(CollapsePanel, {}, [
-      h(Form, { schema, uiSchema: { classNames: "data-form" } }),
-    ]),
+    h(CollapseCard, { isOpen: true }, [h(Form, { schema })]),
     h(LogWindow, { messages: messageHistory.current }),
   ]);
 }
