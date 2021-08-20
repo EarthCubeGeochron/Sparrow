@@ -3,7 +3,7 @@ from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 from webargs_starlette import parser
 from webargs.fields import DelimitedList, Str, Int, Boolean
-from sqlakeyset import get_page,select_page
+from sqlakeyset import get_page, select_page
 
 from ...context import get_database
 from ..exceptions import ValidationError, HTTPException, ApplicationError
@@ -26,19 +26,20 @@ from ..filters import (
 )
 from sparrow.open_search.filter import OpenSearchFilter
 
+
 class BaseEndpoint(HTTPEndpoint):
     """
-        A base endpoint to wrap shared functionality among various endpoints
+    A base endpoint to wrap shared functionality among various endpoints
     """
 
-    def __init__(self,*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.args_schema = dict(
             page=Str(missing=None, description="Page"),
             per_page=Int(missing=20, description="Number to show"),
             all=Boolean(missing=False, description="Return all results."),
-            )
+        )
 
         self._filters = []
         self.register_filter(OpenSearchFilter)
@@ -54,7 +55,7 @@ class BaseEndpoint(HTTPEndpoint):
         self.register_filter(AgeRangeFilter)
         self.register_filter(IdListFilter)
         self.register_filter(TagsFilter)
-    
+
     def register_filter(self, _filter: BaseFilter):
         """Register a filter specification to control parametrization of the
         model query"""
@@ -88,7 +89,7 @@ class BaseEndpoint(HTTPEndpoint):
 
                 if not request.user.is_authenticated and hasattr(
                     self.model, "embargo_date"
-                    ):
+                ):
                     q = q.filter(self.model.embargo_date == None)
 
                 if args["all"]:

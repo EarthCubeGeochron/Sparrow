@@ -33,10 +33,7 @@ class DataFileListEndpoint(BaseEndpoint):
         DataFile = self.model
 
         q = db.session.query(
-            DataFile.file_hash,
-            DataFile.file_mtime,
-            DataFile.basename,
-            DataFile.type_id,
+            DataFile.file_hash, DataFile.file_mtime, DataFile.basename, DataFile.type_id
         ).order_by(DataFile.file_mtime)
 
         return q

@@ -11,6 +11,7 @@ class SubSamples(BaseEndpoint):
 
     sample_collection not coming through in normal api for sample model
     """
+
     def __init__(self, *args, **kwargs):
         self.model = get_database().model.sample
         self.schema = get_database().interface.sample
@@ -64,6 +65,7 @@ class MapSamples(BaseEndpoint):
 
     returns: id, name, location
     """
+
     def __init__(self, *args, **kwargs):
         self.model = get_database().model.sample
         self.schema = get_database().interface.sample
@@ -72,9 +74,10 @@ class MapSamples(BaseEndpoint):
     def form_query(self, db):
         sample = self.model
 
-        q = db.session.query(
-            sample.id, 
-            sample.name, 
-            sample.location).filter(sample.location != None).order_by(sample.id)
-            
+        q = (
+            db.session.query(sample.id, sample.name, sample.location)
+            .filter(sample.location != None)
+            .order_by(sample.id)
+        )
+
         return q
