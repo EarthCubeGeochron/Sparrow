@@ -31,8 +31,7 @@ class BaseEndpoint(HTTPEndpoint):
         A base endpoint to wrap shared functionality among various endpoints
     """
 
-    def __init__(self, selectable=False,*args, **kwargs):
-        self.selectable = selectable
+    def __init__(self,*args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.args_schema = dict(
@@ -59,8 +58,6 @@ class BaseEndpoint(HTTPEndpoint):
     def register_filter(self, _filter: BaseFilter):
         """Register a filter specification to control parametrization of the
         model query"""
-        if self.selectable:
-            return
         f = _filter(self.model, schema=self.schema)
         if not f.should_apply():
             return
@@ -89,6 +86,11 @@ class BaseEndpoint(HTTPEndpoint):
             try:
                 q = self.form_query(db)
 
+                if not request.user.is_authenticated and hasattr(
+                    self.model, "embargo_date"
+                    ):
+                    q = q.filter(self.model.embargo_date == None)
+
                 if args["all"]:
                     res = q.all()
                     return APIResponse(
@@ -99,13 +101,7 @@ class BaseEndpoint(HTTPEndpoint):
                     q = _filter(q, args)
 
                 try:
-                    if self.selectable:
-                        
-                        res = select_page(
-                                 db.session, q, per_page=args["per_page"], page=args["page"]
-                            )                    
-                    else:   
-                        res = get_page(q, per_page=args["per_page"], page=args["page"])
+                    res = get_page(q, per_page=args["per_page"], page=args["page"])
 
                 except ValueError:
                     raise ValidationError("Invalid page token.")

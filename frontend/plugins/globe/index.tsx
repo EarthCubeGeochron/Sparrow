@@ -7,12 +7,12 @@ import {
   Geography,
   Graticule,
   Marker,
-  Markers,
+  Markers
 } from "react-simple-maps";
 import worldMap from "./assets/land-110m.json";
 import { APIResultView } from "@macrostrat/ui-components";
 import { useAPIv2Result } from "~/api-v2";
-import { Colors, H1, Tooltip } from "@blueprintjs/core";
+import { Colors, H1, Spinner, Tooltip } from "@blueprintjs/core";
 import { useHistory } from "react-router-dom";
 
 function MapComponent(props) {
@@ -26,7 +26,7 @@ function MapComponent(props) {
     fill: "#e9fcea",
     stroke: Colors.GRAY5,
     strokeWidth: 0.75,
-    outline: "none",
+    outline: "none"
   };
 
   return (
@@ -34,14 +34,14 @@ function MapComponent(props) {
       <ComposableMap
         projection="orthographic"
         projectionConfig={{
-          scale: 400,
+          scale: 400
         }}
         width={820}
         height={820}
         style={{
           width: "100%",
           height: "auto",
-          maxHeight: "500px",
+          maxHeight: "500px"
         }}
       >
         <ZoomableGlobe
@@ -63,7 +63,7 @@ function MapComponent(props) {
                     style={{
                       default: style,
                       hover: style,
-                      pressed: style,
+                      pressed: style
                     }}
                   />
                 );
@@ -81,7 +81,7 @@ function MapComponent(props) {
                     hover: { fill: "#634dbf" },
                     pressed: { fill: "#FF5722" },
                     hidden: { opacity: 0 },
-                    cursor: "pointer",
+                    cursor: "pointer"
                   }}
                 >
                   <circle
@@ -91,9 +91,9 @@ function MapComponent(props) {
                     style={{
                       stroke: "#634dbf",
                       strokeWidth: 3,
-                      opacity: 0.9,
+                      opacity: 0.9
                     }}
-                    onClick={function () {
+                    onClick={function() {
                       history.push(`/catalog/sample/${marker.id}`);
                     }}
                   />
@@ -109,17 +109,17 @@ function MapComponent(props) {
 
 function getMarkers() {
   const data = useAPIv2Result(
-    "/map-samples",
+    "/map-samples?all=true",
     {},
     {
-      unwrapResponse: (data) => {
-        const markers = data.data.map((d) => {
+      unwrapResponse: data => {
+        const markers = data.data.map(d => {
           const { id, name, location } = d;
           const { coordinates } = location;
           return { id, name, coordinates };
         });
         return markers;
-      },
+      }
     }
   );
   if (!data) {
@@ -130,13 +130,16 @@ function getMarkers() {
 
 function SampleMap() {
   let markers = getMarkers();
+  if (markers.length == 0) {
+    return h(Spinner);
+  }
 
   return h("div", [
     h(
       "h4",
       `${markers.length} measurements have been linked to their geologic metadata`
     ),
-    h(MapComponent, { markers }),
+    h(MapComponent, { markers })
   ]);
 }
 
