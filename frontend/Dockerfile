@@ -1,7 +1,7 @@
 FROM node:14 AS base
 
 # Yarn is already installed
-RUN npm install -g webpack webpack-cli
+RUN npm install -g webpack webpack-cli lerna
 WORKDIR /app
 
 CMD npm run dev
