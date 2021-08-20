@@ -18,18 +18,16 @@ from sparrow.context import get_plugin
 from sparrow.settings import TASK_BROKER, TASK_WORKER_ENABLED
 import typer
 from .task_api import build_tasks_api
-from time import sleep
 from redis import Redis
 import sys
 import traceback
 from json import dumps
 from time import time
 from broadcaster import Broadcast
-from typing import get_type_hints
 from contextlib import contextmanager
 from typer.utils import get_params_from_function
 from pydantic import create_model
-import inspect
+from asyncio import sleep
 
 log = get_logger(__name__)
 
@@ -143,10 +141,21 @@ class RedisFileObject(object):
         except TypeError:
             self._buffer += str(data, "utf-8") + "\n"
         if time() - self._time > 1:
-            self.send_message(self._buffer)
+            self.send_message()
+        else:
+            self.send_delayed()
 
-    def send_message(self, data):
-        self.connection.publish(self.key, create_message(text=data, type=self.type))
+    async def send_delayed(self):
+        await sleep(2)
+        if time() - self._time > 1:
+            self.send_message()
+
+    def send_message(self):
+        if self._buffer == "":
+            return
+        self.connection.publish(
+            self.key, create_message(text=self._buffer, type=self.type)
+        )
         self._buffer = ""
         self._time = time()
 
@@ -154,7 +163,7 @@ class RedisFileObject(object):
         pass
 
     def close(self):
-        self.send_message(self._buffer)
+        self.send_message()
 
     def __enter__(self):
         return self
@@ -265,13 +274,3 @@ def sparrow_task(*args, **kwargs):
         return _run_task
 
     return wrapper
-
-
-@sparrow_task(name="test-task")
-def test_task(overwrite: bool = False):
-    """
-    Test the tasks interface
-    """
-    for i in range(10):
-        print(i)
-        sleep(1)
