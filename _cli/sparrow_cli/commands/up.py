@@ -25,6 +25,7 @@ def sparrow_up(container, force_recreate=False):
     res = cmd(
         "sparrow compose",
         "up --build --no-start",
+        "--remove-orphans",
         "--force-recreate" if force_recreate else "",
         container,
     )
@@ -40,7 +41,10 @@ def sparrow_up(container, force_recreate=False):
 
     print("[green]Following container logs[/green]")
     compose("start", container)
+    # Try to reload nginx server if the container is running
+    compose("exec gateway nginx -s reload")
     # While we're spinning up, repopulate command help in case it's changed
+    log.info("Caching backend help info")
     get_backend_help_info(cache=True)
 
     p.wait()

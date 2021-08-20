@@ -220,7 +220,7 @@ function EditableSessionInfoComponent(props) {
     changeFunction(onSampleClick);
   };
 
-  const data = model.sample ? [sample] : null;
+  const data = model.sample ? [sample] : [];
 
   return h("div", [
     h(PageViewBlock, [

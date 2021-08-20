@@ -3,7 +3,7 @@ from json.decoder import JSONDecodeError
 import os
 from pathlib import Path
 from hashlib import md5
-from ..util import compose, exec_sparrow
+from ..util import compose, exec_sparrow, exec_or_run
 from ..exc import SparrowCommandError
 from subprocess import PIPE
 
@@ -33,13 +33,14 @@ def cli_cache_file():
 def get_backend_help_info(cache=True):
     env = dict(**os.environ)
     env["SPARROW_SECRET_KEY"] = env.get("SPARROW_SECRET_KEY", "Test")
-    out = compose(
-        "run --no-deps --rm -T",
+    out = exec_or_run(
         "backend",
         "/app/sparrow/__main__.py",
         "get-cli-info",
         stdout=PIPE,
         env=env,
+        tty=False,
+        run_args=("--no-deps --rm -T",),
     )
     if out.returncode != 0:
         details = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"
