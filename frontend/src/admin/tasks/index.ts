@@ -1,6 +1,10 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useRef, useMemo, useEffect, useState } from "react";
-import { ControlledSlider, useAPIHelpers } from "@macrostrat/ui-components";
+import {
+  ControlledSlider,
+  useAPIHelpers,
+  CollapsePanel,
+} from "@macrostrat/ui-components";
 import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { MinimalNavbar } from "~/components";
@@ -19,6 +23,7 @@ import { Link } from "react-router-dom";
 import { useElementSize } from "@earthdata/sheet/src";
 import { parse } from "ansicolor";
 import classNames from "classnames";
+import Form from "@rjsf/core";
 
 const Row = ({ data, index, style }) => {
   const lineno = index - 1;
@@ -97,9 +102,12 @@ const statusOptions = {
   [ReadyState.UNINSTANTIATED]: "Uninstantiated",
 };
 
-function TaskMain({ task }) {
-  task = useParams().task;
+function TaskMain({ tasks }) {
+  const task = useParams().task;
+  console.log(tasks, task);
   if (task == null) return null;
+  console.log(tasks);
+  const schema = tasks.find((d) => d.name == task).params;
 
   const helpers = useAPIHelpers(APIV2Context);
   //const url = helpers.buildURL("/import-tracker");
@@ -154,15 +162,18 @@ function TaskMain({ task }) {
       ]),
       h("div.status", "WebSocket connection: " + connectionStatus),
     ]),
+    h(CollapsePanel, {}, [
+      h(Form, { schema, uiSchema: { classNames: "data-form" } }),
+    ]),
     h(LogWindow, { messages: messageHistory.current }),
   ]);
 }
 
-const TasksRouter = ({ base }) => {
+const TasksRouter = ({ base, tasks }) => {
   return h(Switch, [
     h(Route, {
       path: base + "/:task",
-      render: () => h(TaskMain),
+      render: () => h(TaskMain, { tasks }),
     }),
     h(Route, {
       path: base,
@@ -211,7 +222,7 @@ function TasksPage() {
   const base = "/admin/tasks";
   return h("div.tasks-page", [
     h("div.left-column", null, h(TaskList, { tasks, base, task })),
-    h(TasksRouter, { base }),
+    h(TasksRouter, { base, tasks }),
   ]);
 }
 

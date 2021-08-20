@@ -25,6 +25,7 @@
     "@macrostrat/hyper": "^1.2.12",
     "@macrostrat/ui-components": "^0.4.3",
     "@mapbox/mapbox-gl-draw": "^1.2.0",
+    "@rjsf/core": "^3.1.0",
     "@turf/bbox": "^6.0.1",
     "@types/react": "^16.9.49",
     "@urbica/react-map-gl": "^1.14.2",
