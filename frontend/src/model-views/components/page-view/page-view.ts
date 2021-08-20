@@ -100,3 +100,23 @@ export const PageViewDate = (props) => {
 
   return h("div.page-view-date", [format(date, "MMMM D, YYYY")]);
 };
+
+export const FormattedLngLat = (props) => {
+  const { location, precision = 3 } = props;
+  if (!location) return h("div");
+  const { coordinates } = location;
+
+  let [lng, lat] = coordinates;
+
+  let lngString =
+    lng > 0
+      ? `${lng.toFixed(precision)} E`
+      : `${lng.toFixed(precision) * -1} W`;
+
+  let latString =
+    lat > 0
+      ? `${lat.toFixed(precision)} N`
+      : `${lat.toFixed(precision) * -1} S`;
+
+  return h("div.page-view-date", [`${lngString}, ${latString}`]);
+};

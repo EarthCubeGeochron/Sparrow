@@ -4,14 +4,14 @@ from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
 from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
 from marshmallow.decorators import pre_load, post_load, post_dump
-from sqlalchemy.orm import RelationshipProperty, joinedload
+from sqlalchemy.orm import RelationshipProperty, joinedload, defer
 from collections.abc import Mapping
 from sqlalchemy import inspect
 
 from .fields import SmartNested
 from ..exceptions import SparrowSchemaError
 from .util import is_pk_defined, pk_values, prop_is_required
-from .converter import SparrowConverter, allow_nest
+from .converter import SparrowConverter, allow_nest, exclude_fields
 
 from sparrow import get_logger
 
@@ -68,14 +68,23 @@ class ModelSchema(SQLAlchemyAutoSchema):
         kwargs["unknown"] = True
         nests = kwargs.pop("allowed_nests", [])
         self.allowed_nests = nests
+        model = self.opts.model.__name__
+        _message = f"Setting up schema for model {model}"
         if len(self.allowed_nests) > 0:
-            model = self.opts.model.__name__
-            log.info(f"\nSetting up schema for model {model}\n  allowed nests: {nests}")
+            _message += f"\n  allowed nests: {nests}"
+
+        # Excluding kinda works but still pulls back fields into schema
+        self._deferred_fields = [
+            *kwargs.get("exclude", []),
+            # Global defer list (we should refactor this eventually)
+            *exclude_fields.get(model, []),
+        ]
+        log.info(_message)
+
+        super().__init__(*args, **kwargs)
 
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
-
-        super().__init__(*args, **kwargs)
 
     @classmethod
     def query(cls, session):
@@ -142,6 +151,10 @@ class ModelSchema(SQLAlchemyAutoSchema):
             if load_hint is not None:
                 res = res.load_only(*list(load_hint))
             yield res
+        # Defer excluded fields
+        # Results in a huge speedup if fields are sizeable
+        for field in self._deferred_fields:
+            yield defer(field)
 
     def nested_relationships(self, max_depth=None):
         return [v for v, _ in self._nested_relationships(max_depth=max_depth)]

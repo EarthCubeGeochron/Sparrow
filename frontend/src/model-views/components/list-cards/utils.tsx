@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { Frame } from "~/frame";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Link } from "react-router-dom";
-import { pluralize } from "../new-model";
+import { FormattedLngLat, pluralize } from "../new-model";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
 import { PageViewDate, ProjectCardContent, Publication } from "~/model-views";
@@ -18,8 +18,24 @@ function clickedClassname(props) {
   }
 }
 
-export function ModelCard(props) {
-  const { content, id, model, link = true, onClick = () => {} } = props;
+type ModelCardProps = {
+  content: ReactNode;
+  id: number;
+  model: string;
+  showIdentity?: "long" | "short" | null;
+  link: boolean;
+  onClick?: () => void;
+};
+
+export function ModelCard(props: ModelCardProps) {
+  const {
+    content,
+    id,
+    model,
+    showIdentity = null,
+    link = true,
+    onClick = () => {},
+  } = props;
 
   const [clicked, setClicked] = useState();
 
@@ -34,9 +50,14 @@ export function ModelCard(props) {
 
   const classname = clickedClassname({ clicked, id });
 
+  let idInfo = showIdentity == "long" ? `${model} ${id}` : id;
+
   if (link) {
     return h(Link, { to, style: { textDecoration: "none" } }, [
-      h(`div.${classname}`, [content]),
+      h(`div.${classname}`, [
+        h.if(showIdentity != null)("div.id-info", idInfo),
+        content,
+      ]),
     ]);
   } else {
     return h("div", [
@@ -63,19 +84,8 @@ function sessionDates({ session }) {
 
 export const sampleContent = (props) => {
   const { material, id, name, location, session } = props;
-  const Location =
-    location != null
-      ? h("div", [
-          "[",
-          location.coordinates[0].toFixed(3),
-          ", ",
-          location.coordinates[1].toFixed(3),
-          "]",
-        ])
-      : h("div", "No Location");
 
   const sampleName = h("div", { style: { marginBottom: "5px" } }, [
-    "Sample: ",
     h("span", name),
   ]);
 
@@ -87,9 +97,11 @@ export const sampleContent = (props) => {
   const sessionDate = sessionDates({ session });
 
   return h("div.sample-content", [
-    h("div.card-header", [h("div", id), Location]),
+    h("div.card-header", [
+      h("div.bod", [sampleName]),
+      h(FormattedLngLat, { location }),
+    ]),
     h("div.bod", [
-      sampleName,
       Material,
       sessionDate.map((date) => {
         if (sessionDate.lenght > 0) {
@@ -108,6 +120,7 @@ const SampleModelCard = (props) => {
     location,
     session = [],
     link = true,
+    showIdentity,
     onClick = null,
   } = props;
 
@@ -122,12 +135,13 @@ const SampleModelCard = (props) => {
     h(sampleContent, { material, id, name, location, session })
   );
   if (onClick == null) {
-    return h(ModelCard, { id, content, model: "sample", link });
+    return h(ModelCard, { id, content, model: "sample", link, showIdentity });
   }
 
   return h(ModelCard, {
     id,
     content,
+    showIdentity,
     model: "sample",
     link,
     onClick: () => onClick(sample),
@@ -152,7 +166,8 @@ const interior = ({ doi, title }) => {
 };
 
 const PublicationModelCard = (props) => {
-  const { year, id, title, doi, author, journal, onClick, link } = props;
+  const { year, id, title, doi, author, journal, onClick, link, showIdentity } =
+    props;
 
   const content = h(Frame, { id: "publicationCardContent" }, [
     h(interior, { title, doi }),
@@ -161,6 +176,7 @@ const PublicationModelCard = (props) => {
   return h(ModelCard, {
     id,
     content,
+    showIdentity,
     model: "publication",
     link,
     onClick: () => onClick(id, title, doi),
@@ -168,7 +184,7 @@ const PublicationModelCard = (props) => {
 };
 
 export const ResearcherModelCard = (props) => {
-  const { id, name, onClick, link } = props;
+  const { id, name, onClick, link, showIdentity } = props;
 
   const content = h(
     Frame,
@@ -179,6 +195,7 @@ export const ResearcherModelCard = (props) => {
   return h(ModelCard, {
     id,
     content,
+    showIdentity,
     model: "researcher",
     link,
     onClick: () => onClick(id, name),
@@ -195,6 +212,7 @@ const ProjectModelCard = (props) => {
     publication = [],
     link,
     onClick,
+    showIdentity,
     minimal = false,
   } = props;
 
@@ -217,6 +235,7 @@ const ProjectModelCard = (props) => {
 
   return h(ModelCard, {
     id,
+    showIdentity,
     content: cardContent,
     model: "project",
     link,
@@ -262,7 +281,7 @@ const SessionListContent = (props) => {
 
 const SessionListModelCard = (props) => {
   const {
-    session_id,
+    id,
     target,
     date,
     technique,
@@ -272,6 +291,7 @@ const SessionListModelCard = (props) => {
     data,
     link,
     onClick,
+    showIdentity,
     onHover = false,
   } = props;
 
@@ -293,7 +313,7 @@ const SessionListModelCard = (props) => {
     {
       id: "sessionCardContent",
       data: {
-        session_id,
+        id,
         target,
         date,
         technique,
@@ -307,11 +327,12 @@ const SessionListModelCard = (props) => {
   );
 
   return h(ModelCard, {
-    id: session_id,
+    id: id,
     content: cardContent,
+    showIdentity,
     model: "session",
     link,
-    onClick: () => onClick(session_id, date, target, technique),
+    onClick: () => onClick(id, date, target, technique),
   });
 };
 
@@ -371,7 +392,7 @@ const SessionModelLinkCard = (props) => {
 };
 
 const DataFileModelCard = (props) => {
-  const { file_hash, basename, type, date, data_file_link: link } = props;
+  const { file_hash, basename, type, date } = props;
 
   const content = h("div.session-card", [
     h("div.card-header", [h(PageViewDate, { date })]),
@@ -382,7 +403,7 @@ const DataFileModelCard = (props) => {
     Frame,
     {
       id: "datafileCardContent",
-      data: { file_hash, basename, type, date, link },
+      data: { file_hash, basename, type, date },
     },
     content
   );

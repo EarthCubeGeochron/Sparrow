@@ -106,24 +106,24 @@ function getDataFileData(props) {
   const { sample_ids = [0], session_ids = [0], analysis_ids = [0] } = props;
 
   const baseUrl = `/data_file/filter`;
-  const sample = useAPIv2Result(
+  let sample = useAPIv2Result(
     baseUrl + `?sample_id=${sample_ids}`,
     {},
     { unwrapResponse: unwrapDataFile }
   );
-  const session = useAPIv2Result(
+  let session = useAPIv2Result(
     baseUrl + `?session_id=${session_ids}`,
     {},
     { unwrapResponse: unwrapDataFile }
   );
-  const analysis = useAPIv2Result(
+  let analysis = useAPIv2Result(
     baseUrl + `?analysis_id=${analysis_ids}`,
     {},
     { unwrapResponse: unwrapDataFile }
   );
-  if (analysis == null) return [];
-  if (session == null) return [];
-  if (sample == null) return [];
+  if (analysis == null) analysis = [];
+  if (session == null) session = [];
+  if (sample == null) sample = [];
 
   return [...sample, ...session, ...analysis];
 }
@@ -186,7 +186,6 @@ export function DataFilePage(props) {
   } = props;
 
   const data = getDataFileData({ sample_ids, session_ids, analysis_ids });
-
   return h(
     PageViewBlock,
     {

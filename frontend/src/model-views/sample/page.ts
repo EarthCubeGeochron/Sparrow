@@ -31,6 +31,7 @@ import {
   PageViewBlock,
   DataFilePage,
   SubSamplePageView,
+  FormattedLngLat,
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
@@ -99,13 +100,13 @@ const LocationBlock = function (props) {
   const zoom = 8;
   const [longitude, latitude] = location.coordinates;
   return h("div.location", [
-    h("h5.lon-lat", `[${longitude} , ${latitude}]`),
     h(MapLink, { zoom, latitude, longitude }, [
       h(SampleContextMap, {
         center: location.coordinates,
         zoom,
       }),
     ]),
+    h(FormattedLngLat, { location }),
     h.if(location_name)("h5.location-name", location_name),
   ]);
 };
@@ -385,6 +386,16 @@ function SampleTagContainer() {
   });
 }
 
+const handleMemberOfPersist = async (changeset, url) => {
+  if (!changeset["member_of"]) return [];
+  let body = { member_of: changeset["member_of"] };
+  const res = await put(url, body);
+  const { data } = res;
+
+  delete changeset.member_of;
+  return data;
+};
+
 async function TagsChangeSet(changeset, updatedModel, url) {
   /**
    * tag_ids = data['tag_ids']
@@ -442,8 +453,15 @@ function SamplePage(props) {
             buildURL("/tags/models/sample", {})
           )
         );
-        let rest;
         let { id } = updatedModel;
+        console.log(
+          handleMemberOfPersist(
+            changeset,
+            buildURL(`/models/sample/sub-sample/${id}`)
+          )
+        );
+        delete updatedModel.member_of;
+        let rest;
         const response = await put(
           buildURL(`/models/sample/${id}`, {}),
           updatedModel

@@ -5,6 +5,7 @@ import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
 import { useAPIv2Result } from "~/api-v2";
+import { FormattedLngLat } from "./page-view";
 
 const h = hyperStyled(styles);
 
@@ -12,7 +13,7 @@ export const SampleAdd = (props) => {
   const {
     onClickDelete = () => {},
     onClickList = () => {},
-    data,
+    data = [],
     draggable = true,
     setID = () => {},
     isEditing = false,
@@ -166,7 +167,7 @@ export function SampleCard(props: SampleCardProps) {
     },
     [
       h("h4.name", name),
-      h(Location, { location }),
+      h(FormattedLngLat, { location }),
       h.if(material != null)("div.material", material),
       h(SessionContent, { session }),
     ]
@@ -177,7 +178,7 @@ export function SubSamplePageView(props) {
   const { sample_id, isEditing } = props;
 
   let data = useAPIv2Result(
-    `/sub-sample/${sample_id}`,
+    `/models/sample/sub-sample/${sample_id}`,
     {},
     { unwrapResponse: (data) => data.sample_collection }
   );

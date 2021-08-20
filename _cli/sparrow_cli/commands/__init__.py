@@ -6,14 +6,23 @@ from .dev import sparrow_dev  # noqa
 from .info import sparrow_info  # noqa
 from .build import sparrow_build
 from .attach import sparrow_attach
+from .logs import sparrow_logs
+from .up import sparrow_up
+
+_commands = {
+    "db": sparrow_db,
+    "docs": sparrow_docs,
+    "up": sparrow_up,
+    "test": sparrow_test,
+    "build": sparrow_build,
+    "attach": sparrow_attach,
+    "logs": sparrow_logs,
+    "dev": sparrow_dev,
+    "info": sparrow_info,
+    "create-test-lab": sparrow_test_lab,
+}
 
 
 def add_commands(cli):
-    cli.add_command(sparrow_build, name="build")
-    cli.add_command(sparrow_dev, name="dev")
-    cli.add_command(sparrow_info, name="info")
-    cli.add_command(sparrow_docs, name="docs")
-    cli.add_command(sparrow_db, name="db")
-    cli.add_command(sparrow_test, name="test")
-    cli.add_command(sparrow_test_lab, name="create-test-lab")
-    cli.add_command(sparrow_attach, name="attach")
+    for name, command in _commands.items():
+        cli.add_command(command, name=name)
