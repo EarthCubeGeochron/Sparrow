@@ -27,6 +27,8 @@ from time import time
 from broadcaster import Broadcast
 from typing import get_type_hints
 from contextlib import contextmanager
+from typer.utils import get_params_from_function
+from pydantic import create_model
 import inspect
 
 log = get_logger(__name__)
@@ -37,6 +39,17 @@ class SparrowTaskError(Exception):
 
 
 _tasks_to_register = {}
+
+
+def create_args_schema(func):
+    """Create a Pydantic representation of sparrow task parameters."""
+    params = get_params_from_function(func)
+
+    kwargs = {
+        k: (v.annotation, ... if v.default is v.empty else v.default)
+        for k, v in params.items()
+    }
+    return create_model("TaskParamModel", **kwargs)
 
 
 class SparrowTaskManager(SparrowCorePlugin):
@@ -70,8 +83,6 @@ class SparrowTaskManager(SparrowCorePlugin):
     def register_task(self, func, *args, **kwargs):
         # Get plugin name
         name = kwargs.get("name", func.__name__)
-        hints = get_type_hints(func)
-
         destructive = kwargs.get("destructive", False)
         cli_only = kwargs.get("cli_only", False)
         if destructive or self.celery is None:
@@ -80,16 +91,18 @@ class SparrowTaskManager(SparrowCorePlugin):
         self._cli_app.command(name=name)(func)
         if not cli_only:
             task = self.celery.task(*args, **kwargs)(func)
-            self._celery_tasks[name] = task
+            self._celery_tasks[name] = {
+                "func": task,
+                "params": create_args_schema(func),
+            }
 
         self._task_commands.append(name)
         log.debug(f"Registering task {name}")
-
         func._is_sparrow_task = True
         return func
 
     def get_task(self, name):
-        return self._celery_tasks[name]
+        return self._celery_tasks[name]["func"]
 
     def on_plugins_initialized(self):
         global _tasks_to_register
@@ -209,14 +222,15 @@ class SparrowTask(Task):
         try:
             with redirect_output_to_redis(queue, "sparrow:task:" + self.name):
                 queue.publish(
-                    "sparrow:task:" + self.name, create_message(text="Starting task")
+                    "sparrow:task:" + self.name,
+                    create_message(text="Starting task", type="control"),
                 )
                 return self.run(*args, **kwargs)
         except Exception as exc:
             l1 = traceback.format_exception(*sys.exc_info())
             queue.publish(
                 "sparrow:task:" + self.name,
-                create_message(text="".join(l1), type="control"),
+                create_message(text="".join(l1), type="error"),
             )
             raise exc
         finally:

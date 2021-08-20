@@ -105,7 +105,11 @@ async def tasks(request):
     return APIResponse(
         {
             "tasks": [
-                {"name": k, "description": v.__doc__.strip()}
+                {
+                    "name": k,
+                    "description": v["func"].__doc__.strip(),
+                    "params": loads(v["params"].schema_json()),
+                }
                 for k, v in mgr._celery_tasks.items()
             ],
             "enabled": mgr._task_worker_enabled,
