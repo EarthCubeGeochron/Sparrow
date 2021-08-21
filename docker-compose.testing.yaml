@@ -1,24 +1,23 @@
 # Standalone docker-compose file for backend testing.
 # Only spins up backend and database, not frontend.
+# If the appropriate environment variables are set,
+# it will create a worker and task broker. These aren't
+# currently used, but they could be in the future.
 version: "3.6"
-x-backend:
-  &x-backend
-  build:
-    context: ./backend
-    target: testing
-  # Make sure we get colorized terminal output
-  depends_on:
-    - db
-    - broker
-  environment:
-    - SPARROW_SECRET_KEY=test_secret
-    # Whether we should enable a worker pool for running tasks. If we don't,
-    # tasks must be run via the command line.
-    - SPARROW_TASK_WORKER=1
-    - SPARROW_TASK_BROKER=redis://broker:6379/
 services:
   backend:
-    <<: *x-backend
+    build:
+      context: ./backend
+      target: testing
+    # Make sure we get colorized terminal output
+    depends_on:
+      - db
+    environment:
+      - SPARROW_SECRET_KEY=test_secret
+      # Whether we should enable a worker pool for running tasks.
+      # If we don't, tasks must be run via the command line.
+      - SPARROW_TASK_WORKER
+      - SPARROW_TASK_BROKER
     command: pytest /app/sparrow_tests --teardown 
     tty: true
     volumes:
@@ -34,14 +33,32 @@ services:
       - 5432
     environment:
       - POSTGRES_DB=sparrow
+  # Additional testing of broker-based functionality.
   # Broker and worker are for testing task-based functionality
-  # We should see if we can disable this sometimes for minimal tests.
+  # We disable this for minimal tests, but we can test with the brokers
+  # with --profile=task-worker and the SPARROW_TASK_BROKER environment
+  # variable set.
   broker:
     image: redis:latest
+    profiles:
+      - task-worker
     expose:
       - 6379
   worker:
-    <<: *x-backend
+    build:
+      context: ./backend
+      target: testing
+    # Make sure we get colorized terminal output
+    depends_on:
+      - db
+    environment:
+      - SPARROW_SECRET_KEY=test_secret
+      # Whether we should enable a worker pool for running tasks.
+      # If we don't, tasks must be run via the command line.
+      - SPARROW_TASK_WORKER
+      - SPARROW_TASK_BROKER
+    profiles:
+      - task-worker
     command: /bin/run-worker
 volumes:
   pytest_cache:

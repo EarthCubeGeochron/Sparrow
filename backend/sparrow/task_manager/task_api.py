@@ -1,14 +1,13 @@
-from sparrow.api import APIResponse
-from sparrow.context import get_plugin
-from starlette.routing import Route, Router
-from starlette.authentication import requires
 from asyncio import sleep, create_task
 from json import loads
-from sparrow.context import get_plugin
+from starlette.authentication import requires
+from starlette.applications import Starlette
 from starlette.endpoints import WebSocketEndpoint
 from starlette.routing import Route, WebSocketRoute
+
+from sparrow.api import APIResponse
+from sparrow.context import get_plugin
 from sparrow_utils import get_logger
-from starlette.applications import Starlette
 
 log = get_logger(__name__)
 
@@ -64,31 +63,32 @@ class TaskEndpoint(WebSocketEndpoint):
             self._listener.cancel()
         self._listener = create_task(self.listen(session))
 
-    async def listen(self, session):
+    async def _subscriber_loop(self, session, channel_name):
         plugin = get_plugin("task-manager")
+        if plugin.broadcast is None:
+            return
+
+        await session.send_json(
+            {"info": f"Trying to connect to channel {channel_name}"}
+        )
+        if not hasattr(plugin.broadcast._backend, "_subscriber"):
+            await plugin.broadcast.connect()
+        async with plugin.broadcast.subscribe(channel=channel_name) as subscriber:
+            await session.send_json({"info": f"Subscribed to channel {channel_name}"})
+            async for event in subscriber:
+                await session.send_json(loads(event.message))
+            await session.send_json({"info": f"Closing subscription"})
+
+    async def listen(self, session):
         name = session.path_params["task"]
         channel_name = "sparrow:task:" + name
         while True:
-            if plugin.broadcast is not None:
-                await session.send_json(
-                    {"info": f"Trying to connect to channel {channel_name}"}
-                )
-                if not hasattr(plugin.broadcast._backend, "_subscriber"):
-                    await plugin.broadcast.connect()
-                try:
-                    async with plugin.broadcast.subscribe(
-                        channel=channel_name
-                    ) as subscriber:
-                        await session.send_json(
-                            {"info": f"Subscribed to channel {channel_name}"}
-                        )
-                        async for event in subscriber:
-                            await session.send_json(loads(event.message))
-                        await session.send_json({"info": f"Closing subscription"})
-                except Exception as exc:
-                    await session.send_json({"text": str(exc)})
+            try:
+                await self._subscriber_loop(session, channel_name)
+            except Exception as exc:
+                await session.send_json({"text": str(exc)})
             await session.send_json({"info": f"Trying to reconnect"})
-            await sleep(1)
+            await sleep(5)
 
 
 @requires("admin")
@@ -102,7 +102,8 @@ async def tasks(request):
                     "description": v["func"].__doc__.strip(),
                     "params": loads(v["params"].schema_json()),
                 }
-                for k, v in mgr._celery_tasks.items()
+                for k, v in mgr._tasks.items()
+                if not v["cli_only"]
             ],
             "enabled": mgr._task_worker_enabled,
         }

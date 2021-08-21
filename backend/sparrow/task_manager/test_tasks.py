@@ -1,10 +1,8 @@
-from .. import task
 from click import echo
-from ..users.test_user_api import admin_client
-from inspect import signature
-from typing import get_type_hints
-from typer.utils import get_params_from_function
-from pydantic import create_model
+from json import loads
+from pytest import fixture, raises
+from sparrow.users.test_user_api import admin_client
+from .task import task, create_args_schema
 
 
 @task(name="hello")
@@ -16,11 +14,6 @@ def hello_task(name: str):
 
 
 def _really_real(name: str, check_real: bool = True):
-    pass
-
-
-@task(name="really-real")
-def really_real(name: str, check_real: bool = True):
     """Say hello!"""
     if check_real:
         text = f"Hello, {name}"
@@ -30,33 +23,51 @@ def really_real(name: str, check_real: bool = True):
     return text
 
 
+task(name="kinda-real")(_really_real)
+
+
+@task(name="sludge", cli_only=True)
+def dismal_decay():
+    """An underworldly task."""
+    pass
+
+
+@fixture
+def tasks_api_response(admin_client):
+    res = admin_client.get("/api/v2/tasks/")
+    assert res.status_code == 200
+    return res.json()["data"]
+
+
 class TestSparrowTaskManager:
     def test_task_manager_exists(self, app):
         mgr = app.plugins.get("task-manager")
-        mgr.celery.conf.task_always_eager = True
         assert mgr is not None
         hello_task = mgr.get_task("hello")
         assert hello_task is not None
         assert hello_task._is_sparrow_task
         assert hello_task("Sparrow") == "Hello, Sparrow"
 
-    def test_task_manager_api(self, admin_client):
-        res = admin_client.get("/api/v2/tasks/")
-        assert res.status_code == 200
-        data = res.json()["data"]
-        assert data["enabled"]
-        task_names = [t["name"] for t in data["tasks"]]
+    def test_task_manager_api(self, tasks_api_response):
+        task_names = [t["name"] for t in tasks_api_response["tasks"]]
         assert "hello" in task_names
+        assert "_really_real" not in task_names
+        assert "kinda-real" in task_names
+
+    def test_cli_only_tasks(self, app, tasks_api_response):
+        mgr = app.plugins.get("task-manager")
+        with raises(ValueError):
+            mgr.get_task("sludge")
+        assert mgr._tasks["sludge"]["cli_only"]
+        assert "sludge" not in tasks_api_response["tasks"]
+
+    def test_task_manager_api_enabled(self, app, tasks_api_response):
+        mgr = app.plugins.get("task-manager")
+        assert tasks_api_response["enabled"] == mgr._task_worker_enabled
 
     def test_schema_generation(self):
         """Test that a reasonable schema is generated for a function."""
-        params = get_params_from_function(_really_real)
-
-        def get_param(v):
-            return (v.annotation, ... if v.default is v.empty else v.default)
-
-        kwargs = {k: get_param(v) for k, v in params.items()}
-        ParamModel = create_model("ParamModel", **kwargs)
-        schema = ParamModel.schema_json()
-
-        assert False
+        TaskParamModel = create_args_schema(_really_real)
+        schema = TaskParamModel.schema_json()
+        data = loads(schema)
+        assert data["properties"]["check_real"]["type"] == "boolean"

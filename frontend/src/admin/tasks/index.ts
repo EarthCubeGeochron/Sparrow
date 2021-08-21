@@ -4,13 +4,7 @@ import { CollapseCard } from "@macrostrat/ui-components";
 import { useAPIv2Result } from "~/api-v2";
 import useResizeObserver from "use-resize-observer";
 import { MinimalNavbar, ServerStatus } from "~/components";
-import {
-  Button,
-  ButtonGroup,
-  Menu,
-  MenuItem,
-  NonIdealState,
-} from "@blueprintjs/core";
+import { Button, Menu, MenuItem, NonIdealState } from "@blueprintjs/core";
 import styles from "./module.styl";
 import { FixedSizeList as List } from "react-window";
 const h = hyperStyled(styles);
