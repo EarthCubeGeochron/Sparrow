@@ -1,9 +1,24 @@
-from enum import auto
 from os import environ
 from pytest import fixture, mark
+from starlette.authentication import requires
+from starlette.testclient import TestClient
+from sqlalchemy.exc import IntegrityError
 from .create_user import _create_user
 from .backend import JWTBackend
-from starlette.authentication import requires
+
+
+@fixture(scope="class")
+def admin_client(app, db):
+    user = "Test"
+    password = "test"
+    client = TestClient(app)
+    # Create a user directly on the database
+    try:
+        _create_user(db, user, password)
+    except IntegrityError:
+        db.session.rollback()
+    client.post("/api/v2/auth/login", json={"username": user, "password": password})
+    return client
 
 
 @fixture(scope="class")
@@ -43,14 +58,16 @@ bad_credentials = [
 ]
 
 
-@fixture(scope="module", autouse=True)
-def setup_ws_test_route(app):
+def setup_ws_test_routes(app):
     @app.websocket_route("/ws-test")
     @requires("admin")
-    async def ws_route(websocket, additional):
+    async def ws_route(websocket):
         await websocket.accept()
         await websocket.send_json(
-            {"authenticated": websocket.user.is_authenticated, "additional": additional}
+            {
+                "authenticated": websocket.user.is_authenticated,
+                "user": websocket.user.username,
+            }
         )
 
 
@@ -143,3 +160,10 @@ class TestSparrowAuth:
         data = res.json()
         assert "error" not in data
         assert data["answer"] == 42
+
+    @mark.xfail(reason="Cannot get websocket client to work.")
+    def test_websocket_access(self, app, admin_client):
+        setup_ws_test_routes(app)
+        with admin_client.websocket_connect("/ws-test") as websocket:
+            data = websocket.receive_json()
+            assert data == {"authenticated": True, "user": "Test"}

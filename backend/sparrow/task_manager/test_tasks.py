@@ -1,7 +1,7 @@
 from click import echo
 from json import loads
 from pytest import fixture, raises
-from sparrow.users.test_user_api import admin_client
+from sparrow.auth.test_auth import admin_client
 from .task import task, create_args_schema
 
 

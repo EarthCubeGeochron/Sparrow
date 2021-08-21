@@ -1,19 +1,6 @@
 from pytest import fixture
-from sparrow.auth.test_auth import is_forbidden, verify_credentials
-from sparrow.auth.create_user import _create_user
-from starlette.testclient import TestClient
+from sparrow.auth.test_auth import is_forbidden, verify_credentials, admin_client
 from sparrow.database.models import User
-
-
-@fixture(scope="class")
-def admin_client(app, db):
-    user = "Test"
-    password = "test"
-    client = TestClient(app)
-    # Create a user directly on the database
-    _create_user(db, user, password)
-    client.post("/api/v2/auth/login", json={"username": user, "password": password})
-    return client
 
 
 def user_exists(db, username):
