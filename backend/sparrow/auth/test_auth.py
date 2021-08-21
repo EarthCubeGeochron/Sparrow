@@ -1,7 +1,9 @@
+from enum import auto
 from os import environ
 from pytest import fixture, mark
 from .create_user import _create_user
 from .backend import JWTBackend
+from starlette.authentication import requires
 
 
 @fixture(scope="class")
@@ -39,6 +41,17 @@ bad_credentials = [
     {},
     None,
 ]
+
+
+@fixture(scope="module", autouse=True)
+def setup_ws_test_route(app):
+    @app.websocket_route("/ws-test")
+    @requires("admin")
+    async def ws_route(websocket, additional):
+        await websocket.accept()
+        await websocket.send_json(
+            {"authenticated": websocket.user.is_authenticated, "additional": additional}
+        )
 
 
 class TestSparrowAuth:
