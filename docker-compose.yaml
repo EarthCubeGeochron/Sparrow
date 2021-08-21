@@ -8,10 +8,6 @@ x-backend:
       - sparrowdata/backend:${SPARROW_BACKEND_VERSION:-latest}
     target: main
   command: /bin/run
-  # We need a liberal restart policy even in development, unfortunately,
-  # because the server dies on out-of-memory errors in some configurations.
-  # We should really attempt to avoid this, but having the policy is good I think.
-  restart: unless-stopped
   # Make sure we get colorized terminal output
   tty: true
   depends_on:
