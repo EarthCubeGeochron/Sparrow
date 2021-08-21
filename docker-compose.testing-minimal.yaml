@@ -1,0 +1,31 @@
+version: "3.6"
+services:
+  backend:
+    build:
+      context: ./backend
+      target: testing
+    # Make sure we get colorized terminal output
+    depends_on:
+      - db
+    environment:
+      - SPARROW_SECRET_KEY=test_secret
+      # Whether we should enable a worker pool for running tasks.
+      # If we don't, tasks must be run via the command line.
+      - SPARROW_TASK_WORKER=0
+    command: pytest /app/sparrow_tests --teardown 
+    tty: true
+    volumes:
+      - pytest_cache:/run/.pytest_cache
+  db:
+    image: mdillon/postgis:11
+    ports:
+      # We could change this to port 54321 if we were cool with
+      # it conflicting with our default for Sparrow itself. This
+      # might make it harder to run tests, though.
+      - "54322:5432"
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_DB=sparrow
+volumes:
+  pytest_cache:
