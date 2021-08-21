@@ -16,6 +16,7 @@ x-backend:
   tty: true
   depends_on:
     - db
+    - broker
   environment:
     - SPARROW_ENV
     - SPARROW_SECRET_KEY

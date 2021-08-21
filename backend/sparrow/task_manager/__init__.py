@@ -55,7 +55,7 @@ class SparrowTaskManager(SparrowCorePlugin):
         }
 
         # Enables tasks to talk to the frontend
-        self._task_message_queue = Redis(TASK_BROKER)
+        self._task_message_queue = Redis.from_url(TASK_BROKER)
 
     def register_task(self, func, *args, **kwargs):
         # Get plugin name

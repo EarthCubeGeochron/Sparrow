@@ -4,20 +4,24 @@
 # it will create a worker and task broker. These aren't
 # currently used, but they could be in the future.
 version: "3.6"
+x-backend:
+  &x-backend
+  build:
+    context: ./backend
+    target: testing
+  # Make sure we get colorized terminal output
+  depends_on:
+    - db
+    - broker
+  environment:
+    - SPARROW_SECRET_KEY=test_secret
+    # Whether we should enable a worker pool for running tasks.
+    # If we don't, tasks must be run via the command line.
+    - SPARROW_TASK_WORKER=1
+    - SPARROW_TASK_BROKER=redis://broker:6379/0
 services:
   backend:
-    build:
-      context: ./backend
-      target: testing
-    # Make sure we get colorized terminal output
-    depends_on:
-      - db
-    environment:
-      - SPARROW_SECRET_KEY=test_secret
-      # Whether we should enable a worker pool for running tasks.
-      # If we don't, tasks must be run via the command line.
-      - SPARROW_TASK_WORKER
-      - SPARROW_TASK_BROKER
+    <<: *x-backend
     command: pytest /app/sparrow_tests --teardown 
     tty: true
     volumes:
@@ -45,18 +49,7 @@ services:
     expose:
       - 6379
   worker:
-    build:
-      context: ./backend
-      target: testing
-    # Make sure we get colorized terminal output
-    depends_on:
-      - db
-    environment:
-      - SPARROW_SECRET_KEY=test_secret
-      # Whether we should enable a worker pool for running tasks.
-      # If we don't, tasks must be run via the command line.
-      - SPARROW_TASK_WORKER
-      - SPARROW_TASK_BROKER
+    <<: *x-backend
     profiles:
       - task-worker
     command: /bin/run-worker
