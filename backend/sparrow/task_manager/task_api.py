@@ -1,13 +1,15 @@
 from asyncio import sleep, create_task
 from json import loads
-from starlette.authentication import requires
+from starlette.authentication import requires, AuthenticationError
 from starlette.applications import Starlette
 from starlette.endpoints import WebSocketEndpoint
 from starlette.routing import Route, WebSocketRoute
+from starlette import status
 
 from sparrow.api import APIResponse
 from sparrow.context import get_plugin
 from sparrow_utils import get_logger
+from sparrow.auth import get_scopes
 
 log = get_logger(__name__)
 
@@ -32,7 +34,6 @@ class TaskEndpoint(WebSocketEndpoint):
         return self._running_task
 
     async def on_receive(self, session, message):
-
         action = message.get("action", None)
         task_name = session.path_params["task"]
         log.debug(f"Received message {message} for task {task_name}")
@@ -49,11 +50,15 @@ class TaskEndpoint(WebSocketEndpoint):
         await session.send_json(message)
         log.debug(f"Sent message {message}")
 
-    async def on_disconnect(self, session):
+    async def on_disconnect(self, session, close_code):
         if self._listener is not None:
             self._listener.cancel()
 
     async def on_connect(self, session):
+        scopes = await get_scopes(session)
+        if "admin" not in scopes:
+            await session.close(status.WS_1008_POLICY_VIOLATION)
+            return
         await session.accept()
         await session.send_json({"info": "Bienvenue sur le websocket!"})
         await self.start_listener(session)
@@ -88,7 +93,7 @@ class TaskEndpoint(WebSocketEndpoint):
             except Exception as exc:
                 await session.send_json({"text": str(exc)})
             await session.send_json({"info": f"Trying to reconnect"})
-            await sleep(5)
+            await sleep(1)
 
 
 @requires("admin")

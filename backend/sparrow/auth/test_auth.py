@@ -2,7 +2,7 @@ from os import environ
 from pytest import fixture, mark
 from starlette.authentication import requires
 from starlette.testclient import TestClient
-from sqlalchemy.exc import IntegrityError
+from starlette.websockets import WebSocket, WebSocketDisconnect
 from .create_user import _create_user
 from .backend import JWTBackend
 
@@ -13,10 +13,8 @@ def admin_client(app, db):
     password = "test"
     client = TestClient(app)
     # Create a user directly on the database
-    try:
-        _create_user(db, user, password)
-    except IntegrityError:
-        db.session.rollback()
+    _create_user(db, user, password, raise_on_error=False)
+
     client.post("/api/v2/auth/login", json={"username": user, "password": password})
     return client
 
@@ -60,22 +58,47 @@ bad_credentials = [
 
 def setup_ws_test_routes(app):
     @app.websocket_route("/ws-test")
-    @requires("admin")
     async def ws_route(websocket):
         await websocket.accept()
+        await websocket.send_json({"enabled": True})
+
+    @app.websocket_route("/ws-auth-test")
+    @requires("admin")
+    async def ws_auth_route(websocket):
+        await websocket.accept()
+        data = await websocket.receive_json()
         await websocket.send_json(
             {
                 "authenticated": websocket.user.is_authenticated,
                 "user": websocket.user.username,
             }
         )
+        await websocket.close()
+
+
+def test_websocket_send_and_receive_json():
+    def app(scope):
+        async def asgi(receive, send):
+            websocket = WebSocket(scope, receive=receive, send=send)
+            await websocket.accept()
+            data = await websocket.receive_json()
+            await websocket.send_json({"message": data})
+            await websocket.close()
+
+        return asgi
+
+    client = TestClient(app)
+    with client.websocket_connect("/") as websocket:
+        websocket.send_json({"hello": "world"})
+        data = websocket.receive_json()
+        assert data == {"message": {"hello": "world"}}
 
 
 class TestSparrowAuth:
     def test_create_user(self, db):
         user = "Test"
         password = "test"
-        _create_user(db, user, password)
+        _create_user(db, user, password, raise_on_error=False)
 
     def test_jwt_encoding(self, auth_backend):
         value = "Test123"
@@ -161,9 +184,11 @@ class TestSparrowAuth:
         assert "error" not in data
         assert data["answer"] == 42
 
-    @mark.xfail(reason="Cannot get websocket client to work.")
-    def test_websocket_access(self, app, admin_client):
+    @mark.xfail(reason="Websocket testing doesn't seem to work")
+    def test_websocket_access(self, app):
         setup_ws_test_routes(app)
-        with admin_client.websocket_connect("/ws-test") as websocket:
+        client = TestClient(app)
+        with client.websocket_connect("/ws-auth-test") as websocket:
+            websocket.send_json({"hello": "world"})
             data = websocket.receive_json()
             assert data == {"authenticated": True, "user": "Test"}

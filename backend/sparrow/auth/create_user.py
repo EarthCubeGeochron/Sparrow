@@ -1,15 +1,21 @@
 import click
 from click import echo, secho, style, prompt
+from sqlalchemy.exc import IntegrityError
 from ..database.models import User
 
 
-def _create_user(db, username, password):
-    user = User(username=username)
-    user.set_password(password)
-    db.session.add(user)
-    assert user.is_correct_password(password)
-    db.session.commit()
-    return user
+def _create_user(db, username, password, raise_on_error=True):
+    try:
+        user = User(username=username)
+        user.set_password(password)
+        db.session.add(user)
+        assert user.is_correct_password(password)
+        db.session.commit()
+        return user
+    except IntegrityError:
+        db.session.rollback()
+        if raise_on_error:
+            raise
 
 
 def create_user(db):
