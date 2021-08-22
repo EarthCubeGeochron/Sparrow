@@ -97,12 +97,8 @@ function DataSheet() {
    * And at the end I can grab the whole row and send it to the backend.
    */
 
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
-
-  const url = buildURL("/datasheet/view");
-
   const initialData = useAPIResult(
-    url,
+    "/datasheet/view",
     {},
     { unwrapResponse, context: APIV2Context }
   );
