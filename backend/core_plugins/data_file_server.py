@@ -55,7 +55,7 @@ class DataFilePlugin(SparrowCorePlugin):
 
     def on_api_initialized_v2(self, api):
         api.mount(
-            "/data_file/{uuid}",
+            "/data_file/{uuid}/download",
             DataFileAPI,
             name="data_file_api",
             help="Download a data file by URL",
