@@ -1,7 +1,10 @@
 from click import echo
 from json import loads
 from pytest import fixture, raises
-from sparrow.users.test_user_api import admin_client
+from time import time
+from sparrow.auth.test_auth import admin_client
+from starlette.authentication import AuthenticationError
+from starlette.websockets import WebSocketDisconnect
 from .task import task, create_args_schema
 
 
@@ -71,3 +74,18 @@ class TestSparrowTaskManager:
         schema = TaskParamModel.schema_json()
         data = loads(schema)
         assert data["properties"]["check_real"]["type"] == "boolean"
+
+    def test_websocket_task_unauthorized(self, client):
+        with raises(WebSocketDisconnect) as err:
+            with client.websocket_connect("/api/v2/tasks/hello") as websocket:
+                websocket.receive_json()
+            assert err.code == 1008
+
+    def test_websocket_task_running(self, app, admin_client):
+        plugin = app.plugins.get("task-manager")
+        with admin_client.websocket_connect("/api/v2/tasks/hello") as websocket:
+            data = websocket.receive_json()
+            assert data["info"] == "Bienvenue sur le websocket!"
+            websocket.send_json({"action": "start", "params": {"name": "Sparrow"}})
+            if plugin.broadcast is None:
+                return

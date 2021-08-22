@@ -2,7 +2,7 @@ import sys
 from json import dumps
 from time import time
 from contextlib import contextmanager
-from asyncio import sleep
+from asyncio import sleep, get_event_loop
 
 
 def create_message(**kwargs):
@@ -18,6 +18,7 @@ class FunctionLogger(object):
         self._tty = tty
         self._last_message_time = time()
         self._buffer = ""
+        self._loop = get_event_loop()
 
     def isatty(self):
         return True
@@ -30,10 +31,10 @@ class FunctionLogger(object):
         if time() - self._last_message_time > self._chunk_timeout:
             self.send_message()
         else:
-            self.send_delayed()
+            self._loop.run_in_executor(None, self.send_delayed)
 
     async def send_delayed(self):
-        await sleep(1.2 * self._chunk_timeout)
+        await sleep(2 * self._chunk_timeout)
         if time() - self._last_message_time > self._chunk_timeout:
             self.send_message()
 
