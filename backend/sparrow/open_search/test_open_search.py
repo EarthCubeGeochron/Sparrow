@@ -139,3 +139,28 @@ class TestOpenSearch:
             res = client.get(route)
             data = res.json()
             assert data["total_count"] != 0
+
+    def test_insert_search_project(self, client, db):
+        Project = db.model.project
+
+        project1 = Project(name="Blum_Fredrick 15-16 Sept2016")
+        project2 = Project(name="Blum U-Pb May 2016")
+        project3 = Project(name="Blum Pettit Jennings August 1-5 2016")
+
+        db.session.add_all([project1, project2, project3])
+        db.session.commit()
+
+        res = db.session.query(Project).all()
+        assert len(res) >= 3
+
+        name = "blum"
+
+        route = f"/api/v2/models/project?search={name}"
+
+        res = client.get(route)
+        data_json = res.json()
+        data = data_json["data"]
+        assert len(data) == 3
+
+        for project in data:
+            assert name in project["name"].lower()
