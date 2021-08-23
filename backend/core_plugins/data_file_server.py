@@ -9,6 +9,9 @@ from starlette.responses import RedirectResponse, JSONResponse, Response
 from sparrow.plugins import SparrowCorePlugin
 from sparrow.context import get_sparrow_app
 from starlette.exceptions import HTTPException
+from sparrow_utils import get_logger
+
+log = get_logger(__name__)
 
 
 class DataFileAPI(HTTPEndpoint):
@@ -31,6 +34,7 @@ class DataFileAPI(HTTPEndpoint):
         try:
             cloud_data = app.plugins.get("cloud-data")
             url = cloud_data.get_download_url(key)
+            log.debug("Redirecting to cloud download url")
             return RedirectResponse(url=url)
         except AttributeError:
             pass
