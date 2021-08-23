@@ -80,12 +80,17 @@ class SparrowTask(Task):
         pass
 
 
+def _name_for_task(func, **kwargs):
+    return kwargs.get("name", func.__name__).replace("_", "-")
+
+
 def task(*args, **kwargs):
     """A decorator to define a sparrow task."""
     kwargs.setdefault("base", SparrowTask)
 
     def wrapper(func):
-        task_name = kwargs.get("name", func.__name__)
+        task_name = _name_for_task(func, **kwargs)
+        kwargs["name"] = task_name
         try:
             # Register the task right now
             mgr = get_plugin("task-manager")

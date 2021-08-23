@@ -17,7 +17,7 @@ from sparrow.plugins import SparrowCorePlugin
 from sparrow.settings import TASK_BROKER, TASK_WORKER_ENABLED
 import typer
 from .task_api import build_tasks_api
-from .task import create_args_schema, task, _tasks_to_register
+from .base import create_args_schema, task, _tasks_to_register, _name_for_task
 from redis import Redis
 from broadcaster import Broadcast
 
@@ -59,7 +59,7 @@ class SparrowTaskManager(SparrowCorePlugin):
 
     def register_task(self, func, *args, **kwargs):
         # Get plugin name
-        name = kwargs.get("name", func.__name__)
+        name = _name_for_task(func, **kwargs)
         destructive = kwargs.get("destructive", False)
         cli_only = kwargs.get("cli_only", False)
         if destructive:
