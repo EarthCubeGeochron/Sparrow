@@ -75,6 +75,7 @@ x-backend:
     # (for example, git repositorites for the PyChron importer). This could conceivably
     # be delegated to a separate importer container, but that seems overcomplex for now.
     - backend_cache:/cache
+    - model_cache:/.sqlalchemy-cache
 services:
   gateway:
     depends_on:
@@ -199,3 +200,5 @@ volumes:
   backend_cache:
   # Placeholder volumes in case we don't have these volumes to mount
   placeholder:
+  model_cache:
+

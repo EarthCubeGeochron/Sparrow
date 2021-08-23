@@ -60,8 +60,11 @@ class Database:
         #  they are not included by default)
         # TODO: there is probably a way to do this without having to
         # manually register the models
+        log.info("Started registering model overrides")
         self.mapper.register_models(User, Project, Session, DatumType)
         log.info("Registered core model overrides")
+
+        self.mapper._cache_database_map()
 
         # Register a new class
         # Automap the core_view.datum relationship

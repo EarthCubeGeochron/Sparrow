@@ -50,6 +50,7 @@ class SparrowDatabaseMapper:
     _tables = None
     metadata_pickle_filename = "sparrow_db_cache.pickle"
     cache_path = path.join(path.expanduser("~"), ".sqlalchemy_cache")
+    loaded_from_cache = False
 
     def __init__(self, db):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
@@ -62,11 +63,11 @@ class SparrowDatabaseMapper:
         cached_metadata = self._load_database_map()
         if cached_metadata is None:
             self.reflect_database()
-            log.info("Caching database models")
             self._cache_database_map()
 
         else:
             log.info("Loading database models from cache")
+            self.loaded_from_cache = True
             self.automap_base = declarative_base(
                 bind=self.db.engine, metadata=cached_metadata
             )
@@ -76,6 +77,7 @@ class SparrowDatabaseMapper:
 
     # https://stackoverflow.com/questions/41547778/sqlalchemy-automap-best-practices-for-performance/44607512
     def _cache_database_map(self):
+        log.info("Caching database models")
         # save the metadata for future runs
         try:
             if not path.exists(self.cache_path):
@@ -99,7 +101,7 @@ class SparrowDatabaseMapper:
                 ) as cache_file:
                     cached_metadata = load(file=cache_file)
 
-            except IOError:
+            except (IOError, EOFError):
                 # cache file not found - no problem
                 pass
         return cached_metadata
