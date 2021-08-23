@@ -14,52 +14,45 @@ import { useAuth } from "~/auth";
 
 const h = hyperStyled(styles);
 
-const MapNavbar = function (props) {
+const MapNavbar = function(props) {
   const { children, ...rest } = props;
   return h(Menu, { className: "map-navbar", ...rest }, [
     h(MenuItem, {
-      text: h("h1.site-title", null, [h(SiteTitle)]),
+      text: h("h1.site-title", null, [h(SiteTitle)])
     }),
     h.if(children != null)(Menu.Divider),
-    children,
+    children
   ]);
 };
 
-const MapHome = (props) => {
+const MapHome = props => {
   const link = LocationLink(props);
-  const [style, setStyle] = useState("");
-
   const { isEnabled } = useDarkMode();
-
-  useEffect(() => {
-    if (isEnabled) {
-      setStyle("mapbox://styles/mapbox/dark-v10");
-    }
-    setStyle("mapbox://styles/mapbox/outdoors-v9");
-  }, [isEnabled]);
 
   const StandMapMode = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/outdoors-v9";
+
+  console.log(StandMapMode);
   return h("div.map-home", [
     h("div.map-butn", [
       h(
         Tooltip,
         { content: "Go to Map" },
         h(Link, { to: "/map" }, h(Button, { icon: "maximize" }))
-      ),
+      )
     ]),
     h("div.mapHome", [
       h(MapPanel, {
         width: "750px",
         hide_filter: true,
-        mapstyle: StandMapMode,
-      }),
-    ]),
+        mapstyle: StandMapMode
+      })
+    ])
   ]);
 };
 
-const MapPage = (props) => {
+const MapPage = props => {
   const { isEnabled } = useDarkMode();
 
   const StandMapMode = isEnabled
@@ -76,18 +69,18 @@ const MapPage = (props) => {
       width: "100vw",
       height: "100vh",
       mapstyle: StandMapMode,
-      login,
-    }),
+      login
+    })
   ]);
 };
 
-const LocationLink = function (props) {
+const LocationLink = function(props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
   const link = `/map#${zoom}/${latitude}/${longitude}`;
   return link;
 };
 
-const MapLink = function (props) {
+const MapLink = function(props) {
   const { zoom, latitude, longitude, children, ...rest } = props;
   return h(
     HashLink,
