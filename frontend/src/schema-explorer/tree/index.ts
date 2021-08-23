@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import React, { useContext, useEffect, useState } from "react";
 //@ts-ignore
 import styles from "./module.styl";
+import ReactJson from "react-json-view";
 
 const h = hyperStyled(styles);
 
@@ -25,6 +26,7 @@ interface LabelProps {
   read_only?: boolean;
   type?: string;
   link?: string;
+  example?: object;
   onArrowClick?: () => void;
 }
 
@@ -75,6 +77,14 @@ function Description(props: LabelProps) {
     ]),
     h.if(props.required)("div.des-items", [
       h("div.required", ["* this field is required"])
+    ]),
+    h("div.des-items", [
+      h(ReactJson, {
+        name: "Example",
+        displayDataTypes: false,
+        displayObjectSize: false,
+        src: props.example
+      })
     ])
   ]);
 }
@@ -156,6 +166,7 @@ function NodeLabel(props: LabelProps) {
 }
 
 interface TreeProps extends LabelProps {
+  json: object;
   defaultCollapsed?: boolean;
   onSelect?: () => void;
 }
@@ -169,6 +180,7 @@ function Tree({
   onSelect = () => {},
   fieldName = "",
   link = null,
+  json = {},
   ...rest
 }: TreeProps) {
   const [state, setState] = React.useState<TreeState>({
@@ -222,8 +234,12 @@ function Tree({
             if (value["link"]) {
               link_ = value["link"];
             }
+            let newJson = { ...json, ...value.example };
+            //TODO: try tp build json object recursively
+            console.log("new json", newJson);
             return h(Tree, {
               key: i,
+              json: newJson,
               fieldName: key,
               link: link_,
               defaultCollapsed: true,

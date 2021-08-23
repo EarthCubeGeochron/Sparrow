@@ -1,7 +1,23 @@
 from shapely.geometry import mapping, Point
 from geoalchemy2.shape import from_shape
-from ..api_info import get_field_description
+from ..api_info import get_field_description, get_field_json_values
 
+
+def get_schema_field_items(schema):
+    """ returns a generator (field, type_, name)() """
+    fields = schema.fields
+    for f in fields:
+        field = fields[f]
+        name = getattr(field, "data_key", f)
+        if nested_schema := getattr(field, "schema", None):
+            #nested model
+            type_ = nested_schema.__class__.__name__
+            if nested_schema.many:
+                type_ += "[]"
+        else:
+            type_ = field.__class__.__name__
+        
+        yield (field, type_, name)
 
 def construct_schema_fields_object(schema):
     """func to create schema field documentation for the API
@@ -9,31 +25,26 @@ def construct_schema_fields_object(schema):
     field.dump_only == id, audit_id
     field.allow_none
     """
-    fields = schema.fields
+    
     fields_object = {}
-    for f in fields:
-        field = fields[f]
-        name = getattr(field, "data_key", f)
-        if nested_schema := getattr(field, "schema", None):
-            # nested model
-            type_ = nested_schema.__class__.__name__
-            if nested_schema.many:
-                type_ += "[]"
+    for field, type_, name in get_schema_field_items(schema):
+        if "schema" in type_.lower():
             fields_object[name] = {
                 "type": type_,
                 **nested_model_link(field),
                 **get_field_description(type_, name),
                 **construct_field_info(field),
+                **construct_example_json(type_,name, field)
             }
         else:
-            type_ = field.__class__.__name__
             fields_object[name] = {
                 "type": type_,
                 **get_field_description(type_, name),
                 **construct_field_info(field),
+                **construct_example_json(type_,name, field)
             }
-    return fields_object
 
+    return fields_object
 
 def nested_model_link(field):
     """ generate api route for nested model """
@@ -45,6 +56,16 @@ def nested_model_link(field):
     else:
         route = f"/api/v2/models/{model_name}"
     return {"link": route.lower()}
+
+def construct_example_json(type_, name, field):
+    field_dict = {}
+    if getattr(field, 'dump_only'):
+        return {}
+    if type_.lower() in ["uuid"]:
+        return {}
+    field_dict[name] = get_field_json_values(type_)
+
+    return {"example": field_dict}
 
 
 def construct_field_info(field):

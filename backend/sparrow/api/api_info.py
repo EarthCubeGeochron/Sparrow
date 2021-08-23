@@ -41,3 +41,11 @@ def get_field_description(type_: str, field_name: str):
     description = field_descriptions.get(type_.lower(), f"A {type_} describing ")
     description += field_name
     return {"description": description}
+
+def get_field_json_values(type_:str):
+    """ get the values api_help['fields'] """
+    if "schema" in  type_.lower():
+        return api_help['fields']['json-values']['related']
+    else:
+        return api_help['fields']['json-values'][type_.lower()]
+
