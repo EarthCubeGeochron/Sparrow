@@ -33,6 +33,8 @@ class SparrowPluginManager(object):
     application performing actions before all plugins are initialized.
     """
 
+    _hooks_fired = []
+
     def __init__(self):
         self.__init_store = []
         self.__store = None
@@ -136,5 +138,6 @@ class SparrowPluginManager(object):
             yield plugin, method
 
     def run_hook(self, hook_name, *args, **kwargs):
+        self._hooks_fired.append(hook_name)
         for _, method in self._iter_hooks(hook_name):
             method(*args, **kwargs)

@@ -17,6 +17,7 @@ def prepare_docker_environment():
     # NOTE: much of this has been moved to `docker-compose.yaml`
     environ.setdefault("SPARROW_BASE_URL", "/")
     environ.setdefault("SPARROW_LAB_NAME", "")
+    environ.setdefault("SPARROW_TASK_WORKER", "1")
 
     # Have to get rid of random printing to stdout in order to not break
     # logging and container ID
@@ -28,6 +29,10 @@ def prepare_docker_environment():
 
 def is_defined(envvar):
     return environ.get(envvar) is not None
+
+
+def is_truthy(envvar, default="0"):
+    return environ.get(envvar, default).lower() not in ["0", "false", "no"]
 
 
 def prepare_compose_overrides():
@@ -45,8 +50,14 @@ def prepare_compose_overrides():
     # Use the docker-compose profile tool to enable some services
     # NOTE: this is a nicer way to do some things that needed to be handled by
     # compose-file overrides in the past.
+    profiles = []
     if is_production:
-        environ["COMPOSE_PROFILES"] = "production"
+        profiles.append("production")
+    if is_truthy("SPARROW_TASK_WORKER"):
+        profiles.append("task-worker")
+
+    if len(profiles) > 0:
+        environ["COMPOSE_PROFILES"] = ",".join(profiles)
 
     # Use certbot for SSL if certain conditions are met
     use_certbot = (

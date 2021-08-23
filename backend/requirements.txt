@@ -96,3 +96,14 @@ crossrefapi==1.5.0
 # NOTE: we should probably organize these internal
 # packages better...
 # -e ./utils
+
+# Task worker
+celery==5.1.1
+redis==3.5.3
+broadcaster[redis]==0.2.0
+# For worker auto-reloading in development
+watchdog==2.1.2
+argh==0.26.2
+pydantic==1.8.2
+
+typer==0.3.2

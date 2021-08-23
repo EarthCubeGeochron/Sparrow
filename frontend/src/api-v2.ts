@@ -9,6 +9,8 @@ import {
 import { NavButton } from "~/components";
 import { Card } from "@blueprintjs/core";
 import { join } from "path";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import { useCallback, useContext, useState } from "react";
 
 export function APIExplorerV2(props) {
   return h(Card, { className: "api-explorer-v2 bp3-light" }, [
@@ -21,7 +23,7 @@ export function APIExplorerV2(props) {
   ]);
 }
 
-const APIV2Context = createAPIContext({
+export const APIV2Context = createAPIContext({
   baseURL: join(process.env.BASE_URL ?? "/", "/api/v2"),
 });
 
@@ -35,4 +37,45 @@ export function useAPIv2Result(
   return useAPIResult(route, params, opts);
 }
 
-export { APIV2Context };
+export function useSparrowWebSocket(path: string, options = {}) {
+  /** An expanded function to use a websocket */
+  const [reconnectAttempt, setReconnectAttempt] = useState(1);
+  const [hasEverConnected, setConnected] = useState(false);
+  const ctx = useContext(APIV2Context);
+  const getSocketUrl = useCallback(() => {
+    return new Promise((resolve) => {
+      let uri = ctx.baseURL;
+      // Get absolute and websocket URL
+      if (!uri.startsWith("http")) {
+        const { protocol, host } = window.location;
+        uri = `${protocol}//${host}${uri}`;
+      }
+      uri = uri.replace(/^http(s)?:\/\//, "ws$1://") + path;
+      resolve(uri);
+    });
+  }, [ctx, reconnectAttempt]);
+
+  const socket = useWebSocket(getSocketUrl, {
+    onOpen() {
+      setConnected(true);
+    },
+    shouldReconnect() {
+      return true;
+    },
+    ...options,
+  });
+
+  const isOpen = socket.readyState == ReadyState.OPEN;
+
+  const tryToReconnect = useCallback(() => {
+    if (!isOpen) setReconnectAttempt(reconnectAttempt + 1);
+  }, [setReconnectAttempt, isOpen, reconnectAttempt]);
+
+  return {
+    ...socket,
+    reconnectAttempt,
+    hasEverConnected,
+    tryToReconnect,
+    isOpen,
+  };
+}

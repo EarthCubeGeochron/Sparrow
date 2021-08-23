@@ -26,11 +26,11 @@ logconfig_dict = {
         },
         "hypercorn.access": {"level": "ERROR", "propagate": False},
         "sparrow": {"handlers": ["default"], "level": "DEBUG", "propagate": False},
-        "sqlalchemy.engine": {
-            "handlers": ["default"],
-            "level": "INFO",
-            "propagate": False,
-        },
+        # "sqlalchemy.engine": {
+        #     "handlers": ["default"],
+        #     "level": "INFO",
+        #     "propagate": False,
+        # },
         "__main__": {  # if __name__ == '__main__'
             "handlers": ["error_console"],
             "level": "DEBUG",

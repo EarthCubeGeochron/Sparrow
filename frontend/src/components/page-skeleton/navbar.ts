@@ -2,8 +2,8 @@ import { useContext } from "react";
 import { hyperStyled, classed, addClassNames } from "@macrostrat/hyper";
 import { Navbar } from "@blueprintjs/core";
 import { NavLink } from "react-router-dom";
-import { NavLinkButton, DarkModeButton } from "@macrostrat/ui-components";
-
+import { NavLinkButton } from "@macrostrat/ui-components/lib/esm/ext/router-links";
+import { DarkModeButton } from "@macrostrat/ui-components";
 import { AuthStatus } from "~/auth";
 import { Frame, FrameContext } from "~/frame";
 import styles from "./module.styl";

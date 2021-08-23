@@ -10,6 +10,7 @@ setup(
         "sparrow": "sparrow",
         "core_plugins": "plugins",
         "sparrow_tests": "sparrow_tests",
+        "sparrow_worker": "sparrow_worker",
     },
     entry_points={"console_scripts": ["sparrow = sparrow.cli:cli"]},
 )

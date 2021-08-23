@@ -1,0 +1,116 @@
+.tasks-page
+  display flex
+  flex-direction: row
+  height: 100%
+
+.tasks-main
+  flex-grow 1
+  display flex
+  flex-direction: column
+  margin-bottom: -2em
+  .navbar
+    align-items: baseline
+  h3
+    margin 0
+    padding 0
+    margin-right 1em
+
+.task-control-ui
+  z-index 10
+
+.params-form
+  legend
+    display none
+  fieldset
+    border 0
+    margin 0
+    padding 0
+  label, input
+    margin-right 0.5em
+  :global(.form-group)
+    display inline-block
+    margin-right 0.5em
+
+.message-history
+  font-family: monospace
+  font-size 14px
+
+.left-column
+  max-width 24em
+  margin-right 1em
+  .tasks-list :global(.bp3-button)
+    text-align: left
+
+.log-window
+  flex-grow 1
+  overflow-y hidden
+  margin-top: -1em
+  padding: 0 0.25em
+
+ansi($color)
+  color: $color
+  &.dim
+    color: lighten($color, 40%)
+
+.message-history
+  background-color: #f0f0f0
+  .message
+    padding: 0 1em
+    .lineno
+      display: inline-block
+      font-size: 0.8em
+      margin-right: 1em
+      width: 3em
+      user-select none
+      
+    span
+      &.bold
+        font-weight bold
+      &.italic
+        font-style italic
+      ansi(lighten(#1a1b27, 20%))
+      &.dark-gray
+        ansi(lighten(#1a1b27, 60%))
+      &.red
+        ansi(darken(#ff6c8d, 60%))
+      &.green
+        ansi(darken(#8dcd5a, 60%))
+      &.yellow
+        ansi(darken(#ee8951, 60%))
+      &.blue
+        ansi(darken(#71a1fe, 60%))
+      &.magenta
+        ansi(darken(#c296fe, 60%))
+      &.cyan
+        ansi(darken(#00a2bf, 60%))
+
+:global(.bp3-dark)
+  ansi($color)
+    color: $color
+    &.dim
+      color: darken($color, 40%)
+
+  .message-history
+    background-color: #1a1b27
+    .message
+      padding: 0 1em
+      span
+        &.bold
+          font-weight bold
+        &.italic
+          font-style italic
+        ansi(lighten(#1a1b27, 70%))
+        &.dark-gray
+          ansi(lighten(#1a1b27, 20%))
+        &.red
+          ansi(#ff6c8d)
+        &.green
+          ansi(#8dcd5a)
+        &.yellow
+          ansi(#ee8951)
+        &.blue
+          ansi(#71a1fe)
+        &.magenta
+          ansi(#c296fe)
+        &.cyan
+          ansi(#00a2bf)
