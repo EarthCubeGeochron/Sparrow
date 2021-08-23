@@ -55,7 +55,6 @@ class Session(BaseModel):
         UUID(as_uuid=True),
         unique=True,
         nullable=False,
-        default=uuid4,
         server_default="uuid_generate_v4()",
     )
 

@@ -1,10 +1,12 @@
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
-from sqlalchemy.ext.automap import generate_relationship
+from sqlalchemy.ext.automap import automap_base, generate_relationship
 from sqlalchemy.ext.declarative import declarative_base
 from os import path, makedirs
 from sparrow_utils.logs import get_logger
+from sqlalchemy.ext.automap import automap_base
 from pickle import load, dump
+from .base import ModelHelperMixins
 
 # Drag in geographic types for database reflection
 from geoalchemy2 import Geometry, Geography
@@ -43,13 +45,16 @@ class AutomapError(Exception):
     pass
 
 
+BaseModel = automap_base(cls=ModelHelperMixins)
+
+
 class SparrowDatabaseMapper:
     automap_base = None
     automap_error = None
     _models = None
     _tables = None
-    metadata_pickle_filename = "sparrow_db_cache.pickle"
-    cache_path = path.join(path.expanduser("~"), ".sqlalchemy_cache")
+    metadata_pickle_filename = "sparrow-db-cache.pickle"
+    cache_path = path.join(path.expanduser("~"), ".sqlalchemy-cache")
     loaded_from_cache = False
 
     def __init__(self, db):
@@ -60,6 +65,7 @@ class SparrowDatabaseMapper:
         self._reflect_database()
 
     def _reflect_database(self):
+        global BaseModel
         cached_metadata = self._load_database_map()
         if cached_metadata is None:
             self.reflect_database()
@@ -68,42 +74,45 @@ class SparrowDatabaseMapper:
         else:
             log.info("Loading database models from cache")
             self.loaded_from_cache = True
-            self.automap_base = declarative_base(
-                bind=self.db.engine, metadata=cached_metadata
-            )
+            BaseModel = declarative_base(bind=self.db.engine, metadata=cached_metadata)
+        self.automap_base = BaseModel
 
         self._models = ModelCollection(self.automap_base.classes)
         self._tables = TableCollection(self._models)
 
+    @property
+    def _metadata_cache_filename(self):
+        return path.join(self.cache_path, self.metadata_pickle_filename)
+
     # https://stackoverflow.com/questions/41547778/sqlalchemy-automap-best-practices-for-performance/44607512
     def _cache_database_map(self):
-        log.info("Caching database models")
         # save the metadata for future runs
         try:
             if not path.exists(self.cache_path):
                 makedirs(self.cache_path)
             # make sure to open in binary mode - we're writing bytes, not str
-            with open(
-                path.join(self.cache_path, self.metadata_pickle_filename), "wb"
-            ) as cache_file:
+            with open(self._metadata_cache_filename, "wb") as cache_file:
                 dump(self.automap_base.metadata, cache_file)
-        except:
+            log.info(f"Cached database models to {self._metadata_cache_filename}")
+        except IOError:
             # couldn't write the file for some reason
-            pass
+            log.info(
+                f"Could not cache database models to {self._metadata_cache_filename}"
+            )
 
     def _load_database_map(self):
         # We have hard-coded the cache file for now
         cached_metadata = None
-        if path.exists(self.cache_path):
-            try:
-                with open(
-                    path.join(self.cache_path, self.metadata_pickle_filename), "rb"
-                ) as cache_file:
-                    cached_metadata = load(file=cache_file)
+        try:
+            with open(self._metadata_cache_filename, "rb") as cache_file:
+                cached_metadata = load(file=cache_file)
 
-            except (IOError, EOFError):
-                # cache file not found - no problem
-                pass
+        except (IOError, EOFError):
+            # cache file not found - no problem
+            log.info(
+                f"Could not find database model cache ({self._metadata_cache_filename})"
+            )
+            pass
         return cached_metadata
 
     def reflect_database(self):
