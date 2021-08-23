@@ -21,7 +21,7 @@ interface ProjectInfoLinkProps extends Project {
   minimal: boolean;
 }
 
-const ellipseAppend = props => {
+const ellipseAppend = (props) => {
   const { data, attribute } = props;
   if (data.length == 0) return null;
 
@@ -39,7 +39,7 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
     description,
     samples = [],
     publication = [],
-    minimal = false
+    minimal = false,
   } = props;
 
   if (!samples) {
@@ -57,24 +57,24 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
     {
       to,
       key: id,
-      className: "project-card"
+      className: "project-card",
     },
     [
       h("h3", name),
       h("p.description", description),
       h.if(samples.length > 0)(ContentArea, {
         className: "samples",
-        data: samples.map(d => d.name),
-        title: "sample"
+        data: samples.map((d) => d.name),
+        title: "sample",
       }),
       h.if(publication.length > 0)("div.content-area", [
         h("h5", [
           h("span.count", [
-            publication.length + " " + pluralize("Publication", publication)
+            publication.length + " " + pluralize("Publication", publication),
           ]),
-          h("h5", [pubData])
-        ])
-      ])
+          h("h5", [pubData]),
+        ]),
+      ]),
     ]
   );
 }
@@ -85,8 +85,8 @@ export const ContentArea = ({ data, title, className, minimal = false }) =>
     h.if(!minimal)(
       "ul",
       { className },
-      data.map(d => h("li", d))
-    )
+      data.map((d) => h("li", d))
+    ),
   ]);
 
 interface ProjectProps {
@@ -94,12 +94,12 @@ interface ProjectProps {
   id?: number;
 }
 
-const ProjectComponent = function(props: ProjectProps) {
+const ProjectComponent = function (props: ProjectProps) {
   const { id, Edit } = props;
   const data = useAPIv2Result(
     `/models/project/${id}`,
     {
-      nest: "publication,session,sample,researcher,tag"
+      nest: "publication,session,sample,researcher,tag",
     },
     {}
   );
@@ -114,7 +114,7 @@ const ProjectComponent = function(props: ProjectProps) {
 
 function ProjectMatch({ Edit }) {
   const {
-    params: { id }
+    params: { id },
   } = useRouteMatch();
   return h(ProjectComponent, { id, Edit });
 }
