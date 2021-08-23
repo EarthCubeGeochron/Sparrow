@@ -126,6 +126,10 @@ export function MapPanel({
     }
   }, [firstWindowHash]);
 
+  useEffect(() => {
+    setState({ ...state, MapStyle: mapstyle });
+  }, [mapstyle]);
+
   const mapRef = useRef();
 
   const bounds = mapRef.current

@@ -27,20 +27,13 @@ const MapNavbar = function (props) {
 
 const MapHome = (props) => {
   const link = LocationLink(props);
-  const [style, setStyle] = useState("");
-
   const { isEnabled } = useDarkMode();
-
-  useEffect(() => {
-    if (isEnabled) {
-      setStyle("mapbox://styles/mapbox/dark-v10");
-    }
-    setStyle("mapbox://styles/mapbox/outdoors-v9");
-  }, [isEnabled]);
 
   const StandMapMode = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/outdoors-v9";
+
+  console.log(StandMapMode);
   return h("div.map-home", [
     h("div.map-butn", [
       h(
