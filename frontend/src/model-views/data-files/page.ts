@@ -162,7 +162,7 @@ export function DataFilePage(props) {
           h(DataFileDetails),
           h(DataFileSamples),
           h(DataFileSessions),
-          h(Frame, { id: "datafilePage", data }, null),
+          h(Frame, { id: "dataFilePage", data }, null),
         ]),
       ]),
     ]
