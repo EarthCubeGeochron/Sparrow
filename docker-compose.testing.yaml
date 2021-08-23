@@ -12,12 +12,11 @@ x-backend:
   # Make sure we get colorized terminal output
   depends_on:
     - db
-    - broker
   environment:
     - SPARROW_SECRET_KEY=test_secret
     # Whether we should enable a worker pool for running tasks.
     # If we don't, tasks must be run via the command line.
-    - SPARROW_TASK_WORKER=1
+    - SPARROW_TASK_WORKER=0
     - SPARROW_TASK_BROKER=redis://broker:6379/0
 services:
   backend:

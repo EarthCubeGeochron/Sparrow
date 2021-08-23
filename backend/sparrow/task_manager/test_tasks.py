@@ -1,6 +1,6 @@
 from click import echo
 from json import loads
-from pytest import fixture, raises
+from pytest import fixture, raises, mark
 from time import time
 from sparrow.auth.test_auth import admin_client
 from starlette.authentication import AuthenticationError
@@ -81,6 +81,7 @@ class TestSparrowTaskManager:
                 websocket.receive_json()
             assert err.code == 1008
 
+    @mark.skip(reason="Websockets only work when a broker is defined")
     def test_websocket_task_running(self, app, admin_client):
         plugin = app.plugins.get("task-manager")
         with admin_client.websocket_connect("/api/v2/tasks/hello") as websocket:
