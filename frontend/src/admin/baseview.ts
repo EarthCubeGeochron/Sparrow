@@ -13,12 +13,13 @@ export const AnimatedArrow = () => {
  * @description Default page when nothing selected on left navigation
  */
 export function NoStateAdmin(props) {
-  const { name, content = null } = props;
+  const { name, content = null, children } = props;
 
-  const description =
-    "Click one of the Links to the Left to view one of the Pages";
-
-  const title = `No ${name} page selected`;
-
-  return h(NonIdealState, { title, description, icon: "hand-left" }, [content]);
+  const description = "Use the left panel to select a model.";
+  const title = `No ${name} selected`;
+  return h(
+    NonIdealState,
+    { title, description, icon: "inbox" },
+    children ?? content
+  );
 }
