@@ -24,7 +24,13 @@ function getDefaultsForSchema(schema) {
 function getChunkedMessages(msg) {
   if (msg?.data == null) return [];
   try {
-    return JSON.parse(msg.data)?.messages ?? [];
+    const data = JSON.parse(msg.data);
+    // We have an array of messages
+    if (Array.isArray(data)) return data;
+    // We have a chunked message
+    if (data.messages != null) return data.messages;
+    // We have a single message
+    return [data];
   } catch (error) {
     console.error(error);
   }
@@ -39,7 +45,6 @@ function isStopMessage(message) {
 function TaskMain({ tasks, task }) {
   if (task == null) return null;
   const schema = tasks.find((d) => d.name == task).params;
-  console.log(schema);
   const baseParams = getDefaultsForSchema(schema);
   const [params, setParams] = useState(baseParams);
 

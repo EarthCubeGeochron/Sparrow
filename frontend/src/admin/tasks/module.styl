@@ -31,9 +31,6 @@
     display inline-block
     margin-right 0.5em
 
-.message-history
-  font-family: monospace
-  font-size 14px
 
 .left-column
   max-width 24em
@@ -46,6 +43,12 @@
   overflow-y hidden
   margin-top: -1em
   padding: 0 0.25em
+  font-family: monospace
+  font-size 14px
+  .text-measurer
+    position absolute
+    visibility: hidden
+
 
 ansi($color)
   color: $color
@@ -55,12 +58,19 @@ ansi($color)
 .message-history
   background-color: #f0f0f0
   .message
-    padding: 0 1em
+    padding: 0 10px
+    display flex
+    flex-direction row
+    align-items: first-baseline
+    .message-text
+      flex-grow 1
+      display block
+      white-space: break-spaces;
+      word-break: break-all;
     .lineno
-      display: inline-block
       font-size: 0.8em
-      margin-right: 1em
-      width: 3em
+      margin-right: 10px
+      width: 30px
       user-select none
       
     span
