@@ -43,7 +43,7 @@ const Row = ({ data, index, style }) => {
   ]);
 };
 
-function MessageHistory({ messages, width, height, gutterWidth = 100 }) {
+function MessageHistory({ messages, width, height, gutterWidth = 70 }) {
   const ref = useRef<List>();
   const extraLines = 2;
   useEffect(() => {
@@ -54,7 +54,6 @@ function MessageHistory({ messages, width, height, gutterWidth = 100 }) {
   const charsPerLine = Math.floor(
     (width - gutterWidth) / (charSize?.width ?? 8)
   );
-  console.log(charSize, charsPerLine);
 
   const textMeasureRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -83,7 +82,7 @@ function MessageHistory({ messages, width, height, gutterWidth = 100 }) {
       const nLines = Math.max(Math.ceil(n / charsPerLine), 1);
       return lineHeight * nLines;
     },
-    [charSize, charsPerLine]
+    [charSize, width]
   );
 
   if (charSize == null) {
@@ -112,6 +111,7 @@ export function LogWindow({ messages }) {
     width = 1,
     height = 1,
   } = useResizeObserver<HTMLDivElement>();
+  console.log(width, height);
 
   return h(
     "div.log-window",
