@@ -65,11 +65,9 @@ def redirect_output(log_func, disable=False):
         return
     _old_stdout = sys.stdout
     _old_stderr = sys.stderr
-    with FunctionLogger(log_func, type="stdout") as stdout, FunctionLogger(
-        log_func, type="stderr"
-    ) as stderr:
+    with FunctionLogger(log_func, type="stdout") as stdout:
         sys.stdout = stdout
-        sys.stderr = stderr
+        sys.stderr = stdout
         yield
     sys.stdout = _old_stdout
     sys.stderr = _old_stderr
