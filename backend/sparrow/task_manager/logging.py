@@ -49,7 +49,7 @@ def local_logger(text, type, stdout=sys.stdout, stderr=sys.stderr):
 
 
 class ChunkedMessageLogger:
-    _chunk_timeout = 1
+    _chunk_timeout = 0.5
     _buffer = []
     _loop = None
     _mock = False
@@ -70,12 +70,12 @@ class ChunkedMessageLogger:
         if self._is_timed_out():
             self.__send_messages()
 
-    def write_message(self, text, type):
+    def write_message(self, text, type, immediate=False):
         if self._disable:
             self.__local_logger(text, type)
             return
         self._buffer.append(dict(text=as_string(text), type=type))
-        self.flush()
+        self.flush(immediate=immediate)
 
     def _is_timed_out(self):
         return (
