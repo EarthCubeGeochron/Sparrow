@@ -4,8 +4,8 @@ import { APIV2Context } from "~/api-v2";
 import { createContext, useContext, useEffect, useReducer } from "react";
 
 type RequestForm = { type: "request-form"; enabled?: boolean };
-type LoginData = { username: string; password: string };
-type LoginStatus = { username: string; login: boolean };
+type Credentials = { username: string; password: string };
+type LoginStatus = { username: string; login: boolean; error: Error | null };
 
 type UpdateStatus = {
   type: "update-status";
@@ -16,12 +16,12 @@ type AuthSuccess = {
   payload: LoginStatus;
 };
 
-type AuthFailure = { type: "auth-form-failure" };
+type AuthFailure = { type: "auth-form-failure"; payload: LoginStatus };
 
 type AuthAction = RequestForm | UpdateStatus | AuthSuccess | AuthFailure;
 
 type GetStatus = { type: "get-status" };
-type Login = { type: "login"; payload: LoginData };
+type Login = { type: "login"; payload: Credentials };
 type Logout = { type: "logout" };
 
 type AsyncAuthAction = GetStatus | Login | Logout;
@@ -29,8 +29,9 @@ type AsyncAuthAction = GetStatus | Login | Logout;
 function useAuthActions(dispatch) {
   const { get, post } = useAPIActions(APIV2Context);
   return async (action: AuthAction | AsyncAuthAction) => {
+    let payload = { login: false, username: null, error: null };
     switch (action.type) {
-      case "get-status": {
+      case "get-status":
         // Right now, we get login status from the
         // /auth/refresh endpoint, which refreshes access
         // tokens allowing us to extend our session.
@@ -38,13 +39,14 @@ function useAuthActions(dispatch) {
         // when editing information becomes a factor) to
         // only refresh tokens when access is proactively
         // granted by the application.
-        const { login, username } = await get("/auth/status");
-        return dispatch({
-          type: "update-status",
-          payload: { login, username },
-        });
-      }
+        try {
+          const { login, username } = await get("/auth/status");
+          return dispatch({ type: "update-status", payload });
+        } catch (error) {
+          return dispatch({ type: "update-status", payload: { error } });
+        }
       case "login":
+        let type = "auth-form-success";
         try {
           const res = await post("/auth/login", action.payload);
           const { login, username } = res;
@@ -52,15 +54,18 @@ function useAuthActions(dispatch) {
             type: "auth-form-success",
             payload: { username, login },
           });
-        } catch (err) {
-          console.error(err);
-          return dispatch({ type: "auth-form-failure" });
+        } catch (error) {
+          return dispatch({
+            type: "auth-form-failure",
+            payload: { login: false, username: null, error },
+          });
         }
       case "logout": {
         const { login } = await post("/auth/logout", {});
         const payload = {
           login,
           username: null,
+          error: null,
         };
         return dispatch({ type: "auth-form-success", payload });
       }
@@ -75,6 +80,7 @@ interface AuthState {
   username: string | null;
   isLoggingIn: boolean;
   invalidAttempt: boolean;
+  error: Error | null;
 }
 
 interface AuthCtx extends AuthState {
@@ -86,6 +92,7 @@ const authDefaultState: AuthState = {
   username: null,
   isLoggingIn: false,
   invalidAttempt: false,
+  error: null,
 };
 
 const AuthContext = createContext<AuthCtx>({
@@ -111,9 +118,9 @@ function authReducer(state = authDefaultState, action: AuthAction) {
     case "auth-form-failure":
       return {
         ...state,
+        ...action.payload,
         isLoggingIn: true,
         invalidAttempt: true,
-        login: false,
       };
     case "request-form":
       return {

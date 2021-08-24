@@ -71,7 +71,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
         model = self.opts.model.__name__
         _message = f"Setting up schema for model {model}"
         if len(self.allowed_nests) > 0:
-            _message += f"\n  allowed nests: {nests}"
+            _message += f" with allowed nests: {nests}"
+            log.debug(_message)
 
         # Excluding kinda works but still pulls back fields into schema
         self._deferred_fields = [
@@ -79,7 +80,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
             # Global defer list (we should refactor this eventually)
             *exclude_fields.get(model, []),
         ]
-        log.debug(_message)
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
         super().__init__(*args, **kwargs)
