@@ -21,10 +21,30 @@ function getDefaultsForSchema(schema) {
   return defaults;
 }
 
+function getChunkedMessages(msg) {
+  if (msg?.data == null) return [];
+  try {
+    const data = JSON.parse(msg.data);
+    // We have an array of messages
+    if (Array.isArray(data)) return data;
+    // We have a chunked message
+    if (data.messages != null) return data.messages;
+    // We have a single message
+    return [data];
+  } catch (error) {
+    console.error(error);
+  }
+  return [];
+}
+
+function isStopMessage(message) {
+  const { action, type, text } = message;
+  return action == "stop" || (type == "control" && text == "Task finished");
+}
+
 function TaskMain({ tasks, task }) {
   if (task == null) return null;
   const schema = tasks.find((d) => d.name == task).params;
-  console.log(schema);
   const baseParams = getDefaultsForSchema(schema);
   const [params, setParams] = useState(baseParams);
 
@@ -36,32 +56,23 @@ function TaskMain({ tasks, task }) {
   const [showParameters, setShowParameters] = useState(false);
 
   messageHistory.current = useMemo(() => {
-    let message = null;
-    if (lastMessage?.data != null) {
-      try {
-        message = JSON.parse(lastMessage.data);
-      } catch (error) {}
-    }
-    if (message == null) return messageHistory.current;
-    const { action, text, info, type } = message;
-    if (action == "start") {
-      setIsRunning(true);
-      return [];
-    } else if (
-      action == "stop" ||
-      (type == "control" && text == "Task finished")
-    ) {
-      setIsRunning(false);
-    }
-    if (info != null) {
-      console.log(info);
-    }
-
-    console.log(message);
-
-    if (text != null) {
-      const lines = text.split("\n").filter((line) => line.length > 0);
-      messageHistory.current?.push(...lines);
+    const chunkedMessages = getChunkedMessages(lastMessage);
+    for (const message of chunkedMessages) {
+      const { action, text, info, type } = message;
+      if (action == "start") {
+        setIsRunning(true);
+        return [];
+      } else if (isStopMessage(message)) {
+        setIsRunning(false);
+      }
+      if (info != null) {
+        console.log(info);
+      }
+      if (text != null) {
+        // We could eventually keep track of line type here...
+        const lines = text.split("\n").filter((line) => line.length > 0);
+        messageHistory.current?.push(...lines);
+      }
     }
     return messageHistory.current;
   }, [lastMessage]);
