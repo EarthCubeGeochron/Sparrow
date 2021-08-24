@@ -1,11 +1,9 @@
 from click import echo
 from json import loads
 from pytest import fixture, raises, mark
-from time import time
 from sparrow.auth.test_auth import admin_client
-from starlette.authentication import AuthenticationError
 from starlette.websockets import WebSocketDisconnect
-from .task import task, create_args_schema
+from .base import task, create_args_schema
 
 
 @task(name="hello")
