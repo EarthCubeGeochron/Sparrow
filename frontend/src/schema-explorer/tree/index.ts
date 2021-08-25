@@ -165,8 +165,28 @@ function NodeLabel(props: LabelProps) {
   ]);
 }
 
+function createNewJSON(data, json, path) {
+  let treeJSON = { ...json };
+  if (path.length <= 1) {
+    Object.entries(data).map(([key, value], i) => {
+      treeJSON = { ...treeJSON, ...value.example };
+    });
+  } else {
+    let path_ = [...path];
+    path_.splice(0, 1);
+    console.log(path_);
+    let json_ = {};
+    Object.entries(data).map(([key, value], i) => {
+      json_ = { ...json_, ...value.example };
+    });
+    treeJSON[path_[0]] = json_;
+  }
+  return treeJSON;
+}
+
 interface TreeProps extends LabelProps {
   json: object;
+  parentPath: [];
   defaultCollapsed?: boolean;
   onSelect?: () => void;
 }
@@ -181,11 +201,13 @@ function Tree({
   fieldName = "",
   link = null,
   json = {},
+  parentPath = [],
   ...rest
 }: TreeProps) {
   const [state, setState] = React.useState<TreeState>({
     collapsed: defaultCollapsed
   });
+  console.log(json);
 
   const data = useAPIv2Result(
     link,
@@ -215,6 +237,8 @@ function Tree({
   if (state.collapsed) {
     containerClassName += " tree-view_children-collapsed";
   }
+  let newPath = [...parentPath, fieldName];
+  //h(ReactJson, { src: json, name: fieldName, collapsed: state.collapsed }),
 
   return h("div", { className: `tree-view` }, [
     h("li", { className: "tree-view_item" }, [
@@ -234,13 +258,12 @@ function Tree({
             if (value["link"]) {
               link_ = value["link"];
             }
-            let newJson = { ...json, ...value.example };
-            //TODO: try tp build json object recursively
-            console.log("new json", newJson);
+            let newJson = createNewJSON(data, json, newPath);
             return h(Tree, {
               key: i,
               json: newJson,
               fieldName: key,
+              parentPath: newPath,
               link: link_,
               defaultCollapsed: true,
               ...value

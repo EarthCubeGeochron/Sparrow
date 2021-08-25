@@ -108,7 +108,7 @@ function SchemaExplorer({ model }) {
 
   return h("div", [
     h(SchemaNavBar),
-    h.if(state.model != null)("div.body", [h(SchemaTree), h(SchemaTabs)])
+    h.if(state.model != null)("div.body", [h(SchemaTree)])
   ]);
 }
 
