@@ -45,6 +45,7 @@ def prepare_compose_overrides():
         compose_files.append(fn)
 
     env = environ.get("SPARROW_ENV", "development")
+    environ.setdefault("SPARROW_ENV", "development")
     is_production = env == "production"
 
     # Use the docker-compose profile tool to enable some services
