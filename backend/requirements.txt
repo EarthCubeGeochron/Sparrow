@@ -42,6 +42,7 @@ pyyaml==5.4
 beautifulsoup4==4.8.2
 html5lib==1.0.1
 datefinder==0.7.0
+pyarrow==5.0.0
 
 # Not sure why these were added,
 # may be subdependencies of Click
