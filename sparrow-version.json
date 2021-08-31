@@ -6,7 +6,7 @@
   "docker_images": {
     "backend-base": {
       "context": "./base-images/backend",
-      "version": "1.2"
+      "version": "2.0"
     },
     "db-mysql-fdw": {
       "context": "./base-images/db-mysql-fdw",

@@ -1,8 +1,8 @@
-FROM sparrowdata/backend-base:1.2 AS main
+FROM sparrowdata/backend-base:2.0 AS main
 # Multi-stage build of Sparrow backend.
 
 ## Git is required for the PyChron importer
-RUN apk update && apk add git
+RUN apt update && apt install -y git
 
 COPY ./requirements.txt /install/requirements.txt
 RUN pip install --no-cache -r /install/requirements.txt
