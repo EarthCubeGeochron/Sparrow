@@ -4,7 +4,7 @@ from sparrow.util import relative_path
 from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
 import sparrow
-from sparrow.task_manager.task import task
+from sparrow.task_manager.base import task
 import pandas as pd
 from pathlib import Path
 import json
