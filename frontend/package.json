@@ -103,7 +103,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --watch package.json --exec 'yarn install && webpack'",
+    "dev": "nodemon --watch package.json --watch _webpack --exec 'yarn install && webpack'",
     "start": "webpack"
   },
   "prettier": {},

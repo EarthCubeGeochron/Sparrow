@@ -9,7 +9,7 @@ from redis import Redis
 
 from sparrow.logs import get_logger
 from sparrow.context import get_plugin
-from .logging import create_message, redirect_output
+from .logging import RedisQueueLogger, local_logger
 
 log = get_logger(__name__)
 
@@ -32,28 +32,18 @@ def create_args_schema(func):
     return create_model("TaskParamModel", **kwargs)
 
 
-def local_logger(message: str, type: str):
-    if type == "stdout":
-        print(message, file=sys.stdout)
-    if type == "stderr":
-        print(message, file=sys.stderr)
-    else:
-        print(type + ": " + message)
-
-
 class SparrowTask(Task):
     _is_sparrow_task = True
     _message_queue: Redis = None
+    _log_backend: RedisQueueLogger = None
 
-    def log(self, message: str, type: str = "text", **kwargs):
-        queue = self.manager._task_message_queue
-        if queue is None:
-            local_logger(message, type)
-        else:
-            queue.publish(
-                "sparrow:task:" + self.name,
-                create_message(text=message, type=type, **kwargs),
-            )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def log(self, text, type="info"):
+        if self._log_backend is None:
+            local_logger(text, type)
+        self._log_backend.write_message(text, type)
 
     @property
     def manager(self):
@@ -63,9 +53,15 @@ class SparrowTask(Task):
         """In a celery task this function calls the run method, here you can
         set some environment variable before the run of the task"""
 
-        _task_context.set(self)
+        self._message_queue = self.manager._task_message_queue
+        channel = "sparrow:task:" + self.name
+        with RedisQueueLogger(self._message_queue, channel) as self._log_backend:
+            _task_context.set(self)
+            self.__run_task(*args, **kwargs)
+
+    def __run_task(self, *args, **kwargs):
         try:
-            with redirect_output(self.log):
+            with self._log_backend.redirect_output():
                 self.log("Starting task", "control")
                 return self.run(*args, **kwargs)
         except Exception as exc:
@@ -80,12 +76,17 @@ class SparrowTask(Task):
         pass
 
 
+def _name_for_task(func, **kwargs):
+    return kwargs.get("name", func.__name__).replace("_", "-")
+
+
 def task(*args, **kwargs):
     """A decorator to define a sparrow task."""
     kwargs.setdefault("base", SparrowTask)
 
     def wrapper(func):
-        task_name = kwargs.get("name", func.__name__)
+        task_name = _name_for_task(func, **kwargs)
+        kwargs["name"] = task_name
         try:
             # Register the task right now
             mgr = get_plugin("task-manager")

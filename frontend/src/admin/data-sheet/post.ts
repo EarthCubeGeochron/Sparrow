@@ -31,7 +31,6 @@ export function postData(data) {
   const { buildURL } = APIHelpers(useContext(APIV2Context));
 
   const url = buildURL("/datasheet/edits");
-  console.log(url);
 
   axios
     .post(url, post_data)
