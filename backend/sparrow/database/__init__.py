@@ -86,9 +86,9 @@ class Database:
             yield session
             if commit:
                 session.commit()
-        except Exception:
+        except Exception as err:
             session.rollback()
-            raise
+            raise err
         finally:
             session.close()
 

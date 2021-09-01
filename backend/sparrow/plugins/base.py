@@ -16,6 +16,7 @@ class SparrowPlugin(object):
     def __init__(self, app):
         self.app = app
         self.db = self.app.db
+        # self._register_tasks()
 
     def should_enable(self):
         return True

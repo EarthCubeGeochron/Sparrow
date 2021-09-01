@@ -1,9 +1,10 @@
 import { AnchorButton, Intent, Tooltip } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useAPIv2Result } from "~/api-v2";
+import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import { SiMicrosoftexcel } from "react-icons/si";
 import { AiFillFile } from "react-icons/ai";
 import { GrDocumentCsv, GrDocumentTxt } from "react-icons/gr";
+import { useAPIHelpers } from "@macrostrat/ui-components";
 import {
   VscFileBinary,
   VscFilePdf,
@@ -50,11 +51,9 @@ function DownloadButtonIcon(props) {
 function DownloadButtonContent(props) {
   const { file_hash, file_type, basename } = props;
 
-  let text: any | React.ReactNode = "Data file";
+  let text: any | React.ReactNode = "Download data file";
   if (file_type != null) {
-    text = h([
-      h("b", { style: { fontSize: "17px", marginLeft: "22px" } }, file_type),
-    ]);
+    text = h(["Download ", h("b", file_type)]);
   }
 
   return h(
@@ -66,16 +65,15 @@ function DownloadButtonContent(props) {
       },
     },
     [
+      text,
+      " ",
       h(DownloadButtonIcon, {
         basename,
         style: {
-          position: "absolute",
-          bottom: "2px",
-          left: "0",
           fontSize: "17px",
+          marginLeft: "0.5em",
         },
       }),
-      text,
     ]
   );
 }
@@ -86,10 +84,11 @@ function DownloadButtonContent(props) {
  */
 export function DownloadButton(props) {
   const { file_hash, file_type, basename } = props;
+  const { buildURL } = useAPIHelpers(APIV2Context);
 
-  const href = `${process.env.BASE_URL}api/v2/data_file/${file_hash}`;
-  return h(Tooltip, { content: `Download ${file_type} file` }, [
-    h(AnchorButton, { href, rightIcon: "download", intent: Intent.PRIMARY }, [
+  const href = buildURL(`/data_file/${file_hash}/download/`);
+  return h(Tooltip, { content: `Download ${file_type ?? "data"} file` }, [
+    h(AnchorButton, { href, intent: Intent.PRIMARY }, [
       h(DownloadButtonContent, { basename, file_hash, file_type }),
     ]),
   ]);

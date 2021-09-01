@@ -1,0 +1,20 @@
+#! /usr/bin/env sh
+
+set -e
+
+base_command="celery -A sparrow_worker worker -E"
+
+cd /app
+sleep 1
+echo "Running worker in $SPARROW_ENV mode"
+
+if [ $SPARROW_ENV = 'development' ]; then
+  exec watchmedo auto-restart \
+    --directory=/app \
+    --directory=/usr/local/lib/python3.9/site-packages/sparrow_plugins \
+    --pattern='*.py' \
+    --recursive -- \
+    $base_command
+else
+  exec $base_command
+fi

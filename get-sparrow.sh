@@ -7,18 +7,26 @@ get_release() {
     sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
 }
 
-header() {
-  >&2 echo -e "\e[1m$1\e[0m"
+line() {
+  >&2 printf -- "$1\n"
 }
 
-say() {
-  >&2 echo -e "   $1"
+header() {
+  line "\e[1m$1\e[0m"
+}
+
+bullet() {
+  line " - $1"
+}
+
+detail() {
+  line "   $1"
 }
 
 
 abort() {
-    say "$1"
-    say "exiting"
+    detail "$1"
+    detail "exiting"
     exit 1
 }
 
@@ -29,7 +37,7 @@ repo_name=EarthCubeGeochron/Sparrow
 
 platform=$(uname -s)
 header "Installing Sparrow on $platform"
-say ""
+line
 
 # Get the version of Sparrow to install, either from the user or
 # the latest tagged release on GitHub
@@ -39,11 +47,11 @@ release="$1"
 if [ -z $release ]; then
   header "Finding latest Sparrow release"
   release=$(get_release $repo_name latest)
-  say "found release $release"
+  detail "found release $release"
 else
   header "Finding user-specified version $release"
 fi
-say ""
+line
 
 
 url=https://github.com/$repo_name/releases/download/$release/sparrow-$platform-x86_64.tar.gz
@@ -57,41 +65,41 @@ executable=$dist_dir/sparrow
 
 # Check whether URL exists
 header "Checking download link"
-say "\e[2m$url\e[0m"
+detail "\e[2m$url\e[0m"
 if curl --output /dev/null --silent --head --fail "$url"; then
-  say "link is accessible!"
+  detail "link is accessible!"
 else
   abort "could not access link!"
 fi
-echo ""
+detail ""
 
 header "Installation prefix:\e[0m $install_path"
-say "\e[1m\e[2mTip:\e[0m \e[2mthe installation prefix can be controlled with the"
-say "\e[0mSPARROW_INSTALL_PATH\e[2m or \e[0mINSTALL_PATH\e[2m environment variables."
-echo -e "\e[0m"
+detail "\e[1m\e[2mTip:\e[0m \e[2mthe installation prefix can be controlled with the"
+detail "\e[0mSPARROW_INSTALL_PATH\e[2m or \e[0mINSTALL_PATH\e[2m environment variables."
+line "\e[0m"
 
-echo -e "The following locations will be written"
-echo -e "- $dist_dir"
-echo -e "- $symlink"
-say
+header "The following locations will be written:"
+bullet "$dist_dir"
+bullet "$symlink"
+line
 
 #check permissions
 # if permissions are needed it will notify and attempy a sudo login
 SUDO=""
 if ! [ -w $install_path ]; then
     header "Permissions"
-    say "Elevated permissions are required to install to $install_path."
-    say "You may be prompted for your password."
-    say ""
+    detail "Elevated permissions are required to install to $install_path."
+    detail "You may be prompted for your password."
+    line
 fi
 
 # Ask for confirmation no matter what
-echo "Would you like to continue? (y/N)"
+line "Would you like to continue? (y/N)"
 read -r answer
 
 if [[ $answer == "y" || $answer == "Y" || $answer == "yes" || $answer == "Yes" ]]
 then
-  echo ""
+  line
 else
   abort "Installation cancelled"
 fi
@@ -116,18 +124,18 @@ curl -L -s ${url} | $SUDO tar xzf - -C $temp_dir
 test_file=$temp_dir/sparrow
 
 if [ -f "$test_file" ]; then
-  say "success!"
+  detail "success!"
 else
   abort "download unsuccessful"
 fi
-echo ""
+line
 
-echo "clearing out $dist_dir"
+line "clearing out $dist_dir"
 $SUDO rm -rf $dist_dir
 $SUDO mkdir -p $dist_dir
 ## Move files to the correct directory
 # and test they have successfully moved
-echo "installing to $dist_dir"
+line "installing to $dist_dir"
 $SUDO mv $temp_dir/* $dist_dir
 
 move_test_file=$dist_dir/sparrow
@@ -135,21 +143,22 @@ move_test_file=$dist_dir/sparrow
 rm -rf $temp_dir
 if [ -f "$move_test_file" ]; 
 then
-    say "success!"
+    detail "success!"
 else
     abort "copying unsuccessful"
 fi
 
-echo ""
+line
 
 $SUDO mkdir -p $install_path/bin
 # Link executable onto the path
-echo "Linking $symlink -> $executable"
+line "Linking $symlink"
+line "     -> $executable"
 $SUDO ln -sf "$executable" "$symlink"
-echo ""
+line
 
 header "\e[32mSparrow executable installed!\e[0m"
-
-say
-say "Check if you can run the 'sparrow' command."
-say "If not, you may need to add '$install_path/bin' to your PATH"
+line
+header "\e[2mNext steps:\e[0m"
+line "\e[2mCheck if you can run the 'sparrow' command. If not, you may need"
+line "to add $install_path/bin to your PATH"

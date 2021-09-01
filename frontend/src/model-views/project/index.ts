@@ -42,6 +42,13 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
     minimal = false,
   } = props;
 
+  if (!samples) {
+    samples = [];
+  }
+  if (!publication) {
+    publication = [];
+  }
+
   const to = useModelURL(`/project/${id}`);
   const pubData = ellipseAppend({ data: publication, attribute: "title" });
 

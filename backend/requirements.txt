@@ -21,7 +21,7 @@ Flask-RESTful==0.3.7
 # Core application
 migra==3.0.1616366383
 sqlakeyset==1.0.1616300210
-Pygments==2.5.2
+Pygments==2.10.0
 SQLAlchemy==1.4.7
 sqlalchemy-utils==0.37.0
 sqlparse==0.3.0
@@ -31,7 +31,7 @@ toposort==1.5
 # Command-line interface
 click==7.1.2
 click-plugins==1.1.1
-ipython==7.11.1
+ipython==7.27.0
 
 # Static files
 aiofiles==0.6.0
@@ -42,6 +42,7 @@ pyyaml==5.4
 beautifulsoup4==4.8.2
 html5lib==1.0.1
 datefinder==0.7.0
+pyarrow==5.0.0
 
 # Not sure why these were added,
 # may be subdependencies of Click
@@ -74,9 +75,9 @@ starlette-apispec==1.0.3
 boto3==1.12.25
 
 # Testing and logging
-pytest==5.4.0
+pytest==6.2.5
 colorlog==4.2.1
-rich==6.0.0
+rich==10.9.0
 deepdiff[murmur]==5.0.2
 pytest-order==0.9.5
 
@@ -96,3 +97,14 @@ crossrefapi==1.5.0
 # NOTE: we should probably organize these internal
 # packages better...
 # -e ./utils
+
+# Task worker
+celery==5.1.1
+redis==3.5.3
+broadcaster[redis]==0.2.0
+# For worker auto-reloading in development
+watchdog==2.1.2
+argh==0.26.2
+pydantic==1.8.2
+
+typer==0.3.2
