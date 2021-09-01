@@ -4,6 +4,11 @@ envbash
 pytest
 pyyaml
 docker-compose==1.29.2
+# The below pin of 'docker' ensures that we don't encounter
+# https://github.com/docker/compose/issues/8499
+# It should be deleted when docker-compose dependency is upgraded.
+docker>=5.0.2
+
 click-default-group==1.2.2
 packaging==20.9
 
