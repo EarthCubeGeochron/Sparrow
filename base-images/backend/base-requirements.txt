@@ -1,9 +1,9 @@
 # Core
-psycopg2==2.8.5
-shapely==1.7.0
+psycopg2==2.9.1
+shapely==1.7.1
 
 # Importing
-lxml==4.5.1
-numpy==1.18.5
-pandas==1.0.4
-uvloop==0.14.0
+lxml==4.6.3
+numpy==1.21.2
+pandas==1.3.2
+uvloop==0.16.0
