@@ -69,7 +69,6 @@ function TaskMain({ tasks, task }) {
         console.log(info);
       }
       if (text != null) {
-        console.log(text);
         // We could eventually keep track of line type here...
         const lines = text.split("\n").filter((line) => line.length > 0);
         messageHistory.current?.push(...lines);
@@ -137,7 +136,7 @@ function TaskMain({ tasks, task }) {
 
 const TaskRoute = ({ tasks }) => {
   const task = useParams().task;
-  return h(TaskMain, { tasks, task });
+  return h(TaskMain, { tasks, task, key: task });
 };
 
 const TasksRouter = ({ base, tasks }) => {
