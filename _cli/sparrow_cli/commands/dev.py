@@ -1,4 +1,4 @@
-from click import group, secho
+from click import group, secho, option
 from os import environ, path, chdir
 from runpy import run_path
 from subprocess import run
@@ -28,8 +28,7 @@ def dev_reload():
     compose("exec frontend /app/node_modules/.bin/browser-sync reload")
 
 
-@sparrow_dev.command(name="sync-version-info")
-def sync_version_info():
+def _sync_version_info():
     root_dir = environ.get("SPARROW_PATH")
     # We should bail here if we are running a bundled Sparrow...
     chdir(root_dir)
@@ -46,9 +45,23 @@ def sync_version_info():
     run(["git", "add", "sparrow-version.json"])
 
 
+@sparrow_dev.command(name="sync-version-info")
+def sync_version_info():
+    _sync_version_info()
+
+
 @sparrow_dev.command(name="clear-cache")
 def clear_cache():
     """Clear caches used by the command-line application"""
     from ..help.backend import cli_cache_file
 
     cli_cache_file().unlink()
+
+
+@sparrow_dev.command(name="create-release")
+def create_release():
+    """Create a Sparrow release."""
+    root_dir = environ.get("SPARROW_PATH")
+    _sync_version_info()
+    res = run(["git", "status"])
+    print(res)
