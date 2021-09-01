@@ -77,7 +77,7 @@ class TestProjectEdits:
 
         sample_geojson = self.data["schema-sample-geojson"]
 
-        samp = Sample.load(sample_geojson)
+        samp = Sample.load(sample_geojson, session=db.session)
 
         assert samp.location is not None
 
