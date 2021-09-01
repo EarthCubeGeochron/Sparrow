@@ -1,5 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useRef, useMemo, useState } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import { CollapseCard } from "@macrostrat/ui-components";
 import { useAPIv2Result } from "~/api-v2";
 import { MinimalNavbar, ServerStatus } from "~/components";
@@ -69,6 +69,7 @@ function TaskMain({ tasks, task }) {
         console.log(info);
       }
       if (text != null) {
+        console.log(text);
         // We could eventually keep track of line type here...
         const lines = text.split("\n").filter((line) => line.length > 0);
         messageHistory.current?.push(...lines);

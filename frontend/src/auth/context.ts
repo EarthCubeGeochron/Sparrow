@@ -29,7 +29,6 @@ type AsyncAuthAction = GetStatus | Login | Logout;
 function useAuthActions(dispatch) {
   const { get, post } = useAPIActions(APIV2Context);
   return async (action: AuthAction | AsyncAuthAction) => {
-    let payload = { login: false, username: null, error: null };
     switch (action.type) {
       case "get-status":
         // Right now, we get login status from the
@@ -41,18 +40,20 @@ function useAuthActions(dispatch) {
         // granted by the application.
         try {
           const { login, username } = await get("/auth/status");
-          return dispatch({ type: "update-status", payload });
+          return dispatch({
+            type: "update-status",
+            payload: { login, username, error: null },
+          });
         } catch (error) {
           return dispatch({ type: "update-status", payload: { error } });
         }
       case "login":
-        let type = "auth-form-success";
         try {
           const res = await post("/auth/login", action.payload);
           const { login, username } = res;
           return dispatch({
             type: "auth-form-success",
-            payload: { username, login },
+            payload: { username, login, error: null },
           });
         } catch (error) {
           return dispatch({
@@ -62,12 +63,14 @@ function useAuthActions(dispatch) {
         }
       case "logout": {
         const { login } = await post("/auth/logout", {});
-        const payload = {
-          login,
-          username: null,
-          error: null,
-        };
-        return dispatch({ type: "auth-form-success", payload });
+        return dispatch({
+          type: "auth-form-success",
+          payload: {
+            login,
+            username: null,
+            error: null,
+          },
+        });
       }
       default:
         return dispatch(action);

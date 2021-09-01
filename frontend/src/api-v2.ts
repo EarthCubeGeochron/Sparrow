@@ -53,7 +53,7 @@ export function useSparrowWebSocket(path: string, options = {}) {
       uri = uri.replace(/^http(s)?:\/\//, "ws$1://") + path;
       resolve(uri);
     });
-  }, [ctx, reconnectAttempt]);
+  }, [ctx, path, reconnectAttempt]);
 
   const socket = useWebSocket(getSocketUrl, {
     onOpen() {
