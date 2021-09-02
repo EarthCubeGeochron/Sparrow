@@ -1,13 +1,15 @@
+@use "sass:color"
+  
 $secondary: #32536b //#304e68
 $bkg: #261e2d
 
 //$accent: #400C4A
-$accent: darken(#a328b4,40%)
+$accent: color.adjust(#a328b4,$lightness: -40%)
 $gradient-dest: rgb(52,45,79)
-$gradient-light: lighten($gradient-dest,75%)
-$gradient-dark: darken($gradient-dest,5%)
-$dark-card-base:  darken(#32536b,10%)
-$card-base:  lighten(#32536b,60%)
+$gradient-light: color.adjust($gradient-dest,$lightness: 75%)
+$gradient-dark: color.adjust($gradient-dest, $lightness: -5%)
+$dark-card-base:  color.adjust(#32536b,$lightness: -10%)
+$card-base:  color.adjust(#32536b, $lightness: 60%)
 
 :root
   --header-font: "Montserrat", Helvetica, sans-serif
@@ -19,9 +21,9 @@ $card-base:  lighten(#32536b,60%)
   --accent-active: alpha($accent, 10%)
   --header-color: $secondary
   --secondary-color: #666666
-  --card-background: linear-gradient(120deg, desaturate(lighten($card-base,30%),20%) 0%, $card-base 100%)
+  --card-background: linear-gradient(120deg, desaturate(color.adjust($card-base,$lightness: 30%),20%) 0%, $card-base 100%)
   --card-border: $card-base
-  --background-gradient: linear-gradient(120deg, alpha($gradient-light,0) 0%, $gradient-light 100%)
+  --background-gradient: linear-gradient(120deg, color.alpha($gradient-light,0) 0%, $gradient-light 100%)
   --purple-color: #544679
 
 *
@@ -42,17 +44,17 @@ body
   z-index: -10
   background: white
   &.bp3-dark
-    --background-color: darken(rgba(34,29,38,1),30%) 
-    --text-color: lighten(#354a61, 70%)
+    --background-color: color.darken(rgba(34,29,38,1),30%) 
+    --text-color: color.adjust(#354a61, $lightness: 70%)
     --accent-color: $accent-light 
-    --accent-background: alpha($accent-light, 20%)
-    --accent-active: alpha($accent-light, 20%)
-    --header-color: lighten(#32536b,20%) //lighten($secondary,40%)
-    --card-border: darken(#37445a,30%)
-    --background-gradient: linear-gradient(120deg, alpha($gradient-dark,0) 0%, $gradient-dark 100%)
-    --card-background: linear-gradient(120deg, desaturate(darken($dark-card-base,30%),20%) 0%, $dark-card-base 100%)
+    --accent-background: color.alpha($accent-light, 20%)
+    --accent-active: color.alpha($accent-light, 20%)
+    --header-color: color.adjust(#32536b,$lightness: 20%) //lighten($secondary,40%)
+    --card-border: color.adjust(#37445a,$lightness: -30%)
+    --background-gradient: linear-gradient(120deg, color.alpha($gradient-dark,0) 0%, $gradient-dark 100%)
+    --card-background: linear-gradient(120deg, desaturate(color.adjust($dark-card-base, $lightness: -30%),20%) 0%, $dark-card-base 100%)
     --card-border: $dark-card-base
-    background:  darken(rgba(34,29,38,1),30%) // lighten(#161517, 2%) //
+    background:  color.adjust(rgba(34,29,38,1),$lightness: -30%) // lighten(#161517, 2%) //
   transition: background 0.2s
   font-family: "Merriweather", 'Times New Roman', Times, serif
   line-height: 2
