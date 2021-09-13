@@ -8,7 +8,7 @@ from sparrow_utils.logs import get_logger, setup_stderr_logs
 
 from .environment import prepare_docker_environment, prepare_compose_overrides
 from .version_info import SparrowVersionMatch, test_version
-from .file_loader import load_config
+from .file_loader import load_config_file
 
 log = get_logger(__file__)
 
@@ -20,6 +20,7 @@ class SparrowConfig:
     bundle_dir: Path
     path_provided: bool
     is_frozen: bool
+    config_file: typing.Optional[Path] = None
     config_dir: typing.Optional[Path] = None
     version_info: typing.Optional[SparrowVersionMatch] = None
     verbose: bool = False
@@ -37,7 +38,9 @@ class SparrowConfig:
             environ["SPARROW_VERBOSE"] = "1"
 
         # Load configuration from file!
-        load_config()
+        self.config_file = load_config_file()
+        if self.config_file is not None:
+            self.config_dir = self.config_file.parent
 
         if "SPARROW_PATH" in environ:
             self.path_provided = True

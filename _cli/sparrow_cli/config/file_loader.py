@@ -35,7 +35,7 @@ def envbash_init_hack():
         sys.exit(0)
 
 
-def load_config_file(cfg):
+def _load_config_file(cfg):
     envbash_init_hack()
     return load_envbash(cfg)
 
@@ -56,7 +56,7 @@ def get_config() -> Optional[Path]:
     return Path(__config)
 
 
-def load_config():
+def load_config_file():
     environ["SPARROW_WORKDIR"] = getcwd()
     here = Path(environ["SPARROW_WORKDIR"])
 
@@ -84,6 +84,8 @@ def load_config():
         # Actually source the configuration file as a shell script
         # This requires bash to be available on the platform, which
         # might be a problem for Windows/WSL.
-        load_config_file(environ["SPARROW_CONFIG"])
+        _load_config_file(environ["SPARROW_CONFIG"])
         # Change back to original working directory
         chdir(environ["SPARROW_WORKDIR"])
+
+    return sparrow_config
