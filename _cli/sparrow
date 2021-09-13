@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
 
-from sparrow_cli import main_cli
+from sparrow_cli import cli
 
-main_cli()
+cli()

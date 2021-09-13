@@ -2,7 +2,9 @@ import sys
 from os import environ, getenv
 from click import secho
 from rich import print
-from sparrow_utils import relative_path
+from sparrow_utils import relative_path, get_logger
+
+log = get_logger(__name__)
 
 
 def is_defined(envvar):
@@ -42,6 +44,7 @@ def prepare_docker_environment():
 def prepare_compose_overrides():
     base = environ["SPARROW_PATH"]
     main = relative_path(base, "docker-compose.yaml")
+
     compose_files = [main]
 
     def add_override(name):
@@ -63,6 +66,7 @@ def prepare_compose_overrides():
 
     if len(profiles) > 0:
         environ["COMPOSE_PROFILES"] = ",".join(profiles)
+        log.info(f"docker-compose profiles: {profiles}")
 
     # Use certbot for SSL if certain conditions are met
     use_certbot = (
@@ -96,6 +100,7 @@ def prepare_compose_overrides():
         compose_files += overrides.split(":")
 
     environ["COMPOSE_FILE"] = ":".join(compose_files)
+    log.info(f"Docker compose overrides: {compose_files}")
 
 
 def validate_environment():

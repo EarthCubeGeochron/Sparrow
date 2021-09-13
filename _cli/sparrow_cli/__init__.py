@@ -62,6 +62,11 @@ def main(ctx, args):
     except ValueError:
         subcommand = "--help"
 
+    if subcommand == "_docker-compose":
+        # This is an internal, undocumented command that runs  a
+        # 'bare' docker-compose, without applying Sparrow environment
+        return _docker_compose(*args)
+
     # Find sparrow configuration object
     cfg = ctx.find_object(SparrowConfig)
 
@@ -102,17 +107,3 @@ def shell(container):
 
 
 add_commands(cli)
-
-
-def main_cli():
-    subcommand = None
-    args = []
-    if len(sys.argv) > 1:
-        subcommand = sys.argv[1:]
-    if len(sys.argv) > 2:
-        args = sys.argv[2:]
-    if subcommand == "_docker-compose":
-        # This is an internal, undocumented command that runs  a
-        # 'bare' docker-compose, without applying Sparrow environment
-        return _docker_compose(*args)
-    cli()

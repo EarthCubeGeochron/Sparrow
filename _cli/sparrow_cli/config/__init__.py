@@ -70,7 +70,10 @@ class SparrowConfig:
         environ["SPARROW_FRONTEND_VERSION"] = version
 
         prepare_docker_environment()
-        prepare_compose_overrides()
+        if "COMPOSE_FILE" in environ:
+            log.info("COMPOSE_FILE provided; skipping overrides and profiles.")
+        else:
+            prepare_compose_overrides()
 
     def _setup_command_path(self):
         _bin = self.SPARROW_PATH / "_cli" / "bin"
