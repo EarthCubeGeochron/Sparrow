@@ -3,11 +3,12 @@ from shlex import split
 from typing import List
 from pathlib import Path
 from json import loads
-from .exc import SparrowCommandError
 from json.decoder import JSONDecodeError
 from sparrow_utils.logs import get_logger
 from sparrow_utils.shell import cmd as cmd_
 from rich import print
+from .exceptions import SparrowCommandError
+
 
 log = get_logger(__name__)
 

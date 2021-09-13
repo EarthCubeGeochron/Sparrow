@@ -6,7 +6,7 @@ from time import sleep
 
 from ..config.environment import validate_environment
 from ..util import compose, cmd, log
-from ..help.backend import get_backend_help_info
+from ..help import get_backend_help_info
 
 
 @click.command()

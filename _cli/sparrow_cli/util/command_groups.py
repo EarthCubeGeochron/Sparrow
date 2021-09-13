@@ -1,16 +1,13 @@
-import sys
 import click
-from click import echo, secho, style, Group
+from click import echo, secho, style
 from click_default_group import DefaultGroup
-from sparrow_utils.logs import setup_stderr_logs
-from os import environ, getcwd, chdir, getenv
-from pathlib import Path
-from typing import Optional
-from rich.console import Console
-from .config.file_loader import load_config
-from .exc import SparrowCommandError
-from .config import SparrowConfig
-from .config.environment import is_truthy
+from os import environ
+import sys
+
+from ..config import SparrowConfig
+from .exceptions import SparrowCommandError
+from .formatting import format_description
+from .shell import cmd, find_subcommand
 
 
 class SparrowDefaultCommand(DefaultGroup):
@@ -44,26 +41,15 @@ class SparrowDefaultCommand(DefaultGroup):
         super().parse_args(ctx, args)
 
 
-console = Console(highlight=True)
+class CommandGroup(click.Group):
+    """A command group that allows us to specify shell subcommands to shadow"""
 
-
-@click.group(
-    name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True
-)
-@click.option(
-    "--verbose/--no-verbose", is_flag=True, default=is_truthy("SPARROW_VERBOSE")
-)
-@click.pass_context
-def cli(ctx, verbose=False):
-    """Startup function that sets configuration environment variables. Much of the
-    structure of this is inherited from when the application was bootstrapped by a
-    `zsh` script.
-    """
-    if verbose:
-        setup_stderr_logs("sparrow_cli")
-        # Set verbose environment variable for nested commands
-        environ["SPARROW_VERBOSE"] = "1"
-
-    load_config()
-    # First steps towards some much more object-oriented configuration
-    ctx.obj = SparrowConfig(verbose=verbose)
+    def add_shell_command(self, k, v, prefix=""):
+        @self.command(name=k, short_help=format_description(v))
+        @click.argument("args", nargs=-1, type=click.UNPROCESSED)
+        @click.pass_context
+        def command(ctx, args):
+            obj = ctx.find_object(SparrowConfig)
+            fn = find_subcommand(obj.bin_directories, k, prefix=prefix)
+            res = cmd(fn, *args)
+            sys.exit(res.returncode)

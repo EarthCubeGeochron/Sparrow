@@ -5,13 +5,15 @@
 
 import sys
 import click
+from os import environ
 from rich.console import Console
 from rich import print
-from sparrow_utils.logs import get_logger
-from .base import cli
+from sparrow_utils.logs import get_logger, setup_stderr_logs
 from .help import echo_help
-from .util import cmd, exec_or_run, find_subcommand, container_id
+from .util import cmd, exec_or_run, find_subcommand, container_id, SparrowDefaultCommand
 from .config import SparrowConfig
+from .config.file_loader import load_config
+from .config.environment import is_truthy
 from .commands import add_commands
 from .meta import __version__
 
@@ -29,6 +31,28 @@ def _docker_compose(*args):
     sys.exit(0)
 
 
+@click.group(
+    name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True
+)
+@click.option(
+    "--verbose/--no-verbose", is_flag=True, default=is_truthy("SPARROW_VERBOSE")
+)
+@click.pass_context
+def cli(ctx, verbose=False):
+    """Startup function that sets configuration environment variables. Much of the
+    structure of this is inherited from when the application was bootstrapped by a
+    `zsh` script.
+    """
+    if verbose:
+        setup_stderr_logs("sparrow_cli")
+        # Set verbose environment variable for nested commands
+        environ["SPARROW_VERBOSE"] = "1"
+
+    load_config()
+    # First steps towards some much more object-oriented configuration
+    ctx.obj = SparrowConfig(verbose=verbose)
+
+
 @cli.command(
     "main",
     context_settings=dict(
@@ -42,7 +66,7 @@ def _docker_compose(*args):
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
 def main(ctx, args):
-    rest = []
+    rest = tuple()
     try:
         (subcommand, *rest) = args
     except ValueError:
@@ -58,7 +82,7 @@ def main(ctx, args):
     cfg = ctx.find_object(SparrowConfig)
 
     if subcommand in ["--help", "help"]:
-        return echo_help(ctx, cfg.bin_directories)
+        return echo_help(cli, ctx, cfg.bin_directories)
 
     if subcommand == "compose":
         # docker-compose respecting sparrow environment
