@@ -2,12 +2,15 @@ import typing
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from os import environ, chdir
-from sparrow_utils.shell import git_revision_info, cmd
-from packaging.specifiers import SpecifierSet, InvalidSpecifier
-from packaging.version import Version
-from .environment import prepare_docker_environment
+from os import environ
+from sparrow_utils.shell import git_revision_info
+from sparrow_utils.logs import get_logger, setup_stderr_logs
+
+from .environment import prepare_docker_environment, prepare_compose_overrides
 from .version_info import SparrowVersionMatch, test_version
+from .file_loader import load_config
+
+log = get_logger(__file__)
 
 
 @dataclass
@@ -26,6 +29,15 @@ class SparrowConfig:
         self.is_frozen = getattr(sys, "frozen", False)
         if self.is_frozen:
             self.bundle_dir = Path(sys._MEIPASS)
+
+        if verbose:
+            setup_stderr_logs("sparrow_cli")
+            log.info("Verbose logging enabled")
+            # Set verbose environment variable for nested commands
+            environ["SPARROW_VERBOSE"] = "1"
+
+        # Load configuration from file!
+        load_config()
 
         if "SPARROW_PATH" in environ:
             self.path_provided = True
@@ -54,13 +66,8 @@ class SparrowConfig:
         environ["SPARROW_BACKEND_VERSION"] = version
         environ["SPARROW_FRONTEND_VERSION"] = version
 
-        # Enable native builds and layer caching
-        # https://docs.docker.com/develop/develop-images/build_enhancements/
-        # This is kind of experimental
-        environ.setdefault("COMPOSE_DOCKER_CLI_BUILD", "1")
-        environ.setdefault("DOCKER_BUILDKIT", "1")
-
         prepare_docker_environment()
+        prepare_compose_overrides()
 
     def _setup_command_path(self):
         _bin = self.SPARROW_PATH / "_cli" / "bin"

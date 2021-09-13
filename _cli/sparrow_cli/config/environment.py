@@ -5,6 +5,14 @@ from rich import print
 from sparrow_utils import relative_path
 
 
+def is_defined(envvar):
+    return environ.get(envvar) is not None
+
+
+def is_truthy(envvar, default="False"):
+    return getenv(envvar, "False").lower() in ("true", "1", "t", "y", "yes")
+
+
 def prepare_docker_environment():
     if environ.get("_SPARROW_ENV_PREPARED", "0") == "1":
         return
@@ -12,6 +20,12 @@ def prepare_docker_environment():
     environ["_SPARROW_ENV_PREPARED"] = "1"
 
     # ENVIRONMENT VARIABLE DEFAULTS
+    # Enable native builds and layer caching
+    # https://docs.docker.com/develop/develop-images/build_enhancements/
+    # This is kind of experimental
+    environ.setdefault("COMPOSE_DOCKER_CLI_BUILD", "1")
+    environ.setdefault("DOCKER_BUILDKIT", "1")
+
     # Set variables that might not be created in the config file
     # to default values
     # NOTE: much of this has been moved to `docker-compose.yaml`
@@ -23,16 +37,6 @@ def prepare_docker_environment():
     # logging and container ID
     # https://github.com/docker/scan-cli-plugin/issues/149
     environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
-
-    prepare_compose_overrides()
-
-
-def is_defined(envvar):
-    return environ.get(envvar) is not None
-
-
-def is_truthy(envvar, default="False"):
-    return getenv(envvar, "False").lower() in ("true", "1", "t", "y", "yes")
 
 
 def prepare_compose_overrides():

@@ -5,14 +5,13 @@
 
 import sys
 import click
-from os import environ
 from rich.console import Console
 from rich import print
-from sparrow_utils.logs import get_logger, setup_stderr_logs
+from sparrow_utils.logs import get_logger
 from .help import echo_help
-from .util import cmd, exec_or_run, find_subcommand, container_id, SparrowDefaultCommand
+from .util.shell import cmd, exec_or_run, find_subcommand, container_id
+from .util.command_groups import SparrowDefaultCommand
 from .config import SparrowConfig
-from .config.file_loader import load_config
 from .config.environment import is_truthy
 from .commands import add_commands
 from .meta import __version__
@@ -39,17 +38,8 @@ def _docker_compose(*args):
 )
 @click.pass_context
 def cli(ctx, verbose=False):
-    """Startup function that sets configuration environment variables. Much of the
-    structure of this is inherited from when the application was bootstrapped by a
-    `zsh` script.
-    """
-    if verbose:
-        setup_stderr_logs("sparrow_cli")
-        # Set verbose environment variable for nested commands
-        environ["SPARROW_VERBOSE"] = "1"
-
-    load_config()
-    # First steps towards some much more object-oriented configuration
+    """Startup function that sets configuration environment variables."""
+    # Here is where the configuration gets set up for the entire command-line application
     ctx.obj = SparrowConfig(verbose=verbose)
 
 
