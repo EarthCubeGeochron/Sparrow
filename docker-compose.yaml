@@ -1,11 +1,11 @@
 version: "3.6"
 x-backend:
   &x-backend
-  image: sparrowdata/backend:${SPARROW_BACKEND_VERSION:-latest}
+  image: ${SPARROW_BACKEND_IMAGE:-sparrowdata/backend:latest}
   build:
     context: backend
     cache_from:
-      - sparrowdata/backend:${SPARROW_BACKEND_VERSION:-latest}
+      - ${SPARROW_BACKEND_IMAGE:-sparrowdata/backend:latest}
   command: /bin/run
   # Make sure we get colorized terminal output
   tty: true
