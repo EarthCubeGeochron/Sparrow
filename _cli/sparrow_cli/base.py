@@ -7,9 +7,10 @@ from os import environ, getcwd, chdir, getenv
 from pathlib import Path
 from typing import Optional
 from rich.console import Console
-from .config_loader import load_config
+from .config.file_loader import load_config
 from .exc import SparrowCommandError
-from .context import SparrowConfig
+from .config import SparrowConfig
+from .config.environment import is_truthy
 
 
 class SparrowDefaultCommand(DefaultGroup):
@@ -43,27 +44,6 @@ class SparrowDefaultCommand(DefaultGroup):
         super().parse_args(ctx, args)
 
 
-def find_config_file(dir: Path) -> Optional[Path]:
-    for folder in (dir, *dir.parents):
-        pth = folder / "sparrow-config.sh"
-        if pth.is_file():
-            return pth
-
-
-def get_config() -> Optional[Path]:
-    # Get configuration from existing environment variable
-    __config = environ.get("SPARROW_CONFIG")
-    __config_unset = environ.get("_SPARROW_CONFIG_UNSET", "0") == "1"
-    if __config is None or __config_unset:
-        return None
-    return Path(__config)
-
-
-def env_flag(variable):
-    """Parse a boolean environment flag"""
-    return getenv(variable, "False").lower() in ("true", "1", "t", "y", "yes")
-
-
 console = Console(highlight=True)
 
 
@@ -71,7 +51,7 @@ console = Console(highlight=True)
     name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True
 )
 @click.option(
-    "--verbose/--no-verbose", is_flag=True, default=env_flag("SPARROW_VERBOSE")
+    "--verbose/--no-verbose", is_flag=True, default=is_truthy("SPARROW_VERBOSE")
 )
 @click.pass_context
 def cli(ctx, verbose=False):
@@ -84,32 +64,6 @@ def cli(ctx, verbose=False):
         # Set verbose environment variable for nested commands
         environ["SPARROW_VERBOSE"] = "1"
 
-    environ["SPARROW_WORKDIR"] = getcwd()
-    here = Path(environ["SPARROW_WORKDIR"])
-
-    sparrow_config = get_config()
-
-    if sparrow_config is None:
-        # Search for configuration file if it isn't already defined
-        sparrow_config = find_config_file(here)
-
-    if sparrow_config is None:
-        # echo("No configuration file found. Running using default values.", err=True)
-        environ["_SPARROW_CONFIG_UNSET"] = "1"
-    else:
-        environ["SPARROW_CONFIG"] = str(sparrow_config)
-        environ["SPARROW_CONFIG_DIR"] = str(sparrow_config.parent)
-
-    _config_sourced = environ.get("_SPARROW_CONFIG_SOURCED", "0") == "1"
-
-    if sparrow_config is not None and not _config_sourced:
-        chdir(environ["SPARROW_CONFIG_DIR"])
-        # This requires bash to be available on the platform, which
-        # might be a problem for Windows/WSL.
-        load_config(environ["SPARROW_CONFIG"])
-        # Change back to original working directory
-        chdir(environ["SPARROW_WORKDIR"])
-        environ["_SPARROW_CONFIG_SOURCED"] = "1"
-
+    load_config()
     # First steps towards some much more object-oriented configuration
     ctx.obj = SparrowConfig(verbose=verbose)

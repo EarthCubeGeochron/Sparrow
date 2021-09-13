@@ -11,7 +11,7 @@ from sparrow_utils.logs import get_logger
 from .base import cli
 from .help import echo_help
 from .util import cmd, exec_or_run, find_subcommand, container_id
-from .context import SparrowConfig
+from .config import SparrowConfig
 from .commands import add_commands
 from .meta import __version__
 

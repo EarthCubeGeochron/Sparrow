@@ -1,5 +1,5 @@
 import sys
-from os import environ, path
+from os import environ, getenv
 from click import secho
 from rich import print
 from sparrow_utils import relative_path
@@ -31,8 +31,8 @@ def is_defined(envvar):
     return environ.get(envvar) is not None
 
 
-def is_truthy(envvar, default="0"):
-    return environ.get(envvar, default).lower() not in ["0", "false", "no"]
+def is_truthy(envvar, default="False"):
+    return getenv(envvar, "False").lower() in ("true", "1", "t", "y", "yes")
 
 
 def prepare_compose_overrides():

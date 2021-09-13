@@ -1,5 +1,5 @@
 import click
-from ..context import SparrowConfig
+from ..config import SparrowConfig
 from ..meta import __version__
 from json import load
 

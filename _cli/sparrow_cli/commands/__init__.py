@@ -1,9 +1,9 @@
-from .test import sparrow_test  # noqa
+from .test import sparrow_test
 from .test_lab import sparrow_test_lab
-from .database import sparrow_db  # noqa
-from .docs import sparrow_docs  # noqa
-from .dev import sparrow_dev  # noqa
-from .info import sparrow_info  # noqa
+from .database import sparrow_db
+from .docs import sparrow_docs
+from .dev import sparrow_dev
+from .info import sparrow_info
 from .build import sparrow_build
 from .attach import sparrow_attach
 from .logs import sparrow_logs

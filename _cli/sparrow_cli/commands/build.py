@@ -6,7 +6,7 @@ from rich import print
 from pathlib import Path
 from json import load
 
-from ..context import SparrowConfig
+from ..config import SparrowConfig
 from ..util import cmd
 
 images_ = ["backend-base", "db-mysql-fdw", "backend", "frontend"]

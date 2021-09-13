@@ -4,7 +4,7 @@ from subprocess import Popen
 from rich import print
 from time import sleep
 
-from ..env import validate_environment
+from ..config.environment import validate_environment
 from ..util import compose, cmd, log
 from ..help.backend import get_backend_help_info
 
@@ -22,6 +22,8 @@ def sparrow_up(container, force_recreate=False):
     if container is None:
         sleep(1)
         container = ""
+
+    # Bring up the application
     res = cmd(
         "sparrow compose",
         "up --build --no-start",

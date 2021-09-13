@@ -12,7 +12,7 @@ from ..util import fail_without_docker, compose
 from .backend import get_backend_command_help
 from ..base import cli
 from ..exc import SparrowCommandError
-from ..context import SparrowConfig
+from ..config import SparrowConfig
 from .util import format_config_path
 
 console = Console()
