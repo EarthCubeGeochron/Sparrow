@@ -12,16 +12,13 @@ from ..help import get_backend_help_info
 @click.command()
 @click.argument("container", type=str, required=False, default=None)
 @click.option("--force-recreate", is_flag=True, default=False)
-def sparrow_up(container, force_recreate=False):
+@click.pass_context
+def sparrow_up(ctx, container="", force_recreate=False):
     """Bring up the application and start logs"""
     # Validate the presence of SPARROW_SECREY_KEY only if we are bringing
     # the application up. Eventually, this should be wrapped into a Python
     # version of the `sparrow up` command.
     validate_environment()
-
-    if container is None:
-        sleep(1)
-        container = ""
 
     # Bring up the application
     res = cmd(
@@ -39,6 +36,7 @@ def sparrow_up(container, force_recreate=False):
     _log_cmd = ["sparrow", "logs", container]
     log.debug(" ".join(_log_cmd))
     p = Popen(_log_cmd)
+    # Wait a tick to make sure the logs are started
     sleep(0.05)
 
     print("[green]Following container logs[/green]")
