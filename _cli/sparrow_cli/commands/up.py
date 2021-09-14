@@ -21,8 +21,13 @@ def sparrow_up(ctx, container="", force_recreate=False):
     # version of the `sparrow up` command.
     validate_environment()
 
-    # Run the prebuild script
     cfg = ctx.find_object(SparrowConfig)
+
+    # build containers
+    if not cfg.offline:
+        cmd("sparrow compose build")
+
+    # Run the prebuild script
     prebuild = cfg.config_dir / "sparrow-prestart.sh"
     if prebuild.exists():
         log.debug("Running prebuild script")
@@ -31,7 +36,7 @@ def sparrow_up(ctx, container="", force_recreate=False):
     # Bring up the application
     res = cmd(
         "sparrow compose",
-        "up --build --no-start",
+        "up --no-build --no-start",
         "--remove-orphans",
         "--force-recreate" if force_recreate else "",
         container,

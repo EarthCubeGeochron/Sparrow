@@ -55,7 +55,7 @@ x-backend:
     # the importer in the backend
     # NOTE: we should think about moving this to another container
     # but this is precluded by our current plugin architecture.
-    - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
+    - ${SPARROW_DATA_DIR:-placeholder}:/data
     # Share some configuration between backend
     # and frontend
     - ${SPARROW_INIT_SQL:-placeholder}:/init-sql/:ro
