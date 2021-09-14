@@ -99,20 +99,7 @@ class TaskEndpoint(WebSocketEndpoint):
 @requires("admin")
 async def tasks(request):
     mgr = get_plugin("task-manager")
-    return APIResponse(
-        {
-            "tasks": [
-                {
-                    "name": k,
-                    "description": v["func"].__doc__.strip(),
-                    "params": loads(v["params"].schema_json()),
-                }
-                for k, v in mgr._tasks.items()
-                if not v["cli_only"]
-            ],
-            "enabled": mgr._task_worker_enabled,
-        }
-    )
+    return APIResponse({"tasks": mgr.task_info(), "enabled": mgr._task_worker_enabled})
 
 
 def build_tasks_api(manager):
