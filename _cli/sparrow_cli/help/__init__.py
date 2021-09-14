@@ -1,5 +1,6 @@
 import sys
 import re
+import click
 from click import style
 from click.formatting import HelpFormatter
 from os import environ
@@ -45,6 +46,8 @@ def command_dl(directories: Path, extra_commands={}):
             continue
         if name.startswith("sparrow-dev-"):
             continue
+        if name.startswith("sparrow-tasks-"):
+            continue
         key = name[len(prefix) :]
         yield (key, get_description(f).strip())
 
@@ -72,6 +75,7 @@ class SparrowHelpFormatter(HelpFormatter):
         "down": "Safely stop `sparrow`",
         "info": "Show information about the installation",
         "create-test-lab": "Create an example installation of Sparrow",
+        "run": "Run Sparrow tasks (alias to `sparrow tasks run`)",
     }
 
     def write_line(self, text=""):
@@ -157,10 +161,11 @@ class SparrowHelpFormatter(HelpFormatter):
                 **{k: format_help(v) for k, v in command_info(ctx, cli)},
             },
         )
+
         self._write_section(
             "Container orchestration",
             {k: v for k, v in commands},
-            skip=[*self.key_commands.keys()],
+            skip=self.key_commands.keys(),
         )
 
     def _write_section(self, title, commands, skip=[]):
@@ -174,9 +179,10 @@ class SparrowHelpFormatter(HelpFormatter):
 
 sections = {
     "db": "Manage the `sparrow` database",
+    "tasks": "Manage `sparrow`'s task system",
     "test": "Run `sparrow`'s test suite",
-    "docs": "Manage `sparrow`'s documentation",
     "dev": "Helper commands for development",
+    "docs": "Manage `sparrow`'s documentation",
 }
 
 
