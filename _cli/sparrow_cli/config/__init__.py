@@ -66,8 +66,10 @@ class SparrowConfig:
 
         # Set version information needed in compose file
         version = self.find_sparrow_version()
-        environ["SPARROW_BACKEND_VERSION"] = version
-        environ["SPARROW_FRONTEND_VERSION"] = version
+        # Pin the images used in the compose file to the current version, unless
+        # otherwise specified.
+        environ.setdefault("SPARROW_BACKEND_IMAGE", f"sparrow/backend:{version}")
+        environ.setdefault("SPARROW_FRONTEND_IMAGE", f"sparrow/frontend:{version}")
 
         prepare_docker_environment()
         if "COMPOSE_FILE" in environ:
