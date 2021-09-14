@@ -24,9 +24,11 @@ class SparrowConfig:
     config_dir: typing.Optional[Path] = None
     version_info: typing.Optional[SparrowVersionMatch] = None
     verbose: bool = False
+    offline: bool = False
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=False, offline=False):
         self.verbose = verbose
+        self.offline = offline
         self.is_frozen = getattr(sys, "frozen", False)
         if self.is_frozen:
             self.bundle_dir = Path(sys._MEIPASS)
@@ -68,8 +70,14 @@ class SparrowConfig:
         version = self.find_sparrow_version()
         # Pin the images used in the compose file to the current version, unless
         # otherwise specified.
-        environ.setdefault("SPARROW_BACKEND_IMAGE", f"sparrow/backend:{version}")
-        environ.setdefault("SPARROW_FRONTEND_IMAGE", f"sparrow/frontend:{version}")
+        tag = f":{version}"
+        if self.offline:
+            environ["SPARROW_OFFLINE"] = "1"
+            log.info("Running in offline mode by using any available image")
+            tag = ""
+
+        environ.setdefault("SPARROW_BACKEND_IMAGE", "sparrow/backend" + tag)
+        environ.setdefault("SPARROW_FRONTEND_IMAGE", "sparrow/frontend" + tag)
 
         prepare_docker_environment()
         if "COMPOSE_FILE" in environ:

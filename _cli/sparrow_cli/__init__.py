@@ -36,14 +36,13 @@ def _docker_compose(*args):
 @click.group(
     name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True
 )
-@click.option(
-    "--verbose/--no-verbose", is_flag=True, default=is_truthy("SPARROW_VERBOSE")
-)
+@click.option("--verbose", is_flag=True, default=is_truthy("SPARROW_VERBOSE"))
+@click.option("--offline", is_flag=True, default=is_truthy("SPARROW_OFFLINE"))
 @click.pass_context
-def cli(ctx, verbose=False):
+def cli(ctx, verbose=False, offline=False):
     """Startup function that sets configuration environment variables."""
     # Here is where the configuration gets set up for the entire command-line application
-    ctx.obj = SparrowConfig(verbose=verbose)
+    ctx.obj = SparrowConfig(verbose=verbose, offline=offline)
 
 
 @cli.command(
