@@ -10,7 +10,7 @@ from ..help import get_backend_help_info
 
 
 @click.command()
-@click.argument("container", type=str, required=False, default=None)
+@click.argument("container", type=str, required=False, default="")
 @click.option("--force-recreate", is_flag=True, default=False)
 @click.pass_context
 def sparrow_up(ctx, container="", force_recreate=False):

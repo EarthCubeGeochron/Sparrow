@@ -36,7 +36,6 @@ def envbash_init_hack():
 
 
 def _load_config_file(cfg):
-    envbash_init_hack()
     return load_envbash(cfg)
 
 

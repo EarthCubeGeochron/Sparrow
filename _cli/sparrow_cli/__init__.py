@@ -13,8 +13,11 @@ from .util.shell import cmd, exec_or_run, find_subcommand, container_id
 from .util.command_groups import SparrowDefaultCommand
 from .config import SparrowConfig
 from .config.environment import is_truthy
+from .config.file_loader import envbash_init_hack
 from .commands import add_commands
 from .meta import __version__
+
+envbash_init_hack()
 
 log = get_logger(__name__)
 
