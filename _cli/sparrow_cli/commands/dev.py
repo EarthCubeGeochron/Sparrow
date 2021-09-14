@@ -3,8 +3,7 @@ from os import environ, path, chdir
 from runpy import run_path
 from subprocess import run
 import json
-from ..group import CommandGroup
-from ..util import compose
+from ..util import CommandGroup, compose
 
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {
@@ -49,6 +48,6 @@ def sync_version_info():
 @sparrow_dev.command(name="clear-cache")
 def clear_cache():
     """Clear caches used by the command-line application"""
-    from ..help.backend import cli_cache_file
+    from ..help.options_cache import cli_cache_file
 
     cli_cache_file().unlink()

@@ -1,11 +1,11 @@
 version: "3.6"
 x-backend:
   &x-backend
-  image: sparrowdata/backend:${SPARROW_BACKEND_VERSION:-latest}
+  image: ${SPARROW_BACKEND_IMAGE:-sparrowdata/backend}
   build:
     context: backend
     cache_from:
-      - sparrowdata/backend:${SPARROW_BACKEND_VERSION:-latest}
+      - ${SPARROW_BACKEND_IMAGE:-sparrowdata/backend}
   command: /bin/run
   # Make sure we get colorized terminal output
   tty: true
@@ -112,11 +112,11 @@ services:
     volumes:
       - db_cluster:/var/lib/postgresql/data
   frontend:
-    image: sparrowdata/frontend:${SPARROW_FRONTEND_VERSION:-latest}
+    image: ${SPARROW_FRONTEND_IMAGE:-sparrowdata/frontend}
     build:
       context: frontend
       cache_from:
-        - sparrowdata/frontend:${SPARROW_FRONTEND_VERSION:-latest}
+        - ${SPARROW_FRONTEND_IMAGE:-sparrowdata/frontend}
     depends_on:
       - backend
     environment:

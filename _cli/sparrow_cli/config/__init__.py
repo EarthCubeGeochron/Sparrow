@@ -2,74 +2,15 @@ import typing
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from os import environ, chdir
-from sparrow_utils.shell import git_revision_info, cmd
-from packaging.specifiers import SpecifierSet, InvalidSpecifier
-from packaging.version import Version
-from .env import prepare_docker_environment
+from os import environ
+from sparrow_utils.shell import git_revision_info
+from sparrow_utils.logs import get_logger, setup_stderr_logs
 
+from .environment import prepare_docker_environment, prepare_compose_overrides
+from .version_info import SparrowVersionMatch, test_version
+from .file_loader import load_config_file
 
-@dataclass
-class SparrowVersionMatch:
-    is_match: bool
-    desired: str
-    available: str
-    uses_git: bool
-
-
-def get_commit(cfg, match="HEAD"):
-    rev = cmd(
-        "git rev-parse --short",
-        match + "^{commit}",
-        cwd=cfg.SPARROW_PATH,
-        capture_output=True,
-    )
-    return rev.stdout.decode("utf-8").strip()
-
-
-def test_git_version(cfg, required_version) -> typing.Union[SparrowVersionMatch, None]:
-    # Fall back to git-based version string parsing...
-    if cfg.is_frozen and not cfg.path_provided:
-        rev = cfg.git_revision()["revision"].removesuffix("-dirty")
-    else:
-        rev = get_commit(cfg, "HEAD")
-
-    match_rev = get_commit(cfg, required_version)
-    # Could print a cautionary note if we are using a branch name or HEAD...
-    return SparrowVersionMatch(
-        is_match=rev == match_rev,
-        desired=required_version,
-        available=rev,
-        uses_git=True,
-    )
-
-
-def test_version(cfg) -> typing.Union[SparrowVersionMatch, None]:
-    # Test version string against requested version of SPARROW
-    # https://www.python.org/dev/peps/pep-0440/
-    # https://www.python.org/dev/peps/pep-0440/#version-specifiers
-    # We should make this handle git commits and tags as well...
-    required_version = environ.get("SPARROW_VERSION", None)
-    if required_version is None:
-        return
-
-    # We should maybe admonish the user here that specifying a
-    # SPARROW_VERSION or SPARROW_PATH is recommended...
-
-    try:
-        spec = SpecifierSet(required_version, prereleases=True)
-    except InvalidSpecifier:
-        # We fall back to testing git commit versions
-        return test_git_version(cfg, required_version)
-
-    actual_version = Version(cfg.find_sparrow_version())
-
-    return SparrowVersionMatch(
-        is_match=actual_version in spec,
-        desired=str(spec),
-        available=str(actual_version),
-        uses_git=False,
-    )
+log = get_logger(__file__)
 
 
 @dataclass
@@ -79,6 +20,8 @@ class SparrowConfig:
     bundle_dir: Path
     path_provided: bool
     is_frozen: bool
+    config_file: typing.Optional[Path] = None
+    config_dir: typing.Optional[Path] = None
     version_info: typing.Optional[SparrowVersionMatch] = None
     verbose: bool = False
 
@@ -87,6 +30,17 @@ class SparrowConfig:
         self.is_frozen = getattr(sys, "frozen", False)
         if self.is_frozen:
             self.bundle_dir = Path(sys._MEIPASS)
+
+        if verbose:
+            setup_stderr_logs("sparrow_cli")
+            log.info("Verbose logging enabled")
+            # Set verbose environment variable for nested commands
+            environ["SPARROW_VERBOSE"] = "1"
+
+        # Load configuration from file!
+        self.config_file = load_config_file()
+        if self.config_file is not None:
+            self.config_dir = self.config_file.parent
 
         if "SPARROW_PATH" in environ:
             self.path_provided = True
@@ -98,7 +52,7 @@ class SparrowConfig:
                 pth = self.bundle_dir / "srcroot"
             else:
                 this_exe = Path(__file__).resolve()
-                pth = this_exe.parent.parent.parent
+                pth = this_exe.parent.parent.parent.parent
             self.path_provided = False
             environ["SPARROW_PATH"] = str(pth)
 
@@ -112,16 +66,16 @@ class SparrowConfig:
 
         # Set version information needed in compose file
         version = self.find_sparrow_version()
-        environ["SPARROW_BACKEND_VERSION"] = version
-        environ["SPARROW_FRONTEND_VERSION"] = version
-
-        # Enable native builds and layer caching
-        # https://docs.docker.com/develop/develop-images/build_enhancements/
-        # This is kind of experimental
-        environ.setdefault("COMPOSE_DOCKER_CLI_BUILD", "1")
-        environ.setdefault("DOCKER_BUILDKIT", "1")
+        # Pin the images used in the compose file to the current version, unless
+        # otherwise specified.
+        environ.setdefault("SPARROW_BACKEND_IMAGE", f"sparrow/backend:{version}")
+        environ.setdefault("SPARROW_FRONTEND_IMAGE", f"sparrow/frontend:{version}")
 
         prepare_docker_environment()
+        if "COMPOSE_FILE" in environ:
+            log.info("COMPOSE_FILE provided; skipping overrides and profiles.")
+        else:
+            prepare_compose_overrides()
 
     def _setup_command_path(self):
         _bin = self.SPARROW_PATH / "_cli" / "bin"

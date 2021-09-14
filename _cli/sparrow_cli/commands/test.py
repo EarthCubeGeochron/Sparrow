@@ -79,9 +79,8 @@ def compose(*args, **kwargs):
         COMPOSE_PROJECT_NAME="sparrow_test",
         COMPOSE_FILE="docker-compose.testing.yaml",
     )
-
     kwargs["env"] = env
-    return _compose(*args, **kwargs)
+    return cmd("sparrow compose", *args, **kwargs)
 
 
 __ctx = dict(ignore_unknown_options=True, help_option_names=[])
