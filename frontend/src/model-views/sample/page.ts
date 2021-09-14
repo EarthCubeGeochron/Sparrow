@@ -419,12 +419,11 @@ async function TagsChangeSet(changeset, updatedModel, url) {
 const SamplePageDataFiles = () => {
   const { model } = useModelEditor();
 
-  let session_ids = model.session.map((obj) => obj.id);
-  if (session_ids.length == 0) {
-    session_ids = [0];
-  }
-
-  return h(DataFilePage, { model: "sample", session_ids });
+  return h(DataFilePage, {
+    model: "sample",
+    session_ids: model.session.map((obj) => obj.id),
+    sample_ids: [model.id],
+  });
 };
 
 function SamplePage(props) {
