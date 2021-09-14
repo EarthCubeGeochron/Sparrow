@@ -5,6 +5,7 @@ from rich import print
 from time import sleep
 
 from ..config.environment import validate_environment
+from ..config import SparrowConfig
 from ..util import compose, cmd, log
 from ..help import get_backend_help_info
 
@@ -19,6 +20,13 @@ def sparrow_up(ctx, container="", force_recreate=False):
     # the application up. Eventually, this should be wrapped into a Python
     # version of the `sparrow up` command.
     validate_environment()
+
+    # Run the prebuild script
+    cfg = ctx.find_object(SparrowConfig)
+    prebuild = cfg.config_dir / "sparrow-prestart.sh"
+    if prebuild.exists():
+        log.debug("Running prebuild script")
+        cmd("bash", str(prebuild))
 
     # Bring up the application
     res = cmd(
