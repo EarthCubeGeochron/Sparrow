@@ -73,7 +73,7 @@ export function ModelCard(props: ModelCardProps) {
 }
 
 function sessionDates({ session }) {
-  if (session.lenght == 0) return [];
+  if (session.length == 0) return [];
 
   const dates = session.map((ss) => {
     const date = ss.date.split("T")[0];
@@ -104,7 +104,7 @@ export const sampleContent = (props) => {
     h("div.bod", [
       Material,
       sessionDate.map((date) => {
-        if (sessionDate.lenght > 0) {
+        if (sessionDate.length > 0) {
           return h("div", date);
         }
       }),
