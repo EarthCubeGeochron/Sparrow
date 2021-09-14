@@ -1,4 +1,6 @@
+import re
 from os import path
+from click import style
 
 
 def format_config_path(cfg):
@@ -17,3 +19,9 @@ def format_config_path(cfg):
         else:
             tokens.append(token)
     return path.join(*tokens)
+
+
+def format_description(desc):
+    desc = re.sub("\[\[(.*?)\]\]", style("\\1", fg="red", bold=True), desc)
+    desc = re.sub("\[(.*?)\]", style("\\1", fg="green", bold=True), desc)
+    return re.sub("`(.*?)`", style("\\1", fg="cyan"), desc)

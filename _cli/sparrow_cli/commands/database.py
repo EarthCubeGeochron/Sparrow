@@ -1,6 +1,11 @@
 import click
-from ..group import CommandGroup
-from ..util import container_id, container_is_running, compose, exec_sparrow
+from ..util import (
+    CommandGroup,
+    container_id,
+    container_is_running,
+    compose,
+    exec_sparrow,
+)
 from sparrow_utils.shell import cmd
 
 
