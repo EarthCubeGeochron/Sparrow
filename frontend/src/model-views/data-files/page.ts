@@ -105,7 +105,7 @@ function DataFileDetails(props) {
 
   const lastModifiedDate = model.file_mtime;
 
-  const dateUploaded = model.data_file_link[0].date;
+  const dateUploaded = model.data_file_link[0]?.date;
 
   return h(PageViewBlock, [
     h("div", { style: { display: "flex", justifyContent: "space-between" } }, [
