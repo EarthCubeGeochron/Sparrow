@@ -42,12 +42,7 @@ export const NewModelButton = (props) => {
 export const ModelAttributeOneLiner = (props) => {
   const { title, content } = props;
 
-  let displayContent;
-  if (!content) {
-    displayContent = "None";
-  } else {
-    displayContent = content;
-  }
+  const displayContent = content ?? "None";
 
   return h("span", { style: { display: "flex", alignItems: "baseline" } }, [
     h("h4", { style: { marginRight: "4px" } }, title),
@@ -107,16 +102,10 @@ export const FormattedLngLat = (props) => {
   const { coordinates } = location;
 
   let [lng, lat] = coordinates;
-
-  let lngString =
-    lng > 0
-      ? `${lng.toFixed(precision)} E`
-      : `${lng.toFixed(precision) * -1} W`;
-
-  let latString =
-    lat > 0
-      ? `${lat.toFixed(precision)} N`
-      : `${lat.toFixed(precision) * -1} S`;
+  const fmtLng = lng.toFixed(precision);
+  const fmtLat = lat.toFixed(precision);
+  let lngString = lng > 0 ? `${fmtLng}° E` : `${fmtLng * -1}° W`;
+  let latString = lat > 0 ? `${fmtLat}° N` : `${fmtLat * -1}° S`;
 
   return h("div.page-view-date", [`${lngString}, ${latString}`]);
 };

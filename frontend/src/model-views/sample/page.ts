@@ -33,6 +33,7 @@ import {
   DataFilePage,
   SubSamplePageView,
   FormattedLngLat,
+  SampleCard,
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
@@ -131,10 +132,18 @@ const Material = function (props) {
   }
 };
 
+function MemberOfCard(props) {
+  const { id, ...rest } = props;
+  const sample = useAPIv2Result(`/models/sample/${id}`)?.data;
+  if (sample == null) return `Sample ${id}`;
+  return h(SampleCard, { ...sample, ...rest });
+}
+
 const MemberOf = function (props) {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
   const { setListName, changeFunction } = useContext(SampleAdminContext);
 
+  const sample = model;
   const memberOf = model.member_of;
   const href = useModelURL(`/sample/${memberOf}`);
 
@@ -158,7 +167,7 @@ const MemberOf = function (props) {
       ]),
     ]);
   } else {
-    content = memberOf ? h("a", { href }, [`Sample ${memberOf}`]) : null;
+    content = memberOf ? h(MemberOfCard, { id: memberOf, link: true }) : null;
   }
 
   return h(ModelAttributeOneLiner, {
@@ -498,7 +507,6 @@ function SamplePage(props: SampleProps) {
                 h(DepthElevation),
               ]),
               h("div", null, [
-                h(LocationBlock),
                 h(
                   Frame,
                   { id: "sampleHeaderExt", data: { sample: sample.data } },
@@ -509,6 +517,7 @@ function SamplePage(props: SampleProps) {
             h.if(Edit)(SampleTagContainer),
           ]),
         ]),
+        h(LocationBlock),
         h(GeoEntity),
         h(SubSamples),
         h(SampleProjectAdd),
