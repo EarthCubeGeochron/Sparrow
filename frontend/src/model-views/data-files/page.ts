@@ -17,7 +17,7 @@ import {
   EditStatusButtons,
   ModelAttributeOneLiner,
   TagContainer,
-  PageViewDate,
+  FormattedDate,
   PageViewBlock,
 } from "../components";
 
@@ -123,11 +123,11 @@ function DataFileDetails(props) {
           ]),
           h(ModelAttributeOneLiner, {
             title: "Uploaded: ",
-            content: h(PageViewDate, { date: dateUploaded }),
+            content: h(FormattedDate, { date: dateUploaded }),
           }),
           h(ModelAttributeOneLiner, {
             title: "Last Modified: ",
-            content: h(PageViewDate, { date: lastModifiedDate }),
+            content: h(FormattedDate, { date: lastModifiedDate }),
           }),
           h(ModelAttributeOneLiner, {
             title: "Type: ",

@@ -517,12 +517,12 @@ function SamplePage(props: SampleProps) {
             h.if(Edit)(SampleTagContainer),
           ]),
         ]),
-        h(LocationBlock),
-        h(GeoEntity),
-        h(SubSamples),
         h(SampleProjectAdd),
         h(SampleSessionAdd),
         h(SamplePageDataFiles),
+        h(LocationBlock),
+        h(GeoEntity),
+        h(SubSamples),
         h(Frame, { id: "samplePage", data: sample.data }, null),
       ]
     )

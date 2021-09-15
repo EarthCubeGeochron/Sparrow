@@ -16,7 +16,7 @@ import {
 import {
   PageViewBlock,
   ModelLinkCard,
-  PageViewDate,
+  FormattedDate,
   LinkedThroughModel,
 } from "~/model-views";
 import { Frame } from "~/frame";
@@ -135,7 +135,7 @@ function DataFileCard(props) {
     },
     h(Frame, { id: "dataFileLinkContent", data: { dataFile } }, [
       h("div", [
-        h("div", [h(PageViewDate, { date })]),
+        h("div", [h(FormattedDate, { date })]),
         h("div", [h("div", [h("h4", basename)])]),
       ]),
     ])

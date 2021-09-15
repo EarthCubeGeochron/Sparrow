@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { FormattedLngLat, pluralize } from "../new-model";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
-import { PageViewDate, ProjectCardContent, Publication } from "~/model-views";
+import { FormattedDate, ProjectCardContent, Publication } from "~/model-views";
 
 const h = hyperStyled(styles);
 
@@ -265,7 +265,7 @@ const SessionListContent = (props) => {
   const analysisCount = analysis.length + " " + analysisName;
 
   return h(`div.${classname}`, [
-    h("div.card-header", [h(PageViewDate, { date }), h("div", sampleName)]),
+    h("div.card-header", [h(FormattedDate, { date }), h("div", sampleName)]),
     h("div.bod", [
       h.if(FCS)("div", [FCS]),
       h("div", [h("span", technique)]),
@@ -395,7 +395,7 @@ const DataFileModelCard = (props) => {
   const { file_hash, basename, type, date } = props;
 
   const content = h("div.session-card", [
-    h("div.card-header", [h(PageViewDate, { date })]),
+    h("div.card-header", [h(FormattedDate, { date })]),
     h("div.bod", [h("div", [h("span", basename)]), h("div", [type])]),
   ]);
 

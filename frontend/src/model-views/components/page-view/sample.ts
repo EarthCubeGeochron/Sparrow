@@ -1,5 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { ModelLinkCard, PageViewBlock, PageViewDate } from "~/model-views";
+import { ModelLinkCard, PageViewBlock, FormattedDate } from "~/model-views";
 import { DndChild } from "~/components";
 import { useModelURL } from "~/util";
 //@ts-ignore
@@ -18,6 +18,7 @@ export const SampleAdd = (props) => {
     draggable = true,
     setID = () => {},
     isEditing = false,
+    title = "Samples",
   } = props;
 
   return h(
@@ -27,7 +28,7 @@ export const SampleAdd = (props) => {
       modelLink: true,
       onClick: isEditing ? onClickList : null,
       model: "sample",
-      title: "Samples",
+      title,
       hasData: data.length != 0,
     },
     h(PageViewSamples, {
@@ -91,7 +92,7 @@ function SessionContent(props) {
   } else {
     return session.map((ele, i) => {
       return h.if(ele.date)("div", { key: i }, [
-        h(PageViewDate, { date: ele.date }),
+        h(FormattedDate, { date: ele.date }),
         ele.technique,
       ]);
     });

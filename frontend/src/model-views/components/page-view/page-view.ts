@@ -1,6 +1,6 @@
 import { Tooltip, Card, Button } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
-import { format } from "date-fns";
+import { format, getYear } from "date-fns";
 import { useModelURL } from "~/util";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
@@ -90,10 +90,16 @@ export const PageViewBlock = (props) => {
   ]);
 };
 
-export const PageViewDate = (props) => {
+export const FormattedDate = (props) => {
   const { date } = props;
 
-  return h("div.page-view-date", [format(date, "MMMM D, YYYY")]);
+  const year = getYear(date);
+
+  if (year < 1940) return h("div.formatted-date", null, "Unknown date");
+
+  console.log(date);
+
+  return h("div.formatted-date", null, format(date, "MMMM D, YYYY"));
 };
 
 export const FormattedLngLat = (props) => {
