@@ -19,6 +19,7 @@ import {
   PageViewDate,
   LinkedThroughModel,
 } from "~/model-views";
+import { Frame } from "~/frame";
 import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
@@ -123,6 +124,8 @@ function DataFileCard(props) {
     linkedThrough = { model: current_model, id: model_id };
   }
 
+  const dataFile = { date, basename, file_hash };
+
   return h(
     ModelLinkCard,
     {
@@ -130,9 +133,11 @@ function DataFileCard(props) {
       linkedThrough,
       to: useModelURL(`/data-file/${file_hash}`),
     },
-    h("div", [
-      h("div", [h(PageViewDate, { date })]),
-      h("div", [h("div", [h("h4", basename)])]),
+    h(Frame, { id: "dataFileLinkContent", data: { dataFile } }, [
+      h("div", [
+        h("div", [h(PageViewDate, { date })]),
+        h("div", [h("div", [h("h4", basename)])]),
+      ]),
     ])
   );
 }

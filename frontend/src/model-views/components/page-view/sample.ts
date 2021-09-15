@@ -175,7 +175,7 @@ export function SampleCard(props: SampleCardProps) {
       onClick,
       ...rest,
     },
-    h(Frame, { id: "sampleLinkContent", data: sample }, [
+    h(Frame, { id: "sampleLinkContent", data: { sample } }, [
       h("h4.name", name),
       h(FormattedLngLat, { location }),
       h.if(material != null)("div.material", material),
