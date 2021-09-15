@@ -82,7 +82,7 @@ function sessionDates({ session }) {
   return dates;
 }
 
-export const sampleContent = (props) => {
+function SampleDefaultContent(props) {
   const { material, id, name, location, session } = props;
 
   const sampleName = h("div", { style: { marginBottom: "5px" } }, [
@@ -110,7 +110,7 @@ export const sampleContent = (props) => {
       }),
     ]),
   ]);
-};
+}
 
 const SampleModelCard = (props) => {
   const {
@@ -132,7 +132,7 @@ const SampleModelCard = (props) => {
       id: "sampleCardContent",
       data: { material, id, name, location, session },
     },
-    h(sampleContent, { material, id, name, location, session })
+    h(SampleDefaultContent, { material, id, name, location, session })
   );
   if (onClick == null) {
     return h(ModelCard, { id, content, model: "sample", link, showIdentity });

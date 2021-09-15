@@ -7,7 +7,7 @@ import {
   ModelEditor,
   useModelEditor,
 } from "@macrostrat/ui-components";
-import { APIV2Context } from "~/api-v2";
+import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import { put } from "axios";
 import { SampleContextMap } from "~/components";
 import { MapLink } from "~/map";
@@ -426,71 +426,92 @@ const SamplePageDataFiles = () => {
   });
 };
 
-function SamplePage(props) {
-  const { data: sample, Edit } = props;
+interface SampleProps {
+  Edit?: boolean;
+  id?: number;
+  sendQuery?: () => {};
+}
+function SamplePage(props: SampleProps) {
+  const { id, Edit } = props;
+  if (id == null) return null;
 
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
+
+  const sample = useAPIv2Result(`/models/sample/${id}`, {
+    nest: "session,project,sample_geo_entity,geo_entity,tag",
+  });
+  if (sample == null) {
+    return null;
+  }
 
   /*
   Render sample page based on ID provided in URL through react router
   */
 
   return h(
-    ModelEditor,
-    {
-      model: sample.data,
-      canEdit: login || Edit,
-      persistChanges: async (updatedModel, changeset) => {
-        console.log("changeset", changeset);
-        console.log("updatedModel", updatedModel);
-        console.log(
-          "Tags",
-          TagsChangeSet(
-            changeset,
-            updatedModel,
-            buildURL("/tags/models/sample", {})
-          )
-        );
-        let { id } = updatedModel;
-        console.log(
-          handleMemberOfPersist(
-            changeset,
-            buildURL(`/models/sample/sub-sample/${id}`)
-          )
-        );
-        delete updatedModel.member_of;
-        let rest;
-        const response = await put(
-          buildURL(`/models/sample/${id}`, {}),
-          updatedModel
-        );
-        const { data } = response;
+    "div.data-view.sample",
+    null,
+    h(
+      ModelEditor,
+      {
+        model: sample.data,
+        canEdit: login || Edit,
+        persistChanges: async (updatedModel, changeset) => {
+          console.log("changeset", changeset);
+          console.log("updatedModel", updatedModel);
+          console.log(
+            "Tags",
+            TagsChangeSet(
+              changeset,
+              updatedModel,
+              buildURL("/tags/models/sample", {})
+            )
+          );
+          let { id } = updatedModel;
+          console.log(
+            handleMemberOfPersist(
+              changeset,
+              buildURL(`/models/sample/sub-sample/${id}`)
+            )
+          );
+          delete updatedModel.member_of;
+          let rest;
+          const response = await put(
+            buildURL(`/models/sample/${id}`, {}),
+            updatedModel
+          );
+          const { data } = response;
+        },
       },
-    },
-    [
-      h("div.sample", [
-        h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
-        h(PageViewBlock, [
-          h(ModelEditableText, {
-            is: "h3",
-            field: "name",
-            multiline: true,
-          }),
-          h("div.flex-row", [
-            h("div.info-block", [h(MemberOf), h(Material), h(DepthElevation)]),
-            h("div", [h(LocationBlock)]),
+      [
+        h("div.sample", [
+          h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
+          h(PageViewBlock, [
+            h(ModelEditableText, {
+              is: "h3",
+              field: "name",
+              multiline: true,
+            }),
+            h("div.flex-row", [
+              h("div.info-block", [
+                h(MemberOf),
+                h(Material),
+                h(DepthElevation),
+              ]),
+              h("div", [h(LocationBlock)]),
+            ]),
+            h.if(Edit)(SampleTagContainer),
           ]),
-          h.if(Edit)(SampleTagContainer),
         ]),
-      ]),
-      h(GeoEntity),
-      h(SubSamples),
-      h(SampleProjectAdd),
-      h(SampleSessionAdd),
-      h(SamplePageDataFiles),
-      h(Frame, { id: "samplePage", data: sample.data }, null),
-    ]
+        h(GeoEntity),
+        h(SubSamples),
+        h(SampleProjectAdd),
+        h(SampleSessionAdd),
+        h(SamplePageDataFiles),
+        h(Frame, { id: "samplePage", data: sample.data }, null),
+      ]
+    )
   );
 }
 

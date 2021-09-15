@@ -16,7 +16,9 @@ def tasks():
     pass
 
 
-@tasks.command(name="run")
+@tasks.command(
+    name="run", context_settings=dict(ignore_unknown_options=True, help_option_names=[])
+)
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def sparrow_run(args=[]):
     exec_or_run("backend", "/app/sparrow/__main__.py", "tasks", *args)
