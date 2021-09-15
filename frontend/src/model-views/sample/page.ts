@@ -5,6 +5,7 @@ import hyper from "@macrostrat/hyper";
 import {
   APIHelpers,
   ModelEditor,
+  useAPIHelpers,
   useModelEditor,
 } from "@macrostrat/ui-components";
 import { APIV2Context, useAPIv2Result } from "~/api-v2";
@@ -135,6 +136,7 @@ const MemberOf = function (props) {
   const { setListName, changeFunction } = useContext(SampleAdminContext);
 
   const memberOf = model.member_of;
+  const href = useModelURL(`/sample/${memberOf}`);
 
   const onClickSample = (sample) => {
     const { id } = sample;
@@ -156,11 +158,7 @@ const MemberOf = function (props) {
       ]),
     ]);
   } else {
-    content = memberOf
-      ? h("a", { href: useModelURL(`/sample/${memberOf}`) }, [
-          `Sample ${memberOf}`,
-        ])
-      : null;
+    content = memberOf ? h("a", { href }, [`Sample ${memberOf}`]) : null;
   }
 
   return h(ModelAttributeOneLiner, {
@@ -216,18 +214,18 @@ const GeoEntity = (props) => {
   const { sample_geo_entity } = model;
 
   const changeGeoEntity = (entity) => {
-    const currnetEntities = [...sample_geo_entity];
-    const newEntities = [...currnetEntities, ...new Array(entity)];
+    const currentEntities = [...sample_geo_entity];
+    const newEntities = [...currentEntities, ...new Array(entity)];
     actions.updateState({
       model: { sample_geo_entity: { $set: newEntities } },
     });
   };
 
   const deleteGeoEntity = (index) => {
-    const currnetEntities = [...sample_geo_entity];
-    currnetEntities.splice(index, 1);
+    const currentEntities = [...sample_geo_entity];
+    currentEntities.splice(index, 1);
     actions.updateState({
-      model: { sample_geo_entity: { $set: currnetEntities } },
+      model: { sample_geo_entity: { $set: currentEntities } },
     });
   };
 
@@ -499,7 +497,10 @@ function SamplePage(props: SampleProps) {
                 h(Material),
                 h(DepthElevation),
               ]),
-              h("div", [h(LocationBlock)]),
+              h("div", null, [
+                h(LocationBlock),
+                h(Frame, { id: "sampleHeaderInfo", data: sample.data }, null),
+              ]),
             ]),
             h.if(Edit)(SampleTagContainer),
           ]),
