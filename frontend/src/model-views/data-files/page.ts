@@ -108,28 +108,35 @@ function DataFileDetails(props) {
   const dateUploaded = model.data_file_link[0]?.date;
 
   return h(PageViewBlock, [
-    h("div", { style: { display: "flex", justifyContent: "space-between" } }, [
-      h("div", [
-        h("h3", { style: { margin: "0" } }, [model.basename]),
-        h(ModelAttributeOneLiner, {
-          title: "Uploaded: ",
-          content: h(PageViewDate, { date: dateUploaded }),
-        }),
-        h(ModelAttributeOneLiner, {
-          title: "Last Modified: ",
-          content: h(PageViewDate, { date: lastModifiedDate }),
-        }),
-        h(ModelAttributeOneLiner, {
-          title: "Type: ",
-          content: model.type,
-        }),
-      ]),
-      h(DownloadButton, {
-        file_type: model.type,
-        file_hash: model.file_hash,
-        basename: model.basename,
-      }),
-    ]),
+    h(
+      "div.data-file-header",
+      { style: { display: "flex", justifyContent: "space-between" } },
+      [
+        h("div.main-content", [
+          h("div.title-row.flex", [
+            h("h3", { style: { margin: "0" } }, [model.basename]),
+            h(DownloadButton, {
+              file_type: model.type,
+              file_hash: model.file_hash,
+              basename: model.basename,
+            }),
+          ]),
+          h(ModelAttributeOneLiner, {
+            title: "Uploaded: ",
+            content: h(PageViewDate, { date: dateUploaded }),
+          }),
+          h(ModelAttributeOneLiner, {
+            title: "Last Modified: ",
+            content: h(PageViewDate, { date: lastModifiedDate }),
+          }),
+          h(ModelAttributeOneLiner, {
+            title: "Type: ",
+            content: model.type,
+          }),
+        ]),
+        h(Frame, { id: "dataFileHeaderExt", data: { dataFile: model } }, null),
+      ]
+    ),
   ]);
 }
 

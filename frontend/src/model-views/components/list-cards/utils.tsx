@@ -399,11 +399,13 @@ const DataFileModelCard = (props) => {
     h("div.bod", [h("div", [h("span", basename)]), h("div", [type])]),
   ]);
 
+  const dataFile = { file_hash, basename, type, date };
+
   const cardContent = h(
     Frame,
     {
-      id: "datafileCardContent",
-      data: { file_hash, basename, type, date },
+      id: "dataFileCardContent",
+      data: { dataFile },
     },
     content
   );

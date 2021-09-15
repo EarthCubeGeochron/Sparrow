@@ -499,7 +499,11 @@ function SamplePage(props: SampleProps) {
               ]),
               h("div", null, [
                 h(LocationBlock),
-                h(Frame, { id: "sampleHeaderInfo", data: sample.data }, null),
+                h(
+                  Frame,
+                  { id: "sampleHeaderExt", data: { sample: sample.data } },
+                  null
+                ),
               ]),
             ]),
             h.if(Edit)(SampleTagContainer),

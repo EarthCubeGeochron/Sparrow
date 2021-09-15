@@ -4,6 +4,7 @@ import { DndChild } from "~/components";
 import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
+import { Frame } from "~/frame";
 import { useAPIv2Result } from "~/api-v2";
 import { FormattedLngLat } from "./page-view";
 
@@ -142,6 +143,15 @@ export function SampleCard(props: SampleCardProps) {
     ...rest
   } = props;
 
+  const sample = {
+    material,
+    id,
+    name,
+    location,
+    location_name,
+    session,
+  };
+
   const onHover = () => {
     //set id to state so marker is highlighted
     setID(id);
@@ -165,12 +175,12 @@ export function SampleCard(props: SampleCardProps) {
       onClick,
       ...rest,
     },
-    [
+    h(Frame, { id: "sampleLinkContent", data: sample }, [
       h("h4.name", name),
       h(FormattedLngLat, { location }),
       h.if(material != null)("div.material", material),
       h(SessionContent, { session }),
-    ]
+    ])
   );
 }
 
