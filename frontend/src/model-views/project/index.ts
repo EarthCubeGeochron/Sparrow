@@ -1,6 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useRouteMatch } from "react-router-dom";
-import { LinkCard, useAPIResult } from "@macrostrat/ui-components";
+import { useAPIResult } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
 import { useAPIv2Result } from "~/api-v2";
 import { ProjectPage } from "./page";
 import { useModelURL } from "~/util/router";

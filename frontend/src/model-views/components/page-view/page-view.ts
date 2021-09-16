@@ -1,5 +1,5 @@
 import { Tooltip, Card, Button } from "@blueprintjs/core";
-import { LinkCard } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
 import { format, getYear } from "date-fns";
 import { useModelURL } from "~/util";
 import { hyperStyled } from "@macrostrat/hyper";

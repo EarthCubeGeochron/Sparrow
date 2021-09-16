@@ -1,6 +1,6 @@
 import h from "@macrostrat/hyper";
 import { Card } from "@blueprintjs/core";
-import { LinkCard } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
 import { parse, format } from "date-fns";
 import { useModelURL } from "~/util/router";
 import { ModelAttributeOneLiner, FormattedDate } from "../components";

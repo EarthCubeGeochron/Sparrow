@@ -5,11 +5,8 @@ import { Link, Route } from "react-router-dom";
 import update from "immutability-helper";
 import ReactMarkdown from "react-markdown";
 import styled from "@emotion/styled";
-import {
-  StatefulComponent,
-  LinkCard,
-  APIContext,
-} from "@macrostrat/ui-components";
+import { StatefulComponent, APIContext } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
 import { Colors, Text, AnchorButton, Icon } from "@blueprintjs/core";
 import { join } from "path";
 import { nullIfError } from "./utils";

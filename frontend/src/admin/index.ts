@@ -2,7 +2,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { useContext } from "react";
 import { Switch, Link } from "react-router-dom";
 import loadable from "@loadable/component";
-import { LinkCard } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
 import { Spinner, MenuItem, Menu, Divider } from "@blueprintjs/core";
 
 import { Frame } from "~/frame";

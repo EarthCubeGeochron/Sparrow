@@ -1,5 +1,5 @@
 import { Card, Button } from "@blueprintjs/core";
-import { LinkCard } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
 import { hyperStyled } from "@macrostrat/hyper";
 import classNames from "classnames";
 import { Link } from "react-router-dom";

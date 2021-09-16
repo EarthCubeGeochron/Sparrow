@@ -1,5 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { LinkCard } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
 import { NavButton } from "~/components";
 import styles from "./module.styl";
 
