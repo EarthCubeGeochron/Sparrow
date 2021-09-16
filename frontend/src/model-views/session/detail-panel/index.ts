@@ -101,7 +101,7 @@ const AnalysisDetails = function (props) {
   const { analysis_id } = a;
 
   if (a.analysis_id == null) {
-    return h("h2", ["No analyses associated"]);
+    return h("h3", ["No analyses associated"]);
   }
 
   return h(Card, { className: "analysis-details" }, [
@@ -120,10 +120,7 @@ const AnalysisDetails = function (props) {
 };
 
 const SessionDetails = function (props) {
-  let { data, showTitle } = props;
-  if (showTitle == null) {
-    showTitle = false;
-  }
+  let { data, showTitle = false } = props;
   return h("div.session-details", [
     h.if(showTitle)("h2", "Analysis details"),
     data.map((d, i) => h(AnalysisDetails, { key: i, data: d })),
@@ -131,12 +128,12 @@ const SessionDetails = function (props) {
 };
 
 const SessionDetailPanel = function (props) {
-  const { session_id } = props;
+  const { session_id, ...rest } = props;
   const data = useAPIResult("/analysis", { session_id });
 
   if (!data) return h("div");
 
-  return h(SessionDetails, { data });
+  return h(SessionDetails, { data, ...rest });
 };
 
 export { SessionDetailPanel };
