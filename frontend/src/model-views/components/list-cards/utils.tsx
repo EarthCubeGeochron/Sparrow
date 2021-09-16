@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { FormattedLngLat, pluralize } from "../new-model";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
-import { PageViewDate, ProjectCardContent, Publication } from "~/model-views";
+import { FormattedDate, ProjectCardContent, Publication } from "~/model-views";
 
 const h = hyperStyled(styles);
 
@@ -73,7 +73,7 @@ export function ModelCard(props: ModelCardProps) {
 }
 
 function sessionDates({ session }) {
-  if (session.lenght == 0) return [];
+  if (session.length == 0) return [];
 
   const dates = session.map((ss) => {
     const date = ss.date.split("T")[0];
@@ -82,7 +82,7 @@ function sessionDates({ session }) {
   return dates;
 }
 
-export const sampleContent = (props) => {
+function SampleDefaultContent(props) {
   const { material, id, name, location, session } = props;
 
   const sampleName = h("div", { style: { marginBottom: "5px" } }, [
@@ -104,13 +104,13 @@ export const sampleContent = (props) => {
     h("div.bod", [
       Material,
       sessionDate.map((date) => {
-        if (sessionDate.lenght > 0) {
+        if (sessionDate.length > 0) {
           return h("div", date);
         }
       }),
     ]),
   ]);
-};
+}
 
 const SampleModelCard = (props) => {
   const {
@@ -132,7 +132,7 @@ const SampleModelCard = (props) => {
       id: "sampleCardContent",
       data: { material, id, name, location, session },
     },
-    h(sampleContent, { material, id, name, location, session })
+    h(SampleDefaultContent, { material, id, name, location, session })
   );
   if (onClick == null) {
     return h(ModelCard, { id, content, model: "sample", link, showIdentity });
@@ -265,7 +265,7 @@ const SessionListContent = (props) => {
   const analysisCount = analysis.length + " " + analysisName;
 
   return h(`div.${classname}`, [
-    h("div.card-header", [h(PageViewDate, { date }), h("div", sampleName)]),
+    h("div.card-header", [h(FormattedDate, { date }), h("div", sampleName)]),
     h("div.bod", [
       h.if(FCS)("div", [FCS]),
       h("div", [h("span", technique)]),
@@ -395,15 +395,17 @@ const DataFileModelCard = (props) => {
   const { file_hash, basename, type, date } = props;
 
   const content = h("div.session-card", [
-    h("div.card-header", [h(PageViewDate, { date })]),
+    h("div.card-header", [h(FormattedDate, { date })]),
     h("div.bod", [h("div", [h("span", basename)]), h("div", [type])]),
   ]);
+
+  const dataFile = { file_hash, basename, type, date };
 
   const cardContent = h(
     Frame,
     {
-      id: "datafileCardContent",
-      data: { file_hash, basename, type, date },
+      id: "dataFileCardContent",
+      data: { dataFile },
     },
     content
   );

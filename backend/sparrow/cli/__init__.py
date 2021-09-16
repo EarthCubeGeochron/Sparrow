@@ -1,4 +1,5 @@
 import click
+import sparrow
 from click import echo, style, secho
 from sys import exit
 from os import environ
@@ -203,4 +204,16 @@ def command_info(ctx, cli):
 @cli.command(name="get-cli-info", hidden=True)
 @pass_context
 def _get_cli_info(ctx):
-    print(dumps({k: v for k, v in command_info(ctx, cli)}))
+    print(dumps({k: v for k, v in command_info(ctx, cli)}, indent=2))
+
+
+@cli.command(name="get-cli-info-v2", hidden=True)
+@pass_context
+def _get_cli_info_v2(ctx):
+    """A new signature for get-cli-info"""
+    task_mgr = sparrow.get_plugin("task-manager")
+    tasks = task_mgr.task_info()
+
+    info = {"cli_commands": {k: v for k, v in command_info(ctx, cli)}, "tasks": tasks}
+
+    print(dumps(info, indent=2))

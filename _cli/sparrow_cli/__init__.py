@@ -8,12 +8,16 @@ import click
 from rich.console import Console
 from rich import print
 from sparrow_utils.logs import get_logger
-from .base import cli
 from .help import echo_help
-from .util import cmd, exec_or_run, find_subcommand, container_id
-from .context import SparrowConfig
+from .util.shell import cmd, exec_or_run, find_subcommand, container_id
+from .util.command_groups import SparrowDefaultCommand
+from .config import SparrowConfig
+from .config.environment import is_truthy
+from .config.file_loader import envbash_init_hack
 from .commands import add_commands
 from .meta import __version__
+
+envbash_init_hack()
 
 log = get_logger(__name__)
 
@@ -29,6 +33,18 @@ def _docker_compose(*args):
     sys.exit(0)
 
 
+@click.group(
+    name="sparrow", cls=SparrowDefaultCommand, default="main", default_if_no_args=True
+)
+@click.option("--verbose", is_flag=True, default=is_truthy("SPARROW_VERBOSE"))
+@click.option("--offline", is_flag=True, default=is_truthy("SPARROW_OFFLINE"))
+@click.pass_context
+def cli(ctx, verbose=False, offline=False):
+    """Startup function that sets configuration environment variables."""
+    # Here is where the configuration gets set up for the entire command-line application
+    ctx.obj = SparrowConfig(verbose=verbose, offline=offline)
+
+
 @cli.command(
     "main",
     context_settings=dict(
@@ -42,7 +58,7 @@ def _docker_compose(*args):
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
 def main(ctx, args):
-    rest = []
+    rest = tuple()
     try:
         (subcommand, *rest) = args
     except ValueError:
@@ -51,14 +67,13 @@ def main(ctx, args):
     if subcommand == "_docker-compose":
         # This is an internal, undocumented command that runs  a
         # 'bare' docker-compose, without applying Sparrow environment
-        return _docker_compose(*rest)
+        return _docker_compose(*args)
 
-    # Here is where the sparrow environment gets configured...
-    # See the SparrowConfig object for more information
+    # Find sparrow configuration object
     cfg = ctx.find_object(SparrowConfig)
 
     if subcommand in ["--help", "help"]:
-        return echo_help(ctx, cfg.bin_directories)
+        return echo_help(cli, ctx, cfg.bin_directories)
 
     if subcommand == "compose":
         # docker-compose respecting sparrow environment

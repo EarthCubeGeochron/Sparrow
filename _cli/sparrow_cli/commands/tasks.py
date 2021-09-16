@@ -1,42 +1,28 @@
 ## This should probably be refactored out into a sparrow_tasks plugin eventually
 
 import click
-from ..group import CommandGroup
-from ..util import container_id, container_is_running, compose, exec_sparrow
-from sparrow_utils.shell import cmd
+from ..util import CommandGroup, exec_or_run
 
-
-def dump_database(dbname, out_file):
-    if not container_is_running("db"):
-        compose("up db")
-    _id = container_id("db")
-    with open(out_file, "w") as f:
-        cmd("docker exec", _id, "pg_dump -Fc -C -Upostgres", dbname, stdout=f)
-
-
-# container_id=$(sparrow compose ps -q db 2>/dev/null)
-#
-# if [ -z $container_id ]; then
-#   echo "Sparrow db container must be running"
-#   exit 1
-# fi
-#
-# docker exec $container_id \
-#   pg_dump -Fc -C -Upostgres -f $internal_name sparrow
-#
-# docker cp "$container_id:$internal_name" "$1"
-#
-# docker exec $container_id rm -f $internal_name
-
-
-# Commands inherited from earlier shell version of CLI.
-shell_commands = {"celery": "Run the celery task manager CLI"}
+shell_commands = {
+    "events": "Monitor `celery` events",
+    "messages": "Monitor `redis` messages",
+    "celery": "Run the `celery` command-line application",
+    "redis": "Run the `redis-cli` command-line application",
+}
 
 
 @click.group(name="tasks", cls=CommandGroup)
-def sparrow_tasks():
+def tasks():
     pass
 
 
+@tasks.command(
+    name="run", context_settings=dict(ignore_unknown_options=True, help_option_names=[])
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def sparrow_run(args=[]):
+    exec_or_run("backend", "/app/sparrow/__main__.py", "tasks", *args)
+
+
 for k, v in shell_commands.items():
-    sparrow_tasks.add_shell_command(k, v, prefix="sparrow-task-")
+    tasks.add_shell_command(k, v, prefix="sparrow-tasks-")

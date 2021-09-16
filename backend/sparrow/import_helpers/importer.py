@@ -172,7 +172,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         if updated:
             rec.file_hash = hash
 
-        rec.file_type = self.file_type
+        rec.type_id = self.file_type
 
         self.db.session.add(rec)
 
@@ -191,6 +191,13 @@ class BaseImporter(ImperativeImportHelperMixin):
         added = False
         if rec is None:
             rec, added = self._create_data_file_record(fn)
+
+        # Set file types if we need to. We could probably
+        # do this more efficiently.
+        if rec.type_id != self.file_type:
+            rec.type_id = self.file_type
+            self.db.session.add(rec)
+            self.db.session.commit()
 
         err_filter = True
         m = self.m.data_file_link

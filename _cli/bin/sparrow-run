@@ -1,0 +1,3 @@
+#!/bin/bash
+# Description: Run a Sparrow task
+sparrow tasks run $@ 

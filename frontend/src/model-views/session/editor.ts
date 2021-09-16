@@ -240,6 +240,7 @@ function EditableSessionInfoComponent(props) {
       isEditing,
       onClickList: sampleListClick,
       onClickDelete: onSampleClickDelete,
+      title: "Sample",
     }),
     h(ProjectAdd, {
       isEditing,

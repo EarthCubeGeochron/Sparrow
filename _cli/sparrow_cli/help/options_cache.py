@@ -3,9 +3,10 @@ from json.decoder import JSONDecodeError
 import os
 from pathlib import Path
 from hashlib import md5
-from ..util import compose, exec_sparrow, exec_or_run
-from ..exc import SparrowCommandError
 from subprocess import PIPE
+
+from ..util.shell import exec_or_run
+from ..util.exceptions import SparrowCommandError
 
 
 def dirhash(path):

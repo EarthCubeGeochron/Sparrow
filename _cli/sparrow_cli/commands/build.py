@@ -6,7 +6,7 @@ from rich import print
 from pathlib import Path
 from json import load
 
-from ..context import SparrowConfig
+from ..config import SparrowConfig
 from ..util import cmd
 
 images_ = ["backend-base", "db-mysql-fdw", "backend", "frontend"]
@@ -48,12 +48,17 @@ def sparrow_build(ctx, images, push=False):
             version = cfg.find_sparrow_version()
         name = f"{ORG}/{image_name}:{version}"
 
+        tags = [name]
+        if image_name in ["backend", "frontend"]:
+            tags.append(f"{ORG}/{image_name}:latest")
+        tag_args = (f"-t {tag}" for tag in tags)
+
         print(f"{image_name}: building image {name}")
         # Allow build to be used for layer cache
         # https://github.com/moby/moby/issues/39003
         cmd(
-            "docker build -t",
-            name,
+            "docker build",
+            *tag_args,
             "--build-arg BUILDKIT_INLINE_CACHE=1",
             im["context"],
         )

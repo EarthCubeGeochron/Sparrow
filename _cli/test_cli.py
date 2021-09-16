@@ -1,5 +1,5 @@
 from click.testing import CliRunner
-from sparrow_cli import cli
+from sparrow_cli import main_cli
 
 runner = CliRunner()
 
@@ -13,7 +13,7 @@ def test_cli():
 
 
 def test_compose():
-    res = runner.invoke(cli, "compose config")
+    res = runner.invoke(main_cli, "compose config")
     assert res.exit_code == 0
 
     # We need to rework using

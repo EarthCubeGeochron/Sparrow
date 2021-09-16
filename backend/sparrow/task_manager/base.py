@@ -87,13 +87,15 @@ def task(*args, **kwargs):
     def wrapper(func):
         task_name = _name_for_task(func, **kwargs)
         kwargs["name"] = task_name
+        mgr = None
         try:
-            # Register the task right now
             mgr = get_plugin("task-manager")
-            mgr.register_task(func, *args, **kwargs)
         except (ImportError, AttributeError, ValueError):
             # Queue the task for later registration
             _tasks_to_register[task_name] = (func, args, kwargs)
+        if mgr is not None:
+            # Register the task right now
+            mgr.register_task(func, *args, **kwargs)
 
         def _run_task(*args, **kwargs):
             """Function to run a task that is already registered to the running Sparrow application."""

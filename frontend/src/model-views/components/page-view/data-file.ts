@@ -4,7 +4,7 @@ import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import { SiMicrosoftexcel } from "react-icons/si";
 import { AiFillFile } from "react-icons/ai";
 import { GrDocumentCsv, GrDocumentTxt } from "react-icons/gr";
-import { useAPIHelpers } from "@macrostrat/ui-components";
+import { useAPIHelpers, buildQueryString } from "@macrostrat/ui-components";
 import {
   VscFileBinary,
   VscFilePdf,
@@ -16,9 +16,10 @@ import {
 import {
   PageViewBlock,
   ModelLinkCard,
-  PageViewDate,
+  FormattedDate,
   LinkedThroughModel,
 } from "~/model-views";
+import { Frame } from "~/frame";
 import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
@@ -101,30 +102,17 @@ function unwrapDataFile(get_obj) {
   return data;
 }
 
-function getDataFileData(props) {
-  const { sample_ids = [0], session_ids = [0], analysis_ids = [0] } = props;
+function useDataFileModelLinks(props) {
+  const { sample_id, session_id, analysis_id } = props;
 
-  const baseUrl = `/data_file/filter`;
-  let sample = useAPIv2Result(
-    baseUrl + `?sample_id=${sample_ids}`,
-    {},
-    { unwrapResponse: unwrapDataFile }
+  const q = buildQueryString(
+    { sample_id, session_id, analysis_id },
+    { arrayFormat: "comma" }
   );
-  let session = useAPIv2Result(
-    baseUrl + `?session_id=${session_ids}`,
-    {},
-    { unwrapResponse: unwrapDataFile }
-  );
-  let analysis = useAPIv2Result(
-    baseUrl + `?analysis_id=${analysis_ids}`,
-    {},
-    { unwrapResponse: unwrapDataFile }
-  );
-  if (analysis == null) analysis = [];
-  if (session == null) session = [];
-  if (sample == null) sample = [];
 
-  return [...sample, ...session, ...analysis];
+  const res = useAPIv2Result("/data_file/filter?" + q);
+  console.log(res);
+  return res?.data ?? [];
 }
 
 function DataFileCard(props) {
@@ -136,6 +124,8 @@ function DataFileCard(props) {
     linkedThrough = { model: current_model, id: model_id };
   }
 
+  const dataFile = { date, basename, file_hash };
+
   return h(
     ModelLinkCard,
     {
@@ -143,9 +133,11 @@ function DataFileCard(props) {
       linkedThrough,
       to: useModelURL(`/data-file/${file_hash}`),
     },
-    h("div", [
-      h("div", [h(PageViewDate, { date })]),
-      h("div", [h("div", [h("h4", basename)])]),
+    h(Frame, { id: "dataFileLinkContent", data: { dataFile } }, [
+      h("div", [
+        h("div", [h(FormattedDate, { date })]),
+        h("div", [h("div", [h("h4", basename)])]),
+      ]),
     ])
   );
 }
@@ -177,14 +169,13 @@ function DataFilePageCards(props) {
 }
 
 export function DataFilePage(props) {
-  const {
-    sample_ids = [0],
-    session_ids = [0],
-    analysis_ids = [0],
-    model,
-  } = props;
+  const { sample_ids = [], session_ids = [], analysis_ids = [], model } = props;
 
-  const data = getDataFileData({ sample_ids, session_ids, analysis_ids });
+  const data = useDataFileModelLinks({
+    sample_id: sample_ids,
+    session_id: session_ids,
+    analysis_id: analysis_ids,
+  });
   return h(
     PageViewBlock,
     {
@@ -193,6 +184,6 @@ export function DataFilePage(props) {
       title: "Data files",
       hasData: data.length > 0,
     },
-    [h(DataFilePageCards, { data, model })]
+    h(DataFilePageCards, { data, model })
   );
 }

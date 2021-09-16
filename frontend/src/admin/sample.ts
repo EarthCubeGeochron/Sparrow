@@ -2,7 +2,7 @@ import { useState, useContext, createContext, useEffect } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route, Link } from "react-router-dom";
 import { NoStateAdmin } from "./baseview";
-import { SampleMatch } from "~/model-views/sample/list";
+import { SampleMatch } from "~/model-views/sample";
 import { SampleListComponent } from "~/model-views";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";

@@ -13,6 +13,7 @@ Tasks have
 from celery import Celery
 from sparrow.logs import get_logger
 from os import environ
+from json import loads
 from sparrow.plugins import SparrowCorePlugin
 from sparrow.settings import TASK_BROKER, TASK_WORKER_ENABLED
 import typer
@@ -87,6 +88,20 @@ class SparrowTaskManager(SparrowCorePlugin):
                 f"Task {name} is cli-only and cannot be directly requested."
             )
         return task["func"]
+
+    def task_info(self, include_cli_tasks=False):
+        """Return a list of task descriptions"""
+        tasks = self._tasks
+        if not include_cli_tasks:
+            tasks = {k: v for k, v in self._tasks.items() if not v["cli_only"]}
+        return [
+            {
+                "name": k,
+                "description": v["func"].__doc__.strip(),
+                "params": loads(v["params"].schema_json()),
+            }
+            for k, v in tasks.items()
+        ]
 
     def on_plugins_initialized(self):
         global _tasks_to_register
