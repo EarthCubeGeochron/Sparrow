@@ -186,7 +186,7 @@ export function SampleCard(props: SampleCardProps) {
 }
 
 export function SubSamplePageView(props) {
-  const { sample_id, isEditing } = props;
+  const { sample_id, isEditing, fallback = null } = props;
 
   let data = useAPIv2Result(
     `/models/sample/sub-sample/${sample_id}`,
@@ -195,6 +195,10 @@ export function SubSamplePageView(props) {
   );
 
   if (data == null) data = [];
+
+  if (data.length == 0 && !isEditing) {
+    return fallback;
+  }
 
   return h(
     PageViewBlock,

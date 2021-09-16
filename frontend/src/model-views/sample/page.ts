@@ -10,7 +10,7 @@ import {
 } from "@macrostrat/ui-components";
 import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import { put } from "axios";
-import { SampleContextMap } from "~/components";
+import { SampleContextMap, MinimalNavbar } from "~/components";
 import { MapLink } from "~/map";
 import {
   EditNavBar,
@@ -67,9 +67,10 @@ const EditNavBarSample = () => {
     return actions.persistChanges();
   };
 
-  return h(EditNavBar, {
-    header: "Manage Sample",
-    editButtons: h("div", { style: { display: "flex" } }, [
+  return h(
+    MinimalNavbar,
+    null,
+    h("div.editor-buttons", { style: { display: "flex" } }, [
       h.if(isEditing)(DataSheetButton),
       h(EditStatusButtons, {
         onClickCancel,
@@ -77,12 +78,12 @@ const EditNavBarSample = () => {
         hasChanges,
         isEditing,
       }),
-      h(NewModelButton, { model: "sample" }),
-    ]),
-    embargoEditor: h(EmbargoEditor, {
-      active: isEditing,
-    }),
-  });
+      h(NewModelButton, { model: "sample", minimal: false, large: true }),
+      h(EmbargoEditor, {
+        active: isEditing,
+      }),
+    ])
+  );
 };
 
 const LocationBlock = function (props) {
@@ -242,11 +243,13 @@ const GeoEntity = (props) => {
     return h(
       PageViewBlock,
       {
-        title: "Geologic Context",
+        title: "Context",
       },
       [
+        h(LocationBlock),
+        h(DepthElevation),
         h(ModelAttributeOneLiner, {
-          title: "Geologic Context",
+          title: "Geologic Context:",
           content: "None",
         }),
       ]
@@ -493,21 +496,24 @@ function SamplePage(props: SampleProps) {
       },
       [
         h("div.sample", [
-          h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
-          h(PageViewBlock, [
+          h("div.title-bar", [
             h(ModelEditableText, {
-              is: "h3",
+              is: "h2",
               field: "name",
               multiline: true,
             }),
+            h("h2.page-type", ` (Sample #${id})`),
+            h("div.spacer"),
+            h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
+          ]),
+          h(PageViewBlock, [
             h("div.flex-row", [
               h("div.info-block", [
                 h(MemberOf),
                 h(Material),
-                h(DepthElevation),
+                h.if(Edit)(SampleTagContainer),
               ]),
               h("div", null, [
-                h(LocationBlock),
                 h(
                   Frame,
                   { id: "sampleHeaderExt", data: { sample: sample.data } },
@@ -515,13 +521,12 @@ function SamplePage(props: SampleProps) {
                 ),
               ]),
             ]),
-            h.if(Edit)(SampleTagContainer),
           ]),
         ]),
         h(SubSamples),
-        h(SampleProjectAdd),
         h(SampleSessionAdd),
         h(SamplePageDataFiles),
+        h(SampleProjectAdd),
         h(GeoEntity),
         h(Frame, { id: "samplePage", data: sample.data }, null),
       ]

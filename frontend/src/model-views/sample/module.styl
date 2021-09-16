@@ -10,14 +10,25 @@
   div.material
     font-style italic
 
+.title-bar
+  display flex
+  flex-direction: row
+  align-items: baseline
+  &>*
+    margin-right 0.5em
+  margin-right -0.5em
+  margin-bottom 0.5em
+  .spacer
+    flex-grow 1
+
 .basic-info
   h4
     color $gray1
     margin-bottom: 0.3em
 
-h3.page-type
-  font-size 1.2em
+h2.page-type
   color $gray5
+  font-weight: 500
 
 .location
   display flex 
