@@ -50,7 +50,7 @@ function ForeverScroll({
   component,
   fetch,
   moreAfter = null,
-  modelName = null,
+  modelName = "result",
   componentProps = {},
 }) {
   const initialState = {
@@ -113,14 +113,14 @@ function ForeverScroll({
 
       {moreToLoad && (
         //@ts-ignore
-        <div ref={setBottom} style={{ marginTop: "50px" }}>
+        <div ref={setBottom} style={{ marginTop: "50px", height: "500px" }}>
           <Spinner />
         </div>
       )}
 
       {!moreToLoad && (
         <div className="no-results">
-          Results completed, there are {data.length} {name}
+          Completed, there are {data.length} {name}
         </div>
       )}
     </div>

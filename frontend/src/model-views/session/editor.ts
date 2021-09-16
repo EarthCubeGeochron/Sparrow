@@ -220,7 +220,7 @@ function EditableSessionInfoComponent(props) {
     changeFunction(onSampleClick);
   };
 
-  const data = model.sample ? [sample] : null;
+  const data = model.sample ? [sample] : [];
 
   return h("div", [
     h(PageViewBlock, [
@@ -240,6 +240,7 @@ function EditableSessionInfoComponent(props) {
       isEditing,
       onClickList: sampleListClick,
       onClickDelete: onSampleClickDelete,
+      title: "Sample",
     }),
     h(ProjectAdd, {
       isEditing,

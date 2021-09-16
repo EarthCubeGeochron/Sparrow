@@ -37,14 +37,8 @@ const columnSpec: ColumnData[] = [
 
 function unwrapSampleData(sampleData) {
   /** Unwrap samples from API response to a flattened version */
-  const {
-    geometry,
-    project_id,
-    project_name,
-    publication_id,
-    doi,
-    ...rest
-  } = sampleData;
+  const { geometry, project_id, project_name, publication_id, doi, ...rest } =
+    sampleData;
   let longitude: number, latitude: number;
   if (geometry != null) {
     [longitude, latitude] = geometry?.coordinates;
@@ -103,12 +97,8 @@ function DataSheet() {
    * And at the end I can grab the whole row and send it to the backend.
    */
 
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
-
-  const url = buildURL("/datasheet/view");
-
   const initialData = useAPIResult(
-    url,
+    "/datasheet/view",
     {},
     { unwrapResponse, context: APIV2Context }
   );

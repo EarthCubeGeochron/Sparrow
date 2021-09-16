@@ -30,6 +30,7 @@ from ..filters import (
     IdListFilter,
     TagsFilter,
 )
+from sparrow.open_search.filter import OpenSearchFilter
 from ...database.mapper.util import classname_for_table
 from ...logs import get_logger
 from ...util import relative_path
@@ -96,6 +97,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         )
 
         self._filters = []
+        self.register_filter(OpenSearchFilter)
         self.register_filter(AuthorityFilter)
         self.register_filter(FieldExistsFilter)
         self.register_filter(FieldNotExistsFilter)
@@ -218,7 +220,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
             ):
                 q = q.filter(schema.opts.model.embargo_date == None)
 
-            q = q.options(*list(schema.query_options(max_depth=1)))
+            q = q.options(*list(schema.query_options(max_depth=None)))
 
             if args["all"]:
                 res = q.all()

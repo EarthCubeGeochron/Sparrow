@@ -2,21 +2,28 @@ import { hyperStyled } from "@macrostrat/hyper";
 import React, { useState } from "react";
 import { useAuth } from "./context";
 import { Button, Dialog, Callout, Intent, Classes } from "@blueprintjs/core";
+import { ServerStatus } from "~/components";
 import classNames from "classnames";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-function InvalidCredentialsError() {
-  return h(
-    Callout,
-    {
-      className: "login-info",
-      title: "Invalid credentials",
-      intent: Intent.DANGER,
-    },
-    "Invalid credentials were provided"
-  );
+function ErrorPanel() {
+  const { error, invalidAttempt } = useAuth();
+  if (error == null || !invalidAttempt) return null;
+
+  let title = "Invalid credentials";
+  let children = "Invalid credentials were provided";
+  if (error.request?.status == 502) {
+    title = "Bad response from backend";
+    children = "The Sparrow server is not available";
+  }
+  return h(Callout, {
+    className: "login-info",
+    title,
+    intent: Intent.DANGER,
+    children,
+  });
 }
 
 type LoginFormState = {
@@ -70,14 +77,17 @@ function CredentialsDialog({
 
 function LogoutForm() {
   const { runAction, username } = useAuth();
-  const actionButtons = h(
-    Button,
-    {
-      large: true,
-      onClick: () => runAction({ type: "logout" }),
-    },
-    "Log out"
-  );
+  const actionButtons = h([
+    h(ServerStatus),
+    h(
+      Button,
+      {
+        large: true,
+        onClick: () => runAction({ type: "logout" }),
+      },
+      "Log out"
+    ),
+  ]);
   return h(CredentialsDialog, { actionButtons }, [
     h(
       Callout,
@@ -96,7 +106,7 @@ const defaultState = { username: "", password: "" };
 
 function _LoginForm() {
   const [state, setState] = useState<LoginFormState>(defaultState);
-  const { runAction, invalidAttempt } = useAuth();
+  const { runAction } = useAuth();
 
   const submitForm = () => runAction({ type: "login", payload: state });
 
@@ -107,22 +117,26 @@ function _LoginForm() {
     setState({ ...state, [e.target.name]: e.target.value });
   };
 
-  const actionButtons = h(
-    Button,
-    {
-      intent: Intent.PRIMARY,
-      large: true,
-      onClick: submitForm,
-      disabled: !isValid(state),
-    },
-    "Login"
-  );
+  const actionButtons = h([
+    h(ServerStatus),
+    h(
+      Button,
+      {
+        intent: Intent.PRIMARY,
+        large: true,
+        onClick: submitForm,
+        disabled: !isValid(state),
+      },
+      "Login"
+    ),
+  ]);
 
   const className = classNames(Classes.INPUT, "bp3-large");
   const onKeyUp = function (e) {};
 
   return h(CredentialsDialog, { actionButtons }, [
-    h.if(invalidAttempt)(InvalidCredentialsError),
+    h(ErrorPanel),
+    //h.if(invalidAttempt)(InvalidCredentialsError),
     h("form.login-form", [
       h("input", {
         type: "text",

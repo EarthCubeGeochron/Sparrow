@@ -1,6 +1,6 @@
 import { Tooltip, Card, Button } from "@blueprintjs/core";
-import { LinkCard } from "@macrostrat/ui-components";
-import { format } from "date-fns";
+import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
+import { format, getYear } from "date-fns";
 import { useModelURL } from "~/util";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
@@ -42,12 +42,7 @@ export const NewModelButton = (props) => {
 export const ModelAttributeOneLiner = (props) => {
   const { title, content } = props;
 
-  let displayContent;
-  if (!content) {
-    displayContent = "None";
-  } else {
-    displayContent = content;
-  }
+  const displayContent = content ?? "None";
 
   return h("span", { style: { display: "flex", alignItems: "baseline" } }, [
     h("h4", { style: { marginRight: "4px" } }, title),
@@ -95,8 +90,30 @@ export const PageViewBlock = (props) => {
   ]);
 };
 
-export const PageViewDate = (props) => {
-  const { date } = props;
+export const FormattedDate = (props) => {
+  const { date, fallback = "Unknown date", oldestValidYear = 1940 } = props;
 
-  return h("div.page-view-date", [format(date, "MMMM D, YYYY")]);
+  const year = getYear(date);
+
+  if (year < oldestValidYear) {
+    if (fallback != null) {
+      return h("div.formatted-date", null, "Unknown date");
+    }
+    return null;
+  }
+  return h("div.formatted-date", null, format(date, "MMMM D, YYYY"));
+};
+
+export const FormattedLngLat = (props) => {
+  const { location, precision = 3 } = props;
+  if (!location) return h("div");
+  const { coordinates } = location;
+
+  let [lng, lat] = coordinates;
+  const fmtLng = lng.toFixed(precision);
+  const fmtLat = lat.toFixed(precision);
+  let lngString = lng > 0 ? `${fmtLng}° E` : `${fmtLng * -1}° W`;
+  let latString = lat > 0 ? `${fmtLat}° N` : `${fmtLat * -1}° S`;
+
+  return h("div.page-view-date", [`${lngString}, ${latString}`]);
 };

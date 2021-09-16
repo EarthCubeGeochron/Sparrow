@@ -1,0 +1,3 @@
+#!/bin/bash
+# Description: Run the `redis` command-line interface
+sparrow exec broker redis-cli $@

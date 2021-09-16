@@ -50,10 +50,8 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
     <div>
       {clusters.map((cluster) => {
         const [longitude, latitude] = cluster.geometry.coordinates;
-        const {
-          cluster: isCluster,
-          point_count: pointCount,
-        } = cluster.properties;
+        const { cluster: isCluster, point_count: pointCount } =
+          cluster.properties;
 
         const clusterSize = Math.sqrt(5 * pointCount);
 

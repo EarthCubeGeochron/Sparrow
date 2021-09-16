@@ -25,8 +25,6 @@ def _gen_relationship(
     base, direction, return_fn, attrname, local_cls, referred_cls, **kw
 ):
     support_schemas = ["vocabulary", "core_view"]
-    # kw["lazy"] = "joined"
-    # kw["join_depth"] = 1
     if (
         local_cls.__table__.schema in support_schemas
         and referred_cls.__table__.schema is None

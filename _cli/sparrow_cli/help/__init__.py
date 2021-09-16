@@ -1,29 +1,20 @@
 import sys
 import re
-import json
-from typing import get_args
-from click import style, secho
+import click
+from click import style
 from click.formatting import HelpFormatter
-from os import environ, path
+from os import environ
 from pathlib import Path
 from itertools import chain
 from rich.console import Console
-from ..util import fail_without_docker, compose
-from .backend import get_backend_command_help
-from ..base import cli
-from ..exc import SparrowCommandError
-from ..context import SparrowConfig
-from .util import format_config_path
+from .options_cache import get_backend_command_help, get_backend_help_info  # noqa
+from ..util.shell import fail_without_docker
+from ..util.formatting import format_config_path, format_description
+from ..config import SparrowConfig
 
 console = Console()
 
 desc_regex = re.compile("^#\\s+Description:\\s+(.+)$")
-
-
-def format_description(desc):
-    desc = re.sub("\[\[(.*?)\]\]", style("\\1", fg="red", bold=True), desc)
-    desc = re.sub("\[(.*?)\]", style("\\1", fg="green", bold=True), desc)
-    return re.sub("`(.*?)`", style("\\1", fg="cyan"), desc)
 
 
 def get_description(script):
@@ -55,6 +46,8 @@ def command_dl(directories: Path, extra_commands={}):
             continue
         if name.startswith("sparrow-dev-"):
             continue
+        if name.startswith("sparrow-tasks-"):
+            continue
         key = name[len(prefix) :]
         yield (key, get_description(f).strip())
 
@@ -63,7 +56,7 @@ def format_help(val, show_plugin=False):
     if isinstance(val, str):
         return val
     prefix = ""
-    val.get("plugin")
+    plugin = val.get("plugin")
     if show_plugin and plugin is not None:
         prefix = f"[{plugin}] "
 
@@ -82,6 +75,7 @@ class SparrowHelpFormatter(HelpFormatter):
         "down": "Safely stop `sparrow`",
         "info": "Show information about the installation",
         "create-test-lab": "Create an example installation of Sparrow",
+        "run": "Run Sparrow tasks (alias to `sparrow tasks run`)",
     }
 
     def write_line(self, text=""):
@@ -159,7 +153,7 @@ class SparrowHelpFormatter(HelpFormatter):
         commands = {k: format_description(v) for k, v in commands.items()}
         self._write_section(title, commands, **kwargs)
 
-    def write_container_management(self, ctx, core_commands):
+    def write_container_management(self, cli, ctx, core_commands):
         commands = command_dl(
             core_commands,
             extra_commands={
@@ -167,10 +161,11 @@ class SparrowHelpFormatter(HelpFormatter):
                 **{k: format_help(v) for k, v in command_info(ctx, cli)},
             },
         )
+
         self._write_section(
             "Container orchestration",
             {k: v for k, v in commands},
-            skip=[*self.key_commands.keys()],
+            skip=self.key_commands.keys(),
         )
 
     def _write_section(self, title, commands, skip=[]):
@@ -184,9 +179,10 @@ class SparrowHelpFormatter(HelpFormatter):
 
 sections = {
     "db": "Manage the `sparrow` database",
+    "tasks": "Manage `sparrow`'s task system",
     "test": "Run `sparrow`'s test suite",
-    "docs": "Manage `sparrow`'s documentation",
     "dev": "Helper commands for development",
+    "docs": "Manage `sparrow`'s documentation",
 }
 
 
@@ -199,7 +195,7 @@ def command_info(ctx, cli):
         yield name, {"help": help, "plugin": None}
 
 
-def echo_help(ctx, core_commands=None, user_commands=None):
+def echo_help(cli, ctx, core_commands=None, user_commands=None):
     fail_without_docker()
     # We want to run `sparrow up` first so we don't get surprised by container errors later
     # ...actually we likely don't want to do this. It seems like it pushes errors too early
@@ -217,4 +213,4 @@ def echo_help(ctx, core_commands=None, user_commands=None):
         lab_name = environ.get("SPARROW_LAB_NAME", "Lab-specific")
         fmt.write("[underline]" + lab_name + "[/underline] commands", user_commands)
 
-    fmt.write_container_management(ctx, core_commands)
+    fmt.write_container_management(cli, ctx, core_commands)

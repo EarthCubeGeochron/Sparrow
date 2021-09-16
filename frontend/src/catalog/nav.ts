@@ -5,7 +5,7 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const CatalogNavLinks = function ({ base }) {
+const CatalogNavLinks = function({ base }) {
   if (base == null) {
     base = "/catalog";
   }
@@ -13,7 +13,7 @@ const CatalogNavLinks = function ({ base }) {
     h(NavButton, { to: base + "/project" }, "Projects"),
     h(NavButton, { to: base + "/sample" }, "Samples"),
     h(NavButton, { to: base + "/session" }, "Sessions"),
-    h(NavButton, { to: base + "/data-file" }, "Data Files"),
+    h(NavButton, { to: base + "/data-file" }, "Data Files")
   ]);
 };
 
@@ -23,7 +23,7 @@ function DataModelLinks(props) {
     h(LinkCard, { to: base + "/project" }, h("h2", "Projects")),
     h(LinkCard, { to: base + "/sample" }, h("h2", "Samples")),
     h(LinkCard, { to: base + "/session" }, h("h2", "Sessions")),
-    h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files")),
+    h(LinkCard, { to: base + "/data-file" }, h("h2", "Data files"))
   ]);
 }
 
@@ -36,7 +36,7 @@ const CatalogNavbar = (
       { to: base, exact: true, active: false },
       h("h4", "Data Catalog")
     ),
-    h(CatalogNavLinks, { base }),
+    h(CatalogNavLinks, { base })
   ]);
 
 export { CatalogNavLinks, CatalogNavbar, DataModelLinks };

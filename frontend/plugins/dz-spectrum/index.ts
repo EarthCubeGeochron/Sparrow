@@ -148,14 +148,14 @@ function DetritalZirconComponent(props) {
   );
 }
 
-function DZSessionData({ session_id, date, sample }) {
+function DZSessionData({ id, date, sample }) {
   const name = sample?.name ?? "";
   const height = 50;
   const width = 340;
   const data = useAPIResult("/datum", {
     unit: "Ma",
     is_accepted: true,
-    session_id,
+    session_id: id,
   });
 
   let text = name;
@@ -168,7 +168,7 @@ function DZSessionData({ session_id, date, sample }) {
       {
         style: { height },
       },
-      h(DZPlotInner, { session_id, height, width, data })
+      h(DZPlotInner, { session_id: id, height, width, data })
     ),
   ]);
 }

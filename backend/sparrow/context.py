@@ -1,4 +1,5 @@
 from contextvars import ContextVar
+from os import name
 from .logs import get_logger
 
 log = get_logger(__name__)
@@ -37,16 +38,23 @@ def app_context() -> SparrowContext:
     return _sparrow_context.get()
 
 
-def get_sparrow_app():
+def get_sparrow_app(create=True):
     from .app.base import Sparrow
 
     val = _sparrow_context.get()
-    if val is None:
+    if val is None and create:
         app = Sparrow()
         _setup_context(app)
         return app
+    if val is None or val.app is None:
+        raise ValueError("Sparrow application is not created yet.")
     return val.app
 
 
 def get_database():
     return get_sparrow_app().database
+
+
+def get_plugin(name: str):
+    app = get_sparrow_app(create=False)
+    return app.plugins.get(name)

@@ -1,0 +1,3 @@
+#!/bin/bash
+# Description: Run the `celery` command-line interface
+sparrow exec backend celery -A sparrow_worker $@

@@ -118,7 +118,9 @@ function InfiniteAPIView({
       componentProps,
     });
   }
-  return h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
+  return h("div", { style: { marginTop: "100px", height: "300px" } }, [
+    h(Spinner),
+  ]);
 }
 
 export { InfiniteAPIView };

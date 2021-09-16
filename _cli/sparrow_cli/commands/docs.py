@@ -1,7 +1,6 @@
 from click import group
 from os import environ, path
-from ..group import CommandGroup
-from ..util import compose
+from ..util import CommandGroup, compose
 
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {

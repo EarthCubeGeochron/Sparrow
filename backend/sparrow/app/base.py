@@ -99,6 +99,7 @@ class Sparrow(Starlette):
         self.plugins = prepare_plugin_manager(self)
         self.is_loaded = True
         log.info("Finished loading plugins")
+        self.run_hook("plugins-initialized")
 
     def setup_server(self):
         # This could maybe be added to the API...

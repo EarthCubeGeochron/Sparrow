@@ -7,20 +7,18 @@ import h from "react-hyperscript";
 import styled from "@emotion/styled";
 import { useState } from "react";
 import { Callout, NonIdealState, Drawer, Button } from "@blueprintjs/core";
-import {
-  CollapsePanel,
-  APIResultView,
-  LinkCard,
-} from "@macrostrat/ui-components";
+import { CollapsePanel, APIResultView } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components";
+
 import "./gdd-card.styl";
 
-const Snippet = function ({ html }) {
+const Snippet = function({ html }) {
   const __html = html;
   console.log(__html);
   return h("p.snippet", { dangerouslySetInnerHTML: { __html } });
 };
 
-const SnippetResult = function (props) {
+const SnippetResult = function(props) {
   const {
     title,
     pubname,
@@ -28,7 +26,7 @@ const SnippetResult = function (props) {
     coverDate,
     authors,
     highlight,
-    URL,
+    URL
   } = props;
   return h(
     LinkCard,
@@ -39,29 +37,29 @@ const SnippetResult = function (props) {
       h("h3.pub-info", [
         h("span.pubname", pubname),
         " — ",
-        h("span.publisher", publisher),
+        h("span.publisher", publisher)
       ]),
       h("h4.date", coverDate),
       h(
         "div.snippets",
-        highlight.map((d) => h(Snippet, { html: d }))
-      ),
+        highlight.map(d => h(Snippet, { html: d }))
+      )
     ]
   );
 };
 
-const SnippetList = (props) => {
+const SnippetList = props => {
   const { items } = props;
   if (items.length === 0) {
     return h(NonIdealState, {
       icon: "search",
-      title: "No results found",
+      title: "No results found"
     });
   }
   return h(
     "div.snippet-list",
     null,
-    items.map((d) => h(SnippetResult, d))
+    items.map(d => h(SnippetResult, d))
   );
 };
 
@@ -93,7 +91,7 @@ function GeoDeepDiveCard(props) {
         InfoCallout,
         {
           icon: "book",
-          title: "Snippets containing sample name",
+          title: "Snippets containing sample name"
         },
         [
           h(
@@ -101,15 +99,15 @@ function GeoDeepDiveCard(props) {
             `The GeoDeepDive API can be used to aid \
 the linking of sample names to their containing \
 publications`
-          ),
+          )
         ]
       ),
-      h(APIResultView, { route, params }, (res) => {
+      h(APIResultView, { route, params }, res => {
         const {
-          success: { data },
+          success: { data }
         } = res;
         return h(SnippetList, { items: data });
-      }),
+      })
     ])
   );
 }
@@ -125,7 +123,7 @@ function GDDDrawer(props) {
   return (
     h(Button, { onClick: toggleOpen }, ["GeoDeepDive Helper"]),
     h(Drawer, { isOpen: open, onClose: toggleOpen }, [
-      h("p", ["GeoDeepDive: " + name]),
+      h("p", ["GeoDeepDive: " + name])
     ])
   );
 }

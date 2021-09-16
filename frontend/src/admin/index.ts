@@ -32,7 +32,7 @@ const DataSheetPage = loadable(() => import("./data-sheet"), {
   fallback: h(Spinner)
 });
 
-const ImporterPage = loadable(() => import("./importer"), {
+const TasksPage = loadable(() => import("./tasks"), {
   fallback: h(Spinner)
 });
 
@@ -54,7 +54,7 @@ function SecondaryMenuItem(props) {
 function SecondaryPageLinks(props) {
   const { base = "/admin" } = props;
   return h(Menu, [
-    h(SecondaryMenuItem, { to: base + "/import" }, "Import"),
+    h(SecondaryMenuItem, { to: base + "/tasks" }, "Tasks"),
     h(SecondaryMenuItem, { to: base + "/data-sheet" }, "Metadata"),
     h(SecondaryMenuItem, { to: base + "/terms/parameter" }, "Terms"),
     h(SecondaryMenuItem, { to: "/map" }, "Map")
@@ -158,8 +158,8 @@ const AdminRouter = ({ base }) =>
       render: () => h(DataSheetPage)
     }),
     h(Route, {
-      path: base + "/import",
-      render: () => h(ImporterPage)
+      path: base + "/tasks",
+      render: () => h(TasksPage)
     }),
     h(Route, {
       path: base + "/session",

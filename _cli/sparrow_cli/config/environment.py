@@ -1,8 +1,18 @@
 import sys
-from os import environ, path
+from os import environ, getenv
 from click import secho
 from rich import print
-from sparrow_utils import relative_path
+from sparrow_utils import relative_path, get_logger
+
+log = get_logger(__name__)
+
+
+def is_defined(envvar):
+    return environ.get(envvar) is not None
+
+
+def is_truthy(envvar, default="False"):
+    return getenv(envvar, "False").lower() in ("true", "1", "t", "y", "yes")
 
 
 def prepare_docker_environment():
@@ -12,27 +22,29 @@ def prepare_docker_environment():
     environ["_SPARROW_ENV_PREPARED"] = "1"
 
     # ENVIRONMENT VARIABLE DEFAULTS
+    # Enable native builds and layer caching
+    # https://docs.docker.com/develop/develop-images/build_enhancements/
+    # This is kind of experimental
+    environ.setdefault("COMPOSE_DOCKER_CLI_BUILD", "1")
+    environ.setdefault("DOCKER_BUILDKIT", "1")
+
     # Set variables that might not be created in the config file
     # to default values
     # NOTE: much of this has been moved to `docker-compose.yaml`
     environ.setdefault("SPARROW_BASE_URL", "/")
     environ.setdefault("SPARROW_LAB_NAME", "")
+    environ.setdefault("SPARROW_TASK_WORKER", "1")
 
     # Have to get rid of random printing to stdout in order to not break
     # logging and container ID
     # https://github.com/docker/scan-cli-plugin/issues/149
     environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
 
-    prepare_compose_overrides()
-
-
-def is_defined(envvar):
-    return environ.get(envvar) is not None
-
 
 def prepare_compose_overrides():
     base = environ["SPARROW_PATH"]
     main = relative_path(base, "docker-compose.yaml")
+
     compose_files = [main]
 
     def add_override(name):
@@ -40,13 +52,21 @@ def prepare_compose_overrides():
         compose_files.append(fn)
 
     env = environ.get("SPARROW_ENV", "development")
+    environ.setdefault("SPARROW_ENV", "development")
     is_production = env == "production"
 
     # Use the docker-compose profile tool to enable some services
     # NOTE: this is a nicer way to do some things that needed to be handled by
     # compose-file overrides in the past.
+    profiles = []
     if is_production:
-        environ["COMPOSE_PROFILES"] = "production"
+        profiles.append("production")
+    if is_truthy("SPARROW_TASK_WORKER"):
+        profiles.append("task-worker")
+
+    if len(profiles) > 0:
+        environ["COMPOSE_PROFILES"] = ",".join(profiles)
+        log.info(f"docker-compose profiles: {profiles}")
 
     # Use certbot for SSL if certain conditions are met
     use_certbot = (
@@ -80,6 +100,7 @@ def prepare_compose_overrides():
         compose_files += overrides.split(":")
 
     environ["COMPOSE_FILE"] = ":".join(compose_files)
+    log.info(f"Docker compose overrides: {compose_files}")
 
 
 def validate_environment():

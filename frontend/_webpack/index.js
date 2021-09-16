@@ -59,7 +59,7 @@ let baseConfig = {
     alias: {
       "~": srcRoot,
       app: srcRoot,
-      sparrow: srcRoot,
+      sparrow: path.resolve(srcRoot),
       plugins: relativePath("plugins/"),
       "site-content": process.env.SPARROW_SITE_CONTENT,
       // For node module resolution + hooks

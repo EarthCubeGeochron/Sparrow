@@ -1,9 +1,10 @@
 import { AnchorButton, Intent, Tooltip } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useAPIv2Result } from "~/api-v2";
+import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import { SiMicrosoftexcel } from "react-icons/si";
 import { AiFillFile } from "react-icons/ai";
 import { GrDocumentCsv, GrDocumentTxt } from "react-icons/gr";
+import { useAPIHelpers, buildQueryString } from "@macrostrat/ui-components";
 import {
   VscFileBinary,
   VscFilePdf,
@@ -15,9 +16,10 @@ import {
 import {
   PageViewBlock,
   ModelLinkCard,
-  PageViewDate,
+  FormattedDate,
   LinkedThroughModel,
 } from "~/model-views";
+import { Frame } from "~/frame";
 import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
@@ -50,11 +52,9 @@ function DownloadButtonIcon(props) {
 function DownloadButtonContent(props) {
   const { file_hash, file_type, basename } = props;
 
-  let text: any | React.ReactNode = "Data file";
+  let text: any | React.ReactNode = "Download data file";
   if (file_type != null) {
-    text = h([
-      h("b", { style: { fontSize: "17px", marginLeft: "22px" } }, file_type),
-    ]);
+    text = h(["Download ", h("b", file_type)]);
   }
 
   return h(
@@ -66,16 +66,15 @@ function DownloadButtonContent(props) {
       },
     },
     [
+      text,
+      " ",
       h(DownloadButtonIcon, {
         basename,
         style: {
-          position: "absolute",
-          bottom: "2px",
-          left: "0",
           fontSize: "17px",
+          marginLeft: "0.5em",
         },
       }),
-      text,
     ]
   );
 }
@@ -86,10 +85,11 @@ function DownloadButtonContent(props) {
  */
 export function DownloadButton(props) {
   const { file_hash, file_type, basename } = props;
+  const { buildURL } = useAPIHelpers(APIV2Context);
 
-  const href = `${process.env.BASE_URL}api/v2/data_file/${file_hash}`;
-  return h(Tooltip, { content: `Download ${file_type} file` }, [
-    h(AnchorButton, { href, rightIcon: "download", intent: Intent.PRIMARY }, [
+  const href = buildURL(`/data_file/${file_hash}/download/`);
+  return h(Tooltip, { content: `Download ${file_type ?? "data"} file` }, [
+    h(AnchorButton, { href, intent: Intent.PRIMARY }, [
       h(DownloadButtonContent, { basename, file_hash, file_type }),
     ]),
   ]);
@@ -102,30 +102,17 @@ function unwrapDataFile(get_obj) {
   return data;
 }
 
-function getDataFileData(props) {
-  const { sample_ids = [0], session_ids = [0], analysis_ids = [0] } = props;
+function useDataFileModelLinks(props) {
+  const { sample_id, session_id, analysis_id } = props;
 
-  const baseUrl = `/data_file/filter`;
-  const sample = useAPIv2Result(
-    baseUrl + `?sample_id=${sample_ids}`,
-    {},
-    { unwrapResponse: unwrapDataFile }
+  const q = buildQueryString(
+    { sample_id, session_id, analysis_id },
+    { arrayFormat: "comma" }
   );
-  const session = useAPIv2Result(
-    baseUrl + `?session_id=${session_ids}`,
-    {},
-    { unwrapResponse: unwrapDataFile }
-  );
-  const analysis = useAPIv2Result(
-    baseUrl + `?analysis_id=${analysis_ids}`,
-    {},
-    { unwrapResponse: unwrapDataFile }
-  );
-  if (analysis == null) return [];
-  if (session == null) return [];
-  if (sample == null) return [];
 
-  return [...sample, ...session, ...analysis];
+  const res = useAPIv2Result("/data_file/filter?" + q);
+  console.log(res);
+  return res?.data ?? [];
 }
 
 function DataFileCard(props) {
@@ -137,6 +124,8 @@ function DataFileCard(props) {
     linkedThrough = { model: current_model, id: model_id };
   }
 
+  const dataFile = { date, basename, file_hash };
+
   return h(
     ModelLinkCard,
     {
@@ -144,9 +133,11 @@ function DataFileCard(props) {
       linkedThrough,
       to: useModelURL(`/data-file/${file_hash}`),
     },
-    h("div", [
-      h("div", [h(PageViewDate, { date })]),
-      h("div", [h("div", [h("h4", basename)])]),
+    h(Frame, { id: "dataFileLinkContent", data: { dataFile } }, [
+      h("div", [
+        h("div", [h(FormattedDate, { date })]),
+        h("div", [h("div", [h("h4", basename)])]),
+      ]),
     ])
   );
 }
@@ -178,15 +169,13 @@ function DataFilePageCards(props) {
 }
 
 export function DataFilePage(props) {
-  const {
-    sample_ids = [0],
-    session_ids = [0],
-    analysis_ids = [0],
-    model,
-  } = props;
+  const { sample_ids = [], session_ids = [], analysis_ids = [], model } = props;
 
-  const data = getDataFileData({ sample_ids, session_ids, analysis_ids });
-
+  const data = useDataFileModelLinks({
+    sample_id: sample_ids,
+    session_id: session_ids,
+    analysis_id: analysis_ids,
+  });
   return h(
     PageViewBlock,
     {
@@ -195,6 +184,6 @@ export function DataFilePage(props) {
       title: "Data files",
       hasData: data.length > 0,
     },
-    [h(DataFilePageCards, { data, model })]
+    h(DataFilePageCards, { data, model })
   );
 }

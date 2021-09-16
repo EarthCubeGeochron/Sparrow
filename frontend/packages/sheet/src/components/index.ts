@@ -22,7 +22,7 @@ function Columns() {
   return h("colgroup", [
     h("col.index-column", { key: "index", style: { width: 50 } }),
     columns.map(({ width, key }) => {
-      return h("col", {
+      return h("col.data-column", {
         key,
         style: { width },
       });

@@ -1,0 +1,3 @@
+#!/bin/bash
+# Description: Run the `celery` events monitor
+sparrow tasks celery events $@

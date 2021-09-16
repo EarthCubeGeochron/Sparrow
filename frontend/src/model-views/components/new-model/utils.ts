@@ -286,12 +286,13 @@ export const EmbargoDatePick = (props) => {
 };
 
 export const EditStatusButtons = function (props) {
-  const { hasChanges, isEditing, onClickCancel, onClickSubmit } = props;
+  const { hasChanges, isEditing, onClickCancel, onClickSubmit, ...rest } =
+    props;
 
   const changed = hasChanges();
   return h("div.edit-status-controls", [
-    h.if(!isEditing)(ModelEditButton, { minimal: true }, "Edit"),
-    h.if(isEditing)(ButtonGroup, { minimal: true }, [
+    h.if(!isEditing)(ModelEditButton, { minimal: true, ...rest }, "Edit"),
+    h.if(isEditing)(ButtonGroup, { minimal: true, ...rest }, [
       h(
         SaveButton,
         {

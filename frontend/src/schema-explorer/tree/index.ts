@@ -13,6 +13,8 @@ import { Link } from "react-router-dom";
 import React, { useContext, useEffect, useState } from "react";
 //@ts-ignore
 import styles from "./module.styl";
+export * from "./json-tree";
+export * from "./tree-legend";
 import ReactJson from "react-json-view";
 
 const h = hyperStyled(styles);
@@ -51,20 +53,6 @@ function typeClassName(props) {
     }
   });
   return className;
-}
-
-function TreeLegend() {
-  return h(Card, { className: "legend-card" }, [
-    h("h3", "Legend"),
-    h("div.legend-field", [
-      h("div.read-only", "Read-Only"),
-      h("div.legend", ": handled automatically on import")
-    ]),
-    h("div.legend-field", [
-      h("div.required", "*"),
-      h("div.legend", ": required field to import model")
-    ])
-  ]);
 }
 
 function Description(props: LabelProps) {
@@ -207,7 +195,6 @@ function Tree({
   const [state, setState] = React.useState<TreeState>({
     collapsed: defaultCollapsed
   });
-  console.log(json);
 
   const data = useAPIv2Result(
     link,
@@ -273,4 +260,4 @@ function Tree({
   ]);
 }
 
-export { Tree, TreeProps, TreeLegend };
+export { Tree, TreeProps };

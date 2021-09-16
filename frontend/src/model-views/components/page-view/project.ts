@@ -18,7 +18,7 @@ export const ProjectAdd = (props) => {
       model: "project",
       onClick: onClickList,
       isEditing,
-      title: "Projects",
+      title: "Project",
       modelLink: true,
       hasData: data.project.length != 0,
     },

@@ -1,12 +1,12 @@
 {
-  "core": "2.0.0.beta11",
+  "core": "2.0.0.beta14",
   "frontend": "2.0-alpha",
   "schema": "1.1.0",
   "cli": "2.0-beta",
   "docker_images": {
     "backend-base": {
       "context": "./base-images/backend",
-      "version": "1.2"
+      "version": "2.0"
     },
     "db-mysql-fdw": {
       "context": "./base-images/db-mysql-fdw",

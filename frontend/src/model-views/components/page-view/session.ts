@@ -1,7 +1,7 @@
 import { DndContainer } from "~/components";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useModelURL } from "~/util/router";
-import { ModelLinkCard, PageViewBlock, PageViewDate } from "~/model-views";
+import { ModelLinkCard, PageViewBlock, FormattedDate } from "~/model-views";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -142,7 +142,7 @@ export const SessionCard = (props) => {
       [
         h("div", { className: classname }, [
           h("div.session-info", [
-            h("div", [h(PageViewDate, { date }), technique]),
+            h("div", [h(FormattedDate, { date }), technique]),
             h("div", target),
           ]),
         ]),

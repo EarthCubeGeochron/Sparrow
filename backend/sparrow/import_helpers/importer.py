@@ -6,11 +6,13 @@ from os import environ
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import inspect
-from IPython import embed
-
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
 from .imperative_helpers import ImperativeImportHelperMixin
+from rich import print
+from sparrow_utils import get_logger
+
+_log = get_logger(__name__)
 
 
 class BaseImporter(ImperativeImportHelperMixin):
@@ -18,11 +20,14 @@ class BaseImporter(ImperativeImportHelperMixin):
     A basic Sparrow importer to be subclassed.
     """
 
+    id = None
     authority = None
     file_type = None
 
-    def __init__(self, db, **kwargs):
-        self.db = db
+    def __init__(self, app, **kwargs):
+        self.app = app
+        self.db = self.app.database
+
         self.m = self.db.model
         print_sql = kwargs.pop("print_sql", False)
         self.verbose = kwargs.pop("verbose", False)
@@ -65,6 +70,15 @@ class BaseImporter(ImperativeImportHelperMixin):
         # Deprecated
         self.models = self.m
 
+    def _register(self):
+        _log.info("Attempting to register importer")
+        if self.id is None:
+            return
+        plugin = self.app.plugins.get("import-tracker")
+        if plugin is None:
+            return
+        plugin.register_pipeline(self.id, self)
+
     def session_changes(self):
         def changed(i):
             return self.db.session.is_modified(i, include_collections=True)
@@ -82,10 +96,14 @@ class BaseImporter(ImperativeImportHelperMixin):
     ###
 
     def warn(self, message):
-        secho(str(message), fg="yellow")
+        self.log(str(message), fg="yellow")
 
     def import_datafile(self, fn, rec, **kwargs):
         """An importer must `yield` models that are to be tracked in the `data_file_link` table."""
+        raise NotImplementedError()
+
+    def run(self):
+        """Run the pipeline"""
         raise NotImplementedError()
 
     def delete_session(self, rec):
@@ -113,8 +131,10 @@ class BaseImporter(ImperativeImportHelperMixin):
         for rec in seq:
             if rec is None:
                 continue
-            secho(str(rec.file_path), dim=True)
+            self.log(str(rec.file_path), dim=True)
             self.__import_datafile(None, rec, **kwargs)
+            # else:
+            #    self.__import_datafile(None, rec, **kwargs)
 
     def __set_file_info(self, infile, rec):
         _ = infile.stat().st_mtime
@@ -152,7 +172,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         if updated:
             rec.file_hash = hash
 
-        rec.file_type = self.file_type
+        rec.type_id = self.file_type
 
         self.db.session.add(rec)
 
@@ -172,6 +192,13 @@ class BaseImporter(ImperativeImportHelperMixin):
         if rec is None:
             rec, added = self._create_data_file_record(fn)
 
+        # Set file types if we need to. We could probably
+        # do this more efficiently.
+        if rec.type_id != self.file_type:
+            rec.type_id = self.file_type
+            self.db.session.add(rec)
+            self.db.session.commit()
+
         err_filter = True
         m = self.m.data_file_link
         if kwargs.pop("fix_errors", False):
@@ -183,7 +210,7 @@ class BaseImporter(ImperativeImportHelperMixin):
             .count()
         )
         if prev_imports > 0 and not added and not redo:
-            secho("Already imported", fg="green", dim=True)
+            self.log("Already imported", fg="green", dim=True)
             return
         # It might get ugly here if we're trying to overwrite
         # old records but haven't deleted the appropriate
@@ -212,7 +239,7 @@ class BaseImporter(ImperativeImportHelperMixin):
             if df_link is not None:
                 self.db.session.add(df_link)
             self.db.session.commit()
-            secho(str(err), fg="red")
+            self.log(str(err), fg="red")
 
         if redo:
             self.__track_changes()
@@ -222,14 +249,18 @@ class BaseImporter(ImperativeImportHelperMixin):
         self.db.session.commit()
         secho("")
 
+    def log(self, *args, **kwargs):
+        text = " ".join([str(a) for a in args])
+        secho(text, **kwargs)
+
     def __track_changes(self):
         new_changed = set(i for i in self.__new if self.__has_changes(i))
         modified = set(i for i in self.__dirty if self.__has_changes(i))
 
-        def _echo(v, n, **kwargs):
+        def _report(v, n, **kwargs):
             i = len(v)
             if i > 0:
-                secho(f"{i} {n}", **kwargs)
+                self.log(f"{i} {n}", **kwargs)
 
         # has_new_models = len(self.__new) > 0
         # has_dirty_models = len(self.__dirty) > 0
@@ -237,14 +268,14 @@ class BaseImporter(ImperativeImportHelperMixin):
 
         if self.verbose:
             problems = (self.__new & new_changed) | (self.__dirty & modified)
-            _echo(problems, "update attempted for unchanged model", fg="yellow")
+            _report(problems, "update attempted for unchanged model", fg="yellow")
             self.__print_changes(modified)
 
         if not has_modified_models:
-            secho("No modifications", fg="green")
+            self.log("No modifications", fg="green")
         else:
-            _echo(self.__new, "records added", fg="green")
-            _echo(modified, "records modified", fg="yellow")
+            _report(self.__new, "records added", fg="green")
+            _report(modified, "records modified", fg="yellow")
         secho("")
 
     def __print_changes(self, dirty_records):
