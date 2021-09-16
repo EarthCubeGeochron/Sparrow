@@ -53,7 +53,7 @@ function SessionComponent(props) {
         id: "sessionDetail",
         session_id: id,
       },
-      [SessionPageTabs]
+      SessionPageTabs
     ),
   ]);
 }

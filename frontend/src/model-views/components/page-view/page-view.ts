@@ -91,14 +91,16 @@ export const PageViewBlock = (props) => {
 };
 
 export const FormattedDate = (props) => {
-  const { date } = props;
+  const { date, fallback = "Unknown date", oldestValidYear = 1940 } = props;
 
   const year = getYear(date);
 
-  if (year < 1940) return h("div.formatted-date", null, "Unknown date");
-
-  console.log(date);
-
+  if (year < oldestValidYear) {
+    if (fallback != null) {
+      return h("div.formatted-date", null, "Unknown date");
+    }
+    return null;
+  }
   return h("div.formatted-date", null, format(date, "MMMM D, YYYY"));
 };
 

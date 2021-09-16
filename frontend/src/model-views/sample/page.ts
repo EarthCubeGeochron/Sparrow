@@ -507,6 +507,7 @@ function SamplePage(props: SampleProps) {
                 h(DepthElevation),
               ]),
               h("div", null, [
+                h(LocationBlock),
                 h(
                   Frame,
                   { id: "sampleHeaderExt", data: { sample: sample.data } },
@@ -517,12 +518,11 @@ function SamplePage(props: SampleProps) {
             h.if(Edit)(SampleTagContainer),
           ]),
         ]),
+        h(SubSamples),
         h(SampleProjectAdd),
         h(SampleSessionAdd),
         h(SamplePageDataFiles),
-        h(LocationBlock),
         h(GeoEntity),
-        h(SubSamples),
         h(Frame, { id: "samplePage", data: sample.data }, null),
       ]
     )
