@@ -39,6 +39,7 @@ import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
 import { useModelURL } from "~/util";
 import { Button } from "@blueprintjs/core";
+import { useEditingAllowed } from "~/util";
 
 const h = hyper.styled(styles);
 
@@ -436,6 +437,52 @@ const SamplePageDataFiles = () => {
   });
 };
 
+function useSamplePersist() {
+  const { buildURL } = useAPIHelpers(APIV2Context);
+  return async function persistSampleChanges(updatedModel, changeset) {
+    console.log("changeset", changeset);
+    console.log("updatedModel", updatedModel);
+    console.log(
+      "Tags",
+      TagsChangeSet(
+        changeset,
+        updatedModel,
+        buildURL("/tags/models/sample", {})
+      )
+    );
+    let { id } = updatedModel;
+    console.log(
+      handleMemberOfPersist(
+        changeset,
+        buildURL(`/models/sample/sub-sample/${id}`)
+      )
+    );
+    delete updatedModel.member_of;
+    let rest;
+    const response = await put(
+      buildURL(`/models/sample/${id}`, {}),
+      updatedModel
+    );
+    const { data } = response;
+  };
+}
+
+function TitleBar() {
+  const { model: sample } = useModelEditor();
+  const isEditable = useEditingAllowed();
+  const id = sample.id;
+  return h("div.title-bar", [
+    h(ModelEditableText, {
+      is: "h2",
+      field: "name",
+      multiline: true,
+    }),
+    h("h2.page-type", ` (Sample #${id})`),
+    h("div.spacer"),
+    h.if(isEditable)("div.page-type", null, h(EditNavBarSample)),
+  ]);
+}
+
 interface SampleProps {
   Edit?: boolean;
   id?: number;
@@ -446,7 +493,7 @@ function SamplePage(props: SampleProps) {
   if (id == null) return null;
 
   const { login } = useAuth();
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
+  const persistChanges = useSamplePersist();
 
   const sample = useAPIv2Result(`/models/sample/${id}`, {
     nest: "session,project,sample_geo_entity,geo_entity,tag",
@@ -467,45 +514,11 @@ function SamplePage(props: SampleProps) {
       {
         model: sample.data,
         canEdit: login || Edit,
-        persistChanges: async (updatedModel, changeset) => {
-          console.log("changeset", changeset);
-          console.log("updatedModel", updatedModel);
-          console.log(
-            "Tags",
-            TagsChangeSet(
-              changeset,
-              updatedModel,
-              buildURL("/tags/models/sample", {})
-            )
-          );
-          let { id } = updatedModel;
-          console.log(
-            handleMemberOfPersist(
-              changeset,
-              buildURL(`/models/sample/sub-sample/${id}`)
-            )
-          );
-          delete updatedModel.member_of;
-          let rest;
-          const response = await put(
-            buildURL(`/models/sample/${id}`, {}),
-            updatedModel
-          );
-          const { data } = response;
-        },
+        persistChanges,
       },
       [
         h("div.sample", [
-          h("div.title-bar", [
-            h(ModelEditableText, {
-              is: "h2",
-              field: "name",
-              multiline: true,
-            }),
-            h("h2.page-type", ` (Sample #${id})`),
-            h("div.spacer"),
-            h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
-          ]),
+          h(TitleBar),
           h(PageViewBlock, [
             h("div.flex-row", [
               h("div.info-block", [
