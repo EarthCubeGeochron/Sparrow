@@ -8,7 +8,7 @@ import {
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { useAuth } from "~/auth";
 import { put } from "axios";
-import { useModelURL, useModelURLBool } from "~/util/router";
+import { useModelURL, useEditingAllowed } from "~/util/router";
 import {
   Instrument,
   Technique,
@@ -126,6 +126,7 @@ function SessionName(props) {
   return h(ModelEditableText, {
     is: "h4",
     field: "name",
+    placeholder: "Unnamed",
     multiline: true,
   });
 }
@@ -256,7 +257,7 @@ function EditableSessionInfoComponent(props) {
 export function EditableSessionDetails(props) {
   const { id } = props;
 
-  const Edit = useModelURLBool();
+  const Edit = useEditingAllowed();
   const res = useAPIv2Result(`/models/session/${id}`, {
     nest: "sample,instrument,project,tag,publication",
   });

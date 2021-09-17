@@ -178,6 +178,8 @@ export function ModelEditableText(props) {
     // Show text with primary intent if changes have been made
     const intent = actions.hasChanges(field) ? "success" : null;
 
+    console.log(model);
+
     return h(el, rest, [
       h.if(isEditing)(EditableText, {
         className: `model-edit-text field-${field}`,
