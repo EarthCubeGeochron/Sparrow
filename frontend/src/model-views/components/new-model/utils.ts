@@ -170,7 +170,6 @@ export function ModelEditableText(props) {
   if (placeholder == null) {
     placeholder = "Add a " + field;
   }
-  delete rest.is;
 
   if (!editOn) {
     const { model, actions, isEditing } = useContext(ModelEditorContext);
