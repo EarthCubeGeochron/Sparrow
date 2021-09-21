@@ -177,7 +177,7 @@ export function ModelEditableText(props) {
     // Show text with primary intent if changes have been made
     const intent = actions.hasChanges(field) ? "success" : null;
 
-    console.log(model);
+    const nonEditingValue = model[field] ?? h("span.placeholder", placeholder);
 
     return h(el, rest, [
       h.if(isEditing)(EditableText, {
@@ -188,7 +188,7 @@ export function ModelEditableText(props) {
         onChange: actions.onChange(field),
         value: model[field],
       }),
-      h.if(!isEditing)("span", model[field]),
+      h.if(!isEditing)(nonEditingValue),
     ]);
   }
   const { id, onConfirm } = rest;

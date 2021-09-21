@@ -8,9 +8,11 @@ import {
   useAPIHelpers,
   useModelEditor,
 } from "@macrostrat/ui-components";
+import { Navbar } from "@blueprintjs/core";
 import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import { put } from "axios";
 import { SampleContextMap, MinimalNavbar } from "~/components";
+import { ModelTitleBar } from "~/model-views/components/page-view";
 import { MapLink } from "~/map";
 import {
   EditNavBar,
@@ -68,23 +70,26 @@ const EditNavBarSample = () => {
     return actions.persistChanges();
   };
 
-  return h(
-    MinimalNavbar,
-    null,
-    h("div.editor-buttons", { style: { display: "flex" } }, [
-      h.if(isEditing)(DataSheetButton),
-      h(EditStatusButtons, {
-        onClickCancel,
-        onClickSubmit,
-        hasChanges,
-        isEditing,
-      }),
-      h(NewModelButton, { model: "sample", minimal: false, large: true }),
-      h(EmbargoEditor, {
-        active: isEditing,
-      }),
-    ])
-  );
+  return h("div.flex-row", [
+    h(
+      MinimalNavbar,
+      null,
+      h("div.editor-buttons", { style: { display: "flex" } }, [
+        h.if(isEditing)(DataSheetButton),
+        h(EditStatusButtons, {
+          onClickCancel,
+          onClickSubmit,
+          hasChanges,
+          isEditing,
+        }),
+        h(EmbargoEditor, {
+          active: isEditing,
+        }),
+        h(Navbar.Divider),
+        h(NewModelButton, { model: "sample", minimal: true }),
+      ])
+    ),
+  ]);
 };
 
 const LocationBlock = function (props) {
@@ -468,19 +473,13 @@ function useSamplePersist() {
 }
 
 function TitleBar() {
-  const { model: sample } = useModelEditor();
-  const isEditable = useEditingAllowed();
-  const id = sample.id;
-  return h("div.title-bar", [
-    h(ModelEditableText, {
-      is: "h2",
-      field: "name",
-      multiline: true,
-    }),
-    h("h2.page-type", ` (Sample #${id})`),
-    h("div.spacer"),
-    h.if(isEditable)("div.page-type", null, h(EditNavBarSample)),
-  ]);
+  const { model } = useModelEditor();
+  const id = model.id;
+  return h(ModelTitleBar, {
+    titleField: "name",
+    subtitle: `Sample #${id}`,
+    editingContent: h(EditNavBarSample),
+  });
 }
 
 interface SampleProps {
