@@ -9,6 +9,7 @@ from .attach import sparrow_attach
 from .tasks import tasks
 from .logs import sparrow_logs
 from .up import sparrow_up
+from .docker import sparrow_docker_prune
 
 _commands = {
     "db": sparrow_db,
@@ -21,6 +22,7 @@ _commands = {
     "dev": sparrow_dev,
     "info": sparrow_info,
     "create-test-lab": sparrow_test_lab,
+    "prune": sparrow_docker_prune,
     "tasks": tasks,
 }
 
