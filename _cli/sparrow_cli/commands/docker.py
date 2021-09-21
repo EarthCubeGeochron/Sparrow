@@ -8,7 +8,9 @@ from ..util import cmd
 @click.option("--volume", default=False, help="prune sparrow volumes as well (bool)")
 def sparrow_docker_prune(volume):
     lab_name = environ.get("SPARROW_LAB_NAME").lower()
-    if volume:
+    if len(lab_name) == 0:
+        click.secho("No lab name environment variable set!", fg='red')
+    elif volume:
         prompt = "This method will drop the data volumes including the database! To continue type, 'I'm positive.'"
         ans = click.prompt(prompt)
         if ans == "I'm positive.":
