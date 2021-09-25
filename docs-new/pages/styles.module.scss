@@ -30,9 +30,15 @@
 
 .features {
   display: flex;
+  flex-direction: row;
   align-items: center;
   padding: 2rem 0;
   width: 100%;
+
+  :global(.logo-container) {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
 }
 
 .featureImage {

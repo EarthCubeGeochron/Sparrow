@@ -1,6 +1,6 @@
 import React from "react";
 import classnames from "classnames";
-import styles from "./styles.module.css";
+import styles from "./styles.module.scss";
 import Mdx from "../text/index-text.mdx";
 import BasePage from "../components/base-page";
 
