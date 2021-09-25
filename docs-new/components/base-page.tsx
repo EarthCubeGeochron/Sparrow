@@ -54,19 +54,19 @@ const BasePage = function (props) {
   return h("div.page", { className }, [
     <Head>
       <meta charSet="utf-8" />
-      <title>Mapboard GIS</title>
+      <title>Sparrow</title>
       <link rel="preconnect" href="https://fonts.gstatic.com" />
       <link
         href="https://fonts.googleapis.com/css2?family=Merriweather&family=Montserrat&family=Source+Code+Pro:wght@400;700&display=swap"
         rel="stylesheet"
       />
       {analyticsHeaderScripts()}
-      <link rel="icon" type="image/png" href="/favicon-32x32.png" />
-      <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-      <meta property="og:title" content="Mapboard GIS" />
+      <link rel="icon" type="image/png" href="/favicon.png" />
+      <link rel="shortcut icon" type="image/x-icon" href="/favicon.png" />
+      <meta property="og:title" content="Sparrow" />
       <meta
         property="og:description"
-        content="Draw your geologic maps again."
+        content="A small data system for geochemistry labs."
       />
       <meta
         property="og:image"
@@ -89,16 +89,14 @@ const BasePage = function (props) {
       <header>
         <ActiveLink href="/">
           <a className="page-title-link">
-            <h1 className="page-title">
-              Mapboard <span className="dimmer">GIS</span>
-            </h1>
+            <h1 className="page-title">Sparrow</h1>
           </a>
         </ActiveLink>
         <div className="header-image">
           <Link href="/">
             <img
               className="mapboard-logo"
-              src="/img/mapboard-icon.png"
+              src="/img/sparrow-bird-flat.svg"
               width={140}
               height={140}
             />
@@ -110,10 +108,14 @@ const BasePage = function (props) {
       <footer>
         <div>
           <p>
-            <strong>Mapboard GIS</strong>
+            <strong>Sparrow</strong>
           </p>
           <p>
-            2018—2021, <a href="https://davenquinn.com">Daven Quinn</a>
+            2018—2021, the
+            <a href="https://github.com/EarthCubeGeochron">
+              <em>EarthCube Geochronology</em>
+            </a>{" "}
+            team
           </p>
           <RevisionInfo />
         </div>
