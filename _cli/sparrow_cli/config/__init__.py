@@ -115,3 +115,8 @@ class SparrowConfig:
         with (self.SPARROW_PATH / "backend" / "sparrow" / "meta.py").open() as f:
             exec(f.read(), version)
         return version["__version__"]
+
+    def get_sparrow_lab_name(self):
+        """ method to cascade environ variables to get a lab instance name """
+
+        

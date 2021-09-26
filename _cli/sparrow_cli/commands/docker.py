@@ -1,8 +1,6 @@
 import click
 from os import environ, path, chdir
-from pathlib import Path
 import subprocess
-from ..util import cmd
 
 @click.command("system-prune")
 @click.option("--volume", default=False, help="prune sparrow volumes as well (bool)")
