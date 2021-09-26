@@ -8,4 +8,4 @@ from .logs import setup_stderr_logs
 
 setup_stderr_logs()
 app = get_sparrow_app()
-app.bootstrap()
+app.bootstrap(init=True)
