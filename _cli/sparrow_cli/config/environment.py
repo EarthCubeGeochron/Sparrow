@@ -47,7 +47,7 @@ def prepare_docker_environment():
     # to default values
     # NOTE: much of this has been moved to `docker-compose.yaml`
     environ.setdefault("SPARROW_BASE_URL", "/")
-    environ.setdefault("SPARROW_LAB_NAME", "")
+
     environ.setdefault("SPARROW_TASK_WORKER", "1")
 
     # Have to get rid of random printing to stdout in order to not break

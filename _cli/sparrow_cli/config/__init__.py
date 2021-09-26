@@ -2,7 +2,7 @@ import typing
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from os import environ
+from os import environ, getenv
 from sparrow_utils.shell import git_revision_info
 from sparrow_utils.logs import get_logger, setup_stderr_logs
 
@@ -78,6 +78,9 @@ class SparrowConfig:
 
         environ.setdefault("SPARROW_BACKEND_IMAGE", "sparrow/backend" + tag)
         environ.setdefault("SPARROW_FRONTEND_IMAGE", "sparrow/frontend" + tag)
+        
+        #will set COMPOSE_PROJECT_NAME if undefined
+        self.set_compose_lab_name()
 
         prepare_docker_environment()
         if "COMPOSE_FILE" in environ:
@@ -116,7 +119,18 @@ class SparrowConfig:
             exec(f.read(), version)
         return version["__version__"]
 
-    def get_sparrow_lab_name(self):
+    def set_compose_lab_name(self):
         """ method to cascade environ variables to get a lab instance name """
 
-        
+        compose_name = getenv("COMPOSE_PROJECT_NAME", None)
+        lab_name = getenv("SPARROW_LAB_NAME", None)
+        config_dir = getenv("SPARROW_CONFIG_DIR", None)
+
+        if compose_name is None:
+            if lab_name is not None:
+                lab_name = "_".join(lab_name.split()).lower() # format
+                environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
+            else:
+                lab_name = config_dir.split("/")[-1].lower()
+                environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
+                environ.setdefault("SPARROW_LAB_NAME", lab_name)
