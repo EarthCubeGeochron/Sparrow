@@ -34,6 +34,10 @@
   align-items: center;
   padding: 2rem 0;
   width: 100%;
+  margin-right: -5%;
+  & > * {
+    margin-right: 5%;
+  }
 
   :global(.logo-container) {
     flex: 0 0 33.333333%;

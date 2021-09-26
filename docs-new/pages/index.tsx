@@ -76,22 +76,20 @@ function Home() {
       <main>
         {features && features.length && (
           <section className={styles.features}>
-            <div className="container">
-              <div className="logo-container">
-                <h2>
-                  A small and sophisticated data system for geochronology and
-                  geochemistry labs.
-                </h2>
-                <img
-                  src="https://sparrow-data.org/images/sparrow-logo.png"
-                  width="100%"
-                />
-              </div>
-              <div className="feature-container">
-                {features.map((props, idx) => (
-                  <Feature key={idx} {...props} />
-                ))}
-              </div>
+            <div className="logo-container">
+              <h2>
+                A small and sophisticated data system for geochronology and
+                geochemistry labs.
+              </h2>
+              <img
+                src="https://sparrow-data.org/images/sparrow-logo.png"
+                width="100%"
+              />
+            </div>
+            <div className="feature-container">
+              {features.map((props, idx) => (
+                <Feature key={idx} {...props} />
+              ))}
             </div>
           </section>
         )}

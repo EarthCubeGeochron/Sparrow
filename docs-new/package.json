@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@blueprintjs/core": "^3.50.2",
     "@macrostrat/hyper": "^1.2.14",
     "@macrostrat/revision-info-webpack": "^1.0.0",
     "@macrostrat/ui-components": "^0.6.8",

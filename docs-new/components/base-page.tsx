@@ -1,4 +1,4 @@
-import h from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import { Nav, ActiveLink } from "./nav";
 import Link from "next/link";
 import Head from "next/head";
@@ -8,6 +8,10 @@ import { useRouter } from "next/router";
 import { unnestLinks } from "./nav";
 import { aboutLinks, userGuideLinks } from "./page-map";
 import { analyticsHeaderScripts } from "./analytics/server";
+import * as styles from "./page-layout.module.sass";
+import "@blueprintjs/core/lib/css/blueprint.css";
+
+const h = hyperStyled(styles);
 
 const GA_TRACKING_ID = process.env.GA_TRACKING_ID;
 
@@ -86,24 +90,26 @@ const BasePage = function (props) {
     </Head>,
     h("div.underlay"),
     h("div.wrap", [
-      <header>
-        <ActiveLink href="/">
-          <a className="page-title-link">
-            <h1 className="page-title">Sparrow</h1>
-          </a>
-        </ActiveLink>
-        <div className="header-image">
-          <Link href="/">
-            <img
-              className="mapboard-logo"
-              src="/img/sparrow-bird-flat.svg"
-              width={140}
-              height={140}
-            />
-          </Link>
-        </div>
-        <Nav links={navLinks} exactLinks={false} />
-      </header>,
+      h("header.page-header", [
+        <div className="nav-wrap">
+          <div className="header-image">
+            <Link href="/">
+              <img
+                className="sparrow-logo"
+                src="/img/sparrow-bird-flat.svg"
+                width={140}
+                height={140}
+              />
+            </Link>
+          </div>
+          <ActiveLink href="/">
+            <a className="page-title-link">
+              <h1 className="page-title">Sparrow</h1>
+            </a>
+          </ActiveLink>
+          <Nav links={navLinks} exactLinks={false} />
+        </div>,
+      ]),
       h("div.main", [children]),
       <footer>
         <div>
