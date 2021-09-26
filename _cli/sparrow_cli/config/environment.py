@@ -1,8 +1,11 @@
 import sys
+from docker import from_env
+from docker.errors import DockerException
 from os import environ, getenv
 from click import secho
 from rich import print
 from sparrow_utils import relative_path, get_logger
+from ..util.exceptions import SparrowCommandError
 
 log = get_logger(__name__)
 
@@ -15,9 +18,21 @@ def is_truthy(envvar, default="False"):
     return getenv(envvar, "False").lower() in ("true", "1", "t", "y", "yes")
 
 
+def check_docker_availability():
+    try:
+        from_env()
+    except DockerException as exc:
+        raise SparrowCommandError(
+            "Cannot connect to the Docker daemon. Is Docker running?", details=str(exc)
+        )
+
+
 def prepare_docker_environment():
     if environ.get("_SPARROW_ENV_PREPARED", "0") == "1":
         return
+
+    check_docker_availability()
+
     # Convey that we have already prepared the environment
     environ["_SPARROW_ENV_PREPARED"] = "1"
 
