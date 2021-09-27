@@ -3,6 +3,7 @@ import { useDataSheet } from "./provider";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useRef, useEffect } from "react";
 import { useElementSize, useScrollOffset } from "./helpers";
+import { Columns, Header, Row, Sheet } from "./components";
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
@@ -62,6 +63,10 @@ function VirtualizedSheet(props) {
     h("div.ui", { style: { height, width } }, [
       h(ReactDataSheet, {
         ...rest,
+        sheetRenderer: Sheet,
+        keyFn(index) {
+          return index + rowOffset;
+        },
         data: data.slice(rowOffset, lastRow),
         selected: offsetSelection(selection, -rowOffset),
         onSelect(sel) {

@@ -7,11 +7,10 @@ import { Frame } from "~/frame";
 import {
   DataSheetProvider,
   Row,
-  Sheet,
   useElementSize,
   apportionWidths,
   VirtualizedSheet,
-} from "@earthdata/sheet/src/index.ts";
+} from "@earthdata/sheet/src";
 import { SheetToolbar } from "./toolbar";
 import classNames from "classnames";
 import styles from "./module.styl";
@@ -20,6 +19,7 @@ import { postData } from "./post";
 import { DoiProjectButton } from "./sheet-enter-components/doi-button";
 import { DataEditor } from "react-datasheet/lib";
 import { join } from "path";
+import { memo } from "react";
 
 const h = hyperStyled(styles);
 
@@ -84,6 +84,8 @@ interface SampleData {
   longitude: number;
   name: string;
 }
+
+const valueRenderer = (cell) => `${cell.value ?? ""}`;
 
 function DataSheet() {
   const [data, setData] = useState<SampleData[]>([]);
@@ -221,8 +223,7 @@ function DataSheet() {
       h("div.sheet", { ref }, [
         h(VirtualizedSheet, {
           data: cellData,
-          valueRenderer: (cell) => `${cell.value ?? ""}`,
-          sheetRenderer: Sheet,
+          valueRenderer,
           rowRenderer: Row,
           onCellsChanged,
           width: size?.width ?? 500,
