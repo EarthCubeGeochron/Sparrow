@@ -83,12 +83,15 @@ function NodeLabel(props: LabelProps) {
   const { state, runAction } = useContext(SchemaExplorerContext);
   const [open, setOpen] = useState(false);
 
+  if (props.read_only) return null;
+
   const onInfoClick = e => {
     e.stopPropagation();
     setOpen(!open);
   };
 
   let type = props.type;
+  let fieldName = props.fieldName;
   let classname = typeClassName(props);
   if (props.required) {
     type += "*";
@@ -133,7 +136,8 @@ function NodeLabel(props: LabelProps) {
     h("div.node-label", { onClick: props.onArrowClick }, [
       h("div.node-left", [
         props.link != null ? h(Arrow) : h("div.placeholder"),
-        h("h4", [props.fieldName])
+        h("h4", [fieldName]),
+        h.if(props.required)("div.required", "*")
       ]),
       h("div.node-right", [
         h.if(props.type != null && props.link == null)(`div.${classname}`, [
@@ -173,8 +177,8 @@ function createNewJSON(data, json, path) {
 }
 
 interface TreeProps extends LabelProps {
-  json: object;
-  parentPath: [];
+  json?: object;
+  parentPath?: [];
   defaultCollapsed?: boolean;
   onSelect?: () => void;
 }
@@ -225,9 +229,8 @@ function Tree({
     containerClassName += " tree-view_children-collapsed";
   }
   let newPath = [...parentPath, fieldName];
-  //h(ReactJson, { src: json, name: fieldName, collapsed: state.collapsed }),
 
-  return h("div", { className: `tree-view` }, [
+  return h("div", { className: "tree-view" }, [
     h("li", { className: "tree-view_item" }, [
       h(NodeLabel, {
         collapsed: state.collapsed,

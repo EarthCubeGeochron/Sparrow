@@ -1,5 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import React, { useContext } from "react";
+import { Divider } from "@blueprintjs/core";
 import { SchemaExplorerContext } from "./context";
 import { JsonTree, Tree, TreeLegend } from "./tree";
 //@ts-ignore
@@ -19,13 +20,14 @@ function SchemaTree() {
 
   return h("div.schema-tree", [
     h(Tree, { fieldName: state.model, link: state.route, ...defaultSchema }),
-    h("div.legend-json", [
-      h(TreeLegend),
+    h(Divider),
+    h("div.json-tree-container", [
       h(JsonTree, {
         fieldName: state.model,
         link: state.route,
         ...defaultSchema
-      })
+      }),
+      h(TreeLegend)
     ])
   ]);
 }

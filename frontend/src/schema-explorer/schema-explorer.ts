@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Button, Collapse, Tab, Tabs, TextArea } from "@blueprintjs/core";
 import { SchemaExplorerContext } from "./context";
-import { MinimalNavbar } from "~/components";
+import { capitalize, MinimalNavbar } from "~/components";
 import { Link } from "react-router-dom";
 import { SchemaTree } from "./schema-tree";
 //@ts-ignore
@@ -41,23 +41,23 @@ function SchemaNavBar() {
     }
   }, [state.model]);
 
-  return h("div", [
-    h(MinimalNavbar, [
+  let currentModel = capitalize(state.model);
+
+  return h(MinimalNavbar, { className: "schema-nav" }, [
+    h("div.button-nav-bar", [
       h("h2", "Schema Explorer"),
-      h("h4", `Current Model: ${state.model}`)
+      h.if(state.model != null)("h4", `Current Model: ${currentModel}`)
     ]),
-    h(MinimalNavbar, [
-      h("div", [
-        h("div.button-nav-bar", [
-          h("h4", "Choose a data model to view the schema"),
-          h(Button, {
-            minimal: true,
-            icon: "menu",
-            onClick: () => setOpen(!open)
-          })
-        ]),
-        h(Collapse, { isOpen: open }, [h(SchemaModelButtons)])
-      ])
+    h("div", [
+      h("div.button-nav-bar", [
+        h("h4", "Choose a data model to view the schema"),
+        h(Button, {
+          minimal: true,
+          icon: "menu",
+          onClick: () => setOpen(!open)
+        })
+      ]),
+      h(Collapse, { isOpen: open }, [h(SchemaModelButtons)])
     ])
   ]);
 }
@@ -106,10 +106,7 @@ function SchemaExplorer({ model }) {
     }
   }, [state.possibleModels, model]);
 
-  return h("div", [
-    h(SchemaNavBar),
-    h.if(state.model != null)("div.body", [h(SchemaTree)])
-  ]);
+  return h("div", [h(SchemaNavBar), h.if(state.model != null)(SchemaTree)]);
 }
 
 export { SchemaExplorer };

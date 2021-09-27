@@ -16,8 +16,8 @@ export function HelpButton(props) {
       modifiers: {
         preventOverflow: { enabled: false },
         flip: { enabled: true },
-        hide: { enabled: false },
-      },
+        hide: { enabled: false }
+      }
     },
     [h(Button, { minimal: true, intent: "danger" }, ["Help"])]
   );
@@ -26,12 +26,12 @@ export function HelpButton(props) {
 export function DndContainer(props) {
   const {
     children,
-    onDrop = (data) => console.log(data),
+    onDrop = data => console.log(data),
     id,
-    data_id = "child_id",
+    data_id = "child_id"
   } = props;
 
-  const drop = (e) => {
+  const drop = e => {
     e.preventDefault();
     const child = JSON.parse(e.dataTransfer.getData(data_id));
 
@@ -39,7 +39,7 @@ export function DndContainer(props) {
     onDrop(child, id);
   };
 
-  const dragOver = (e) => {
+  const dragOver = e => {
     e.preventDefault();
   };
 
@@ -49,14 +49,14 @@ export function DndContainer(props) {
 export function DndChild(props) {
   const { children, id, data, draggable = true, data_id = "child_id" } = props;
 
-  const dragStart = (e) => {
+  const dragStart = e => {
     const target = e.target;
     //console.log(data);
     const d = JSON.stringify(data);
     e.dataTransfer.setData(data_id, d);
   };
 
-  const dragOver = (e) => {
+  const dragOver = e => {
     e.stopPropagation();
   };
 
@@ -95,4 +95,9 @@ export function isTooDark(hexcolor) {
   var yiq = (r * 299 + g * 587 + b * 114) / 1000;
 
   return yiq < 90;
+}
+
+export function capitalize(word) {
+  if (!word) return null;
+  return word.charAt(0).toUpperCase() + word.slice(1);
 }

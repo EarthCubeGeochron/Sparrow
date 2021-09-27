@@ -6,7 +6,8 @@ import {
   Spinner,
   Tooltip,
   Icon,
-  Collapse
+  Collapse,
+  Divider
 } from "@blueprintjs/core";
 import { SchemaExplorerContext } from "../context";
 import { Link } from "react-router-dom";
@@ -45,5 +46,19 @@ export function JsonTree({
     newJson = { ...newJson, ...value.example };
   });
 
-  return h(ReactJson, { src: newJson, name: fieldName });
+  const onEdit = edit => {
+    return true;
+  };
+
+  return h("div", [
+    h("h3", ["Example JSON for ", fieldName]),
+    h("p", ["Edit the fields and copy to your clipboard!"]),
+    h(Divider),
+    h(ReactJson, {
+      src: newJson,
+      name: fieldName,
+      displayDataTypes: false,
+      onEdit
+    })
+  ]);
 }
