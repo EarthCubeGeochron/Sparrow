@@ -17,10 +17,11 @@ function SchemaModelButtons() {
   return h("div.button-container", [
     state.modelsToShow.map((key, i) => {
       return h("div.model-button", { key: i }, [
-        h(Link, { to: path + key }, [
+        h(Link, { to: path + key, style: { textDecoration: "none" } }, [
           h(
             Button,
             {
+              intent: state.model == key ? "primary" : "none",
               key: i
             },
             [key]
@@ -35,18 +36,9 @@ function SchemaNavBar() {
   const { state } = useContext(SchemaExplorerContext);
   const [open, setOpen] = useState(state.model == null);
 
-  useEffect(() => {
-    if (state.model != null) {
-      setOpen(false);
-    }
-  }, [state.model]);
-
-  let currentModel = capitalize(state.model);
-
   return h(MinimalNavbar, { className: "schema-nav" }, [
     h("div.button-nav-bar", [
-      h("h2", "Schema Explorer"),
-      h.if(state.model != null)("h4", `Current Model: ${currentModel}`)
+      h(Link, { to: "/admin/schema-explorer" }, [h("h2", "Schema Explorer")])
     ]),
     h("div", [
       h("div.button-nav-bar", [
