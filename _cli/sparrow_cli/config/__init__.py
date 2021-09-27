@@ -135,6 +135,6 @@ class SparrowConfig:
                 environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
                 environ.setdefault("SPARROW_LAB_NAME", lab_name)
             else:
-                lab_name = 'sparrow'
+                lab_name = "sparrow"
                 environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
                 environ.setdefault("SPARROW_LAB_NAME", lab_name)
