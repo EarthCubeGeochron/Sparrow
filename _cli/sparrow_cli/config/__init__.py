@@ -130,7 +130,11 @@ class SparrowConfig:
             if lab_name is not None:
                 lab_name = "_".join(lab_name.split()).lower() # format
                 environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
-            else:
+            elif config_dir is not None:
                 lab_name = config_dir.split("/")[-1].lower()
+                environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
+                environ.setdefault("SPARROW_LAB_NAME", lab_name)
+            else:
+                lab_name = 'sparrow'
                 environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
                 environ.setdefault("SPARROW_LAB_NAME", lab_name)
