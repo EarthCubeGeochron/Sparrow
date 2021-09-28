@@ -79,9 +79,6 @@ class SparrowConfig:
         environ.setdefault("SPARROW_BACKEND_IMAGE", "sparrow/backend" + tag)
         environ.setdefault("SPARROW_FRONTEND_IMAGE", "sparrow/frontend" + tag)
 
-        # will set COMPOSE_PROJECT_NAME if undefined
-        self.set_compose_lab_name()
-
         prepare_docker_environment()
         if "COMPOSE_FILE" in environ:
             log.info("COMPOSE_FILE provided; skipping overrides and profiles.")
@@ -118,23 +115,3 @@ class SparrowConfig:
         with (self.SPARROW_PATH / "backend" / "sparrow" / "meta.py").open() as f:
             exec(f.read(), version)
         return version["__version__"]
-
-    def set_compose_lab_name(self):
-        """method to cascade environ variables to get a lab instance name"""
-
-        compose_name = getenv("COMPOSE_PROJECT_NAME", None)
-        lab_name = getenv("SPARROW_LAB_NAME", None)
-        config_dir = getenv("SPARROW_CONFIG_DIR", None)
-
-        if compose_name is None:
-            if lab_name is not None:
-                lab_name = "_".join(lab_name.split()).lower()  # format
-                environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
-            elif config_dir is not None:
-                lab_name = config_dir.split("/")[-1].lower()
-                environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
-                environ.setdefault("SPARROW_LAB_NAME", lab_name)
-            else:
-                lab_name = 'sparrow'
-                environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
-                environ.setdefault("SPARROW_LAB_NAME", lab_name)

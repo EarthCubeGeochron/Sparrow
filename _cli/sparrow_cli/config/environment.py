@@ -2,6 +2,7 @@ import sys
 from docker import from_env
 from docker.errors import DockerException
 from os import environ, getenv
+from pathlib import Path
 from click import secho
 from rich import print
 from sparrow_utils import relative_path, get_logger
@@ -26,12 +27,24 @@ def check_docker_availability():
             "Cannot connect to the Docker daemon. Is Docker running?", details=str(exc)
         )
 
+def set_compose_lab_name():
+    """ sets defaults for COMPOSE_PROJECT_NAME, SPARROW_LAB_NAME """
+    default_lab_name = "sparrow"
+    # first get config_dir
+    config_dir = getenv("SPARROW_CONFIG_DIR", None)
+
+    if config_dir is not None:
+        default_lab_name = Path(config_dir).name
+
+    lab_name = environ.setdefault("SPARROW_LAB_NAME", default_lab_name)
+    environ.setdefault("COMPOSE_PROJECT_NAME", lab_name )
 
 def prepare_docker_environment():
     if environ.get("_SPARROW_ENV_PREPARED", "0") == "1":
         return
 
     check_docker_availability()
+    set_compose_lab_name()
 
     # Convey that we have already prepared the environment
     environ["_SPARROW_ENV_PREPARED"] = "1"
