@@ -27,8 +27,9 @@ def check_docker_availability():
             "Cannot connect to the Docker daemon. Is Docker running?", details=str(exc)
         )
 
+
 def set_compose_lab_name():
-    """ sets defaults for COMPOSE_PROJECT_NAME, SPARROW_LAB_NAME """
+    """sets defaults for COMPOSE_PROJECT_NAME, SPARROW_LAB_NAME"""
     default_lab_name = "sparrow"
     # first get config_dir
     config_dir = getenv("SPARROW_CONFIG_DIR", None)
@@ -37,7 +38,8 @@ def set_compose_lab_name():
         default_lab_name = Path(config_dir).name
 
     lab_name = environ.setdefault("SPARROW_LAB_NAME", default_lab_name)
-    environ.setdefault("COMPOSE_PROJECT_NAME", lab_name )
+    environ.setdefault("COMPOSE_PROJECT_NAME", lab_name)
+
 
 def prepare_docker_environment():
     if environ.get("_SPARROW_ENV_PREPARED", "0") == "1":
