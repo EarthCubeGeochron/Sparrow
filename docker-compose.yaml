@@ -150,6 +150,7 @@ services:
   #   depends_on:
   #     - backend
   database_backup:
+    image: ghcr.io/uw-macrostrat/pg-backup-service:main
     # This service backs up the database periodically
     # to a remote S3 bucket or a local directory on the server.
     restart: unless-stopped
@@ -158,22 +159,20 @@ services:
     profiles:
       - production
     environment:
-      - SPARROW_S3_ENDPOINT
-      - SPARROW_S3_BUCKET
-      - SPARROW_S3_KEY
-      - SPARROW_S3_SECRET
-      - SPARROW_BACKUP_BUCKET
+      - S3_ENDPOINT=${SPARROW_S3_ENDPOINT}
+      - S3_BACKUP_BUCKET=${SPARROW_S3_BUCKET}
+      - S3_ACCESS_KEY=${SPARROW_S3_KEY}
+      - S3_SECRET_KEY=${SPARROW_S3_SECRET}
+      - S3_BACKUP_BUCKET=${SPARROW_BACKUP_BUCKET}
       # If we don't specify all S3 parameters,
       # we fall back to using the local backup directory
-      - SPARROW_BACKUP_DIR
+      - DB_BACKUP_DIR=${SPARROW_BACKUP_DIR}
       # Mounted volume for local backups (mapped to Sparrow backup dir)
-      - SPARROW_BACKUP_VOLUME=/local-backups
+      - DB_BACKUP_VOLUME=/local-backups
       # The unique-ish identifier of the lab (used to prefix backups)
-      - SPARROW_LAB_ID
-    build: services/backup-database
+      - DB_BACKUP_PREFIX=${SPARROW_LAB_ID}
     tty: true
-    entrypoint: ""
-    command: /conf/backup-service
+    command: backup-service
     depends_on:
       - db
     volumes:
