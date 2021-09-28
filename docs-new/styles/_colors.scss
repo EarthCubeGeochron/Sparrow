@@ -1,0 +1,7 @@
+$accent: color.adjust(#a328b4, $lightness: -40%);
+$gradient-dest: rgb(52, 45, 79);
+$gradient-light: color.adjust($gradient-dest, $lightness: 75%);
+$gradient-dark: color.adjust($gradient-dest, $lightness: -5%);
+$dark-card-base: color.adjust(#32536b, $lightness: -10%);
+$card-base: color.adjust(#32536b, $lightness: 60%);
+$accent-light: color.adjust($accent, $lightness: 20%);

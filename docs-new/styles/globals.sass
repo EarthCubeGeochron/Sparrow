@@ -1,4 +1,5 @@
 @use "sass:color"
+@use "buttons"
   
 $secondary: #32536b //#304e68
 $bkg: #261e2d
@@ -74,11 +75,16 @@ h1, h2, h3, h4, h5, h6
   font-weight: 700
 
 .wrap
-  padding: 2em
-  max-width: 60em
-  margin: 0 auto
   min-height: 100vh
+  width: 100vw
   display: flex
   flex-direction: column
   padding-bottom: 0em
   //overflow hidden
+
+.main
+  padding: 2em 0
+
+.main, .nav-wrap, footer
+  width: 70em
+  margin: 0 auto

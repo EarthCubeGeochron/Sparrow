@@ -8,7 +8,7 @@ export const DarkModeButton = dynamic(() => {
   if (typeof window == "undefined") return Promise.resolve(null);
   return import("@macrostrat/ui-components/lib/cjs/dark-mode").then((mod) => {
     return () =>
-      h(mod.DarkModeProvider, null, h(mod.DarkModeButton, { large: true }));
+      h(mod.DarkModeProvider, null, h(mod.DarkModeButton, { large: false }));
   });
 });
 

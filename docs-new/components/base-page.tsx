@@ -9,7 +9,6 @@ import { unnestLinks } from "./nav";
 import { aboutLinks, userGuideLinks } from "./page-map";
 import { analyticsHeaderScripts } from "./analytics/server";
 import * as styles from "./page-layout.module.sass";
-import "@blueprintjs/core/lib/css/blueprint.css";
 
 const h = hyperStyled(styles);
 
@@ -61,7 +60,7 @@ const BasePage = function (props) {
       <title>Sparrow</title>
       <link rel="preconnect" href="https://fonts.gstatic.com" />
       <link
-        href="https://fonts.googleapis.com/css2?family=Merriweather&family=Montserrat&family=Source+Code+Pro:wght@400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Merriweather&family=Montserrat:wght@400;700&family=Source+Code+Pro:wght@400;700&display=swap"
         rel="stylesheet"
       />
       {analyticsHeaderScripts()}
@@ -96,18 +95,18 @@ const BasePage = function (props) {
             <Link href="/">
               <img
                 className="sparrow-logo"
-                src="/img/sparrow-bird-flat.svg"
-                width={140}
-                height={140}
+                src="https://sparrow-data.org/images/sparrow-logo.png"
               />
             </Link>
           </div>
-          <ActiveLink href="/">
-            <a className="page-title-link">
-              <h1 className="page-title">Sparrow</h1>
-            </a>
-          </ActiveLink>
-          <Nav links={navLinks} exactLinks={false} />
+          <div className="nav-main">
+            <ActiveLink href="/">
+              <a className="page-title-link">
+                <h1 className="page-title">Sparrow</h1>
+              </a>
+            </ActiveLink>
+            <Nav links={navLinks} exactLinks={false} />
+          </div>
         </div>,
       ]),
       h("div.main", [children]),

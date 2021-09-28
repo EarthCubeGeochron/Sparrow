@@ -18,7 +18,7 @@ const navLinks: Links = [
   { href: "/docs", label: "User guide" },
   h("li.spacer"),
   h("li", null, h(GetAppButton)),
-  h("li", null, h(DarkModeButton)),
+  h("li", null, h(DarkModeButton, { large: false })),
 ];
 
 const aboutLinks: Links = [
