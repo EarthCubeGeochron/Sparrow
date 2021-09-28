@@ -23,6 +23,7 @@
     "@emotion/styled": "^10.0.7",
     "@loadable/component": "^5.10.2",
     "@macrostrat/hyper": "^1.2.14",
+    "@macrostrat/router-components": "^1.0.2",
     "@macrostrat/ui-components": "^0.6.8",
     "@mapbox/mapbox-gl-draw": "^1.2.0",
     "@rjsf/core": "^3.1.0",

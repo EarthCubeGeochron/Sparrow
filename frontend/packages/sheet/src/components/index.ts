@@ -17,7 +17,7 @@ function Row({ row, children, className }) {
   ]);
 }
 
-function Columns() {
+function Columns_() {
   const columns = useColumnWidths();
   return h("colgroup", [
     h("col.index-column", { key: "index", style: { width: 50 } }),
@@ -29,6 +29,8 @@ function Columns() {
     }),
   ]);
 }
+
+const Columns = memo(Columns_);
 
 function ColumnResizeHandles() {
   const { dispatch } = useDataSheet();
@@ -111,4 +113,4 @@ function Sheet({ className, children }) {
 }
 
 export * from "./column-utils";
-export { Sheet, Row };
+export { Sheet, Row, Columns, Header };
