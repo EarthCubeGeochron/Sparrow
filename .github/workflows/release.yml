@@ -6,12 +6,10 @@ on:
     tags:
       - 'v*.*.*'
 jobs:
-  build:
+  build_test:
     # Note: for deployment, we move to an older version of Ubuntu
     # https://pyinstaller.readthedocs.io/en/stable/usage.html
-    runs-on: ubuntu-16.04
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url  }}
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -33,48 +31,14 @@ jobs:
       - name: Zip up command-line application
         # For zipping, change directory to the dist directory.
         run: tar -czv -f ./_cli/dist/sparrow.tar.gz -C _cli/dist/sparrow .
-      # We create the release only if tests pass
-      # (but we don't make sure that things work on Darwin!)
-      # Note: see https://github.com/overhangio/tutor/releases for a well-developed release schedule
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Sparrow ${{ github.ref }}
-          draft: false
-          prerelease: false
-          body: |
-            The latest release of Sparrow can be installed using the following command:
-            ```
-            bash -c "$(curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh)"
-            ```
 
-            - If you want to install this release specifically, you can add it to the above command,
-              like so: `bash -c $(...) - ${{ github.ref }}`.
-            - You can also download the installation
-              script manually and run it using `bash get-sparrow.sh` or `bash get-sparrow.sh $${{ github.ref }}`.
-            - For complete control over the installation process, you can manually run the download and installation steps
-              encapsulated by the [install script](https://github.com/EarthCubeGeochron/Sparrow/blob/HEAD/get-sparrow.sh).
-
-            See the [Getting started documentation](https://sparrow-data.org/docs/getting-started).
-            for more information on how to set up Sparrow.
-      - name: Upload Sparrow CLI for release
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./_cli/dist/sparrow.tar.gz
-          asset_name: sparrow-Linux-x86_64.tar.gz
-          asset_content_type: application/tar+gzip
-    # We could fix this using a build matrix
-    # https://docs.github.com/en/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+          name: sparrow-cli-linux
+          path: ./_cli/dist/sparrow.tar.gz
+          retention-days: 1
+
   build_darwin:
-    needs: build
     # Note: for deployment, we might need to move to an older version of Ubuntu
     # https://pyinstaller.readthedocs.io/en/stable/usage.html
     runs-on: macOS-latest
@@ -97,15 +61,59 @@ jobs:
       - name: Zip up command-line application
         run: tar -czv -f ./_cli/dist/sparrow.tar.gz -C _cli/dist/sparrow .
 
-      - name: Upload Sparrow CLI for release
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v2
         with:
-          upload_url: ${{ needs.build.outputs.upload_url }} 
-          asset_path: ./_cli/dist/sparrow.tar.gz
-          asset_name: sparrow-Darwin-x86_64.tar.gz
-          asset_content_type: application/tar+gzip
-    # We could fix this using a build matrix
-    # https://docs.github.com/en/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+          name: sparrow-cli-darwin
+          path: ./_cli/dist/sparrow.tar.gz
+          retention-days: 1
+
+  create_release:
+    needs: [build_test, build_cli_darwin]
+    # Note: for deployment, we might need to move to an older version of Ubuntu
+    # https://pyinstaller.readthedocs.io/en/stable/usage.html
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url  }}
+    steps:
+
+      - name: Get built Sparrow CLI (Linux) 
+        uses: actions/download-artifact@v2
+        with:
+          name: sparrow-cli-linux
+          path: sparrow-Linux-x86_64.tar.gz
+
+      - name: Get built Sparrow CLI (Darwin) 
+        uses: actions/download-artifact@v2
+        with:
+          name: sparrow-cli-linux
+          path: sparrow-Darwin-x86_64.tar.gz
+
+      # We create the release only if things work both on Linux and Darwin
+      # Note: see https://github.com/overhangio/tutor/releases for a well-developed release schedule
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref }}
+          name: Sparrow ${{ github.ref }}
+          draft: false
+          prerelease: false
+          body: |
+            The latest release of Sparrow can be installed using the following command:
+            ```
+            bash -c "$(curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh)"
+            ```
+
+            - If you want to install this release specifically, you can add it to the above command,
+              like so: `bash -c $(...) - ${{ github.ref }}`.
+            - You can also download the installation
+              script manually and run it using `bash get-sparrow.sh` or `bash get-sparrow.sh $${{ github.ref }}`.
+            - For complete control over the installation process, you can manually run the download and installation steps
+              encapsulated by the [install script](https://github.com/EarthCubeGeochron/Sparrow/blob/HEAD/get-sparrow.sh).
+
+            See the [Getting started documentation](https://sparrow-data.org/docs/getting-started).
+            for more information on how to set up Sparrow.
+          files: |
+            sparrow-Linux-x86_64.tar.gz
+            sparrow-Darwin-x86_64.tar.gz
