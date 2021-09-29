@@ -34,7 +34,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sparrow-cli-linux
+          name: sparrow-Linux-x86_64.tar.gz
           path: ./_cli/dist/sparrow.tar.gz
           retention-days: 1
 
@@ -44,7 +44,7 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -61,6 +61,8 @@ jobs:
           push: true
           tags: ${{ steps.backend_meta.outputs.tags }}
           labels: ${{ steps.backend_meta.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/earthcubegeochron/sparrow/frontend:latest
+          cache-to: type=inline
 
       - name: Extract metadata (tags, labels) for Docker
         id: frontend_meta
@@ -75,6 +77,8 @@ jobs:
           push: true
           tags: ${{ steps.frontend_meta.outputs.tags }}
           labels: ${{ steps.frontend_meta.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/earthcubegeochron/sparrow/frontend:latest
+          cache-to: type=inline
 
   build_cli_darwin:
     # Note: for deployment, we might need to move to an older version of Ubuntu
@@ -101,7 +105,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sparrow-cli-darwin
+          name: sparrow-Darwin-x86_64.tar.gz
           path: ./_cli/dist/sparrow.tar.gz
           retention-days: 1
 
@@ -117,14 +121,12 @@ jobs:
       - name: Get built Sparrow CLI (Linux) 
         uses: actions/download-artifact@v2
         with:
-          name: sparrow-cli-linux
-          path: sparrow-Linux-x86_64.tar.gz
+          name: sparrow-Linux-x86_64.tar.gz
 
       - name: Get built Sparrow CLI (Darwin) 
         uses: actions/download-artifact@v2
         with:
-          name: sparrow-cli-linux
-          path: sparrow-Darwin-x86_64.tar.gz
+          name: sparrow-Darwin-x86_64.tar.gz
 
       # We create the release only if things work both on Linux and Darwin
       # Note: see https://github.com/overhangio/tutor/releases for a well-developed release schedule
