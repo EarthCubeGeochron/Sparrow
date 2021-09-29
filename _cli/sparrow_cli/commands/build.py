@@ -8,7 +8,7 @@ from pathlib import Path
 from json import load
 
 from ..config import SparrowConfig
-from ..util import cmd
+from ..util import cmd, SparrowCommandError
 
 images_ = ["backend-base", "postgis-mysql-fdw", "backend", "frontend"]
 
@@ -35,6 +35,8 @@ def sparrow_build(ctx, images, push=False):
     """Build Sparrow Docker images"""
 
     cfg = ctx.find_object(SparrowConfig)
+
+    raise SparrowCommandError()
 
     # get version info
     versions = get_image_info()

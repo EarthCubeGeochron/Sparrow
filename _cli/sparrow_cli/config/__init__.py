@@ -9,6 +9,7 @@ from sparrow_utils.logs import get_logger, setup_stderr_logs
 from .environment import prepare_docker_environment, prepare_compose_overrides
 from .version_info import SparrowVersionMatch, test_version
 from .file_loader import load_config_file
+from ..util.exceptions import SparrowCommandError
 
 log = get_logger(__file__)
 
@@ -46,6 +47,8 @@ class SparrowConfig:
 
         if "SPARROW_PATH" in environ:
             self.path_provided = True
+            source_root = Path(environ["SPARROW_PATH"])
+
         else:
             # Check if this script is part of a source
             # installation. If so, set SPARROW_PATH to the matching
@@ -59,7 +62,16 @@ class SparrowConfig:
             environ["SPARROW_PATH"] = str(pth)
 
         # Provide environment variable in a more Pythonic way as well
-        self.SPARROW_PATH = Path(environ["SPARROW_PATH"])
+        source_root = Path(environ["SPARROW_PATH"])
+        self.SPARROW_PATH = source_root
+        _is_correct_source = (
+            source_root.is_dir() and (source_root / "sparrow-version.json").is_file()
+        )
+        if not _is_correct_source:
+            raise SparrowCommandError(
+                "The SPARROW_PATH environment variable does not appear to point to a Sparrow source directory.",
+                details=f"SPARROW_PATH={environ['SPARROW_PATH']}",
+            )
 
         self.version_info = test_version(self)
 
