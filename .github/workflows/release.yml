@@ -9,7 +9,7 @@ jobs:
   build:
     # Note: for deployment, we move to an older version of Ubuntu
     # https://pyinstaller.readthedocs.io/en/stable/usage.html
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url  }}
     steps:
