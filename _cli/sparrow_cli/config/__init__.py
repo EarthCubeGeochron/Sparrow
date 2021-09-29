@@ -129,3 +129,6 @@ class SparrowConfig:
         with (self.SPARROW_PATH / "backend" / "sparrow" / "meta.py").open() as f:
             exec(f.read(), version)
         return version["__version__"]
+
+    def is_source_install(self):
+        return not self.is_frozen or self.path_provided

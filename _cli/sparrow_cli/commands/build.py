@@ -36,7 +36,10 @@ def sparrow_build(ctx, images, push=False):
 
     cfg = ctx.find_object(SparrowConfig)
 
-    raise SparrowCommandError()
+    if push and not cfg.is_source_install():
+        raise SparrowCommandError(
+            "Sparrow packages cannot be pushed from the bundled version."
+        )
 
     # get version info
     versions = get_image_info()
