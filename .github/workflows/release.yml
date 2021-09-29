@@ -63,7 +63,7 @@ jobs:
           labels: ${{ steps.backend_meta.outputs.labels }}
 
       - name: Extract metadata (tags, labels) for Docker
-        id: backend_meta
+        id: frontend_meta
         uses: docker/metadata-action@v3
         with:
           images: ghcr.io/earthcubegeochron/sparrow/frontend
@@ -73,10 +73,10 @@ jobs:
         with:
           context: frontend
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.frontend_meta.outputs.tags }}
+          labels: ${{ steps.frontend_meta.outputs.labels }}
 
-  build_darwin:
+  build_cli_darwin:
     # Note: for deployment, we might need to move to an older version of Ubuntu
     # https://pyinstaller.readthedocs.io/en/stable/usage.html
     runs-on: macOS-latest
