@@ -62,6 +62,7 @@ def sparrow_build(ctx, images, push=False):
         cmd(
             "docker build",
             *tag_args,
+            "--build-arg DOCKER_BUILDKIT=1",
             "--build-arg BUILDKIT_INLINE_CACHE=1",
             im["context"],
         )
