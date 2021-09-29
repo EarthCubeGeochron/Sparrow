@@ -8,8 +8,8 @@
       "context": "./base-images/backend",
       "version": "2.0"
     },
-    "db-mysql-fdw": {
-      "context": "./base-images/db-mysql-fdw",
+    "postgis-mysql-fdw": {
+      "context": "./base-images/postgis-mysql-fdw",
       "version": "1.0"
     },
     "frontend": {

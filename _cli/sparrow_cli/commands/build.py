@@ -1,3 +1,4 @@
+from sparrow_cli.util.exceptions import SparrowCommandError
 import click
 from os import environ, chdir
 
@@ -9,8 +10,9 @@ from json import load
 from ..config import SparrowConfig
 from ..util import cmd
 
-images_ = ["backend-base", "db-mysql-fdw", "backend", "frontend"]
-ORG = "sparrowdata"
+images_ = ["backend-base", "postgis-mysql-fdw", "backend", "frontend"]
+
+prefix = "ghcr.io/earthcubegeochron/sparrow"
 
 
 def root():
@@ -38,6 +40,7 @@ def sparrow_build(ctx, images, push=False):
     versions = get_image_info()
 
     chdir(root())
+
     for image_name in images:
         im = versions[image_name]
         version = im.get("version")
@@ -46,11 +49,11 @@ def sparrow_build(ctx, images, push=False):
             # canonical Sparrow backend version. This might not be the
             # ideal thing to do but it seems to work OK...
             version = cfg.find_sparrow_version()
-        name = f"{ORG}/{image_name}:{version}"
+        name = f"{prefix}/{image_name}:{version}"
 
         tags = [name]
         if image_name in ["backend", "frontend"]:
-            tags.append(f"{ORG}/{image_name}:latest")
+            tags.append(f"{prefix}/{image_name}:latest")
         tag_args = (f"-t {tag}" for tag in tags)
 
         print(f"{image_name}: building image {name}")
