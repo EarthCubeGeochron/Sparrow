@@ -17,11 +17,15 @@ Sparrow's import infrastructure allows JSON with an
 appropriate schema structure to be imported into the database
 using the API.
 
-For instance, the _datum schema_ includes the value for one analytical parameter within one analysis (e.g. <sup>87</sup>Sr/<sup>86</sup>Sr), the name of that type of datum, and uncertainty around the measurement. Schema such as _session_ include multiple datum 
+For instance, the _datum schema_ includes the value for one analytical parameter within one analysis (e.g. <sup>87</sup>Sr/<sup>86</sup>Sr), the name of that type of datum, and uncertainty around the measurement. Schema such as _session_ include multiple datum
 
 ## Example schema from Sparrow
 
-The various options for import schema can be viewed through the _/api-explorer/v2_ route on your implimentation of Sparrow. These list the requirements for data to be incorporated using each nested level of the schema JSON. When building your importer using schema, be contientious about what fields allow for _null_ entries and be sure to exclude _null_ entries.
+The various options for import schema can be viewed through the
+_/api-explorer/v2_ route on your implementation of Sparrow. These list the
+requirements for data to be incorporated using each nested level of the schema
+JSON. When building your importer using schema, be conscientious about what
+fields allow for _null_ entries and be sure to exclude _null_ entries.
 
 ## Using schema for importing data
 
