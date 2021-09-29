@@ -1,4 +1,5 @@
 from json.decoder import JSONDecodeError
+from sparrow.import_helpers.util import SparrowImportError
 from click import command, secho, option
 from sparrow.plugins.base import SparrowPlugin
 from sparrow.import_helpers import BaseImporter
@@ -25,9 +26,6 @@ class PyChronImporter(BaseImporter):
                 extra_data=dict(remote_url=remote_url, pychron_id=uid),
             )
 
-        file_iter = (f for uid, f in pr.scan())
-        self.iterfiles(file_iter, **kwargs)
-
     def build_reference_path(self, fn, extra_data={}):
         uri = extra_data.get("remote_url")
         return uri
@@ -41,7 +39,7 @@ class PyChronImporter(BaseImporter):
         except JSONDecodeError as err:
             print("Could not read json")
             print(contents)
-            raise err
+            raise SparrowImportError(f"Invalid JSON")
         res = self._importer.import_file(json_data, filename=fn)
         model = self.db.load_data("session", res)
         yield model

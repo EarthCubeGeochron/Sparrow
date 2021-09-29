@@ -148,11 +148,19 @@ class BaseImporter(ImperativeImportHelperMixin):
     def _find_existing_data_file(self, file_path=None, file_hash=None):
         # Get data file record if it exists
         ## TODO: First, get file with same hash (i.e., exact same file contents), attempting to relink if non-existant
-        return (
-            self.db.session.query(self.m.data_file)
-            .filter_by(file_path=file_path)
-            .first()
-        )
+        if file_hash is not None:
+            df = (
+                self.db.session.query(self.m.data_file)
+                .filter_by(file_hash=file_hash)
+                .one_or_none()
+            )
+        if df is None and file_path is not None:
+            df = (
+                self.db.session.query(self.m.data_file)
+                .filter_by(file_path=file_path)
+                .first()
+            )
+        return df
 
     def build_reference_path(self, infile: Path, extra_data={}):
         """Build the path tracked by Sparrow for a given input file."""
@@ -160,7 +168,7 @@ class BaseImporter(ImperativeImportHelperMixin):
             infile = infile.relative_to(self.basedir)
         return str(infile)
 
-    def _create_data_file_record(self, fn, extra_data={}):
+    def _create_data_file_record(self, fn, extra_data):
 
         # Get the path location (this must be unique)
         _infile = Path(fn)
@@ -176,6 +184,9 @@ class BaseImporter(ImperativeImportHelperMixin):
         if should_add_record:
             rec = self.m.data_file(file_path=file_path, file_hash=hash)
 
+        # In case we have changed the file location
+        rec.file_path = file_path
+
         updated = rec.file_hash != hash
         if updated:
             rec.file_hash = hash
@@ -183,6 +194,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         rec.type_id = self.file_type
 
         self.db.session.add(rec)
+        self.db.session.commit()
 
         self.__set_file_info(_infile, rec)
         return rec, should_add_record
@@ -206,7 +218,7 @@ class BaseImporter(ImperativeImportHelperMixin):
         redo = kwargs.pop("redo", False)
         added = False
         if rec is None:
-            rec, added = self._create_data_file_record(fn, extra_data={})
+            rec, added = self._create_data_file_record(fn, extra_data)
 
         # Set file types if we need to. We could probably
         # do this more efficiently.

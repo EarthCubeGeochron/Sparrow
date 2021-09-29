@@ -35,7 +35,7 @@ class PyChronRepoCrawler:
 
     def scan(self):
         for name in self._names:
-            print("scanning repo. {}".format(name))
+            print(f"scanning repository {name}")
             yield from self.scan_repo(name)
 
     def scan_repo(self, name):
@@ -43,9 +43,18 @@ class PyChronRepoCrawler:
         # clone otherwise
         root = os.path.join(self._local_root, name)
         url = f"{self._remote}/{name}"
+
+        giturl = url + ".git"
+        user = os.environ.get("GITHUB_USER", None)
+        pat = os.environ.get("GITHUB_TOKEN", None)
+        if user is not None and pat is not None:
+            print(f"Logging in using github user {user} and personal access token")
+            giturl = giturl.replace("https://", f"https://{user}:{pat}@")
+
         if not os.path.isdir(root):
-            subprocess.run(["git", "clone", url, root])
+            subprocess.run(["git", "clone", giturl, root])
         else:
+            subprocess.run(["git", "remote", "set-url", "origin", giturl], cwd=root)
             subprocess.run(["git", "pull", "origin", "master"], cwd=root)
 
         # scan repo looking for ia files
