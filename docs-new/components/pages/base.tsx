@@ -6,7 +6,7 @@ import { navLinks } from "../page-map";
 import newGithubIssueUrl from "new-github-issue-url";
 import { useRouter } from "next/router";
 import { unnestLinks } from "../nav";
-import { aboutLinks, userGuideLinks } from "../page-map";
+import { aboutLinks, docsLinks } from "../page-map";
 import { analyticsHeaderScripts } from "../analytics/server";
 import * as styles from "./page-layout.module.sass";
 
@@ -14,7 +14,7 @@ const h = hyperStyled(styles);
 
 const GA_TRACKING_ID = process.env.GA_TRACKING_ID;
 
-const allLinks = unnestLinks([...aboutLinks, ...userGuideLinks]);
+const allLinks = unnestLinks([...aboutLinks, ...docsLinks]);
 
 function PageIssueLink() {
   const router = useRouter();

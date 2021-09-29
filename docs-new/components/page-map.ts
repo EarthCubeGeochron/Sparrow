@@ -37,7 +37,7 @@ const aboutLinks: Links = [
   // { href: '/about/features', label: "Features"}
 ];
 
-const userGuideLinks: Links = [
+const docsLinks: Links = [
   { href: "/docs", label: "Getting started" },
   {
     href: "/docs/core",
@@ -63,4 +63,4 @@ const userGuideLinks: Links = [
   { href: "/docs/local-development", label: "Local development" },
 ];
 
-export { navLinks, aboutLinks, userGuideLinks };
+export { navLinks, aboutLinks, docsLinks };
