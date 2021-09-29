@@ -19,7 +19,7 @@ def counterkey(x):
 
 
 class PyChronRepoCrawler:
-    def __init__(self, names, remote, local_root=None):
+    def __init__(self, remote, names, local_root=None):
         if local_root is None:
             local_root = os.path.join(os.path.expanduser("~"), "local_repo")
         self._local_root = local_root
@@ -58,6 +58,9 @@ class PyChronRepoCrawler:
                 uid = "{}{}".format(b, gi)
                 # sort group by the counter suffix
                 gs = sorted(gs, key=counterkey, reverse=True)
-                p = os.path.join(d, gs[0])
+                local_path = os.path.join(d, gs[0])
 
-                yield uid, p
+                tail = local_path.split(root)[1]
+                remote_url = f"{url}/blob/master{tail}"
+
+                yield uid, local_path, remote_url
