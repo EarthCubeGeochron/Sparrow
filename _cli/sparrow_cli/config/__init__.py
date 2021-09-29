@@ -76,8 +76,10 @@ class SparrowConfig:
             log.info("Running in offline mode by using any available image")
             tag = ""
 
-        environ.setdefault("SPARROW_BACKEND_IMAGE", "sparrow/backend" + tag)
-        environ.setdefault("SPARROW_FRONTEND_IMAGE", "sparrow/frontend" + tag)
+        image_prefix = "ghcr.io/earthcubegeochron/sparrow"
+
+        environ.setdefault("SPARROW_BACKEND_IMAGE", f"{image_prefix}/backend" + tag)
+        environ.setdefault("SPARROW_FRONTEND_IMAGE", f"{image_prefix}/frontend" + tag)
 
         prepare_docker_environment()
         if "COMPOSE_FILE" in environ:
