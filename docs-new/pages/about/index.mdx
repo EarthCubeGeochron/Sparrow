@@ -1,8 +1,4 @@
----
-id: motivation-and-design
-title: Motivation and design
-sidebar_label: Motivation and design
----
+import { AboutPage } from "components/pages";
 
 ![Chart](pathname:///images/simplified-chart.png)
 
@@ -21,7 +17,7 @@ However, it must also be interpreted by outside researchers, integrated into pub
 and archived in publication records and global databases. This process is time-consuming
 for labs, which would like to focus on their core competency of zapping rocks.
 
-Our hope is that a well architected, _lab-controlled_ data store with a standardized basic schema and
+Our hope is that a well architected, _lab-managed_ data store with a standardized basic schema and
 web-facing API will provide a flexible and extensible way to automate connections to the community.
 
 ## Modes of access
@@ -138,3 +134,5 @@ exposed to the outside world.
 The **Sparrow** API will map lab-specific vocabulary to community standards.
 
 <img src="/images/vocabulary-mapping.png" width="500" />
+
+export default AboutPage;

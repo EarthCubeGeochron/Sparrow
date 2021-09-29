@@ -1,12 +1,12 @@
 import React from "react";
 import classnames from "classnames";
-import styles from "./styles.module.scss";
+import * as styles from "./styles.module.scss";
 import Mdx from "../text/index-text.mdx";
-import BasePage from "../components/base-page";
+import { BasePage } from "components";
 
 const features = [
   {
-    title: <>Manage your geochemical data</>,
+    title: <>Manage geochemical data</>,
     description: (
       <>
         <b>Sparrow</b> allows labs to organize analytical data and track
@@ -81,10 +81,6 @@ function Home() {
                 A small and sophisticated data system for geochronology and
                 geochemistry labs.
               </h2>
-              <img
-                src="https://sparrow-data.org/images/sparrow-logo.png"
-                width="100%"
-              />
             </div>
             <div className="feature-container">
               {features.map((props, idx) => (

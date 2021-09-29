@@ -1,13 +1,13 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { Nav, ActiveLink } from "./nav";
+import { Nav, ActiveLink } from "../nav";
 import Link from "next/link";
 import Head from "next/head";
-import { navLinks } from "./page-map";
+import { navLinks } from "../page-map";
 import newGithubIssueUrl from "new-github-issue-url";
 import { useRouter } from "next/router";
-import { unnestLinks } from "./nav";
-import { aboutLinks, userGuideLinks } from "./page-map";
-import { analyticsHeaderScripts } from "./analytics/server";
+import { unnestLinks } from "../nav";
+import { aboutLinks, userGuideLinks } from "../page-map";
+import { analyticsHeaderScripts } from "../analytics/server";
 import * as styles from "./page-layout.module.sass";
 
 const h = hyperStyled(styles);

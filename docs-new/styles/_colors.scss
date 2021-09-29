@@ -1,3 +1,5 @@
+@use "sass:color";
+
 $accent: color.adjust(#a328b4, $lightness: -40%);
 $gradient-dest: rgb(52, 45, 79);
 $gradient-light: color.adjust($gradient-dest, $lightness: 75%);

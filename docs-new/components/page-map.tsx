@@ -16,8 +16,8 @@ export type Links = Link[];
 const navLinks: Links = [
   { href: "/about", label: "About" },
   { href: "/docs", label: "User guide" },
+  { href: "/get-started", label: "Get started!" },
   h("li.spacer"),
-  h("li", null, h(GetAppButton)),
   h("li", null, h(DarkModeButton, { large: false })),
 ];
 

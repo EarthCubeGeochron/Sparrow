@@ -4,6 +4,8 @@ title: Getting started
 sidebar_label: Getting started
 ---
 
+import { BasePage } from "~/components";
+
 Although Sparrow is a complex software application, it is packaged in
 a set of [**Docker** containers](https://www.docker.com/), enabling relatively seamless cross-platform
 installation, independent of the configuration of the base system.
@@ -15,7 +17,9 @@ systems. If you want to do this, please see the [**Sparrow on Windows**](/docs/s
 documentation.
 :::
 
-## Installing Docker
+## Install Docker
+
+Sparrow is a _containerized_ application.
 
 In its containerized form, Sparrow can be installed easily
 on any Unix environment. This containerized
@@ -31,7 +35,7 @@ make sure your user can run `docker` without root permissions (typically
 `sudo usermod -aG docker ${USER}`).
 Installation is also possible on Windows 10 using Windows Subsystem for Linux.
 
-# Downloading Sparrow
+# Download Sparrow
 
 :::tip New!
 Sparrow is now available via a [bundled download](/docs/getting-started#bundled-version).
@@ -217,3 +221,5 @@ Several `sparrow` subcommands allow inspection of the running
 
 - [Local development](/docs/local-development)
 - [Core extensions](/docs/core/extensions)
+
+export default BasePage;
