@@ -1,13 +1,11 @@
 import click
-from click import echo, secho, style
 from click_default_group import DefaultGroup
 from os import environ
-from rich import print
 import sys
 
 from ..config import SparrowConfig
 from .exceptions import SparrowCommandError
-from .formatting import format_description
+from .formatting import format_description, console
 from .shell import cmd, find_subcommand
 
 
@@ -17,13 +15,12 @@ class SparrowDefaultCommand(DefaultGroup):
             return self.main(*args, **kwargs)
         except SparrowCommandError as exc:
             prefix = "!!!"
-            print(f"[red][bold]{prefix}[/bold] " + str(exc), file=sys.stderr)
+            console.print(f"[red][bold]{prefix}[/bold] " + str(exc))
             details = getattr(exc, "details", "Exiting Sparrow due to an error")
             if details is not None:
-                print("[dim gray]" + details, file=sys.stderr)
-            print(
-                "[dim]Re-run this command using [cyan]sparrow --verbose[/cyan] to see more details.",
-                file=sys.stderr,
+                console.print("[dim gray]" + details)
+            console.print(
+                "[dim]Re-run this command using [cyan]sparrow --verbose[/cyan] to see more details."
             )
             # Maybe we should reraise only if debug is set?
             if environ.get("SPARROW_VERBOSE") is not None:

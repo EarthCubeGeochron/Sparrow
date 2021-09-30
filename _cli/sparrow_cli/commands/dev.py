@@ -6,8 +6,9 @@ from runpy import run_path
 from subprocess import run
 import json
 import re
+import sys
 from ..config import SparrowConfig
-from ..util import SparrowCommandError, CommandGroup, compose, cmd
+from ..util import SparrowCommandError, CommandGroup, compose, cmd, console
 
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {
@@ -44,10 +45,14 @@ def check_version_allowed(version, message="Trying to create a duplicate release
 @sparrow_dev.command(name="create-release")
 @argument("version")
 @option(
-    "--force", is_flag=True, help="Force release when git configuration is not clean"
+    "--force",
+    is_flag=True,
+    help="Force release when git configuration is not clean",
+    default=False,
 )
+@option("--push", is_flag=True, help="Push release tag when finished", default=False)
 @click.pass_context
-def create_release(ctx, version, force=False):
+def create_release(ctx, version, force=False, push=False):
     """Show information about this Sparrow installation"""
     cfg = ctx.find_object(SparrowConfig)
     if not cfg.is_source_install():
@@ -80,11 +85,11 @@ def create_release(ctx, version, force=False):
                 details=res.stderr,
             )
 
-    print(f"[green]Creating release for version [bold]{version}")
+    console.print(f"[green]Creating release for version [cyan bold]{version}")
     is_prerelease = match.group(4) is not None
     core_version = match.group(2)
     if is_prerelease:
-        print(f"This is a prerelease for version [bold]{core_version}")
+        console.print(f"This is a prerelease for version [cyan green]{core_version}")
         check_version_allowed(
             core_version, "Cannot create a prerelease for an existing version"
         )
@@ -112,11 +117,13 @@ def create_release(ctx, version, force=False):
     res = cmd("git tag -a", tag_name, "-m", commit_info)
     if res.returncode != 0:
         raise SparrowCommandError(
-            f"Could not create tag {tag_name}", details=res.stderr
+            f"Could not create tag [green bold]{tag_name}", details=res.stderr
         )
+    console.print("[green bold]Successfully created release")
 
-    print("\n[green bold]Pushing changes")
-    cmd("git push")
+    if push:
+        console.print("\n[green bold]Pushing changes")
+        cmd("git push")
 
 
 @sparrow_dev.command(name="clear-cache")
