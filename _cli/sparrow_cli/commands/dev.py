@@ -70,6 +70,26 @@ def create_release(ctx, version, force=False, push=False):
             details="Version must be in a format like 1.2.3[.[abc]4][(-.)5]",
         )
 
+    console.print(f"[green]Creating release for version [cyan bold]{version}")
+
+    is_prerelease = match.group(4) is not None
+    is_build = match.group(6) is not None
+    build = match.group(7)
+    core_version = match.group(3)
+    main_version = match.group(2)
+
+    if is_prerelease:
+        console.print(f"This is a prerelease for version [cyan bold]{core_version}")
+        check_version_allowed(
+            core_version, "Cannot create a prerelease for an existing version"
+        )
+    if is_build:
+        print(f"...build [cyan]{build}[/cyan]")
+
+    print()
+
+    tag_name = check_version_allowed(version)
+
     res = cmd("git status --short", capture_output=True)
     if bool(res.stdout.strip()) and not force:
         raise SparrowCommandError(
@@ -85,38 +105,16 @@ def create_release(ctx, version, force=False, push=False):
                 details=res.stderr,
             )
 
-    console.print(f"[green]Creating release for version [cyan bold]{version}")
-
-    is_prerelease = match.group(4) is not None
-    is_build = match.group(6) is not None
-    build = match.group(7)
-    core_version = match.group(3)
-    main_version = match.group(2)
-
-    if is_prerelease:
-        console.print(f"This is a prerelease for version [cyan bold]{core_version}")
-        check_version_allowed(
-            core_version, "Cannot create a prerelease for an existing version"
-        )
-    print()
-
-    tag_name = check_version_allowed(version)
-
-    print(
-        f"[green bold]Syncing version info ([cyan]{main_version}[/cyan]) to packages."
-    )
-    if is_build:
-        print(f"[dim]Build info ([cyan]{build}[/cyan]) will be omitted")
+    print(f"[green bold]Syncing version info to packages.")
 
     backend_meta = path.join("backend", "sparrow", "meta.py")
     with open(backend_meta, "w") as f:
-        f.write(f'__version__ = "{main_version}"')
-        f.write(f'__full_version__ = "{version}"')
+        f.write(f'__version__ = "{version}"\n')
+        # f.write(f'__full_version__ = "{version}"\n')
 
     version_file = "sparrow-version.json"
     info = json.load(open(version_file, "r"))
     info["core"] = main_version
-    info["core_build"] = version
     json.dump(info, open(version_file, "w"), indent=2)
 
     print("\n[green bold]Committing and tagging release")
