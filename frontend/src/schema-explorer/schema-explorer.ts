@@ -10,23 +10,43 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
+const buttonHierarchy = {
+  primary: ["project", "sample", "session", "analysis", "datum", "data_file"],
+  secondary: [
+    "sample_geo_entity",
+    "geo_entity",
+    "material",
+    "instrument",
+    "method",
+    "researcher",
+    "publication",
+    "tag"
+  ],
+  tertiary: ["attribute", "authority", "datum_type", "unit", "error_metric"]
+};
+
 function SchemaModelButtons() {
   const { state, runAction } = useContext(SchemaExplorerContext);
   let path = "/admin/schema-explorer/";
 
-  return h("div.button-container", [
-    state.modelsToShow.map((key, i) => {
-      return h("div.model-button", { key: i }, [
-        h(Link, { to: path + key, style: { textDecoration: "none" } }, [
-          h(
-            Button,
-            {
-              intent: state.model == key ? "primary" : "none",
-              key: i
-            },
-            [key]
-          )
-        ])
+  return h("div", [
+    Object.entries(buttonHierarchy).map(([hierarchy, buttons], i) => {
+      return h("div.button-container", { key: i }, [
+        buttons.map((key, i) => {
+          return h("div.model-button", { key: i }, [
+            h(Link, { to: path + key, style: { textDecoration: "none" } }, [
+              h(
+                Button,
+                {
+                  style: hierarchy == "primary" ? { fontWeight: "bold" } : {},
+                  intent: state.model == key ? "primary" : "none",
+                  key: i
+                },
+                [capitalize(key)]
+              )
+            ])
+          ]);
+        })
       ]);
     })
   ]);
@@ -54,12 +74,6 @@ function SchemaNavBar() {
   ]);
 }
 
-function SchemaExample() {
-  const { state } = useContext(SchemaExplorerContext);
-
-  return h("div", [h("h3", `Example JSON for ${state.model}`)]);
-}
-
 function SchemaTest() {
   const { state } = useContext(SchemaExplorerContext);
   const initText: string = `Paste your JSON object for ${state.model}`;
@@ -82,16 +96,11 @@ function SchemaTest() {
   ]);
 }
 
-function SchemaTabs() {
-  return h(Tabs, { id: "schema-tabs" }, [
-    h(Tab, { id: "example", panel: h(SchemaExample), title: "Example JSON" }),
-    h(Tab, { id: "test", panel: h(SchemaTest), title: "Test JSON Validatity" })
-  ]);
-}
-
 function SchemaExplorer({ model }) {
   const { state, runAction } = useContext(SchemaExplorerContext);
-  console.log(state, model);
+
+  console.log(state);
+
   useEffect(() => {
     if (state.possibleModels) {
       runAction({ type: "switch-model", payload: { model } });

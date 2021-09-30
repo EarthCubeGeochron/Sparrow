@@ -32,16 +32,16 @@ def construct_schema_fields_object(schema):
             fields_object[name] = {
                 "type": type_,
                 **nested_model_link(field),
-                **get_field_description(type_, name),
+                **get_field_description(type_, name,schema),
                 **construct_field_info(field),
-                **construct_example_json(type_,name, field)
+                **construct_example_json(type_,name, field, schema)
             }
         else:
             fields_object[name] = {
                 "type": type_,
-                **get_field_description(type_, name),
+                **get_field_description(type_, name, schema),
                 **construct_field_info(field),
-                **construct_example_json(type_,name, field)
+                **construct_example_json(type_,name,field, schema)
             }
 
     return fields_object
@@ -52,18 +52,21 @@ def nested_model_link(field):
     route = ""
     if "vocabulary" in model_name or "tags" in model_name:
         schema, model = model_name.split("_", 1)
-        route = f"/api/v2/{schema}/{model}"
+        route = f"/{schema}/{model}"
+    elif model_name.lower() == "datumtype":
+        # looks like datumtype is the only one with this issue?
+        route = "/models/datum_type"
     else:
-        route = f"/api/v2/models/{model_name}"
+        route = f"/models/{model_name}"
     return {"link": route.lower()}
 
-def construct_example_json(type_, name, field):
+def construct_example_json(type_, name, field, schema):
     field_dict = {}
     if getattr(field, 'dump_only'):
         return {}
     if type_.lower() in ["uuid"]:
         return {}
-    field_dict[name] = get_field_json_values(type_)
+    field_dict[name] = get_field_json_values(type_, name, schema)
 
     return {"example": field_dict}
 

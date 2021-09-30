@@ -41,7 +41,7 @@ function OpenSearch() {
   const url = "search/query";
 
   const data = useAPIv2Result(url, { query: query, model: "all" });
-  console.log("open search data", data);
+
   useEffect(() => {
     if (data) {
       setScrollData([]);

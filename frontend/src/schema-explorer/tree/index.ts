@@ -1,13 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIv2Result } from "~/api-v2";
-import {
-  Card,
-  Button,
-  Spinner,
-  Tooltip,
-  Icon,
-  Collapse
-} from "@blueprintjs/core";
+import { Button, Switch, Icon, Collapse } from "@blueprintjs/core";
 import { SchemaExplorerContext } from "../context";
 import { Link } from "react-router-dom";
 import React, { useContext, useEffect, useState } from "react";
@@ -29,7 +22,10 @@ interface LabelProps {
   type?: string;
   link?: string;
   example?: object;
+  parentData?: any;
+  json_?: object;
   onArrowClick?: () => void;
+  onChange?: (obj, arr) => void;
 }
 
 function typeClassName(props) {
@@ -56,6 +52,10 @@ function typeClassName(props) {
 }
 
 function Description(props: LabelProps) {
+  const { parentData, fieldName } = props;
+  const [checked, setChecked] = useState(false);
+  let baseExample = parentData[fieldName].example[fieldName];
+  let newJSON = checked ? baseExample : props.json_;
   return h("div.description", [
     h("div.des-items", props.description),
     h.if(props.read_only)("div.des-items", [
@@ -68,11 +68,22 @@ function Description(props: LabelProps) {
     ]),
     h("div.des-items", [
       h(ReactJson, {
-        name: "Example",
+        name: false,
         displayDataTypes: false,
         displayObjectSize: false,
         src: props.example
-      })
+      }),
+      h.if(props.link != null)(
+        Switch,
+        {
+          checked,
+          onChange: () => {
+            props.onChange(newJSON, props.fieldName);
+            setChecked(!checked);
+          }
+        },
+        ["Show in Schema"]
+      )
     ])
   ]);
 }
@@ -80,7 +91,7 @@ function Description(props: LabelProps) {
 /// TODO: Make more like blueprintjs. Specific icons per datatype
 // specific icons for required, nullable, read_only etc. Easy for legend
 function NodeLabel(props: LabelProps) {
-  const { state, runAction } = useContext(SchemaExplorerContext);
+  const { state } = useContext(SchemaExplorerContext);
   const [open, setOpen] = useState(false);
 
   if (props.read_only) return null;
@@ -97,7 +108,7 @@ function NodeLabel(props: LabelProps) {
     type += "*";
   }
 
-  const searchModel = () => {
+  const modelLink = () => {
     let model: string;
     Object.entries(state.possibleModels).map(([key, value], i) => {
       if (props.link.search(value) > -1) {
@@ -107,23 +118,22 @@ function NodeLabel(props: LabelProps) {
     return model;
   };
 
-  let iconName = props.collapsed ? "caret-right" : "caret-down";
-
   const Arrow = () => {
     return h(Icon, {
-      icon: iconName
+      icon: props.collapsed ? "caret-right" : "caret-down"
     });
   };
 
   const LinkButton = () => {
     return h.if(props.type != null)(
       Link,
-      { to: `/admin/schema-explorer/${searchModel()}` },
+      {
+        to: `/admin/schema-explorer/${modelLink()}`
+      },
       [
         h(
-          Button,
+          "div",
           {
-            minimal: true,
             className: classname
           },
           [type]
@@ -157,30 +167,20 @@ function NodeLabel(props: LabelProps) {
   ]);
 }
 
-function createNewJSON(data, json, path) {
-  let treeJSON = { ...json };
-  if (path.length <= 1) {
-    Object.entries(data).map(([key, value], i) => {
-      treeJSON = { ...treeJSON, ...value.example };
-    });
-  } else {
-    let path_ = [...path];
-    path_.splice(0, 1);
-    console.log(path_);
-    let json_ = {};
-    Object.entries(data).map(([key, value], i) => {
-      json_ = { ...json_, ...value.example };
-    });
-    treeJSON[path_[0]] = json_;
-  }
-  return treeJSON;
+function createJSON(data) {
+  if (data == null) return null;
+  let json = {};
+  Object.entries(data).map(([key, value], i) => {
+    json = { ...json, ...value.example };
+  });
+  return json;
 }
 
 interface TreeProps extends LabelProps {
-  json?: object;
-  parentPath?: [];
   defaultCollapsed?: boolean;
   onSelect?: () => void;
+  isRoot?: boolean;
+  json?: object;
 }
 
 interface TreeState {
@@ -192,13 +192,24 @@ function Tree({
   onSelect = () => {},
   fieldName = "",
   link = null,
-  json = {},
-  parentPath = [],
+  parentData = null,
+  isRoot = true,
+  onChange,
   ...rest
 }: TreeProps) {
   const [state, setState] = React.useState<TreeState>({
     collapsed: defaultCollapsed
   });
+
+  const [json_, setJSON] = useState({});
+  const [changing, setChanging] = useState(false);
+
+  const onChildChange = (newJson, fieldName_) => {
+    let j_ = { ...json_ };
+    j_[fieldName_] = newJson;
+    setJSON(j_);
+    setChanging(!changing);
+  };
 
   const data = useAPIv2Result(
     link,
@@ -211,11 +222,19 @@ function Tree({
       }
     }
   );
+
   useEffect(() => {
     if (defaultCollapsed == null && data != null) {
       setState({ collapsed: false });
     }
   }, [fieldName, data]);
+
+  useEffect(() => {
+    if (data != null) {
+      setJSON(createJSON(data));
+      setChanging(!changing);
+    }
+  }, [data, state.collapsed]);
 
   const handleClick = () => {
     onSelect();
@@ -228,32 +247,40 @@ function Tree({
   if (state.collapsed) {
     containerClassName += " tree-view_children-collapsed";
   }
-  let newPath = [...parentPath, fieldName];
+
+  useEffect(() => {
+    if (data != null && isRoot) {
+      onChange(json_, fieldName);
+    }
+  }, [data, state.collapsed, changing]);
 
   return h("div", { className: "tree-view" }, [
     h("li", { className: "tree-view_item" }, [
       h(NodeLabel, {
+        json_,
         collapsed: state.collapsed,
         fieldName: fieldName,
         link,
-        ...rest,
-        onArrowClick: handleClick
+        onArrowClick: handleClick,
+        onChange,
+        parentData,
+        ...rest
       })
     ]),
-    h(`div.${containerClassName}`, [
-      state.collapsed || data == null
+    h.if(!state.collapsed)(`div.${containerClassName}`, [
+      data == null
         ? null
         : Object.entries(data).map(([key, value], i) => {
             let link_: string;
             if (value["link"]) {
               link_ = value["link"];
             }
-            let newJson = createNewJSON(data, json, newPath);
             return h(Tree, {
               key: i,
-              json: newJson,
               fieldName: key,
-              parentPath: newPath,
+              isRoot: false,
+              parentData: data,
+              onChange: onChildChange,
               link: link_,
               defaultCollapsed: true,
               ...value

@@ -1,17 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIv2Result } from "~/api-v2";
-import {
-  Card,
-  Button,
-  Spinner,
-  Tooltip,
-  Icon,
-  Collapse,
-  Divider
-} from "@blueprintjs/core";
-import { SchemaExplorerContext } from "../context";
-import { Link } from "react-router-dom";
-import React, { useContext, useEffect, useState } from "react";
+import { Divider } from "@blueprintjs/core";
 //@ts-ignore
 import styles from "./module.styl";
 import ReactJson from "react-json-view";
@@ -25,7 +14,6 @@ export function JsonTree({
   fieldName = "",
   link = null,
   json = {},
-  parentPath = [],
   ...rest
 }: TreeProps) {
   const data = useAPIv2Result(
@@ -55,7 +43,7 @@ export function JsonTree({
     h("p", ["Edit the fields and copy to your clipboard!"]),
     h(Divider),
     h(ReactJson, {
-      src: newJson,
+      src: json,
       name: fieldName,
       displayDataTypes: false,
       onEdit

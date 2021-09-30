@@ -4,7 +4,7 @@ import { useAPIActions } from "@macrostrat/ui-components";
 function buildLink(props: { route: string }) {
   const { route } = props;
 
-  return "/api/v2" + route;
+  return route;
 }
 
 function unwrapResponse(res) {
@@ -41,7 +41,7 @@ function unwrapModels(res) {
 }
 
 async function getPossibleModels(get) {
-  const url: string = "/api/v2";
+  const url: string = "/";
   const data = await get(url);
 
   return unwrapModels(data);
@@ -61,7 +61,5 @@ function dynamicDictIndexer(dict: object, list: []) {
   let newDict = dict[listCopy[0]];
   delete listCopy[0];
 }
-
-//obj[list[1]][list[2]] = fields;
 
 export { fetchFields, getPossibleModels };
