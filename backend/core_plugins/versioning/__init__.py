@@ -7,7 +7,7 @@ import click
 from sparrow.database.util import run_sql
 
 exclude_tables = ["spatial_ref_sys"]
-audit_schemas = ["public", "vocabulary"]
+audit_schemas = ["public", "vocabulary", "tags"]
 
 # Tables in the pg_memento schema
 memento_tables = [
