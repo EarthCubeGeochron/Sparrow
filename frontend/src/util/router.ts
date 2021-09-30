@@ -31,7 +31,9 @@ export function useModelURL(tail) {
 /**
  * returns true if on admin page
  */
-export function useModelURLBool() {
+export function useEditingAllowed() {
+  /** Returns whether we allow editing based on whether we are part of the
+   * admin section */
   const { pathname } = useLocation();
   const onAdmin = pathname.startsWith("/admin");
   return onAdmin;

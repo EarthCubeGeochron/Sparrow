@@ -42,8 +42,29 @@ def sparrow_up(ctx, container="", force_recreate=False):
         container,
     )
     if res.returncode != 0:
-        print("[red]One or more containers did not build successfully, aborting.[/red]")
+        print("[red bold]One or more containers did not build successfully, aborting.")
         sys.exit(res.returncode)
+    else:
+        print("[green bold]All containers built successfully.")
+    print()
+
+    print("[green bold]Starting the Sparrow application!")
+
+    # Check if containers are running
+    res = compose("ps --services --filter status=running", capture_output=True)
+    running_containers = res.stdout.decode("utf-8").strip()
+    if running_containers != "" and not force_recreate:
+        print("[dim]Some containers are already running and up to date: ")
+        print("  " + ", ".join(running_containers.split("\n")))
+        print(
+            "[dim]To fully restart Sparrow, run [cyan]sparrow restart[/cyan] or [cyan]sparrow up --force-recreate[/cyan]."
+        )
+    print()
+
+    print("[green bold]Following container logs")
+    print("[dim]- Press Ctrl+c to exit (Sparrow will keep running).")
+    print("[dim]- Sparrow can be stopped with the [cyan]sparrow down[/cyan] command.")
+    print()
 
     # Make sure popen call gets logged...
     _log_cmd = ["sparrow", "logs", container]
@@ -52,12 +73,18 @@ def sparrow_up(ctx, container="", force_recreate=False):
     # Wait a tick to make sure the logs are started
     sleep(0.05)
 
-    print("[green]Following container logs[/green]")
     compose("start", container)
+
     # Try to reload nginx server if the container is running
-    compose("exec gateway nginx -s reload")
+    if "gateway" in running_containers:
+        compose("exec gateway nginx -s reload")
+
     # While we're spinning up, repopulate command help in case it's changed
     log.info("Caching backend help info")
     get_backend_help_info(cache=True)
+
+    if "backend" not in running_containers:
+        sleep(5)
+        cmd("sparrow", "db", "check-schema")
 
     p.wait()

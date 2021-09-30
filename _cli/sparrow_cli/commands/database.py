@@ -1,4 +1,5 @@
 import click
+import sys
 from ..util import (
     CommandGroup,
     container_id,
@@ -7,6 +8,11 @@ from ..util import (
     exec_sparrow,
 )
 from sparrow_utils.shell import cmd
+from subprocess import PIPE
+from rich import print
+from rich.console import Console
+
+console = Console()
 
 
 def dump_database(dbname, out_file):
@@ -63,6 +69,26 @@ def migration(args):
 def update(args):
     """Update the database schema"""
     exec_sparrow("db-update", *args)
+
+
+@sparrow_db.command(name="check-schema")
+def check_database():
+    """Check that the database schema is up to date"""
+
+    print("[bold green]Checking database schema...")
+    res = exec_sparrow("db-migration", tty=False, capture_output=True)
+    migration_sql = res.stdout.decode("utf-8").strip("\n ")
+
+    if migration_sql == "" or migration_sql is None:
+        print("[green bold]The database schema is up to date!")
+        sys.exit(0)
+    else:
+        print("[red bold]The Sparrow database does not match its target schema.")
+        print(
+            "[dim]You may need to run migrations with [cyan]sparrow db update[/cyan]."
+        )
+        print("[dim]" + migration_sql)
+        sys.exit(1)
 
 
 for k, v in shell_commands.items():

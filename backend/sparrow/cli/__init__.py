@@ -177,7 +177,7 @@ def plugins(app):
 @click.option("--safe", is_flag=True, default=True)
 @click.option("--apply", is_flag=True, default=False)
 @click.option("--hide-view-changes", is_flag=True, default=False)
-def _db_migration(db, safe=True, apply=False, hide_view_changes=False):
+def _db_migration(db, safe=True, apply=False, hide_view_changes=False, quiet=False):
     """Command to generate a basic migration."""
     db_migration(db, safe=safe, apply=apply, hide_view_changes=hide_view_changes)
 
