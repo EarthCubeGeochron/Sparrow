@@ -168,12 +168,17 @@ class BaseImporter(ImperativeImportHelperMixin):
             infile = infile.relative_to(self.basedir)
         return str(infile)
 
+    def set_source_url(self, infile: Path, extra_data={}):
+        """
+        Set the source_url field for a given data file.
+        """
+        return None
+
     def _create_data_file_record(self, fn, extra_data):
 
         # Get the path location (this must be unique)
         _infile = Path(fn)
         file_path = self.build_reference_path(_infile, extra_data)
-        self.log(f"Computed reference path {file_path}")
 
         # Get file hash
         hash = md5hash(str(fn))
@@ -184,8 +189,9 @@ class BaseImporter(ImperativeImportHelperMixin):
         if should_add_record:
             rec = self.m.data_file(file_path=file_path, file_hash=hash)
 
-        # In case we have changed the file location
+        # In case we have changed the file location parameters
         rec.file_path = file_path
+        rec.source_url = self.set_source_url(_infile, extra_data)
 
         updated = rec.file_hash != hash
         if updated:

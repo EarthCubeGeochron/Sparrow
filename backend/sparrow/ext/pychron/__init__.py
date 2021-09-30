@@ -17,7 +17,7 @@ class PyChronImporter(BaseImporter):
     file_type = "PyChron Interpreted Age"
 
     def import_all(self, remote, repo_names, **kwargs):
-        local_root = path.join(environ["SPARROW_CACHE_DIR"], ".pychron-repo-cache")
+        local_root = path.join(environ["SPARROW_DATA_DIR"], ".pychron-repo-cache")
         pr = PyChronRepoCrawler(remote, repo_names, local_root=local_root)
         for (uid, local_path, remote_url) in pr.scan():
             self._import_datafile(
@@ -26,7 +26,7 @@ class PyChronImporter(BaseImporter):
                 extra_data=dict(remote_url=remote_url, pychron_id=uid),
             )
 
-    def build_reference_path(self, fn, extra_data={}):
+    def set_source_url(self, fn, extra_data={}):
         uri = extra_data.get("remote_url")
         return uri
 
