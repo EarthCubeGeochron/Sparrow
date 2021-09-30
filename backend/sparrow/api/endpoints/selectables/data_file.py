@@ -36,8 +36,9 @@ class DataFileListEndpoint(HTTPEndpoint):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.schema = get_database().interface.data_file
-        self.model = get_database().model.data_file
+        db = get_database()
+        self.schema = db.interface.data_file
+        self.model = db.model.data_file
 
         self._filters = []
         self.register_filter(AuthorityFilter)
