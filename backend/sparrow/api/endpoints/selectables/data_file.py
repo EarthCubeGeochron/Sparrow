@@ -6,6 +6,7 @@ from sqlakeyset import get_page
 from starlette.responses import JSONResponse
 from webargs.fields import Str, Int, Boolean, DelimitedList
 from sparrow.context import get_database
+from sparrow.open_search.filter import OpenSearchFilter
 from ...exceptions import SparrowAPIError, ValidationError, ApplicationError
 from ...response import APIResponse
 from ...filters import (
@@ -41,6 +42,7 @@ class DataFileListEndpoint(HTTPEndpoint):
         self.model = db.model.data_file
 
         self._filters = []
+        self.register_filter(OpenSearchFilter)
         self.register_filter(AuthorityFilter)
         self.register_filter(FieldExistsFilter)
         self.register_filter(FieldNotExistsFilter)

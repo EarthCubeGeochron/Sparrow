@@ -398,12 +398,12 @@ class TextSearchFilter(BaseFilter):
     Use the meta joiner to filter by all linked text fields
     """
 
-    key = "search"
+    key = "like"
 
     @property
     def params(self):
         d = "A string to match text field of the data model"
-        e = ["?search=basalt"]
+        e = ["?like=basalt"]
         des = create_params(d, e)
         return {self.key: Str(description=des)}
 
