@@ -52,10 +52,10 @@ def sparrow_up(ctx, container="", force_recreate=False):
 
     # Check if containers are running
     res = compose("ps --services --filter status=running", capture_output=True)
-    containers = res.stdout.decode("utf-8").strip()
-    if containers != "" and not force_recreate:
+    running_containers = res.stdout.decode("utf-8").strip()
+    if running_containers != "" and not force_recreate:
         print("[dim]Some containers are already running and up to date: ")
-        print("  " + ", ".join(containers.split("\n")))
+        print("  " + ", ".join(running_containers.split("\n")))
         print(
             "[dim]To fully restart Sparrow, run [cyan]sparrow restart[/cyan] or [cyan]sparrow up --force-recreate[/cyan]."
         )
@@ -74,10 +74,17 @@ def sparrow_up(ctx, container="", force_recreate=False):
     sleep(0.05)
 
     compose("start", container)
+
     # Try to reload nginx server if the container is running
-    compose("exec gateway nginx -s reload")
+    if "gateway" in running_containers:
+        compose("exec gateway nginx -s reload")
+
     # While we're spinning up, repopulate command help in case it's changed
     log.info("Caching backend help info")
     get_backend_help_info(cache=True)
+
+    if "backend" not in running_containers:
+        sleep(5)
+        cmd("sparrow", "db", "check-schema")
 
     p.wait()
