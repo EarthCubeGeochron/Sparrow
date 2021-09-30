@@ -42,25 +42,26 @@ def sparrow_up(ctx, container="", force_recreate=False):
         container,
     )
     if res.returncode != 0:
-        print("[red]One or more containers did not build successfully, aborting.[/red]")
+        print("[red bold]One or more containers did not build successfully, aborting.")
         sys.exit(res.returncode)
     else:
-        print("[green]All containers built successfully.[/green]")
+        print("[green bold]All containers built successfully.")
     print()
 
-    print("[green]Starting the sparrow application![/green]")
+    print("[green bold]Starting the Sparrow application!")
 
     # Check if containers are running
     res = compose("ps --services --filter status=running", capture_output=True)
     containers = res.stdout.decode("utf-8").strip()
     if containers != "" and not force_recreate:
+        print("[dim]Some containers are already running and up to date: ")
+        print("  " + ", ".join(containers.split("\n")))
         print(
-            "[dim]Some containers are already running. To fully restart sparrow, run "
-            "[cyan]sparrow restart[/cyan] or [cyan]sparrow up --force-recreate[/cyan]."
+            "[dim]To fully restart Sparrow, run [cyan]sparrow restart[/cyan] or [cyan]sparrow up --force-recreate[/cyan]."
         )
     print()
 
-    print("[green]Following container logs[/green]")
+    print("[green bold]Following container logs")
     print("[dim]- Press Ctrl+c to exit (Sparrow will keep running).")
     print("[dim]- Sparrow can be stopped with the [cyan]sparrow down[/cyan] command.")
     print()
