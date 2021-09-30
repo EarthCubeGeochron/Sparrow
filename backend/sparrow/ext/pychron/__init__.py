@@ -43,18 +43,3 @@ class PyChronImporter(BaseImporter):
         res = self._importer.import_file(json_data, filename=fn)
         model = self.db.load_data("session", res)
         yield model
-
-
-@command(name="import-pychron")
-@option("--redo", is_flag=True, default=False)
-def pychron_import_command(redo=False):
-    """Import PyChron Interpreted Age files."""
-    importer = PyChronImporter(verbose=True)
-    importer.import_all(redo=redo)
-
-
-class PyChronImportPlugin(SparrowPlugin):
-    name = "pychron-importer"
-
-    def on_setup_cli(self, cli):
-        cli.add_command(pychron_import_command)
