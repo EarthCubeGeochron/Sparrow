@@ -25,3 +25,11 @@ SELECT pgmemento.create_schema_audit(
   -- Tables to ignore
   null
 );
+
+SELECT pgmemento.create_schema_audit(
+  'tags',
+  -- Log existing data as imported
+  FALSE,
+  -- Tables to ignore
+  null
+);
