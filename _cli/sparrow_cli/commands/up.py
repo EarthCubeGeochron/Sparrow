@@ -44,6 +44,26 @@ def sparrow_up(ctx, container="", force_recreate=False):
     if res.returncode != 0:
         print("[red]One or more containers did not build successfully, aborting.[/red]")
         sys.exit(res.returncode)
+    else:
+        print("[green]All containers built successfully.[/green]")
+    print()
+
+    print("[green]Starting the sparrow application![/green]")
+
+    # Check if containers are running
+    res = compose("ps --services --filter status=running", capture_output=True)
+    containers = res.stdout.decode("utf-8").strip()
+    if containers != "" and not force_recreate:
+        print(
+            "[dim]Some containers are already running. To fully restart sparrow, run "
+            "[cyan]sparrow restart[/cyan] or [cyan]sparrow up --force-recreate[/cyan]."
+        )
+    print()
+
+    print("[green]Following container logs[/green]")
+    print("[dim]- Press Ctrl+c to exit (Sparrow will keep running).")
+    print("[dim]- Sparrow can be stopped with the [cyan]sparrow down[/cyan] command.")
+    print()
 
     # Make sure popen call gets logged...
     _log_cmd = ["sparrow", "logs", container]
@@ -52,7 +72,6 @@ def sparrow_up(ctx, container="", force_recreate=False):
     # Wait a tick to make sure the logs are started
     sleep(0.05)
 
-    print("[green]Following container logs[/green]")
     compose("start", container)
     # Try to reload nginx server if the container is running
     compose("exec gateway nginx -s reload")
