@@ -63,7 +63,7 @@ def create_release(ctx, version, force=False, push=False):
     # We should bail here if we are running a bundled Sparrow...
     chdir(root_dir)
 
-    match = re.match(r"^((\d+\.\d+\.\d+)(\.([a-z]*\d+))?([-\.](\d+))?)$", version)
+    match = re.match(r"^(((\d+\.\d+\.\d+)(\.([a-z]*\d+)))?([-\.](\d+))?)$", version)
     if match is None:
         raise SparrowCommandError(
             "Invalid version string",
@@ -86,10 +86,14 @@ def create_release(ctx, version, force=False, push=False):
             )
 
     console.print(f"[green]Creating release for version [cyan bold]{version}")
+
     is_prerelease = match.group(4) is not None
-    core_version = match.group(2)
+    is_build = match.group(6) is not None
+    core_version = match.group(3)
+    main_version = match.group(2)
+
     if is_prerelease:
-        console.print(f"This is a prerelease for version [cyan green]{core_version}")
+        console.print(f"This is a prerelease for version [cyan bold]{core_version}")
         check_version_allowed(
             core_version, "Cannot create a prerelease for an existing version"
         )
@@ -97,10 +101,16 @@ def create_release(ctx, version, force=False, push=False):
 
     tag_name = check_version_allowed(version)
 
-    print("Syncing version info to repository files.")
+    print(
+        f"[green bold]Syncing version info ([cyan]{main_version}[/cyan]) to packages."
+    )
+    if is_build:
+        print(f"[dim]Build info ([cyan]{match.group(7)}[/cyan]) will be omitted")
+
     backend_meta = path.join("backend", "sparrow", "meta.py")
     with open(backend_meta, "w") as f:
-        f.write(f'__version__ = "{version}"\n')
+        f.write(f'__version__ = "{main_version}"')
+        f.write(f'__full_version__ = "{version}"')
 
     version_file = "sparrow-version.json"
     info = json.load(open(version_file, "r"))
