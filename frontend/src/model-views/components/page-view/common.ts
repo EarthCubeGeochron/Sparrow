@@ -1,8 +1,11 @@
 import { Tooltip, Card, Button } from "@blueprintjs/core";
-import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
 import { format, getYear } from "date-fns";
-import { useModelURL } from "~/util";
+import { useModelURL, useEditingAllowed } from "~/util";
+import { ModelEditableText } from "~/model-views";
 import { hyperStyled } from "@macrostrat/hyper";
+import { useModelEditor } from "@macrostrat/ui-components";
+import { LinkButton } from "@macrostrat/ui-components/src/ext/router-links";
+
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -12,7 +15,7 @@ export const AddCard = (props) => {
   const { onClick, model } = props;
   return h(
     Tooltip,
-    { content: `Select from exisitng ${model}s` },
+    { content: `Select from existing ${model}s` },
     h(Button, { onClick, icon: "small-plus", minimal: true })
   );
 };
@@ -26,16 +29,15 @@ export const NewModelButton = (props) => {
     window.location.href = to;
   };
 
-  const string = model.charAt(0).toUpperCase() + model.slice(1);
-
   return h(
-    Button,
+    LinkButton,
     {
+      icon: "plus",
       minimal: true,
       intent: "success",
-      onClick: handleClick,
+      to,
     },
-    [`New ${string}`]
+    `New ${model}`
   );
 };
 
@@ -117,3 +119,32 @@ export const FormattedLngLat = (props) => {
 
   return h("div.page-view-date", [`${lngString}, ${latString}`]);
 };
+
+export function ModelTitleBar(props): React.ReactNode {
+  const {
+    editingContent = null,
+    rightContent = null,
+    titleField = "name",
+    subtitle,
+  } = props;
+  const isEditable = useEditingAllowed();
+
+  // Set up the subtitle
+  let subtitleElement = null;
+  if (subtitle != null) {
+    subtitleElement = h("h2.page-type", ["(", subtitle, ")"]);
+  }
+
+  return h("div.model-title-bar", [
+    h(ModelEditableText, {
+      is: "h2",
+      field: titleField,
+      multiline: false,
+      placeholder: "Unnamed",
+    }),
+    subtitleElement,
+    h("div.spacer"),
+    h.if(isEditable)("div.page-type", null, editingContent),
+    rightContent,
+  ]);
+}
