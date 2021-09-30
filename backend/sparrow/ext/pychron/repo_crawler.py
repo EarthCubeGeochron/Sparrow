@@ -19,7 +19,7 @@ def counterkey(x):
 
 
 class PyChronRepoCrawler:
-    def __init__(self, names, remote, local_root=None):
+    def __init__(self, remote, names, local_root=None):
         if local_root is None:
             local_root = os.path.join(os.path.expanduser("~"), "local_repo")
         self._local_root = local_root
@@ -35,7 +35,7 @@ class PyChronRepoCrawler:
 
     def scan(self):
         for name in self._names:
-            print("scanning repo. {}".format(name))
+            print(f"scanning repository {name}")
             yield from self.scan_repo(name)
 
     def scan_repo(self, name):
@@ -43,9 +43,18 @@ class PyChronRepoCrawler:
         # clone otherwise
         root = os.path.join(self._local_root, name)
         url = f"{self._remote}/{name}"
+
+        giturl = url + ".git"
+        user = os.environ.get("GITHUB_USER", None)
+        pat = os.environ.get("GITHUB_TOKEN", None)
+        if user is not None and pat is not None:
+            print(f"Logging in using github user {user} and personal access token")
+            giturl = giturl.replace("https://", f"https://{user}:{pat}@")
+
         if not os.path.isdir(root):
-            subprocess.run(["git", "clone", url, root])
+            subprocess.run(["git", "clone", giturl, root])
         else:
+            subprocess.run(["git", "remote", "set-url", "origin", giturl], cwd=root)
             subprocess.run(["git", "pull", "origin", "master"], cwd=root)
 
         # scan repo looking for ia files
@@ -58,6 +67,9 @@ class PyChronRepoCrawler:
                 uid = "{}{}".format(b, gi)
                 # sort group by the counter suffix
                 gs = sorted(gs, key=counterkey, reverse=True)
-                p = os.path.join(d, gs[0])
+                local_path = os.path.join(d, gs[0])
 
-                yield uid, p
+                tail = local_path.split(root)[1]
+                remote_url = f"{url}/blob/master{tail}"
+
+                yield uid, local_path, remote_url

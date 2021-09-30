@@ -114,8 +114,6 @@ jobs:
     # Note: for deployment, we might need to move to an older version of Ubuntu
     # https://pyinstaller.readthedocs.io/en/stable/usage.html
     runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url  }}
     steps:
 
       - name: Get built Sparrow CLI (Linux) 

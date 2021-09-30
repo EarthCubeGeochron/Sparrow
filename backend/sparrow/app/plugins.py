@@ -4,7 +4,6 @@ from ..legacy.api_v1 import APIv1Plugin
 from ..plugins import SparrowPluginManager
 from ..interface import InterfacePlugin
 from ..auth import AuthPlugin
-from ..ext.pychron import PyChronImportPlugin
 from ..datasheet import DatasheetPlugin
 from ..project_edits import ProjectEdits
 from ..ext import HeartbeatPlugin
@@ -31,7 +30,6 @@ def prepare_plugin_manager(app):
         WebPlugin,
         HeartbeatPlugin,
         InterfacePlugin,
-        PyChronImportPlugin,
         DatasheetPlugin,
         # ProjectEdits,
         DataValidationPlugin,

@@ -10,6 +10,7 @@ from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
 from .imperative_helpers import ImperativeImportHelperMixin
 from rich import print
+import sparrow
 from sparrow_utils import get_logger
 
 _log = get_logger(__name__)
@@ -24,7 +25,9 @@ class BaseImporter(ImperativeImportHelperMixin):
     authority = None
     file_type = None
 
-    def __init__(self, app, **kwargs):
+    def __init__(self, app=None, **kwargs):
+        if app is None:
+            app = sparrow.get_app()
         self.app = app
         self.db = self.app.database
 
@@ -145,19 +148,37 @@ class BaseImporter(ImperativeImportHelperMixin):
     def _find_existing_data_file(self, file_path=None, file_hash=None):
         # Get data file record if it exists
         ## TODO: First, get file with same hash (i.e., exact same file contents), attempting to relink if non-existant
-        return (
-            self.db.session.query(self.m.data_file)
-            .filter_by(file_path=file_path)
-            .first()
-        )
+        if file_hash is not None:
+            df = (
+                self.db.session.query(self.m.data_file)
+                .filter_by(file_hash=file_hash)
+                .one_or_none()
+            )
+        if df is None and file_path is not None:
+            df = (
+                self.db.session.query(self.m.data_file)
+                .filter_by(file_path=file_path)
+                .first()
+            )
+        return df
 
-    def _create_data_file_record(self, fn):
+    def build_reference_path(self, infile: Path, extra_data={}):
+        """Build the path tracked by Sparrow for a given input file."""
+        if self.basedir is not None:
+            infile = infile.relative_to(self.basedir)
+        return str(infile)
+
+    def set_source_url(self, infile: Path, extra_data={}):
+        """
+        Set the source_url field for a given data file.
+        """
+        return None
+
+    def _create_data_file_record(self, fn, extra_data):
 
         # Get the path location (this must be unique)
         _infile = Path(fn)
-        if self.basedir is not None:
-            infile = _infile.relative_to(self.basedir)
-        file_path = str(infile)
+        file_path = self.build_reference_path(_infile, extra_data)
 
         # Get file hash
         hash = md5hash(str(fn))
@@ -168,6 +189,10 @@ class BaseImporter(ImperativeImportHelperMixin):
         if should_add_record:
             rec = self.m.data_file(file_path=file_path, file_hash=hash)
 
+        # In case we have changed the file location parameters
+        rec.file_path = file_path
+        rec.source_url = self.set_source_url(_infile, extra_data)
+
         updated = rec.file_hash != hash
         if updated:
             rec.file_hash = hash
@@ -175,11 +200,18 @@ class BaseImporter(ImperativeImportHelperMixin):
         rec.type_id = self.file_type
 
         self.db.session.add(rec)
+        self.db.session.commit()
 
         self.__set_file_info(_infile, rec)
         return rec, should_add_record
 
-    def __import_datafile(self, fn, rec=None, **kwargs):
+    def _import_datafile(self, fn, rec=None, extra_data={}, **kwargs):
+        """
+        Import a data file into the database.
+        """
+        return self.__import_datafile(fn, rec, extra_data, **kwargs)
+
+    def __import_datafile(self, fn, rec=None, extra_data={}, **kwargs):
         """
         A wrapper for data file import that tracks data files through
         the import process and builds links to data file types.
@@ -187,10 +219,12 @@ class BaseImporter(ImperativeImportHelperMixin):
         :param fix_errors  Fix errors that have previously been ignored
         """
         secho(str(fn), dim=True)
+        if len(extra_data) != 0:
+            self.log(f"Extra data: {extra_data}")
         redo = kwargs.pop("redo", False)
         added = False
         if rec is None:
-            rec, added = self._create_data_file_record(fn)
+            rec, added = self._create_data_file_record(fn, extra_data)
 
         # Set file types if we need to. We could probably
         # do this more efficiently.

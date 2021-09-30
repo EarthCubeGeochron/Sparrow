@@ -126,10 +126,21 @@ class APIv2(Starlette):
     def add_schema_route(self):
         # We will want to layer this back in eventually
         # self._schemas = APISpecSchemaGenerator(self.spec)
-        self.add_route("/schema", schema, methods=["GET"], include_in_schema=False)
+        self.add_route(
+            "/schema",
+            schema,
+            methods=["GET"],
+            include_in_schema=False,
+            help="OpenAPI definitions for this API",
+        )
 
     def add_meta_route(self):
-        self.add_route("/meta", JSONResponse(meta_info()), methods=["GET"])
+        self.add_route(
+            "/meta",
+            JSONResponse(meta_info()),
+            methods=["GET"],
+            help="Information about this API",
+        )
 
     def _add_routes(self):
 
@@ -154,10 +165,19 @@ class APIv2(Starlette):
 
         self.add_schema_route()
         self.add_meta_route()
-        self.add_route("/data_file/list", DataFileListEndpoint)
-        self.add_route("/data_file/filter", DataFileFilterByModelID)
         self.add_route(
-            "/models/sample/sub-sample/{id}", SubSamples, methods=["GET", "PUT"]
+            "/data_file/list", DataFileListEndpoint, help="Get a list of data files"
+        )
+        self.add_route(
+            "/data_file/filter",
+            DataFileFilterByModelID,
+            help="Filter data files by associated models",
+        )
+        self.add_route(
+            "/models/sample/sub-sample/{id}",
+            SubSamples,
+            methods=["GET", "PUT"],
+            help="Get sub-samples for a given sample",
         )
         self.add_route("/map-samples", MapSamples)
 
