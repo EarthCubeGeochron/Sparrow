@@ -80,7 +80,7 @@ class VersioningPlugin(SparrowCorePlugin):
         fn = id + ".sql"
         return
 
-    def on_core_tables_initialized(self, db):
+    def on_finalize_database_schema(self, db):
 
         procedures = []
 
