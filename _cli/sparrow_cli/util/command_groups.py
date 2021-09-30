@@ -2,6 +2,7 @@ import click
 from click import echo, secho, style
 from click_default_group import DefaultGroup
 from os import environ
+from rich import print
 import sys
 
 from ..config import SparrowConfig
@@ -15,17 +16,14 @@ class SparrowDefaultCommand(DefaultGroup):
         try:
             return self.main(*args, **kwargs)
         except SparrowCommandError as exc:
-            prefix = str(type(exc).__name__) + "\n"
-            echo(
-                style(prefix, bold=True, fg="red") + style(str(exc), fg="red"), err=True
-            )
+            prefix = "!!!"
+            print(f"[red][bold]{prefix}[/bold] " + str(exc), file=sys.stderr)
             details = getattr(exc, "details", "Exiting Sparrow due to an error")
             if details is not None:
-                secho(details, dim=True)
-            secho(
-                "To see more details, re-run this command using "
-                + style("sparrow --verbose", fg="cyan", dim=True),
-                dim=True,
+                print("[dim gray]" + details, file=sys.stderr)
+            print(
+                "[dim]Re-run this command using [cyan]sparrow --verbose[/cyan] to see more details.",
+                file=sys.stderr,
             )
             # Maybe we should reraise only if debug is set?
             if environ.get("SPARROW_VERBOSE") is not None:
