@@ -229,6 +229,8 @@ class Database:
 
         migrator = SparrowDatabaseMigrator(self)
         migrator.add_module(migrations)
+        self.app.run_hook("prepare-database-migrations", migrator)
+        # TODO: deprecate this hook
         self.app.run_hook("prepare-database-upgrade", migrator)
         migrator.run_migration(**kwargs)
 
