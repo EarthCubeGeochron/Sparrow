@@ -72,11 +72,15 @@ def update(args):
 
 
 @sparrow_db.command(name="check-schema")
-def check_database():
+@click.option("--quiet", is_flag=True, default=False, help="Suppress output")
+def check_database(quiet: bool = False):
     """Check that the database schema is up to date"""
 
-    print("[bold green]Checking database schema...")
-    res = exec_sparrow("db-migration", tty=False, capture_output=True)
+    if not quiet:
+        console.status("[bold green]Checking database schema...")
+    res = exec_sparrow(
+        "db-migration --hide-view-changes", tty=False, capture_output=True
+    )
     migration_sql = res.stdout.decode("utf-8").strip("\n ")
 
     if migration_sql == "" or migration_sql is None:
