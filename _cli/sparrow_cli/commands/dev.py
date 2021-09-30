@@ -89,6 +89,7 @@ def create_release(ctx, version, force=False, push=False):
 
     is_prerelease = match.group(4) is not None
     is_build = match.group(6) is not None
+    build = match.group(7)
     core_version = match.group(3)
     main_version = match.group(2)
 
@@ -105,7 +106,7 @@ def create_release(ctx, version, force=False, push=False):
         f"[green bold]Syncing version info ([cyan]{main_version}[/cyan]) to packages."
     )
     if is_build:
-        print(f"[dim]Build info ([cyan]{match.group(7)}[/cyan]) will be omitted")
+        print(f"[dim]Build info ([cyan]{build}[/cyan]) will be omitted")
 
     backend_meta = path.join("backend", "sparrow", "meta.py")
     with open(backend_meta, "w") as f:
@@ -114,9 +115,9 @@ def create_release(ctx, version, force=False, push=False):
 
     version_file = "sparrow-version.json"
     info = json.load(open(version_file, "r"))
-    if info["core"] != version:
-        info["core"] = version
-        json.dump(info, open(version_file, "w"), indent=2)
+    info["core"] = main_version
+    info["core_build"] = version
+    json.dump(info, open(version_file, "w"), indent=2)
 
     print("\n[green bold]Committing and tagging release")
 
