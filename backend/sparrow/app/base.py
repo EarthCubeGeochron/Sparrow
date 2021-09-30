@@ -43,9 +43,9 @@ class Sparrow(Starlette):
 
         super().__init__(*args, **kwargs)
 
-    def bootstrap(self, init=False):
+    def bootstrap(self, init=False, force_db_setup=False):
         if init:
-            self.init_database()
+            self.init_database(force=force_db_setup)
         self.setup_database()
         log.info("Booting up application server")
         self.setup_server()
