@@ -555,6 +555,7 @@ CREATE TABLE IF NOT EXISTS data_file (
   file_mtime timestamp,
   basename text,
   file_path text UNIQUE,
+  source_url text,
   type_id text REFERENCES data_file_type(id)
 );
 
