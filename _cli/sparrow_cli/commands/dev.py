@@ -169,6 +169,7 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
         console.print("\n[green bold]Running tests")
         res = exec_sparrow("test")
         if res.returncode != 0:
+            cmd("git checkout --", *files)
             raise SparrowCommandError(
                 "Tests failed. Rerun with [cyan]--no-test[/cyan] to skip this step."
             )
@@ -181,7 +182,7 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
         console.print("\n[green bold]Dry run complete. Potential commit message:")
         console.print(commit_info, style="dim")
         if not force:
-            cmd("git restore", *files)
+            cmd("git checkout --", *files)
         return
 
     cmd("git add", *files)
