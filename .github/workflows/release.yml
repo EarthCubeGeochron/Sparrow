@@ -57,6 +57,7 @@ jobs:
         with:
           images: ghcr.io/earthcubegeochron/sparrow/backend
           tags: |
+            type=match,pattern=v(.*),group=1
             type=pep440,pattern={{version}}
 
       - name: Build and push backend
@@ -75,6 +76,7 @@ jobs:
         with:
           images: ghcr.io/earthcubegeochron/sparrow/frontend
           tags: |
+            type=match,pattern=v(.*),group=1
             type=pep440,pattern={{version}}
 
       - name: Build and push frontend

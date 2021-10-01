@@ -89,7 +89,7 @@ def _check_version_not_exists(version):
         raise SparrowCommandError(f"Version {version} already exists.")
 
 
-def check_release_validity(version, clean_version=True):
+def check_release_validity(version, clean_version=False):
     try:
         spec = Version(version)
     except InvalidVersion:
