@@ -10,6 +10,7 @@ from .environment import prepare_docker_environment, prepare_compose_overrides
 from .version_info import SparrowVersionMatch, test_version
 from .file_loader import load_config_file
 from ..util.exceptions import SparrowCommandError
+from packaging.version import Version
 
 log = get_logger(__file__)
 
@@ -79,6 +80,7 @@ class SparrowConfig:
         self._setup_command_path()
 
         # Set version information needed in compose file
+        # Packages use canonicalized version string, no matter how it is represented in tags
         version = self.find_sparrow_version()
         # Pin the images used in the compose file to the current version, unless
         # otherwise specified.
