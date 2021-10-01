@@ -189,7 +189,7 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
         file_object.write(commit_info.encode("utf-8"))
         res = cmd("git commit -t", file_object.name)
         if res.returncode != 0:
-            cmd("git checkout HEAD --", *files)
+            cmd("git checkout --", *files)
             raise SparrowCommandError("Commit not completed successfully")
 
     console.print("\nTagging release", style="green bold")
