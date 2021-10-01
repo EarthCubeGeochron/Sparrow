@@ -140,6 +140,7 @@ def _check_consistency(version=None, exact=False):
     if version is None:
         version = latest_tag
 
+    print(version)
     version = clean_tag(version)
 
     # If we've provided a tag to check, then we clean it
@@ -149,10 +150,14 @@ def _check_consistency(version=None, exact=False):
 
     spec = Version(version)
 
+    print(version)
+
     key_ = "Version tag"
     if _exact_tag_match:
         key_ += " (exact)"
-    console.print(f"{key_:28} {tag_name}")
+    console.print(f"{key_:28} v{version}")
+
+    assert not version.startswith("v")
 
     assert check_version_exists(version)
 
@@ -216,6 +221,9 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
     root_dir = cfg.SPARROW_PATH
     # We should bail here if we are running a bundled Sparrow...
     chdir(root_dir)
+
+    if version.startswith("v"):
+        version = version[1:]
 
     console.print(f"\nCreating release {version}", style="green bold")
 
