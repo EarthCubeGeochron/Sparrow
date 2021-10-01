@@ -22,6 +22,9 @@ from ..util import (
     exec_sparrow,
 )
 
+console = Console(highlight=False)
+
+
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {
     "graph": "Graph the git commit history of the Sparrow repository",
@@ -44,14 +47,10 @@ def dev_reload():
     compose("exec frontend /app/node_modules/.bin/browser-sync reload")
 
 
-def check_version_allowed(version, message="Trying to create a duplicate release."):
+def check_version_exists(version):
     tag_name = "v" + version
     res = cmd("git tag -l", tag_name, capture_output=True)
-    if bool(res.stdout.strip()):
-        raise SparrowCommandError(
-            message, details=f"Tag [cyan]{tag_name}[/cyan] already exists"
-        )
-    return tag_name
+    return bool(res.stdout.strip())
 
 
 def write_version_info(version):
@@ -64,6 +63,52 @@ def write_version_info(version):
     info["core"] = version
     json.dump(info, open(version_file, "w"), indent=2)
     return (backend_meta, version_file)
+
+
+def remove_postrelease(version):
+    spec = Version(version)
+    while spec.is_postrelease:
+        version = version[:-1]
+        try:
+            spec = Version(version)
+        except InvalidVersion:
+            pass
+    return version
+
+
+def check_release_validity(version):
+    try:
+        spec = Version(version)
+        assert not check_version_exists(version)
+    except InvalidVersion:
+        raise SparrowCommandError(f"Version specifier {version} is invalid.")
+
+    except AssertionError:
+        raise SparrowCommandError(f"Version {version} already exists.")
+
+    pre_base = spec.base_version
+    post_base = remove_postrelease(version)
+
+    if spec.is_prerelease:
+        pre = spec.pre
+        console.print(
+            f"- Prerelease [cyan bold]{pre[0]}{pre[1]}[/cyan bold] for version {pre_base}"
+        )
+    if spec.is_postrelease:
+        console.print(
+            f"- Postrelease [cyan bold]{spec.post}[/cyan bold] for version {post_base}"
+        )
+
+    if spec.is_prerelease and check_version_exists(pre_base):
+        raise SparrowCommandError(
+            f"Cannot create a prerelease for existing version {pre_base}."
+        )
+
+    if spec.is_postrelease and not check_version_exists(post_base):
+        raise SparrowCommandError(
+            f"Cannot create a postrelease for non-existant version {post_base}."
+        )
+    console.print()
 
 
 @sparrow_dev.command(name="create-release")
@@ -85,39 +130,19 @@ def write_version_info(version):
 @click.pass_context
 def create_release(ctx, version, force=False, dry_run=False, test=True, push=True):
     """Show information about this Sparrow installation"""
-    console = Console(highlight=False)
 
     cfg = ctx.find_object(SparrowConfig)
     if not cfg.is_source_install():
         raise SparrowCommandError(
-            "Sparrow versions cannot be created from the bundled version."
+            "Sparrow versions cannot be created from the bundled application."
         )
     root_dir = cfg.SPARROW_PATH
     # We should bail here if we are running a bundled Sparrow...
     chdir(root_dir)
 
-    try:
-        spec = Version(version)
-    except InvalidVersion:
-        raise SparrowCommandError(f"Version specifier {version} is invalid.")
+    console.print(f"\nCreating release {version}", style="green bold")
 
-    console.print(f"[green]Creating release for version [cyan bold]{version}")
-
-    if spec.is_prerelease:
-        console.print(
-            f"This is a prerelease for version [cyan bold]{spec.base_version}"
-        )
-        check_version_allowed(
-            spec.base_version, "Cannot create a prerelease for an existing version"
-        )
-    if spec.is_devrelease:
-        console.print(f"...dev release [cyan]{spec.dev}[/cyan]")
-    if spec.is_postrelease:
-        console.print(f"...post release [cyan]{spec.post}[/cyan]")
-
-    console.print()
-
-    tag_name = check_version_allowed(version)
+    check_release_validity(version)
 
     res = cmd("git status --short", capture_output=True)
     if bool(res.stdout.strip()) and not force:
@@ -128,7 +153,8 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Tru
         )
 
     if not force:
-        res = cmd("git pull --all")
+        # Ensure that we have the latest changes
+        res = cmd("git pull --all --ff-only")
         if res.returncode != 0:
             raise SparrowCommandError(
                 "Could not pull from remote repositories. Rerun with [cyan]--force[/cyan] to skip this step.",
@@ -156,13 +182,15 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Tru
 
     cmd("git add", *files)
     with NamedTemporaryFile() as file_object:
-        file_object.write(commit_info)
+        file_object.write(commit_info.encode("utf-8"))
         res = cmd("git commit -t", file_object.name)
         if res.returncode != 0:
-            cmd("git restore", *files)
+            cmd("git restore --staged", *files)
+            raise SparrowCommandError("Commit not completed successfully")
 
     console.print("\nTagging release", style="green bold")
 
+    tag_name = "v" + version
     res = cmd("git tag -a", tag_name, f"-m '{commit_info}'")
     if res.returncode != 0:
         raise SparrowCommandError(
