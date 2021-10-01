@@ -167,7 +167,7 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
 
     if test:
         console.print("\n[green bold]Running tests")
-        res = exec_sparrow("test")
+        res = cmd("sparrow test")
         if res.returncode != 0:
             cmd("git checkout --", *files)
             raise SparrowCommandError(
