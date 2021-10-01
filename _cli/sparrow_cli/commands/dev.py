@@ -125,10 +125,10 @@ def check_release_validity(version):
     "--push/--no-push",
     is_flag=True,
     help="Push release tag when finished",
-    default=True,
+    default=False,
 )
 @click.pass_context
-def create_release(ctx, version, force=False, dry_run=False, test=True, push=True):
+def create_release(ctx, version, force=False, dry_run=False, test=True, push=False):
     """Show information about this Sparrow installation"""
 
     cfg = ctx.find_object(SparrowConfig)
@@ -167,7 +167,11 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Tru
 
     if test:
         console.print("\n[green bold]Running tests")
-        exec_sparrow("test")
+        res = exec_sparrow("test")
+        if res.returncode != 0:
+            raise SparrowCommandError(
+                "Tests failed. Rerun with [cyan]--no-test[/cyan] to skip this step."
+            )
 
     console.print("\n[green bold]Committing release files")
 
@@ -185,7 +189,7 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Tru
         file_object.write(commit_info.encode("utf-8"))
         res = cmd("git commit -t", file_object.name)
         if res.returncode != 0:
-            cmd("git restore --staged", *files)
+            cmd("git checkout HEAD --", *files)
             raise SparrowCommandError("Commit not completed successfully")
 
     console.print("\nTagging release", style="green bold")
