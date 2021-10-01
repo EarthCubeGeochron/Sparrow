@@ -303,6 +303,10 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
 def check_version(ctx, version=None, exact=False):
     """Check that version information is consistent throughout the codebase."""
     cfg = ctx.find_object(SparrowConfig)
+    if not cfg.is_source_install():
+        raise SparrowCommandError(
+            "Only source installations of Sparrow contain versioning information."
+        )
     root_dir = cfg.SPARROW_PATH
     # We should bail here if we are running a bundled Sparrow...
     chdir(root_dir)

@@ -26,7 +26,7 @@ jobs:
         run: make build && sudo make install
 
       - name: Check version consistency
-        run: sparrow dev check-version --exact
+        run: SPARROW_PATH=$(pwd) sparrow dev check-version --exact
 
       - name: Run Sparrow tests for built application
         run: sparrow test
