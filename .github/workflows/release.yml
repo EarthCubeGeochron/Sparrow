@@ -21,12 +21,12 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Check version consistency
-        run: sparrow dev check-version --exact
-
         # Bundling
       - name: Bundle command-line application with PyInstaller
         run: make build && sudo make install
+
+      - name: Check version consistency
+        run: sparrow dev check-version --exact
 
       - name: Run Sparrow tests for built application
         run: sparrow test

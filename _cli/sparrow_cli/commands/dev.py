@@ -299,8 +299,13 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
 @sparrow_dev.command(name="check-version")
 @argument("version", required=False, default=None)
 @option("--exact", is_flag=True, help="Check for exact version", default=False)
-def check_version(version=None, exact=False):
+@click.pass_context
+def check_version(ctx, version=None, exact=False):
     """Check that version information is consistent throughout the codebase."""
+    cfg = ctx.find_object(SparrowConfig)
+    root_dir = cfg.SPARROW_PATH
+    # We should bail here if we are running a bundled Sparrow...
+    chdir(root_dir)
     check_consistency(tag_name=version, exact=exact)
 
 
