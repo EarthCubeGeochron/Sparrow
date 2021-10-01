@@ -129,13 +129,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: sparrow-Linux-x86_64.tar.gz
-          path: .
+          path: /home/runner/work/Sparrow/Sparrow
 
       - name: Get built Sparrow CLI (Darwin) 
         uses: actions/download-artifact@v2
         with:
           name: sparrow-Darwin-x86_64.tar.gz
-          path: .
+          path: /home/runner/work/Sparrow/Sparrow
 
       - name: Get the version
         id: get-version
@@ -164,5 +164,5 @@ jobs:
 
             See the [Getting started documentation](https://sparrow-data.org/docs/getting-started) for more information on how to set up Sparrow.
           files: |
-            ./sparrow-Linux-x86_64.tar.gz
-            ./sparrow-Darwin-x86_64.tar.gz
+            /home/runner/work/Sparrow/Sparrow/sparrow-Linux-x86_64.tar.gz
+            /home/runner/work/Sparrow/Sparrow/sparrow-Darwin-x86_64.tar.gz
