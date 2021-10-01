@@ -6,7 +6,7 @@ import {
   ProjectModelCard,
   SessionListModelCard,
   SampleModelCard,
-  ModelCard,
+  ModelCard
 } from "~/model-views/components";
 import ForeverScroll from "~/components/infinite-scroll/forever-scroll";
 import { SearchInput } from "~/filter/components";
@@ -15,13 +15,13 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const OpenSearchCard = (props) => {
+const OpenSearchCard = props => {
   const { model, data } = props;
 
   let possibleModels = {
     sample: SampleModelCard,
     project: ProjectModelCard,
-    session: SessionListModelCard,
+    session: SessionListModelCard
   };
   let data_ = { ...data, showIdentity: "long" };
   for (const key in possibleModels) {
@@ -38,7 +38,7 @@ const OpenSearchCard = (props) => {
 function OpenSearch() {
   const [query, setQuery] = useState("");
   const [scrollData, setScrollData] = useState<any>([]);
-  const url = "/api/v2/search/query";
+  const url = "search/query";
 
   const data = useAPIv2Result(url, { query: query, model: "all" });
 
@@ -69,16 +69,16 @@ function OpenSearch() {
       h(SearchInput, {
         leftElement: h(Icon, { icon: "search" }),
         updateParams: onChange,
-        value: query,
-      }),
+        value: query
+      })
     ]),
     h("div.results", [
       h.if(scrollData.length > 0)(ForeverScroll, {
         initialData: scrollData,
         component: OpenSearchCard,
-        fetch: () => {},
-      }),
-    ]),
+        fetch: () => {}
+      })
+    ])
   ]);
 }
 
