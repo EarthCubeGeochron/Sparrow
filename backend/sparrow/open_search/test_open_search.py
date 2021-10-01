@@ -139,3 +139,32 @@ class TestOpenSearch:
             res = client.get(route)
             data = res.json()
             assert data["total_count"] != 0
+
+    def test_on_add_triggers(self, client, db):
+        """ 
+            add some data and try to search for it, make sure that
+            the on insert triggers are working correctly
+        """
+
+        Sample = db.model.sample
+        name = 'test insert'
+
+        sample_ = Sample(name)
+
+        db.session.add(sample_)
+        db.session.commit()
+
+        ## confirm in db
+
+        sample_ = db.session.query(Sample).filter(name).first()
+
+        assert sample_.name == name
+
+
+        ## test via open search
+        route = "/api/v2/models/sample?search=insert"
+
+        res = client.get(route)
+        data = res.json()
+
+        assert 0 == 1
