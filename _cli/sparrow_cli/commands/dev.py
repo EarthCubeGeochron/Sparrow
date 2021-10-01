@@ -1,14 +1,26 @@
+from sparrow_cli.config import version_info
 import click
 from rich import print
+from rich.console import Console
 from click import group, secho, argument, option
 from os import environ, path, chdir
+from shlex import quote
 from runpy import run_path
 from subprocess import run
+from tempfile import NamedTemporaryFile
 import json
-import re
-import sys
+
+# import keepachangelog
+from packaging.version import Version, InvalidVersion
 from ..config import SparrowConfig
-from ..util import SparrowCommandError, CommandGroup, compose, cmd, console
+from ..util import (
+    SparrowCommandError,
+    CommandGroup,
+    compose,
+    cmd,
+    console,
+    exec_sparrow,
+)
 
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {
@@ -42,6 +54,18 @@ def check_version_allowed(version, message="Trying to create a duplicate release
     return tag_name
 
 
+def write_version_info(version):
+    backend_meta = path.join("backend", "sparrow", "meta.py")
+    with open(backend_meta, "w") as f:
+        f.write(f'__version__ = "{version}"\n')
+
+    version_file = "sparrow-version.json"
+    info = json.load(open(version_file, "r"))
+    info["core"] = version
+    json.dump(info, open(version_file, "w"), indent=2)
+    return (backend_meta, version_file)
+
+
 @sparrow_dev.command(name="create-release")
 @argument("version")
 @option(
@@ -50,10 +74,19 @@ def check_version_allowed(version, message="Trying to create a duplicate release
     help="Force release when git configuration is not clean",
     default=False,
 )
-@option("--push", is_flag=True, help="Push release tag when finished", default=False)
+@option("--dry-run", is_flag=True, help="Don't make any changes", default=False)
+@option("--test/--no-test", is_flag=True, help="Run tests", default=True)
+@option(
+    "--push/--no-push",
+    is_flag=True,
+    help="Push release tag when finished",
+    default=True,
+)
 @click.pass_context
-def create_release(ctx, version, force=False, push=False):
+def create_release(ctx, version, force=False, dry_run=False, test=True, push=True):
     """Show information about this Sparrow installation"""
+    console = Console(highlight=False)
+
     cfg = ctx.find_object(SparrowConfig)
     if not cfg.is_source_install():
         raise SparrowCommandError(
@@ -63,37 +96,34 @@ def create_release(ctx, version, force=False, push=False):
     # We should bail here if we are running a bundled Sparrow...
     chdir(root_dir)
 
-    match = re.match(r"^(((\d+\.\d+\.\d+)(\.([a-z]*\d+)))?([-\.](\d+))?)$", version)
-    if match is None:
-        raise SparrowCommandError(
-            "Invalid version string",
-            details="Version must be in a format like 1.2.3[.[abc]4][(-.)5]",
-        )
+    try:
+        spec = Version(version)
+    except InvalidVersion:
+        raise SparrowCommandError(f"Version specifier {version} is invalid.")
 
     console.print(f"[green]Creating release for version [cyan bold]{version}")
 
-    is_prerelease = match.group(4) is not None
-    is_build = match.group(6) is not None
-    build = match.group(7)
-    core_version = match.group(3)
-    main_version = match.group(2)
-
-    if is_prerelease:
-        console.print(f"This is a prerelease for version [cyan bold]{core_version}")
-        check_version_allowed(
-            core_version, "Cannot create a prerelease for an existing version"
+    if spec.is_prerelease:
+        console.print(
+            f"This is a prerelease for version [cyan bold]{spec.base_version}"
         )
-    if is_build:
-        print(f"...build [cyan]{build}[/cyan]")
+        check_version_allowed(
+            spec.base_version, "Cannot create a prerelease for an existing version"
+        )
+    if spec.is_devrelease:
+        console.print(f"...dev release [cyan]{spec.dev}[/cyan]")
+    if spec.is_postrelease:
+        console.print(f"...post release [cyan]{spec.post}[/cyan]")
 
-    print()
+    console.print()
 
     tag_name = check_version_allowed(version)
 
     res = cmd("git status --short", capture_output=True)
     if bool(res.stdout.strip()) and not force:
         raise SparrowCommandError(
-            "Refusing to create a release with a dirty working directory. Commit your changes or rerun with [cyan]--force[/cyan] to continue.",
+            "Refusing to create a release with a dirty working directory. "
+            "Commit your changes or rerun with [cyan]--force[/cyan] to continue.",
             details=res.stdout,
         )
 
@@ -105,25 +135,35 @@ def create_release(ctx, version, force=False, push=False):
                 details=res.stderr,
             )
 
-    print(f"[green bold]Syncing version info to packages.")
+    console.print(f"[green bold]Syncing version info to packages.")
 
-    backend_meta = path.join("backend", "sparrow", "meta.py")
-    with open(backend_meta, "w") as f:
-        f.write(f'__version__ = "{version}"\n')
-        # f.write(f'__full_version__ = "{version}"\n')
+    files = write_version_info(version)
 
-    version_file = "sparrow-version.json"
-    info = json.load(open(version_file, "r"))
-    info["core"] = main_version
-    json.dump(info, open(version_file, "w"), indent=2)
+    if test:
+        console.print("\n[green bold]Running tests")
+        exec_sparrow("test")
 
-    print("\n[green bold]Committing and tagging release")
+    console.print("\n[green bold]Committing release files")
 
-    cmd("git add", backend_meta, "sparrow-version.json")
-    commit_info = f"'Version {version}'"
-    cmd("git commit -m", commit_info)
+    commit_info = f"Version {version}"
 
-    res = cmd("git tag -a", tag_name, "-m", commit_info)
+    if dry_run:
+        console.print("\n[green bold]Dry run complete. Potential commit message:")
+        console.print(commit_info, style="dim")
+        if not force:
+            cmd("git restore", *files)
+        return
+
+    cmd("git add", *files)
+    with NamedTemporaryFile() as file_object:
+        file_object.write(commit_info)
+        res = cmd("git commit -t", file_object.name)
+        if res.returncode != 0:
+            cmd("git restore", *files)
+
+    console.print("\nTagging release", style="green bold")
+
+    res = cmd("git tag -a", tag_name, f"-m '{commit_info}'")
     if res.returncode != 0:
         raise SparrowCommandError(
             f"Could not create tag [green bold]{tag_name}", details=res.stderr
@@ -132,7 +172,9 @@ def create_release(ctx, version, force=False, push=False):
 
     if push:
         console.print("\n[green bold]Pushing changes")
-        cmd("git push")
+        cmd("git push -u origin HEAD")
+    else:
+        console.print("Finalize your release using [cyan]git push[/cyan].")
 
 
 @sparrow_dev.command(name="clear-cache")
