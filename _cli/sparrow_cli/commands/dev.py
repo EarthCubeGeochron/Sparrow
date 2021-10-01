@@ -3,11 +3,10 @@ import click
 from rich import print
 from rich.console import Console
 from click import group, secho, argument, option
-from os import environ, path, chdir
+from os import path, chdir
 from shlex import quote
 from runpy import run_path
 from subprocess import run
-from tempfile import NamedTemporaryFile
 import json
 
 # import keepachangelog
@@ -182,16 +181,14 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
         console.print("\n[green bold]Dry run complete. Potential commit message:")
         console.print(commit_info, style="dim")
         if not force:
-            cmd("git checkout --", *files)
+            cmd("git checkout HEAD --", *files)
         return
 
     cmd("git add", *files)
-    with NamedTemporaryFile() as file_object:
-        file_object.write(commit_info.encode("utf-8"))
-        res = cmd("git commit -t", file_object.name)
-        if res.returncode != 0:
-            cmd("git checkout --", *files)
-            raise SparrowCommandError("Commit not completed successfully")
+    res = cmd("git commit -m", quote(commit_info))
+    if res.returncode != 0:
+        cmd("git checkout HEAD --", *files)
+        raise SparrowCommandError("Commit not completed successfully")
 
     console.print("\nTagging release", style="green bold")
 
