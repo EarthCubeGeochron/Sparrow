@@ -1,4 +1,5 @@
 import sys
+import os
 import click
 from subprocess import Popen
 from rich import print
@@ -8,6 +9,14 @@ from ..config.environment import validate_environment
 from ..config import SparrowConfig
 from ..util import compose, cmd, log
 from ..help import get_backend_help_info
+
+
+def _report_image_versions():
+    backend_img_version = os.environ.get("SPARROW_BACKEND_IMAGE")
+    log.info(f"Backend image version: {backend_img_version}")
+
+    frontend_img_version = os.environ.get("SPARROW_FRONTEND_IMAGE")
+    log.info(f"Frontend image version: {frontend_img_version}")
 
 
 @click.command()
@@ -23,6 +32,7 @@ def sparrow_up(ctx, container="", force_recreate=False):
 
     cfg = ctx.find_object(SparrowConfig)
 
+    _report_image_versions()
     # build containers
     if not cfg.offline:
         cmd("sparrow compose build")

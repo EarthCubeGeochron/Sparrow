@@ -82,20 +82,37 @@ def remove_postrelease(version):
     return version
 
 
+def _check_version_not_exists(version):
+    try:
+        assert not check_version_exists(version)
+    except AssertionError:
+        raise SparrowCommandError(f"Version {version} already exists.")
+
+
 def check_release_validity(version):
     try:
         spec = Version(version)
         assert not check_version_exists(version)
     except InvalidVersion:
-        raise SparrowCommandError(f"Version specifier {version} is invalid.")
+        raise SparrowCommandError(
+            f"Version specifier [cyan bold]{version}[/cyan bold] is invalid."
+        )
 
-    except AssertionError:
-        raise SparrowCommandError(f"Version {version} already exists.")
+    _check_version_not_exists(version)
+
+    # Clean version to PEP440 shortened version, if applicable:
+    cleaned_version = str(spec)
+    if cleaned_version != version:
+        console.print(
+            f"Shortening [cyan bold]{version}[/cyan bold] to [cyan bold]{cleaned_version}[/cyan bold]"
+        )
+        version = cleaned_version
+        _check_version_not_exists(version)
 
     pre_base = spec.base_version
     post_base = remove_postrelease(version)
 
-    if spec.is_prerelease:
+    if spec.is_prerelease and spec.pre is not None:
         pre = spec.pre
         console.print(
             f"- Prerelease [cyan bold]{pre[0]}{pre[1]}[/cyan bold] for version {pre_base}"
@@ -115,6 +132,7 @@ def check_release_validity(version):
             f"Cannot create a postrelease for non-existant version {post_base}."
         )
     console.print()
+    return version
 
 
 def check_output(*args, **kwargs):
@@ -227,7 +245,7 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
 
     console.print(f"\nCreating release {version}", style="green bold")
 
-    check_release_validity(version)
+    version = check_release_validity(version)
 
     output = check_output("git status --short")
     if bool(output) and not force:
