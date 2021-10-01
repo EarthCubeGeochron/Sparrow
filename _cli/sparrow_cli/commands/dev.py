@@ -1,3 +1,4 @@
+import runpy
 from sparrow_cli.config import version_info
 import click
 from rich import print
@@ -6,6 +7,7 @@ from click import group, secho, argument, option
 from os import path, chdir
 from shlex import quote
 from runpy import run_path
+from itertools import groupby
 from subprocess import run
 import json
 
@@ -22,6 +24,11 @@ from ..util import (
 )
 
 console = Console(highlight=False)
+
+
+def all_equal(*items):
+    g = groupby(items)
+    return next(g, True) and not next(g, False)
 
 
 # Commands inherited from earlier shell version of CLI.
@@ -110,6 +117,77 @@ def check_release_validity(version):
     console.print()
 
 
+def check_output(*args, **kwargs):
+    res = cmd(*args, capture_output=True, **kwargs)
+    if res.returncode != 0:
+        raise SparrowCommandError("Command failed", res.stderr.decode())
+    output = res.stdout.decode("utf-8").strip()
+    if output.isspace():
+        return None
+    return output
+
+
+def clean_tag(tag):
+    tag = tag.replace("refs/tags/", "")
+    if tag.startswith("v"):
+        tag = tag[1:]
+    return tag
+
+
+def _check_consistency(version=None, exact=False):
+    latest_tag = check_output("git describe --tags --abbrev=0")
+    current_rev = check_output("git describe --tags")
+    if version is None:
+        version = latest_tag
+
+    version = clean_tag(version)
+
+    # If we've provided a tag to check, then we clean it
+
+    tag_name = "v" + version
+    _exact_tag_match = all_equal(current_rev, latest_tag, tag_name)
+
+    spec = Version(version)
+
+    key_ = "Version tag"
+    if _exact_tag_match:
+        key_ += " (exact)"
+    console.print(f"{key_:28} {tag_name}")
+
+    assert check_version_exists(version)
+
+    assert latest_tag == tag_name
+    assert current_rev.startswith(tag_name)
+    if exact:
+        assert latest_tag == current_rev
+
+    # Check backend version
+    backend_meta = path.join("backend", "sparrow", "meta.py")
+    meta = run_path(backend_meta)
+    _version = meta["__version__"]
+    assert _version == version
+    console.print(f"{backend_meta:29} {_version}")
+
+    # Check base directory version file
+    version_file = "sparrow-version.json"
+    info = json.load(open(version_file, "r"))
+    _version = info["core"]
+    console.print(f"{version_file:29} {_version}")
+    assert _version == version
+
+    return tag_name
+
+
+def check_consistency(tag_name=None, exact=False):
+    try:
+        tag_name = _check_consistency(tag_name, exact=exact)
+    except AssertionError:
+        raise SparrowCommandError(f"Version files are not consistent")
+    except InvalidVersion:
+        raise SparrowCommandError("Invalid version")
+    console.print(f"Version information is consistent with tag {tag_name}")
+
+
 @sparrow_dev.command(name="create-release")
 @argument("version")
 @option(
@@ -143,12 +221,12 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
 
     check_release_validity(version)
 
-    res = cmd("git status --short", capture_output=True)
-    if bool(res.stdout.strip()) and not force:
+    output = check_output("git status --short")
+    if bool(output) and not force:
         raise SparrowCommandError(
             "Refusing to create a release with a dirty working directory. "
             "Commit your changes or rerun with [cyan]--force[/cyan] to continue.",
-            details=res.stdout,
+            details=output,
         )
 
     if not force:
@@ -193,11 +271,14 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
     console.print("\nTagging release", style="green bold")
 
     tag_name = "v" + version
-    res = cmd("git tag -a", tag_name, f"-m '{commit_info}'")
+    res = cmd("git tag -a", tag_name, "-m", quote(commit_info))
     if res.returncode != 0:
         raise SparrowCommandError(
             f"Could not create tag [green bold]{tag_name}", details=res.stderr
         )
+
+    check_consistency(tag_name)
+
     console.print("[green bold]Successfully created release")
 
     if push:
@@ -205,6 +286,14 @@ def create_release(ctx, version, force=False, dry_run=False, test=True, push=Fal
         cmd("git push -u origin HEAD")
     else:
         console.print("Finalize your release using [cyan]git push[/cyan].")
+
+
+@sparrow_dev.command(name="check-version")
+@argument("version", required=False, default=None)
+@option("--exact", is_flag=True, help="Check for exact version", default=False)
+def check_version(version=None, exact=False):
+    """Check that version information is consistent throughout the codebase."""
+    check_consistency(tag_name=version, exact=exact)
 
 
 @sparrow_dev.command(name="clear-cache")

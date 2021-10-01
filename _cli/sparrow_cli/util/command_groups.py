@@ -25,6 +25,8 @@ class SparrowDefaultCommand(DefaultGroup):
             # Maybe we should reraise only if debug is set?
             if environ.get("SPARROW_VERBOSE") is not None:
                 raise exc
+            else:
+                sys.exit(1)
 
     def parse_args(self, ctx, args):
         # Handle the edge case where we
