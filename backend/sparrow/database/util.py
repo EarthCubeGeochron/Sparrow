@@ -1,4 +1,3 @@
-import sys
 from click import secho
 from sqlalchemy.exc import ProgrammingError, IntegrityError
 from sqlparse import split, format
@@ -151,7 +150,7 @@ def connection_args(engine):
 
 def db_isready(engine_or_url):
     args, _ = connection_args(engine_or_url)
-    c = cmd("pg_isready", args, stdout=sys.stderr, stderr=None)
+    c = cmd("pg_isready", args, capture_output=True)
     return c.returncode == 0
 
 
