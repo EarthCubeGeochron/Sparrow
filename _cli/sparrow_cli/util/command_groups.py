@@ -14,7 +14,7 @@ class SparrowDefaultCommand(DefaultGroup):
         try:
             return self.main(*args, **kwargs)
         except SparrowCommandError as exc:
-            prefix = "!!!"
+            prefix = "Error:"
             console.print(f"[red][bold]{prefix}[/bold] " + str(exc))
             details = getattr(exc, "details", "Exiting Sparrow due to an error")
             if details is not None:
