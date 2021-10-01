@@ -98,6 +98,7 @@ def check_release_validity(version, clean_version=True):
         )
 
     _check_version_not_exists(version)
+    post_base = remove_postrelease(version)
 
     # Clean version to PEP440 shortened version, if applicable:
     cleaned_version = str(spec)
@@ -109,7 +110,6 @@ def check_release_validity(version, clean_version=True):
         _check_version_not_exists(version)
 
     pre_base = spec.base_version
-    post_base = remove_postrelease(version)
     cleaned_post_base = remove_postrelease(cleaned_version)
 
     if spec.is_prerelease and spec.pre is not None:
