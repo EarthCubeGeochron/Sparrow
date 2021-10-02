@@ -160,7 +160,6 @@ def _check_consistency(version=None, exact=False):
     if version is None:
         version = latest_tag
 
-    print(version)
     version = clean_tag(version)
 
     # If we've provided a tag to check, then we clean it
@@ -168,9 +167,8 @@ def _check_consistency(version=None, exact=False):
     tag_name = "v" + version
     _exact_tag_match = all_equal(current_rev, latest_tag, tag_name)
 
-    spec = Version(version)
-
-    print(version)
+    # Check that we have a valid PEP440 version specifier
+    Version(version)
 
     key_ = "Version tag"
     if _exact_tag_match:
