@@ -10,6 +10,7 @@ import {
   useElementSize,
   apportionWidths,
   VirtualizedSheet,
+  ColumnData,
 } from "@earthdata/sheet/src";
 import { SheetToolbar } from "./toolbar";
 import classNames from "classnames";
@@ -20,6 +21,8 @@ import { DoiProjectButton } from "./sheet-enter-components/doi-button";
 import { DataEditor } from "react-datasheet/lib";
 import { join } from "path";
 import { memo } from "react";
+import { Button } from "@blueprintjs/core";
+import { createSettingsContext } from "@macrostrat/ui-components";
 
 const h = hyperStyled(styles);
 
@@ -83,6 +86,19 @@ interface SampleData {
   latitude: number;
   longitude: number;
   name: string;
+}
+
+interface DataSheetSettings {}
+
+const [DataSheetSettingsProvider, useSettings, useSettingsUpdater] =
+  createSettingsContext<DataSheetSettings>({});
+
+function ColumnTogglePanel() {
+  return h("div.toggle-panel");
+}
+
+function SettingsPopup() {
+  return h(Button, { icon: "cog" }, "Settings");
 }
 
 const valueRenderer = (cell) => `${cell.value ?? ""}`;
@@ -212,25 +228,33 @@ function DataSheet() {
 
   //console.log(size);
   return h(
-    DataSheetProvider,
-    { columns, containerWidth: size?.width ?? 500, desiredWidths },
-    h("div.data-sheet", [
-      h(SheetToolbar, {
-        onSubmit: handleSubmit,
-        onUndo: handleUndo,
-        hasChanges: initialData != data,
-      }),
-      h("div.sheet", { ref }, [
-        h(VirtualizedSheet, {
-          data: cellData,
-          valueRenderer,
-          rowRenderer: Row,
-          onCellsChanged,
-          width: size?.width ?? 500,
-          dataEditor: DataEditor,
-        }),
-      ]),
-    ])
+    DataSheetSettingsProvider,
+    { storageID: "datasheet" },
+    h(
+      DataSheetProvider,
+      { columns, containerWidth: size?.width ?? 500, desiredWidths },
+      h("div.data-sheet", [
+        h(
+          SheetToolbar,
+          {
+            onSubmit: handleSubmit,
+            onUndo: handleUndo,
+            hasChanges: initialData != data,
+          },
+          h("div.right-actions", null, h(SettingsPopup))
+        ),
+        h("div.sheet", { ref }, [
+          h(VirtualizedSheet, {
+            data: cellData,
+            valueRenderer,
+            rowRenderer: Row,
+            onCellsChanged,
+            width: size?.width ?? 500,
+            dataEditor: DataEditor,
+          }),
+        ]),
+      ])
+    )
   );
 }
 
