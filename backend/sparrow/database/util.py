@@ -1,4 +1,3 @@
-import sys
 from click import secho
 from sqlalchemy.exc import ProgrammingError, IntegrityError
 from sqlparse import split, format

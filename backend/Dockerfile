@@ -1,4 +1,4 @@
-FROM sparrowdata/backend-base:2.0 AS main
+FROM ghcr.io/earthcubegeochron/sparrow/backend-base:2.0 AS main
 # Multi-stage build of Sparrow backend.
 
 ## Git is required for the PyChron importer
