@@ -1,11 +1,11 @@
 version: "3.6"
 x-backend:
   &x-backend
-  image: ${SPARROW_BACKEND_IMAGE:-sparrowdata/backend}
+  image: ${SPARROW_BACKEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/backend}
   build:
     context: backend
     cache_from:
-      - ${SPARROW_BACKEND_IMAGE:-sparrowdata/backend}
+      - ${SPARROW_BACKEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/backend}
   command: /bin/run
   # Make sure we get colorized terminal output
   tty: true
@@ -55,7 +55,7 @@ x-backend:
     # the importer in the backend
     # NOTE: we should think about moving this to another container
     # but this is precluded by our current plugin architecture.
-    - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
+    - ${SPARROW_DATA_DIR:-placeholder}:/data
     # Share some configuration between backend
     # and frontend
     - ${SPARROW_INIT_SQL:-placeholder}:/init-sql/:ro
@@ -112,11 +112,11 @@ services:
     volumes:
       - db_cluster:/var/lib/postgresql/data
   frontend:
-    image: ${SPARROW_FRONTEND_IMAGE:-sparrowdata/frontend}
+    image: ${SPARROW_FRONTEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/frontend}
     build:
       context: frontend
       cache_from:
-        - ${SPARROW_FRONTEND_IMAGE:-sparrowdata/frontend}
+        - ${SPARROW_FRONTEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/frontend}
     depends_on:
       - backend
     environment:

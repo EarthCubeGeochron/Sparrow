@@ -7,11 +7,9 @@ import h from "react-hyperscript";
 import styled from "@emotion/styled";
 import { useState } from "react";
 import { Callout, NonIdealState, Drawer, Button } from "@blueprintjs/core";
-import {
-  CollapsePanel,
-  APIResultView,
-  LinkCard,
-} from "@macrostrat/ui-components";
+import { CollapsePanel, APIResultView } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
+
 import "./gdd-card.styl";
 
 const Snippet = function ({ html }) {

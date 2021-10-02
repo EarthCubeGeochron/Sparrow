@@ -1,8 +1,11 @@
 import { Tooltip, Card, Button } from "@blueprintjs/core";
-import { LinkCard } from "@macrostrat/ui-components";
-import { format } from "date-fns";
-import { useModelURL } from "~/util";
+import { format, getYear } from "date-fns";
+import { useModelURL, useEditingAllowed } from "~/util";
+import { ModelEditableText } from "~/model-views";
 import { hyperStyled } from "@macrostrat/hyper";
+import { useModelEditor } from "@macrostrat/ui-components";
+import { LinkButton } from "@macrostrat/ui-components/src/ext/router-links";
+
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -12,7 +15,7 @@ export const AddCard = (props) => {
   const { onClick, model } = props;
   return h(
     Tooltip,
-    { content: `Select from exisitng ${model}s` },
+    { content: `Select from existing ${model}s` },
     h(Button, { onClick, icon: "small-plus", minimal: true })
   );
 };
@@ -26,28 +29,22 @@ export const NewModelButton = (props) => {
     window.location.href = to;
   };
 
-  const string = model.charAt(0).toUpperCase() + model.slice(1);
-
   return h(
-    Button,
+    LinkButton,
     {
+      icon: "plus",
       minimal: true,
       intent: "success",
-      onClick: handleClick,
+      to,
     },
-    [`New ${string}`]
+    `New ${model}`
   );
 };
 
 export const ModelAttributeOneLiner = (props) => {
   const { title, content } = props;
 
-  let displayContent;
-  if (!content) {
-    displayContent = "None";
-  } else {
-    displayContent = content;
-  }
+  const displayContent = content ?? "None";
 
   return h("span", { style: { display: "flex", alignItems: "baseline" } }, [
     h("h4", { style: { marginRight: "4px" } }, title),
@@ -95,10 +92,18 @@ export const PageViewBlock = (props) => {
   ]);
 };
 
-export const PageViewDate = (props) => {
-  const { date } = props;
+export const FormattedDate = (props) => {
+  const { date, fallback = "Unknown date", oldestValidYear = 1940 } = props;
 
-  return h("div.page-view-date", [format(date, "MMMM D, YYYY")]);
+  const year = getYear(date);
+
+  if (year < oldestValidYear) {
+    if (fallback != null) {
+      return h("div.formatted-date", null, "Unknown date");
+    }
+    return null;
+  }
+  return h("div.formatted-date", null, format(date, "MMMM D, YYYY"));
 };
 
 export const FormattedLngLat = (props) => {
@@ -107,16 +112,39 @@ export const FormattedLngLat = (props) => {
   const { coordinates } = location;
 
   let [lng, lat] = coordinates;
-
-  let lngString =
-    lng > 0
-      ? `${lng.toFixed(precision)} E`
-      : `${lng.toFixed(precision) * -1} W`;
-
-  let latString =
-    lat > 0
-      ? `${lat.toFixed(precision)} N`
-      : `${lat.toFixed(precision) * -1} S`;
+  const fmtLng = lng.toFixed(precision);
+  const fmtLat = lat.toFixed(precision);
+  let lngString = lng > 0 ? `${fmtLng}° E` : `${fmtLng * -1}° W`;
+  let latString = lat > 0 ? `${fmtLat}° N` : `${fmtLat * -1}° S`;
 
   return h("div.page-view-date", [`${lngString}, ${latString}`]);
 };
+
+export function ModelTitleBar(props): React.ReactNode {
+  const {
+    editingContent = null,
+    rightContent = null,
+    titleField = "name",
+    subtitle,
+  } = props;
+  const isEditable = useEditingAllowed();
+
+  // Set up the subtitle
+  let subtitleElement = null;
+  if (subtitle != null) {
+    subtitleElement = h("h2.page-type", ["(", subtitle, ")"]);
+  }
+
+  return h("div.model-title-bar", [
+    h(ModelEditableText, {
+      is: "h2",
+      field: titleField,
+      multiline: false,
+      placeholder: "Unnamed",
+    }),
+    subtitleElement,
+    h("div.spacer"),
+    h.if(isEditable)("div.page-type", null, editingContent),
+    rightContent,
+  ]);
+}

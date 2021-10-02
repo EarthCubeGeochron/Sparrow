@@ -223,6 +223,7 @@ A physical object to be measured
 CREATE TABLE IF NOT EXISTS sample (
   id serial PRIMARY KEY,
   name text,
+  uuid uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
   igsn text UNIQUE,
   material text REFERENCES vocabulary.material(id),
   member_of integer REFERENCES sample(id),
@@ -555,6 +556,7 @@ CREATE TABLE IF NOT EXISTS data_file (
   file_mtime timestamp,
   basename text,
   file_path text UNIQUE,
+  source_url text,
   type_id text REFERENCES data_file_type(id)
 );
 

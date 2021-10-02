@@ -1,9 +1,9 @@
 import h from "@macrostrat/hyper";
 import { Card } from "@blueprintjs/core";
-import { LinkCard } from "@macrostrat/ui-components";
+import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
 import { parse, format } from "date-fns";
 import { useModelURL } from "~/util/router";
-import { ModelAttributeOneLiner, PageViewDate } from "../components";
+import { ModelAttributeOneLiner, FormattedDate } from "../components";
 
 export const Sample = (props) => {
   const sampleTo = useModelURL(`/sample/${props.id}`);
@@ -22,7 +22,7 @@ export const SessionDate = (props) => {
 
   return h(ModelAttributeOneLiner, {
     title: "Date:",
-    content: h(PageViewDate, { date }),
+    content: h(FormattedDate, { date }),
   });
 };
 

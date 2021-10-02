@@ -5,11 +5,14 @@ import hyper from "@macrostrat/hyper";
 import {
   APIHelpers,
   ModelEditor,
+  useAPIHelpers,
   useModelEditor,
 } from "@macrostrat/ui-components";
-import { APIV2Context } from "~/api-v2";
+import { Navbar } from "@blueprintjs/core";
+import { APIV2Context, useAPIv2Result } from "~/api-v2";
 import { put } from "axios";
-import { SampleContextMap } from "~/components";
+import { SampleContextMap, MinimalNavbar } from "~/components";
+import { ModelTitleBar } from "~/model-views/components/page-view";
 import { MapLink } from "~/map";
 import {
   EditNavBar,
@@ -32,11 +35,13 @@ import {
   DataFilePage,
   SubSamplePageView,
   FormattedLngLat,
+  SampleCard,
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
 import { useModelURL } from "~/util";
 import { Button } from "@blueprintjs/core";
+import { useEditingAllowed } from "~/util";
 
 const h = hyper.styled(styles);
 
@@ -65,22 +70,26 @@ const EditNavBarSample = () => {
     return actions.persistChanges();
   };
 
-  return h(EditNavBar, {
-    header: "Manage Sample",
-    editButtons: h("div", { style: { display: "flex" } }, [
-      h.if(isEditing)(DataSheetButton),
-      h(EditStatusButtons, {
-        onClickCancel,
-        onClickSubmit,
-        hasChanges,
-        isEditing,
-      }),
-      h(NewModelButton, { model: "sample" }),
-    ]),
-    embargoEditor: h(EmbargoEditor, {
-      active: isEditing,
-    }),
-  });
+  return h("div.flex-row", [
+    h(
+      MinimalNavbar,
+      null,
+      h("div.editor-buttons", { style: { display: "flex" } }, [
+        h.if(isEditing)(DataSheetButton),
+        h(EditStatusButtons, {
+          onClickCancel,
+          onClickSubmit,
+          hasChanges,
+          isEditing,
+        }),
+        h(EmbargoEditor, {
+          active: isEditing,
+        }),
+        h(Navbar.Divider),
+        h(NewModelButton, { model: "sample", minimal: true }),
+      ])
+    ),
+  ]);
 };
 
 const LocationBlock = function (props) {
@@ -130,11 +139,20 @@ const Material = function (props) {
   }
 };
 
+function MemberOfCard(props) {
+  const { id, ...rest } = props;
+  const sample = useAPIv2Result(`/models/sample/${id}`)?.data;
+  if (sample == null) return `Sample ${id}`;
+  return h(SampleCard, { ...sample, ...rest });
+}
+
 const MemberOf = function (props) {
   const { isEditing, hasChanges, actions, model } = useModelEditor();
   const { setListName, changeFunction } = useContext(SampleAdminContext);
 
+  const sample = model;
   const memberOf = model.member_of;
+  const href = useModelURL(`/sample/${memberOf}`);
 
   const onClickSample = (sample) => {
     const { id } = sample;
@@ -156,11 +174,7 @@ const MemberOf = function (props) {
       ]),
     ]);
   } else {
-    content = memberOf
-      ? h("a", { href: useModelURL(`/sample/${memberOf}`) }, [
-          `Sample ${memberOf}`,
-        ])
-      : null;
+    content = memberOf ? h(MemberOfCard, { id: memberOf, link: true }) : null;
   }
 
   return h(ModelAttributeOneLiner, {
@@ -216,18 +230,18 @@ const GeoEntity = (props) => {
   const { sample_geo_entity } = model;
 
   const changeGeoEntity = (entity) => {
-    const currnetEntities = [...sample_geo_entity];
-    const newEntities = [...currnetEntities, ...new Array(entity)];
+    const currentEntities = [...sample_geo_entity];
+    const newEntities = [...currentEntities, ...new Array(entity)];
     actions.updateState({
       model: { sample_geo_entity: { $set: newEntities } },
     });
   };
 
   const deleteGeoEntity = (index) => {
-    const currnetEntities = [...sample_geo_entity];
-    currnetEntities.splice(index, 1);
+    const currentEntities = [...sample_geo_entity];
+    currentEntities.splice(index, 1);
     actions.updateState({
-      model: { sample_geo_entity: { $set: currnetEntities } },
+      model: { sample_geo_entity: { $set: currentEntities } },
     });
   };
 
@@ -235,11 +249,13 @@ const GeoEntity = (props) => {
     return h(
       PageViewBlock,
       {
-        title: "Geologic Context",
+        title: "Context",
       },
       [
+        h(LocationBlock),
+        h(DepthElevation),
         h(ModelAttributeOneLiner, {
-          title: "Geologic Context",
+          title: "Geologic Context:",
           content: "None",
         }),
       ]
@@ -419,79 +435,114 @@ async function TagsChangeSet(changeset, updatedModel, url) {
 const SamplePageDataFiles = () => {
   const { model } = useModelEditor();
 
-  let session_ids = model.session.map((obj) => obj.id);
-  if (session_ids.length == 0) {
-    session_ids = [0];
-  }
-
-  return h(DataFilePage, { model: "sample", session_ids });
+  return h(DataFilePage, {
+    model: "sample",
+    session_ids: model.session.map((obj) => obj.id),
+    sample_ids: [model.id],
+  });
 };
 
-function SamplePage(props) {
-  const { data: sample, Edit } = props;
+function useSamplePersist() {
+  const { buildURL } = useAPIHelpers(APIV2Context);
+  return async function persistSampleChanges(updatedModel, changeset) {
+    console.log("changeset", changeset);
+    console.log("updatedModel", updatedModel);
+    console.log(
+      "Tags",
+      TagsChangeSet(
+        changeset,
+        updatedModel,
+        buildURL("/tags/models/sample", {})
+      )
+    );
+    let { id } = updatedModel;
+    console.log(
+      handleMemberOfPersist(
+        changeset,
+        buildURL(`/models/sample/sub-sample/${id}`)
+      )
+    );
+    delete updatedModel.member_of;
+    let rest;
+    const response = await put(
+      buildURL(`/models/sample/${id}`, {}),
+      updatedModel
+    );
+    const { data } = response;
+  };
+}
+
+function TitleBar() {
+  const { model } = useModelEditor();
+  const id = model.id;
+  return h(ModelTitleBar, {
+    titleField: "name",
+    subtitle: `Sample #${id}`,
+    editingContent: h(EditNavBarSample),
+  });
+}
+
+interface SampleProps {
+  Edit?: boolean;
+  id?: number;
+  sendQuery?: () => {};
+}
+function SamplePage(props: SampleProps) {
+  const { id, Edit } = props;
+  if (id == null) return null;
 
   const { login } = useAuth();
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
+  const persistChanges = useSamplePersist();
+
+  const sample = useAPIv2Result(`/models/sample/${id}`, {
+    nest: "session,project,sample_geo_entity,geo_entity,tag",
+  });
+  if (sample == null) {
+    return null;
+  }
 
   /*
   Render sample page based on ID provided in URL through react router
   */
 
   return h(
-    ModelEditor,
-    {
-      model: sample.data,
-      canEdit: login || Edit,
-      persistChanges: async (updatedModel, changeset) => {
-        console.log("changeset", changeset);
-        console.log("updatedModel", updatedModel);
-        console.log(
-          "Tags",
-          TagsChangeSet(
-            changeset,
-            updatedModel,
-            buildURL("/tags/models/sample", {})
-          )
-        );
-        let { id } = updatedModel;
-        console.log(
-          handleMemberOfPersist(
-            changeset,
-            buildURL(`/models/sample/sub-sample/${id}`)
-          )
-        );
-        delete updatedModel.member_of;
-        let rest;
-        const response = await put(
-          buildURL(`/models/sample/${id}`, {}),
-          updatedModel
-        );
-        const { data } = response;
+    "div.data-view.sample",
+    null,
+    h(
+      ModelEditor,
+      {
+        model: sample.data,
+        canEdit: login || Edit,
+        persistChanges,
       },
-    },
-    [
-      h("div.sample", [
-        h("div.page-type", [Edit ? h(EditNavBarSample) : null]),
-        h(PageViewBlock, [
-          h(ModelEditableText, {
-            is: "h3",
-            field: "name",
-            multiline: true,
-          }),
-          h("div.flex-row", [
-            h("div.info-block", [h(MemberOf), h(Material), h(DepthElevation)]),
-            h("div", [h(LocationBlock)]),
+      [
+        h("div.sample", [
+          h(TitleBar),
+          h(PageViewBlock, [
+            h("div.flex-row", [
+              h("div.info-block", [
+                h(MemberOf),
+                h(Material),
+                h.if(Edit)(SampleTagContainer),
+              ]),
+              h("div", null, [
+                h(
+                  Frame,
+                  { id: "sampleHeaderExt", data: { sample: sample.data } },
+                  null
+                ),
+              ]),
+            ]),
           ]),
-          h.if(Edit)(SampleTagContainer),
         ]),
-      ]),
-      h(GeoEntity),
-      h(SubSamples),
-      h(SampleProjectAdd),
-      h(SampleSessionAdd),
-      h(SamplePageDataFiles),
-      h(Frame, { id: "samplePage", data: sample.data }, null),
-    ]
+        h(SubSamples),
+        h(SampleSessionAdd),
+        h(SamplePageDataFiles),
+        h(SampleProjectAdd),
+        h(GeoEntity),
+        h(Frame, { id: "samplePage", data: sample.data }, null),
+      ]
+    )
   );
 }
 
