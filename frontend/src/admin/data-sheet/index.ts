@@ -5,38 +5,28 @@ import update from "immutability-helper";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Frame } from "~/frame";
 import {
-  DataSheetProvider,
   Row,
   useElementSize,
   apportionWidths,
   VirtualizedSheet,
+  DataSheetProvider,
   ColumnData,
 } from "@earthdata/sheet/src";
 import { SheetToolbar } from "./toolbar";
 import classNames from "classnames";
-import styles from "./module.styl";
 import { combineLikeIds, addNecesaryFields } from "./util";
 import { postData } from "./post";
-import { DoiProjectButton } from "./sheet-enter-components/doi-button";
 import { DataEditor } from "react-datasheet/lib";
-import { join } from "path";
-import { memo } from "react";
-import { Button } from "@blueprintjs/core";
-import { createSettingsContext } from "@macrostrat/ui-components";
+import {
+  DataSheetSettingsProvider,
+  SettingsPopup,
+  useSettings,
+} from "./settings";
+
+import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
+import styles from "./module.styl";
 
 const h = hyperStyled(styles);
-
-const columnSpec: ColumnData[] = [
-  { name: "Sample ID", key: "id", editable: false },
-  { name: "Sample Name", key: "name" },
-  { name: "Material", key: "material" },
-  { name: "Longitude", key: "longitude" },
-  { name: "Latitude", key: "latitude" },
-  { name: "Publication ID", key: "publication_id", editable: false },
-  { name: "DOI", key: "doi" },
-  { name: "Project ID", key: "project_id", editable: false },
-  { name: "Project", key: "project_name" },
-];
 
 function unwrapSampleData(sampleData) {
   /** Unwrap samples from API response to a flattened version */
@@ -88,26 +78,14 @@ interface SampleData {
   name: string;
 }
 
-interface DataSheetSettings {}
-
-const [DataSheetSettingsProvider, useSettings, useSettingsUpdater] =
-  createSettingsContext<DataSheetSettings>({});
-
-function ColumnTogglePanel() {
-  return h("div.toggle-panel");
-}
-
-function SettingsPopup() {
-  return h(Button, { icon: "cog" }, "Settings");
-}
-
 const valueRenderer = (cell) => `${cell.value ?? ""}`;
 
 function DataSheet() {
   const [data, setData] = useState<SampleData[]>([]);
   //console.log(data);
 
-  const columns = columnSpec;
+  const { showColumns = {}, allColumns } = useSettings();
+  const columns = allColumns.filter(({ key }) => showColumns[key] !== false);
 
   const [edits, setEdits] = useState([]);
   /**
@@ -134,7 +112,7 @@ function DataSheet() {
   //const [columns, setDesiredWidth] = useState(columnSpec);
 
   const desiredWidths =
-    initialData != null ? calculateWidths(initialData, columnSpec) : {};
+    initialData != null ? calculateWidths(initialData, columns) : {};
 
   // Change management
   const handleUndo = () => {
@@ -226,48 +204,59 @@ function DataSheet() {
     //key is name of column
   );
 
-  //console.log(size);
   return h(
-    DataSheetSettingsProvider,
-    { storageID: "datasheet" },
-    h(
-      DataSheetProvider,
-      { columns, containerWidth: size?.width ?? 500, desiredWidths },
-      h("div.data-sheet", [
-        h(
-          SheetToolbar,
-          {
-            onSubmit: handleSubmit,
-            onUndo: handleUndo,
-            hasChanges: initialData != data,
-          },
-          h("div.right-actions", null, h(SettingsPopup))
-        ),
-        h("div.sheet", { ref }, [
-          h(VirtualizedSheet, {
-            data: cellData,
-            valueRenderer,
-            rowRenderer: Row,
-            onCellsChanged,
-            width: size?.width ?? 500,
-            dataEditor: DataEditor,
-          }),
-        ]),
-      ])
-    )
+    DataSheetProvider,
+    {
+      containerWidth: size?.width ?? 500,
+      desiredWidths,
+      columns,
+    },
+    h("div.data-sheet.data-sheet-page", [
+      h(
+        SheetToolbar,
+        {
+          onSubmit: handleSubmit,
+          onUndo: handleUndo,
+          hasChanges: initialData != data,
+        },
+        h("div.right-actions", null, h(SettingsPopup))
+      ),
+      h("div.sheet", { ref }, [
+        h(VirtualizedSheet, {
+          data: cellData,
+          valueRenderer,
+          rowRenderer: Row,
+          onCellsChanged,
+          width: size?.width ?? 500,
+          dataEditor: DataEditor,
+        }),
+      ]),
+    ])
   );
 }
 
-/*
-(props) =>
-            props.col === 6
-              ? h(DoiProjectButton, { data, ...props })
-              : h(DataEditor, { ...props }),
-        }
-*/
+const columnSpec: ColumnData[] = [
+  { name: "Sample ID", key: "id", editable: false },
+  { name: "Sample Name", key: "name" },
+  { name: "Material", key: "material" },
+  { name: "Longitude", key: "longitude" },
+  { name: "Latitude", key: "latitude" },
+  { name: "Publication ID", key: "publication_id", editable: false },
+  { name: "DOI", key: "doi" },
+  { name: "Project ID", key: "project_id", editable: false },
+  { name: "Project", key: "project_name" },
+];
+
+function DataSheetMain({ ...rest }) {
+  return h(
+    DataSheetSettingsProvider,
+    { allColumns: columnSpec },
+    h(DataSheet, rest)
+  );
+}
 
 function DataSheetPage(props) {
-  return h(Frame, { id: "dataSheet" }, h(DataSheet, props));
+  return h(Frame, { id: "dataSheet" }, h(DataSheetMain, props));
 }
 
 export default DataSheetPage;
