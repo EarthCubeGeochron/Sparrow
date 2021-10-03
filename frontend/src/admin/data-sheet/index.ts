@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useContext, useCallback } from "react";
 import { useAPIResult, APIHelpers } from "@macrostrat/ui-components";
+import { Link } from "react-router-dom";
 import { APIV2Context } from "~/api-v2";
 import update from "immutability-helper";
 import { hyperStyled } from "@macrostrat/hyper";
@@ -236,14 +237,26 @@ function DataSheet() {
 }
 
 const columnSpec: ColumnData[] = [
-  { name: "Sample ID", key: "id", editable: false },
+  {
+    name: "Sample ID",
+    key: "id",
+    editable: false,
+    valueViewer: ({ value }) =>
+      h(Link, { to: `/admin/sample/${value}` }, value),
+  },
   { name: "Sample Name", key: "name" },
   { name: "Material", key: "material" },
   { name: "Longitude", key: "longitude" },
   { name: "Latitude", key: "latitude" },
   { name: "Publication ID", key: "publication_id", editable: false },
   { name: "DOI", key: "doi" },
-  { name: "Project ID", key: "project_id", editable: false },
+  {
+    name: "Project ID",
+    key: "project_id",
+    editable: false,
+    valueViewer: ({ value }) =>
+      h(Link, { to: `/admin/project/${value}` }, value),
+  },
   { name: "Project", key: "project_name" },
 ];
 
