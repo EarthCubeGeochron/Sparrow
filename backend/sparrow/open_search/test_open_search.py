@@ -1,3 +1,4 @@
+import sparrow
 from sparrow_tests.helpers import json_fixture
 from sqlalchemy import text, Table, or_
 from .filter import get_document_tables
@@ -140,31 +141,13 @@ class TestOpenSearch:
             data = res.json()
             assert data["total_count"] != 0
 
-    def test_on_add_triggers(self, client, db):
+    def test_on_initialization(self, client, db):
         """ 
-            add some data and try to search for it, make sure that
-            the on insert triggers are working correctly
+            test the open search _initialization function
         """
+        db = sparrow.get_database()
+        OpenSearch = sparrow.get_plugin("open-search")
 
-        Sample = db.model.sample
-        name = 'test insert'
+        OpenSearch.initialize_tables(db)
 
-        sample_ = Sample(name)
-
-        db.session.add(sample_)
-        db.session.commit()
-
-        ## confirm in db
-
-        sample_ = db.session.query(Sample).filter(name).first()
-
-        assert sample_.name == name
-
-
-        ## test via open search
-        route = "/api/v2/models/sample?search=insert"
-
-        res = client.get(route)
-        data = res.json()
-
-        assert 0 == 1
+        self.test_open_search_api(client, db)
