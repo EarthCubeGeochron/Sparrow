@@ -19,7 +19,7 @@ const allLinks = unnestLinks([...aboutLinks, ...docsLinks]);
 function PageIssueLink() {
   const router = useRouter();
   //@ts-ignore
-  const activeLink = allLinks.find((d) => d?.href == router.pathname);
+  const activeLink = allLinks.find(d => d?.href == router.pathname);
 
   //@ts-ignore
   const pageName = activeLink?.label ?? router.pathname;
@@ -28,12 +28,12 @@ function PageIssueLink() {
     user: "EarthCubeGeochron",
     repo: "Sparrow",
     title: `Issue with "${pageName}" page`,
-    labels: ["documentation"],
+    labels: ["documentation"]
   });
 
   return h("p", [
     "Found a problem with this page? ",
-    h("a", { target: "_blank", href }, "Create an issue"),
+    h("a", { target: "_blank", href }, "Create an issue")
   ]);
 }
 
@@ -48,10 +48,10 @@ const RevisionInfo = () =>
       { href: JSON.parse(process.env.GITHUB_REV_LINK) },
       JSON.parse(process.env.GIT_COMMIT_HASH)
     ),
-    ")",
+    ")"
   ]);
 
-const BasePage = function (props) {
+const BasePage = function(props) {
   const { children, className, ...rest } = props;
 
   return h("div.page", { className }, [
@@ -107,7 +107,7 @@ const BasePage = function (props) {
             </ActiveLink>
             <Nav links={navLinks} exactLinks={false} />
           </div>
-        </div>,
+        </div>
       ]),
       h("div.main", [children]),
       <footer>
@@ -126,8 +126,8 @@ const BasePage = function (props) {
         </div>
 
         <PageIssueLink />
-      </footer>,
-    ]),
+      </footer>
+    ])
   ]);
 };
 

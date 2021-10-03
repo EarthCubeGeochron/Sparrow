@@ -1,0 +1,22 @@
+---
+Backend Plugins
+---
+
+import { DocsPage } from "components";
+
+### Backend Hooks
+
+Backend hooks allow developers to run code during key points of the Sparrow app building and initialization. A list of available hooks will be below with some descriptions. To use the hooks in a Sparrow Plugin define a function in the class with the name of the hook in this format: add "on" to the front and replace any "-" with "\_".
+
+```text
+"database-available" -> def on_database_available():
+
+"api-initialized-v2" -> def on_api_initialized_v2():
+```
+
+Some hooks will receive other parameters. For instance, the "database-available" can receive "db" as a parameter \(the sparrow database object\). Likewise, the "api-initialized-v2" hook can receive "api" as a parameter \(the sparrow API object\).
+
+- "database-available" : Runs code while database is being set up. If you are adding new tables and want them to be auto-mapped to the API, this is the hook you need!
+- "api-initialized-v2": Runs code when APIv2 has been created. This hook is good to use for adding custom routes to the Sparrow API.
+
+export default DocsPage;

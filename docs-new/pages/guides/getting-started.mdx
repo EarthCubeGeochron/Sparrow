@@ -1,10 +1,8 @@
 ---
-id: getting-started
-title: Getting started
-sidebar_label: Getting started
+Getting Started
 ---
 
-import { BasePage } from "components";
+import { GuidePage } from "components";
 
 Although Sparrow is a complex software application, it is packaged in
 a set of [**Docker** containers](https://www.docker.com/), enabling relatively seamless cross-platform
@@ -59,8 +57,8 @@ contribute to Sparrow.
 Downloading the bundled version of Sparrow occurs through a `curl` command. `curl` commands are used
 to transfer data from servers.
 
-```
-curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh | bash -s -
+```javascript
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh)"
 ```
 
 This is the most updated `curl` command at this time. The most recent release can be found at [Sparrow's Github page](https://github.com/EarthCubeGeochron/Sparrow) in the right most column
@@ -222,4 +220,4 @@ Several `sparrow` subcommands allow inspection of the running
 - [Local development](/docs/local-development)
 - [Core extensions](/docs/core/extensions)
 
-export default BasePage;
+export default GuidePage;
