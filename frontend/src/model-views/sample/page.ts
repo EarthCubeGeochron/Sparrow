@@ -247,23 +247,6 @@ const GeoEntity = props => {
   let title: string =
     sample_geo_entity.length == 0 ? "Context" : "Geologic Context";
 
-  // if (sample_geo_entity.length == 0) {
-  //   return h(
-  //     PageViewBlock,
-  //     {
-  //       title: "Context"
-  //     },
-  //     [
-  //       h(LocationBlock),
-  //       h(DepthElevation),
-  //       h(ModelAttributeOneLiner, {
-  //         title: "Geologic Context:",
-  //         content: "None"
-  //       })
-  //     ]
-  //   );
-  // }
-
   return h(PageViewBlock, { title }, [
     h(LocationBlock),
     h(DepthElevation),
