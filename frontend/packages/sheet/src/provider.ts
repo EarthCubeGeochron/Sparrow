@@ -146,7 +146,6 @@ function DataSheetProviderBase(props: DataSheetProps) {
   useEffect(() => {
     // If we don't have this we'll get an infinite loop
     const col = apportionWidths(columns, desiredWidths, containerWidth);
-    console.log(col, containerWidth);
     dispatch({ type: "set-columns", value: col });
   }, [containerWidth, desiredWidths, columns]);
 
@@ -168,7 +167,9 @@ const DataSheetProvider = compose(
   DataSheetProviderBase
 );
 
-const useDataSheet = () => useContext(DataSheetContext);
+const useDataSheet = () => {
+  return useContext(DataSheetContext);
+};
 const useDispatch = () => useDataSheet().dispatch;
 
 export {
