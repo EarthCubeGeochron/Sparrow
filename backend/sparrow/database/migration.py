@@ -80,24 +80,23 @@ def _create_migration(db_engine, target, safe=True):
 
 
 @contextmanager
-def _target_db(url, quiet=False):
+def _target_db(url, quiet=False, redirect=sys.stderr):
     from sparrow.app import Sparrow
 
-    stdout = sys.stderr
     if quiet:
-        stdout = open(os.devnull, "w")
+        redirect = open(os.devnull, "w")
 
     log.debug("Creating migration target")
     with temp_database(url) as engine:
         app = Sparrow(database=url)
-        with redirect_stdout(stdout):
+        with redirect_stdout(redirect):
             app.init_database()
         yield engine
 
 
-def create_migration(db, safe=True):
+def create_migration(db, safe=True, redirect=sys.stderr):
     url = "postgresql://postgres@db:5432/sparrow_temp_migration"
-    with _target_db(url) as target, redirect_stdout(sys.stderr):
+    with _target_db(url, redirect=redirect) as target, redirect_stdout(redirect):
         return _create_migration(db.engine, target)
 
 
@@ -108,7 +107,7 @@ def needs_migration(db):
 
 def db_migration(db, safe=True, apply=False, hide_view_changes=False):
     """Create a database migration against the idealized schema"""
-    m = create_migration(db, safe=safe)
+    m = create_migration(db, safe=safe, redirect=sys.stderr)
     stmts = m.statements
     if hide_view_changes:
         stmts = m.changes_omitting_views()

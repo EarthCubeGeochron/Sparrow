@@ -13,7 +13,8 @@
     "esModuleInterop": true,
     "typeRoots": ["node_modules/@types"],
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["src/*"],
+      "react": ["node_modules/react/"]
     }
   },
   "include": ["src", "plugins", "default-content", "packages"]

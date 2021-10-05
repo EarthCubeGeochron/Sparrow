@@ -5,6 +5,7 @@ import { useRef, useEffect } from "react";
 import { useElementSize, useScrollOffset } from "./helpers";
 import { Columns, Header, Row, Sheet } from "./components";
 import styles from "./module.styl";
+import { enhanceRow } from "./fields";
 
 const h = hyperStyled(styles);
 
@@ -41,7 +42,7 @@ function VirtualizedSheet(props) {
     ...rest
   } = props;
 
-  const { rowHeight, selection, dispatch } = useDataSheet();
+  const { rowHeight, selection, dispatch, columns } = useDataSheet();
 
   const ref = useRef<HTMLDivElement>();
 
@@ -67,7 +68,7 @@ function VirtualizedSheet(props) {
         keyFn(index) {
           return index + rowOffset;
         },
-        data: data.slice(rowOffset, lastRow),
+        data: data.slice(rowOffset, lastRow).map((d) => enhanceRow(d, columns)),
         selected: offsetSelection(selection, -rowOffset),
         onSelect(sel) {
           dispatch({ type: "set-selection", value: sel });
