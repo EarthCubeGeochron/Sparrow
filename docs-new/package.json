@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@blueprintjs/core": "^3.50.2",
-    "@macrostrat/hyper": "^1.2.14",
+    "@macrostrat/hyper": "^1.4.1",
     "@macrostrat/revision-info-webpack": "^1.0.0",
-    "@macrostrat/ui-components": "^0.6.8",
+    "@macrostrat/ui-components": "^1.0.2",
     "@mdx-js/loader": "^1.6.22",
     "@next/mdx": "^11.1.2",
     "@types/classnames": "^2.3.1",

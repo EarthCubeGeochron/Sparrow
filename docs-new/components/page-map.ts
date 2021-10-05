@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
-import h from "@macrostrat/hyper";
+import { hyperStyled } from "@macrostrat/hyper";
 import { DarkModeButton, GetAppButton } from "./buttons";
-
+const h = hyperStyled({});
 interface LinkSpec {
   href: string;
   label: string;
@@ -20,7 +20,7 @@ const navLinks: Links = [
   { href: "/guides", label: "Guides" },
   { href: "/guides/get-started", label: "Get started!" },
   h("li.spacer"),
-  h("li", null, h(DarkModeButton, { large: false }))
+  h("li", null, h(DarkModeButton, { large: false })),
 ];
 
 const guideLinks: Links = [
@@ -34,9 +34,9 @@ const guideLinks: Links = [
       { href: "/guides/schema/importers", label: "Importers" },
       {
         href: "/guides/schema/wiscsims-example",
-        label: "WiscSims Importer Example"
-      }
-    ]
+        label: "WiscSims Importer Example",
+      },
+    ],
   },
   {
     href: "/guides/tutorials",
@@ -45,15 +45,15 @@ const guideLinks: Links = [
       { href: "/guides/tutorials/views-and-tables", label: "Views and Tables" },
       {
         href: "/guides/tutorials/frontend-visualizations",
-        label: "Frontend Visualization"
+        label: "Frontend Visualization",
       },
       {
         href: "/guides/tutorials/custom-commands",
-        label: "Adding Custom Commands"
+        label: "Adding Custom Commands",
       },
       { href: "/guides/tutorials/map-views", label: "Map Views" },
-      { href: "/guides/tutorials/docker-ubuntu", label: "Docker for Ubuntu" }
-    ]
+      { href: "/guides/tutorials/docker-ubuntu", label: "Docker for Ubuntu" },
+    ],
   },
   { href: "/guides/embargo", label: "Embargo" },
   {
@@ -62,13 +62,13 @@ const guideLinks: Links = [
     children: [
       {
         href: "/guides/integrations/postgresql-client",
-        label: "PostgreSQL Client"
+        label: "PostgreSQL Client",
       },
       {
         href: "/guides/integrations/qgis",
-        label: "QGIS"
-      }
-    ]
+        label: "QGIS",
+      },
+    ],
   },
   {
     href: "/guides/resources",
@@ -77,16 +77,16 @@ const guideLinks: Links = [
       { href: "/guides/resources/presentations", label: "Presentations" },
       {
         href: "/guides/resources/lab-implementations",
-        label: "Lab Implementations"
-      }
-    ]
-  }
+        label: "Lab Implementations",
+      },
+    ],
+  },
 ];
 
 const aboutLinks: Links = [
   { href: "/about", label: "Motivation" },
   { href: "/about/implementations", label: "Implementations" },
-  { href: "/about/presentations", label: "Presentations" }
+  { href: "/about/presentations", label: "Presentations" },
   // { href: '/about/features', label: "Features"}
 ];
 
@@ -100,8 +100,8 @@ const docsLinks: Links = [
       { href: "/docs/core/cli", label: "Command-line interface" },
       { href: "/docs/core/server-config", label: "Server configuration" },
       { href: "/docs/core/plugins", label: "Plugins" },
-      { href: "/docs/core/extensions", label: "Extensions" }
-    ]
+      { href: "/docs/core/extensions", label: "Extensions" },
+    ],
   },
   { href: "/docs/database", label: "Database" },
   {
@@ -109,8 +109,8 @@ const docsLinks: Links = [
     label: "Frontend",
     children: [
       { href: "/docs/frontend/data-input-form", label: "Data Input Form" },
-      { href: "/docs/frontend/frames", label: "Extensions and Frames" }
-    ]
+      { href: "/docs/frontend/frames", label: "Extensions and Frames" },
+    ],
   },
   {
     href: "/docs/development",
@@ -121,9 +121,9 @@ const docsLinks: Links = [
       { href: "/docs/development/frontend-plugins", label: "Frontend Plugins" },
       {
         href: "/docs/development/local-development",
-        label: "Local development"
-      }
-    ]
+        label: "Local development",
+      },
+    ],
   },
   {
     href: "/docs/misscellaneous",
@@ -131,15 +131,15 @@ const docsLinks: Links = [
     children: [
       {
         href: "/docs/misscellaneous/linux-permissions",
-        label: "Linux Permissions"
+        label: "Linux Permissions",
       },
       { href: "/docs/misscellaneous/docker-issues", label: "Docker Issues" },
       {
         href: "/docs/misscellaneous/trouble-shooting",
-        label: "Trouble Shooting"
-      }
-    ]
-  }
+        label: "Trouble Shooting",
+      },
+    ],
+  },
 ];
 
 export { navLinks, aboutLinks, docsLinks, guideLinks };
