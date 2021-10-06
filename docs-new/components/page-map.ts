@@ -26,7 +26,6 @@ const navLinks: Links = [
 const guideLinks: Links = [
   { href: "/guides/getting-started", label: "Getting started" },
   { href: "/guides/motivation-and-design", label: "Motivation and design" },
-  { href: "/guides/datascience", label: "Data science" },
   {
     href: "/guides/schema",
     label: "Schema and Importing data",
@@ -42,6 +41,11 @@ const guideLinks: Links = [
     href: "/guides/tutorials",
     label: "User Tutorials",
     children: [
+      {
+        href: "/guides/tutorials/metadata-importer",
+        label: "Metadata Importer"
+      },
+      { href: "/guides/tutorials/datascience", label: "Data science" },
       { href: "/guides/tutorials/views-and-tables", label: "Views and Tables" },
       {
         href: "/guides/tutorials/frontend-visualizations",
