@@ -17,6 +17,7 @@
   bottom 0px
   display flex
   flex-direction column
+  padding 0 1em
   tbody
     padding-bottom 2em
   // https://css-tricks.com/position-sticky-and-table-headers/
@@ -33,6 +34,7 @@
     align-items: baseline;
 
   .sheet-actions
+    align-items: baseline;
     &>*
       display inline-block
       margin-right 0.5em
@@ -45,6 +47,8 @@
       margin 0
       margin-right 1em
       color $gray1
+    .spacer
+      flex-grow 1
 
   .sheet
     flex 1

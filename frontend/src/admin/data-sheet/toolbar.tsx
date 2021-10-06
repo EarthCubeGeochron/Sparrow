@@ -35,7 +35,7 @@ function SubmitDialog({ onClick, content, className = null, disabled }) {
 }
 
 export function SheetToolbar(props) {
-  const { onSubmit, onUndo, hasChanges } = props;
+  const { onSubmit, onUndo, hasChanges, children } = props;
   var constant =
     "Are you sure you want to save your edits? All changes will be final. If you do not want to submit, click Cancel.";
   return (
@@ -52,6 +52,8 @@ export function SheetToolbar(props) {
           Reset changes
         </Button>
       </div>
+      <div className="spacer"></div>
+      {children}
     </div>
   );
 }

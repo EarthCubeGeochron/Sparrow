@@ -121,6 +121,8 @@ function DataFileDetails(props) {
               basename: model.basename,
             }),
           ]),
+          h("h4", model.file_path),
+
           h(ModelAttributeOneLiner, {
             title: "Uploaded: ",
             content: h(FormattedDate, { date: dateUploaded }),

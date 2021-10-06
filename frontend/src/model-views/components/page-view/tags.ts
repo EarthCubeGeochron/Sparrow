@@ -5,7 +5,7 @@ import { useAPIv2Result } from "~/api-v2";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
 import styles from "./module.styl";
-import { ModelAttributeOneLiner } from "./page-view";
+import { ModelAttributeOneLiner } from "./common";
 
 const h = hyperStyled(styles);
 

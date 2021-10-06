@@ -218,6 +218,7 @@ class Database:
 
         try:
             self.app.run_hook("core-tables-initialized", self)
+            self.app.run_hook("finalize-database-schema", self)
         except AttributeError as err:
             secho("Could not load plugins", fg="red", dim=True)
             secho(str(err))
@@ -228,6 +229,8 @@ class Database:
 
         migrator = SparrowDatabaseMigrator(self)
         migrator.add_module(migrations)
+        self.app.run_hook("prepare-database-migrations", migrator)
+        # TODO: deprecate this hook
         self.app.run_hook("prepare-database-upgrade", migrator)
         migrator.run_migration(**kwargs)
 

@@ -1,14 +1,23 @@
 import { sum } from "d3-array";
 import { useDataSheet } from "../provider";
 import { useDrop, DropTargetMonitor } from "react-dnd";
+import ReactDataSheet from "react-datasheet";
 
-interface ColumnData {
+export interface Field<Key = string> {
   name: string;
-  key: string;
+  key: Key;
+  required?: boolean;
+  editable?: boolean;
+  isValid?(k: any): boolean;
+  transform?(k: any): any;
+  dataEditor?: ReactDataSheet.DataEditor<ReactDataSheet.Cell<any, any>>;
+  valueViewer?: ReactDataSheet.ValueViewer<ReactDataSheet.Cell<any, any>>;
+}
+
+type ColumnData<K = string> = Field<K> & {
   width?: number;
   idealWidth?: number;
-  editable?: boolean;
-}
+};
 
 interface ColumnWidthInfo {
   key: string;

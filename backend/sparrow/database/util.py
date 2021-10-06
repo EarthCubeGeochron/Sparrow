@@ -150,7 +150,7 @@ def connection_args(engine):
 
 def db_isready(engine_or_url):
     args, _ = connection_args(engine_or_url)
-    c = cmd("pg_isready", args)
+    c = cmd("pg_isready", args, capture_output=True)
     return c.returncode == 0
 
 
@@ -158,6 +158,6 @@ def wait_for_database(engine_or_url, quiet=False):
     msg = "Waiting for database..."
     while not db_isready(engine_or_url):
         if not quiet:
-            echo(msg)
+            echo(msg, err=True)
         log.info(msg)
         sleep(1)

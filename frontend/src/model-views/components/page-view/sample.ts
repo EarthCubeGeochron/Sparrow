@@ -6,7 +6,7 @@ import { useModelURL } from "~/util";
 import styles from "./module.styl";
 import { Frame } from "~/frame";
 import { useAPIv2Result } from "~/api-v2";
-import { FormattedLngLat } from "./page-view";
+import { FormattedLngLat } from "./common";
 
 const h = hyperStyled(styles);
 
