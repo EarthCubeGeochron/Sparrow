@@ -1,8 +1,6 @@
----
-LaserChron Metadata Importer
----
+import { DocsPage } from "components";
 
-import { GuidePage } from "components";
+# LaserChron Metadata Importer
 
 ### Overview:
 
@@ -11,12 +9,12 @@ analytical data comes from a separate source as the metadata. Consider analytica
 instrument versus metadata in a field notebook. Metadata are important to give scientific context
 to analytical data. Well reported and well connected metadata makes it easier for a lab to use
 there own data as well as by others. Thus, metadata also makes a lab more findable, accessible,
-interoperable, and reusable ([see importers](/guides/schema/importers)).
+interoperable, and reusable ([see importers](/guides/getting-started/importers)).
 
 Here we glance at an ongoing process to shape the metadata archive for Arizona LaserChron (ALC). At the end
 of this tutorial, you should have a foundation understanding for how to create your own metadata importer,
 including the two motifs of data cleaning and schema based importing as an iterative process
-([see importers](/guides/schema/importers)).
+([see importers](/guides/getting-started/importers)).
 
 ### Where to start?
 
@@ -45,11 +43,12 @@ in order to be imported into Sparrow. The data structure needs to fit into the [
 are focusing on the schema for the Sample data model. Based on the metadata we have, each sample will have some
 variation of the following data schema.
 
-```
-{'name': 'AME18-201',
- 'location': {'coordinates': [180, 90], 'type': 'Point'},
- 'material': 'zircon',
- 'sample_geo_entity':[{'geo_entity': {'name': 'apex basalt'}}]
+```json
+{
+  "name": "AME18-201",
+  "location": { "coordinates": [180, 90], "type": "Point" },
+  "material": "zircon",
+  "sample_geo_entity": [{ "geo_entity": { "name": "apex basalt" } }]
 }
 ```
 
@@ -85,7 +84,7 @@ python data cleaning iterations when I was first learning python.
 As an example below you'll see a function I made to change cardinal direction letters (i.e N,E,S,W) into a true or false value representing
 if the coordinate is negative or positive.
 
-```
+```Python
     def sign_check(self, unformatted_str):
         """
         Takes an unformatted coordinate string and checks if one of the cardinal directions is in it.cardinal_direction_to_sign
@@ -119,12 +118,12 @@ if the coordinate is negative or positive.
 At this point you have cleaned data that is correct and ready to be put into the correct data structure
 for importing. For this importer we are importing samples with a structure variable to the following:
 
-```
+```json
 {
- 'name': 'AME18-201',
- 'location': {'coordinates': [180, 90], 'type': 'Point'},
- 'material': 'zircon',
- 'sample_geo_entity':[{'geo_entity': {'name': 'apex basalt'}}]
+  "name": "AME18-201",
+  "location": { "coordinates": [180, 90], "type": "Point" },
+  "material": "zircon",
+  "sample_geo_entity": [{ "geo_entity": { "name": "apex basalt" } }]
 }
 ```
 
@@ -134,7 +133,7 @@ with that format. In the following example, I iterate through a pandas dataframe
 out of every row in the dataframe and then append the dictionary to a list. At the end of the function, it returns
 a list of python dictionaries, one for every row.
 
-```
+```Python
     def create_sample_dict(self, df):
         """ Create sample dictionary ready for loading """
         """ ref_datum: null,
@@ -166,7 +165,7 @@ Now for the actual importing. For this step there is a simple function provided 
 the last step and imports it into the Sparrow database. That function is `db.load_data`. This function takes two arguments: 1) a string of the
 model name we are importing, 2) the data list. For example for this importer the function call would be:
 
-```
+```Python
 db.load_data('sample', structured_data)
 ```
 
@@ -177,7 +176,7 @@ The easiest way to get your importer integrated with Sparrow is to turn it into 
 will allow you to run the importer from the frontend of Sparrow and see the output in real time.
 Creating a Sparrow task is easy and can be done relatively quickly with just a few lines of code (see below).
 
-```
+```Python
 from sparrow.task_manager import task
 import sparrow
 
@@ -200,7 +199,7 @@ the built-in Sparrow function, `sparrow.get_plugin()` to find the importer I've 
 Then I call only one method (function), `MetadataImporter.iterfiles()`. The defintion for this function
 is shown below and can be found [here](https://github.com/EarthCubeGeochron/Sparrow-LaserChron/blob/master/plugins/metadata_import/__init__.py#L26).
 
-```
+```Python
   def iterfiles(self, filename):
         """
         Read in csv and perform some data cleaning
@@ -245,4 +244,4 @@ In this `iterfiles()` function I get the file from local storage, clean the data
 in this class (i.e `self.clean_long_lat_to_float`), and then at the end I try to import the data using
 `db.load_data()` and I catch any errors using a [python try and except](https://www.w3schools.com/python/python_try_except.asp).
 
-export default GuidePage;
+export default DocsPage;

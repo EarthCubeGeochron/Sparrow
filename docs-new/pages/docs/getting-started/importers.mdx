@@ -1,8 +1,6 @@
----
-General importer build guide
----
+import { DocsPage } from "components";
 
-import { GuidePage } from "components";
+# Data Importers
 
 ## Big picture
 
@@ -35,7 +33,7 @@ similar form \([see this example website](https://regexr.com/)\). Simply,
 the minimum matching structured characters may be what is necessary to always
 find the needed columns. If you want more control, make your regular expression
 strings longer, or use a look-up dictionary with all possible columns
-listed \(see [WiscSIMS importer example](wiscsims-importer-example.md#creating-uniform-columns)\).
+listed \(see [WiscSIMS importer example](/docs/getting-started/wiscsims-example).
 
 For data in cells, it is important to ensure that there are no `null` values
 where not allowed in the Sparrow import pipeline. This can be handled in the
@@ -51,4 +49,14 @@ findable, accessible, interoperable, and reusable data. For instance, if standar
 run with samples and the values of both are necessary to check for the accuracy
 and precision of data in your lab, make sure to import both.
 
-export default GuidePage;
+## Summary:
+
+Writing data importers for Sparrow is an iterative and long yet rewarding process that makes
+your lab's data findable, accessible, and interoperable.
+
+Two examples for importers can be found:
+
+- [WiscSIMS importer (in R)](/docs/getting-started/wiscsims-example)
+- [LaserChron Metadata Importer (in Python)](/docs/getting-started/metadata-importer)
+
+export default DocsPage;
