@@ -19,6 +19,13 @@ def _report_image_versions():
     log.info(f"Frontend image version: {frontend_img_version}")
 
 
+def _get_prestart_script(cfg):
+    if cfg.config.dir is None:
+        return None
+    prestart = cfg.config_dir / "sparrow-prestart.sh"
+    return prestart.exists()
+
+
 @click.command()
 @click.argument("container", type=str, required=False, default="")
 @click.option("--force-recreate", is_flag=True, default=False)
@@ -38,10 +45,9 @@ def sparrow_up(ctx, container="", force_recreate=False):
         cmd("sparrow compose build")
 
     # Run the prebuild script
-    prebuild = cfg.config_dir / "sparrow-prestart.sh"
-    if prebuild.exists():
-        log.debug("Running prebuild script")
-        cmd("bash", str(prebuild))
+    prestart = _get_prestart_script(cfg)
+    if prestart is not None:
+        cmd("bash", str(prestart))
 
     # Bring up the application
     res = cmd(
