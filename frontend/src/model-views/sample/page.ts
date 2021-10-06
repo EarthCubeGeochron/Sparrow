@@ -41,7 +41,6 @@ import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
 import { useModelURL } from "~/util";
 import { Button } from "@blueprintjs/core";
-import { useEditingAllowed } from "~/util";
 
 const h = hyper.styled(styles);
 
@@ -245,29 +244,19 @@ const GeoEntity = (props) => {
     });
   };
 
-  if (sample_geo_entity.length == 0) {
-    return h(
-      PageViewBlock,
-      {
-        title: "Context",
-      },
-      [
-        h(LocationBlock),
-        h(DepthElevation),
-        h(ModelAttributeOneLiner, {
-          title: "Geologic Context:",
-          content: "None",
-        }),
-      ]
-    );
-  }
+  let title: string =
+    sample_geo_entity.length == 0 ? "Context" : "Geologic Context";
 
-  return h(GeoContext, {
-    sample_geo_entity,
-    isEditing,
-    changeGeoEntity,
-    deleteGeoEntity,
-  });
+  return h(PageViewBlock, { title }, [
+    h(LocationBlock),
+    h(DepthElevation),
+    h(GeoContext, {
+      sample_geo_entity,
+      isEditing,
+      changeGeoEntity,
+      deleteGeoEntity,
+    }),
+  ]);
 };
 
 const SampleProjectAdd = () => {
