@@ -147,6 +147,8 @@ def has_table(engine, table):
 
 def has_column(engine, table, column):
     insp = get_inspector(engine)
+    if table not in insp.tables:
+        return False
     tbl = insp.tables[table]
     for col in tbl.columns:
         if col == column:
