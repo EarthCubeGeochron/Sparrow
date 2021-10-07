@@ -1,43 +1,38 @@
 {
-  "name": "main-docs",
-  "version": "0.0.0",
+  "name": "sparrow-docs",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "docusaurus start",
-    "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@blueprintjs/core": "^3.41.0",
-    "@blueprintjs/icons": "^3.25.1",
-    "@docusaurus/core": "2.0.0-alpha.71",
-    "@docusaurus/preset-classic": "2.0.0-alpha.71",
+    "@blueprintjs/core": "^3.50.2",
+    "@macrostrat/hyper": "^1.4.1",
+    "@macrostrat/revision-info-webpack": "^1.0.0",
+    "@macrostrat/ui-components": "^1.0.2",
+    "@mdx-js/loader": "^1.6.22",
+    "@next/mdx": "^11.1.2",
+    "@types/classnames": "^2.3.1",
     "classnames": "^2.2.6",
-    "lodash": "^4.17.21",
-    "lodash.flatmap": "^4.5.0",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "new-github-issue-url": "^0.2.1",
+    "next": "11.1.2",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-icons": "^4.2.0",
+    "remark-admonitions": "^1.2.1",
+    "remark-code-blocks": "^2.0.1",
+    "remark-slug": "^7.0.0",
+    "sass": "^1.42.1",
+    "stylus": "^0.55.0"
   },
   "devDependencies": {
-    "date-fns": "^2.16.1",
-    "html-loader": "^1.1.0",
-    "postcss": "^8.1.9",
-    "postcss-import": "12.0.1",
-    "shelljs": "^0.8.4",
-    "stylus": "^0.54.7",
-    "stylus-relative-loader": "^4.0.0"
-  }
+    "@types/react": "17.0.19",
+    "eslint": "7.32.0",
+    "eslint-config-next": "11.1.2",
+    "typescript": "4.4.2"
+  },
+  "prettier": {}
 }
