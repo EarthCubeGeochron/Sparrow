@@ -1,16 +1,12 @@
----
-Frontend visualization plugins
----
+import { DocsPage } from "components";
 
-import { GuidePage } from "components";
+# Frontend Visualizations
 
 Frontend plugins are written in JavaScript and take advantage of extensive open-source libraries for data transformation and visualization. This can take some time to learn, but here we walk through the basic React components for a simple crossplot based on all data for a single analytical session on a sample mount in the WiscSIMS lab.
 
-{% hint style="warning" %}
+:::warning
 If you are developing plugins, do it locally and with Sparrow in Development mode. This automatically rebuilds the frontend as you edit your code so you can update figure rendering.
-{% endhint %}
-
-{% page-ref page="../misscel./development-mode.md" %}
+:::
 
 ## Visualizations
 
@@ -230,4 +226,4 @@ export default {
 };
 ```
 
-export default GuidePage;
+export default DocsPage;

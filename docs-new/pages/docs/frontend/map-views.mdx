@@ -1,8 +1,6 @@
----
-Map Views
----
+import { DocsPage } from "components";
 
-import { GuidePage } from "components";
+# Map Views
 
 Maps are useful for communicating the distribution of data collected in labs. Sparrow has several map views available by default \([see WiscAr example](https://wiscar-sparrow.geoscience.wisc.edu/map)\). These include a simple map with cultural information, a map with satellite views and cultural information, a topographic map, and a geological map that draws on [Macrostrat](https://macrostrat.org/). The non-geological maps are built using [Mapbox](https://www.mapbox.com/).
 
@@ -39,4 +37,4 @@ export MAPBOX_API_TOKEN="yourlongtoken"
 
 If you want to customize your static map style for the static sample location map or the map that informs sample location updating, you adjust two different files. In `frontend/src/components` the `static-map.ts` can be edited for a custom map style.
 
-export default GuidePage;
+export default DocsPage;

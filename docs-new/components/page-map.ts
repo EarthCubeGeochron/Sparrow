@@ -26,51 +26,21 @@ const navLinks: Links = [
 const guideLinks: Links = [
   { href: "/guides/motivation-and-design", label: "Motivation and design" },
   {
-    href: "/guides/schema",
-    label: "Schema and importing data",
-    children: [{ href: "/guides/schema/importers", label: "Importers" }]
-  },
-  {
     href: "/guides/tutorials",
     label: "User Tutorials",
     children: [
       { href: "/guides/tutorials/datascience", label: "Data science" },
-      { href: "/guides/tutorials/views-and-tables", label: "Views and tables" },
-      {
-        href: "/guides/tutorials/frontend-visualizations",
-        label: "Frontend visualization"
-      },
-      {
-        href: "/guides/tutorials/custom-commands",
-        label: "Adding custom commands"
-      },
-      { href: "/guides/tutorials/map-views", label: "Map views" },
+      { href: "/guides/tutorials/git-github", label: "Collaborative coding" },
       { href: "/guides/tutorials/docker-ubuntu", label: "Docker for ubuntu" }
     ]
   },
-  { href: "/guides/embargo", label: "Embargo" },
   {
     href: "/guides/integrations",
     label: "Integrations",
     children: [
       {
-        href: "/guides/integrations/postgresql-client",
-        label: "PostgreSQL client"
-      },
-      {
         href: "/guides/integrations/qgis",
         label: "QGIS"
-      }
-    ]
-  },
-  {
-    href: "/guides/resources",
-    label: "Resources",
-    children: [
-      { href: "/guides/resources/presentations", label: "Presentations" },
-      {
-        href: "/guides/resources/lab-implementations",
-        label: "Lab implementations"
       }
     ]
   }
@@ -97,7 +67,12 @@ const docsLinks: Links = [
       {
         href: "/docs/getting-started/wiscsims-example",
         label: "WiscSims importer example"
-      }
+      },
+      {
+        href: "/docs/getting-started/schema",
+        label: "Schema"
+      },
+      { href: "/docs/getting-started/embargo", label: "Embargo" }
     ]
   },
   {
@@ -106,31 +81,33 @@ const docsLinks: Links = [
     children: [
       { href: "/docs/core/cli", label: "Command-line interface" },
       { href: "/docs/core/server-config", label: "Server configuration" },
-      { href: "/docs/core/plugins", label: "Plugins" },
       { href: "/docs/core/extensions", label: "Extensions" }
     ]
   },
   { href: "/docs/database", label: "Database" },
+  { href: "/docs/tasks", label: "Tasks" },
   {
-    href: "/docs/development/frontend",
+    href: "/docs/frontend",
     label: "Frontend",
     children: [
+      { href: "/docs/frontend/map-views", label: "Map views" },
       { href: "/docs/frontend/data-input-form", label: "Data input form" },
+      {
+        href: "/docs/frontend/visualizations",
+        label: "Frontend visualization"
+      },
       { href: "/docs/frontend/frames", label: "Extensions and frames" }
     ]
   },
   {
-    href: "/docs/development",
-    label: "Development",
-    children: [
-      { href: "/docs/development/sparrow-cli", label: "Sparrow CLI" },
-      {
-        href: "/docs/development/local-development",
-        label: "Local development"
-      }
-    ]
+    href: "/docs/local-development",
+    label: "Local development"
   },
   { href: "/docs/windows", label: "Sparrow on windows" },
+  {
+    href: "/docs/misscellaneous/trouble-shooting",
+    label: "Trouble shooting"
+  },
   {
     href: "/docs/misscellaneous",
     label: "Miscellaneous",
@@ -139,11 +116,7 @@ const docsLinks: Links = [
         href: "/docs/misscellaneous/linux-permissions",
         label: "Linux permissions"
       },
-      { href: "/docs/misscellaneous/docker-issues", label: "Docker issues" },
-      {
-        href: "/docs/misscellaneous/trouble-shooting",
-        label: "Trouble shooting"
-      }
+      { href: "/docs/misscellaneous/docker-issues", label: "Docker issues" }
     ]
   }
 ];
