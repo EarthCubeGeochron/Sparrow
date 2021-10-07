@@ -15,12 +15,12 @@ export function DataFilesMainPanel() {
   return h(Switch, [
     h(Route, {
       path: base + "/:file_hash",
-      component: () => h(DataFileMatch)
+      component: () => h(DataFileMatch),
     }),
     h(Route, {
       path: base,
-      component: () => h(NoStateAdmin, { name: "Data File" })
-    })
+      component: () => h(NoStateAdmin, { name: "Data File" }),
+    }),
   ]);
 }
 
@@ -31,7 +31,7 @@ export function DataFileAdminPage() {
 
   const [params, setParams] = useState(initialState);
 
-  const createParams = params => {
+  const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
       console.log(key, value);
       if (key == "search") {
@@ -50,8 +50,8 @@ export function DataFileAdminPage() {
       listComponent: h(DataFilesListComponent, { params }),
       possibleFilters,
       createParams,
-      initParams: params || {}
+      initParams: params || {},
     }),
-    mainPageComponent: h(DataFilesMainPanel)
+    mainPageComponent: h(DataFilesMainPanel),
   });
 }
