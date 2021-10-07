@@ -1,4 +1,9 @@
 .git
 .pytest_cache
 **/node_modules
-frontend/.docusaurus
+
+docs/node_modules
+docs/.next
+docs/.ci
+docs/Dockerfile
+docs/__old

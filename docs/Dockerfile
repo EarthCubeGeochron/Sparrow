@@ -1,17 +1,17 @@
 # This actually is built from the base directory, NOT the docs directory.
 # Simple dockerfile: https://github.com/vercel/next.js/blob/canary/examples/with-docker/Dockerfile
 
-FROM node:12-slim
+FROM node:14
 
 WORKDIR /docs
 # Copy files needed for installation
-COPY docs/package.json /docs/package.json
-#COPY docs/package-lock.json /docs/package-lock.json
+COPY ./docs/package*.json /docs/
 
 # Install node modules
-RUN npm ci 
+# Should use `npm ci` but there are errors
+RUN npm install
 
-COPY docs/ /docs/
+COPY ./docs/ /docs/
 
 ENV NODE_ENV production
 
