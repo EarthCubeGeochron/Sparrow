@@ -5,6 +5,7 @@ export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID;
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/pages
 export const pageview = (url: URL) => {
+  // @ts-ignore
   window.gtag("config", GA_TRACKING_ID, {
     page_path: url,
   });
@@ -19,6 +20,7 @@ type GTagEvent = {
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events
 export const event = ({ action, category, label, value }: GTagEvent) => {
+  // @ts-ignore
   window.gtag("event", action, {
     event_category: category,
     event_label: label,
@@ -29,8 +31,8 @@ export const event = ({ action, category, label, value }: GTagEvent) => {
 export function useGoogleAnalytics() {
   const router = useRouter();
   useEffect(() => {
-    if (GA_TRACKING_ID == null) return null;
-    const handleRouteChange = (url) => {
+    if (GA_TRACKING_ID == null) return;
+    const handleRouteChange = (url: URL) => {
       pageview(url);
     };
     router.events.on("routeChangeComplete", handleRouteChange);

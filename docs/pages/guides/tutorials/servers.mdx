@@ -1,0 +1,20 @@
+# Servers
+
+One sticking point to running your own instance of Sparrow is working on a Linux server.
+Here we have compiled tips for working on Linux.
+
+## Permissions
+
+Linux has the concept of "users" and "groups". Files can be scoped for access (read, write, and/or execute) by either
+user or group.
+
+When multiple users are working on a machine and changing files, it is easy for permissions to get out of sync.
+
+    $ sudo chown -R username:group /path/to/folder
+
+## Github authorization
+
+Personal access tokens or SSH keys are required to push to GitHub. These can often be hard to set up.
+The [GitHub CLI](https://cli.github.com/) can help you set up these integrations.
+The [Linux installation instructions](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)
+can be tough to find.
