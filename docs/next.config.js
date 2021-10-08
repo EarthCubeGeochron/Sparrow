@@ -29,6 +29,18 @@ let baseConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: "/images/:path*",
+        destination: "https://sparrow-data.org/images/:path*", // Proxy to Backend
+      },
+      {
+        source: "/media/:path*",
+        destination: "https://sparrow-data.org/media/:path*", // Proxy to Backend
+      },
+    ];
+  },
 };
 
 module.exports = withMDX(baseConfig);

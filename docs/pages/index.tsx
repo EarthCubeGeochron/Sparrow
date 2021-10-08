@@ -2,7 +2,7 @@ import React from "react";
 import classnames from "classnames";
 import * as styles from "./styles.module.scss";
 import Mdx from "../text/index-text.mdx";
-import { BasePage } from "components";
+import BasePage from "components/pages/base";
 
 const features = [
   {
