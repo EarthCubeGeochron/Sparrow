@@ -11,6 +11,7 @@ FROM base AS frontend
 COPY packages/schema-linker/package.json /app/packages/schema-linker/
 COPY packages/sheet/package.json /app/packages/sheet/
 COPY package.json lerna.json .npmrc /app/
+
 RUN lerna bootstrap --hoist
 COPY ./ /app/
 CMD webpack

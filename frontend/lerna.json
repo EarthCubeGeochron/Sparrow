@@ -2,7 +2,7 @@
   "packages": ["packages/*"],
   "version": "independent",
   "npmClient": "npm",
-  "bootstrap": {
+  "bootstrap": {  
     "npmClientArgs": ["--no-package-lock", "--legacy-peer-deps"]
   }
 }
