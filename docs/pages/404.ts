@@ -1,8 +1,8 @@
-import { BasePage } from "components";
+import BasePage from "components/pages/base";
 import h from "@macrostrat/hyper";
 
-const ErrorPage = () =>
-  h(BasePage, [
+const ErrorPage = () => {
+  return h(BasePage, [
     h("h1.centered.extra-space", "404 — Page not found"),
     // h("div.mountain-underlay", [
     //   h("div.images", [
@@ -11,5 +11,6 @@ const ErrorPage = () =>
     //   ]),
     // ]),
   ]);
+};
 
 export default ErrorPage;

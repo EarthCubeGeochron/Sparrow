@@ -1,5 +1,7 @@
-$admonition = darken(#64cac1,60%)
-$admonition-dark = darken(desaturate(#64cac1,20%),20%)
+@use "sass:color";
+  
+$admonition: color.adjust(#64cac1,$lightness: -60%)
+$admonition-dark = color.adjust#64cac1, $saturation: -20%, $lightness: -20%)
 
 $admonition-caution=#e0c380  
 
