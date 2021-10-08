@@ -1,6 +1,6 @@
 import sparrow
 from sparrow_tests.helpers import json_fixture
-from sqlalchemy import text, Table, or_
+from sqlalchemy import Table, or_
 from .filter import get_document_tables
 
 
@@ -141,13 +141,17 @@ class TestOpenSearch:
             data = res.json()
             assert data["total_count"] != 0
 
-    def test_on_initialization(self, client, db):
-        """ 
-            test the open search _initialization function
-        """
-        db = sparrow.get_database()
-        OpenSearch = sparrow.get_plugin("open-search")
+    def test_add_new(self, client, db):
+        """ test to see if new item added to documents table """
 
-        OpenSearch.initialize_tables(db)
+        project_doc, sample_doc, session_doc = get_document_tables(db)
 
-        self.test_open_search_api(client, db)
+        res = db.session.query(sample_doc).all()
+
+        sample = {"name": "AME18-203", "material": "granodiorite"}
+
+        db.load_data("sample", sample)
+
+        res2 = db.session.query(sample_doc).all()
+
+        assert len(res2) > len(res)
