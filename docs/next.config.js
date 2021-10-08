@@ -30,14 +30,17 @@ let baseConfig = {
     ignoreDuringBuilds: true,
   },
   async rewrites() {
+    // Don't rewrite paths in production
+    if (process.env.NODE_ENV === "production") return [];
+    // ...but rewrite them in development
     return [
       {
         source: "/images/:path*",
-        destination: "https://sparrow-data.org/images/:path*", // Proxy to Backend
+        destination: "http://sparrow-data.org/images/:path*", // Proxy to Backend
       },
       {
         source: "/media/:path*",
-        destination: "https://sparrow-data.org/media/:path*", // Proxy to Backend
+        destination: "http://sparrow-data.org/media/:path*", // Proxy to Backend
       },
     ];
   },
