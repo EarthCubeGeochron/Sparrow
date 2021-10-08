@@ -33,6 +33,11 @@ export function DataFileAdminPage() {
 
   const createParams = (params) => {
     for (let [key, value] of Object.entries(params)) {
+      console.log(key, value);
+      if (key == "search") {
+        params["like"] = params[key];
+        delete params[key];
+      }
       if (value == null) {
         delete params[key];
       }

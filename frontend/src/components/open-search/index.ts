@@ -38,7 +38,7 @@ const OpenSearchCard = (props) => {
 function OpenSearch() {
   const [query, setQuery] = useState("");
   const [scrollData, setScrollData] = useState<any>([]);
-  const url = "/api/v2/search/query";
+  const url = "search/query";
 
   const data = useAPIv2Result(url, { query: query, model: "all" });
 
