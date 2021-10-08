@@ -12,6 +12,7 @@ COPY ./docs/package*.json /docs/
 RUN npm install
 
 COPY ./docs/ /docs/
+COPY ./get-sparrow.sh /docs/public/
 
 ENV NODE_ENV production
 

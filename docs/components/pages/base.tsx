@@ -97,7 +97,7 @@ const BasePage = function (props) {
         </div>,
       ]),
       h("div.main", [children]),
-      <footer>
+      <footer className={styles["page-footer"]}>
         <div>
           <p>
             <strong>Sparrow</strong>
