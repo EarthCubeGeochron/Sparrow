@@ -1,6 +1,7 @@
 @use "sass:color"
 @use "buttons"
 @use "nav"
+@use "admonitions"
 @use "colors" as *
   
 $secondary: #32536b //#304e68
@@ -28,7 +29,7 @@ $gradient-background: desaturate(color.adjust($card-base,$lightness: 30%),20%)
 
 *
   box-sizing: border-box
-  line-height: 1.3
+  line-height: 1.5
 
 a
   color: var(--accent-color)
@@ -39,7 +40,6 @@ p
 
 code, pre 
   font-family: var(--mono-font)
-  line-height: 1.2
 
 body
   z-index: -10
