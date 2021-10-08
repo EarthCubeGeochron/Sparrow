@@ -142,7 +142,7 @@ class TestOpenSearch:
             assert data["total_count"] != 0
 
     def test_add_new(self, client, db):
-        """ test to see if new item added to documents table """
+        """test to see if new item added to documents table"""
 
         project_doc, sample_doc, session_doc = get_document_tables(db)
 

@@ -21,7 +21,7 @@ def _initialize_tables(engine, refresh=True):
     filenames = list(fixtures.glob("*.sql"))
     filenames.sort()
 
-    #creates tables, functions, triggers and indexes
+    # creates tables, functions, triggers and indexes
     for fn in filenames:
         run_sql_file(engine, fn)
 
