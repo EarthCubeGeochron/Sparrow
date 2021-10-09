@@ -4,7 +4,4 @@ set -e
 
 source docs/.ci/_defs.bash
 
-for img in "$main_img" "$test_img"; do
-  docker tag $img $PKG_ROOT$img
-  docker push $PKG_ROOT$img || true
-done
+docker push $main_img

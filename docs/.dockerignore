@@ -1,6 +1,6 @@
-docker-compose.yaml
+__old
+.next
+.ci
 .docusaurus
 Dockerfile
 node_modules
-public
-.cache

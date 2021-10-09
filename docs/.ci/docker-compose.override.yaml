@@ -1,6 +1,0 @@
-version: "3.4"
-services:
-  sparrow_docs:
-    image: sparrow-documentation-site:latest
-  test:
-    image: sparrow-documentation-test:latest
