@@ -2,7 +2,7 @@ import typing
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from os import environ
+from os import environ, getenv
 from sparrow_utils.shell import git_revision_info
 from sparrow_utils.logs import get_logger, setup_stderr_logs
 
