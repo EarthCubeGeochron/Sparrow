@@ -15,6 +15,7 @@ let baseConfig = {
   reactStrictMode: true,
   pageExtensions: ["mdx", "ts", "tsx"],
   env: {
+    MEDIA_PATH: "https://sparrow-documentation-assets.s3.amazonaws.com/",
     ...RevisionInfoWebpack(null, GITHUB_LINK)
   }
 };

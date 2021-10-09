@@ -1,6 +1,11 @@
 import { AboutPage } from "components/pages";
 
-![Chart](pathname:///images/simplified-chart.png)
+<!-- ![Chart](https://sparrow-documentation-assets.s3.amazonaws.com/images/simplified-chart.png) -->
+
+<img
+  width={850}
+  src="https://sparrow-documentation-assets.s3.amazonaws.com/images/simplified-chart.png"
+/>
 
 ## A lab information management system
 
@@ -70,7 +75,12 @@ to the server. Data collection, storage, and analysis tools
 such as [`PyChron`](https://github.com/NMGRL/PyChron)
 sit immediately prior to this system in a typical lab's data production pipeline.
 
-![Chart](pathname:///images/Lab-Data-Interface.png)
+<!-- ![Chart](pathname:///images/Lab-Data-Interface.png) -->
+
+<img
+  width={850}
+  src="https://sparrow-documentation-assets.s3.amazonaws.com/images/Lab-Data-Interface.png"
+/>
 
 ## Meta-goals
 
@@ -108,7 +118,12 @@ Code and issues for this project are tracked [on Github](https://github.com/Eart
 
 ### Hierarchical levels of analytical data
 
-![Chart](pathname:///images/model-levels.png)
+<!-- ![Chart](pathname:///images/model-levels.png) -->
+
+<img
+  width={850}
+  src="https://sparrow-documentation-assets.s3.amazonaws.com/images/model-levels.png"
+/>
 
 - **`datum`**: an individual data point (any numerical parameter and its error)
 - **`analysis`**: an collection of data points measured at the same time
@@ -127,12 +142,20 @@ Code and issues for this project are tracked [on Github](https://github.com/Eart
 Data must be loaded into this standardized core in order to be
 exposed to the outside world.
 
-![Chart](pathname:///images/erd-core.png)
+<!-- ![Chart](pathname:///images/erd-core.png) -->
+
+<img
+  width={850}
+  src="https://sparrow-documentation-assets.s3.amazonaws.com/images/erd-core.png"
+/>
 
 ### Schema → API
 
 The **Sparrow** API will map lab-specific vocabulary to community standards.
 
-<img src="/images/vocabulary-mapping.png" width="500" />
+<img
+  src="https://sparrow-documentation-assets.s3.amazonaws.com/images/vocabulary-mapping.png"
+  width="850"
+/>
 
 export default AboutPage;

@@ -4,7 +4,12 @@ import { DocsPage } from "components";
 
 Maps are useful for communicating the distribution of data collected in labs. Sparrow has several map views available by default \([see WiscAr example](https://wiscar-sparrow.geoscience.wisc.edu/map)\). These include a simple map with cultural information, a map with satellite views and cultural information, a topographic map, and a geological map that draws on [Macrostrat](https://macrostrat.org/). The non-geological maps are built using [Mapbox](https://www.mapbox.com/).
 
-![Map canvas examples from the WiscAr lab showing sample locations.](../.gitbook/assets/mapcanvasexample.png)
+<!-- ![Map canvas examples from the WiscAr lab showing sample locations.](../.gitbook/assets/mapcanvasexample.png) -->
+
+<img
+  width={850}
+  src="https://sparrow-documentation-assets.s3.amazonaws.com/images/MapCanvasExample.png"
+/>
 
 ### Custom mapbox styles
 
@@ -19,11 +24,21 @@ In Sparrow, you can add custom Mapbox styles to visualize your sample distributi
 
 To find your style URL, look at a style in Mapbox Studio \(see screenshot below\). You can learn more about making new styles in the [Mapbox tutorials and documentation](https://docs.mapbox.com/help/tutorials/).
 
-![Mapbox screenshot showing Style URL.](../.gitbook/assets/image.png)
+<!-- ![Mapbox screenshot showing Style URL.](../.gitbook/assets/image.png) -->
+
+<img
+  width={850}
+  src="https://sparrow-documentation-assets.s3.amazonaws.com/images/mapbox-styling.png"
+/>
 
 A Mapbox API token for your lab needs to be created and added to your configuration files for your instance of Sparrow that is publically available. You can find this information in your Mapbox account. The most recent free version allows 50,000 views a month.
 
-![API access token dialog on Mapbox in account window.](../.gitbook/assets/mapbox_api_token.png)
+<!-- ![API access token dialog on Mapbox in account window.](../.gitbook/assets/mapbox_api_token.png) -->
+
+<img
+  width={850}
+  src="https://sparrow-documentation-assets.s3.amazonaws.com/images/mapbox_api_token.png"
+/>
 
 This is added to the `sparrow-config.sh` file as noted below. This will enable your public Sparrow instance to render maps from Mapbox.
 
