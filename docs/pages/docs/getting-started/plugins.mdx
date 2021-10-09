@@ -1,0 +1,193 @@
+import { DocsPage } from "components";
+
+# Backend Plugins
+
+Backend plugins are the heart of lab development for Sparrow. Through backend plugins a lab can write data
+importers, add extra database tables, add extra API routes, and more without touching any of the core codebase!
+To do this, Sparrow has developed a few tools in order to allow labs to implement plugins. First we have **hooks**.
+Hooks allow users to run plugins at specific points during the Sparrow application lifecycle. Second have **tasks**.
+A Sparrow `task` allows the user to define a process that can be run on command, through the Sparrow frontend. We recommend
+implementing importers using a `task` (see this [example](/docs/getting-started/metadata-importer)).
+
+### Backend Hooks
+
+Backend hooks allow developers to run code during key points of the Sparrow app building and initialization. A list of available hooks will be below with some descriptions. To use the hooks in a Sparrow Plugin define a function in the class with the name of the hook in this format: add "on" to the front and replace any "-" with "\_".
+
+```text
+"database-available" -> def on_database_available():
+
+"api-initialized-v2" -> def on_api_initialized_v2():
+```
+
+As a basic example:
+
+```Python
+
+def on_api_initialized_v2(api):
+    api.add_route("/some-route", SomeRoute, methods=["GET"], include_in_schema=false)
+
+```
+
+This code would create a new API route at "/some-route" with the given class `SomeRoute`. A basic implementation
+using this hook can be found [here](https://github.com/Idzikowski-Casey/Sparrow-WiscAr-Example/blob/master/site-content/backend-plugins/__init__.py#L35).
+
+Some hooks will receive other parameters. For instance, the "database-available" can receive "db" as a parameter \(the sparrow database object\). Likewise, the "api-initialized-v2" hook can receive "api" as a parameter \(the sparrow API object\).
+
+- "database-available" : Runs code while database is being set up. If you are adding new tables and want them to be auto-mapped to the API, this is the hook you need!
+- "api-initialized-v2": Runs code when APIv2 has been created. This hook is good to use for adding custom routes to the Sparrow API.
+
+### Adding a custom command
+
+:::warning
+The best-practice way to add commands is currently in development, and some changes are expected during the `2.x` release series.
+:::
+
+Sparrow commands can be created within plugins with using the `on_setup_cli` hook, as such:
+
+```text
+from click import command
+from sparrow.plugins import SparrowPlugin
+
+@command(name="import-data")
+def import_data():
+    print("No data yet!")
+
+class DataReductionImportPlugin(SparrowPlugin):
+    name = "data-reduction-import"
+
+    def on_setup_cli(self, cli):
+        cli.add_command(import_data)
+```
+
+How this works internally is complicated: The `sparrow` command-line application actually wraps a similar command-line application within the `backend` Docker container, which calls commands in the application's context.
+
+- Most commands that don't directly manage the Docker services are passed through to the inner layer, which should be happen transparently for most commands.
+- In order to notify the Sparrow wrapper that a new command is available, we need to refresh some cached help text, which can be done using the command `sparrow dev clear-cache` \(note: this happens automatically on each `sparrow up` as well\).
+
+### Sparrow tasks
+
+Sparrow provides a `task` decorator that allows a backend process to be called on command from the frontend. Consider the following:
+
+```Python
+from click import secho
+from sparrow.task_manager import task
+
+@task(name="say-hello")
+def say_hello():
+    secho("Hello World, I am a Sparrow Task", fg='green')
+```
+
+This tiny block of code will create a `task` viewable on the frontend that when run would print: "Hello World, I am a Sparrow Task"
+in a nice green color.
+
+Of course this is an rudimentary example; however, you can use Sparrow tasks to do complex things such as run importers or
+periodic processes (like exporting new data).
+
+### Adding view or table
+
+An installation of Sparrow can have arbitrary views and tables added as plugins. This is useful for adding lab-specific data and more convenient representations of particular data types.
+
+Plugins are Python classes that inherit from `sparrow.plugins.SparrowPlugin` and implement one or more "hooks" to interact with the Sparrow application.
+
+Plugins can be added in `sparrow-config.sh` by pointing an environment variable to a [Python module that exports plugins](https://github.com/EarthCubeGeochron/Sparrow-LaserChron/tree/master/plugins) \(a directory with an `__init__.py` file containing references to the installed plugins\):
+
+```text
+export SPARROW_PLUGIN_DIR=plugins
+```
+
+[The `InitSQLPlugin`](https://github.com/EarthCubeGeochron/Sparrow/blob/master/backend/core_plugins/init_sql.py), which is part of Sparrow core, is an example of a simple plugin that implements the `on_core_tables_initialized` function to respond to the 'core-tables-initialized' hook. This plugin \(available in Sparrow core by default\) allows startup SQL to be initialized from a directory full of `*.sql` files. This plugin is enabled by adding
+
+```text
+export SPARROW_INIT_SQL=dir-of-files
+```
+
+to `sparrow.sh`. If your plugin only needs to create views and tables on the database, using this built-in capability is the most straightforward approach.
+
+# Frontend Plugins
+
+Frontend plugins are written in JavaScript (we recommend [React.js](https://reactjs.org/)) and take advantage of extensive open-source libraries for data transformation and visualization.
+Labs can customize the user interface of their Sparrow installation using frontend plugins. Plugins overwrite certain parts of the
+default frontend through the use of [Frames](). There are many Frames in existence already, however, if you want one in a different place the
+best thing to do is write it up as a Github issue [here](https://github.com/EarthCubeGeochron/Sparrow/issues).
+
+### Implementation example
+
+Frontend plugins can not only be used for visualization but for other practical uses as well. Here, we will look at a plugin
+that leverages Sparrow to autogenerate png files that can be used as slide mounts for analytical sessions. Integrating Sparrow into
+lab workflows should be an end goal for all users.
+
+Below is a short react component that creates a box label display given some data about a specific sample. When the user clicks on the
+download button, the `onClick` function is called and the label is downloaded as a png that can be printed and used for a slide mount.
+This file can be found [here](https://github.com/Idzikowski-Casey/Sparrow-WiscAr-Example/blob/master/site-content/custom-components.ts).
+
+```JavaScript
+import React, { useEffect, useRef } from "react";
+import html2canvas from "html2canvas";
+import { Button } from "@blueprintjs/core";
+import { hyperStyled } from "@macrostrat/hyper";
+//@ts-ignore
+import styles from "./module.styl";
+
+const h = hyperStyled(styles);
+
+export function CanvasDownloader(props) {
+  if (!props) return null;
+
+  const { name } = props.data;
+  console.log(name);
+
+  const onClick = () => {
+    const c = document.getElementById("hal");
+    html2canvas(c).then(function(canvas) {
+      const dataURI = canvas.toDataURL();
+      const a = document.createElement("a");
+      document.body.append(a);
+      a.href = dataURI;
+      a.download = `${name}-mount.png`;
+      a.click();
+      document.body.removeChild(a);
+    });
+  };
+
+  return h("div", [
+    h("div.canvas", { id: "hal" }, [
+      h("div.label-top", [
+        h("h1", "Open the pod bay doors, please, HAL"),
+        h("h3", `Samlpe Name: ${name}`),
+      ]),
+      h("div.label-bottom", [
+        "Cast in Epoxy, Cut on Lines",
+        h("hr.dashed"),
+        "Standard",
+        h("hr.dashed"),
+        `Sample # (${name})`,
+        h("hr.dashed"),
+        "Museum Name",
+      ]),
+    ]),
+    h(Button, { intent: "success", onClick }, ["Download"]),
+  ]);
+}
+```
+
+Now that we have a component we need to get it into a Frame. I want this component to live on the Sample Admin Page so I will use
+the Frame ID `samplePage`. In the `site-content/index.js` file, autogenerated in [this process](/docs/getting-started/create-lab), we need
+to import our custom component and then add it to the exported JavaScript dictionary with the ID corresponding to the Frame we want.
+This file can be found [here](https://github.com/Idzikowski-Casey/Sparrow-WiscAr-Example/blob/master/site-content/index.js).
+
+```JavaScript
+import h from "@macrostrat/hyper";
+import { CanvasDownloader } from "./custom-components";
+
+export default {
+  siteTitle: "TestSite",
+  samplePage: (props) => {
+    const { defaultContent, ...rest } = props;
+    return h(CanvasDownloader, rest);
+  },
+};
+```
+
+You can find more information on frontend visualization on [this page](/docs/frontend/visualizations)
+
+export default DocsPage;

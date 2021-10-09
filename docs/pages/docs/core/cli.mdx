@@ -1,0 +1,91 @@
+---
+Command Line Interface
+---
+
+import { DocsPage } from "components";
+
+**Sparrow** is administered using the `sparrow` command-line
+interface. This command wraps application management,
+database management, and `docker-compose` orchestration subcommands in a
+single executable, simplifying basic management tasks.
+
+```
+Key commands:
+  up                       Start sparrow and follow logs
+  down                     Safely stop sparrow
+  info                     Show information about the installation
+  create-test-lab          Create an example installation of Sparrow
+  run                      Run Sparrow tasks (alias to sparrow tasks
+                           run)
+
+
+Command groups:
+  db                       Manage the sparrow database
+  tasks                    Manage sparrow's task system
+  test                     Run sparrow's test suite
+  dev                      Helper commands for development
+  docs                     Manage sparrow's documentation
+
+Core commands:
+  config                   Print configuration of backend
+  create-user              Create an authorized user for the web frontend
+  create-views             Recreate views only (without building rest of
+                           schema)
+
+  init                     Initialize database schema (non-destructive)
+  list-users
+  plugins                  Print a list of enabled plugins
+  reset-password           Reset the password for an existing user
+  shell                    Get a Python shell within the application
+
+Plugin commands:
+  import-earthchem         Import EarthChem vocabulary files
+  import-pychron           Import PyChron Interpreted Age files.
+  remove-audit-trail       Remove PGMemento audit trail
+  show-interface           Show the import interface for a database model.
+  tasks
+  update-location-names    Update location names
+  validate-data            Try to import data into the database to see if
+                           errors are raised.
+
+
+Container orchestration:
+  compose                  Alias to docker-compose that respects
+                           sparrow config
+
+  attach                   Attach to the standard output of a container
+  build                    Build Sparrow Docker images
+  container-id
+  logs
+  shell                    Get an iPython or container shell
+  psql                     Get a psql session to the database
+  monitor                  Run a monitor
+  printenv                 Print sparrow environment variables to a
+                           file
+
+  exec                     Quick shortcut to docker-compose exec
+  status                   Get the status of the running Sparrow instance.
+  kill                     Like sparrow down, but for people in a
+                           hurry.
+
+  test-runtime             Run tests for Sparrow
+  restart                  Fully restart all sparrow containers
+```
+
+## Some key commands:
+
+- `sparrow compose config`: print out the entire Docker-compose configuration.
+- `sparrow restart`: forces sparrow to restart and rebuild the docker containers.
+- `sparrow db`: shows a list of the available commands for the sparrow database.
+- `sparrow tasks`: shows a list of the available sparrow tasks, may not be a complete list and others can be seen on frontend.
+- `sparrow show-interface <schema-name>`: shows the schema for a given data model (i.e sample).
+- `sparrow init`: intializes the sparrow database. If the database doesn't exist this command will build the schemas and tables.
+
+## Container orchestration
+
+Sparrow bundles its own version of [`docker-compose`](https://docs.docker.com/compose/)
+for container orchestration. All commands that are part of the compose interface
+can be used to access and manage containers that are part of a
+Sparrow installation.
+
+export default DocsPage;

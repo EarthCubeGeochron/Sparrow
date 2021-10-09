@@ -1,0 +1,62 @@
+import { DocsPage } from "components";
+
+# Data Importers
+
+## Big picture
+
+Sparrow helps to make your lab data findable, accessible,
+interoperable, and reusable. To do this, your data needs to
+be in a form that can be passed to the Sparrow database.
+This means you will likely need to minimize variability in
+your files that humans may have added. Some useful information
+on the source of samples and papers may not be easily
+accessible in the archive you have, but Sparrow will help with that later.
+
+You should plan on iterative development of an import pipeline,
+especially if you have a large dataset that may include variation
+from human input. For instance, if you have 3 common methods, start
+an import pipeline that extracts data for one of them and then build on it.
+It is difficult to build an automation that works for an entire archive
+the first time, but be persistent and work toward completeness later.
+
+1. Clean your analytical data files to make uniform columns and cells.
+2. Iterate to ingest as much of your archive as possible.
+3. Link metadata to analytical data in Sparrow.
+4. Share data to the outside world!
+
+## Data cleaning
+
+Uniform column headers and data types in cells are two of the most important
+steps in organizing and cleaning data from Excel files. This may be as simple
+to complete as writing a single regular expression to find all columns with a
+similar form \([see this example website](https://regexr.com/)\). Simply,
+the minimum matching structured characters may be what is necessary to always
+find the needed columns. If you want more control, make your regular expression
+strings longer, or use a look-up dictionary with all possible columns
+listed \(see [WiscSIMS importer example](/docs/getting-started/wiscsims-example).
+
+For data in cells, it is important to ensure that there are no `null` values
+where not allowed in the Sparrow import pipeline. This can be handled in the
+steps to transform tables into JSON. See the schema for more information on what can not be null.
+
+## Iterative workflows
+
+Start simple and build complexity is the fundamental rule for building importers.
+Unless your initial files are well structured and have minimal variability from
+user input, it is unreasonable to expect 100% success on the first attempt at importing
+data. Identify the minimal data necessary to populate your instance of Sparrow with
+findable, accessible, interoperable, and reusable data. For instance, if standards
+run with samples and the values of both are necessary to check for the accuracy
+and precision of data in your lab, make sure to import both.
+
+## Summary:
+
+Writing data importers for Sparrow is an iterative and long yet rewarding process that makes
+your lab's data findable, accessible, and interoperable.
+
+Two examples for importers can be found:
+
+- [WiscSIMS importer (in R)](/docs/getting-started/wiscsims-example)
+- [LaserChron Metadata Importer (in Python)](/docs/getting-started/metadata-importer)
+
+export default DocsPage;
