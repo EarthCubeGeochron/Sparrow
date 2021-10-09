@@ -95,7 +95,7 @@ const TagContainer = (props) => {
         const name =
           key == "public"
             ? natLang[key][value]
-            : key == "search"
+            : key == "search" || key == "like"
             ? value
             : natLang[key];
         return h(

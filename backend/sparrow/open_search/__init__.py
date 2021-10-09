@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from sqlalchemy import text
 import sparrow
 from sparrow.plugins import SparrowCorePlugin
 from sparrow.task_manager.base import task
@@ -14,7 +14,7 @@ procedures = here / "procedures"
 
 
 def _initialize_tables(engine, refresh=True):
-    initialization_fn = procedures / "on-initialization.sql"
+    fill_empty_docs = procedures / "fill_empty_tables.sql"
     if refresh:
         run_sql_file(engine, procedures / "drop-tables.sql")
 
@@ -26,7 +26,7 @@ def _initialize_tables(engine, refresh=True):
         run_sql_file(engine, fn)
 
     # checks if tables are empty, if so try to fill with info from other tables
-    run_sql_file(engine, initialization_fn)
+    run_sql_file(engine, fill_empty_docs)
 
 
 class DocumentTableMigration(SparrowMigration):
