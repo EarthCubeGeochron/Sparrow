@@ -1,53 +1,98 @@
 import { DocsPage } from "components/pages";
 
-# Getting Started
+# Getting started with Sparrow
 
-Although Sparrow is a complex software application, it is packaged in
-a set of [**Docker** containers](https://www.docker.com/), enabling relatively seamless cross-platform
-installation, independent of the configuration of the base system.
-Local installation is possible, but less supported.
-
-:::note
-Running Sparrow on Windows is somewhat more complex than for Unix (e.g. Linux, Mac)
-systems. If you want to do this, please see the [**Sparrow on Windows**](/docs/windows)
-documentation.
-:::
+Sparrow is a complex software application, but it has been packaged for easy
+setup on a wide variety of systems, from personal laptops to servers (both
+physical and in the cloud). This guide focuses on setting up the system on
+personal and workspace computers (i.e., those with and a graphical environment
+and attached screens). However, some aspects of server installation are
+touched on.
 
 ## Install Docker
 
-Sparrow is a _containerized_ application.
+The first step to running Sparrow is to
+[**install the Docker application**](https://docs.docker.com/install/)
+using the instructions for your platform.
 
+Sparrow is packaged in a set of [**Docker** containers](https://www.docker.com/).
+A container is a miniature
+virtual machine designed to hold a single application and all of its
+dependencies. Docker enables relatively seamless cross-platform installation of
+Sparrow, independent of the configuration of the base system.
+The Docker toolchain is stable, open-source, and supported by helpful tools like
+[Docker Desktop][docker-desktop] for running applications in development.
+Local installation (i.e., without Docker) is straightforward but unsupported at the
+moment.
+
+:::note Windows installation
+Running Sparrow is easiest on Unix platforms, like **Linux** and **MacOS**.
+Running containerized applications on Windows requires some additional steps, although the
+[Windows Subsystem for Linux][wsl] has made this considerably easier than in the past.
+Please see the [**Sparrow on Windows**](/docs/windows) documentation for more information.
+:::
+
+[docker-desktop]: http://docker.com/desktop
+[wsl]: https://microsoft.com
+
+<!--
 In its containerized form, Sparrow can be installed easily
 on any Unix environment. This containerized
 distribution strategy will allow easy deployment on any infrastructure
 (local, cloud hosting, AWS/Azure, etc.).
-The Docker toolchain is stable and open-source.
+-->
 
-The only installation requirements on Unix host
-systems (e.g. Linux and MacOS) are `docker` and `python3`.
-First, [install Docker](https://docs.docker.com/install/) and
-`docker-compose` using the instructions for your platform, and
-make sure your user can run `docker` without root permissions (typically
-`sudo usermod -aG docker ${USER}`).
-Installation is also possible on Windows 10 using Windows Subsystem for Linux.
+Once you have installed Docker, you should be able to access it at the terminal
+using the `docker` command. Running a basic example container (e.g., `docker run hello-world`)
+is a good idea to make sure that everything is set up properly.
 
-# Download Sparrow
+For server installations, it is a good idea to
+ensure that your user can run `docker` without root permissions, by running
+`sudo usermod -aG docker ${USER}` or your distribution's equivalent.
+This is automatically set up when using **Docker Desktop**.
 
-:::tip New!
-Sparrow is now available via a [bundled download](/docs/getting-started#bundled-version).
+## Install the `sparrow` executable
+
+Sparrow's stack of Docker containers are wrapped in a command-line interface
+that simplifies management of the system.
+Sparrow's command line application is a small Python package that has been
+bundled with [PyInstaller][pyinstaller]. New versions of Sparrow are released
+periodically on [Github][sparrow-releases]
+
+The `sparrow` CLI is most easily installed using a convenience script that
+installs it in the right location based on common configurations. This can be
+downloaded and run using the following terminal snippet:
+
+```sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh)"
+```
+
+This command will download Sparrow to your `/usr/local/bin` and `/usr/local/opt` (or `~/.sparrow/opt` on MacOS) directories .
+In your favorite terminal or shell, run the command from above. If it is installed properly you should
+see the output `Sparrow executable installed!`
+
+:::caution
+`get-sparrow.sh` requests **`sudo`** privilege elevation so that it can
+install `sparrow` to `/usr/local/bin`, which allows the command to be
+run without a path prefix on most systems.
 :::
 
-Currently there are two ways to downloading Sparrow. Either
-download a bundled version or clone the codebase directly from Github. The former, bundled version,
-is the main way Sparrow should be downloaded. The bundled version has an easier download and startup process and removes
-the need for the user to manage a core codebase. There is, however, still the ability to customize a Sparrow instance through
-frontend and backend plugins.
+:::note Installation alternatives
 
-The second way to download Sparrow is to clone the [Sparrow](https://github.com/EarthCubeGeochron/Sparrow) repository from Github.
-This process is more involved, however it gives access to the core codebase.
-**NOTE:** modifying the main codebase should only be done if the user intends to
-contribute to Sparrow.
+- The install prefix can be modified using the `SPARROW_INSTALL_PATH`, `SPARROW_DIST_DIR`, and `INSTALL_PATH` variables.
+- If you'd like to install Sparrow manually,
+  you can download the setup script and run it locally: `bash get-sparrow.sh`.
+- If you'd like to install a specific version of Sparrow, you can add an optional version argument:
+  `... get-sparrow.sh -- v2.0.0.beta16`.
+- You can always download the executable directly from the [Sparrow releases][sparrow-releases]
+  page on GitHub and manually place it on your system's `PATH`.
 
+:::
+
+[pyinstaller]: https://pyinstaller.org
+[sparrow-releases]: https://github.com/EarthCubeGeochron/Sparrow/releases
+
+<!--
 ## Bundled Version
 
 ### Shell command
@@ -55,20 +100,32 @@ contribute to Sparrow.
 Downloading the bundled version of Sparrow occurs through a `curl` command. `curl` commands are used
 to transfer data from servers.
 
-```javascript
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh)"
-```
-
 This is the most updated `curl` command at this time. The most recent release can be found at [Sparrow's Github page](https://github.com/EarthCubeGeochron/Sparrow) in the right most column
 under **Releases**. This command will download all the files to your `usr/local/bin` and `usr/local/opt` directories.
 In your favorite terminal or shell, run the command from above. If it is installed properly you should
 see the output _Sparrow executable installed!_
+-->
 
-If the installation works, try running `sparrow` on in the same terminal or shell. If the Sparrow CLI has been downloaded correctly
-you will see a list of possible [sparrow commands](/docs/command-line-interface). If you do **not** see a list of sparrow commands you may have to write `usr/local/bin` to your `PATH` variable.
-Otherwise, you have successfully installed Sparrow!
+Once you have installed the `sparrow` CLI, you can try running it in your terminal.
 
-You can immediately view the instance of sparrow by running.
+```shell
+sparrow
+```
+
+The first time it is run, the Sparrow CLI builds Docker containers and sets some basic configuration.
+Several errors commonly arise at this step:
+
+- **`command not found`**: Sparrow might not be properly referenced on your command search `PATH`.
+- **`Cannot connect to the Docker daemon`** or similar: You may not have started the Docker engine.
+- The Docker containers might not build properly, for a variety of reasons.
+  If this is the case, follow the [Troubleshooting guide][troubleshooting].
+
+If the Sparrow command-line interface has been installed correctly, it will print some build output, followed
+by a list of possible Sparrow commands.
+
+## Set up a Sparrow database and server
+
+An unconfigured instance of Sparrow can be started by running
 
 ```
 SPARROW_SECRET_KEY=TemporaryKey sparrow up
@@ -83,23 +140,8 @@ The quickest way to set up an instance of Sparrow is by running:
 sparrow create-test-lab <directory name>
 ```
 
-This will create an out of the box Sparrow instance that will come pre-configured with a Sparrow configuration file as well
+This will create an out-of-the-box Sparrow instance that will come pre-configured with a Sparrow configuration file as well
 as directories used for frontend and backend plugins. There is also some test data that is pre-loaded in the backend plugin.
-
-## Cloning Sparrow Codebase
-
-:::caution
-Cloning Sparrow's codebase should only be done by those who wish to contribute to the core codebase.
-If you want to set up a lab instance of Sparrow without modifying the core codebase please refer to
-the [bundled version](/docs/getting-started#bundled-version).
-:::
-
-### Getting the code
-
-Currently, all installations of Sparrow require you to fetch the source code
-from GitHub. Work is progressing on a "standalone" version of Sparrow that does not require
-interacting with the source code. But for now, only development installation
-is supported.
 
 ```
 git clone https://github.com/EarthCubeGeochron/Sparrow.git
