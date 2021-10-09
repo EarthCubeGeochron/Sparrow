@@ -127,27 +127,61 @@ by a list of possible Sparrow commands.
 
 An unconfigured instance of Sparrow can be started by running
 
+The **Sparrow** application can be run using the command
+`sparrow up`. The environment variable
+`SPARROW_SECRET_KEY` must be set before running, but other variables
+will be set to default values if not provided. Thus, a minimal working
+**Sparrow** demo can be run using the following command:
+
 ```
 SPARROW_SECRET_KEY=TemporaryKey sparrow up
 ```
 
-Or you can continute onto to [creating a new user](/docs/getting-started#creating-a-user) and
-[creating a sparrow configuration](/docs/getting-started#running-a-configured-application).
+This command will spin up several Docker containers including a
+database engine, frontend, backend, and gateway service and
+automatically run the `sparrow init`
+command to set up initial database tables.
+The **Sparrow** web interface can then be accessed at `http://localhost:5002`;
+the API can be found at `http://localhost:5002/api`.
 
-The quickest way to set up an instance of Sparrow is by running:
+## Run a configured application
+
+<!-- Or you can continute onto to [creating a new user](/docs/getting-started#creating-a-user) and
+[creating a sparrow configuration](/docs/getting-started#running-a-configured-application). -->
+
+In practice, Sparrow needs to be configured differently for each lab that runs
+the software. Typically, this is done by creating a lab configuration directory with a
+`sparrow-config.sh` file in it. An example of this script
+is shown in [`sparrow-config.sh.example`](https://github.com/EarthCubeGeochron/Sparrow/blob/main/sparrow-config.sh.example).
+While not _required_ (environment
+variables can be set externally), this approach is strongly preferred.
+
+At runtime, the `sparrow` application fsearches
+upwards from the current directory until the first file named
+`sparrow-config.sh` is found. This behavior is similar to that of the
+`git` command.
+
+:::tip
+Alternatively, the location of the configuration
+file can be set using the `SPARROW_CONFIG` environment variable, allowing
+the `sparrow` command to be run from anywhere on the system.
+:::
+
+The quickest way to set up an instance of Sparrow is by running
 
 ```
-sparrow create-test-lab <directory name>
+sparrow create-test-lab <your-directory>
 ```
 
-This will create an out-of-the-box Sparrow instance that will come pre-configured with a Sparrow configuration file as well
-as directories used for frontend and backend plugins. There is also some test data that is pre-loaded in the backend plugin.
+This will create a pre-configured Sparrow instance with a basic configuration file (`sparrow-config.sh`),
+a few plugins, and a small test dataset.
+
+<!--
 
 ```
 git clone https://github.com/EarthCubeGeochron/Sparrow.git
 cd Sparrow
 ```
-
 ### Installing the command-line interface
 
 **Sparrow** is administered using the `sparrow` command-line
@@ -167,14 +201,6 @@ make install
 This will build a development version of the
 `sparrow` command-line runner.
 
-:::note
-`make install` requests **`sudo`** privilege elevation so that it can
-install `sparrow` to `/usr/local/bin`, which allows the command to be
-run without a path prefix on most systems. If you want to install to a different location, you can
-instead run `SPARROW_INSTALL_DIR=<root-path> make install`. This will install `sparrow`
-to `<root-path>/bin/sparrow`.
-:::
-
 ### Running Sparrow
 
 Typing `sparrow` at the command line will download and build containers
@@ -182,24 +208,9 @@ Typing `sparrow` at the command line will download and build containers
 and show the [application's help page](/docs/cli).
 Seeing the help page successfully means the application has been installed.
 
-The **Sparrow** application can be run using the command
-`sparrow up`. The environment variable
-`SPARROW_SECRET_KEY` must be set before running, but other variables
-will be set to default values if not provided. Thus, a minimal working
-**Sparrow** demo can be run using the following command:
+-->
 
-```
-SPARROW_SECRET_KEY=TemporaryKey sparrow up
-```
-
-This command will spin up a database engine, frontend, backend,
-and gateway service (details of each service can be found in
-`docker-compose.yaml`) and automatically run the `sparrow init`
-command to set up database tables.
-The **Sparrow** web interface can then be accessed at `http://localhost:5002`;
-the API can be found at `http://localhost:5002/api`.
-
-## Creating a user
+## Create a user
 
 On navigating to the web interface for the first time, you will not be logged
 in — indeed, no user will exist! To create a user, run the `sparrow create-user` command and follow the prompts. There should be a single row in
@@ -207,34 +218,25 @@ the `user` table after running this command. Note: the `SPARROW_SECRET_KEY`
 environment variable is used to encrypt passwords, so make sure
 this value is kept consistent through the lifetime of the application.
 
-## Running a configured application
+:::note
+User management will gain capabilities in future versions of **Sparrow**
+:::
 
-**Sparrow** is configured using a shell script that exports environment
-variables to customize the **Sparrow** installation. An example of this script
-is shown in [`sparrow-config.sh.example`](https://github.com/EarthCubeGeochron/Sparrow/blob/master/sparrow-config.sh.example).
-While not _required_ (environment
-variables can be set externally), this approach is strongly preferred.
+## Version your lab configuration
 
-At runtime, the `sparrow` application finds a configuration file by searching
-upwards from the current directory until the first file named
-`sparrow-config.sh` is found. Alternatively, the location of the configuration
-file can be set using the `SPARROW_CONFIG` environment variable. This will
-allow the `sparrow` command to be run from anywhere on the system.
+Most labs implementing Sparrow manager their configuration and plugins as Git repositories, allowing lab-specific code
+to be developed and improved over time.
+This also allows lab instances to be made publicly available to guide future implementations.
 
-The best way to get a basic configured application to test is by running the
-`sparrow create-test-lab <your-directory>` command, which will give you a
-basic lab with a few plugins and a small test dataset, based on the configuration
-[in this directory](https://github.com/EarthCubeGeochron/Sparrow/tree/master/test-lab).
+Several reference implemetations are available:
 
-Managing lab implementations of Sparrow as Git repositories is a good idea, as it
-allows plugins and site content to be versioned and pinned (using [Git submodules](https://git-scm.com/docs/git-submodule))
-to a specific version of Sparrow. This has the added benefit of allowing configurations
-and lab-specific code to be publicly available to guide future implementations. This approach
-is taken by the [UW Cosmogenic Nuclide lab](https://github.com/EarthCubeGeochron/sparrow-uw-cosmo),
-[Arizona Laserchron Center](https://github.com/EarthCubeGeochron/Sparrow-LaserChron),
-[WiscAr](https://github.com/EarthCubeGeochron/Sparrow-WiscAr),
-[the Desert Research Institute](https://github.com/EarthCubeGeochron/Sparrow-luminescence-demo),
-and other implementing facilities.
+- [University of Wisconsin Cosmogenic Nuclide lab](https://github.com/EarthCubeGeochron/sparrow-uw-cosmo)
+- [Arizona Laserchron Center](https://github.com/EarthCubeGeochron/Sparrow-LaserChron)
+- [WiscAr](https://github.com/EarthCubeGeochron/Sparrow-WiscAr)
+- [WiscSIMS](https://github.com/EarthCubeGeochron/Sparrow-WiscSIMS)
+- [the Desert Research Institute](https://github.com/EarthCubeGeochron/Sparrow-luminescence-demo)
+- [the Boise State isotope geochemistry lab](https://github.com/EarthCubeGeochron/Sparrow-BoiseState-IGL)
+- [CU Trail (thermochronology)](https://github.com/EarthCubeGeochron/Sparrow-CU-TRaIL)
 
 ## Inspecting the running application
 
