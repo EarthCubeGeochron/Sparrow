@@ -19,7 +19,12 @@ class TestOpenSearch:
 
         # Load data (replaces load_data_loop)
         for model, spec_list in self.data.items():
-            if model in ["og-project", "edit-project"]:
+            if model in [ "og-project",
+                "edit-project",
+                "geojson",
+                "wkt",
+                "schema-sample-wkt",
+                "schema-sample-geojson"]:
                 continue
             for spec in spec_list:
                 db.load_data(model, spec)

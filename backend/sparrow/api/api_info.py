@@ -54,7 +54,9 @@ def get_field_description(type_: str, field_name: str, schema):
 
 def get_field_json_values(type_: str, name: str, schema):
     """get the values api_help['fields']"""
-
+    if type_.lower() == "uuid":
+        return ""
+        
     schema_name = schema.opts.model.__name__.lower()
     json_values = api_help["fields"]["json-values"]
 

@@ -17,7 +17,7 @@ class TestEndpointUtils:
             except:
                 continue
         assert worked == len(db.interface)
-
+    
     def test_schema_json_examples(self, db):
         """
         Autogenerating json examples for fields
