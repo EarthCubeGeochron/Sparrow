@@ -20,6 +20,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         uses: docker/metadata-action@v3
+        id: meta
         with:
           images: ghcr.io/earthcubegeochron/sparrow/documentation-site
       - name: Build and push website image
