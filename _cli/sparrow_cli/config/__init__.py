@@ -9,6 +9,8 @@ from sparrow_utils.logs import get_logger, setup_stderr_logs
 from .environment import prepare_docker_environment, prepare_compose_overrides
 from .version_info import SparrowVersionMatch, test_version
 from .file_loader import load_config_file
+from ..util.exceptions import SparrowCommandError
+from packaging.version import Version
 
 log = get_logger(__file__)
 
@@ -46,6 +48,8 @@ class SparrowConfig:
 
         if "SPARROW_PATH" in environ:
             self.path_provided = True
+            source_root = Path(environ["SPARROW_PATH"])
+
         else:
             # Check if this script is part of a source
             # installation. If so, set SPARROW_PATH to the matching
@@ -59,7 +63,16 @@ class SparrowConfig:
             environ["SPARROW_PATH"] = str(pth)
 
         # Provide environment variable in a more Pythonic way as well
-        self.SPARROW_PATH = Path(environ["SPARROW_PATH"])
+        source_root = Path(environ["SPARROW_PATH"])
+        self.SPARROW_PATH = source_root
+        _is_correct_source = (
+            source_root.is_dir() and (source_root / "sparrow-version.json").is_file()
+        )
+        if not _is_correct_source:
+            raise SparrowCommandError(
+                "The SPARROW_PATH environment variable does not appear to point to a Sparrow source directory.",
+                details=f"SPARROW_PATH={environ['SPARROW_PATH']}",
+            )
 
         self.version_info = test_version(self)
 
@@ -67,6 +80,7 @@ class SparrowConfig:
         self._setup_command_path()
 
         # Set version information needed in compose file
+        # Packages use canonicalized version string, no matter how it is represented in tags
         version = self.find_sparrow_version()
         # Pin the images used in the compose file to the current version, unless
         # otherwise specified.
@@ -76,8 +90,10 @@ class SparrowConfig:
             log.info("Running in offline mode by using any available image")
             tag = ""
 
-        environ.setdefault("SPARROW_BACKEND_IMAGE", "sparrow/backend" + tag)
-        environ.setdefault("SPARROW_FRONTEND_IMAGE", "sparrow/frontend" + tag)
+        image_prefix = "ghcr.io/earthcubegeochron/sparrow"
+
+        environ.setdefault("SPARROW_BACKEND_IMAGE", f"{image_prefix}/backend" + tag)
+        environ.setdefault("SPARROW_FRONTEND_IMAGE", f"{image_prefix}/frontend" + tag)
 
         prepare_docker_environment()
         if "COMPOSE_FILE" in environ:
@@ -115,3 +131,6 @@ class SparrowConfig:
         with (self.SPARROW_PATH / "backend" / "sparrow" / "meta.py").open() as f:
             exec(f.read(), version)
         return version["__version__"]
+
+    def is_source_install(self):
+        return not self.is_frozen or self.path_provided

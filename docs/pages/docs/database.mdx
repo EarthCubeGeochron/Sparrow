@@ -1,0 +1,30 @@
+import { DocsPage } from "components";
+
+# Sparrow Database
+
+Sparrow utilizes a [PostgreSQL](https://www.postgresql.org/) database. PostgreSQL is a powerful open-source
+relational database with a large community with resources and documentation.
+It can be useful to view and interact with Sparrow using a PostgreSQL client application that has a user interface for interacting and checking tables. Connecting to a local implementation of Sparrow is slightly easier, but a networked version is also possible.
+
+### Local connection
+
+For local development on Mac OS and Windows, these parameters are needed to connect to the database. For Mac OS, [Postico](https://eggerapps.at/postico/) has been used to connect. On Windows [DBeaver](https://alternativeto.net/software/dbeaver/about/) has been used to connect locally.
+
+- `Host:` localhost
+- `Port:` 54321
+- `User:` postgres
+- `Database:` sparrow
+
+### Server connection
+
+Depending on the server setup, the following will allow you to login to your remote Sparrow instance and view the database. For a primer on creating SSH keys for servers, take [a look at this tutorial](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server).
+
+- `Host:` localhost
+- `Port:` 54321
+- `User:` postgres
+- `Database:` sparrow
+- `SSH Host:` your-server-url
+- `User:` your-server-login
+- `Private Key:` SSH-key for your server
+
+export default DocsPage;

@@ -1,0 +1,82 @@
+@use "sass:color"
+  
+$admonition: color.adjust(#64cac1, $lightness: -20%)
+$admonition-dark: color.adjust(#64cac1, $saturation: -20%, $lightness: -10%)
+
+$admonition-caution: #e0c380  
+
+@mixin admonition($color)
+  --admonition-color: #{$color}
+  --admonition-background: #{color.change($color, $alpha: 0.1)}
+  --admonition-border: #{color.change($color, $alpha: 0.2)}
+
+:root
+  @include admonition($admonition)
+  .admonition-caution
+    @include admonition(color.adjust($admonition-caution, $lightness: -30%))
+
+body.bp3-dark
+  @include admonition($admonition-dark)
+  .admonition-caution
+    @include admonition($admonition-caution)
+
+.admonition
+  display: flex
+  flex-direction: row
+  align-items: baseline
+  background: var(--admonition-background)
+  color: var(--admonition-color)
+  border: 2px solid var(--admonition-border)
+  .admonition-heading
+    margin-right: 0.5em
+    //width: 1em
+    //height: 1em
+    .admonition-icon svg
+      fill: var(--admonition-color)
+      align-self: baseline
+      margin-bottom: -0.3em
+      margin-right: 1em
+    h5
+      margin: 0
+      text-transform: uppercase
+
+  border-radius: 6px
+  padding: 0.2em 1em
+  padding-left: 0.6em
+  margin: 1.5em 0 2em
+  .admonition-content
+    flex-grow: 1
+    font-size: 0.8em
+    margin: 0.4em 0
+    &>:first-child
+      margin-top: 0
+    &>:last-child
+      margin-bottom: 0
+    a
+      color: var(--admonition-color)
+
+pre
+  text-overflow: ellipsis
+  display: block
+  overflow: hidden
+  max-width: 40em
+  //max-width 35em // GOD this is dumb that we have to do this...
+  font-size: 0.9em
+  &>code
+    border: none
+    display: block
+
+code, pre
+  @include admonition(#888888)
+  border-radius: 6px
+  background: var(--admonition-background)
+  color: var(--admonition-color)
+  border: 2px solid var(--admonition-border)
+
+code
+  padding: 0 0.1em
+  line-height: 1.2em
+  display: inline-block
+
+pre>code
+  padding: 0.5em

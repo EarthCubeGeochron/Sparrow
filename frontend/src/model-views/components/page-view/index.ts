@@ -1,4 +1,4 @@
-export * from "./page-view";
+export * from "./common";
 export * from "./project";
 export * from "./publication";
 export * from "./sample";

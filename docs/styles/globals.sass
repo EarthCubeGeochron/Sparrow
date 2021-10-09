@@ -1,0 +1,74 @@
+@use "sass:color"
+@use "buttons"
+@use "nav"
+@use "admonitions"
+@use "colors" as *
+  
+$secondary: #32536b //#304e68
+$bkg: #261e2d
+
+//$accent: #400C4A
+
+$gradient-background: desaturate(color.adjust($card-base,$lightness: 30%),20%)
+
+:root
+  --header-font: "Montserrat", Helvetica, sans-serif
+  --mono-font: "Source Code Pro", monospace
+  --background-color: white
+  //lighten(#161517, 0%)
+  --text-color: darken(#354a61, 20%)
+  --accent-color: #{$accent}
+  --accent-background: alpha(#{$accent}, 20%)
+  --accent-active: alpha(#{$accent}, 10%)
+  --header-color: #{$secondary}
+  --secondary-color: #666666
+  --card-background: linear-gradient(120deg, #{$gradient-background} 0%, #{$card-base} 100%)
+  --card-border: #{$card-base}
+  --background-gradient: linear-gradient(120deg, alpha(#{$gradient-light},0) 0%, #{$gradient-light} 100%)
+  --purple-color: #544679
+
+*
+  box-sizing: border-box
+  line-height: 1.5
+
+a
+  color: var(--accent-color)
+
+// Typography
+p
+  text-align: justify
+
+code, pre 
+  font-family: var(--mono-font)
+
+body
+  z-index: -10
+  background: white
+  &.bp3-dark
+    --background-color: darken(rgba(34,29,38,1),30%)
+    --text-color: #{color.adjust(#354a61, $lightness: 70%)}
+    --accent-color: #{$accent-light} 
+    --accent-background: alpha(#{$accent-light}, 20%)
+    --accent-active: alpha(#{$accent-light}, 20%)
+    --header-color: #{color.adjust(#32536b,$lightness: 20%)}
+    --card-border: #{color.adjust(#37445a,$lightness: -30%)}
+    --background-gradient: linear-gradient(120deg, alpha(#{$gradient-dark},0) 0%, #{$gradient-dark} 100%)
+    --card-background: linear-gradient(120deg, #{desaturate(color.adjust($dark-card-base, $lightness: -30%),20%)} 0%, #{$dark-card-base} 100%)
+    --card-border: #{$dark-card-base}
+    background:  #{color.adjust(rgba(34,29,38,1),$lightness: -30%)}
+    // lighten(#161517, 2%) //
+  transition: background 0.2s
+  font-family: "Merriweather", 'Times New Roman', Times, serif
+  line-height: 2
+  position: relative
+  margin: 0
+  padding: 0
+  color: var(--text-color)
+
+h1, h2, h3, h4, h5, h6
+  font-family: var(--header-font)
+  font-weight: 700
+
+
+
+

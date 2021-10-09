@@ -1,6 +1,10 @@
 import re
+import sys
 from os import path
 from click import style
+from rich.console import Console
+
+console = Console(file=sys.stderr, highlight=False)
 
 
 def format_config_path(cfg):

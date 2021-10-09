@@ -112,5 +112,7 @@ function Sheet({ className, children }) {
   ]);
 }
 
+const sheet = memo(Sheet);
+
 export * from "./column-utils";
 export { Sheet, Row, Columns, Header };

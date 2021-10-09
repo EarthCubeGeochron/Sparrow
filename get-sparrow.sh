@@ -58,9 +58,8 @@ url=https://github.com/$repo_name/releases/download/$release/sparrow-$platform-x
 
 install_path=${SPARROW_INSTALL_PATH:-${INSTALL_PATH:-/usr/local}}
 build_dir=_cli/dist/sparrow
-dist_dir=$install_path/opt/sparrow
+dist_dir=${SPARROW_DIST_DIR:-$install_path/opt/sparrow}
 symlink=$install_path/bin/sparrow
-executable=$dist_dir/sparrow
 #TMPDIR=$install_path/sparrowtemp
 
 # Check whether URL exists
@@ -74,14 +73,32 @@ fi
 detail ""
 
 header "Installation prefix:\e[0m $install_path"
-detail "\e[1m\e[2mTip:\e[0m \e[2mthe installation prefix can be controlled with the"
-detail "\e[0mSPARROW_INSTALL_PATH\e[2m or \e[0mINSTALL_PATH\e[2m environment variables."
 line "\e[0m"
 
+if [[ $platform == "Darwin" && ! $dist_dir == /Users* ]]; then
+  header "Adjustments for MacOS"
+  d4m="\e[2m\e[1mDocker for Mac\e[0m\e[2m"
+  detail "$d4m can only mount volumes in certain directories."
+  if [[ $dist_dir == /usr/local/opt/sparrow ]]; then
+    dist_dir=$HOME/.sparrow/opt
+    detail "\e[2mThe SPARROW_DIST_DIR has been changed to $dist_dir"
+    detail "to conform to these requirements."
+  else
+    detail "\e[2mYou specified a non-standard installation path outside of the \e[0m/Users\e[2m directory."
+    detail "\e[0m\e[1m\e[31mThis may not work!!!\e[0m"
+    detail "\e[2mPlease ensure that $d4m has permissions to mount volumes in your SPARROW_DIST_DIR."
+  fi
+  detail "\e[2mSee https://github.com/EarthCubeGeochron/Sparrow/issues/210 for more information."
+  line "\e[0m"
+fi
+
 header "The following locations will be written:"
-bullet "$dist_dir"
-bullet "$symlink"
-line
+detail "\e[2m\e[1mTip:\e[0m\e[2m These can be adjusted using environment variables.\e[0m"
+bullet "$symlink \e[2m(Adjust using SPARROW_INSTALL_PATH or INSTALL_PATH)\e[0m"
+bullet "$dist_dir \e[2m(Adjust using SPARROW_DIST_DIR)"
+line "\e[0m"
+
+executable=$dist_dir/sparrow
 
 #check permissions
 # if permissions are needed it will notify and attempy a sudo login

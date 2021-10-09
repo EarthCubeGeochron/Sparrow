@@ -18,7 +18,13 @@ from sparrow.plugins import SparrowCorePlugin
 from sparrow.settings import TASK_BROKER, TASK_WORKER_ENABLED
 import typer
 from .task_api import build_tasks_api
-from .base import create_args_schema, task, _tasks_to_register, _name_for_task
+from .base import (
+    create_args_schema,
+    task,  # noqa
+    _tasks_to_register,
+    _name_for_task,
+    SparrowTaskError,
+)
 from redis import Redis
 from broadcaster import Broadcast
 
@@ -70,11 +76,15 @@ class SparrowTaskManager(SparrowCorePlugin):
         task = func
         if self.celery is not None:
             task = self.celery.task(*args, **kwargs)(func)
-        self._tasks[name] = {
-            "func": task,
-            "params": create_args_schema(func),
-            "cli_only": cli_only,
-        }
+
+        try:
+            args_schema = create_args_schema(func)
+        except RuntimeError:
+            raise SparrowTaskError(
+                f"Task {name} has untyped arguments, which is not allowed."
+            )
+
+        self._tasks[name] = {"func": task, "params": args_schema, "cli_only": cli_only}
 
         self._task_commands.append(name)
         log.debug(f"Registering task {name}")

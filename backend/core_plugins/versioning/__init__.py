@@ -7,7 +7,7 @@ import click
 from sparrow.database.util import run_sql
 
 exclude_tables = ["spatial_ref_sys"]
-audit_schemas = ["public", "vocabulary"]
+audit_schemas = ["public", "vocabulary", "tags", "geo_context"]
 
 # Tables in the pg_memento schema
 memento_tables = [
@@ -80,7 +80,7 @@ class VersioningPlugin(SparrowCorePlugin):
         fn = id + ".sql"
         return
 
-    def on_core_tables_initialized(self, db):
+    def on_finalize_database_schema(self, db):
 
         procedures = []
 

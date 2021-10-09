@@ -402,21 +402,15 @@ export function GeoContext(props) {
   ]);
 
   if (!isEditing) {
-    return h.if(sample_geo_entity.length > 0)(
-      PageViewBlock,
-      { title: "Geologic Context" },
-      [
-        h("div.geo-entity-card", [
-          h(GeoEntityText, {
-            sample_geo_entity,
-            isEditing: false,
-          }),
-        ]),
-      ]
-    );
+    return h("div", [
+      h(GeoEntityText, {
+        sample_geo_entity,
+        isEditing: false,
+      }),
+    ]);
   }
 
-  return h(PageViewBlock, { title: "Geologic Context" }, [
+  return h("div", [
     h(HelpButton, { content: helpContent, position: "top" }),
     content,
     h(GeoEntityText, { sample_geo_entity, deleteGeoEntity }),

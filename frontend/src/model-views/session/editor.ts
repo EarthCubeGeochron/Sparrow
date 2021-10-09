@@ -8,7 +8,7 @@ import {
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { useAuth } from "~/auth";
 import { put } from "axios";
-import { useModelURL, useModelURLBool } from "~/util/router";
+import { useModelURL, useEditingAllowed } from "~/util/router";
 import {
   Instrument,
   Technique,
@@ -29,6 +29,7 @@ import {
   PageViewBlock,
   DataFilePage,
 } from "../components";
+import { ModelTitleBar } from "~/model-views/components";
 import { SessionAdminContext } from "~/admin/session";
 import styles from "./module.styl";
 
@@ -79,13 +80,17 @@ function EditStatusButtonsSess(props) {
   });
 }
 
-function SessionEditsNavBar(props) {
-  const { header } = props;
-
-  return h(EditNavBar, {
-    header,
-    editButtons: h(EditStatusButtonsSess),
-    embargoEditor: h(EmbargoEditor),
+function SessionTitleBar() {
+  const { model } = useModelEditor();
+  const id = model.id;
+  return h(ModelTitleBar, {
+    titleField: "name",
+    subtitle: `Session #${id}`,
+    editingContent: h(EditNavBar, {
+      header: null,
+      editButtons: h(EditStatusButtonsSess),
+      embargoEditor: h(EmbargoEditor),
+    }),
   });
 }
 
@@ -126,6 +131,7 @@ function SessionName(props) {
   return h(ModelEditableText, {
     is: "h4",
     field: "name",
+    placeholder: "Unnamed",
     multiline: true,
   });
 }
@@ -256,7 +262,7 @@ function EditableSessionInfoComponent(props) {
 export function EditableSessionDetails(props) {
   const { id } = props;
 
-  const Edit = useModelURLBool();
+  const Edit = useEditingAllowed();
   const res = useAPIv2Result(`/models/session/${id}`, {
     nest: "sample,instrument,project,tag,publication",
   });
@@ -291,7 +297,7 @@ export function EditableSessionDetails(props) {
     },
     [
       h("div", [
-        h.if(Edit)(SessionEditsNavBar, { header: `Manage Session #${id}` }),
+        h(SessionTitleBar),
         h.if(Edit)(EditableSessionInfoComponent),
         h.if(!Edit)(CatalogSessionInfoCard),
       ]),

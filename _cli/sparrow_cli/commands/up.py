@@ -1,4 +1,5 @@
 import sys
+import os
 import click
 from subprocess import Popen
 from rich import print
@@ -8,6 +9,21 @@ from ..config.environment import validate_environment
 from ..config import SparrowConfig
 from ..util import compose, cmd, log
 from ..help import get_backend_help_info
+
+
+def _report_image_versions():
+    backend_img_version = os.environ.get("SPARROW_BACKEND_IMAGE")
+    log.info(f"Backend image version: {backend_img_version}")
+
+    frontend_img_version = os.environ.get("SPARROW_FRONTEND_IMAGE")
+    log.info(f"Frontend image version: {frontend_img_version}")
+
+
+def _get_prestart_script(cfg):
+    if cfg.config_dir is None:
+        return None
+    prestart = cfg.config_dir / "sparrow-prestart.sh"
+    return prestart.exists()
 
 
 @click.command()
@@ -23,15 +39,15 @@ def sparrow_up(ctx, container="", force_recreate=False):
 
     cfg = ctx.find_object(SparrowConfig)
 
+    _report_image_versions()
     # build containers
     if not cfg.offline:
         cmd("sparrow compose build")
 
     # Run the prebuild script
-    prebuild = cfg.config_dir / "sparrow-prestart.sh"
-    if prebuild.exists():
-        log.debug("Running prebuild script")
-        cmd("bash", str(prebuild))
+    prestart = _get_prestart_script(cfg)
+    if prestart is not None:
+        cmd("bash", str(prestart))
 
     # Bring up the application
     res = cmd(
@@ -42,8 +58,29 @@ def sparrow_up(ctx, container="", force_recreate=False):
         container,
     )
     if res.returncode != 0:
-        print("[red]One or more containers did not build successfully, aborting.[/red]")
+        print("[red bold]One or more containers did not build successfully, aborting.")
         sys.exit(res.returncode)
+    else:
+        print("[green bold]All containers built successfully.")
+    print()
+
+    print("[green bold]Starting the Sparrow application!")
+
+    # Check if containers are running
+    res = compose("ps --services --filter status=running", capture_output=True)
+    running_containers = res.stdout.decode("utf-8").strip()
+    if running_containers != "" and not force_recreate:
+        print("[dim]Some containers are already running and up to date: ")
+        print("  " + ", ".join(running_containers.split("\n")))
+        print(
+            "[dim]To fully restart Sparrow, run [cyan]sparrow restart[/cyan] or [cyan]sparrow up --force-recreate[/cyan]."
+        )
+    print()
+
+    print("[green bold]Following container logs")
+    print("[dim]- Press Ctrl+c to exit (Sparrow will keep running).")
+    print("[dim]- Sparrow can be stopped with the [cyan]sparrow down[/cyan] command.")
+    print()
 
     # Make sure popen call gets logged...
     _log_cmd = ["sparrow", "logs", container]
@@ -52,12 +89,18 @@ def sparrow_up(ctx, container="", force_recreate=False):
     # Wait a tick to make sure the logs are started
     sleep(0.05)
 
-    print("[green]Following container logs[/green]")
     compose("start", container)
+
     # Try to reload nginx server if the container is running
-    compose("exec gateway nginx -s reload")
+    if "gateway" in running_containers:
+        compose("exec gateway nginx -s reload")
+
     # While we're spinning up, repopulate command help in case it's changed
     log.info("Caching backend help info")
     get_backend_help_info(cache=True)
+
+    if "backend" not in running_containers:
+        sleep(5)
+        cmd("sparrow", "db", "check-schema")
 
     p.wait()
