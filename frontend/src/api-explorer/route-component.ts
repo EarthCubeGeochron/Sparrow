@@ -6,7 +6,7 @@ import update from "immutability-helper";
 import ReactMarkdown from "react-markdown";
 import styled from "@emotion/styled";
 import { StatefulComponent, APIContext } from "@macrostrat/ui-components";
-import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
+import { LinkCard } from "@macrostrat/ui-components";
 import { Colors, Text, AnchorButton, Icon } from "@blueprintjs/core";
 import { join } from "path";
 import { nullIfError } from "./utils";
@@ -60,8 +60,8 @@ class RouteName extends Component {
 }
 RouteName.initClass();
 
-const StyledLinkCard = styled(LinkCard)`\
-color: ${Colors.BLUE1}\
+const StyledLinkCard = styled(LinkCard)`
+  \color: ${Colors.BLUE1}\;;
 `;
 
 const ChildRoutesList = function ({ base, routes }) {

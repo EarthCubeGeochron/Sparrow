@@ -1,6 +1,6 @@
 import hyper from "@macrostrat/hyper";
 import { Callout } from "@blueprintjs/core";
-import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
+import { LinkCard } from "@macrostrat/ui-components";
 import { FilterListComponent } from "~/components/filter-list";
 //@ts-ignore
 import styles from "./module.styl";

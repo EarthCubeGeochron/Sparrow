@@ -966,6 +966,29 @@
   resolved "https://registry.yarnpkg.com/@blueprintjs/colors/-/colors-1.0.0.tgz#3b3501eae2294098fe5bdf8f37d0c471e95cd0e6"
   integrity sha512-eJh111ucz8HYxLBON6ADkAGQQBACqdbX6Zws/GpuiTkeCFJ3IAjZdBpk7IM7/Y5XuGuSS1ujwjnLDOEtyywtKw==
 
+"@blueprintjs/colors@^4.0.0-alpha.1":
+  version "4.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/colors/-/colors-4.0.0-alpha.1.tgz#370684b404e5400494169c54cc3a31385fc6db6a"
+  integrity sha512-i95xW/cAIijJAMIBDrXw1WLbGVXVaRDRG1Ga0CxOtMVwL20zvdXlQj7EMqhkgVEJo9LaKNIDliPI+jsh7h5Lag==
+
+"@blueprintjs/core@^3.23.0":
+  version "3.50.4"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-3.50.4.tgz#18868d6d9930d513b25d30bfc3b30b3d68adf72a"
+  integrity sha512-FYGr1ZMH1si2acdZaTI4gqhvwgb0yOWcv7otYdi/tvC4ReId2gsm2i+bDw/eBMYsH+OSFYZT0C6hFvHV3HrkPA==
+  dependencies:
+    "@blueprintjs/colors" "^4.0.0-alpha.1"
+    "@blueprintjs/icons" "^3.30.2"
+    "@types/dom4" "^2.0.1"
+    classnames "^2.2"
+    dom4 "^2.1.5"
+    normalize.css "^8.0.1"
+    popper.js "^1.16.1"
+    react-lifecycles-compat "^3.0.4"
+    react-popper "^1.3.7"
+    react-transition-group "^2.9.0"
+    resize-observer-polyfill "^1.5.1"
+    tslib "~1.13.0"
+
 "@blueprintjs/core@^3.31.0", "@blueprintjs/core@^3.39.0", "@blueprintjs/core@^3.42.0", "@blueprintjs/core@^3.48.0":
   version "3.48.0"
   resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-3.48.0.tgz#e2d27c05943203d4979eae95f8a0c10b24d2b6cc"
@@ -999,6 +1022,14 @@
   version "3.28.0"
   resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-3.28.0.tgz#d06528df4aadc0ea685b0b3be18fd3b19dece9e5"
   integrity sha512-gDvvU2ljV4NXsY5ofKcs1ChXAgmqNp/DIMu2uJIJmXhSXfP6JDd4qbnbGMsP3FmLTaqQP3E9oBZqAG/FRB8VmQ==
+  dependencies:
+    classnames "^2.2"
+    tslib "~1.13.0"
+
+"@blueprintjs/icons@^3.30.2":
+  version "3.30.2"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/icons/-/icons-3.30.2.tgz#6ec4e621242c363937f40c3bd0bb240aeba9deaa"
+  integrity sha512-t0coke9JWLtAt4eQuGfTD2KQSjD+Q5V9JLnRwt1sEyV9/CHXgeoTvsEEqpiXe6gWOW72Rok6Uo86yLyICRW7wQ==
   dependencies:
     classnames "^2.2"
     tslib "~1.13.0"
@@ -1976,6 +2007,16 @@
     hoist-non-react-statics "^3.3.1"
     react-is "^16.12.0"
 
+"@macrostrat/hyper@^1.2.0", "@macrostrat/hyper@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@macrostrat/hyper/-/hyper-1.4.0.tgz#207c24852712ff0d9158528da9f173bc4b4e1063"
+  integrity sha512-pOtJ9VL4WSC9E9wlLoYwabGFYLXeU45yvHmTSJ4hejUcZ2HPqEiigNsgsg3uAyaO/1EKo6ecyLNZ0/otGg+/fA==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-hyperscript" "^3.0.5"
+    classnames "^2.3.1"
+    react-hyperscript "^3.2.0"
+
 "@macrostrat/hyper@^1.2.12", "@macrostrat/hyper@^1.2.14":
   version "1.2.14"
   resolved "https://registry.yarnpkg.com/@macrostrat/hyper/-/hyper-1.2.14.tgz#5b5618338f425ffcc8987d0d272a772731a4a470"
@@ -1985,6 +2026,42 @@
     "@types/react-hyperscript" "^3.0.5"
     classnames "^2.3.1"
     react-hyperscript "^3.2.0"
+
+"@macrostrat/router-components@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@macrostrat/router-components/-/router-components-1.0.2.tgz#db39ba4ae57df363177e84bc229cc55defe27105"
+  integrity sha512-P6BQp5HO7VrOjnqJIHuTb/MaUkwRKkIqLUOrXGBP8SqSeQE9tvf++FY0yUT705kTw0tQehi582YWgrT3hw3QCA==
+  dependencies:
+    "@blueprintjs/core" "^3.23.0"
+    "@macrostrat/hyper" "^1.2.0"
+    "@macrostrat/ui-components" ">=0.5.0"
+    classnames "^2.3.1"
+
+"@macrostrat/ui-components@>=0.5.0":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@macrostrat/ui-components/-/ui-components-1.0.1.tgz#7f0bdae49d1122b0ab8e651a19fefeff5e1706fb"
+  integrity sha512-GIQJi2HgNgmXtaBvn9oIEkebitqkoMX6nZ7hcH88eiOoVWuTfmh+BbzCcv8Nq/QR7PRAamr9KbKa5joJ0YdvaQ==
+  dependencies:
+    "@babel/polyfill" "^7.4.4"
+    "@blueprintjs/core" "^3.31.0"
+    "@blueprintjs/datetime" "^3.18.6"
+    "@macrostrat/hyper" "^1.4.0"
+    "@types/react" "^17.0.11"
+    "@types/react-dom" "^17.0.8"
+    axios "^0.21.4"
+    classnames "^2.3.0"
+    core-js "^3.6.4"
+    d3-array "^3.0.4"
+    date-fns "^2.15.0"
+    fp-ts "^2.5.3"
+    immutability-helper "^3.1.1"
+    io-ts "^2.1.2"
+    query-string "^7.0.0"
+    react-dropzone "^11.4.2"
+    react-intersection-observer "^8.32.1"
+    react-json-tree "^0.15.0"
+    underscore "^1.9.1"
+    use-async-effect "^2.2.1"
 
 "@macrostrat/ui-components@^0.6.8":
   version "0.6.8"
@@ -3746,6 +3823,13 @@ axios@^0.18.0:
     follow-redirects "1.5.10"
     is-buffer "^2.0.2"
 
+axios@^0.21.4:
+  version "0.21.4"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
+  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
+  dependencies:
+    follow-redirects "^1.14.0"
+
 babel-loader@^8.1.0:
   version "8.2.2"
   resolved "https://registry.yarnpkg.com/babel-loader/-/babel-loader-8.2.2.tgz#9363ce84c10c9a40e6c753748e1441b60c8a0b81"
@@ -4520,7 +4604,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@*, classnames@^2.2, classnames@^2.2.5, classnames@^2.2.6, classnames@^2.3.1:
+classnames@*, classnames@^2.2, classnames@^2.2.5, classnames@^2.2.6, classnames@^2.3.0, classnames@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.3.1.tgz#dfcfa3891e306ec1dad105d0e88f4417b8535e8e"
   integrity sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==
@@ -5247,6 +5331,13 @@ d3-array@2, d3-array@^2.0.3, d3-array@^2.12.1, d3-array@^2.3.0:
   integrity sha512-B0ErZK/66mHtEsR1TkPEEkwdy+WDesimkM5gpZr5Dsg54BiTA5RXtYW5qTLIAcekaS9xfZrzBLF/OAkB3Qn1YQ==
   dependencies:
     internmap "^1.0.0"
+
+d3-array@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-3.0.4.tgz#60550bcc9818be9ace88d269ccd97038fc399b55"
+  integrity sha512-ShFl90cxNqDaSynDF/Bik/kTzISqePqU3qo2fv6kSJEvF7y7tDCDpcU6WiT01rPO6zngZnrvJ/0j4q6Qg+5EQg==
+  dependencies:
+    internmap "1 - 2"
 
 d3-collection@1:
   version "1.0.7"
@@ -6529,6 +6620,11 @@ follow-redirects@^1.0.0, follow-redirects@^1.10.0:
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.2.tgz#cecb825047c00f5e66b142f90fed4f515dec789b"
   integrity sha512-yLR6WaE2lbF0x4K2qE2p9PEXKLDjUjnR/xmjS3wHAYxtlsI9MLLBJUZirAHKzUZDGLxje7w/cXR49WOUo4rbsA==
 
+follow-redirects@^1.14.0:
+  version "1.14.4"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.4.tgz#838fdf48a8bbdd79e52ee51fb1c94e3ed98b9379"
+  integrity sha512-zwGkiSXC1MUJG/qmeIFH2HBJx9u0V46QGUe3YR1fXG8bXQxq7fLj0RjLZQ5nubr9qNJUZrH+xUcwXEoXNpfS+g==
+
 for-in@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
@@ -7579,6 +7675,11 @@ internal-slot@^1.0.3:
     get-intrinsic "^1.1.0"
     has "^1.0.3"
     side-channel "^1.0.4"
+
+"internmap@1 - 2":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/internmap/-/internmap-2.0.3.tgz#6685f23755e43c524e251d29cbc97248e3061009"
+  integrity sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==
 
 internmap@^1.0.0:
   version "1.0.1"
@@ -10506,6 +10607,15 @@ react-dropzone@^11.0.3:
     file-selector "^0.2.2"
     prop-types "^15.7.2"
 
+react-dropzone@^11.4.2:
+  version "11.4.2"
+  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-11.4.2.tgz#1eb99e9def4cc7520f4f58e85c853ce52c483d56"
+  integrity sha512-ocYzYn7Qgp0tFc1gQtUTOaHHSzVTwhWHxxY+r7cj2jJTPfMTZB5GWSJHdIVoxsl+EQENpjJ/6Zvcw0BqKZQ+Eg==
+  dependencies:
+    attr-accept "^2.2.1"
+    file-selector "^0.2.2"
+    prop-types "^15.7.2"
+
 react-fast-compare@^3.0.1:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-3.2.0.tgz#641a9da81b6a6320f270e89724fb45a0b39e43bb"
@@ -10548,6 +10658,11 @@ react-inspector@^2.3.0:
     babel-runtime "^6.26.0"
     is-dom "^1.0.9"
     prop-types "^15.6.1"
+
+react-intersection-observer@^8.32.1:
+  version "8.32.1"
+  resolved "https://registry.yarnpkg.com/react-intersection-observer/-/react-intersection-observer-8.32.1.tgz#9b949871eb35eb1fc730732bbf8fcfaaaf3f5b02"
+  integrity sha512-FOmMkMw7MeJ8FkuADpU8TRcvGuTvPB+DRkaikS1QXcWArYLCWC3mjRorq2XeRGBuqmaueOBd27PUazTu9AgInw==
 
 react-is@^16.12.0, react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.6, react-is@^16.9.0:
   version "16.13.1"

@@ -31,3 +31,43 @@ def root_info():
 
 def meta_info():
     return api_help["meta"]
+
+
+def get_field_description(type_: str, field_name: str, schema):
+
+    schema_name = schema.opts.model.__name__.lower()
+
+    field_descriptions = api_help["fields"]["descriptions"]
+    if "schema" in type_.lower():
+        description = f"An unique ID specifying a {field_name} or a JSON object in structure with the {type_}"
+        if "[]" in type_.lower():
+            description = f"A list of unique IDs specifying {field_name}s or a JSON object with the schema structure matching {type_}"
+    else:
+        description = field_descriptions.get(type_.lower(), f"A {type_} describing ")
+        description += field_name
+
+    if schema_name in field_descriptions:
+        description = field_descriptions[schema_name].get(field_name, description)
+
+    return {"description": description}
+
+
+def get_field_json_values(type_: str, name: str, schema):
+    """get the values api_help['fields']"""
+
+    schema_name = schema.opts.model.__name__.lower()
+    json_values = api_help["fields"]["json-values"]
+
+    if "schema" in type_.lower():
+        default_value = json_values["related"]
+        if "[]" in type_.lower():
+            default_value = json_values["related-list"]
+
+    else:
+        default_value = json_values[type_.lower()]
+
+    ## check if schema_name is in api_help
+    if schema_name in json_values:
+        schema_json = json_values[schema_name]
+        default_value = schema_json.get(name, default_value)
+    return default_value

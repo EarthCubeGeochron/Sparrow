@@ -1,0 +1,114 @@
+@require "~app/shared/colors"
+
+/* the tree node's style */
+.tree-view
+  //overflow-y hidden
+  min-width 400px
+  flex-grow 1
+
+.tree-view_item 
+  /* immediate child of .tree-view, for styling convenience */
+  display flex
+  width 100%
+  :hover
+    background-color $light-gray4
+    cursor pointer
+  :active
+    background-color $light-gray2
+
+/* style for the children nodes container */
+.tree-view_children 
+  margin-left 7px
+  padding-left 7px
+  border-left 1px solid $light-gray2
+
+
+.tree-view_children-collapsed 
+  height 0px
+
+.placeholder
+  width 15px
+
+.node 
+  width 100%  
+  border-radius 6px
+
+.node-label
+    display flex
+    align-items baseline
+    width 100%
+    justify-content space-between
+
+.node-left, .node-right
+  display flex 
+  align-items baseline
+
+.read-only
+  color $gray4
+
+.type-schema
+  font-family "Lucida Console", Monospace
+
+.string
+  color $indigo3
+
+.boolean
+  color $turquoise4
+
+.integer
+  color $cobalt1
+
+.decimal
+  color $cobalt3
+
+.default
+  color $violet4
+.required
+  color $red1
+
+
+.geom, .decimal, .integer, .boolean, .string, .read-only, .default, .required
+  font-style italic
+  font-size 15px
+
+.geom
+  color $green3
+
+.legend, .caption
+  font-style italic
+  color: $gray3
+
+.legend-card
+  width 400px
+  height 150px
+  margin 20px
+  
+.legend-field
+  display flex
+  margin-bottom 0.2em
+
+.description 
+  display flex
+  white-space pre-wrap
+  align-items baseline
+  max-width 300px
+  flex-wrap wrap
+  font-style italic
+  margin-left 15px
+
+.des-items
+  margin-top 5px
+  display flex
+  min-width 350px
+
+.container-full
+  display flex
+
+.tree-json-container
+  display flex
+  justify-content space-between
+
+.json-tree
+  padding 6px
+  border-radius 6px
+  background-color: $light-gray5

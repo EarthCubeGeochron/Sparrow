@@ -96,3 +96,8 @@ export function isTooDark(hexcolor) {
 
   return yiq < 90;
 }
+
+export function capitalize(word) {
+  if (!word) return null;
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}

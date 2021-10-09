@@ -1,7 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIv2Result } from "~/api-v2";
 import { Spinner } from "@blueprintjs/core";
-import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
+import { LinkCard } from "@macrostrat/ui-components";
 import { useModelURL } from "~/util/router";
 import { Route, Switch } from "react-router-dom";
 import { DataFileMatch } from "./page";

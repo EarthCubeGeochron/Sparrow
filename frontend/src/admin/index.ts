@@ -2,7 +2,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { useContext } from "react";
 import { Switch, Link } from "react-router-dom";
 import loadable from "@loadable/component";
-import { LinkCard } from "@macrostrat/ui-components/src/ext/router-links";
+import { LinkCard } from "@macrostrat/ui-components";
 import { Spinner, MenuItem, Menu, Divider } from "@blueprintjs/core";
 
 import { Frame } from "~/frame";
@@ -20,6 +20,8 @@ import { DataFileAdminPage } from "./data-file";
 import { VocabularyPage } from "./vocabulary";
 
 import { TagManager } from "~/components/tags";
+
+import { SchemaExplorerMainPanel } from "./schema-explorer";
 
 //@ts-ignore
 import styles from "./module.styl";

@@ -41,6 +41,7 @@ from ..api_info import (
     root_info,
     meta_info,
 )
+from .utils import construct_schema_fields_object
 
 log = get_logger(__name__)
 
@@ -174,10 +175,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
                 "parameters": dict(self.build_param_help()),
                 "allowed_nests": list(set(schema._available_nests())),
                 "examples": list(self.example),
-                "fields": {
-                    k: _field_description(schema, v)
-                    for k, v in _schema_fields(schema).items()
-                },
+                "fields": construct_schema_fields_object(schema),
             }
         )
 

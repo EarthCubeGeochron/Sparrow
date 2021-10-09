@@ -1,4 +1,33 @@
 {
+  "geojson": {
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [-9.194183349609375, 38.665005297729465],
+          [-9.170150756835938, 38.65763297744505],
+          [-9.161224365234375, 38.66768595330274],
+          [-9.169549942016602, 38.67519125499225],
+          [-9.190664291381836, 38.6755262947558],
+          [-9.194183349609375, 38.665005297729465]
+        ]
+      ]
+    }
+  },
+  "wkt": "SRID=4326;POINT(-6.777 26.092)",
+  "schema-sample-geojson": {
+    "name": "schema-geojson-test",
+    "material": "TTG",
+    "location": {
+      "type": "Point",
+      "coordinates": [-9.194183349609375, 38.665005297729465]
+    }
+  },
+  "schema-sample-wkt": {
+    "name": "schema-geojson-test",
+    "material": "TTG",
+    "location": "SRID=4326;POINT(-6.777 26.092)"
+  },
   "publication": [
     { "title": "Fake title 1", "doi": "10.1224/toei90x" },
     { "title": "Fake title 2", "doi": "10.1224/txrt" }
