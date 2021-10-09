@@ -1,15 +1,12 @@
 name: Documentaton website continuous integration
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
-  workflow_dispatch: {}
+    branches: [main, develop]
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      PKG_ROOT: docker.pkg.github.com/earthcubegeochron/sparrow/
     steps:
       # https://dev.to/dtinth/caching-docker-builds-in-github-actions-which-approach-is-the-fastest-a-research-18ei
       - uses: actions/checkout@v2
@@ -21,10 +18,18 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build Docker images
-        run: docs/.ci/1-build-images
-      - name: Test that website loads properly
-        run: docs/.ci/2-run-tests
-      - name: Push new images to GitHub Packages
-        if: ${{ github.event_name == 'push' }}
-        run: docs/.ci/3-push-images
+      - name: Extract metadata (tags, labels) for Docker
+        uses: docker/metadata-action@v3
+        with:
+          images: ghcr.io/earthcubegeochron/sparrow/documentation-site
+      - name: Build and push website image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: docs/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/earthcubegeochron/sparrow/documentation-site:latest
+          cache-to: type=inline
+
