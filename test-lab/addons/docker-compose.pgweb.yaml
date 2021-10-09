@@ -14,3 +14,7 @@ services:
         source: ${SPARROW_CONFIG_DIR}/addons/pgweb.conf
         target: /etc/nginx/locations/pgweb.conf
         read_only: true
+    depends_on:
+      - backend
+      - frontend
+      - pgweb

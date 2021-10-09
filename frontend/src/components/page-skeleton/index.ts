@@ -20,6 +20,7 @@ const MainNavbar = (props) =>
     h(NavButton, { to: "/map" }, "Map"),
     h(NavButton, { to: "/admin" }, "Admin"),
     h(AppNavbar.Divider),
+    h(NavButton, { to: "/import-schema-explorer" }, "Import schemas"),
     h(NavButton, { to: "/api-explorer" }, "API"),
     // NavButton, similar to React-Router 'Link' takes the 'to' arg
   ]);

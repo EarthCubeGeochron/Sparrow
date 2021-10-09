@@ -4,6 +4,7 @@ import React, { useContext } from "react";
 import { Divider } from "@blueprintjs/core";
 import { SchemaExplorerContext } from "./context";
 import { JsonTree, Tree, TreeLegend } from "./tree";
+import { CollapsePanel } from "@macrostrat/ui-components";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -14,7 +15,7 @@ const defaultSchema = {
   nullable: false,
   required: true,
   read_only: false,
-  type: null
+  type: null,
 };
 function SchemaTree() {
   const { state } = useContext(SchemaExplorerContext);
@@ -25,23 +26,34 @@ function SchemaTree() {
     setJSON(j);
   };
 
-  return h("div.schema-tree", [
-    h(Tree, {
-      fieldName: state.model,
-      link: state.route,
-      onChange,
-      ...defaultSchema
-    }),
-    h(Divider),
-    h("div.json-tree-container", [
-      h(JsonTree, {
+  return h("div", [
+    h("div.schema-tree", [
+      h(Tree, {
         fieldName: state.model,
-        json,
         link: state.route,
-        ...defaultSchema
+        onChange,
+        ...defaultSchema,
       }),
-      h(TreeLegend)
-    ])
+      h(Divider),
+      h("div.right-panel", [
+        h(TreeLegend),
+        h(
+          CollapsePanel,
+          {
+            title: `Example JSON for ${state.model}`,
+            storageID: "json-example",
+          },
+          h("div.json-tree-container", [
+            h(JsonTree, {
+              fieldName: state.model,
+              json,
+              link: state.route,
+              ...defaultSchema,
+            }),
+          ])
+        ),
+      ]),
+    ]),
   ]);
 }
 

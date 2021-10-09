@@ -14,11 +14,28 @@ import { useCallback, useContext, useState } from "react";
 
 export function APIExplorerV2(props) {
   return h(Card, { className: "api-explorer-v2 bp3-light" }, [
-    h(
-      NavButton,
-      { className: "bp3-light", to: "/api-explorer/v1", minimal: false },
-      "Version 1"
-    ),
+    h("div.minimal-navbar", [
+      h(
+        NavButton,
+        {
+          className: "bp3-light",
+          to: "/api-explorer/v1",
+          minimal: false,
+          large: true,
+        },
+        "Version 1"
+      ),
+      h(
+        NavButton,
+        {
+          className: "bp3-light",
+          to: "/import-schema-explorer",
+          minimal: false,
+          large: true,
+        },
+        "Import schemas"
+      ),
+    ]),
     h(SwaggerUI, { url: "/api/v2/schema" }),
   ]);
 }

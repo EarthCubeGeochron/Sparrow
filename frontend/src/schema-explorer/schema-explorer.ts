@@ -5,6 +5,7 @@ import { SchemaExplorerContext } from "./context";
 import { capitalize, MinimalNavbar } from "~/components";
 import { Link } from "react-router-dom";
 import { SchemaTree } from "./schema-tree";
+import { CollapsePanel } from "@macrostrat/ui-components";
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -20,14 +21,14 @@ const buttonHierarchy = {
     "method",
     "researcher",
     "publication",
-    "tag"
+    "tag",
   ],
-  tertiary: ["attribute", "authority", "datum_type", "unit", "error_metric"]
+  tertiary: ["attribute", "authority", "datum_type", "unit", "error_metric"],
 };
 
 function SchemaModelButtons() {
   const { state, runAction } = useContext(SchemaExplorerContext);
-  let path = "/admin/schema-explorer/";
+  let path = "/import-schema-explorer/";
 
   return h("div", [
     Object.entries(buttonHierarchy).map(([hierarchy, buttons], i) => {
@@ -40,15 +41,15 @@ function SchemaModelButtons() {
                 {
                   style: hierarchy == "primary" ? { fontWeight: "bold" } : {},
                   intent: state.model == key ? "primary" : "none",
-                  key: i
+                  key: i,
                 },
-                [capitalize(key)]
-              )
-            ])
+                h("span.monospace", key)
+              ),
+            ]),
           ]);
-        })
+        }),
       ]);
-    })
+    }),
   ]);
 }
 
@@ -58,7 +59,14 @@ function SchemaNavBar() {
 
   return h(MinimalNavbar, { className: "schema-nav" }, [
     h("div.button-nav-bar", [
-      h(Link, { to: "/admin/schema-explorer" }, [h("h2", "Schema Explorer")])
+      h(Link, { to: "/import-schema-explorer" }, [
+        h("h2", "Import schema explorer"),
+      ]),
+    ]),
+    h("p", [
+      "Schemas to be used with ",
+      h("code", "db.load_data"),
+      " for adding data to the Sparrow database.",
     ]),
     h("div", [
       h("div.button-nav-bar", [
@@ -66,11 +74,11 @@ function SchemaNavBar() {
         h(Button, {
           minimal: true,
           icon: "menu",
-          onClick: () => setOpen(!open)
-        })
+          onClick: () => setOpen(!open),
+        }),
       ]),
-      h(Collapse, { isOpen: open }, [h(SchemaModelButtons)])
-    ])
+      h(Collapse, { isOpen: open }, [h(SchemaModelButtons)]),
+    ]),
   ]);
 }
 
@@ -79,7 +87,7 @@ function SchemaTest() {
   const initText: string = `Paste your JSON object for ${state.model}`;
   const [text, setText] = useState<string>(initText);
 
-  const onChange = e => {
+  const onChange = (e) => {
     setText(e.target.value);
   };
   return h("div", [
@@ -89,10 +97,10 @@ function SchemaTest() {
         onChange,
         value: text,
         fill: true,
-        style: { height: "250px", width: "250px" }
-      })
+        style: { height: "250px", width: "250px" },
+      }),
     ]),
-    h(Button, { intent: "primary" }, ["Submit"])
+    h(Button, { intent: "primary" }, ["Submit"]),
   ]);
 }
 

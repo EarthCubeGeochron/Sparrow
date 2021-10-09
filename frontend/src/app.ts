@@ -12,6 +12,7 @@ import { APIExplorer } from "./api-explorer";
 import { AuthProvider } from "./auth";
 import { AppToaster } from "./toaster";
 import { AdminRoute } from "./admin";
+import SchemaExplorerMainPanel from "./schema-explorer";
 import { PageStyle } from "~/components/page-skeleton";
 import HomePage from "./homepage";
 import Catalog from "./catalog";
@@ -63,6 +64,10 @@ function AppRouter(props) {
         path: "/api-explorer/v2",
         component: APIExplorerV2,
         exact: true,
+      }),
+      h(PageRoute, {
+        path: "/import-schema-explorer",
+        component: SchemaExplorerMainPanel,
       }),
       h(PageRoute, { path: "*", component: NoMatchPage }),
     ])

@@ -36,7 +36,7 @@ function typeClassName(props) {
     Integer: "integer",
     Boolean: "boolean",
     DateTime: "string",
-    Geometry: "geom"
+    Geometry: "geom",
   };
   let className: string = "default";
   Object.entries(opts).map(([key, value], i) => {
@@ -60,18 +60,18 @@ function Description(props: LabelProps) {
     h("div.des-items", props.description),
     h.if(props.read_only)("div.des-items", [
       h("div.read-only", [
-        "This datatype is read-only and is handled on the backend"
-      ])
+        "This datatype is read-only and is handled on the backend",
+      ]),
     ]),
     h.if(props.required)("div.des-items", [
-      h("div.required", ["* this field is required"])
+      h("div.required", ["* this field is required"]),
     ]),
     h("div.des-items", [
       h(ReactJson, {
         name: false,
         displayDataTypes: false,
         displayObjectSize: false,
-        src: props.example
+        src: props.example,
       }),
       h.if(props.link != null)(
         Switch,
@@ -80,11 +80,11 @@ function Description(props: LabelProps) {
           onChange: () => {
             props.onChange(newJSON, props.fieldName);
             setChecked(!checked);
-          }
+          },
         },
         ["Show in Schema"]
-      )
-    ])
+      ),
+    ]),
   ]);
 }
 
@@ -96,7 +96,7 @@ function NodeLabel(props: LabelProps) {
 
   if (props.read_only) return null;
 
-  const onInfoClick = e => {
+  const onInfoClick = (e) => {
     e.stopPropagation();
     setOpen(!open);
   };
@@ -120,7 +120,7 @@ function NodeLabel(props: LabelProps) {
 
   const Arrow = () => {
     return h(Icon, {
-      icon: props.collapsed ? "caret-right" : "caret-down"
+      icon: props.collapsed ? "caret-right" : "caret-down",
     });
   };
 
@@ -128,16 +128,16 @@ function NodeLabel(props: LabelProps) {
     return h.if(props.type != null)(
       Link,
       {
-        to: `/admin/schema-explorer/${modelLink()}`
+        to: `/import-schema-explorer/${modelLink()}`,
       },
       [
         h(
           "div",
           {
-            className: classname
+            className: classname,
           },
           [type]
-        )
+        ),
       ]
     );
   };
@@ -147,23 +147,23 @@ function NodeLabel(props: LabelProps) {
       h("div.node-left", [
         props.link != null ? h(Arrow) : h("div.placeholder"),
         h("h4", [fieldName]),
-        h.if(props.required)("div.required", "*")
+        h.if(props.required)("div.required", "*"),
       ]),
       h("div.node-right", [
         h.if(props.type != null && props.link == null)(`div.${classname}`, [
-          type
+          type,
         ]),
         h.if(props.link != null)(LinkButton),
         h.if(props.description != null)("div.left-icon", [
           h(Button, {
             icon: "more",
             onClick: onInfoClick,
-            minimal: true
-          })
-        ])
-      ])
+            minimal: true,
+          }),
+        ]),
+      ]),
     ]),
-    h(Collapse, { isOpen: open }, [h(Description, { ...props })])
+    h(Collapse, { isOpen: open }, [h(Description, { ...props })]),
   ]);
 }
 
@@ -198,7 +198,7 @@ function Tree({
   ...rest
 }: TreeProps) {
   const [state, setState] = React.useState<TreeState>({
-    collapsed: defaultCollapsed
+    collapsed: defaultCollapsed,
   });
 
   const [json_, setJSON] = useState({});
@@ -215,11 +215,11 @@ function Tree({
     link,
     {},
     {
-      unwrapResponse: res => {
+      unwrapResponse: (res) => {
         if (res.fields) {
           return res.fields;
         }
-      }
+      },
     }
   );
 
@@ -264,8 +264,8 @@ function Tree({
         onArrowClick: handleClick,
         onChange,
         parentData,
-        ...rest
-      })
+        ...rest,
+      }),
     ]),
     h.if(!state.collapsed)(`div.${containerClassName}`, [
       data == null
@@ -283,10 +283,10 @@ function Tree({
               onChange: onChildChange,
               link: link_,
               defaultCollapsed: true,
-              ...value
+              ...value,
             });
-          })
-    ])
+          }),
+    ]),
   ]);
 }
 

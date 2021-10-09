@@ -20,11 +20,11 @@ export function JsonTree({
     link,
     {},
     {
-      unwrapResponse: res => {
+      unwrapResponse: (res) => {
         if (res.fields) {
           return res.fields;
         }
-      }
+      },
     }
   );
   if (!data) return h("div");
@@ -34,19 +34,22 @@ export function JsonTree({
     newJson = { ...newJson, ...value.example };
   });
 
-  const onEdit = edit => {
+  const onEdit = (edit) => {
     return true;
   };
 
   return h("div", [
-    h("h3", ["Example JSON for ", fieldName]),
-    h("p", ["Edit the fields and copy to your clipboard!"]),
-    h(Divider),
-    h(ReactJson, {
-      src: json,
-      name: fieldName,
-      displayDataTypes: false,
-      onEdit
-    })
+    //h("h3", ["Example JSON for ", fieldName]),
+    h(
+      "div.json-tree",
+      null,
+      h(ReactJson, {
+        src: json,
+        name: fieldName,
+        displayDataTypes: false,
+        onEdit,
+      })
+    ),
+    h("em.caption", ["Edit the fields and copy to your clipboard!"]),
   ]);
 }

@@ -2,8 +2,9 @@
 
 /* the tree node's style */
 .tree-view
-  overflow-y hidden
+  //overflow-y hidden
   min-width 400px
+  flex-grow 1
 
 .tree-view_item 
   /* immediate child of .tree-view, for styling convenience */
@@ -30,8 +31,6 @@
 
 .node 
   width 100%  
-  padding-top 1px
-  padding-bottom 4px
   border-radius 6px
 
 .node-label
@@ -67,6 +66,7 @@
 .required
   color $red1
 
+
 .geom, .decimal, .integer, .boolean, .string, .read-only, .default, .required
   font-style italic
   font-size 15px
@@ -74,8 +74,9 @@
 .geom
   color $green3
 
-.legend
-  font-style bold
+.legend, .caption
+  font-style italic
+  color: $gray3
 
 .legend-card
   width 400px
@@ -84,6 +85,7 @@
   
 .legend-field
   display flex
+  margin-bottom 0.2em
 
 .description 
   display flex
@@ -105,3 +107,8 @@
 .tree-json-container
   display flex
   justify-content space-between
+
+.json-tree
+  padding 6px
+  border-radius 6px
+  background-color: $light-gray5
