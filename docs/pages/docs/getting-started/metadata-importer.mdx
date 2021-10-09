@@ -61,14 +61,11 @@ the data for importing. The full code for this importer can be found [here](http
 
 ### Cleaning the Data:
 
-<img
-  width={850}
-  src="https://sparrow-documentation-assets.s3.amazonaws.com/images/laserchron-excel.png"
-/>
+![Chart](/images/laserchron-excel.png)
 
 Above you can see a snapshot of the excel file that contains the collection of metadata we will be importing. Even though
 the data was entered into a relatively standard format there is still human added variability including differences in
-reporting of longitude and latitude, empty rows, rows with misscellaneous notes, etc. The \*\*first\*\* thing we need to is
+reporting of longitude and latitude, empty rows, rows with misscellaneous notes, etc. The **first** thing we need to is
 clean the data such that we only have the wanted information to import at the end.
 
 To begin get your data into a [pandas dataframe](https://pandas.pydata.org/docs/reference/frame.html)! Pandas provides
