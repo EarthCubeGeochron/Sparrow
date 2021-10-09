@@ -18,13 +18,13 @@ export function DataFilesList(props) {
 
   return h(
     "div.data-files",
-    data.map(d => {
+    data.map((d) => {
       return h(
         LinkCard,
         { to: useModelURL(`/data-file/${d.file_hash}`) },
         h("div", { className: "data-file-card" }, [
           h("h2", d.basename),
-          h("div.type", d.type)
+          h("div.type", d.type),
         ])
       );
     })
@@ -42,13 +42,13 @@ export function DataFilesCard(data) {
       h("div.data-file-card", [
         h("div.content", [
           h.if(date !== null)("h4", { style: { padding: "0px" } }, [
-            format(date, "MMMM D, YYYY")
+            format(date, "MMMM D, YYYY"),
           ]),
           h("h2", basename),
-          h("div.type", type)
-        ])
+          h("div.type", type),
+        ]),
       ])
-    )
+    ),
   ]);
 }
 
@@ -59,13 +59,13 @@ function DataFilesMain(props) {
   return h(Switch, [
     h(Route, {
       path: base + "/:file_hash",
-      component: DataFileMatch
+      component: DataFileMatch,
     }),
     h(Route, {
       path: base,
       component: DataFilesList,
-      exact: true
-    })
+      exact: true,
+    }),
   ]);
 }
 

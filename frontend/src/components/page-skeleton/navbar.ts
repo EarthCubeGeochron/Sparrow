@@ -35,23 +35,23 @@ function AppNavbar({ children, fullTitle, subtitle, ...rest }) {
           h(SiteTitle),
           h.if(subtitle != null)([
             h("span", " "),
-            h("span.subtitle", null, subtitle)
-          ])
-        ])
+            h("span.subtitle", null, subtitle),
+          ]),
+        ]),
       ]),
       h.if(children != null)(Navbar.Divider),
-      children
+      children,
     ]),
     h("div.navbar-spacer"),
     h(Navbar.Group, [
       h(DarkModeButton, { minimal: true, active: false }),
-      h(AuthStatus, { className: "auth-right" })
-    ])
+      h(AuthStatus, { className: "auth-right" }),
+    ]),
   ]);
 }
 
 AppNavbar.Divider = Navbar.Divider;
 
-const MinimalNavbar = props => h("div.minimal-navbar", props);
+const MinimalNavbar = (props) => h("div.minimal-navbar", props);
 
 export { AppNavbar, NavButton, SiteTitle, ShortSiteTitle, MinimalNavbar };

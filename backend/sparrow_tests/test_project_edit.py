@@ -55,7 +55,7 @@ class TestProjectEdits:
         assert set([s.id for s in orig_sessions]) == set([1, 2])
 
     def test_add_location(self, db):
-        """ geojson geometry must be passed """
+        """geojson geometry must be passed"""
         sample = db.model.sample
 
         sample_ = db.session.query(sample).first()

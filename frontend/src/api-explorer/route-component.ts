@@ -38,11 +38,11 @@ class RouteName extends Component {
         {
           to: parent,
           className: "bp3-button bp3-minimal bp3-intent-primary route-parent",
-          role: "button"
+          role: "button",
         },
         [
           h(Icon, { icon: "arrow-left" }),
-          h("span.bp3-button-text", api_route.replace(route, ""))
+          h("span.bp3-button-text", api_route.replace(route, "")),
         ]
       );
     }
@@ -53,18 +53,18 @@ class RouteName extends Component {
       h(AnchorButton, {
         minimal: true,
         icon: "link",
-        href: baseURL + route + queryString
-      })
+        href: baseURL + route + queryString,
+      }),
     ]);
   }
 }
 RouteName.initClass();
 
 const StyledLinkCard = styled(LinkCard)`
-  \color: ${Colors.BLUE1}\;
+  \color: ${Colors.BLUE1}\;;
 `;
 
-const ChildRoutesList = function({ base, routes }) {
+const ChildRoutesList = function ({ base, routes }) {
   if (routes == null) {
     return null;
   }
@@ -72,13 +72,13 @@ const ChildRoutesList = function({ base, routes }) {
     h("h3", "Routes"),
     h(
       "ul.routes",
-      routes.map(function(d) {
+      routes.map(function (d) {
         const to = join(base, d.route);
         return h("li.route", [
-          h(StyledLinkCard, { to }, [h("h4", d.route), h("p", d.description)])
+          h(StyledLinkCard, { to }, [h("h4", d.route), h("p", d.description)]),
         ]);
       })
-    )
+    ),
   ]);
 };
 
@@ -86,17 +86,17 @@ class RouteComponent extends StatefulComponent {
   static initClass() {
     this.contextType = APIContext;
     this.defaultProps = {
-      parent: null
+      parent: null,
     };
 
-    this.prototype.renderSubRoutes = nullIfError(function() {
+    this.prototype.renderSubRoutes = nullIfError(function () {
       const { response } = this.state;
       const { routes } = response;
       const { path: parent } = this.props.match;
       // Use a render function instead of a component match
-      const render = props => h(RouteComponent, { ...props, parent });
+      const render = (props) => h(RouteComponent, { ...props, parent });
 
-      return routes.map(function(r) {
+      return routes.map(function (r) {
         const path = join(parent, r.route);
         return h(Route, { path, key: r.route, render });
       });
@@ -111,21 +111,21 @@ class RouteComponent extends StatefulComponent {
       response: null,
       expandedParameter: null,
       queryString: "",
-      params: {}
+      params: {},
     };
     this.getData();
   }
 
   updateParams(cset) {
     const {
-      helpers: { buildQueryString }
+      helpers: { buildQueryString },
     } = this.context;
     const { params } = this.state;
     const newParams = update(params, cset);
     const queryString = buildQueryString(newParams);
     return this.updateState({
       queryString: { $set: queryString },
-      params: { $set: newParams }
+      params: { $set: newParams },
     });
   }
 
@@ -162,10 +162,10 @@ class RouteComponent extends StatefulComponent {
     return h(Route, { path, exact }, [
       h("div.route-ui", [
         h("div.panel-header", [
-          h(RouteName, { api_route, route, parent, queryString })
+          h(RouteName, { api_route, route, parent, queryString }),
         ]),
-        h("div.route-body", [this.renderBody()])
-      ])
+        h("div.route-body", [this.renderBody()]),
+      ]),
     ]);
   }
 
@@ -190,14 +190,14 @@ class RouteComponent extends StatefulComponent {
         expandedParameter,
         params,
         updateParameters: this.updateParams,
-        expandParameter: this.expandParameter
+        expandParameter: this.expandParameter,
       }),
       h(APIDataComponent, {
         route: api_route,
         params,
         title: "Data",
-        storageID: "data"
-      })
+        storageID: "data",
+      }),
     ]);
   }
 

@@ -15,7 +15,7 @@ const h = hyper.styled(styles);
  *
  *
  */
-const SampleListCard = function(props) {
+const SampleListCard = function (props) {
   const { material, id, name, location } = props;
 
   const to = useModelURL(`/sample/${id}`);
@@ -25,22 +25,22 @@ const SampleListCard = function(props) {
     {
       to,
       key: id,
-      className: "sample-list-card"
+      className: "sample-list-card",
     },
     [
       h("h4", ["Sample ", h("span.name", name)]),
-      h.if(material != null)("div.material", material)
+      h.if(material != null)("div.material", material),
     ]
   );
 };
 
 //Catalog Page
-const SampleList = function() {
+const SampleList = function () {
   const route = "/sample";
   const filterFields = {
     name: "Sample name",
     material: "Material",
-    project_name: "Project"
+    project_name: "Project",
   };
 
   return h("div.data-view.sample-list", [
@@ -48,7 +48,7 @@ const SampleList = function() {
       Callout,
       {
         icon: "info-sign",
-        title: "Samples"
+        title: "Samples",
       },
       "This page lists all samples indexed in the laboratory data system."
     ),
@@ -56,8 +56,8 @@ const SampleList = function() {
     h(FilterListComponent, {
       route,
       filterFields,
-      itemComponent: SampleListCard
-    })
+      itemComponent: SampleListCard,
+    }),
   ]);
 };
 

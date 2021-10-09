@@ -45,14 +45,14 @@ function useSchemaActions(dispatch) {
         const models = await getPossibleModels(get);
         return dispatch({
           type: "possible-models",
-          payload: { models }
+          payload: { models },
         });
       }
       case "get-model-fields": {
         const fields = await fetchFields(action.payload.model_route, get);
         return dispatch({
           type: "model-fields",
-          payload: { fields }
+          payload: { fields },
         });
       }
       case "get-model-from-path": {
@@ -77,19 +77,19 @@ function schemaExplorerReducer(
       return {
         ...state,
         model: action.payload.model,
-        route
+        route,
       };
     }
     case "possible-models": {
       return {
         ...state,
-        possibleModels: action.payload.models
+        possibleModels: action.payload.models,
       };
     }
     case "model-fields": {
       return {
         ...state,
-        fields: action.payload.fields
+        fields: action.payload.fields,
       };
     }
     default:
@@ -122,8 +122,8 @@ const schemaExplorerDefaultState: schemaState = {
     "instrument",
     "researcher",
     "publication",
-    "tag"
-  ]
+    "tag",
+  ],
 };
 
 interface SchemaCtx {
@@ -133,7 +133,7 @@ interface SchemaCtx {
 
 const SchemaExplorerContext = createContext<SchemaCtx>({
   state: schemaExplorerDefaultState,
-  async runAction() {}
+  async runAction() {},
 });
 
 function SchemaExplorerContextProvider(props) {
@@ -151,7 +151,7 @@ function SchemaExplorerContextProvider(props) {
   useEffect(() => {
     runAction({
       type: "get-model-fields",
-      payload: { model_route: state.route }
+      payload: { model_route: state.route },
     });
   }, [state.model]);
 

@@ -31,7 +31,7 @@ function unwrapModels(res) {
     let total_routes = { ...vocab, ...models, ...tags };
 
     let namesAndRoutes: object = {};
-    Object.keys(total_routes).map(key => {
+    Object.keys(total_routes).map((key) => {
       let name = key.split("/").slice(-1)[0];
       let route = key;
       namesAndRoutes = { ...namesAndRoutes, ...{ [name]: route } };

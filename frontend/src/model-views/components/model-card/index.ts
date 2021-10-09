@@ -16,12 +16,12 @@ function RemoveButton({ onClick }) {
       position: "absolute",
       top: "0",
       right: "0",
-      marginLeft: "5px"
+      marginLeft: "5px",
     },
     icon: "small-cross",
     minimal: true,
     intent: "danger",
-    onClick
+    onClick,
   });
 }
 
@@ -43,7 +43,7 @@ function LinkedThrough(props: { data: LinkedThroughModel }) {
   const { model, id } = props.data;
   return h("div.model-card-link", [
     "Linked through ",
-    h(Link, { to: useModelURL(`/${model}/${id}`) }, `${model} ${id}`)
+    h(Link, { to: useModelURL(`/${model}/${id}`) }, `${model} ${id}`),
   ]);
 }
 
@@ -59,7 +59,7 @@ export const ModelLinkCard = (props: ModelLinkCardProps) => {
     onMouseLeave,
     draggable = false,
     styles = {},
-    onClick
+    onClick,
   } = props;
 
   const isLink = to != null;
@@ -79,15 +79,15 @@ export const ModelLinkCard = (props: ModelLinkCardProps) => {
         onMouseEnter,
         onMouseLeave,
         draggable,
-        style: { position: "relative", ...styles }
+        style: { position: "relative", ...styles },
       },
       [
         h.if(isEditing && linkedThrough == null)(RemoveButton, {
-          onClick
+          onClick,
         }),
-        children
+        children,
       ]
     ),
-    h.if(linkedThrough != null)(LinkedThrough, { data: linkedThrough })
+    h.if(linkedThrough != null)(LinkedThrough, { data: linkedThrough }),
   ]);
 };
