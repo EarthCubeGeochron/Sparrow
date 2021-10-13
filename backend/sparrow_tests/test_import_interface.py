@@ -472,8 +472,20 @@ class TestDeclarativeImporter:
                 == "Provided a single object for a collection field"
             )
 
+
+class TestSampleMessages:
     def test_failing_sample_message(self, db):
         sample = json_fixture("failing-sample-duplicates.json")
+
+        try:
+            db.load_data("sample", sample)
+            assert False
+        except Exception as err:
+            db.session.rollback()
+
+        sample["session"][0]["analysis"][0]["datum"][2]["type"][
+            "parameter"
+        ] = "Length 2"
         db.load_data("sample", sample)
 
 
