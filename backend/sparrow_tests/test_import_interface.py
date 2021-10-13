@@ -1,3 +1,4 @@
+import json
 from sparrow.app import Sparrow
 from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
@@ -470,6 +471,10 @@ class TestDeclarativeImporter:
                 err.messages["researcher"][0]
                 == "Provided a single object for a collection field"
             )
+
+    def test_failing_sample_message(self, db):
+        sample = json_fixture("failing-sample-duplicates.json")
+        db.load_data("sample", sample)
 
 
 class TestStagedImport:

@@ -71,7 +71,7 @@ ImportDataAPI = Router(
 
 class ImportDataPlugin(SparrowCorePlugin):
     name = "import-data"
-    sparrow_version = ">=2.*"
+    sparrow_version = "==2.*"
 
     def on_api_initialized_v2(self, api):
         api.mount("/import-data", ImportDataAPI, name=self.name)

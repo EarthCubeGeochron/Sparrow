@@ -3,7 +3,7 @@ from sparrow.ext.pychron import PyChronJSONImporter
 from pytest import mark
 
 
-class TestPyChronJSONImporter(PyChronJSONImporter):
+class PyChronJSONImporterTest(PyChronJSONImporter):
     """A PyChron importer that phones it in on units. This helps to assess
     whether we can successfully overwrite to the proper units for successive imports.
     It is important for progressive enhancement of the web application."""
@@ -28,7 +28,7 @@ class TestPyChronImport:
     def test_pychron_poor_quality_import(self, db):
         ia = json_fixture("pychron-interpreted-age.json")
         assert ia is not None
-        data = TestPyChronJSONImporter().import_file(ia, filename=None)
+        data = PyChronJSONImporterTest().import_file(ia, filename=None)
         res = db.load_data("session", data)
         check_age_units(res, "dimensionless")
 

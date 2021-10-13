@@ -33,8 +33,9 @@ def migration_base():
 class TestDatabaseMigrations:
     @mark.xfail(reason="There is some interference between plugins right now")
     def test_migration(self, db, migration_base):
+
         test_app = Sparrow(debug=True, database=migration_base.url)
-        test_app.setup_database()
+        test_app.setup_database(automap=False)
         # We can use the existing testing database as a target
         m = _create_migration(test_app.db.engine, db.engine)
 
