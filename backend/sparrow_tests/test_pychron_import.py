@@ -1,3 +1,4 @@
+from .fixtures.pychron_session import make_pychron_session
 from .helpers import json_fixture
 from sparrow.ext.pychron import PyChronJSONImporter
 from pytest import mark
@@ -38,4 +39,12 @@ class TestPyChronImport:
         assert ia is not None
         data = PyChronJSONImporter().import_file(ia, filename=None)
         res = db.load_data("session", data)
+        check_age_units(res, "Ma")
+
+
+class TestPychronIASessionImport:
+    def test_session_import(self, db):
+        ia = make_pychron_session()
+        assert ia is not None
+        res = db.load_data("session", ia)
         check_age_units(res, "Ma")
