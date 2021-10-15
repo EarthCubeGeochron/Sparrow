@@ -4,7 +4,7 @@ import subprocess
 from itertools import groupby
 
 # Find IA files by regex
-iare = re.compile("(?P<cnt>_\d{5}\.ia\.json)")
+iare = re.compile(r"(?P<cnt>_\d{5}\.ia\.json)")
 
 
 def key(x):

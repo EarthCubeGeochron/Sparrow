@@ -1,0 +1,37 @@
+{
+    "member_of": {"project": [{"name": "Martin"}], "name": "93RW16A", "material": "rock"},
+    "name": "93RW16A_a06",
+    "material": "Apatite",
+    "session": [
+        {
+            "technique": {"id": "Picking Information"},
+            "instrument": {"name": "Leica microscope"},
+            "date": "2021-04-09 00:00:00",
+            "analysis": [
+                {
+                    "analysis_type": "Grain Shape",
+                    "datum": [
+                        {"value": 167.2, "error": null, "type": {"parameter": "Length 1", "unit": "μm"}},
+                        {"value": 85.3, "error": null, "type": {"parameter": "Width 1", "unit": "μm"}},
+                        {"value": 158.2, "error": null, "type": {"parameter": "Length 1", "unit": "μm"}},
+                        {"value": 60.0, "error": null, "type": {"parameter": "Width 2", "unit": "μm"}},
+                        {"value": 0.6321567005645838, "error": null, "type": {"parameter": "238U Ft", "unit": "μm"}},
+                        {"value": 0.5797092776813073, "error": null, "type": {"parameter": "235U Ft", "unit": "μm"}},
+                        {"value": 0.5719712571439586, "error": null, "type": {"parameter": "232Th Ft", "unit": "μm"}},
+                        {"value": 0.8774698568240697, "error": null, "type": {"parameter": "147Sm Ft", "unit": "μm"}},
+                        {
+                            "value": 1.369728055938351e-06,
+                            "error": null,
+                            "type": {"parameter": "Dimensional mass", "unit": "μm"}
+                        }
+                    ],
+                    "attribute": [
+                        {"parameter": "Geometry", "value": "Hexagonal"},
+                        {"parameter": "Crystal terminations", "value": "Single termination"},
+                        {"parameter": "Notes", "value": "very rough grain but overall shape is still visible"}
+                    ]
+                }
+            ]
+        }
+    ]
+}

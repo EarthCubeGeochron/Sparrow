@@ -1,3 +1,6 @@
+import json
+
+from sqlalchemy.exc import IntegrityError
 from sparrow.app import Sparrow
 from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
@@ -8,6 +11,7 @@ from sparrow.logs import get_logger
 from sparrow.encoders import JSONEncoder
 from json import dumps
 from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy.exc import IntegrityError
 
 from .fixtures import basic_data, incomplete_analysis, basic_project
 from .helpers import json_fixture, ensure_single
@@ -470,6 +474,30 @@ class TestDeclarativeImporter:
                 err.messages["researcher"][0]
                 == "Provided a single object for a collection field"
             )
+
+
+class TestSampleMessages:
+    sample = json_fixture("failing-sample-duplicates.json")
+
+    def test_failing_sample_message(self, db):
+        """Check to see whether a sample with an invalid duplicate key
+        is rejected with an appropriate message"""
+        try:
+            db.load_data("sample", self.sample)
+            assert False
+        except IntegrityError as err:
+            # We have an error from unique constraint violation
+            exc = err.orig
+            assert exc.diag.table_name == "datum"
+            assert "duplicate key value violates unique constraint" in str(exc)
+            assert "(analysis, type)" in str(exc)
+
+    def test_fixed_sample_import(self, db):
+        # Adjust sample to perform better by deduplicating length
+        self.sample["session"][0]["analysis"][0]["datum"][2]["type"][
+            "parameter"
+        ] = "Length 2"
+        db.load_data("sample", self.sample)
 
 
 class TestStagedImport:
