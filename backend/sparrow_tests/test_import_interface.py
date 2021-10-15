@@ -477,11 +477,13 @@ class TestDeclarativeImporter:
 
 
 class TestSampleMessages:
-    def test_failing_sample_message(self, db):
-        sample = json_fixture("failing-sample-duplicates.json")
+    sample = json_fixture("failing-sample-duplicates.json")
 
+    def test_failing_sample_message(self, db):
+        """Check to see whether a sample with an invalid duplicate key
+        is rejected with an appropriate message"""
         try:
-            db.load_data("sample", sample)
+            db.load_data("sample", self.sample)
             assert False
         except IntegrityError as err:
             # We have an error from unique constraint violation
@@ -490,11 +492,12 @@ class TestSampleMessages:
             assert "duplicate key value violates unique constraint" in str(exc)
             assert "(analysis, type)" in str(exc)
 
+    def test_fixed_sample_import(self, db):
         # Adjust sample to perform better by deduplicating length
-        sample["session"][0]["analysis"][0]["datum"][2]["type"][
+        self.sample["session"][0]["analysis"][0]["datum"][2]["type"][
             "parameter"
         ] = "Length 2"
-        db.load_data("sample", sample)
+        db.load_data("sample", self.sample)
 
 
 class TestStagedImport:
