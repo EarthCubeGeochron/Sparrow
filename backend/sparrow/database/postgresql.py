@@ -21,7 +21,9 @@ def prefix_inserts(insert, compiler, **kw):
     """Conditionally adapt insert statements to use on-conflict resolution (a PostgreSQL feature)"""
     action = getattr(state, "on_conflict", "restrict")
     if action == "do-nothing":
-        insert._post_values_clause = postgresql.dml.OnConflictDoNothing()
+        insert._post_values_clause = postgresql.dml.OnConflictDoNothing(
+            index_elements=insert.table.primary_key
+        )
     if action == "do-update":
         try:
             params = insert.compile().params
@@ -41,5 +43,7 @@ def prefix_inserts(insert, compiler, **kw):
                 index_elements=insert.table.primary_key, set_=vals
             )
         else:
-            insert._post_values_clause = postgresql.dml.OnConflictDoNothing()
+            insert._post_values_clause = postgresql.dml.OnConflictDoNothing(
+                index_elements=insert.table.primary_key
+            )
     return compiler.visit_insert(insert, **kw)
