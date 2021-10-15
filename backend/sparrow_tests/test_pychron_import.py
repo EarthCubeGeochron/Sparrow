@@ -1,4 +1,3 @@
-from .fixtures.pychron_session import make_pychron_session
 from .helpers import json_fixture
 from sparrow.ext.pychron import PyChronJSONImporter
 from pytest import mark
@@ -47,7 +46,7 @@ class TestPyChronImport:
 class TestPychronIASessionImport:
     def test_session_import(self, db):
         """Test that non-conforming session import fails with a meaningful error message."""
-        ia = make_pychron_session()
+        ia = json_fixture("pychron-failing-session.json")
         try:
             db.load_data("session", ia)
             assert False
@@ -56,7 +55,7 @@ class TestPychronIASessionImport:
 
     def test_session_import_fixed(self, db):
         """Fix session import by getting rid of non-conforming analyses."""
-        ia = make_pychron_session()
+        ia = json_fixture("pychron-failing-session.json")
         ia["analysis"] = [
             i for i in ia["analysis"] if i["analysis_type"] != "Preferred"
         ]
