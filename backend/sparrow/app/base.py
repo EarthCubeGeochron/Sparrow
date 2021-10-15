@@ -68,7 +68,7 @@ class Sparrow(Starlette):
         elif _exists:
             log.info("Application tables exist")
 
-    def setup_database(self):
+    def setup_database(self, automap=True):
         # If we set up the database twice, bad things will happen
         # with overriding of models, etc. We must make sure we only
         # set up the database once.
@@ -77,7 +77,7 @@ class Sparrow(Starlette):
             return self.db
         self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
-        if self.db.mapper is None:
+        if self.db.mapper is None and automap:
             self.database.automap()
         if self.db.mapper is not None:
             self.run_hook("database-ready", self.db)

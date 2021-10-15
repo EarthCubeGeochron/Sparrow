@@ -1,9 +1,11 @@
 from .helpers import json_fixture
 from sparrow.ext.pychron import PyChronJSONImporter
 from pytest import mark
+from sqlalchemy.exc import IntegrityError
+from psycopg2.errors import UniqueViolation
 
 
-class TestPyChronJSONImporter(PyChronJSONImporter):
+class PyChronJSONImporterTest(PyChronJSONImporter):
     """A PyChron importer that phones it in on units. This helps to assess
     whether we can successfully overwrite to the proper units for successive imports.
     It is important for progressive enhancement of the web application."""
@@ -28,7 +30,7 @@ class TestPyChronImport:
     def test_pychron_poor_quality_import(self, db):
         ia = json_fixture("pychron-interpreted-age.json")
         assert ia is not None
-        data = TestPyChronJSONImporter().import_file(ia, filename=None)
+        data = PyChronJSONImporterTest().import_file(ia, filename=None)
         res = db.load_data("session", data)
         check_age_units(res, "dimensionless")
 
@@ -39,3 +41,23 @@ class TestPyChronImport:
         data = PyChronJSONImporter().import_file(ia, filename=None)
         res = db.load_data("session", data)
         check_age_units(res, "Ma")
+
+
+class TestPychronIASessionImport:
+    def test_session_import(self, db):
+        """Test that non-conforming session import fails with a meaningful error message."""
+        ia = json_fixture("pychron-failing-session.json")
+        try:
+            db.load_data("session", ia)
+            assert False
+        except IntegrityError as err:
+            assert isinstance(err.orig, UniqueViolation)
+
+    def test_session_import_fixed(self, db):
+        """Fix session import by getting rid of non-conforming analyses."""
+        ia = json_fixture("pychron-failing-session.json")
+        ia["analysis"] = [
+            i for i in ia["analysis"] if i["analysis_type"] != "Preferred"
+        ]
+        db.load_data("session", ia)
+        # check_age_units(res, "Ma")

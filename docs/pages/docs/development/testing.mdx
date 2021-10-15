@@ -1,0 +1,13 @@
+Sparrow tests are run with the `sparrow test` command.
+
+## Options
+
+The testing application has several custom options:
+
+- `--include-slow`: Include slow-running tests.
+- `--psql`: Enter a PostgreSQL client application when the tests finish.
+
+Many standard PyTest options can also be used:
+
+- Use the `--pdb` flag to enter a debugger session when a test fails.
+- If output is too long, it can be hidden using the `--show-capture=no` flag.

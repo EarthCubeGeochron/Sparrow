@@ -54,7 +54,7 @@ def get_csv(uuid):
 
 class WebPlugin(SparrowCorePlugin):
     name = "web"
-    sparrow_version = ">=2.*"
+    sparrow_version = "==2.*"
 
     def on_finalize_routes(self):
         app = Flask(__name__)
