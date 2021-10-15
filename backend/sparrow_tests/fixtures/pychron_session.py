@@ -1,5 +1,6 @@
 def make_pychron_session():
-    obj = {
+    """Make an invalid import schema for session (too many 'weighted mean' analyses)"""
+    return {
         "analysis": [
             {
                 "analysis_name": "66874-01",
@@ -903,10 +904,8 @@ def make_pychron_session():
             "location": {"coordinates": [-106.0, 35.0], "type": "Point"},
             "material": "Sanidine",
             "name": "04L-37",
-            "note": "Not picked in oils to isolate inclusion-rich and "
-            "inclusion-poor crystals",
+            "note": "Not picked in oils to isolate inclusion-rich and inclusion-poor crystals",
             "project": [{"name": "AdvancedArgonFall2018"}],
         },
         "technique": "Ar/Ar Incremental Heating",
     }
-    return obj

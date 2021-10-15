@@ -12,6 +12,7 @@ from sparrow.encoders import JSONEncoder
 from json import dumps
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.exc import IntegrityError
+from psycopg2.errors import UniqueViolation
 
 from .fixtures import basic_data, incomplete_analysis, basic_project
 from .helpers import json_fixture, ensure_single
@@ -488,6 +489,7 @@ class TestSampleMessages:
         except IntegrityError as err:
             # We have an error from unique constraint violation
             exc = err.orig
+            assert isinstance(exc, UniqueViolation)
             assert exc.diag.table_name == "datum"
             assert "duplicate key value violates unique constraint" in str(exc)
             assert "(analysis, type)" in str(exc)
