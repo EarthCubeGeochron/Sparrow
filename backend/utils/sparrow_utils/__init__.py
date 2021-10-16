@@ -4,7 +4,7 @@ core and command-line interface.
 """
 from os import path
 from .logs import setup_stderr_logs, get_logger
-from .shell import cmd
+from .shell import cmd, split_args
 
 
 def relative_path(base, *parts):
