@@ -5,7 +5,7 @@ from pathlib import Path
 from json import loads
 from json.decoder import JSONDecodeError
 from sparrow_utils.logs import get_logger
-from sparrow_utils.shell import cmd as cmd_
+from sparrow_utils.shell import split_args, cmd as cmd_
 from rich import print
 from .exceptions import SparrowCommandError
 
@@ -65,8 +65,10 @@ def exec_or_run(
             *compose_args, "exec", *tty_args, container, *args, **popen_kwargs
         )
     else:
+        run_args = split_args(*run_args)
+        run_args = list(set([*tty_args, *run_args]))
         return compose(
-            *compose_args, "run", *tty_args, *run_args, container, *args, **popen_kwargs
+            *compose_args, "run", *run_args, container, *args, **popen_kwargs
         )
 
 
