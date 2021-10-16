@@ -41,7 +41,7 @@ def get_backend_help_info(cache=True):
         stdout=PIPE,
         env=env,
         tty=False,
-        run_args=("--no-deps --rm -T",),
+        run_args=("--no-deps --rm",),
     )
     if out.returncode != 0:
         details = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"
