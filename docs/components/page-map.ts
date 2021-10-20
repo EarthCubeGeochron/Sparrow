@@ -24,7 +24,6 @@ const navLinks: Links = [
 ];
 
 const guideLinks: Links = [
-  { href: "/guides/motivation-and-design", label: "Motivation and design" },
   {
     href: "/guides/tutorials",
     label: "User Tutorials",
@@ -48,6 +47,7 @@ const guideLinks: Links = [
 
 const aboutLinks: Links = [
   { href: "/about", label: "Motivation" },
+  { href: "/about/sparrow-stack", label: "Tech Stack" },
   { href: "/about/implementations", label: "Implementations" },
   { href: "/about/presentations", label: "Presentations" }
 ];

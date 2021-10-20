@@ -39,6 +39,11 @@ ERROR: for backend  Cannot create container for service backend: invalid mount c
 
 This was solved by going into docker desktop and adding `usr/local/opt` to the file-shared list located in settings/Resources/FILE SHARING
 
+<img
+  src="https://sparrow-documentation-assets.s3.amazonaws.com/images/docker-file-share.png"
+  width={850}
+/>
+
 Now there is a new issue.. the frontend doesn't start. No error logs, just says `error`.
 
 ERROR: for frontend Cannot start service frontend: OCI runtime create failed: container_linux.go:380: starting container process caused: process_linux.go:545: container init caused: rootfs_linux.go:76: mounting "/host_mnt/usr/local/opt/sparrow/srcroot/frontend/default-content" to rootfs at "/app/site-content" caused: mkdir /var/lib/docker/overlay2/c87062967c034960a87c9229675f23abdfe4cf76111d5508cce7309fc125f453/merged/app/site-content: operation not permitted: unknown Attaching to srcroot_gateway_1, srcroot_frontend_1, srcroot_api-tests_1, srcroot_backend_1, srcroot_db_1
