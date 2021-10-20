@@ -1,0 +1,159 @@
+import { DocsPage } from "components";
+
+# Sparrow's data models
+
+All imported data lives in the Sparrow database as tables and relationships upon those tables.
+From these tables and relationships, Sparrow's backend extracts data models with the help of
+[Sqlalchemy](https://www.sqlalchemy.org/) and [Marshmallow](https://marshmallow.readthedocs.io/en/stable/).
+In tandem with Sqlalchemy and Marshmallow, Sparrow maps over the database and generates
+python classes for every data model it extracts from the database. For instance the `Sample` model
+represents the `Sample` table and it's corresponding relationships. These
+python class data models can be used to search for and create data in Sparrow. In the following
+tutorial we will explore these data models and learn how to do some basic searching and creating
+with them.
+
+## Sqlalchemy tutorial with Sparrow
+
+In order to follow along with this tutorial you will need a working version of sparrow
+running locally. If you don't have one currently working you can follow along as I will try
+to show as much of the expected output as possible. Lets begin!
+
+First go to the command line and type in:
+
+```
+sparrow shell
+```
+
+This command will put you in an iPython environment in the backend directory of Sparrow. We will be able
+to import and run functions similar to how one would in a Jupyter Notebook.
+
+Once you are in the shell run
+
+```python
+db.model
+```
+
+The output you should see is below. This is a list of all the available data models in sparrow. Many
+of these have names resembling their database table name or their schema and database table name. You
+can see many models but the most commonly used are: `project`, `sample`, `session`, `analysis`, `datum`.
+
+```
+ModelCollection: [
+  vocabulary_parameter,
+  vocabulary_parameter_link,
+  vocabulary_material,
+  vocabulary_material_link,
+  vocabulary_analysis_type,
+  vocabulary_entity_type,
+  vocabulary_unit,
+  vocabulary_error_metric,
+  vocabulary_entity_reference,
+  vocabulary_method,
+  tags_tag,
+  datum,
+  analysis,
+  standard_sample,
+  sample,
+  spatial_ref_sys,
+  researcher,
+  publication,
+  geo_entity,
+  instrument,
+  sample_geo_entity,
+  instrument_session,
+  attribute,
+  data_file_type,
+  constant,
+  data_file,
+  enum_date_precision,
+  data_file_link,
+  favorite_rock,
+  user,
+  project,
+  session,
+  datum_type,
+  core_view_datum
+]
+```
+
+Here we will look at the `sample` data model for this tutorial. The first thing we will do is
+store the `sample` data model reference in a variable. We'll name it `Sample`. **NOTE:** when accessing
+models from `db.model` use the attribute "dot" notation, `db.model.sample`.
+
+```python
+Sample = db.model.sample
+Sample
+```
+
+If you run just `Sample` you should see the following output. This means that the Sample data model is
+an extension of a sqlalchemy python class.
+
+```
+sqlalchemy.ext.automap.sample
+```
+
+Okay, now that we have the Sample model we'll do some searching of the models.
+
+```python
+db.session.query(Sample).all()
+db.session.query(Sample.name).all()
+db.session.query(Sample).filter_by(name="sample_name").all()
+```
+
+Above are 3 commands that will return arrays of the Sample models or empty arrays If
+no data exist to match the query. Notice how each one begins with `db.session.query`? `db.session`
+is a pythonic link to say, "time to do things on the database." And the method that comes after,
+`query()` means we will be querying the database. `query()` then takes in either the data model, `Sample`
+or an attribute of the data model, `Sample.name`, `Sample.material`, etc. There are other functions
+we can chain onto this, like the `filter_by` method which will filter data models via a `**kwarg`. Lastly,
+each query needs an ending method to let the query know the amount of data to bring back, i.e `all()`,
+`first()`. A database query needs this ending function otherwise the query will not run.
+
+Next we will create a simple sample data model with only a name.
+
+```
+sample_1 = Sample(name="fake sample 1")
+print(sample_1)
+print(sample_1.name)
+```
+
+Creating a new database model is similar to creating a python class instance. In the above code
+we create an instance of `Sample` with name `fake sample 1` and save it in the variable `sample_1`.
+If we `print(sample_1)` we see a instance of the sample data model without an `id`. this is because the
+unqiue id is set when it is added to the database. At this point we have transiently created a fake sample
+in a local variable. You can access and set attributes on `sample_1` via the "dot" notation as well.
+To view all the attributes and methods you can run `help(sample_1)`.
+
+```python
+sample(id: –)
+"fake sample 1"
+```
+
+The next two lines will add the sample to the database! If you don't want to add this fake sample to
+your database **DO NOT RUN THEM**.
+
+```python
+db.session.add(sample_1)
+db.session.commit()
+```
+
+In this block we have added our sample, `sample_1`, to the database transaction session. The next command
+commits all of the changes in the database transaction session to the database. You can view uncommited
+things in the session by running `db.session.new` to see new models, or `db.session.dirty` to view edited
+models. If you wish to empty the session without commiting you can run `db.session.rollback()`. This basically
+resets the database transaction block.
+
+## Summary:
+
+Sparrow uses Sqlalchemy and Marshmallow to map all database tables and relationships in the python classes
+used to represent the different data models in Sparrow. With these data models we can search for, edit existing,
+and create new data models.
+
+Learning sqlalchemy syntax and functions takes time. Below are a list of some resources we've used as well as
+a link to some python tests that heavily use sqlalchemy models.
+
+- [SqlAlchemy Query API](https://docs.sqlalchemy.org/en/14/orm/query.html)
+- [Introduction to SqlAlchemy by Mike Bayer (youtube video)](https://www.youtube.com/watch?v=sO7FFPNvX2s)
+- [Sparrow test that creates multiple Sample Models](https://github.com/EarthCubeGeochron/Sparrow/blob/main/backend/sparrow_tests/test_api.py#L45)
+
+export default DocsPage;

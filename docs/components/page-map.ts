@@ -81,7 +81,8 @@ const docsLinks: Links = [
     children: [
       { href: "/docs/core/cli", label: "Command-line interface" },
       { href: "/docs/core/server-config", label: "Server configuration" },
-      { href: "/docs/core/extensions", label: "Extensions" }
+      { href: "/docs/core/extensions", label: "Extensions" },
+      { href: "/docs/core/sqlalchemy", label: "Data models" }
     ]
   },
   { href: "/docs/database", label: "Database" },
