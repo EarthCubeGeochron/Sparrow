@@ -44,6 +44,7 @@ html5lib==1.0.1
 datefinder==0.7.0
 pyarrow==5.0.0
 openpyxl==3.0.9
+uncertainties==3.1.6 
 
 # Not sure why these were added,
 # may be subdependencies of Click
