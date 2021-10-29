@@ -22,7 +22,7 @@ install-dev: build-dev
 ## TODO: fix bugs with install-dist to make it more capable
 # Bundle with PyInstaller and install (requires local Python 3)
 install-dist: _cli/dist/sparrow install-hooks
-	_cli/_scripts/install
+	get-sparrow.sh $<
 
 test:
 	_cli/_scripts/test-cli
