@@ -4,3 +4,6 @@
 [submodule "backend/core_plugins/versioning/pg-memento"]
 	path = backend/core_plugins/versioning/pg-memento
 	url = https://github.com/pgMemento/pgMemento.git
+[submodule "backend/python-tools"]
+	path = backend/python-tools
+	url = git://github.com/UW-Macrostrat/python-tools.git
