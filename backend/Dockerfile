@@ -26,12 +26,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # This warning can get confused with an error,
 # but it's just pip being self-important
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
-# Disable caching to slim down image
-ENV PIP_NO_CACHE_DIR=1
-
-# For graphing the database schema
-RUN git clone https://github.com/davenquinn/sadisplay.git /ext/sadisplay \
-  && pip install -e /ext/sadisplay
 
 COPY ./docker-scripts/* /bin/
 RUN mkdir /app
