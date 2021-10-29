@@ -2,10 +2,18 @@ FROM ghcr.io/earthcubegeochron/sparrow/backend-base:2.0 AS main
 # Multi-stage build of Sparrow backend.
 
 ## Git is required for the PyChron importer
-RUN apt update && apt install -y git
+RUN apt update && \
+  apt install -y git && \
+  pip install "poetry==1.1.10" && \
+  rm -rf /var/lib/apt/lists/*
 
-COPY ./requirements.txt /install/requirements.txt
-RUN pip install --no-cache -r /install/requirements.txt
+# Copy only requirements to cache them in docker layer
+COPY poetry.lock pyproject.toml /app/
+
+# Project initialization:
+RUN --mount=type=cache,target=/root/.cache \
+  poetry config virtualenvs.create false \
+  && poetry install --no-interaction --no-ansi --no-root
 
 COPY ./docker.cfg /config/docker.cfg
 # These values should not change between installations
@@ -32,7 +40,7 @@ WORKDIR /app
 ## Copy app core
 COPY ./ /app/
 
-RUN pip install -e utils && pip install -e .
+RUN poetry install --no-interaction --no-ansi 
 
 # Copy command-line options to a place where they can be easily accessed
 # by the wrapper CLI.
