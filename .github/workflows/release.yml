@@ -156,12 +156,14 @@ jobs:
           body: |
             The latest release of Sparrow can be installed using the following command:
             ```
-            bash -c "$(curl -fsSL https://raw.githubusercontent.com/EarthCubeGeochron/Sparrow/HEAD/get-sparrow.sh)"
+            bash -c "$(curl -fsSL https://sparrow-data.org/get-sparrow.sh)"
             ```
 
             - If you want to install this release specifically, you can add it to the above command, like so: `bash -c $(...) - ${{ steps.get-version.outputs.tag_name }}`.
-            - You can also download the installation script manually and run it using `bash get-sparrow.sh` or `bash get-sparrow.sh ${{ steps.get-version.outputs.tag_name }}`.
-            - For complete control over the installation process, you can manually run the download and installation steps encapsulated by the [install script](https://github.com/EarthCubeGeochron/Sparrow/blob/HEAD/get-sparrow.sh).
+            - You can also download the [`get-sparrow.sh` script](https://github.com/EarthCubeGeochron/Sparrow/blob/HEAD/get-sparrow.sh)
+              manually and run it using `bash get-sparrow.sh` or `bash get-sparrow.sh ${{ steps.get-version.outputs.tag_name }}`.
+            - For complete control over the installation process, you can manually review the [`get-sparrow.sh` script](https://github.com/EarthCubeGeochron/Sparrow/blob/HEAD/get-sparrow.sh)
+              and run the download and installation steps yourself.
 
             See the [Getting started documentation](https://sparrow-data.org/docs/getting-started) for more information on how to set up Sparrow.
           files: |

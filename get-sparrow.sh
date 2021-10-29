@@ -44,10 +44,14 @@ line
 
 # Release should be last argument to the script if provided
 release="$1"
+local_install=0
 if [ -z $release ]; then
   header "Finding latest Sparrow release"
   release=$(get_release $repo_name latest)
   detail "found release $release"
+elif [ -d $release ]; then
+  detail "Installing local file $release"
+  local_install=1
 else
   header "Finding user-specified version $release"
 fi
@@ -62,15 +66,20 @@ dist_dir=${SPARROW_DIST_DIR:-$install_path/opt/sparrow}
 symlink=$install_path/bin/sparrow
 #TMPDIR=$install_path/sparrowtemp
 
-# Check whether URL exists
-header "Checking download link"
-detail "\e[2m$url\e[0m"
-if curl --output /dev/null --silent --head --fail "$url"; then
-  detail "link is accessible!"
-else
-  abort "could not access link!"
+# We now use the download script for local installations as well, because there
+# is a ton of logic aroudn where to install the source root for the Sparrow codebase.
+# This may be something we can get rid of eventually, or wrap into the CLI itself.
+if ((!local_install)); then
+  # Check whether URL exists
+  header "Checking download link"
+  detail "\e[2m$url\e[0m"
+  if curl --output /dev/null --silent --head --fail "$url"; then
+    detail "link is accessible!"
+  else
+    abort "could not access link!"
+  fi
+  detail ""
 fi
-detail ""
 
 header "Installation prefix:\e[0m $install_path"
 line "\e[0m"
@@ -127,25 +136,33 @@ if ! [ -w $install_path ]; then
     SUDO="sudo"
 fi
 
-
-## create temporary directory using the TMPDIR environmental variable
-temp_dir=$(mktemp -d)
-if [ ! -d $temp_dir ]; then
-  abort "$temp_dir not created successfully"
-fi
-
-## download into temp directory to see if it downloaded correctly
-header "Downloading Sparrow CLI \e[0m$release"
-curl -L -s ${url} | $SUDO tar xzf - -C $temp_dir
-
-test_file=$temp_dir/sparrow
-
-if [ -f "$test_file" ]; then
-  detail "success!"
+source_dir=""
+if ((local_install)); then
+  header "Installing Sparrow from local file"
+  source_dir=$release
 else
-  abort "download unsuccessful"
+  ## create temporary directory using the TMPDIR environmental variable
+  temp_dir=$(mktemp -d)
+  if [ ! -d $temp_dir ]; then
+    abort "$temp_dir not created successfully"
+  fi
+
+  ## download into temp directory to see if it downloaded correctly
+  header "Downloading Sparrow CLI \e[0m$release"
+  curl -L -s ${url} | $SUDO tar xzf - -C $temp_dir
+
+  test_file=$temp_dir/sparrow
+
+  if [ -f "$test_file" ]; then
+    detail "success!"
+  else
+    abort "download unsuccessful"
+  fi
+  line
+
+  source_dir=$temp_dir
 fi
-line
+
 
 line "clearing out $dist_dir"
 $SUDO rm -rf $dist_dir
@@ -153,11 +170,25 @@ $SUDO mkdir -p $dist_dir
 ## Move files to the correct directory
 # and test they have successfully moved
 line "installing to $dist_dir"
-$SUDO mv $temp_dir/* $dist_dir
+
+# We could do something bad here if source dir was unset!
+if [ -z $source_dir ]; then
+  abort "source_dir not set"
+fi
+
+if ((local_install)); then
+  $SUDO cp -r $source_dir/* $dist_dir
+else
+  $SUDO mv $temp_dir/* $dist_dir
+fi
 
 move_test_file=$dist_dir/sparrow
 
-rm -rf $temp_dir
+if [ ! -z $temp_dir ]; then
+  detail "deleting $temp_dir"
+  rm -rf $temp_dir
+fi
+
 if [ -f "$move_test_file" ]; 
 then
     detail "success!"
