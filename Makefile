@@ -41,7 +41,10 @@ _cli/dist/macos/sparrow:
 	pyinstaller --distpath _cli/dist/macos _cli/sparrow.spec
 
 _cli/dist/linux/sparrow:
-	docker run -v "$(shell pwd)/_cli:/src" cdrx/pyinstaller-linux:latest
+	docker run -it \
+		-v "$(shell pwd):/src/" \
+		cdrx/pyinstaller-linux:latest \
+		_cli/_scripts/build-dist
 
 _cli/dist/windows/sparrow:
 	docker run -v "$(shell pwd)/_cli:/src" cdrx/pyinstaller-windows:latest
