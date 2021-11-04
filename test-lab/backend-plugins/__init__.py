@@ -31,7 +31,6 @@ class TestDataInitPlugin(SparrowPlugin):
         project_count = db.session.query(db.model.project).count()
         if project_count > 0:
             return
-        db = self.app.database
         data = load(open(_test_data, "r"))
         db.load_data("project", data["data"])
 
