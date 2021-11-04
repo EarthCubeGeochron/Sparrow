@@ -21,8 +21,8 @@ install-dev: build-dev
 
 ## TODO: fix bugs with install-dist to make it more capable
 # Bundle with PyInstaller and install (requires local Python 3)
-install-dist: _cli/dist/sparrow install-hooks
-	get-sparrow.sh $<
+install-dist: install-hooks
+	./get-sparrow.sh $<
 
 test:
 	_cli/_scripts/test-cli
@@ -45,7 +45,7 @@ _cli/dist/sparrow:
 	_cli/_scripts/build-dist
 
 build-linux:
-	docker run -it \
+	docker run \
 		-v "$(shell pwd):/src/" \
 		cdrx/pyinstaller-linux:latest \
 		_cli/_scripts/build-dist
@@ -53,7 +53,7 @@ build-linux:
 # This will build the CLI for windows, which is currently unsupported
 # (WSL integration with the linux binaries should be used instead)
 build-windows:
-	docker run -it \
+	docker run \
 		-v "$(shell pwd):/src/" \
 		cdrx/pyinstaller-windows:latest \
 		_cli/_scripts/build-dist
