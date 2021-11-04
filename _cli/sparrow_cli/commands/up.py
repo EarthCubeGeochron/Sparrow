@@ -23,7 +23,10 @@ def _get_prestart_script(cfg):
     if cfg.config_dir is None:
         return None
     prestart = cfg.config_dir / "sparrow-prestart.sh"
-    return prestart.exists()
+    if not prestart.exists():
+        log.info(f"No prestart script found at {prestart}")
+        return None
+    return prestart
 
 
 @click.command()

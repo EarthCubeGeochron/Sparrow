@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -e
 
 # Meant to be run from the repository root folder
 _cli/_scripts/build-local

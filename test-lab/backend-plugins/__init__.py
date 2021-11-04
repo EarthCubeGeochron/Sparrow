@@ -21,7 +21,9 @@ class TestDataInitPlugin(SparrowPlugin):
             db.session.add(user)
             db.session.commit()
 
-    def on_database_ready(self):
+        self._load_testing_data()
+
+    def _load_testing_data(self):
         """Loads testing data on app startup."""
         ## TODO: running importers on app lifecycle methods is a bad idea,
         # because we might run the method on several workers in production.
