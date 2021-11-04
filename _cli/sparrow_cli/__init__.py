@@ -67,9 +67,11 @@ def main(ctx, args):
     if subcommand == "_docker-compose":
         # This is an internal, undocumented command that runs  a
         # 'bare' docker-compose, without applying Sparrow environment
-        return _docker_compose(*args)
+        return _docker_compose(*rest)
 
-    # Find sparrow configuration object
+    # Find sparrow configuration object, creating it if it doesn't exist.
+    # NOTE: This is the core of the Sparrow CLI configuration system, and
+    # the primary locus of setup work in the application.
     cfg = ctx.find_object(SparrowConfig)
 
     if subcommand in ["--help", "help"]:
