@@ -138,10 +138,9 @@ services:
       # Right now, we configure default site content
       # rather than allowing any customization
       - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/app/site-content
-      # A folder for a testing version of the @macrostrat/ui-components
-      # Javascript library that will be linked into the container at runtime
-      # to support tandem development within Docker
-      - ${SPARROW_UI_COMPONENTS:-placeholder}:/app/_local_modules/@macrostrat/ui-components:ro
+      # A folder for node modules that will be resolved preferentially
+      # instead of the main node_modules packages.
+      - ${SPARROW_FRONTEND_MODULES:-placeholder}:/app/_local_modules:ro
   # API TESTS container is disabled for now
   # api-tests:
   #   build: api-tests

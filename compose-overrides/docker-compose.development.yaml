@@ -6,15 +6,11 @@ services:
       context: frontend
       target: base
     volumes:
-      # Right now, we configure default site content
-      # rather than allowing any customization
-      - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/app/site-content
-      # A folder for a testing version of the @macrostrat/ui-components
-      # Javascript library that will be linked into the container at runtime
-      # to support tandem development within Docker
-      - ${SPARROW_UI_COMPONENTS:-placeholder}:/app/_local_modules/@macrostrat/ui-components:ro
-      - ./frontend:/app
+      # Extra bind mounts to local directories for code reloading
+      - ./frontend/src:/app/src
+      - ./frontend/packages:/app/packages
+      - ./frontend/plugins:/app/plugins
+      # Keep node_modules in a container to facilitate rebuilding
       - frontend_node_modules:/app/node_modules
 volumes:
   frontend_node_modules:
-  placeholder:

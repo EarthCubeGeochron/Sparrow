@@ -18,14 +18,14 @@ without fully packaging for NPM.
 
 ### Inserting local modules
 
+:::warning
+This is an experimental feature.
+:::
+
 Frontend modules being developed locally can be bundled into
-Sparrow by mounting them into the frontend Docker image
-at the `/app/_local_modules` directory. Modules installed
-in this way will take precedence over globally-installed
-Node modules. The `@macrostrat/ui-components` module,
-which is foundational to the Sparrow web frontend,
-can be bundled in by providing the `SPARROW_UI_COMPONENTS=<path>`
-value to link the development directory.
+Sparrow by putting them in a `node_modules` directory that is
+mounted into the application using the environment variable `SPARROW_FRONTEND_MODULES`.
+This feature has not yet been thoroughly tested.
 
 ### A fully local frontend
 
