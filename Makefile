@@ -21,8 +21,8 @@ install-dev: build-dev
 
 ## TODO: fix bugs with install-dist to make it more capable
 # Bundle with PyInstaller and install (requires local Python 3)
-install-dist: _cli/dist/sparrow install-hooks
-	get-sparrow.sh $<
+install-dist: install-hooks
+	./get-sparrow.sh $<
 
 test:
 	_cli/_scripts/test-cli
@@ -40,20 +40,28 @@ _cli/dist/macos/sparrow:
 	# Due to the vagaries of PyInstaller, Mac distribution must be built on OS X
 	pyinstaller --distpath _cli/dist/macos _cli/sparrow.spec
 
-_cli/dist/linux/sparrow:
-	docker run -v "$(shell pwd)/_cli:/src" cdrx/pyinstaller-linux:latest
-
-_cli/dist/windows/sparrow:
-	docker run -v "$(shell pwd)/_cli:/src" cdrx/pyinstaller-windows:latest
-
-# Build locally for the current platform
+# Build locally for the current platform (DEFAULT)
 _cli/dist/sparrow:
 	_cli/_scripts/build-dist
 
+build-linux:
+	docker run \
+		-v "$(shell pwd):/src/" \
+		cdrx/pyinstaller-linux:latest \
+		_cli/_scripts/build-dist
+
+# This will build the CLI for windows, which is currently unsupported
+# (WSL integration with the linux binaries should be used instead)
+build-windows:
+	docker run \
+		-v "$(shell pwd):/src/" \
+		cdrx/pyinstaller-windows:latest \
+		_cli/_scripts/build-dist
+
+# Helper to generate a build specification
 _generate_buildspec:
 	cd _cli && \
 	pyinstaller --noconfirm --distpath dist sparrow_cli/__main__.py
-	# docker run -v "$(shell pwd)/_cli/:/src/" cdrx/pyinstaller-linux "pyinstaller main.py"
 
 # Link git hooks
 # (handles automatic submodule updating etc.)
