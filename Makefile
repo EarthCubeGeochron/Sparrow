@@ -1,6 +1,8 @@
 INSTALL_PATH ?= /usr/local
 SPARROW_INSTALL_PATH ?= $(INSTALL_PATH)
 
+.PHONY: build install install-dev build-dev install-dist test clean
+
 all: install-hooks build-dev
 
 build:
@@ -29,8 +31,6 @@ test:
 
 clean:
 	rm -rf _cli/build
-
-.PHONY: build install install-dev build-dev install-dist test clean
 
 # Build locally for the current platform (DEFAULT)
 _cli/dist/sparrow:
