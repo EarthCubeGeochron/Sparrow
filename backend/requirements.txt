@@ -101,7 +101,7 @@ crossrefapi==1.5.0
 # -e ./utils
 
 # Task worker
-celery==5.1.1
+celery==5.2.2
 redis==3.5.3
 broadcaster[redis]==0.2.0
 # For worker auto-reloading in development
