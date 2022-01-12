@@ -97,8 +97,6 @@ services:
       start_period: 40s
     expose:
       - 5000
-    ports:
-      - 5000:5000
   db:
     image: mdillon/postgis:11
     expose:
