@@ -225,6 +225,7 @@ CREATE TABLE IF NOT EXISTS sample (
   name text,
   uuid uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
   igsn text UNIQUE,
+  lab_id text UNIQUE,
   material text REFERENCES vocabulary.material(id),
   member_of integer REFERENCES sample(id),
   /* #### Location fields
@@ -247,7 +248,7 @@ CREATE TABLE IF NOT EXISTS sample (
   -- borehole depth in meters
   depth numeric,
   embargo_date timestamp,
-  CHECK ((name IS NOT null) OR (igsn IS NOT null))
+  CHECK ((name IS NOT null) OR (igsn IS NOT null) OR (lab_id IS NOT null))
 );
 /*
 
