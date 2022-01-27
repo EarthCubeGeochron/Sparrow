@@ -16,6 +16,7 @@ import SchemaExplorerMainPanel from "./schema-explorer";
 import { PageStyle } from "~/components/page-skeleton";
 import HomePage from "./homepage";
 import Catalog from "./catalog";
+import { Frame } from "./frame";
 
 //import { MapSelector } from "./data-sheet/sheet-enter-components";
 
@@ -69,6 +70,7 @@ function AppRouter(props) {
         path: "/import-schema-explorer",
         component: SchemaExplorerMainPanel,
       }),
+      h(Frame, { id: "extraPages", default: null }, null),
       h(PageRoute, { path: "*", component: NoMatchPage }),
     ])
   );
