@@ -88,3 +88,8 @@ class TestSparrowTaskManager:
             websocket.send_json({"action": "start", "params": {"name": "Sparrow"}})
             if plugin.broadcast is None:
                 return
+
+    def test_create_untyped_task(self):
+        @task()
+        def terrible_task(bad_arg="Bleh"):
+            print(bad_arg)
