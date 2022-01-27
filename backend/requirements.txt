@@ -31,7 +31,7 @@ toposort==1.5
 # Command-line interface
 click==7.1.2
 click-plugins==1.1.1
-ipython==7.27.0
+ipython==7.31.1
 
 # Static files
 aiofiles==0.6.0
