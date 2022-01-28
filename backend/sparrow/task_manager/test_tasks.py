@@ -3,7 +3,7 @@ from json import loads
 from pytest import fixture, raises, mark
 from sparrow.auth.test_auth import admin_client
 from starlette.websockets import WebSocketDisconnect
-from .base import task, create_args_schema
+from .base import SparrowTaskError, task, create_args_schema
 
 
 @task(name="hello")
@@ -90,6 +90,10 @@ class TestSparrowTaskManager:
                 return
 
     def test_create_untyped_task(self):
-        @task()
-        def terrible_task(bad_arg="Bleh"):
-            print(bad_arg)
+        with raises(SparrowTaskError) as exc_info:
+
+            @task()
+            def terrible_task(bad_arg="Bleh"):
+                print(bad_arg)
+
+        assert "Task terrible-task has untyped arguments" in str(exc_info.value)
