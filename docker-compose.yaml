@@ -151,7 +151,7 @@ services:
     # This service backs up the database periodically
     # to a remote S3 bucket or a local directory on the server.
     restart: unless-stopped
-    # This service should only run under the "production" profile
+    # This service will only run under the "production" profile
     # https://docs.docker.com/compose/profiles/
     profiles:
       - production
