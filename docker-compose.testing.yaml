@@ -31,7 +31,7 @@ services:
       # We could change this to port 54321 if we were cool with
       # it conflicting with our default for Sparrow itself. This
       # might make it harder to run tests, though.
-      - "54322:5432"
+      - "${SPARROW_TEST_DATABASE_PORT:-54322}:5432"
     expose:
       - 5432
     environment:
