@@ -100,7 +100,7 @@ def sparrow_up(ctx, container="", force_recreate=False):
 
     # While we're spinning up, repopulate command help in case it's changed
     log.info("Caching backend help info")
-    get_backend_help_info(cache=True)
+    get_backend_help_info(write_cache=True)
 
     if "backend" not in running_containers:
         sleep(5)

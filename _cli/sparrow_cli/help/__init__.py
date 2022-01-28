@@ -1,12 +1,13 @@
 import sys
 import re
 import click
-from click import style
+from click import style, Context
 from click.formatting import HelpFormatter
 from os import environ
 from pathlib import Path
 from itertools import chain
 from rich.console import Console
+from setuptools import Command
 from .options_cache import get_backend_command_help, get_backend_help_info  # noqa
 from ..util.shell import fail_without_docker
 from ..util.formatting import format_config_path, format_description
@@ -78,6 +79,14 @@ class SparrowHelpFormatter(HelpFormatter):
         "run": "Run Sparrow tasks (alias to `sparrow tasks run`)",
     }
 
+    config: SparrowConfig
+    ctx: Context
+
+    def __init__(self, ctx: Context):
+        self.ctx = ctx
+        self.config = self.ctx.find_object(SparrowConfig)
+        super().__init__()
+
     def write_line(self, text=""):
         self.write(text + "\n")
 
@@ -89,7 +98,7 @@ class SparrowHelpFormatter(HelpFormatter):
         """Writes a heading into the buffer."""
         self.write(style(f"{'':>{self.current_indent}}{heading}", bold=True) + ":\n")
 
-    def write_frontmatter(self, ctx):
+    def write_frontmatter(self):
         self.write_usage("sparrow", "[options] <command> [args]...")
         self.write_line()
         cfg = environ.get("SPARROW_CONFIG", None)
@@ -97,12 +106,12 @@ class SparrowHelpFormatter(HelpFormatter):
         if cfg is None:
             self.write_line(f"No configuration file found")
         else:
-            d0 = format_config_path(cfg)
+            d0 = format_config_path(self.config)
             self.write_line("Config: " + style(d0, fg="cyan"))
         d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
         self.write_line(f"Lab: {d1}")
 
-        ver = ctx.version_info
+        ver = self.config.version_info
         if ver:
             msg2 = " "
             msg2 += "matches" if ver.is_match else "does not match"
@@ -121,7 +130,7 @@ class SparrowHelpFormatter(HelpFormatter):
 
     def backend_help(self):
         # Grab commands file from backend
-        commands = get_backend_command_help()
+        commands = get_backend_command_help().data
         if commands is None:
             return
         core_commands = {
@@ -153,12 +162,12 @@ class SparrowHelpFormatter(HelpFormatter):
         commands = {k: format_description(v) for k, v in commands.items()}
         self._write_section(title, commands, **kwargs)
 
-    def write_container_management(self, cli, ctx, core_commands):
+    def write_container_management(self, cli, core_commands):
         commands = command_dl(
             core_commands,
             extra_commands={
                 "compose": "Alias to `docker-compose` that respects `sparrow` config",
-                **{k: format_help(v) for k, v in command_info(ctx, cli)},
+                **{k: format_help(v) for k, v in command_info(self.ctx, cli)},
             },
         )
 
@@ -201,9 +210,8 @@ def echo_help(cli, ctx, core_commands=None, user_commands=None):
     # ...actually we likely don't want to do this. It seems like it pushes errors too early
     # in Sparrow's installation process
     # compose("up --no-start --remove-orphans")
-
-    fmt = SparrowHelpFormatter()
-    fmt.write_frontmatter(ctx.find_object(SparrowConfig))
+    fmt = SparrowHelpFormatter(ctx)
+    fmt.write_frontmatter()
     fmt.write_section("Key commands", fmt.key_commands)
     fmt.write_section("Command groups", sections)
 
@@ -213,4 +221,4 @@ def echo_help(cli, ctx, core_commands=None, user_commands=None):
         lab_name = environ.get("SPARROW_LAB_NAME", "Lab-specific")
         fmt.write("[underline]" + lab_name + "[/underline] commands", user_commands)
 
-    fmt.write_container_management(cli, ctx, core_commands)
+    fmt.write_container_management(cli, core_commands)
