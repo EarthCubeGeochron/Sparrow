@@ -7,8 +7,8 @@ from subprocess import PIPE
 from pydantic import BaseModel
 from enum import Enum
 
-from ..util.shell import exec_or_run
-from ..util.exceptions import SparrowCommandError
+from ...util.shell import exec_or_run
+from ...util.exceptions import SparrowCommandError
 from sparrow_utils import relative_path
 
 

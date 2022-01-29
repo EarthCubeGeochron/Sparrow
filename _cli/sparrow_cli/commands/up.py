@@ -8,7 +8,7 @@ from time import sleep
 from ..config.environment import validate_environment
 from ..config import SparrowConfig
 from ..util import compose, cmd, log
-from ..help import get_backend_help_info
+from ..config.command_cache import get_backend_help_info
 
 
 def _report_image_versions():

@@ -3,15 +3,15 @@ import re
 import click
 from click import style, Context
 from click.formatting import HelpFormatter
+from rich.text import Text
 from os import environ
 from pathlib import Path
 from itertools import chain
 from rich.console import Console
 from setuptools import Command
-from .options_cache import get_backend_command_help, get_backend_help_info  # noqa
 from ..util.shell import fail_without_docker
 from ..util.formatting import format_config_path, format_description
-from ..config import SparrowConfig
+from ..config import Level, SparrowConfig
 
 console = Console()
 
@@ -70,6 +70,16 @@ def is_plugin_command(val):
     return val.get("plugin") is not None
 
 
+def get_style(level: Level):
+    if level == Level.SUCCESS:
+        return "green"
+    elif level == Level.WARNING:
+        return "yellow"
+    elif level == Level.ERROR:
+        return "red"
+    return None
+
+
 class SparrowHelpFormatter(HelpFormatter):
     key_commands = {
         "up": "Start `sparrow` and follow logs",
@@ -101,36 +111,28 @@ class SparrowHelpFormatter(HelpFormatter):
     def write_frontmatter(self):
         self.write_usage("sparrow", "[options] <command> [args]...")
         self.write_line()
+        self.flush()
         cfg = environ.get("SPARROW_CONFIG", None)
 
-        if cfg is None:
-            self.write_line(f"No configuration file found")
-        else:
-            d0 = format_config_path(self.config)
-            self.write_line("Config: " + style(d0, fg="cyan"))
-        d1 = style(environ.get("SPARROW_LAB_NAME", "None"), fg="cyan", bold=True)
-        self.write_line(f"Lab: {d1}")
+        lines = []
 
-        ver = self.config.version_info
-        if ver:
-            msg2 = " "
-            msg2 += "matches" if ver.is_match else "does not match"
-            msg2 += " target "
-            msg2 += style(ver.desired, underline=True)
-            color = "green" if ver.is_match else "red"
-            msg = "Sparrow "
-            msg += "revision" if ver.uses_git else "version"
-            msg += " "
-            msg += style(ver.available, underline=True)
-            msg += style(msg2, fg=color)
-            self.write_line(style(msg, fg=color))
+        if self.config.lab_name is not None:
+            lines.append(f"Lab name: [bold cyan]{self.config.lab_name}")
 
-        self.flush()
-        self.write("")
+        if cfg is not None:
+            d0 = format_config_path(self.config.config_file)
+            lines.append(f"Config: [cyan]{d0}[/cyan]")
+
+        if len(lines) == 0:
+            return
+
+        for line in lines:
+            console.print(line)
+        console.print("")
 
     def backend_help(self):
         # Grab commands file from backend
-        commands = get_backend_command_help().data
+        commands = self.config.backend_commands
         if commands is None:
             return
         core_commands = {
@@ -185,6 +187,18 @@ class SparrowHelpFormatter(HelpFormatter):
             self.write("\n")
         self.flush()
 
+    def write_messages(self):
+        if len(self.config.messages) == 0:
+            return
+        console.print("[bold]Status:")
+        for message in self.config.messages:
+            txt = Text.from_markup("• " + message.text)
+            txt.style = get_style(message.level)
+            console.print(txt)
+            if message.details:
+                console.print(f"  [dim]{message.details}[/dim]")
+        console.print("")
+
 
 sections = {
     "db": "Manage the `sparrow` database",
@@ -212,6 +226,7 @@ def echo_help(cli, ctx, core_commands=None, user_commands=None):
     # compose("up --no-start --remove-orphans")
     fmt = SparrowHelpFormatter(ctx)
     fmt.write_frontmatter()
+    fmt.write_messages()
     fmt.write_section("Key commands", fmt.key_commands)
     fmt.write_section("Command groups", sections)
 

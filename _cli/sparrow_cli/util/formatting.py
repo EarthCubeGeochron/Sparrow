@@ -1,17 +1,19 @@
 import re
 import sys
 from os import path
+from pathlib import Path
 from click import style
 from rich.console import Console
 
 console = Console(file=sys.stderr, highlight=False)
 
 
-def format_config_path(cfg):
+def format_config_path(cfg: Path):
     """A helper for pretty formatting a path,
     eliding most of the directory tree.
     """
     home = path.expanduser("~")
+    cfg = str(cfg)
     if cfg.startswith(home):
         cfg = cfg.replace(home, "~")
     split_path = cfg.split("/")
