@@ -515,6 +515,12 @@ CREATE TABLE IF NOT EXISTS __session_attribute (
   PRIMARY KEY (session_id, attribute_id)
 );
 
+CREATE TABLE IF NOT EXISTS sample_attribute (
+  sample_id integer NOT NULL REFERENCES sample(id),
+  attribute_id integer NOT NULL REFERENCES attribute(id),
+  PRIMARY KEY (sample_id, attribute_id)
+);
+
 /*
 ## Analytical constants
 
