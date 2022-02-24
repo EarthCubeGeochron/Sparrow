@@ -1,0 +1,66 @@
+{
+  "config": {
+    "help": "Print configuration of backend",
+    "plugin": null
+  },
+  "create-user": {
+    "help": "Create an authorized user for the web frontend",
+    "plugin": null
+  },
+  "create-views": {
+    "help": "Recreate views only (without building rest of schema)",
+    "plugin": null
+  },
+  "db-migration": {
+    "help": "Command to generate a basic migration.",
+    "plugin": null
+  },
+  "db-update": {
+    "help": "",
+    "plugin": null
+  },
+  "import-earthchem": {
+    "help": "Import EarthChem vocabulary files",
+    "plugin": "earthchem-vocabulary"
+  },
+  "init": {
+    "help": "Initialize database schema (non-destructive)",
+    "plugin": null
+  },
+  "list-users": {
+    "help": "",
+    "plugin": null
+  },
+  "plugins": {
+    "help": "Print a list of enabled plugins",
+    "plugin": null
+  },
+  "remove-audit-trail": {
+    "help": "Remove PGMemento audit trail",
+    "plugin": "versioning"
+  },
+  "reset-password": {
+    "help": "Reset the password for an existing user",
+    "plugin": null
+  },
+  "shell": {
+    "help": "Get a Python shell within the application",
+    "plugin": null
+  },
+  "show-interface": {
+    "help": "Show the import interface for a database model.",
+    "plugin": "schema-interface"
+  },
+  "tasks": {
+    "help": "",
+    "plugin": "task-manager"
+  },
+  "update-location-names": {
+    "help": "Update location names",
+    "plugin": "location-names"
+  },
+  "validate-data": {
+    "help": "Try to import data into the database to see if errors are raised.",
+    "plugin": "data-validation-cli"
+  }
+}

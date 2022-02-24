@@ -3,6 +3,7 @@ rich
 envbash
 pytest
 pyyaml
+pydantic==1.9.0
 docker-compose==1.29.2
 # The below pin of 'docker' ensures that we don't encounter
 # https://github.com/docker/compose/issues/8499
