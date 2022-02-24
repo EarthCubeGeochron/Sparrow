@@ -248,6 +248,9 @@ CREATE TABLE IF NOT EXISTS sample (
   -- borehole depth in meters
   depth numeric,
   embargo_date timestamp,
+  note text,
+  -- arbitrary additional information
+  data jsonb,
   CHECK ((name IS NOT null) OR (igsn IS NOT null) OR (lab_id IS NOT null))
 );
 /*
@@ -349,6 +352,7 @@ CREATE TABLE IF NOT EXISTS session (
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
   embargo_date timestamp,
+  note text,
   /* A field to store extra, semi-structured session data in a key/value format */
   data jsonb,
   UNIQUE (sample_id, date, instrument, technique)
@@ -413,6 +417,7 @@ CREATE TABLE IF NOT EXISTS analysis (
      for each relevant system)
   - a calculated plateau age for a stepped-heating Ar-Ar experiment. */
   is_interpreted boolean,
+  note text,
   data jsonb,
   UNIQUE (session_id, session_index, analysis_name),
   /*
