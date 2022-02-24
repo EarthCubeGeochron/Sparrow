@@ -9,7 +9,7 @@ from enum import Enum
 
 from ...util.shell import exec_or_run
 from ...util.exceptions import SparrowCommandError
-from sparrow_utils import relative_path
+from .default_backend_commands import default_commands
 
 
 def dirhash(path):
@@ -87,7 +87,4 @@ def get_backend_command_help():
         raise SparrowCommandError(
             f"Could not read cache file {cache_file}", details=str(err)
         )
-    return ContainerCommandData(
-        data=json.load(open(relative_path(__file__, "default-backend-commands.json"))),
-        source=CommandDataSource.default,
-    )
+    return ContainerCommandData(data=default_commands, source=CommandDataSource.default)
