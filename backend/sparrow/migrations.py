@@ -34,3 +34,22 @@ class InstrumentSessionMigration(SparrowMigration):
         """,
             stop_on_error=True,
         )
+
+
+class AnalysisLinksMigration(SparrowMigration):
+    """Migration to get rid of underscores in table names"""
+
+    name = "analysis-links"
+
+    _tables = ["__session_attribute", "__analysis_attribute", "__analysis_constant"]
+
+    def should_apply(self, source, target, migrator):
+        for tbl in self._tables:
+            if has_table(source, f'"public"."{tbl}"'):
+                return True
+        return False
+
+    def apply(self, db):
+        for tbl in self._tables:
+            new_name = tbl.replace("__", "")
+            run_sql(f"ALTER TABLE {tbl} RENAME TO {new_name};")

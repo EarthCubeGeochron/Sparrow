@@ -503,13 +503,13 @@ CREATE TABLE IF NOT EXISTS attribute (
   UNIQUE (value, parameter)
 );
 
-CREATE TABLE IF NOT EXISTS __analysis_attribute (
+CREATE TABLE IF NOT EXISTS analysis_attribute (
   analysis_id integer NOT NULL REFERENCES analysis(id),
   attribute_id integer NOT NULL REFERENCES attribute(id),
   PRIMARY KEY (analysis_id, attribute_id)
 );
 
-CREATE TABLE IF NOT EXISTS __session_attribute (
+CREATE TABLE IF NOT EXISTS session_attribute (
   session_id integer NOT NULL REFERENCES session(id),
   attribute_id integer NOT NULL REFERENCES attribute(id),
   PRIMARY KEY (session_id, attribute_id)
@@ -531,7 +531,8 @@ with the exception that there is a many-to-many link on the data.
 CREATE TABLE IF NOT EXISTS constant (
   /* Analytical parameters, calibration types, etc.
   that remain constant across many sessions
-  (e.g. decay constants, assumed physical parameters). */
+  (e.g. decay constants, assumed physical parameters). 
+  Basically, this is a numerical analog of attributes. */
   id serial PRIMARY KEY,
   value numeric NOT NULL,
   error numeric,
@@ -539,7 +540,7 @@ CREATE TABLE IF NOT EXISTS constant (
   description text
 );
 
-CREATE TABLE IF NOT EXISTS __analysis_constant (
+CREATE TABLE IF NOT EXISTS analysis_constant (
   analysis_id integer NOT NULL REFERENCES analysis(id),
   constant_id integer NOT NULL REFERENCES constant(id),
   PRIMARY KEY (analysis_id, constant_id)
