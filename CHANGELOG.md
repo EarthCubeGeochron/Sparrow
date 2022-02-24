@@ -10,6 +10,10 @@ and this project is working towards adherence to
 ## `[Unreleased]` - 2022-01-28
 
 - Add a `sample.lab_id` column for use in internal lab tracking.
+- Ensure that core analytical models (`sample`, `session`, and `analysis`) each have a `note` and `data`
+  column for arbitrary text and JSON data, respectively.
+- Add an `sample_attribute` linking model so that the `sample`, `session`, and `analysis` tables can all link to
+  shared attributes. 
 
 ## `[2.0.0.beta4]` - 2021-04-30
 
