@@ -91,6 +91,15 @@ def main(ctx, args):
         sys.exit(res.returncode)
 
     # If all else fails, try to run a subcommand in the "backend" Docker container
+    return exec_backend_command(ctx, *args)
+
+
+def exec_backend_command(ctx, *args):
+    """Run a command in the backend container."""
+    cfg = ctx.find_object(SparrowConfig)
+    if cfg.verbose:
+        args = ["--verbose"] + list(args)
+
     return exec_or_run("backend", "/app/sparrow/__main__.py", *args)
 
 
@@ -102,12 +111,13 @@ def _container_id(container):
 
 @cli.command(name="shell")
 @click.argument("container", type=str, required=False, default=None)
-def shell(container):
+@click.pass_context
+def shell(ctx, container):
     """Get an iPython or container shell"""
     if container is not None:
         return exec_or_run(container, "sh")
     print("Running [bold]iPython[/bold] shell in application context.")
-    exec_or_run("backend", "/app/sparrow/__main__.py shell")
+    exec_backend_command(ctx, "shell")
 
 
 add_commands(cli)
