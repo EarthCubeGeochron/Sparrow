@@ -62,4 +62,30 @@ Two examples for importers can be found:
 - [WiscSIMS importer (in R)](/docs/getting-started/wiscsims-example)
 - [LaserChron Metadata Importer (in Python)](/docs/getting-started/metadata-importer)
 
+## Tips and tricks
+
+### Embedding a shell
+
+When building an importer, you might want to debug your data import code as you.
+For this, you can embed an IPython shell in your application, which allows you to
+inspect the state of the application at a given point.
+
+```python
+from pathlib import Path
+from pandas import read_table
+from IPython import embed
+import sparrow
+
+@sparrow.task(name="import-earthchem")
+def import_earthchem():
+    for file in Path(sparrow.settings.DATA_DIR).glob("*.txt"):
+        df = read_table(file, sep="\t")
+        ## The line below embeds a shell prompt in the importer
+        embed()
+        ## Here we raise an error, so we don't get in an endless loop
+        ## of shell embedding :)
+        raise
+
+```
+
 export default DocsPage;
