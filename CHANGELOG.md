@@ -6,9 +6,9 @@ The format is based on
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
-
 ## `[Unreleased]` - 2022-01-28
 
+- Automatically read environment variables from `sparrow-config.overrides.sh` and `sparrow-secrets.sh`, if available.
 - Add a `sample.lab_id` column for use in internal lab tracking.
 - Ensure that core analytical models (`sample`, `session`, and `analysis`) each have a `note` and `data`
   column for arbitrary text and JSON data, respectively.
