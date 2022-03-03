@@ -7,6 +7,8 @@ class ModelHelperMixins:
     Standard mixins for database models
     """
 
+    loaded_from_cache = False
+
     def to_dict(self):
         res = {}
         for k, v in self.__table__.c.items():

@@ -1,3 +1,4 @@
+from typing_extensions import Self
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
 from sqlalchemy.ext.automap import automap_base, generate_relationship
@@ -21,7 +22,6 @@ from .util import (
     name_for_scalar_relationship,
     name_for_collection_relationship,
 )
-from .base import BaseModel
 
 log = get_logger(__name__)
 
@@ -45,54 +45,23 @@ class AutomapError(Exception):
     pass
 
 
-BaseModel = automap_base(cls=ModelHelperMixins)
-
-
-class SparrowDatabaseMapper:
-    automap_base = None
-    automap_error = None
-    _models = None
-    _tables = None
+class DatabaseModelCacher:
     metadata_pickle_filename = "sparrow-db-cache.pickle"
     cache_path = path.join(path.expanduser("~"), ".sqlalchemy-cache")
-    loaded_from_cache = False
-
-    def __init__(self, db):
-        # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
-        # TODO: add the process flow described below:
-        # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
-        self.db = db
-        self._reflect_database()
-
-    def _reflect_database(self):
-        global BaseModel
-        cached_metadata = self._load_database_map()
-        if cached_metadata is None:
-            self.reflect_database()
-            self._cache_database_map()
-
-        else:
-            log.info("Loading database models from cache")
-            self.loaded_from_cache = True
-            BaseModel = declarative_base(bind=self.db.engine, metadata=cached_metadata)
-        self.automap_base = BaseModel
-
-        self._models = ModelCollection(self.automap_base.classes)
-        self._tables = TableCollection(self._models)
 
     @property
     def _metadata_cache_filename(self):
         return path.join(self.cache_path, self.metadata_pickle_filename)
 
     # https://stackoverflow.com/questions/41547778/sqlalchemy-automap-best-practices-for-performance/44607512
-    def _cache_database_map(self):
+    def _cache_database_map(self, metadata):
         # save the metadata for future runs
         try:
             if not path.exists(self.cache_path):
                 makedirs(self.cache_path)
             # make sure to open in binary mode - we're writing bytes, not str
             with open(self._metadata_cache_filename, "wb") as cache_file:
-                dump(self.automap_base.metadata, cache_file)
+                dump(metadata, cache_file)
             log.info(f"Cached database models to {self._metadata_cache_filename}")
         except IOError:
             # couldn't write the file for some reason
@@ -115,7 +84,37 @@ class SparrowDatabaseMapper:
             pass
         return cached_metadata
 
-    def reflect_database(self):
+    def __call__(self):
+        cached_metadata = self._load_database_map()
+        if cached_metadata is None:
+            base = automap_base(cls=ModelHelperMixins)
+        else:
+            log.info("Loading database models from cache")
+            base = automap_base(metadata=cached_metadata)
+            base.loaded_from_cache = True
+        base.builder = self
+        return base
+
+
+model_builder = DatabaseModelCacher()
+
+BaseModel = model_builder()
+
+
+class SparrowDatabaseMapper:
+    automap_base = None
+    automap_error = None
+    _models = None
+    _tables = None
+
+    def __init__(self, db):
+        # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
+        # TODO: add the process flow described below:
+        # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
+        self.db = db
+        self.reflect_database(use_cache=True)
+
+    def reflect_database(self, use_cache=True):
         # This stuff should be placed outside of core (one likely extension point).
         reflection_kwargs = dict(
             name_for_scalar_relationship=name_for_scalar_relationship,
@@ -124,16 +123,27 @@ class SparrowDatabaseMapper:
             generate_relationship=_gen_relationship,
         )
 
-        for schema in ("vocabulary", "core_view", "tags"):
-            # Reflect tables in schemas we care about
-            # Note: this will not reflect views because they don't have
-            # primary keys.
-            log.info(f"Reflecting schema {schema}")
-            BaseModel.metadata.reflect(bind=self.db.engine, schema=schema)
-        log.info("Reflecting core tables")
-        BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
+        if use_cache and BaseModel.loaded_from_cache:
+            BaseModel.prepare(self.db.engine)
+        else:
+            for schema in ("vocabulary", "core_view", "tags"):
+                # Reflect tables in schemas we care about
+                # Note: this will not reflect views because they don't have
+                # primary keys.
+                log.info(f"Reflecting schema {schema}")
+                BaseModel.metadata.reflect(bind=self.db.engine, schema=schema)
+            log.info("Reflecting core tables")
+            BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
+            self._cache_database_map()
 
         self.automap_base = BaseModel
+        self._models = ModelCollection(self.automap_base.classes)
+        self._tables = TableCollection(self._models)
+
+    def _cache_database_map(self):
+        if BaseModel.loaded_from_cache:
+            return
+        BaseModel.builder._cache_database_map(BaseModel.metadata)
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """
