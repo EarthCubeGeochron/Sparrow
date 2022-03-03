@@ -64,8 +64,6 @@ class Database:
         self.mapper.register_models(User, Project, Session, DatumType)
         log.info("Registered core model overrides")
 
-        self.mapper._cache_database_map()
-
         # Register a new class
         # Automap the core_view.datum relationship
         cls = self.mapper.automap_view(
@@ -77,6 +75,7 @@ class Database:
         )
         self.mapper.register_models(cls)
         self.app.run_hook("database-mapped")
+        self.mapper._cache_database_map()
         log.info("Finished automapping database")
 
     @contextmanager

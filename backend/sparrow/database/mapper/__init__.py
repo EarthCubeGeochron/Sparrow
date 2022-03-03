@@ -123,15 +123,19 @@ class SparrowDatabaseMapper:
             generate_relationship=_gen_relationship,
         )
 
+        schemas = ["vocabulary", "core_view", "tags", None]
+
         if use_cache and BaseModel.loaded_from_cache:
-            BaseModel.prepare(self.db.engine)
+            for schema in schemas:
+                BaseModel.prepare(self.db.engine, schema=schema, **reflection_kwargs)
         else:
-            for schema in ("vocabulary", "core_view", "tags"):
+            for schema in schemas:
                 # Reflect tables in schemas we care about
                 # Note: this will not reflect views because they don't have
                 # primary keys.
                 log.info(f"Reflecting schema {schema}")
-                BaseModel.metadata.reflect(bind=self.db.engine, schema=schema)
+                if schema is not None:
+                    BaseModel.metadata.reflect(bind=self.db.engine, schema=schema)
             log.info("Reflecting core tables")
             BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
             self._cache_database_map()
