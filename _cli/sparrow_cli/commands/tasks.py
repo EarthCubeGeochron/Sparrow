@@ -1,7 +1,7 @@
 ## This should probably be refactored out into a sparrow_tasks plugin eventually
 
 import click
-from ..util import CommandGroup, exec_or_run
+from ..util import CommandGroup, exec_backend_command
 
 shell_commands = {
     "events": "Monitor `celery` events",
@@ -20,8 +20,9 @@ def tasks():
     name="run", context_settings=dict(ignore_unknown_options=True, help_option_names=[])
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
-def sparrow_run(args=[]):
-    exec_or_run("backend", "/app/sparrow/__main__.py", "tasks", *args)
+@click.pass_context
+def sparrow_run(ctx, args=[]):
+    exec_backend_command(ctx, "tasks", *args)
 
 
 for k, v in shell_commands.items():

@@ -1,5 +1,4 @@
 from sparrow.interface import model_interface
-from sqlalchemy.ext.automap import automap_base
 from ...interface.util import primary_key
 
 
@@ -7,6 +6,8 @@ class ModelHelperMixins:
     """
     Standard mixins for database models
     """
+
+    loaded_from_cache = False
 
     def to_dict(self):
         res = {}
@@ -23,6 +24,3 @@ class ModelHelperMixins:
     def _schema(self, *args, **kwargs):
         session = kwargs.pop("sqla_session", None)
         return model_interface(self, session=session)(*args, **kwargs)
-
-
-BaseModel = automap_base(cls=ModelHelperMixins)
