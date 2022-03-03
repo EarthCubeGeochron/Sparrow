@@ -126,6 +126,7 @@ class SparrowDatabaseMapper:
         schemas = ["vocabulary", "core_view", "tags", None]
 
         if use_cache and BaseModel.loaded_from_cache:
+            log.info("Database models have been loaded from cache")
             for schema in schemas:
                 BaseModel.prepare(self.db.engine, schema=schema, **reflection_kwargs)
         else:
