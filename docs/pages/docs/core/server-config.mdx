@@ -22,4 +22,10 @@ More detailed configurations can be set by directly
 using [docker-compose environment variables](https://docs.docker.com/compose/reference/envvars/).
 :::
 
+Configuration variables are most often set in the `sparrow-config.sh` file,
+which much be present in the root directory of your Sparrow lab instance. If
+available, a `sparrow-config.overrides.sh` and `sparrow-secrets.sh` file will
+also be sourced, in that order. These files should not be added to version
+control.
+
 export default DocsPage;
