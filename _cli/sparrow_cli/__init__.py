@@ -9,7 +9,13 @@ from rich.console import Console
 from rich import print
 from sparrow_utils.logs import get_logger
 from .help import echo_help
-from .util.shell import cmd, exec_or_run, find_subcommand, container_id
+from .util.shell import (
+    cmd,
+    exec_or_run,
+    exec_backend_command,
+    find_subcommand,
+    container_id,
+)
 from .util.command_groups import SparrowDefaultCommand
 from .config import SparrowConfig
 from .config.environment import is_truthy
@@ -92,15 +98,6 @@ def main(ctx, args):
 
     # If all else fails, try to run a subcommand in the "backend" Docker container
     return exec_backend_command(ctx, *args)
-
-
-def exec_backend_command(ctx, *args):
-    """Run a command in the backend container."""
-    cfg = ctx.find_object(SparrowConfig)
-    if cfg.verbose:
-        args = ["--verbose"] + list(args)
-
-    return exec_or_run("backend", "/app/sparrow/__main__.py", *args)
 
 
 @cli.command(name="container-id")

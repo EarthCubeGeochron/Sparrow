@@ -72,6 +72,17 @@ def exec_or_run(
         )
 
 
+def exec_backend_command(ctx, *args, **kwargs):
+    """Run a command in the backend container."""
+    from ..config import SparrowConfig
+
+    cfg = ctx.find_object(SparrowConfig)
+    if cfg.verbose:
+        args = ["--verbose"] + list(args)
+
+    return exec_or_run("backend", "/app/sparrow/__main__.py", *args, **kwargs)
+
+
 def exec_sparrow(*args, **kwargs):
     return exec_or_run("backend", "/app/sparrow/__main__.py", *args, **kwargs)
 
