@@ -115,7 +115,11 @@ def _container_id(container):
 def shell(ctx, container):
     """Get an iPython or container shell"""
     if container is not None:
-        return exec_or_run(container, "sh")
+        for shell in ["bash", "sh"]:
+            v = exec_or_run(container, shell)
+            if v.returncode == 0:
+                return
+        return
     print("Running [bold]iPython[/bold] shell in application context.")
     exec_backend_command(ctx, "shell")
 
