@@ -90,10 +90,11 @@ def load_config_file():
         # This requires bash to be available on the platform, which
         # might be a problem for Windows/WSL.
         _load_config_file(sparrow_config)
-        # Load the `sparrow-secrets.sh` file if it exists.
-        secrets = sparrow_config.with_name("sparrow-secrets.sh")
-        if secrets.is_file():
-            _load_config_file(secrets)
+        for fn in ["sparrow-config.overrides.sh", "sparrow-secrets.sh"]:
+            # Load the `sparrow-secrets.sh` file if it exists.
+            extra_cfg = sparrow_config.with_name(fn)
+            if extra_cfg.is_file():
+                _load_config_file(extra_cfg)
 
         # Change back to original working directory
         chdir(environ["SPARROW_WORKDIR"])
