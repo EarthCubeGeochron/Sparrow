@@ -110,12 +110,14 @@ class SparrowDatabaseMapper:
     _models = None
     _tables = None
 
-    def __init__(self, db, use_cache=True):
+    def __init__(self, db, use_cache=True, reflect=True):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
         # TODO: add the process flow described below:
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
         self.db = db
-        self.reflect_database(use_cache=use_cache)
+        self.automap_base = BaseModel
+        if reflect:
+            self.reflect_database(use_cache=use_cache)
 
     def reflect_database(self, use_cache=True):
         # This stuff should be placed outside of core (one likely extension point).
@@ -128,10 +130,12 @@ class SparrowDatabaseMapper:
 
         schemas = ["vocabulary", "core_view", "tags", None]
 
-        if use_cache and BaseModel.loaded_from_cache:
+        if use_cache and self.automap_base.loaded_from_cache:
             log.info("Database models have been loaded from cache")
             for schema in schemas:
-                BaseModel.prepare(self.db.engine, schema=schema, **reflection_kwargs)
+                self.automap_base.prepare(
+                    self.db.engine, schema=schema, **reflection_kwargs
+                )
         else:
             for schema in schemas:
                 # Reflect tables in schemas we care about
@@ -139,21 +143,22 @@ class SparrowDatabaseMapper:
                 # primary keys.
                 log.info(f"Reflecting schema {schema}")
                 if schema is not None:
-                    BaseModel.metadata.reflect(bind=self.db.engine, schema=schema)
+                    self.automap_base.metadata.reflect(
+                        bind=self.db.engine, schema=schema
+                    )
             log.info("Reflecting core tables")
-            BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
+            self.automap_base.prepare(self.db.engine, reflect=True, **reflection_kwargs)
 
-        if not BaseModel.loaded_from_cache:
+        if not self.automap_base.loaded_from_cache:
             self._cache_database_map()
 
-        self.automap_base = BaseModel
         self._models = ModelCollection(self.automap_base.classes)
         self._tables = TableCollection(self._models)
 
     def _cache_database_map(self):
-        if BaseModel.loaded_from_cache:
+        if self.automap_base.loaded_from_cache:
             return
-        BaseModel.builder._cache_database_map(BaseModel.metadata)
+        self.automap_base.builder._cache_database_map(self.automap_base.metadata)
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """
@@ -198,4 +203,4 @@ class SparrowDatabaseMapper:
         """
         tbl = self.reflect_table(table_name, *column_args, **kwargs)
         name = classname_for_table(tbl)
-        return type(name, (BaseModel,), dict(__table__=tbl))
+        return type(name, (self.automap_base,), dict(__table__=tbl))
