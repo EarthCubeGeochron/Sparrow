@@ -48,6 +48,7 @@ class AutomapError(Exception):
 class DatabaseModelCacher:
     metadata_pickle_filename = "sparrow-db-cache.pickle"
     cache_path = path.join(path.expanduser("~"), ".sqlalchemy-cache")
+    enabled = True
 
     @property
     def _metadata_cache_filename(self):
@@ -55,6 +56,8 @@ class DatabaseModelCacher:
 
     # https://stackoverflow.com/questions/41547778/sqlalchemy-automap-best-practices-for-performance/44607512
     def _cache_database_map(self, metadata):
+        if not self.enabled:
+            return
         # save the metadata for future runs
         try:
             if not path.exists(self.cache_path):
@@ -86,7 +89,7 @@ class DatabaseModelCacher:
 
     def __call__(self):
         cached_metadata = self._load_database_map()
-        if cached_metadata is None:
+        if cached_metadata is None or not self.enabled:
             base = automap_base(cls=ModelHelperMixins)
         else:
             log.info("Loading database models from cache")
@@ -107,12 +110,12 @@ class SparrowDatabaseMapper:
     _models = None
     _tables = None
 
-    def __init__(self, db):
+    def __init__(self, db, use_cache=True):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
         # TODO: add the process flow described below:
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
         self.db = db
-        self.reflect_database(use_cache=True)
+        self.reflect_database(use_cache=use_cache)
 
     def reflect_database(self, use_cache=True):
         # This stuff should be placed outside of core (one likely extension point).
@@ -139,6 +142,8 @@ class SparrowDatabaseMapper:
                     BaseModel.metadata.reflect(bind=self.db.engine, schema=schema)
             log.info("Reflecting core tables")
             BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
+
+        if not BaseModel.loaded_from_cache:
             self._cache_database_map()
 
         self.automap_base = BaseModel

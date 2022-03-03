@@ -10,4 +10,4 @@ setup_stderr_logs()
 from .context import get_sparrow_app
 
 app = get_sparrow_app()
-app.bootstrap(init=True)
+app.bootstrap(init=True, use_schema_cache=False)

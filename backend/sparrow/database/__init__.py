@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 from click import secho
+from time import perf_counter
 
 from sqlalchemy import create_engine, inspect, MetaData, text
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -51,18 +52,19 @@ class Database:
         self.session = scoped_session(self._session_factory)
         # Use the self.session_scope function to more explicitly manage sessions.
 
-    def automap(self):
+    def automap(self, use_cache=True):
         log.info("Automapping the database")
-        self.mapper = SparrowDatabaseMapper(self)
+        t0 = perf_counter()
+
+        self.mapper = SparrowDatabaseMapper(self, use_cache=use_cache)
 
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
         #  they are not included by default)
         # TODO: there is probably a way to do this without having to
         # manually register the models
-        log.info("Started registering model overrides")
+        log.info("Registering model overrides")
         self.mapper.register_models(User, Project, Session, DatumType)
-        log.info("Registered core model overrides")
 
         # Register a new class
         # Automap the core_view.datum relationship
@@ -75,8 +77,10 @@ class Database:
         )
         self.mapper.register_models(cls)
         self.app.run_hook("database-mapped")
-        self.mapper._cache_database_map()
-        log.info("Finished automapping database")
+        if not use_cache:
+            self.mapper._cache_database_map()
+        t1 = perf_counter()
+        log.info(f"Finished automapping database: {t1-t0:.2f}s")
 
     @contextmanager
     def session_scope(self, commit=True):
