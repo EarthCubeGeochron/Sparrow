@@ -11,6 +11,7 @@ from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from marshmallow.exceptions import ValidationError
+from marshmallow import RAISE
 
 from .util import run_sql_file, run_query, get_or_create, run_sql_query_file
 from .models import User, Project, Session, DatumType
@@ -135,10 +136,12 @@ class Database:
             )
         schema = model_interface(model, session)()
 
+        unknown = kwargs.pop("unknown", RAISE)
+
         with on_conflict("do-nothing"):
             try:
                 log.info(f"Initiating load of {model_name}")
-                res = schema.load(data, session=session, **kwargs)
+                res = schema.load(data, session=session, unknown=unknown, **kwargs)
                 log.info("Entering final commit phase of import")
                 log.info(f"Adding top-level object {res}")
                 session.add(res)
