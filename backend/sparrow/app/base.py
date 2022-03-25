@@ -68,7 +68,7 @@ class Sparrow(Starlette):
         elif _exists:
             log.info("Application tables exist")
 
-    def setup_database(self, automap=True, use_cache=True):
+    def setup_database(self, automap=True, use_cache=False):
         # If we set up the database twice, bad things will happen
         # with overriding of models, etc. We must make sure we only
         # set up the database once.
