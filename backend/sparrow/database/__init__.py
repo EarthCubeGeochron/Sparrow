@@ -11,7 +11,7 @@ from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from marshmallow.exceptions import ValidationError
-from marshmallow import RAISE
+from marshmallow import RAISE, EXCLUDE
 
 from .util import run_sql_file, run_query, get_or_create, run_sql_query_file
 from .models import User, Project, Session, DatumType
@@ -125,7 +125,13 @@ class Database:
                 log.debug(err)
 
     def load_data(self, model_name, data, session=None, **kwargs):
-        """Load data into the database using a schema-based importing tool"""
+        """Load data into the database using a schema-based importing tool.
+        
+        kwargs:
+            - session: the session to use for the import
+            - strict: if True, will raise an exception on extra fields
+            - unknown: Pass through to Marshmallow's load() behavior on unknown fields
+        """
         if session is None:
             session = self.session
         # Do an end-around for lack of creating interfaces on app startup
@@ -136,7 +142,10 @@ class Database:
             )
         schema = model_interface(model, session)()
 
-        unknown = kwargs.pop("unknown", RAISE)
+        strict_mode = kwargs.pop("strict", False)
+        default_unknown = RAISE if strict_mode else EXCLUDE
+
+        unknown = kwargs.pop("unknown", default_unknown)
 
         with on_conflict("do-nothing"):
             try:

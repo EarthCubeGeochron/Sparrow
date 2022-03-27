@@ -52,7 +52,7 @@ class TestSIMSWebscraper:
         proj_titles = []
         for i, title in enumerate(title_list):
             proj_titles.append(
-                {"name": title, "publications": [{"title": title, "doi": doi_list[i]}]}
+                {"name": title, "publication": [{"title": title, "doi": doi_list[i]}]}
             )
 
         res = client.post(route, headers={"Authorization": token}, json=proj_titles)
