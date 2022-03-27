@@ -138,6 +138,7 @@ CREATE TABLE IF NOT EXISTS vocabulary.entity_reference (
   authority text
 );
 
+
 /*
 - We could add a model for "global reference" (e.g. sea level, surface) to
   allow abstraction of elevation, depth, etc. But this may overcomplicate things
@@ -616,4 +617,22 @@ CREATE TABLE IF NOT EXISTS data_file_link (
   ),
   -- Only one link between a data file and its model
   UNIQUE (file_hash, session_id, analysis_id, sample_id, instrument_session_id)
+);
+
+CREATE TABLE sample_contribution (
+  sample_id integer NOT NULL REFERENCES sample(id) ON DELETE CASCADE,
+  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
+  organization_id integer REFERENCES organization(id) ON DELETE CASCADE,
+  contribution text NOT NULL,
+  notes text,
+  PRIMARY KEY (sample_id, researcher_id, organization_id)
+);
+
+CREATE TABLE project_contribution (
+  project_id integer NOT NULL REFERENCES sample(id) ON DELETE CASCADE,
+  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
+  organization_id integer REFERENCES organization(id) ON DELETE CASCADE,
+  contribution text NOT NULL,
+  notes text,
+  PRIMARY KEY (project_id, researcher_id, organization_id)
 );
