@@ -126,7 +126,7 @@ class Database:
 
     def load_data(self, model_name, data, session=None, **kwargs):
         """Load data into the database using a schema-based importing tool.
-        
+
         kwargs:
             - session: the session to use for the import
             - strict: if True, will raise an exception on extra fields
