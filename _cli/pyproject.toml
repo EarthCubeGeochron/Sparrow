@@ -1,5 +1,3 @@
-[tool.poetry.dependencies]
-
 [tool.poetry]
 name = "sparrow_cli"
 version = "3.0.0"
@@ -29,5 +27,4 @@ keepachangelog = "2.0.0.dev2"
 packaging = "20.9"
 
 # Utility functions (we would move this to a separate folder, ideally)
-colorlog = "4.2.1"
-"macrostrat.core_utils" = { "path" = "../backend/python-tools/core-utils/macrostrat/core_utils", develop = true }
+"macrostrat.core_utils" = { "path" = "../backend/python-tools/core-utils", develop = true }
