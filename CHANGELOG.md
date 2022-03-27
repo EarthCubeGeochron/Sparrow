@@ -6,14 +6,39 @@ The format is based on
 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
-## `[Unreleased]` - 2022-01-28
+
+## `[2.0.0]` - 2022-03-27
+
+This is the first non-beta release of the 2.0.0 series. It has most of the tools needed
+to successfully track data within a single lab. Additional releases in this series will
+focus on adding flexibility to this strong core, to track data from multiple labs or
+the literature, and to improve documentation and usage instructions.
+
+### Changes
+
+- Added a `strict` model (disabled by default) to the importer. When enabled, this
+  forces imports to fail when unknown fields are encountered.
+- Added a model cache to the sparrow database (disabled by default)
+
+## `[2.0.0.beta21]` - 2022-01-28
+
+### Command-line interface
 
 - Automatically read environment variables from `sparrow-config.overrides.sh` and `sparrow-secrets.sh`, if available.
+- Add the concept of `messages` that the application can use to report common misconfigurations
+
+### Data model
+
 - Add a `sample.lab_id` column for use in internal lab tracking.
 - Ensure that core analytical models (`sample`, `session`, and `analysis`) each have a `note` and `data`
   column for arbitrary text and JSON data, respectively.
 - Add an `sample_attribute` linking model so that the `sample`, `session`, and `analysis` tables can all link to
-  shared attributes. 
+  shared attributes.
+
+## `[2.0.0.beta20]` - 2021-11-04
+
+- Improved continuous integration scripts
+- Fixed a bug with prestart scripts
 
 ## `[2.0.0.beta4]` - 2021-04-30
 
