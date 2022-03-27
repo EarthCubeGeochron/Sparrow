@@ -1,0 +1,33 @@
+[tool.poetry.dependencies]
+
+[tool.poetry]
+name = "sparrow_cli"
+version = "3.0.0"
+description = ""
+authors = ["Daven Quinn <dev@davenquinn.com>"]
+packages = [
+  {include= "sparrow_cli"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+click = "8.0.1"
+rich = "*"
+envbash = "*"
+pytest = "*"
+pyyaml = "*"
+pydantic = "1.9.0"
+docker-compose = "1.29.2"
+# The below pin of 'docker' ensures that we don't encounter
+# https://github.com/docker/compose/issues/8499
+# It should be deleted when docker-compose dependency is upgraded.
+docker = ">=5.0.2"
+
+click-default-group = "1.2.2"
+keepachangelog = "2.0.0.dev2"
+packaging = "20.9"
+
+# Utility functions (we would move this to a separate folder, ideally)
+colorlog = "4.2.1"
+"macrostrat.core_utils" = { "path" = "../backend/python-tools/core-utils/macrostrat/core_utils", develop = true }
