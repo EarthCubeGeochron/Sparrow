@@ -27,4 +27,7 @@ keepachangelog = "2.0.0.dev2"
 packaging = "20.9"
 
 # Utility functions (we would move this to a separate folder, ideally)
-"macrostrat.core_utils" = { "path" = "../backend/python-tools/core-utils", develop = true }
+"macrostrat.core_utils" = { path = "../backend/python-tools/core-utils", develop = true }
+
+[tool.poetry.scripts]
+sparrow = "sparrow_cli:cli"

@@ -7,7 +7,7 @@ import sys
 import click
 from rich.console import Console
 from rich import print
-from sparrow_utils.logs import get_logger
+from macrostrat.core_utils.logs import get_logger
 from .help import echo_help
 from .util.shell import (
     cmd,

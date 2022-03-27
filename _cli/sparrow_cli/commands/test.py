@@ -6,7 +6,7 @@ from click_default_group import DefaultGroup
 from textwrap import dedent
 from ..util import cmd, exec_or_run
 from ..util import compose as _compose
-from sparrow_utils import get_logger
+from macrostrat.core_utils import get_logger
 
 log = get_logger(__name__)
 

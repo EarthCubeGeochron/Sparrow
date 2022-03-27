@@ -4,7 +4,7 @@ from docker.errors import DockerException
 from os import environ, getenv
 from click import secho
 from rich import print
-from sparrow_utils import relative_path, get_logger
+from macrostrat.core_utils import relative_path, get_logger
 from ..util.exceptions import SparrowCommandError
 
 log = get_logger(__name__)
