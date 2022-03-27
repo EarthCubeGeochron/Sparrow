@@ -33,7 +33,7 @@ allowed_collections = {
         "sample_geo_entity",
         "publication",
         "tag",
-        "attribute"
+        "attribute",
     ],
     "geo_entity": "all",
     "sample_geo_entity": "all",
