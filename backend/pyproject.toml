@@ -18,7 +18,7 @@ python = "^3.8"
 psycopg2 = "*"
 shapely = "*"
 lxml = "*"
-numpy = "*"
+numpy = "^1.22.3"
 pandas = "*"
 uvloop = "*"
 
@@ -33,12 +33,8 @@ Flask-RESTful = "0.3.7"
 markupsafe = "2.0.1"
 
 # Core application
-migra = "3.0.1616366383"
-sqlakeyset = "1.0.1616300210"
 Pygments = "2.10.0"
-SQLAlchemy = "1.4.7"
 sqlalchemy-utils = "0.37.0"
-sqlparse = "0.3.0"
 requests = "2.22.0"
 toposort = "1.5"
 
@@ -56,7 +52,7 @@ pyyaml = "5.4"
 beautifulsoup4 = "4.8.2"
 html5lib = "1.0.1"
 datefinder = "0.7.0"
-pyarrow = "5.0.0"
+#pyarrow = "^7.0.0"
 openpyxl = "3.0.9"
 uncertainties = "3.1.6" 
 
@@ -73,9 +69,6 @@ marshmallow-sqlalchemy = "0.24.2"
 marshmallow-jsonschema = "0.10.0"
 stringcase = "1.2.0"
 
-# (De)serialization of geographic data
-GeoAlchemy2 = "0.8.5"
-
 # Prototype GraphQL API
 Flask-GraphQL = "2.0.1"
 graphene = "2.1.8"
@@ -91,7 +84,6 @@ boto3 = "1.12.25"
 
 # Testing and logging
 pytest = "6.2.5"
-colorlog = "4.2.1"
 rich = "10.9.0"
 deepdiff = { version = "5.0.2", extras = [ "murmur" ] }
 pytest-order = "0.9.5"
