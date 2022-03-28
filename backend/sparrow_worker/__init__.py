@@ -1,6 +1,6 @@
 from celery import Celery
 from celery.signals import after_setup_logger
-from sparrow_utils import setup_stderr_logs
+from sparrow.utils import setup_stderr_logs
 import sparrow
 import redis
 import json

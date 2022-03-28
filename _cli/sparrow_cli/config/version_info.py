@@ -1,7 +1,7 @@
 import typing
 from dataclasses import dataclass
 from os import environ
-from macrostrat.core_utils.shell import cmd
+from sparrow.utils.shell import cmd
 from packaging.specifiers import SpecifierSet, InvalidSpecifier
 from packaging.version import Version
 

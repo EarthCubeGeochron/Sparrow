@@ -8,7 +8,7 @@ from starlette import status
 
 from sparrow.api import APIResponse
 from sparrow.context import get_plugin
-from sparrow_utils import get_logger
+from sparrow.utils import get_logger
 from sparrow.auth import get_scopes
 
 log = get_logger(__name__)

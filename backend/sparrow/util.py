@@ -4,7 +4,7 @@ from pathlib import Path
 from contextlib import contextmanager
 from subprocess import run as _run
 from shlex import split
-from sparrow_utils import relative_path
+from sparrow.utils import relative_path
 
 
 @contextmanager

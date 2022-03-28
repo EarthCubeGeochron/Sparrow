@@ -22,15 +22,15 @@ numpy = "*"
 pandas = "*"
 uvloop = "*"
 
-birdbrain = {path = "python-tools/birdbrain"}
-"macrostrat.core_utils" = {path = "python-tools/core-utils"}
+"sparrow.birdbrain" = {path = "shared-modules/birdbrain"}
+"sparrow.utils" = {path = "shared-modules/utils"}
 sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
 # Legacy application
 Flask = "1.1.4"
 Flask-RESTful = "0.3.7"
 # https://serverfault.com/questions/1094062
 # We have to pin Markupsafe to 2.0.1 for now.
-markupsafe = 2.0.1
+markupsafe = "2.0.1"
 
 # Core application
 migra = "3.0.1616366383"
@@ -108,7 +108,7 @@ asgiref = "3.2.8"
 # Plugin Dependencies
 crossrefapi = "1.5.0"
 
-# sparrow_utils
+# sparrow.utils
 # NOTE: we should probably organize these internal
 # packages better...
 # -e ./utils

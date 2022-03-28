@@ -4,8 +4,8 @@ from typing import List
 from pathlib import Path
 from json import loads
 from json.decoder import JSONDecodeError
-from macrostrat.core_utils.logs import get_logger
-from macrostrat.core_utils.shell import split_args, cmd as cmd_
+from sparrow.utils.logs import get_logger
+from sparrow.utils.shell import split_args, cmd as cmd_
 from rich import print
 from .exceptions import SparrowCommandError
 

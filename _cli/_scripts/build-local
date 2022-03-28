@@ -3,4 +3,3 @@
 # Meant to be run from the repository root folder
 cd _cli
 poetry install
-

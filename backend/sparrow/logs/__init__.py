@@ -1,1 +1,1 @@
-from sparrow_utils.logs import *
+from sparrow.utils.logs import *

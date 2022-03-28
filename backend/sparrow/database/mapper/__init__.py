@@ -4,7 +4,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.ext.automap import automap_base, generate_relationship
 from sqlalchemy.ext.declarative import declarative_base
 from os import path, makedirs
-from sparrow_utils.logs import get_logger
+from sparrow.utils.logs import get_logger
 from sqlalchemy.ext.automap import automap_base
 from pickle import load, dump
 from .base import ModelHelperMixins

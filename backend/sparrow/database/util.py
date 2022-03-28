@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 from sqlalchemy_utils import create_database, database_exists, drop_database
-from sparrow_utils import cmd, get_logger
+from sparrow.utils import cmd, get_logger
 from time import sleep
 from click import echo
 

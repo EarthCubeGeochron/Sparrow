@@ -4,7 +4,7 @@ from schemainspect import get_inspector
 from migra import Migration
 from migra.statements import check_for_drop
 import sys
-from sparrow_utils import get_logger, cmd
+from sparrow.utils import get_logger, cmd
 from sqlalchemy import text
 import os
 from rich import print

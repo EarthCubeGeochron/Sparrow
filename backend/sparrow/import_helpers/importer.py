@@ -12,7 +12,7 @@ from .imperative_helpers import ImperativeImportHelperMixin
 from psycopg2.errors import ForeignKeyViolation
 from rich import print
 import sparrow
-from sparrow_utils import get_logger
+from sparrow.utils import get_logger
 
 _log = get_logger(__name__)
 

@@ -4,8 +4,8 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from os import environ
-from macrostrat.core_utils.shell import git_revision_info
-from macrostrat.core_utils.logs import get_logger, setup_stderr_logs
+from sparrow.utils.shell import git_revision_info
+from sparrow.utils.logs import get_logger, setup_stderr_logs
 from pydantic import BaseModel
 from enum import Enum
 

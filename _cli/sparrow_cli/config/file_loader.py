@@ -3,7 +3,7 @@ from os import environ, getcwd, chdir
 from envbash import load_envbash
 from pathlib import Path
 from typing import Optional
-from macrostrat.core_utils import get_logger
+from sparrow.utils import get_logger
 
 log = get_logger(__name__)
 

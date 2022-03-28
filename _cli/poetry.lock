@@ -263,22 +263,6 @@ python-versions = ">=3.6"
 testing = ["requests (>=2.0.0,<3.0.0)", "starlette (>=0.16.0,<0.17.0)", "flask-restx (>=0.5.0,<0.6.0)", "pytest-cov (>=2.0.0,<3.0.0)"]
 
 [[package]]
-name = "macrostrat.core-utils"
-version = "0.1.0"
-description = "Core utilities for Macrostrat projects"
-category = "main"
-optional = false
-python-versions = "^3.8"
-develop = true
-
-[package.dependencies]
-colorlog = "^6.5.0"
-
-[package.source]
-type = "directory"
-url = "../backend/python-tools/core-utils"
-
-[[package]]
 name = "packaging"
 version = "20.9"
 description = "Core utilities for Python packages"
@@ -484,6 +468,22 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
+name = "sparrow.utils"
+version = "0.1.0"
+description = "Core utilities for Sparrow"
+category = "main"
+optional = false
+python-versions = "^3.8"
+develop = true
+
+[package.dependencies]
+colorlog = "^6.5.0"
+
+[package.source]
+type = "directory"
+url = "../backend/shared-modules/utils"
+
+[[package]]
 name = "texttable"
 version = "1.6.4"
 description = "module for creating simple ASCII tables"
@@ -534,7 +534,7 @@ six = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "85f4e0e86ef6818f6b1e9943941518663316d30edf6f72be9021649ca5af5f65"
+content-hash = "123e0c36026110c20525bf27d9dc647f51d16b5ac3f69ba4ddc4365ee4dcd8ac"
 
 [metadata.files]
 atomicwrites = [
@@ -696,7 +696,6 @@ keepachangelog = [
     {file = "keepachangelog-2.0.0.dev2-py3-none-any.whl", hash = "sha256:fab31d5746cfefcf30d9ab7ed97be9f1d4dcad4cba0b8e6545b7663de5dad500"},
     {file = "keepachangelog-2.0.0.dev2.tar.gz", hash = "sha256:72f12f5f0f1b34b969d6a478739c12c53023d090e0b748ae39f0df1c8b4481c2"},
 ]
-"macrostrat.core-utils" = []
 packaging = [
     {file = "packaging-20.9-py2.py3-none-any.whl", hash = "sha256:67714da7f7bc052e064859c05c595155bd1ee9f69f76557e21f051443c20947a"},
     {file = "packaging-20.9.tar.gz", hash = "sha256:5b327ac1320dc863dca72f4514ecc086f31186744b84a230374cc1fd776feae5"},
@@ -862,6 +861,7 @@ six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
+"sparrow.utils" = []
 texttable = [
     {file = "texttable-1.6.4-py2.py3-none-any.whl", hash = "sha256:dd2b0eaebb2a9e167d1cefedab4700e5dcbdb076114eed30b58b97ed6b37d6f2"},
     {file = "texttable-1.6.4.tar.gz", hash = "sha256:42ee7b9e15f7b225747c3fa08f43c5d6c83bc899f80ff9bae9319334824076e9"},
