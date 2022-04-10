@@ -6,7 +6,7 @@ via the Sparrow API using x-accel-redirect
 import os
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import RedirectResponse, JSONResponse, Response
-from sparrow.plugins import SparrowCorePlugin
+from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.context import get_sparrow_app
 from starlette.exceptions import HTTPException
 from sparrow.utils import get_logger

@@ -1,4 +1,4 @@
-from sparrow.util import relative_path
+from sparrow.core.util import relative_path
 import gzip
 import json
 from pytest import mark

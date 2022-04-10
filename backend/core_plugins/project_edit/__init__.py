@@ -6,7 +6,7 @@ from sparrow.legacy.api_v1 import (
     ModelEditParser,
     get_jwt_identity,
 )
-from sparrow.plugins import SparrowCorePlugin
+from sparrow.core.plugins import SparrowCorePlugin
 
 log = get_logger(__name__)
 

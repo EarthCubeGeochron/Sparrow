@@ -1,4 +1,4 @@
-from sparrow.util import relative_path
+from sparrow.core.util import relative_path
 from sparrow.interface import model_interface
 from sparrow.ext.detrital_zircon import DetritalZirconTableImporter
 from pandas import read_csv

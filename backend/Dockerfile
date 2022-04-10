@@ -7,13 +7,16 @@ RUN apt update && \
   pip install "poetry==1.1.10" && \
   rm -rf /var/lib/apt/lists/*
 
+WORKDIR /app
+
 # Copy only requirements to cache them in docker layer
 COPY poetry.lock pyproject.toml /app/
+COPY shared-modules /app/shared-modules/
 
 # Project initialization:
 RUN --mount=type=cache,target=/root/.cache \
-  poetry config virtualenvs.create false \
-  && poetry install --no-interaction --no-ansi --no-root
+poetry config virtualenvs.create false \
+&& poetry install --no-interaction --no-ansi --no-root
 
 COPY ./docker.cfg /config/docker.cfg
 # These values should not change between installations
@@ -28,8 +31,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
 COPY ./docker-scripts/* /bin/
-RUN mkdir /app
-WORKDIR /app
 
 ## Copy app core
 COPY ./ /app/
@@ -38,7 +39,7 @@ RUN poetry install --no-interaction --no-ansi
 
 # Copy command-line options to a place where they can be easily accessed
 # by the wrapper CLI.
-RUN SPARROW_SECRET_KEY=test /app/sparrow/__main__.py get-cli-info > /run/cli-info.json
+RUN SPARROW_SECRET_KEY=test /app/sparrow/core/__main__.py get-cli-info > /run/cli-info.json
 
 CMD ["/bin/run"]
 

@@ -180,7 +180,7 @@ class SparrowConfig:
     def find_sparrow_version(self):
         # Get the sparrow version from the command path...
         version = {}
-        with (self.SPARROW_PATH / "backend" / "sparrow" / "meta.py").open() as f:
+        with (self.SPARROW_PATH / "backend" / "sparrow" / "core" / "meta.py").open() as f:
             exec(f.read(), version)
         return version["__version__"]
 

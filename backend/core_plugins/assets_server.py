@@ -4,7 +4,7 @@ from a directory in the Sparrow server container,
 specified by the SPARROW_ASSET_DIRECTORY environment variable.
 """
 
-from sparrow.plugins import SparrowCorePlugin
+from sparrow.core.plugins import SparrowCorePlugin
 from starlette.staticfiles import StaticFiles
 from os import environ
 

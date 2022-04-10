@@ -5,7 +5,7 @@ Initialize database and dump data into it.
 from sparrow.app import App
 from sparrow_tests.helpers.database import testing_database, connection_args
 from sparrow_tests.test_dz_import import import_dz_test_data
-from sparrow.util import run
+from sparrow.core.util import run
 from sys import stderr, stdout
 from contextlib import redirect_stdout
 from sparrow.logs import console_handler, get_logger

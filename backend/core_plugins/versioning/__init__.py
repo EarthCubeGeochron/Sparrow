@@ -1,6 +1,6 @@
 from sqlalchemy import inspect, sql
-from sparrow.plugins import SparrowCorePlugin
-from sparrow.util import relative_path
+from sparrow.core.plugins import SparrowCorePlugin
+from sparrow.core.util import relative_path
 from sparrow.context import get_database
 import click
 

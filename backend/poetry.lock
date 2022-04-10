@@ -1318,6 +1318,19 @@ type = "directory"
 url = "shared-modules/utils"
 
 [[package]]
+name = "sqlakeyset"
+version = "1.0.1629029818"
+description = "offset-free paging for sqlalchemy"
+category = "main"
+optional = false
+python-versions = ">=3.4"
+
+[package.dependencies]
+packaging = ">=20.0"
+python-dateutil = "*"
+sqlalchemy = ">=1.3.11"
+
+[[package]]
 name = "sqlalchemy"
 version = "1.4.32"
 description = "Database Abstraction Library"
@@ -1641,7 +1654,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "57fa771ef410bb2dbe12247976d6d936135dd3d1953f0aada006eb003fee0dd4"
+content-hash = "eaeb38afbb742cfb1f156ce94e4d1756e5f8bada05d72cf739ae44779f698e70"
 
 [metadata.files]
 aiofiles = [
@@ -2468,6 +2481,10 @@ soupsieve = [
 ]
 "sparrow.birdbrain" = []
 "sparrow.utils" = []
+sqlakeyset = [
+    {file = "sqlakeyset-1.0.1629029818-py3-none-any.whl", hash = "sha256:a5332b090364ed072f1395212b9f6c1bad8758b5bac248212f4c112b5e8800c4"},
+    {file = "sqlakeyset-1.0.1629029818.tar.gz", hash = "sha256:11d83e8a9b6dfe351f441c913fe779d8c5d0ce7fbf3c5e92aa0ec016c7e00588"},
+]
 sqlalchemy = [
     {file = "SQLAlchemy-1.4.32-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:4b2bcab3a914715d332ca783e9bda13bc570d8b9ef087563210ba63082c18c16"},
     {file = "SQLAlchemy-1.4.32-cp27-cp27m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:159c2f69dd6efd28e894f261ffca1100690f28210f34cfcd70b895e0ea7a64f3"},
