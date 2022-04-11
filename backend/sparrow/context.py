@@ -38,7 +38,7 @@ def app_context() -> SparrowContext:
     return _sparrow_context.get()
 
 
-def get_sparrow_app(create=True):
+def get_app(create=True):
     from .app.base import Sparrow
 
     val = _sparrow_context.get()
@@ -51,10 +51,14 @@ def get_sparrow_app(create=True):
     return val.app
 
 
+# Support a legacy signature
+get_sparrow_app = get_app
+
+
 def get_database():
-    return get_sparrow_app().database
+    return get_app().database
 
 
 def get_plugin(name: str):
-    app = get_sparrow_app(create=False)
+    app = get_app(create=False)
     return app.plugins.get(name)

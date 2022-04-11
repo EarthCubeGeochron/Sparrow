@@ -62,4 +62,93 @@ Two examples for importers can be found:
 - [WiscSIMS importer (in R)](/docs/getting-started/wiscsims-example)
 - [LaserChron Metadata Importer (in Python)](/docs/getting-started/metadata-importer)
 
+## Tips and tricks
+
+### Embedding a shell
+
+When building an importer, you might want to debug your data import code as you.
+For this, you can embed an IPython shell in your application, which allows you to
+inspect the state of the application at a given point.
+
+```python
+from pathlib import Path
+from IPython import embed
+from rich import print # Rich is a nice library for pretty-printing data
+import pandas
+import sparrow
+
+@sparrow.task(name="import-earthchem")
+def import_earthchem():
+    for file in Path(sparrow.settings.DATA_DIR).glob("*.txt"):
+        df = pandas.read_table(file, sep="\t")
+        ## The line below embeds a shell prompt in the importer
+        embed()
+        ## Here we raise an error, so we don't get in an endless loop
+        ## of shell embedding :)
+        raise
+
+```
+
+### Start simple and get more complex
+
+First, read the data sheet, and inspect it to get a sense of its form.
+
+Then, focus on getting a single row in the proper form to be imported.
+A second-phase importer for the one above might look like this:
+
+```python
+@sparrow.task(name="import-earthchem")
+def import_earthchem():
+    for file in Path(sparrow.settings.DATA_DIR).glob("*.txt"):
+        df = pandas.read_table(file, sep="\t")
+        for ix, row in df.itertuples():
+            print(f"Importing row {ix} of {df.shape[0]}")
+            import_sample(row)
+
+def import_sample(row):
+    # Now we can inspect a single row!
+    embed()
+    raise
+```
+
+### Build towards producing "clean" JSON
+
+Now, the focus of your development can be the `import_sample` function.
+Your next target is to start producing "clean" JSON that approximates
+the form of the data in the Sparrow archive.
+
+```python
+def import_sample(row):
+    # Split year and author from references
+    ref = row["REFERENCE"]
+    year = re.search(r", (\d{4})$", ref)
+
+    if year is None:
+        raise Exception(f"Could not parse reference {ref}")
+    authors = ref[: year.start()].strip()
+    year = int(year.group(1))
+
+    sample = {
+        "name": data["SAMPLE ID"],
+        "location": {
+            "type": "Point",
+            "coordinates": [
+                float(data["LONGITUDE"]),
+                float(data["LATITUDE"]),
+            ],
+        },
+        "publication": {
+            "author": authors,
+            "year": year,
+        },
+    }
+    # For now, just print the data and move on
+    print(sample)
+```
+
+### Regular expressions
+
+Sometimes it's necessary to split strings using "regular expressions".
+Some helpers: [regexr.com](https://regexr.com/), [regex101.com](https://regex101.com), and [pythex.org](https://pythex.org/)
+
 export default DocsPage;

@@ -1,8 +1,11 @@
 import sys
-from os import environ, getcwd, chdir, getenv
+from os import environ, getcwd, chdir
 from envbash import load_envbash
 from pathlib import Path
 from typing import Optional
+from sparrow_utils import get_logger
+
+log = get_logger(__name__)
 
 
 def envbash_init_hack():
@@ -35,15 +38,18 @@ def envbash_init_hack():
         sys.exit(0)
 
 
-def _load_config_file(cfg):
-    return load_envbash(cfg)
+def _load_config_file(cfg: Path):
+    log.debug(f"Loading configuration file: {cfg}")
+    return load_envbash(str(cfg))
 
 
-def find_config_file(dir: Path) -> Optional[Path]:
-    for folder in (dir, *dir.parents):
-        pth = folder / "sparrow-config.sh"
+def find_config_file(_dir: Path, filename="sparrow-config.sh") -> Optional[Path]:
+    """Find a configuration file searching recursively from the given directory."""
+    for folder in (_dir, *_dir.parents):
+        pth = folder / filename
         if pth.is_file():
             return pth
+    return None
 
 
 def get_config() -> Optional[Path]:
@@ -83,7 +89,13 @@ def load_config_file():
         # Actually source the configuration file as a shell script
         # This requires bash to be available on the platform, which
         # might be a problem for Windows/WSL.
-        _load_config_file(environ["SPARROW_CONFIG"])
+        _load_config_file(sparrow_config)
+        for fn in ["sparrow-config.overrides.sh", "sparrow-secrets.sh"]:
+            # Load the `sparrow-secrets.sh` file if it exists.
+            extra_cfg = sparrow_config.with_name(fn)
+            if extra_cfg.is_file():
+                _load_config_file(extra_cfg)
+
         # Change back to original working directory
         chdir(environ["SPARROW_WORKDIR"])
 

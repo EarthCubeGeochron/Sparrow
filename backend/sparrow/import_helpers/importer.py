@@ -9,6 +9,7 @@ from sqlalchemy import inspect
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
 from .imperative_helpers import ImperativeImportHelperMixin
+from psycopg2.errors import ForeignKeyViolation
 from rich import print
 import sparrow
 from sparrow_utils import get_logger
@@ -267,7 +268,12 @@ class BaseImporter(ImperativeImportHelperMixin):
                 if df_link is not None:
                     self.db.session.add(df_link)
                 self.db.session.commit()
-        except (SparrowImportError, NotImplementedError, IntegrityError) as err:
+        except (
+            SparrowImportError,
+            NotImplementedError,
+            IntegrityError,
+            ForeignKeyViolation,
+        ) as err:
             self.db.session.rollback()
             df_link = self.__track_model(rec, None, error=str(err))
             if df_link is not None:

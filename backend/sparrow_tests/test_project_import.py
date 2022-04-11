@@ -5,6 +5,7 @@ from json import dumps, loads
 from sparrow.encoders import JSONEncoder
 from sqlalchemy import event
 from sqlalchemy.orm import joinedload
+from marshmallow import EXCLUDE
 from datetime import datetime
 from pytest import mark
 import logging

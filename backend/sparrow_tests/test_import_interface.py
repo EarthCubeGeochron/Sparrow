@@ -6,7 +6,7 @@ from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from datetime import datetime
-from pytest import mark
+from pytest import mark, raises
 from sparrow.logs import get_logger
 from sparrow.encoders import JSONEncoder
 from json import dumps
@@ -534,3 +534,14 @@ class TestNestedQuerying:
         for rel_list in relationships:
             for rel in rel_list:
                 assert isinstance(rel.property, RelationshipProperty)
+
+
+class TestStrictModeImport:
+    def test_strict_mode_import(self, db):
+        db.load_data("session", basic_data, strict=True)
+
+    def test_strict_mode_import_fail(self, db):
+        new_data = basic_data.copy()
+        new_data["fancy"] = "so_fancy"
+        with raises(ValidationError):
+            db.load_data("session", new_data, strict=True)

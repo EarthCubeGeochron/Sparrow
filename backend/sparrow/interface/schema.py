@@ -80,6 +80,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
             # Global defer list (we should refactor this eventually)
             *exclude_fields.get(model, []),
         ]
+        # log.debug(_message)
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
         super().__init__(*args, **kwargs)

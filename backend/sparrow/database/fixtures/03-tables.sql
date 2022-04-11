@@ -138,6 +138,7 @@ CREATE TABLE IF NOT EXISTS vocabulary.entity_reference (
   authority text
 );
 
+
 /*
 - We could add a model for "global reference" (e.g. sea level, surface) to
   allow abstraction of elevation, depth, etc. But this may overcomplicate things
@@ -225,6 +226,7 @@ CREATE TABLE IF NOT EXISTS sample (
   name text,
   uuid uuid DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
   igsn text UNIQUE,
+  lab_id text UNIQUE,
   material text REFERENCES vocabulary.material(id),
   member_of integer REFERENCES sample(id),
   /* #### Location fields
@@ -247,7 +249,10 @@ CREATE TABLE IF NOT EXISTS sample (
   -- borehole depth in meters
   depth numeric,
   embargo_date timestamp,
-  CHECK ((name IS NOT null) OR (igsn IS NOT null))
+  note text,
+  -- arbitrary additional information
+  data jsonb,
+  CHECK ((name IS NOT null) OR (igsn IS NOT null) OR (lab_id IS NOT null))
 );
 /*
 
@@ -348,6 +353,7 @@ CREATE TABLE IF NOT EXISTS session (
   technique text REFERENCES vocabulary.method(id),
   target text REFERENCES vocabulary.material(id),
   embargo_date timestamp,
+  note text,
   /* A field to store extra, semi-structured session data in a key/value format */
   data jsonb,
   UNIQUE (sample_id, date, instrument, technique)
@@ -412,6 +418,7 @@ CREATE TABLE IF NOT EXISTS analysis (
      for each relevant system)
   - a calculated plateau age for a stepped-heating Ar-Ar experiment. */
   is_interpreted boolean,
+  note text,
   data jsonb,
   UNIQUE (session_id, session_index, analysis_name),
   /*
@@ -509,6 +516,12 @@ CREATE TABLE IF NOT EXISTS __session_attribute (
   PRIMARY KEY (session_id, attribute_id)
 );
 
+CREATE TABLE IF NOT EXISTS sample_attribute (
+  sample_id integer NOT NULL REFERENCES sample(id),
+  attribute_id integer NOT NULL REFERENCES attribute(id),
+  PRIMARY KEY (sample_id, attribute_id)
+);
+
 /*
 ## Analytical constants
 
@@ -604,4 +617,22 @@ CREATE TABLE IF NOT EXISTS data_file_link (
   ),
   -- Only one link between a data file and its model
   UNIQUE (file_hash, session_id, analysis_id, sample_id, instrument_session_id)
+);
+
+CREATE TABLE sample_contribution (
+  sample_id integer NOT NULL REFERENCES sample(id) ON DELETE CASCADE,
+  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
+  organization_id integer REFERENCES organization(id) ON DELETE CASCADE,
+  contribution text NOT NULL,
+  notes text,
+  PRIMARY KEY (sample_id, researcher_id, organization_id)
+);
+
+CREATE TABLE project_contribution (
+  project_id integer NOT NULL REFERENCES sample(id) ON DELETE CASCADE,
+  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
+  organization_id integer REFERENCES organization(id) ON DELETE CASCADE,
+  contribution text NOT NULL,
+  notes text,
+  PRIMARY KEY (project_id, researcher_id, organization_id)
 );

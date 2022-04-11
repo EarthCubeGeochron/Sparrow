@@ -1,7 +1,13 @@
+from typing_extensions import Self
 from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
-from sqlalchemy.ext.automap import generate_relationship
-from ...logs import get_logger
+from sqlalchemy.ext.automap import automap_base, generate_relationship
+from sqlalchemy.ext.declarative import declarative_base
+from os import path, makedirs
+from sparrow_utils.logs import get_logger
+from sqlalchemy.ext.automap import automap_base
+from pickle import load, dump
+from .base import ModelHelperMixins
 
 # Drag in geographic types for database reflection
 from geoalchemy2 import Geometry, Geography
@@ -16,7 +22,6 @@ from .util import (
     name_for_scalar_relationship,
     name_for_collection_relationship,
 )
-from .base import BaseModel
 
 log = get_logger(__name__)
 
@@ -40,18 +45,81 @@ class AutomapError(Exception):
     pass
 
 
+class DatabaseModelCacher:
+    metadata_pickle_filename = "sparrow-db-cache.pickle"
+    cache_path = path.join(path.expanduser("~"), ".sqlalchemy-cache")
+    enabled = True
+
+    @property
+    def _metadata_cache_filename(self):
+        return path.join(self.cache_path, self.metadata_pickle_filename)
+
+    # https://stackoverflow.com/questions/41547778/sqlalchemy-automap-best-practices-for-performance/44607512
+    def _cache_database_map(self, metadata):
+        if not self.enabled:
+            return
+        # save the metadata for future runs
+        try:
+            if not path.exists(self.cache_path):
+                makedirs(self.cache_path)
+            # make sure to open in binary mode - we're writing bytes, not str
+            with open(self._metadata_cache_filename, "wb") as cache_file:
+                dump(metadata, cache_file)
+            log.info(f"Cached database models to {self._metadata_cache_filename}")
+        except IOError:
+            # couldn't write the file for some reason
+            log.info(
+                f"Could not cache database models to {self._metadata_cache_filename}"
+            )
+
+    def _load_database_map(self):
+        # We have hard-coded the cache file for now
+        cached_metadata = None
+        try:
+            with open(self._metadata_cache_filename, "rb") as cache_file:
+                cached_metadata = load(file=cache_file)
+
+        except (IOError, EOFError):
+            # cache file not found - no problem
+            log.info(
+                f"Could not find database model cache ({self._metadata_cache_filename})"
+            )
+            pass
+        return cached_metadata
+
+    def __call__(self):
+        cached_metadata = self._load_database_map()
+        if cached_metadata is None or not self.enabled:
+            base = automap_base(cls=ModelHelperMixins)
+        else:
+            log.info("Loading database models from cache")
+            base = automap_base(metadata=cached_metadata)
+            base.loaded_from_cache = True
+        base.builder = self
+        return base
+
+
+model_builder = DatabaseModelCacher()
+
+BaseModel = model_builder()
+
+
 class SparrowDatabaseMapper:
     automap_base = None
     automap_error = None
     _models = None
     _tables = None
 
-    def __init__(self, db):
+    def __init__(self, db, use_cache=True, reflect=True):
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
         # TODO: add the process flow described below:
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
         self.db = db
+        self.automap_base = BaseModel
+        if reflect:
+            self.reflect_database(use_cache=use_cache)
 
+    def reflect_database(self, use_cache=True):
         # This stuff should be placed outside of core (one likely extension point).
         reflection_kwargs = dict(
             name_for_scalar_relationship=name_for_scalar_relationship,
@@ -60,19 +128,37 @@ class SparrowDatabaseMapper:
             generate_relationship=_gen_relationship,
         )
 
-        for schema in ("vocabulary", "core_view", "tags"):
-            # Reflect tables in schemas we care about
-            # Note: this will not reflect views because they don't have
-            # primary keys.
-            log.info(f"Reflecting schema {schema}")
-            BaseModel.metadata.reflect(bind=self.db.engine, schema=schema)
-        log.info("Reflecting core tables")
-        BaseModel.prepare(self.db.engine, reflect=True, **reflection_kwargs)
+        schemas = ["vocabulary", "core_view", "tags", None]
 
-        self.automap_base = BaseModel
+        if use_cache and self.automap_base.loaded_from_cache:
+            log.info("Database models have been loaded from cache")
+            for schema in schemas:
+                self.automap_base.prepare(
+                    self.db.engine, schema=schema, **reflection_kwargs
+                )
+        else:
+            for schema in schemas:
+                # Reflect tables in schemas we care about
+                # Note: this will not reflect views because they don't have
+                # primary keys.
+                log.info(f"Reflecting schema {schema}")
+                if schema is not None:
+                    self.automap_base.metadata.reflect(
+                        bind=self.db.engine, schema=schema
+                    )
+            log.info("Reflecting core tables")
+            self.automap_base.prepare(self.db.engine, reflect=True, **reflection_kwargs)
+
+        if not self.automap_base.loaded_from_cache:
+            self._cache_database_map()
 
         self._models = ModelCollection(self.automap_base.classes)
         self._tables = TableCollection(self._models)
+
+    def _cache_database_map(self):
+        if self.automap_base.loaded_from_cache:
+            return
+        self.automap_base.builder._cache_database_map(self.automap_base.metadata)
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """
@@ -117,4 +203,4 @@ class SparrowDatabaseMapper:
         """
         tbl = self.reflect_table(table_name, *column_args, **kwargs)
         name = classname_for_table(tbl)
-        return type(name, (BaseModel,), dict(__table__=tbl))
+        return type(name, (self.automap_base,), dict(__table__=tbl))

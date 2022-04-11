@@ -4,9 +4,12 @@ import os
 from pathlib import Path
 from hashlib import md5
 from subprocess import PIPE
+from pydantic import BaseModel
+from enum import Enum
 
-from ..util.shell import exec_or_run
-from ..util.exceptions import SparrowCommandError
+from ...util.shell import exec_or_run
+from ...util.exceptions import SparrowCommandError
+from .default_backend_commands import default_commands
 
 
 def dirhash(path):
@@ -31,7 +34,7 @@ def cli_cache_file():
     return cache_dir(create=True) / f"{prefix}-cli-options.json"
 
 
-def get_backend_help_info(cache=True):
+def get_backend_help_info(write_cache=True):
     env = dict(**os.environ)
     env["SPARROW_SECRET_KEY"] = env.get("SPARROW_SECRET_KEY", "Test")
     out = exec_or_run(
@@ -52,7 +55,7 @@ def get_backend_help_info(cache=True):
     data = out.stdout.decode("utf-8").strip()
     try:
         _decoded = json.loads(data)
-        if cache:
+        if write_cache:
             cachefile = cli_cache_file()
             cachefile.open("w").write(data)
         return _decoded
@@ -62,11 +65,26 @@ def get_backend_help_info(cache=True):
         )
 
 
+class CommandDataSource(str, Enum):
+    default = "default"
+    cached = "cached"
+    direct = "direct"
+
+
+class ContainerCommandData(BaseModel):
+    data: dict
+    source: CommandDataSource
+
+
 def get_backend_command_help():
-    cachefile = cli_cache_file()
+    cache_file = cli_cache_file()
     try:
-        if cachefile.is_file():
-            return json.load(cachefile.open("r"))
-    except Exception:
-        pass
-    return get_backend_help_info(cache=True)
+        if cache_file.is_file():
+            return ContainerCommandData(
+                data=json.load(cache_file.open("r")), source=CommandDataSource.cached
+            )
+    except Exception as err:
+        raise SparrowCommandError(
+            f"Could not read cache file {cache_file}", details=str(err)
+        )
+    return ContainerCommandData(data=default_commands, source=CommandDataSource.default)

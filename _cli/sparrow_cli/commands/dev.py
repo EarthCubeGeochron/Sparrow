@@ -32,6 +32,8 @@ def dev_reload():
 @sparrow_dev.command(name="clear-cache")
 def clear_cache():
     """Clear caches used by the command-line application"""
-    from ..help.options_cache import cli_cache_file
+    from ..config.command_cache import cli_cache_file
 
-    cli_cache_file().unlink()
+    cache = cli_cache_file()
+    cache.unlink(missing_ok=True)
+    print(f"Cleared cache file {cache}")

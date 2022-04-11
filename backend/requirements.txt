@@ -15,8 +15,11 @@ pandas
 uvloop
 
 # Legacy application
-Flask==1.1.1
+Flask==1.1.4
 Flask-RESTful==0.3.7
+# https://serverfault.com/questions/1094062
+# We have to pin Markupsafe to 2.0.1 for now.
+markupsafe==2.0.1
 
 # Core application
 migra==3.0.1616366383
@@ -31,7 +34,7 @@ toposort==1.5
 # Command-line interface
 click==7.1.2
 click-plugins==1.1.1
-ipython==7.27.0
+ipython==7.31.1
 
 # Static files
 aiofiles==0.6.0

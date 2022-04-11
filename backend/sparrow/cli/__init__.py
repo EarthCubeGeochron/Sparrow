@@ -61,11 +61,14 @@ class SparrowCLI(click.Group):
 # Get configuration from environment variable or passed
 # using the `--config` flag
 @click.option("--config", "cfg", type=str, required=False)
+@click.option("--verbose", "verbose", is_flag=True, required=False, default=False)
 @click.pass_context
-def cli(ctx, cfg=None):
+def cli(ctx, cfg=None, verbose=False):
     # This signature might run things twice...
     if cfg is not None:
         ctx.obj = _build_app_context(config)
+    if verbose:
+        setup_stderr_logs()
 
 
 def abort(message, status=1):

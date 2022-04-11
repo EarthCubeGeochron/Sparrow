@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 from click import secho
+from time import perf_counter
 
 from sqlalchemy import create_engine, inspect, MetaData, text
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -10,6 +11,7 @@ from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from marshmallow.exceptions import ValidationError
+from marshmallow import RAISE, EXCLUDE
 
 from .util import run_sql_file, run_query, get_or_create, run_sql_query_file
 from .models import User, Project, Session, DatumType
@@ -51,17 +53,19 @@ class Database:
         self.session = scoped_session(self._session_factory)
         # Use the self.session_scope function to more explicitly manage sessions.
 
-    def automap(self):
+    def automap(self, use_cache=True):
         log.info("Automapping the database")
-        self.mapper = SparrowDatabaseMapper(self)
+        t0 = perf_counter()
+
+        self.mapper = SparrowDatabaseMapper(self, use_cache=use_cache)
 
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
         #  they are not included by default)
         # TODO: there is probably a way to do this without having to
         # manually register the models
+        log.info("Registering model overrides")
         self.mapper.register_models(User, Project, Session, DatumType)
-        log.info("Registered core model overrides")
 
         # Register a new class
         # Automap the core_view.datum relationship
@@ -74,7 +78,10 @@ class Database:
         )
         self.mapper.register_models(cls)
         self.app.run_hook("database-mapped")
-        log.info("Finished automapping database")
+        if not use_cache:
+            self.mapper._cache_database_map()
+        t1 = perf_counter()
+        log.info(f"Finished automapping database: {t1-t0:.2f}s")
 
     @contextmanager
     def session_scope(self, commit=True):
@@ -118,7 +125,13 @@ class Database:
                 log.debug(err)
 
     def load_data(self, model_name, data, session=None, **kwargs):
-        """Load data into the database using a schema-based importing tool"""
+        """Load data into the database using a schema-based importing tool.
+
+        kwargs:
+            - session: the session to use for the import
+            - strict: if True, will raise an exception on extra fields
+            - unknown: Pass through to Marshmallow's load() behavior on unknown fields
+        """
         if session is None:
             session = self.session
         # Do an end-around for lack of creating interfaces on app startup
@@ -129,10 +142,15 @@ class Database:
             )
         schema = model_interface(model, session)()
 
+        strict_mode = kwargs.pop("strict", False)
+        default_unknown = RAISE if strict_mode else EXCLUDE
+
+        unknown = kwargs.pop("unknown", default_unknown)
+
         with on_conflict("do-nothing"):
             try:
                 log.info(f"Initiating load of {model_name}")
-                res = schema.load(data, session=session, **kwargs)
+                res = schema.load(data, session=session, unknown=unknown, **kwargs)
                 log.info("Entering final commit phase of import")
                 log.info(f"Adding top-level object {res}")
                 session.add(res)

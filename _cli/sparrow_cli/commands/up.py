@@ -8,7 +8,7 @@ from time import sleep
 from ..config.environment import validate_environment
 from ..config import SparrowConfig
 from ..util import compose, cmd, log
-from ..help import get_backend_help_info
+from ..config.command_cache import get_backend_help_info
 
 
 def _report_image_versions():
@@ -23,7 +23,10 @@ def _get_prestart_script(cfg):
     if cfg.config_dir is None:
         return None
     prestart = cfg.config_dir / "sparrow-prestart.sh"
-    return prestart.exists()
+    if not prestart.exists():
+        log.info(f"No prestart script found at {prestart}")
+        return None
+    return prestart
 
 
 @click.command()
@@ -97,7 +100,7 @@ def sparrow_up(ctx, container="", force_recreate=False):
 
     # While we're spinning up, repopulate command help in case it's changed
     log.info("Caching backend help info")
-    get_backend_help_info(cache=True)
+    get_backend_help_info(write_cache=True)
 
     if "backend" not in running_containers:
         sleep(5)

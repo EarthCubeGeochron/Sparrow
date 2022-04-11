@@ -1,18 +1,35 @@
 import typing
+from typing import List, Optional
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from os import environ
 from sparrow_utils.shell import git_revision_info
 from sparrow_utils.logs import get_logger, setup_stderr_logs
+from pydantic import BaseModel
+from enum import Enum
 
 from .environment import prepare_docker_environment, prepare_compose_overrides
 from .version_info import SparrowVersionMatch, test_version
+from .command_cache import get_backend_command_help, CommandDataSource
 from .file_loader import load_config_file
 from ..util.exceptions import SparrowCommandError
 from packaging.version import Version
 
 log = get_logger(__file__)
+
+
+class Level(str, Enum):
+    WARNING = "WARNING"
+    ERROR = "ERROR"
+    SUCCESS = "SUCCESS"
+
+
+class Message(BaseModel):
+    id: str
+    text: str
+    details: str = None
+    level: str = Level.WARNING
 
 
 @dataclass
@@ -27,10 +44,14 @@ class SparrowConfig:
     version_info: typing.Optional[SparrowVersionMatch] = None
     verbose: bool = False
     offline: bool = False
+    messages: List[Message] = field(default_factory=list)
+    backend_commands: List[dict] = list
+    lab_name: Optional[str] = None
 
     def __init__(self, verbose=False, offline=False):
         self.verbose = verbose
         self.offline = offline
+        self.messages = []
         self.is_frozen = getattr(sys, "frozen", False)
         if self.is_frozen:
             self.bundle_dir = Path(sys._MEIPASS)
@@ -43,7 +64,15 @@ class SparrowConfig:
 
         # Load configuration from file!
         self.config_file = load_config_file()
-        if self.config_file is not None:
+        if self.config_file is None:
+            self.messages.append(
+                Message(
+                    id="no-config-file",
+                    text="No lab configuration file found",
+                    details="Create a [cyan]sparrow-config.sh[/cyan] file in a project directory to set up a lab.",
+                )
+            )
+        else:
             self.config_dir = self.config_file.parent
 
         if "SPARROW_PATH" in environ:
@@ -62,6 +91,19 @@ class SparrowConfig:
             self.path_provided = False
             environ["SPARROW_PATH"] = str(pth)
 
+        res = get_backend_command_help()
+        self.backend_commands = res.data
+        if res.source == CommandDataSource.default:
+            self.messages.append(
+                Message(
+                    id="backend-commands",
+                    text="Plugin commands have not yet been loaded from Sparrow core",
+                    details="Run [cyan]sparrow up[/cyan] to populate the configuration cache.",
+                )
+            )
+
+        self.lab_name = environ.get("SPARROW_LAB_NAME")
+
         # Provide environment variable in a more Pythonic way as well
         source_root = Path(environ["SPARROW_PATH"])
         self.SPARROW_PATH = source_root
@@ -75,6 +117,7 @@ class SparrowConfig:
             )
 
         self.version_info = test_version(self)
+        self.add_revision_message()
 
         # Setup path for subcommands
         self._setup_command_path()
@@ -124,6 +167,15 @@ class SparrowConfig:
             ).stdout.decode("utf-8")
         rev = rev.strip()
         return dict(revision=rev, dirty=rev.endswith("-dirty"))
+
+    def add_revision_message(self):
+        ver = self.version_info
+        if not ver:
+            return
+        rev = "revision" if ver.uses_git else "version"
+        msg = "matches" if ver.is_match else "does not match"
+        msg = f"Sparrow {rev} [underline]{ver.available}[/underline] {msg} [underline]{ver.desired}[/underline]"
+        self.messages.append(Message(id="version-match", text=msg, level=Level.SUCCESS))
 
     def find_sparrow_version(self):
         # Get the sparrow version from the command path...

@@ -1,6 +1,8 @@
 INSTALL_PATH ?= /usr/local
 SPARROW_INSTALL_PATH ?= $(INSTALL_PATH)
 
+.PHONY: build install install-dev build-dev install-dist test clean
+
 all: install-hooks build-dev
 
 build:
@@ -21,8 +23,8 @@ install-dev: build-dev
 
 ## TODO: fix bugs with install-dist to make it more capable
 # Bundle with PyInstaller and install (requires local Python 3)
-install-dist: _cli/dist/sparrow install-hooks
-	get-sparrow.sh $<
+install-dist: install-hooks
+	./get-sparrow.sh --no-confirm _cli/dist/sparrow
 
 test:
 	_cli/_scripts/test-cli
@@ -30,22 +32,14 @@ test:
 clean:
 	rm -rf _cli/build
 
-.PHONY: build install install-dev build-dev install-dist test clean
-
-# Docker CLI build instructions (for e.g. CI)
-# Some information on how to build can be found at https://github.com/docker/compose
-# Build the sparrow command-line application (for different platforms)
-
-_cli/dist/macos/sparrow:
-	# Due to the vagaries of PyInstaller, Mac distribution must be built on OS X
-	pyinstaller --distpath _cli/dist/macos _cli/sparrow.spec
-
 # Build locally for the current platform (DEFAULT)
 _cli/dist/sparrow:
 	_cli/_scripts/build-dist
 
+# For older varieties of Linux, we have to build in a Docker container
+# with an older libc. This is mostly an issue for RHEL and older Ubuntu installations.
 build-linux:
-	docker run -it \
+	docker run \
 		-v "$(shell pwd):/src/" \
 		cdrx/pyinstaller-linux:latest \
 		_cli/_scripts/build-dist
@@ -53,7 +47,7 @@ build-linux:
 # This will build the CLI for windows, which is currently unsupported
 # (WSL integration with the linux binaries should be used instead)
 build-windows:
-	docker run -it \
+	docker run \
 		-v "$(shell pwd):/src/" \
 		cdrx/pyinstaller-windows:latest \
 		_cli/_scripts/build-dist

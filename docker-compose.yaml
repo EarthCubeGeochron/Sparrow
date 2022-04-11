@@ -75,6 +75,7 @@ x-backend:
     # (for example, git repositorites for the PyChron importer). This could conceivably
     # be delegated to a separate importer container, but that seems overcomplex for now.
     - backend_cache:/cache
+    - model_cache:/root/.sqlalchemy-cache
 services:
   gateway:
     depends_on:
@@ -97,8 +98,6 @@ services:
       start_period: 40s
     expose:
       - 5000
-    ports:
-      - 5000:5000
   db:
     image: mdillon/postgis:11
     expose:
@@ -138,10 +137,9 @@ services:
       # Right now, we configure default site content
       # rather than allowing any customization
       - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/app/site-content
-      # A folder for a testing version of the @macrostrat/ui-components
-      # Javascript library that will be linked into the container at runtime
-      # to support tandem development within Docker
-      - ${SPARROW_UI_COMPONENTS:-placeholder}:/app/_local_modules/@macrostrat/ui-components:ro
+      # A folder for node modules that will be resolved preferentially
+      # instead of the main node_modules packages.
+      - ${SPARROW_FRONTEND_MODULES:-placeholder}:/app/_local_modules:ro
   # API TESTS container is disabled for now
   # api-tests:
   #   build: api-tests
@@ -150,30 +148,28 @@ services:
   #   depends_on:
   #     - backend
   database_backup:
+    image: ghcr.io/uw-macrostrat/pg-backup-service:main
     # This service backs up the database periodically
     # to a remote S3 bucket or a local directory on the server.
     restart: unless-stopped
-    # This service should only run under the "production" profile
+    # This service will only run under the "production" profile
     # https://docs.docker.com/compose/profiles/
     profiles:
       - production
     environment:
-      - SPARROW_S3_ENDPOINT
-      - SPARROW_S3_BUCKET
-      - SPARROW_S3_KEY
-      - SPARROW_S3_SECRET
-      - SPARROW_BACKUP_BUCKET
+      - S3_ENDPOINT=${SPARROW_S3_ENDPOINT:-""}
+      - S3_ACCESS_KEY=${SPARROW_S3_KEY:-""}
+      - S3_SECRET_KEY=${SPARROW_S3_SECRET:-""}
+      - S3_BACKUP_BUCKET=${SPARROW_BACKUP_BUCKET:-""}
       # If we don't specify all S3 parameters,
       # we fall back to using the local backup directory
-      - SPARROW_BACKUP_DIR
+      - DB_BACKUP_DIR=${SPARROW_BACKUP_DIR:-""}
       # Mounted volume for local backups (mapped to Sparrow backup dir)
-      - SPARROW_BACKUP_VOLUME=/local-backups
+      - DB_BACKUP_VOLUME=/local-backups
       # The unique-ish identifier of the lab (used to prefix backups)
-      - SPARROW_LAB_ID
-    build: services/backup-database
+      - DB_BACKUP_PREFIX=${SPARROW_LAB_ID:-""}
     tty: true
-    entrypoint: ""
-    command: /conf/backup-service
+    command: backup-service
     depends_on:
       - db
     volumes:
@@ -204,3 +200,5 @@ volumes:
   backend_cache:
   # Placeholder volumes in case we don't have these volumes to mount
   placeholder:
+  model_cache:
+

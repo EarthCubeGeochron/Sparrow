@@ -43,10 +43,10 @@ class Sparrow(Starlette):
 
         super().__init__(*args, **kwargs)
 
-    def bootstrap(self, init=False, force_db_setup=False):
+    def bootstrap(self, init=False, force_db_setup=False, use_schema_cache=True):
         if init:
             self.init_database(force=force_db_setup)
-        self.setup_database()
+        self.setup_database(use_cache=use_schema_cache)
         log.info("Booting up application server")
         self.setup_server()
 
@@ -68,7 +68,7 @@ class Sparrow(Starlette):
         elif _exists:
             log.info("Application tables exist")
 
-    def setup_database(self, automap=True):
+    def setup_database(self, automap=True, use_cache=False):
         # If we set up the database twice, bad things will happen
         # with overriding of models, etc. We must make sure we only
         # set up the database once.
@@ -78,7 +78,7 @@ class Sparrow(Starlette):
         self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
         if self.db.mapper is None and automap:
-            self.database.automap()
+            self.database.automap(use_cache=use_cache)
         if self.db.mapper is not None:
             self.run_hook("database-ready", self.db)
             self.database_ready = True

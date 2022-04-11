@@ -35,6 +35,18 @@ Some hooks will receive other parameters. For instance, the "database-available"
 
 - "database-available" : Runs code while database is being set up. If you are adding new tables and want them to be auto-mapped to the API, this is the hook you need!
 - "api-initialized-v2": Runs code when APIv2 has been created. This hook is good to use for adding custom routes to the Sparrow API.
+- "database-ready" : Runs code after database has been mapped.
+- "database-mapped": Runs code after database is automapped, but only runs if database was not automapped already.
+- "core-tables-initialized": Run on database initialization
+- "finalize-database-schema": Run on database initialization
+- "prepare-database-migrations": Runs on schema upgrade
+- "prepare-database-upgrade": Runs on Schema upgrade, ****DEPRECATED****
+- "plugins-initialized" : Runs after Sparrow plugins have been initialized
+- "add-routes": Runs before the sparrow API is mounted
+- "finalize-routes": Runs after the api router is mounted
+- "asgi-setup" : Runs after the api router is mounted
+- "register-tasks"
+- "api-v1-initialized"
 
 ### Adding a custom command
 

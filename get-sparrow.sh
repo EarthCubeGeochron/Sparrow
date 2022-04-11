@@ -33,6 +33,12 @@ abort() {
 
 ################################################################### script
 
+should_confirm=1
+if [ "$1" == "--no-confirm" ]; then
+  should_confirm=0
+  shift
+fi
+
 repo_name=EarthCubeGeochron/Sparrow
 
 platform=$(uname -s)
@@ -101,7 +107,7 @@ if [[ $platform == "Darwin" && ! $dist_dir == /Users* ]]; then
   line "\e[0m"
 fi
 
-header "The following locations will be written:"
+header "The following locations will be overwritten:"
 detail "\e[2m\e[1mTip:\e[0m\e[2m These can be adjusted using environment variables.\e[0m"
 bullet "$symlink \e[2m(Adjust using SPARROW_INSTALL_PATH or INSTALL_PATH)\e[0m"
 bullet "$dist_dir \e[2m(Adjust using SPARROW_DIST_DIR)"
@@ -119,15 +125,17 @@ if ! [ -w $install_path ]; then
     line
 fi
 
-# Ask for confirmation no matter what
-line "Would you like to continue? (y/N)"
-read -r answer
-
-if [[ $answer == "y" || $answer == "Y" || $answer == "yes" || $answer == "Yes" ]]
-then
-  line
+if ((should_confirm)); then
+  line "Would you like to continue? (y/N)"
+  read -r answer
+  if [[ $answer == "y" || $answer == "Y" || $answer == "yes" || $answer == "Yes" ]]
+  then
+    line
+  else
+    abort "Installation cancelled"
+  fi
 else
-  abort "Installation cancelled"
+  line "Skipping confirmation..."
 fi
 
 SUDO=""

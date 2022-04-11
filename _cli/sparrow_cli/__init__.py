@@ -9,7 +9,13 @@ from rich.console import Console
 from rich import print
 from sparrow_utils.logs import get_logger
 from .help import echo_help
-from .util.shell import cmd, exec_or_run, find_subcommand, container_id
+from .util.shell import (
+    cmd,
+    exec_or_run,
+    exec_backend_command,
+    find_subcommand,
+    container_id,
+)
 from .util.command_groups import SparrowDefaultCommand
 from .config import SparrowConfig
 from .config.environment import is_truthy
@@ -67,9 +73,11 @@ def main(ctx, args):
     if subcommand == "_docker-compose":
         # This is an internal, undocumented command that runs  a
         # 'bare' docker-compose, without applying Sparrow environment
-        return _docker_compose(*args)
+        return _docker_compose(*rest)
 
-    # Find sparrow configuration object
+    # Find sparrow configuration object, creating it if it doesn't exist.
+    # NOTE: This is the core of the Sparrow CLI configuration system, and
+    # the primary locus of setup work in the application.
     cfg = ctx.find_object(SparrowConfig)
 
     if subcommand in ["--help", "help"]:
@@ -89,7 +97,7 @@ def main(ctx, args):
         sys.exit(res.returncode)
 
     # If all else fails, try to run a subcommand in the "backend" Docker container
-    return exec_or_run("backend", "/app/sparrow/__main__.py", *args)
+    return exec_backend_command(ctx, *args)
 
 
 @cli.command(name="container-id")
@@ -100,12 +108,17 @@ def _container_id(container):
 
 @cli.command(name="shell")
 @click.argument("container", type=str, required=False, default=None)
-def shell(container):
+@click.pass_context
+def shell(ctx, container):
     """Get an iPython or container shell"""
     if container is not None:
-        return exec_or_run(container, "sh")
+        for shell in ["bash", "sh"]:
+            v = exec_or_run(container, shell)
+            if v.returncode == 0:
+                return
+        return
     print("Running [bold]iPython[/bold] shell in application context.")
-    exec_or_run("backend", "/app/sparrow/__main__.py shell")
+    exec_backend_command(ctx, "shell")
 
 
 add_commands(cli)
