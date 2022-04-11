@@ -1,11 +1,12 @@
 @use "sass:color";
 
-$accent: color.adjust(#a328b4, $lightness: -40%);
-$accent-active: color.adjust(#e126fa, $lightness: -40%);
-$accent-background: color.adjust(#ef7aff, $lightness: -40%);
+$accent-base: #6ebdd4;
+$accent: color.adjust($accent-base, $lightness: -30%);
+$accent-active: color.adjust($accent-base, $lightness: -20%);
+$accent-background: color.adjust($accent-base, $lightness: -40%);
 $gradient-dest: rgb(52, 45, 79);
 $gradient-light: color.adjust($gradient-dest, $lightness: 75%);
 $gradient-dark: color.adjust($gradient-dest, $lightness: -5%);
 $dark-card-base: color.adjust(#32536b, $lightness: -10%);
 $card-base: color.adjust(#32536b, $lightness: 60%);
-$accent-light: color.adjust($accent, $lightness: 20%);
+$accent-light: color.adjust($accent-base, $lightness: 30%);
