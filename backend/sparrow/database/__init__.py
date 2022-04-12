@@ -18,7 +18,7 @@ from .models import User, Project, Session, DatumType
 from .mapper import SparrowDatabaseMapper
 from sparrow.logs import get_logger
 from sparrow.utils import relative_path
-from sparrow.core.interface import ModelSchema, model_interface
+from sparrow.loader import ModelSchema, model_interface
 from sparrow.core.exceptions import DatabaseMappingError
 from .postgresql import on_conflict
 from .migration import SparrowDatabaseMigrator

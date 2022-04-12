@@ -1,5 +1,5 @@
 import collections
-from ..interface.converter import allowed_collections
+from sparrow.loader.converter import allowed_collections
 
 
 def nested_collection_path(start, end, allowed_collections=allowed_collections):

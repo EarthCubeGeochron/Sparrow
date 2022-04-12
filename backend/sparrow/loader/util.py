@@ -1,5 +1,6 @@
 from stringcase import pascalcase
-from marshmallow_sqlalchemy.fields import get_primary_keys
+#from marshmallow_sqlalchemy.fields import get_primary_keys
+from sparrow.database.mapper.util import primary_key
 
 
 def column_is_required(col):
@@ -28,18 +29,13 @@ def prop_is_required(prop):
     return any(cols)
 
 
-def primary_key(instance):
-    props = get_primary_keys(instance.__class__)
-    return {prop.key: getattr(instance, prop.key) for prop in props}
-
-
 def pk_values(instance):
     return primary_key(instance).values()
 
 
 def pk_data(model, data):
-    props = get_primary_keys(model)
-    keys = {prop.key: data.get(prop.key) for prop in props}
+    pk = primary_key(model)
+    keys = {key: data.get(key) for key in pk.keys()}
     return keys.values()
 
 

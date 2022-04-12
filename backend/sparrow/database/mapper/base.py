@@ -1,5 +1,4 @@
-from sparrow.core.interface import model_interface
-from sparrow.core.interface.util import primary_key
+from .util import primary_key
 
 
 class ModelHelperMixins:
@@ -21,6 +20,6 @@ class ModelHelperMixins:
         pk_ = ", ".join(vals)
         return f"{self.__class__.__name__}({pk_})"
 
-    def _schema(self, *args, **kwargs):
-        session = kwargs.pop("sqla_session", None)
-        return model_interface(self, session=session)(*args, **kwargs)
+    # def _schema(self, *args, **kwargs):
+    #     session = kwargs.pop("sqla_session", None)
+    #     return model_interface(self, session=session)(*args, **kwargs)

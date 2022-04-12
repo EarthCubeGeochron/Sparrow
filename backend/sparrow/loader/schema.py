@@ -9,7 +9,7 @@ from collections.abc import Mapping
 from sqlalchemy import inspect
 
 from .fields import SmartNested
-from ..exceptions import SparrowSchemaError
+from sparrow.core.exceptions import SparrowSchemaError
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter, allow_nest, exclude_fields
 

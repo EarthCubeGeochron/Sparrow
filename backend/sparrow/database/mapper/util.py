@@ -1,3 +1,11 @@
+def primary_key(instance):
+    """Get primary key properties for a SQLAlchemy model.
+    :param model: SQLAlchemy model class
+    """
+    mapper = instance.__class__.__mapper__
+    prop_list = [mapper.get_property_by_column(column) for column in mapper.primary_key]
+    return {prop.key: getattr(instance, prop.key) for prop in prop_list}
+
 def classname_for_table(table):
     if table.schema is not None:
         return f"{table.schema}_{table.name}"

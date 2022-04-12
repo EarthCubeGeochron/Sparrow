@@ -1,6 +1,6 @@
 from yaml import load
 from os import environ
-from sparrow.interface import load_data
+from sparrow.data_loader import load_data
 from click import command, echo, secho
 from pathlib import Path
 

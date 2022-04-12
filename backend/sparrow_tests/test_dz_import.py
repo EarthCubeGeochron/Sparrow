@@ -1,5 +1,5 @@
 from sparrow.core.util import relative_path
-from sparrow.core.interface import model_interface
+from sparrow.loader import model_interface
 from sparrow.core.ext.detrital_zircon import DetritalZirconTableImporter
 from pandas import read_csv
 from pytest import mark, fixture

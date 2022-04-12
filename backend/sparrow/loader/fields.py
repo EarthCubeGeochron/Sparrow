@@ -12,7 +12,7 @@ from marshmallow.utils import is_collection
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
 from .util import primary_key
-from ..logs import get_logger
+from sparrow.utils import get_logger
 
 log = get_logger(__name__)
 

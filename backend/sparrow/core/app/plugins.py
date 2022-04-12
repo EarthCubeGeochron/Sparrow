@@ -2,7 +2,7 @@ from ..task_manager import SparrowTaskManager
 from ..api import APIv2Plugin
 from ..legacy.api_v1 import APIv1Plugin
 from ..plugins import SparrowPluginManager
-from ..interface import InterfacePlugin
+from sparrow.loader import InterfacePlugin
 from ..auth import AuthPlugin
 from ..datasheet import DatasheetPlugin
 from ..project_edits import ProjectEdits
