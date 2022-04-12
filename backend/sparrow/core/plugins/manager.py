@@ -11,7 +11,7 @@ log = get_logger(__name__)
 def handle_compat_error(plugin):
     _error = (
         f"Plugin '{plugin.name}' is incompatible with Sparrow core "
-        f"version {sparrow.__version__} (expected {plugin.sparrow_version})"
+        f"version {sparrow.core.__version__} (expected {plugin.sparrow_version})"
     )
     log.error(_error)
     if issubclass(plugin, SparrowCorePlugin):
@@ -59,7 +59,7 @@ class SparrowPluginManager(object):
             raise SparrowPluginError(
                 f"Plugin '{plugin.name}' specifies an invalid Sparrow compatibility range '{plugin.sparrow_version}'"
             )
-        return Version(sparrow.__version__) in spec
+        return Version(sparrow.core.__version__) in spec
 
     def add(self, plugin):
         if not plugin.should_enable(self):

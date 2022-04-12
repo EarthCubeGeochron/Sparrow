@@ -18,11 +18,11 @@ if [ $SPARROW_ENV = 'development' ]; then
     --config python:sparrow.logs.config \
     --reload \
     --bind $HOST:$PORT \
-    "sparrow.__entry__:app"
+    "sparrow.core.__entry__:app"
 else
   exec hypercorn --bind $HOST:$PORT \
     -w 1 \
     --log-file - \
     --log-level warning \
-    "sparrow.__entry__:app"
+    "sparrow.core.__entry__:app"
 fi

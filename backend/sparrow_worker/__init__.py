@@ -6,7 +6,7 @@ import redis
 import json
 import time
 
-_app = sparrow.get_app()
+_app = sparrow.core.get_app()
 _app.setup_database()
 
 app = _app.plugins.get("task-manager").celery

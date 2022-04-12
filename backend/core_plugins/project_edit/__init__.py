@@ -1,7 +1,7 @@
 from flask import current_app
 from flask_restful import Resource
-from sparrow import get_logger
-from sparrow.legacy.api_v1 import (
+from sparrow.utils import get_logger
+from sparrow.core.legacy.api_v1 import (
     APIResourceCollection,
     ModelEditParser,
     get_jwt_identity,
