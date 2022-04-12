@@ -3,7 +3,8 @@ from json import loads
 from pytest import fixture, raises, mark
 from sparrow.core.auth.test_auth import admin_client
 from starlette.websockets import WebSocketDisconnect
-from .base import SparrowTaskError, task, create_args_schema
+from sparrow.core import task
+from sparrow.core.task_manager.base import SparrowTaskError, create_args_schema
 
 
 @task(name="hello")

@@ -3,7 +3,7 @@ from sparrow.core.plugins import SparrowPlugin
 from sparrow.core.context import get_database
 from json import load
 from sys import stdin
-from sparrow.core.database.postgresql import on_conflict
+from sparrow.database.postgresql import on_conflict
 from sparrow.utils.logs import setup_stderr_logs
 from time import time
 

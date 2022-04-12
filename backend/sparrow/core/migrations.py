@@ -1,5 +1,5 @@
-from .database.migration import SparrowMigration, has_column, has_table
-from .database.util import run_sql
+from sparrow.database.migration import SparrowMigration, has_column, has_table
+from sparrow.database.util import run_sql
 from sqlalchemy.orm import sessionmaker
 from schemainspect import get_inspector
 

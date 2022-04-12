@@ -9,7 +9,7 @@ from .util import with_database, with_app, with_full_app
 from .user import create_user, list_users, reset_password
 from ..util import working_directory
 from ..context import get_sparrow_app
-from ..database.migration import db_migration
+from sparrow.database.migration import db_migration
 from sparrow.utils.logs import setup_stderr_logs
 from typing import Optional
 from ..plugins import SparrowPlugin

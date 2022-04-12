@@ -1,5 +1,5 @@
 from click import echo, style, prompt, secho
-from ..database.models import User
+from sparrow.database.models import User
 
 
 def _create_user(db, username, password):

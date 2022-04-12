@@ -1,7 +1,7 @@
 import click
 from click import echo, secho, style, prompt
 from sqlalchemy.exc import IntegrityError
-from ..database.models import User
+from sparrow.database.models import User
 
 
 def _create_user(db, username, password, raise_on_error=True):

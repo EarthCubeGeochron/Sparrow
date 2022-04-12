@@ -10,7 +10,7 @@ from sparrow.logs import get_logger
 from .app import Sparrow
 from .task_manager import task
 from .plugins import SparrowPlugin
-from .database import Database
+from sparrow.database import Database
 from .context import get_sparrow_app, get_plugin, get_database
 
 # Support some more concise signatures

@@ -18,9 +18,9 @@ def omit_key(changeset, key):
 class TestProjectImport:
     def test_import_dumpfile(self, db, caplog):
         data = json_fixture("project-dump.json")
-        # with caplog.at_level(logging.INFO, logger="sparrow.interface.schema"):
-        #    # So we don't get spammed with output
-        db.load_data("project", data["data"])
+        with caplog.at_level(logging.INFO, logger="sparrow.core.interface.schema"):
+            #    # So we don't get spammed with output
+            db.load_data("project", data["data"])
 
     def test_retrieve_dumpfile(self, db, caplog):
         data = json_fixture("project-dump.json")["data"]

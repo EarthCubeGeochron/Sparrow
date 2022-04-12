@@ -31,7 +31,7 @@ from ..filters import (
     TagsFilter,
 )
 from sparrow.core.open_search.filter import OpenSearchFilter
-from ...database.mapper.util import classname_for_table
+from sparrow.database.mapper.util import classname_for_table
 from ...logs import get_logger
 from ...util import relative_path
 from ..api_info import (

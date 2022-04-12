@@ -1,9 +1,9 @@
 from sparrow.core.migrations import InstrumentSessionMigration
-from sparrow.core.database.migration import create_schema_clone
+from sparrow.database.migration import create_schema_clone
 from sparrow.core.app import Sparrow
 from sparrow.utils import relative_path, cmd
-from sparrow.core.database.migration import _create_migration
-from sparrow.core.database.util import connection_args, temp_database
+from sparrow.database.migration import _create_migration
+from sparrow.database.util import connection_args, temp_database
 from pytest import mark, fixture
 
 target_db = "postgresql://postgres@db:5432/sparrow_test"

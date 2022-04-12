@@ -1,6 +1,6 @@
 from pytest import fixture
 from sparrow.core.auth.test_auth import is_forbidden, verify_credentials, admin_client
-from sparrow.core.database.models import User
+from sparrow.database.models import User
 
 
 def user_exists(db, username):

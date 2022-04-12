@@ -2,7 +2,7 @@ import json
 
 from sqlalchemy.exc import IntegrityError
 from sparrow.core.app import Sparrow
-from sparrow.core.database.mapper import BaseModel
+from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from datetime import datetime

@@ -2,7 +2,7 @@ from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
 from starlette.authentication import requires, AuthenticationError
 from webargs_starlette import use_annotations
-from sparrow.core.database.models import User
+from sparrow.database.models import User
 from sparrow.core.context import get_sparrow_app, get_database
 from sparrow.logs import get_logger
 

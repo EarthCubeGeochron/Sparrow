@@ -6,7 +6,7 @@ from starlette.responses import JSONResponse
 
 from ..exceptions import ValidationError
 from ..response import APIResponse
-from ...database.mapper.util import classname_for_table
+from sparrow.database.mapper.util import classname_for_table
 from ...logs import get_logger
 from ...context import get_database
 

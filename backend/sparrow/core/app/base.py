@@ -15,7 +15,7 @@ from webargs_starlette import WebargsHTTPException
 from sparrow.core import settings
 from ..logs import get_logger
 from .plugins import prepare_plugin_manager, SparrowPluginManager
-from ..database.util import wait_for_database
+from sparrow.database.util import wait_for_database
 from ..startup import tables_exist
 
 log = get_logger(__name__)
@@ -53,7 +53,7 @@ class Sparrow(Starlette):
     def __ensure_database(self):
         if self.db is not None:
             return
-        from ..database import Database
+        from sparrow.database import Database
 
         self.db = Database(self.__db_url, self)
 

@@ -1,6 +1,6 @@
 import os
 from contextlib import contextmanager
-from sparrow.core.database.util import temp_database
+from sparrow.database.util import temp_database
 from sqlalchemy_utils import drop_database
 
 

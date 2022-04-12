@@ -3,8 +3,8 @@ from sqlalchemy import text
 from sparrow import core
 from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.core.task_manager.base import task
-from sparrow.core.database.migration import SparrowMigration, has_column
-from sparrow.core.database.util import run_sql_file
+from sparrow.database.migration import SparrowMigration, has_column
+from sparrow.database.util import run_sql_file
 
 from .base import OpenSearchAPI
 

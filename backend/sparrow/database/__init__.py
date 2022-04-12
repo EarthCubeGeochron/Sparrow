@@ -16,13 +16,13 @@ from marshmallow import RAISE, EXCLUDE
 from .util import run_sql_file, run_query, get_or_create, run_sql_query_file
 from .models import User, Project, Session, DatumType
 from .mapper import SparrowDatabaseMapper
-from ..logs import get_logger
-from ..util import relative_path
-from ..interface import ModelSchema, model_interface
-from ..exceptions import DatabaseMappingError
+from sparrow.logs import get_logger
+from sparrow.utils import relative_path
+from sparrow.core.interface import ModelSchema, model_interface
+from sparrow.core.exceptions import DatabaseMappingError
 from .postgresql import on_conflict
 from .migration import SparrowDatabaseMigrator
-from ..settings import ECHO_SQL
+from sparrow.core.settings import ECHO_SQL
 
 metadata = MetaData()
 

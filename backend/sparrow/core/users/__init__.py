@@ -5,7 +5,7 @@ from starlette.routing import Route, Router
 from starlette.authentication import requires
 from starlette.responses import JSONResponse
 from sparrow.core.plugins import SparrowCorePlugin
-from sparrow.core.database.models import User
+from sparrow.database.models import User
 from sparrow.core.api import APIResponse, SparrowAPIError
 from sparrow.core.context import get_database
 from sparrow.core.auth import get_backend

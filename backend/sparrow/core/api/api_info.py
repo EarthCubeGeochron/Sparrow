@@ -1,6 +1,6 @@
 from yaml import safe_load
 from ..util import relative_path
-from ..database.mapper.util import classname_for_table
+from sparrow.database.mapper.util import classname_for_table
 
 
 with open(relative_path(__file__, ".", "api-help.yaml"), "r") as f:

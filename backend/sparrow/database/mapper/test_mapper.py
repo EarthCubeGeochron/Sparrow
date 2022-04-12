@@ -1,4 +1,4 @@
-from . import BaseModel, SparrowDatabaseMapper
+from sparrow.database.mapper import BaseModel, SparrowDatabaseMapper
 
 
 def test_db_mapper_cache(db):
