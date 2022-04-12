@@ -4,8 +4,11 @@ skip-magic-trailing-comma = true
 target-version = ['py38']
 
 [tool.pylint.messages_control]
-line-length = 88
+
+max-line-length = 88
+
 disable = [
   "missing-docstring",
-  "unused-argument",
+  "missing-class-docstring",
+  "too-few-public-methods",
 ]
