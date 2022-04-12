@@ -2,7 +2,7 @@ from contextlib import redirect_stdout
 from .helpers import json_fixture
 from deepdiff import DeepDiff
 from json import dumps, loads
-from sparrow.encoders import JSONEncoder
+from sparrow.core.encoders import JSONEncoder
 from sqlalchemy import event
 from sqlalchemy.orm import joinedload
 from marshmallow import EXCLUDE

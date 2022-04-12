@@ -1,7 +1,7 @@
 from .helpers import json_fixture
-from sparrow.api.endpoints.utils import create_location_from_coordinates
-from sparrow.api.utils import nested_collection_joins, nested_collection_path
-from sparrow.database.util import get_db_model
+from sparrow.core.api.endpoints.utils import create_location_from_coordinates
+from sparrow.core.api.utils import nested_collection_joins, nested_collection_path
+from sparrow.core.database.util import get_db_model
 from pytest import mark
 import datetime
 import json

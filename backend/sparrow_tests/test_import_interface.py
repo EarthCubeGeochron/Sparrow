@@ -1,14 +1,14 @@
 import json
 
 from sqlalchemy.exc import IntegrityError
-from sparrow.app import Sparrow
-from sparrow.database.mapper import BaseModel
+from sparrow.core.app import Sparrow
+from sparrow.core.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from datetime import datetime
 from pytest import mark, raises
 from sparrow.logs import get_logger
-from sparrow.encoders import JSONEncoder
+from sparrow.core.encoders import JSONEncoder
 from json import dumps
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.exc import IntegrityError

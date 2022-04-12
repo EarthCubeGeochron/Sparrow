@@ -1,7 +1,7 @@
 from pytest import fixture
 from geoalchemy2.shape import from_shape
 from shapely.geometry import shape
-from sparrow.interface import model_interface
+from sparrow.core.interface import model_interface
 import logging
 
 test_sample = {

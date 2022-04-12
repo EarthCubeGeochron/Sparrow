@@ -1,8 +1,8 @@
 from json.decoder import JSONDecodeError
-from sparrow.import_helpers.util import SparrowImportError
+from sparrow.core.import_helpers.util import SparrowImportError
 from click import command, secho, option
 from sparrow.core.plugins.base import SparrowPlugin
-from sparrow.import_helpers import BaseImporter
+from sparrow.core.import_helpers import BaseImporter
 from os import path, environ
 from json import loads, JSONDecodeError
 from rich import print
