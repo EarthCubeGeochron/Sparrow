@@ -6,7 +6,6 @@ authors = ["Daven Quinn <dev@davenquinn.com>"]
 packages = [
   {include= "sparrow"},
   {include = "core_plugins"},
-  {include = "sparrow_tests"},
   {include = "sparrow_worker"},
 ]
 

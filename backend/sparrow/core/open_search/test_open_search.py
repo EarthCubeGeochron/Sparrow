@@ -1,5 +1,5 @@
 import sparrow
-from sparrow_tests.helpers import json_fixture
+from sparrow.tests.helpers import json_fixture
 from sqlalchemy import Table, or_
 from .filter import get_document_tables
 from pytest import mark

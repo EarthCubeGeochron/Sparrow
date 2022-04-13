@@ -3,13 +3,13 @@
 Initialize database and dump data into it.
 """
 from sparrow.app import App
-from sparrow_tests.helpers.database import testing_database, connection_args
-from sparrow_tests.test_dz_import import import_dz_test_data
+from sparrow.tests.helpers.database import testing_database, connection_args
+from sparrow.tests.test_dz_import import import_dz_test_data
 from sparrow.core.util import run
 from sys import stderr, stdout
 from contextlib import redirect_stdout
 from sparrow.logs import console_handler, get_logger
-from sparrow_tests.fixtures import basic_project
+from sparrow.tests.fixtures import basic_project
 import logging
 
 log = get_logger(level=logging.WARNING, handler=console_handler)

@@ -5,7 +5,7 @@ from sparrow.core.app import Sparrow
 from sparrow.core.context import _setup_context
 from sparrow.birdbrain.utils import wait_for_database
 from sparrow.core.auth.create_user import _create_user
-from sparrow_tests.helpers.database import testing_database
+from sparrow.tests.helpers.database import testing_database
 from sqlalchemy.orm import Session
 from sqlalchemy import event
 
