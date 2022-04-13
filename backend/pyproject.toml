@@ -115,7 +115,7 @@ watchdog = "2.1.2"
 argh = "0.26.2"
 pydantic = "1.8.2"
 
-typer = "0.3.2"
+typer = "0.4.1"
 sqlakeyset = "^1.0.1629029818"
 
 [tool.poetry.dev-dependencies]

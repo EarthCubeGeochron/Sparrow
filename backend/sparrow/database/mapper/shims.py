@@ -41,7 +41,3 @@ def _is_many_to_many(automap_base, table):
         fk_constraints[1].elements[0].column.table,
         fk_constraints,
     )
-
-
-# Apply the hotfix to the SQLAlchemy model.
-automap._is_many_to_many = _is_many_to_many

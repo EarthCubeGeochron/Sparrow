@@ -11,7 +11,7 @@ from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from collections import defaultdict
 from starlette_apispec import APISpecSchemaGenerator
-from sparrow.database.mapper.util import classname_for_table
+from sparrow.database import classname_for_table
 from .endpoints.selectables.data_file import (
     DataFileListEndpoint,
     DataFileFilterByModelID,
