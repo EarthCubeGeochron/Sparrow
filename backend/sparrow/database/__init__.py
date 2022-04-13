@@ -20,7 +20,7 @@ from sparrow.logs import get_logger
 from sparrow.utils import relative_path
 from sparrow.loader import ModelSchema, model_interface
 from sparrow.core.exceptions import DatabaseMappingError
-from .postgresql import on_conflict
+from sparrow.database.postgresql import on_conflict
 from .migration import SparrowDatabaseMigrator
 from sparrow.core.settings import ECHO_SQL
 

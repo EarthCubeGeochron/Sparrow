@@ -1,26 +1,27 @@
-import threading
 from contextlib import contextmanager
+from contextvars import ContextVar
 
 from sqlalchemy.exc import CompileError
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import Insert
 from sqlalchemy.dialects import postgresql
 
-state = threading.local()
+_import_mode = ContextVar("import-mode", default="restrict")
 
 # https://stackoverflow.com/questions/33307250/postgresql-on-conflict-in-sqlalchemy/62305344#62305344
 @contextmanager
 def on_conflict(action="restrict"):
-    state.on_conflict = action
-    yield
-    del state.on_conflict
+    token = _import_mode.set(action)
+    try:
+        yield
+    finally:
+        _import_mode.reset(token)
 
 
 @compiles(Insert, "postgresql")
 def prefix_inserts(insert, compiler, **kw):
     """Conditionally adapt insert statements to use on-conflict resolution (a PostgreSQL feature)"""
-    action = getattr(state, "on_conflict", "restrict")
-
+    action = _import_mode.get()
     if action == "do-update":
         try:
             params = insert.compile().params

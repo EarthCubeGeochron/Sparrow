@@ -231,12 +231,12 @@ class ModelSchema(SQLAlchemyAutoSchema):
             instance = query.first()
 
             if instance is not None:
-                log.debug(msg + f"...success!\n...filters: {filters}")
+                log.info(msg + f"...success!\n...filters: {filters}")
                 for k, v in data.items():
                     setattr(instance, k, v)
                 return instance
             else:
-                log.debug(msg + f"...none found\n...filters: {filters}")
+                log.info(msg + f"...none found\n...filters: {filters}")
             log.debug(data)
         return super().get_instance(data)
 
