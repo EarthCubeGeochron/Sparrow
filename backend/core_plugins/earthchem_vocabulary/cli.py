@@ -9,8 +9,8 @@ once a stable plugin system is created.
 """
 
 import pandas as P
-from sparrow.database import Database
-from sparrow.database.util import run_sql
+from sparrow.database import Database, run_sql
+from sparrow.birdbrain.utils import run_sql
 from os.path import join, realpath, dirname
 from click import command, option
 

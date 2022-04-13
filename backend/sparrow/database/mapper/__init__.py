@@ -1,19 +1,10 @@
-from typing_extensions import Self
-from sqlalchemy.schema import Table
-from sqlalchemy import MetaData
 from sqlalchemy.ext import automap
-from sqlalchemy.ext.automap import automap_base, generate_relationship
-from sqlalchemy.ext.declarative import declarative_base
-from os import path, makedirs
+from sqlalchemy.ext.automap import generate_relationship
+from os import path
 from sparrow.utils.logs import get_logger
-from sqlalchemy.ext.automap import automap_base
-from pickle import load, dump
-from sparrow.birdbrain.mapper import DatabaseModelCacher
-from sparrow.birdbrain.mapper.base import ModelHelperMixins
+from sparrow.birdbrain.mapper import DatabaseModelCache
 from sparrow.birdbrain import DatabaseMapper
 
-# Drag in geographic types for database reflection
-from geoalchemy2 import Geometry, Geography
 from .shims import _is_many_to_many
 
 log = get_logger(__name__)
@@ -38,19 +29,18 @@ class AutomapError(Exception):
     pass
 
 
-model_builder = DatabaseModelCacher()
+cache_path = path.join(path.expanduser("~"), ".sqlalchemy-cache", "sparrow-db-cache.pickle")
 
-BaseModel = model_builder()
+model_builder = DatabaseModelCache(cache_path)
+BaseModel = model_builder.automap_base()
 
 class SparrowDatabaseMapper(DatabaseMapper):
-    automap_base = None
-    automap_error = None
-    _models = None
-    _tables = None
+    automap_base = BaseModel
 
     def __init__(self, db, use_cache=True, reflect=True):
         # Apply the hotfix to the SQLAlchemy model.
         automap._is_many_to_many = _is_many_to_many
+        super().__init__(db, generate_relationship=_gen_relationship)
 
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare
         # TODO: add the process flow described below:
@@ -58,4 +48,4 @@ class SparrowDatabaseMapper(DatabaseMapper):
         self.db = db
         self.automap_base = BaseModel
         if reflect:
-            self.reflect_database(use_cache=use_cache)
+            self.reflect_database(schemas=["vocabulary", "core_view", "tags", "public"], use_cache=use_cache)

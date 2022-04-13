@@ -1,11 +1,11 @@
 from click import command, argument, File
-from sparrow.core.plugins import SparrowPlugin
-from sparrow.core.context import get_database
 from json import load
 from sys import stdin
-from sparrow.database.postgresql import on_conflict
-from sparrow.utils.logs import setup_stderr_logs
 from time import time
+from sparrow.core.plugins import SparrowPlugin
+from sparrow.core.context import get_database
+from sparrow.birdbrain import on_conflict
+from sparrow.logs import setup_stderr_logs
 
 
 @command(name="validate-data")

@@ -9,7 +9,7 @@ from sqlalchemy import text
 import os
 from rich import print
 
-from .util import _exec_raw_sql, run_sql, temp_database, connection_args
+from sparrow.birdbrain.utils import _exec_raw_sql, run_sql, temp_database, connection_args
 
 
 log = get_logger(__name__)
