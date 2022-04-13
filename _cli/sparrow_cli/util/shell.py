@@ -80,11 +80,11 @@ def exec_backend_command(ctx, *args, **kwargs):
     if cfg.verbose:
         args = ["--verbose"] + list(args)
 
-    return exec_or_run("backend", "/app/sparrow/core/__main__.py", *args, **kwargs)
+    return exec_or_run("backend", "poetry run python -m sparrow", *args, **kwargs)
 
 
 def exec_sparrow(*args, **kwargs):
-    return exec_or_run("backend", "/app/sparrow/core/__main__.py", *args, **kwargs)
+    return exec_or_run("backend", "poetry run python -m sparrow", *args, **kwargs)
 
 
 def fail_without_docker():

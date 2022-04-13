@@ -22,8 +22,8 @@ numpy = "^1.22.3"
 pandas = "*"
 uvloop = "*"
 
-"sparrow.birdbrain" = {path = "shared-modules/birdbrain"}
-"sparrow.utils" = {path = "shared-modules/utils"}
+"sparrow.birdbrain" = {path = "./shared-modules/birdbrain", develop = true }
+"sparrow.utils" = {path = "./shared-modules/utils", develop = true }
 sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
 # Legacy application
 Flask = "1.1.4"
