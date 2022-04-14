@@ -2,21 +2,16 @@ let path = require("path");
 const { EnvironmentPlugin } = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
-const DotenvPlugin = require("dotenv-webpack");
 
 const environment = process.env.SPARROW_ENV || "production";
 
-const isDev = process.env.SPARROW_ENV == "development";
+const isDev = environment != "production";
 const mode = isDev ? "development" : "production";
 console.log(`Bundling frontend for ${environment}`);
 
-// Create HTML template configuration
-let htmlConfig = {
-  title: process.env.SPARROW_LAB_NAME,
-  favicon: relativePath("static/img/favicon.png"),
-};
-if (environment == "development") {
-  htmlConfig.template = relativePath("_webpack/dev-template.ejs");
+if (environment == "local-development") {
+  // Read .env file from local directory
+  require("dotenv").config({ path: "./.env" });
 }
 
 process.env["BASE_URL"] =
@@ -31,23 +26,29 @@ let assetsDir =
   process.env.SPARROW_FRONTEND_BUILD_DIR || relativePath("_assets");
 let srcRoot = relativePath("src");
 
-let assetsRoute = process.env.SPARROW_BASE_URL || process.env.BASE_URL;
+let assetsRoute = "/"; //process.env.SPARROW_BASE_URL || process.env.BASE_URL || "/";
 
 let baseConfig = {
   mode,
-  watch: isDev,
+  devServer: {
+    compress: true,
+    port: 3000,
+    hot: true,
+    open: true,
+    historyApiFallback: true,
+  },
   module: {
     rules: require("./loaders"),
   },
   devtool: "source-map",
   resolve: {
     // Resolve node modules from Sparrow's own node_modules if not found in plugins
-    modules: [
-      "packages",
-      "_local_modules",
-      "node_modules",
-      relativePath("node_modules"),
-    ],
+    // modules: [
+    //   "packages",
+    //   "_local_modules",
+    //   "node_modules",
+    //   relativePath("node_modules"),
+    // ],
     extensions: [
       ".ts",
       ".tsx",
@@ -69,9 +70,10 @@ let baseConfig = {
       // For node module resolution + hooks
       react: relativePath("node_modules", "react"),
     },
+    fallback: { path: false, process: false },
   },
   entry: {
-    index: relativePath("src/index.ts"),
+    main: "./src/index.ts",
   },
   stats: {
     colors: true,
@@ -90,9 +92,10 @@ let baseConfig = {
     },
   },
   plugins: [
-    new HtmlWebpackPlugin(htmlConfig),
-    // This allows us to use a local .env file in development to set some variables
-    new DotenvPlugin({ silent: true }),
+    new HtmlWebpackPlugin({
+      title: process.env.SPARROW_LAB_NAME,
+      favicon: relativePath("static/img/favicon.png"),
+    }),
     new EnvironmentPlugin([
       "BASE_URL",
       "SPARROW_LAB_NAME",
@@ -105,6 +108,7 @@ let baseConfig = {
 // Add browserSync plugin if we are in dev mode.
 if (environment == "development") {
   const domain = `localhost:${process.env.SPARROW_HTTP_PORT || "5002"}`;
+
   console.log(`Running browserSync at ${domain}`);
   let browserSync = new BrowserSyncPlugin({
     open: false,
@@ -115,6 +119,7 @@ if (environment == "development") {
     },
   });
 
+  baseConfig.watch = true;
   baseConfig.plugins.push(browserSync);
 }
 

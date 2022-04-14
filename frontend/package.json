@@ -86,12 +86,13 @@
     "babel-plugin-emotion": "^10.0.7",
     "browser-sync": "^2.26.3",
     "browser-sync-webpack-plugin": "^2.2.2",
-    "coffee-loader": "^0.9.0",
+    "coffee-loader": "^3.0.0",
     "coffeescript": "^2.3.2",
     "css-loader": "^3.0.0",
-    "file-loader": "^3.0.1",
-    "html-loader": "^0.5.5",
-    "html-webpack-plugin": "^4.3.0",
+    "dotenv": "^16.0.0",
+    "file-loader": "^6.2.0",
+    "html-loader": "^3.1.0",
+    "html-webpack-plugin": "^5.5.0",
     "husky": "4.2.5",
     "lerna": "^3.22.1",
     "lint-staged": "10.2.11",
@@ -101,7 +102,8 @@
     "stylus": "^0.54.5",
     "stylus-relative-loader": "^4.0.0",
     "webpack": "^5.72.0",
-    "webpack-cli": "^4.9.2"
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.8.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
