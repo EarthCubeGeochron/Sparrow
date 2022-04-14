@@ -31,9 +31,9 @@ let assetsRoute = "/"; //process.env.SPARROW_BASE_URL || process.env.BASE_URL ||
 let baseConfig = {
   mode,
   devServer: {
-    compress: true,
+    compress: false,
     port: 3000,
-    hot: true,
+    //hot: true,
     open: true,
     historyApiFallback: true,
   },
@@ -82,6 +82,7 @@ let baseConfig = {
     path: assetsDir,
     publicPath: assetsRoute,
     filename: "[name].js",
+    devtoolModuleFilenameTemplate: "file:///[absolute-resource-path]",
   },
   // Always split chunks
   // We could turn this off in development if we wanted.
