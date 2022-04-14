@@ -9,3 +9,6 @@ _docker
 .cache/
 .pytest_cache
 .parcel-cache
+
+# Ignore files present on other branches
+backend/shared-modules
