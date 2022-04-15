@@ -1,6 +1,6 @@
 import h, { C, compose } from "@macrostrat/hyper";
 import { useEffect } from "react";
-import { join } from "path";
+import join from "url-join";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import loadable from "@loadable/component";
 import siteContent from "site-content";
@@ -17,8 +17,6 @@ import { PageStyle } from "~/components/page-skeleton";
 import HomePage from "./homepage";
 import Catalog from "./catalog";
 import { Frame } from "./frame";
-
-//import { MapSelector } from "./data-sheet/sheet-enter-components";
 
 const APIExplorerV2 = loadable(async function () {
   const module = await import("./api-v2");
@@ -89,6 +87,7 @@ const errorHandler = function (route, response) {
 function App() {
   // Nest application in React context providers
   const baseURL = process.env.BASE_URL ?? "/";
+  console.log(baseURL);
   const apiBaseURL = join(process.env.BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
 
   return h(

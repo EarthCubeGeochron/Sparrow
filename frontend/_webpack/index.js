@@ -14,8 +14,7 @@ if (environment == "local-development") {
   require("dotenv").config({ path: "./.env" });
 }
 
-process.env["BASE_URL"] =
-  process.env.API_BASE_URL || process.env.SPARROW_BASE_URL;
+process.env.BASE_URL = process.env.API_BASE_URL || process.env.SPARROW_BASE_URL;
 /* BrowserSync allows us to automatically reload the Sparrow frontend in development */
 
 function relativePath(...tokens) {

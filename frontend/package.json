@@ -41,7 +41,6 @@
     "babel-polyfill": "^6.26.0",
     "d3-array": "^2.0.3",
     "date-fns": "^1.30.1",
-    "dotenv-webpack": "^7.1.0",
     "emotion": "^10.0.7",
     "html2canvas": "^1.0.0-rc.7",
     "immutability-helper": "^2.9.0",
@@ -69,7 +68,8 @@
     "react-virtualized": "^9.21.2",
     "react-window": "^1.8.6",
     "store": "^2.0.12",
-    "swagger-ui-react": "^3.34.0",
+    "swagger-ui-react": "^4.10.3",
+    "url-join": "^5.0.0",
     "use-resize-observer": "^7.0.1",
     "use-supercluster": "0.2.8",
     "viewport-mercator-project": "^6.2.2"

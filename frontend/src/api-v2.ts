@@ -8,7 +8,7 @@ import {
 } from "@macrostrat/ui-components";
 import { NavButton } from "~/components";
 import { Card } from "@blueprintjs/core";
-import { join } from "path";
+import join from "url-join";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useCallback, useContext, useState } from "react";
 
