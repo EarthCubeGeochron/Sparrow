@@ -41,7 +41,7 @@ export function APIExplorerV2(props) {
 }
 
 export const APIV2Context = createAPIContext({
-  baseURL: join(process.env.BASE_URL ?? "/", "/api/v2"),
+  baseURL: join(process.env.API_BASE_URL ?? "/", "/api/v2"),
 });
 
 export function useAPIv2Result(

@@ -87,8 +87,7 @@ const errorHandler = function (route, response) {
 function App() {
   // Nest application in React context providers
   const baseURL = process.env.BASE_URL ?? "/";
-  console.log(baseURL);
-  const apiBaseURL = join(process.env.BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
+  const apiBaseURL = join(process.env.API_BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
 
   return h(
     compose(

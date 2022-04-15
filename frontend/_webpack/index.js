@@ -14,7 +14,9 @@ if (environment == "local-development") {
   require("dotenv").config({ path: "./.env" });
 }
 
-process.env.BASE_URL = process.env.API_BASE_URL || process.env.SPARROW_BASE_URL;
+console.log(process.env);
+
+//process.env.BASE_URL = process.env.API_BASE_URL || process.env.SPARROW_BASE_URL;
 /* BrowserSync allows us to automatically reload the Sparrow frontend in development */
 
 function relativePath(...tokens) {
@@ -25,7 +27,7 @@ let assetsDir =
   process.env.SPARROW_FRONTEND_BUILD_DIR || relativePath("_assets");
 let srcRoot = relativePath("src");
 
-let assetsRoute = "/"; //process.env.SPARROW_BASE_URL || process.env.BASE_URL || "/";
+let assetsRoute = process.env.BASE_URL || "/";
 
 let baseConfig = {
   mode,
@@ -98,6 +100,7 @@ let baseConfig = {
     }),
     new EnvironmentPlugin([
       "BASE_URL",
+      "API_BASE_URL",
       "SPARROW_LAB_NAME",
       "MAPBOX_API_TOKEN",
       "SPARROW_ENV",
