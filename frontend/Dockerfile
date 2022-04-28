@@ -4,7 +4,7 @@ FROM node:14 AS base
 RUN npm install -g webpack webpack-cli nodemon
 WORKDIR /app
 
-CMD npm run dev
+CMD npm run dev:docker
 
 FROM base AS frontend
 

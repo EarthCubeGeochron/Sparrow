@@ -8,7 +8,7 @@ import {
 } from "@macrostrat/ui-components";
 import { NavButton } from "~/components";
 import { Card } from "@blueprintjs/core";
-import { join } from "path";
+import join from "url-join";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useCallback, useContext, useState } from "react";
 
@@ -41,7 +41,7 @@ export function APIExplorerV2(props) {
 }
 
 export const APIV2Context = createAPIContext({
-  baseURL: join(process.env.BASE_URL ?? "/", "/api/v2"),
+  baseURL: join(process.env.API_BASE_URL ?? "/", "/api/v2"),
 });
 
 export function useAPIv2Result(

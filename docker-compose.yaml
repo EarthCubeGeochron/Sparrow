@@ -85,7 +85,6 @@ services:
       - ${SPARROW_HTTP_PORT:-5002}:80
     volumes:
       - ./nginx-config/locations/core.conf:/etc/nginx/locations/core.conf:ro
-      - ./nginx-config/locations/browser-sync.conf:/etc/nginx/locations/browser-sync.conf:ro
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend: 
@@ -122,7 +121,8 @@ services:
       - CONTAINERIZED=1
       - SPARROW_LAB_NAME
       - SPARROW_ECHO_SQL
-      - SPARROW_BASE_URL
+      - BASE_URL=${SPARROW_BASE_URL:-/}
+      - API_BASE_URL=${SPARROW_BASE_URL:-/}
       # We need to forward SPARROW_HTTP_PORT to the frontend so that we can
       # load BrowserSync on the correct port if in development mode
       - SPARROW_HTTP_PORT
