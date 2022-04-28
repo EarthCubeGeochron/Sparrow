@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
-import MapGl, { FlyToInterpolator, Marker } from "react-map-gl";
+import MapGl, { FlyToInterpolator, Marker, Source, Layer } from "react-map-gl";
 import h from "@macrostrat/hyper";
 import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
@@ -13,7 +13,6 @@ import { MapNav } from "./components/map-nav";
 import styles from "./module.styl";
 import { ShortSiteTitle } from "~/components";
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
-import { Viewport } from "viewport-mercator-project";
 
 function changeStateOnParams(params, setData) {
   const { get } = useAPIActions(APIV2Context);
@@ -174,6 +173,19 @@ export function MapPanel({
     }
   };
 
+  const features = (initialData?.data ?? []).map((d) => {
+    return {
+      type: "Feature",
+      geometry: d.location,
+      properties: {
+        id: d.id,
+        name: d.name,
+      },
+    };
+  });
+
+  console.log(initialData);
+
   return h("div.map-container", [
     h("div.layer-button", [
       h.if(on_map)(Navbar, { className: styles["map-navbar"] }, [
@@ -218,6 +230,24 @@ export function MapPanel({
           ref: mapRef,
         },
         [
+          h(
+            Source,
+            {
+              id: "sparrow-data",
+              type: "geojson",
+              data: { type: "FeatureCollection", features },
+            },
+            [
+              h(Layer, {
+                id: "point",
+                type: "circle",
+                paint: {
+                  "circle-radius": 3,
+                  "circle-color": "#007cbf",
+                },
+              }),
+            ]
+          ),
           h.if(state.clickPnt.lng && on_map)(
             Marker,
             {
@@ -228,12 +258,6 @@ export function MapPanel({
             },
             h(Icon, { icon: "map-marker", color: "black" })
           ),
-          h.if(state.showMarkers)(MarkerCluster, {
-            data: initialData,
-            viewport,
-            changeViewport,
-            bounds,
-          }),
         ]
       ),
     ]),
