@@ -122,7 +122,7 @@ services:
       - SPARROW_LAB_NAME
       - SPARROW_ECHO_SQL
       - BASE_URL=${SPARROW_BASE_URL:-/}
-      - API_BASE_URL="${SPARROW_BASE_URL:-/}/api"
+      - API_BASE_URL=${SPARROW_BASE_URL:-/}
       # We need to forward SPARROW_HTTP_PORT to the frontend so that we can
       # load BrowserSync on the correct port if in development mode
       - SPARROW_HTTP_PORT
