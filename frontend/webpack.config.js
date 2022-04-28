@@ -18,7 +18,7 @@ if (environment == "local-development") {
 /* BrowserSync allows us to automatically reload the Sparrow frontend in development */
 
 function relativePath(...tokens) {
-  return path.resolve(__dirname, "..", ...tokens);
+  return path.resolve(__dirname, ...tokens);
 }
 
 let assetsDir =

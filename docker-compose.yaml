@@ -121,7 +121,8 @@ services:
       - CONTAINERIZED=1
       - SPARROW_LAB_NAME
       - SPARROW_ECHO_SQL
-      - SPARROW_BASE_URL
+      - BASE_URL=${SPARROW_BASE_URL:-/}
+      - API_BASE_URL="${SPARROW_BASE_URL:-/}/api"
       # We need to forward SPARROW_HTTP_PORT to the frontend so that we can
       # load BrowserSync on the correct port if in development mode
       - SPARROW_HTTP_PORT
