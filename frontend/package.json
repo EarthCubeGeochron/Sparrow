@@ -84,8 +84,6 @@
     "@babel/preset-typescript": "^7.10.1",
     "babel-loader": "^8.1.0",
     "babel-plugin-emotion": "^10.0.7",
-    "browser-sync": "^2.26.3",
-    "browser-sync-webpack-plugin": "^2.2.2",
     "coffee-loader": "^3.0.0",
     "coffeescript": "^2.6.1",
     "css-loader": "^3.0.0",

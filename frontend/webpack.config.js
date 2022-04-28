@@ -1,7 +1,6 @@
 let path = require("path");
 const { EnvironmentPlugin } = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
 
 const environment = process.env.SPARROW_ENV || "production";
 
@@ -179,22 +178,10 @@ let baseConfig = {
   ],
 };
 
-// Add browserSync plugin if we are in dev mode.
 if (environment == "development") {
   const domain = `localhost:${process.env.SPARROW_HTTP_PORT || "5002"}`;
-
-  console.log(`Running browserSync at ${domain}`);
-  let browserSync = new BrowserSyncPlugin({
-    open: false,
-    logSnippet: false,
-    logLevel: "silent",
-    socket: {
-      domain,
-    },
-  });
-
+  console.log(`Running frontend at ${domain}`);
   baseConfig.watch = true;
-  baseConfig.plugins.push(browserSync);
 }
 
 module.exports = baseConfig;
