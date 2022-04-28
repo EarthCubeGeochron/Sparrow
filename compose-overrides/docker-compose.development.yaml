@@ -4,8 +4,9 @@ services:
   frontend:
     build:
       context: frontend
-    command: npm run dev
+    command: npm run dev:docker
     volumes:
+      - ./nginx-config/locations/development.conf:/etc/nginx/locations/development.conf:ro
       # Extra bind mounts to local directories for code reloading
       - ./frontend/src:/app/src
       - ./frontend/packages:/app/packages
