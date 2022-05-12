@@ -545,3 +545,61 @@ class TestStrictModeImport:
         new_data["fancy"] = "so_fancy"
         with raises(ValidationError):
             db.load_data("session", new_data, strict=True)
+
+class TestResearcherSampleImport:
+    def test_duplicate_import(self, db):
+        byrne = {"name": "David Byrne"}
+        eno = {"name": "Brian Eno"}
+        sample_data = [
+            {"name": "Sample 1", "researcher": [byrne]},
+            {"name": "Sample 2", "researcher": [byrne]},
+            {"name": "Sample 3", "researcher": [byrne, eno]},
+        ]
+
+        for sample in sample_data:
+            db.load_data("sample", sample, strict=True)
+
+        db.session.commit()
+
+        assert db.session.query(db.model.researcher).count() == 2
+
+    def test_same_researcher_import(self, db):
+        """Re-importing the same researcher should lead to no change"""
+        byrne = {"name": "David Byrne"}
+
+        db.load_data("researcher", byrne, strict=True)
+        assert db.session.query(db.model.researcher).count() == 2
+
+    def test_researcher_orcid_import(self, db):
+        """Re-importing the same researcher with a new orcid should add a new researcher."""
+        byrne = {"name": "David Byrne", "orcid": "0000-0002-1825-0097"}
+
+        db.load_data("researcher", byrne, strict=True)
+        assert db.session.query(db.model.researcher).count() == 3
+
+
+class TestResearcherProjectImport:
+    projects = [
+            {"name": "Project 1", "researcher": [{"name": "David Byrne"}]},
+            {"name": "Project 2", "researcher": [{"name": "David Byrne"}]},
+        ]
+    def test_researcher_project_import(self, db):
+        """Re-importing the same researcher with a new project should keep the same researcher."""
+
+        for project in self.projects:
+            db.load_data("project", project, strict=True)
+
+        assert db.session.query(db.model.project).count() == 2
+        assert db.session.query(db.model.researcher).count() == 1
+
+    def test_change_researcher(self, db):
+        # Re-import as a single operation (trying out many at once)
+        project = self.projects[0]
+        project["researcher"] = [{"name": "Brian Eno"}]
+
+        db.load_data("project", project, strict=True)
+
+        assert db.session.query(db.model.project).count() == 2
+        assert db.session.query(db.model.researcher).count() == 2
+
+        # Next: check for moved files
