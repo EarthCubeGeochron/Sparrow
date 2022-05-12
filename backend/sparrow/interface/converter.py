@@ -31,6 +31,7 @@ allowed_collections = {
         "material",
         "project",
         "sample_geo_entity",
+        "researcher",
         "publication",
         "tag",
         "attribute",
