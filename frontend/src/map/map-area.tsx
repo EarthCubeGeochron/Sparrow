@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
-import MapGl, { FlyToInterpolator, Marker } from "react-map-gl";
+import MapGl, { FlyToInterpolator, Marker, Source, Layer } from "react-map-gl";
 import h from "@macrostrat/hyper";
 import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
@@ -173,51 +173,82 @@ export function MapPanel({
     }
   };
 
-  return (
-    <div className="map-container">
-      <div className="layer-button">
-        {on_map && (
-          <Navbar className={styles["map-navbar"]}>
-            <Navbar.Group className={styles["map-navbar-inner"]}>
-              <Navbar.Heading>
-                <h1>
-                  <ShortSiteTitle />
-                </h1>
-              </Navbar.Heading>
-              <Navbar.Divider />
-              <MapNav />
-              <LayerMenu
-                hide={hide_filter}
-                MapStyle={state.MapStyle}
-                chooseMapStyle={chooseMapStyle}
-                showMarkers={state.showMarkers}
-                toggleShowMarkers={toggleShowMarkers}
-              ></LayerMenu>
-              {/* <FilterMenu
+  const features = (initialData?.data ?? []).map((d) => {
+    return {
+      type: "Feature",
+      geometry: d.location,
+      properties: {
+        id: d.id,
+        name: d.name,
+      },
+    };
+  });
+
+  console.log(initialData);
+
+  return h("div.map-container", [
+    h("div.layer-button", [
+      h.if(on_map)(Navbar, { className: styles["map-navbar"] }, [
+        <Navbar.Group className={styles["map-navbar-inner"]}>
+          <Navbar.Heading>
+            <h1>
+              <ShortSiteTitle />
+            </h1>
+          </Navbar.Heading>
+          <Navbar.Divider />
+          <MapNav />
+          <LayerMenu
+            hide={hide_filter}
+            MapStyle={state.MapStyle}
+            chooseMapStyle={chooseMapStyle}
+            showMarkers={state.showMarkers}
+            toggleShowMarkers={toggleShowMarkers}
+          ></LayerMenu>
+          {/* <FilterMenu
                 changeParams={changePararms}
                 hide={hide_filter}
                 on_map={on_map}
               ></FilterMenu> */}
-            </Navbar.Group>
-          </Navbar>
-        )}
-      </div>
-      <div>
-        <MapGl
-          onClick={(e) => {
+        </Navbar.Group>,
+      ]),
+    ]),
+    h("div", [
+      h(
+        MapGl,
+        {
+          onClick(e) {
             mapClicked(e);
-          }}
-          mapStyle={state.MapStyle}
-          mapboxApiAccessToken={process.env.MAPBOX_API_TOKEN}
-          {...viewport}
-          onViewportChange={(viewport) => {
+          },
+          mapStyle: state.MapStyle,
+          mapboxApiAccessToken: process.env.MAPBOX_API_TOKEN,
+          ...viewport,
+          onViewportChange(viewport) {
             if (state.mounted) {
               setViewport(viewport);
             }
-          }}
-          ref={mapRef}
-        >
-          {h.if(state.clickPnt.lng && on_map)(
+          },
+          ref: mapRef,
+        },
+        [
+          h(
+            Source,
+            {
+              id: "sparrow-data",
+              type: "geojson",
+              data: { type: "FeatureCollection", features },
+            },
+            [
+              h(Layer, {
+                id: "point",
+                type: "circle",
+                paint: {
+                  "circle-radius": 3,
+                  "circle-color": "#007cbf",
+                },
+              }),
+            ]
+          ),
+          h.if(state.clickPnt.lng && on_map)(
             Marker,
             {
               latitude: state.clickPnt.lat,
@@ -226,17 +257,9 @@ export function MapPanel({
               offsetTop: -10,
             },
             h(Icon, { icon: "map-marker", color: "black" })
-          )}
-          {state.showMarkers ? (
-            <MarkerCluster
-              data={initialData}
-              viewport={viewport}
-              changeViewport={changeViewport}
-              bounds={bounds}
-            ></MarkerCluster>
-          ) : null}
-        </MapGl>
-      </div>
-    </div>
-  );
+          ),
+        ]
+      ),
+    ]),
+  ]);
 }
