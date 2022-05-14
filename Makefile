@@ -19,7 +19,7 @@ build-dev:
 # Install without building with PyInstaller
 install-dev: build-dev
 	mkdir -p $(SPARROW_INSTALL_PATH)/bin
-	ln -sf $(shell pwd)/_cli/sparrow-dev-shim $(SPARROW_INSTALL_PATH)/bin/sparrow
+	ln -sf "$(shell pwd)/_cli/sparrow-dev-shim" "$(SPARROW_INSTALL_PATH)/bin/sparrow"
 
 ## TODO: fix bugs with install-dist to make it more capable
 # Bundle with PyInstaller and install (requires local Python 3)

@@ -1,11 +1,11 @@
-from subprocess import run, PIPE, STDOUT
+from subprocess import PIPE, STDOUT
 from shlex import split
 from typing import List
 from pathlib import Path
 from json import loads
 from json.decoder import JSONDecodeError
 from sparrow_utils.logs import get_logger
-from sparrow_utils.shell import split_args, cmd as cmd_
+from sparrow_utils.shell import split_args, cmd as cmd_, run as run_
 from rich import print
 from .exceptions import SparrowCommandError
 
@@ -26,6 +26,10 @@ def cmd(*v, **kwargs):
     kwargs["logger"] = log
     # TODO: We shouldn't print unless we specify a debug/verbose flag...
     return cmd_(*v, **kwargs)
+
+def run(*v, **kwargs):
+    kwargs["logger"] = log
+    return run_(*v, **kwargs)
 
 
 def compose(*args, **kwargs):

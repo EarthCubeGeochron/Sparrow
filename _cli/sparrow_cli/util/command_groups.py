@@ -6,7 +6,7 @@ import sys
 from ..config import SparrowConfig
 from .exceptions import SparrowCommandError
 from .formatting import format_description, console
-from .shell import cmd, find_subcommand
+from .shell import find_subcommand, run
 
 
 class SparrowDefaultCommand(DefaultGroup):
@@ -48,5 +48,5 @@ class CommandGroup(click.Group):
         def command(ctx, args):
             obj = ctx.find_object(SparrowConfig)
             fn = find_subcommand(obj.bin_directories, k, prefix=prefix)
-            res = cmd(fn, *args)
+            res = run(fn, *args)
             sys.exit(res.returncode)
