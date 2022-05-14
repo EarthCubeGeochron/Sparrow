@@ -44,12 +44,12 @@ exe = EXE(
     pyz,
     a.scripts,
     [],
-    exclude_binaries=False,
+    exclude_binaries=True,
     name="sparrow",
-    strip=True,
+    strip=False,
     upx=True,
     console=True,
-    debug=True
+    debug=False
 )
 coll = COLLECT(
     exe,
@@ -69,7 +69,6 @@ coll = COLLECT(
             ".git",
             ".githooks",
             ".github",
-            "_cli",
             "frontend",
             ".venv",
             "build",

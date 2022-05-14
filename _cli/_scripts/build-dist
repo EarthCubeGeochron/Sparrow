@@ -11,4 +11,4 @@ cd _cli
 pyinstaller --noconfirm --distpath dist sparrow.spec
 cd dist
 du -h -d 2 sparrow
-./sparrow/sparrow 2&> /dev/null
+./sparrow/sparrow
