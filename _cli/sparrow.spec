@@ -44,13 +44,12 @@ exe = EXE(
     pyz,
     a.scripts,
     [],
-    exclude_binaries=True,
+    exclude_binaries=False,
     name="sparrow",
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
+    strip=True,
     upx=True,
     console=True,
+    debug=True
 )
 coll = COLLECT(
     exe,
@@ -72,6 +71,11 @@ coll = COLLECT(
             ".github",
             "_cli",
             "frontend",
+            ".venv",
+            "build",
+            "dist",
+            "__pycache__",
+            "node_modules"
         ],
     ),
     # We have to include subfolders as separate trees, apparently, to allow
@@ -81,8 +85,7 @@ coll = COLLECT(
         prefix="srcroot/frontend",
         excludes=["node_modules", "examples", ".parcel-cache"],
     ),
-    Tree(path.join(src_root, "_cli"), prefix="srcroot/_cli", excludes=["build", "dist"]),
-    strip=False,
+    strip=True,
     upx=True,
     upx_exclude=[],
     name="sparrow",
