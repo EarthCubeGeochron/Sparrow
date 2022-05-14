@@ -1,5 +1,5 @@
-from click import group
-
+from click import group, pass_obj
+from rich import print
 from ..release_generation import create_release, check_version
 from ..util import CommandGroup, compose
 
@@ -37,3 +37,9 @@ def clear_cache():
     cache = cli_cache_file()
     cache.unlink(missing_ok=True)
     print(f"Cleared cache file {cache}")
+
+@sparrow_dev.command(name="print-config")
+@pass_obj
+def print_config(ctx):
+    """Print the Sparrow CLI configuration object"""
+    print(ctx)

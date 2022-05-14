@@ -93,8 +93,9 @@ def exec_backend_command(ctx, *args, **kwargs):
 def exec_sparrow(*args, **kwargs):
     return exec_or_run("backend", "/app/sparrow/__main__.py", *args, **kwargs)
 
+
 def fail_without_docker():
-    res = cmd("which docker", check=True)
+    res = cmd("which docker", check=True, stdout=PIPE)
     if res.returncode != 0:
         raise SparrowCommandError(
             "Cannot find the docker command. Is docker installed?"
@@ -102,11 +103,12 @@ def fail_without_docker():
 
 
 def raise_docker_engine_errors():
-    fail_without_docker()
     k = "_SPARROW_CHECKED_DOCKER_ENGINE"
-    if not environ.get(k) == "1":
-        res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
-        environ[k] = "1"
+    if environ.get(k) == "1":
+        return
+    fail_without_docker()
+    res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
+    environ[k] = "1"
     try:
         errors = loads(str(res.stdout, "utf-8"))
     except JSONDecodeError:
