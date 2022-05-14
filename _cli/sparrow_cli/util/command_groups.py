@@ -19,13 +19,13 @@ class SparrowDefaultCommand(DefaultGroup):
             details = getattr(exc, "details", "Exiting Sparrow due to an error")
             if details is not None:
                 console.print("[dim gray]" + details)
-            console.print(
-                "[dim]Re-run this command using [cyan]sparrow --verbose[/cyan] to see more details."
-            )
             # Maybe we should reraise only if debug is set?
             if environ.get("SPARROW_VERBOSE") is not None:
                 raise exc
             else:
+                console.print(
+                    "[dim]Re-run this command using [cyan]sparrow --verbose[/cyan] to see more details."
+                )
                 sys.exit(1)
 
     def parse_args(self, ctx, args):
