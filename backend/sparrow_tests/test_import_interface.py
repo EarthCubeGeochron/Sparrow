@@ -605,3 +605,34 @@ class TestResearcherProjectImport:
         assert db.session.query(db.model.researcher).count() == 2
 
         # Next: check for moved files
+
+
+class TestAddToExisting:
+    def test_add_session_existing_sample(self, db):
+        """Test that we can add to an existing session"""
+        sample = db.load_data("sample", {
+            "name": "Sample 1",
+            "session": [
+                {"name": "Test session", "date": "2022-01-01T00:00:00"},
+            ],
+        })
+
+        db.load_data("session", {
+            "sample": sample,
+            "name": "Test session 2",
+            "date": "2022-01-02T00:00:00",
+        })
+
+    def test_add_analysis_existing_session(self, db):
+        """Test that we can add to an existing session"""
+        session = json_fixture("sims-session.json")
+        res = db.load_data("session", session)
+
+        db.load_data("analysis", {
+            "session": res,
+            "analysis_type": {"name": "Grain dimensions"},
+            "datum": [
+                {"type": {"name": "Length"}, "value": 1.0},
+                {"type": {"name": "Width"}, "value": 2.0},
+            ],
+        })
