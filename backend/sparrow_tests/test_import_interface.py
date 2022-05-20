@@ -546,6 +546,7 @@ class TestStrictModeImport:
         with raises(ValidationError):
             db.load_data("session", new_data, strict=True)
 
+
 class TestResearcherSampleImport:
     def test_duplicate_import(self, db):
         byrne = {"name": "David Byrne"}
@@ -580,9 +581,10 @@ class TestResearcherSampleImport:
 
 class TestResearcherProjectImport:
     projects = [
-            {"name": "Project 1", "researcher": [{"name": "David Byrne"}]},
-            {"name": "Project 2", "researcher": [{"name": "David Byrne"}]},
-        ]
+        {"name": "Project 1", "researcher": [{"name": "David Byrne"}]},
+        {"name": "Project 2", "researcher": [{"name": "David Byrne"}]},
+    ]
+
     def test_researcher_project_import(self, db):
         """Re-importing the same researcher with a new project should keep the same researcher."""
 

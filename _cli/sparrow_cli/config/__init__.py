@@ -36,9 +36,9 @@ class Message(BaseModel):
 class SparrowConfig:
     bin_directories: typing.List[Path]
     SPARROW_PATH: Path
-    bundle_dir: Path
     path_provided: bool
     is_frozen: bool
+    bundle_dir: Path = None
     config_file: typing.Optional[Path] = None
     config_dir: typing.Optional[Path] = None
     version_info: typing.Optional[SparrowVersionMatch] = None

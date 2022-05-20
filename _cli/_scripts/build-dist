@@ -3,11 +3,12 @@
 # Meant to be run from the repository root folder
 _cli/_scripts/build-local
 # Activate virtual environment without actually activating
-export VIRTUAL_ENV="$(pwd)/_cli/build/venv"
+export VIRTUAL_ENV="$(pwd)/_cli/.venv"
 export PATH="$VIRTUAL_ENV/bin:$PATH"
 
-pip3 install pyinstaller==4.9
+pip3 install pyinstaller==5.0.1
 cd _cli
 pyinstaller --noconfirm --distpath dist sparrow.spec
 cd dist
 du -h -d 2 sparrow
+./sparrow/sparrow

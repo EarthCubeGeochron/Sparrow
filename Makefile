@@ -19,11 +19,12 @@ build-dev:
 # Install without building with PyInstaller
 install-dev: build-dev
 	mkdir -p $(SPARROW_INSTALL_PATH)/bin
-	ln -sf $(shell pwd)/_cli/sparrow-dev-shim $(SPARROW_INSTALL_PATH)/bin/sparrow
+	ln -sf "$(shell pwd)/_cli/sparrow-dev-shim" "$(SPARROW_INSTALL_PATH)/bin/sparrow"
 
 ## TODO: fix bugs with install-dist to make it more capable
 # Bundle with PyInstaller and install (requires local Python 3)
 install-dist: install-hooks
+	_cli/_scripts/build-dist
 	./get-sparrow.sh --no-confirm _cli/dist/sparrow
 
 test:
@@ -33,7 +34,7 @@ clean:
 	rm -rf _cli/build
 
 # Build locally for the current platform (DEFAULT)
-_cli/dist/sparrow:
+_cli/build/sparrow:
 	_cli/_scripts/build-dist
 
 # For older varieties of Linux, we have to build in a Docker container

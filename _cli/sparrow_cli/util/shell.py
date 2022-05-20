@@ -1,11 +1,12 @@
-from subprocess import run, PIPE, STDOUT
-from shlex import split
+from subprocess import PIPE, STDOUT
 from typing import List
 from pathlib import Path
 from json import loads
+from os import environ
 from json.decoder import JSONDecodeError
+
 from sparrow_utils.logs import get_logger
-from sparrow_utils.shell import split_args, cmd as cmd_
+from sparrow_utils.shell import split_args, cmd as cmd_, run as run_
 from rich import print
 from .exceptions import SparrowCommandError
 
@@ -28,7 +29,13 @@ def cmd(*v, **kwargs):
     return cmd_(*v, **kwargs)
 
 
+def run(*v, **kwargs):
+    kwargs["logger"] = log
+    return run_(*v, **kwargs)
+
+
 def compose(*args, **kwargs):
+    raise_docker_engine_errors()
     return cmd("sparrow compose", *args, **kwargs)
 
 
@@ -88,12 +95,20 @@ def exec_sparrow(*args, **kwargs):
 
 
 def fail_without_docker():
-    try:
-        res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
-    except FileNotFoundError:
+    res = cmd("which docker", check=True, stdout=PIPE)
+    if res.returncode != 0:
         raise SparrowCommandError(
             "Cannot find the docker command. Is docker installed?"
         )
+
+
+def raise_docker_engine_errors():
+    k = "_SPARROW_CHECKED_DOCKER_ENGINE"
+    if environ.get(k) == "1":
+        return
+    fail_without_docker()
+    res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
+    environ[k] = "1"
     try:
         errors = loads(str(res.stdout, "utf-8"))
     except JSONDecodeError:
