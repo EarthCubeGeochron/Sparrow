@@ -630,9 +630,9 @@ class TestAddToExisting:
 
         db.load_data("analysis", {
             "session": res,
-            "analysis_type": {"name": "Grain dimensions"},
+            "analysis_type": "Grain dimensions",
             "datum": [
-                {"type": {"name": "Length"}, "value": 1.0},
-                {"type": {"name": "Width"}, "value": 2.0},
+                {"type": {"parameter": "Length", "unit": "µm"}, "value": 1.0},
+                {"type": {"parameter": "Width", "unit": "µm"}, "value": 2.0},
             ],
-        })
+        }, strict=True)

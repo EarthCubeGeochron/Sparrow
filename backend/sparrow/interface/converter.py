@@ -50,7 +50,7 @@ allowed_collections = {
         "method",
         "tag",
     ],
-    "analysis": ["datum", "attribute", "constant", "analysis_type", "material", "tag"],
+    "analysis": ["datum", "attribute", "constant", "analysis_type", "material", "tag", "session"],
     "attribute": ["parameter", "unit"],
     "instrument_session": ["session", "project", "researcher"],
     "project": [
