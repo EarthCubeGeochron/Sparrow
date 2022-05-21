@@ -22,10 +22,6 @@ log = get_logger(__name__)
 
 # pytestmark = mark.filterwarnings("ignore", "*", SAWarning)
 
-# This should be in the fixture function ideally but I can't figure out
-# how to cache it so it doesn't repeatedly regenerate.
-app = Sparrow()
-
 session = dict(sample_id="A-0", date=datetime.now())
 
 
