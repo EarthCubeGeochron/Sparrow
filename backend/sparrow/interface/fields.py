@@ -127,6 +127,7 @@ class SmartNested(Nested, Related):
         if value is None:
             return None
         self._instances.add(value)
+
         return self._serialize_related_key(value)
 
     def _should_nest(self):

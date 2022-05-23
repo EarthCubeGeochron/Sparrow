@@ -199,6 +199,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
         return filters
 
     def load(self, data, **kwargs):
+        # In cases where we provide a SQLAlchemy model directly, we just pass that along.
+        if isinstance(data, self.opts.model):
+            return data
         if self.session is None:
             return super().load(data, **kwargs)
         with self.session.no_autoflush:

@@ -6,7 +6,7 @@ from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from datetime import datetime
-from pytest import mark, raises
+from pytest import mark, raises, fixture
 from sparrow.logs import get_logger
 from sparrow.encoders import JSONEncoder
 from json import dumps
@@ -18,7 +18,6 @@ from .fixtures import basic_data, incomplete_analysis, basic_project
 from .helpers import json_fixture, ensure_single
 
 log = get_logger(__name__)
-
 
 # pytestmark = mark.filterwarnings("ignore", "*", SAWarning)
 
@@ -602,6 +601,18 @@ class TestResearcherProjectImport:
 
         # Next: check for moved files
 
+@fixture()
+def new_analysis_data(db):
+    session = json_fixture("sims-session.json")
+    res = db.load_data("session", session)
+    return {
+            "session": res,
+            "analysis_type": "Grain dimensions",
+            "datum": [
+                {"type": {"parameter": "Length", "unit": "µm"}, "value": 1.0},
+                {"type": {"parameter": "Width", "unit": "µm"}, "value": 2.0},
+            ],
+        }
 
 class TestAddToExisting:
     def test_add_session_existing_sample(self, db):
@@ -619,16 +630,46 @@ class TestAddToExisting:
             "date": "2022-01-02T00:00:00",
         })
 
-    def test_add_analysis_existing_session(self, db):
+    def test_add_analysis_existing_session(self, db, new_analysis_data):
         """Test that we can add to an existing session"""
-        session = json_fixture("sims-session.json")
-        res = db.load_data("session", session)
 
-        db.load_data("analysis", {
-            "session": res,
-            "analysis_type": "Grain dimensions",
-            "datum": [
-                {"type": {"parameter": "Length", "unit": "µm"}, "value": 1.0},
-                {"type": {"parameter": "Width", "unit": "µm"}, "value": 2.0},
-            ],
-        }, strict=True)
+        db.load_data("analysis", new_analysis_data, strict=True)
+
+    def test_extend_analysis_without_existing_values(self, db):
+        start_count = db.session.query(db.model.analysis).count()
+        datum_count = db.session.query(db.model.datum).count()
+        analysis = db.session.query(db.model.analysis).first()
+
+        new_datum = {
+            "type": {"parameter": "Roundness", "unit": "dimensionless"}, "value": 0.88, "analysis": analysis}
+
+        datum = db.load_data("datum", new_datum, strict=True)
+
+        assert datum._analysis == analysis
+
+        assert db.session.query(db.model.analysis).count() == start_count
+        assert db.session.query(db.model.datum).count() == datum_count+1
+
+    @mark.skip("This creates a new analysis right now, rather than updating the current instance.")
+    def test_replace_data_for_existing_analysis(self, db, new_analysis_data):
+        """Here, we replace all the data with a new set."""
+
+        new_analysis_data["datum"][0]["value"] = 3.0
+
+        new_analysis = db.load_data("analysis", new_analysis_data, strict=True)
+
+        assert db.session.query(db.model.analysis).count() == 1
+        assert db.session.query(db.model.datum).count() == 2
+        assert len(new_analysis._datum) == 2
+        assert new_analysis._datum[0].value == 4.0
+
+    @mark.skip("This creates a new analysis right now, rather than updating the current instance.")
+    def test_extend_analysis_with_new_datum(self, db):
+        new_datum = {"type": {"parameter": "Thickness", "unit": "nm"}, "value": 5.0}
+        new_analysis_data["datum"].append(new_datum)
+        new_analysis = db.load_data("analysis", new_analysis_data, strict=True)
+
+        assert db.session.query(db.model.analysis).count() == 1
+        assert db.session.query(db.model.datum).count() == 3
+        assert len(new_analysis._datum) == 3
+        assert new_analysis._datum[2].value == 5.0

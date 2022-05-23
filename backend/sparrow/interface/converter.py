@@ -50,7 +50,7 @@ allowed_collections = {
         "method",
         "tag",
     ],
-    "analysis": ["datum", "attribute", "constant", "analysis_type", "material", "tag", "session"],
+    "analysis": ["datum", "attribute", "constant", "analysis_type", "material", "tag"],
     "attribute": ["parameter", "unit"],
     "instrument_session": ["session", "project", "researcher"],
     "project": [
@@ -78,6 +78,13 @@ def allow_nest(outer, inner):
         return True
     return inner in coll
 
+
+class PassThroughRelated(Related):
+    def _deserialize(self, value, attr=None, data=None, **kwargs):
+        # In cases where we provide a SQLAlchemy model directly, we just pass that along.
+        if isinstance(value, self.related_model):
+            return value
+        return super()._deserialize(value, attr, data, **kwargs)
 
 class SparrowConverter(ModelConverter):
     # Make sure that we can properly convert geometries
@@ -255,9 +262,9 @@ class SparrowConverter(ModelConverter):
         if not allow_nest(this_table.name, prop.target.name):
             # Fields that are not allowed to be nested
             if prop.uselist:
-                return RelatedList(Related, **field_kwargs)
+                return RelatedList(PassThroughRelated, **field_kwargs)
             else:
-                return Related(**field_kwargs)
+                return PassThroughRelated(**field_kwargs)
         if prop.target.schema == "enum":
             # special carve-out for enums represented as foreign keys
             # (these should be stored in the 'enum' schema):
