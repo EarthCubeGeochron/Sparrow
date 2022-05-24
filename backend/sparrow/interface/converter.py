@@ -12,7 +12,15 @@ from sqlalchemy.types import Integer, Numeric, DateTime
 from sqlalchemy.dialects import postgresql
 
 from ..database.mapper.util import trim_postfix
-from .fields import Geometry, Enum, JSON, SmartNested, UUID, PassThroughRelated, DateTimeExt
+from .fields import (
+    Geometry,
+    Enum,
+    JSON,
+    SmartNested,
+    UUID,
+    PassThroughRelated,
+    DateTimeExt,
+)
 from .util import to_schema_name
 
 from ..logs import get_logger
@@ -91,7 +99,7 @@ class SparrowConverter(ModelConverter):
                 postgresql.JSON: JSON,
                 postgresql.JSONB: JSON,
                 postgresql.UUID: UUID,
-                DateTime: DateTimeExt
+                DateTime: DateTimeExt,
             }.items()
         )
     )
