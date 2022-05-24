@@ -7,6 +7,11 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[2.1.1]` - 2022-05-24
+
+- **Command-line**: CLI returns success even when `docker`
+  is not available, but warns the user.
+
 ## `[2.1.0]` - 2022-05-23
 
 This version contains many fixes for data importing and some foundational improvements
