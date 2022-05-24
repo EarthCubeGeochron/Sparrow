@@ -48,7 +48,15 @@ class Geometry(Field):
         return from_shape(shape(value))
 
 
-class Enum(Related):
+class PassThroughRelated(Related):
+    def _deserialize(self, value, attr=None, data=None, **kwargs):
+        # In cases where we provide a SQLAlchemy model directly, we just pass that along.
+        if isinstance(value, self.related_model):
+            return value
+        return super()._deserialize(value, attr, data, **kwargs)
+
+
+class Enum(PassThroughRelated):
     """
     Enums are represented by a `Related` field, but we want to potentially
     be able to revise/extend this later without breaking external APIs.
@@ -57,20 +65,7 @@ class Enum(Related):
     pass
 
 
-class NullableRelated(Related):
-    def __init__(self, *args, **kwargs):
-        kwargs["allow_none"] = True
-        super().__init__(*args, **kwargs)
-
-    def _deserialize(self, value, attr=None, data=None, **kwargs):
-        if value is None:
-            if self.many:
-                return []
-            return None
-        return super()._deserialize(value, attr, data, **kwargs)
-
-
-class SmartNested(Nested, Related):
+class SmartNested(Nested, PassThroughRelated):
     """This field allows us to resolve relationships as either primary keys or nested models."""
 
     # https://github.com/marshmallow-code/marshmallow/blob/dev/src/marshmallow/fields.py
@@ -89,7 +84,7 @@ class SmartNested(Nested, Related):
             unknown=unknown,
             **field_kwargs,
         )
-        Related.__init__(self, **field_kwargs)
+        PassThroughRelated.__init__(self, **field_kwargs)
         self._many = many
         self._instances = set()
         self.allow_none = True
@@ -99,7 +94,7 @@ class SmartNested(Nested, Related):
         self._copy_config("_show_audit_id")
 
     def _deserialize(self, value, attr=None, data=None, **kwargs):
-        if isinstance(value, self.schema.opts.model):
+        if isinstance(value, self.related_model):
             return value
         # Better error message for collections.
         if not is_collection(value) and self._many:
@@ -127,6 +122,7 @@ class SmartNested(Nested, Related):
         if value is None:
             return None
         self._instances.add(value)
+
         return self._serialize_related_key(value)
 
     def _should_nest(self):

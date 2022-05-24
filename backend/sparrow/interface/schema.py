@@ -207,6 +207,9 @@ class ModelSchema(SQLAlchemyAutoSchema):
     def _get_instance(self, data):
         """Gets pre-existing instances if they are available."""
 
+        if self.instance is not None:
+            return self.instance
+
         if isinstance(data, self.opts.model):
             return data
 

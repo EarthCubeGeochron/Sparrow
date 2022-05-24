@@ -12,7 +12,7 @@ from sqlalchemy.types import Integer, Numeric
 from sqlalchemy.dialects import postgresql
 
 from ..database.mapper.util import trim_postfix
-from .fields import Geometry, Enum, JSON, SmartNested, UUID
+from .fields import Geometry, Enum, JSON, SmartNested, UUID, PassThroughRelated
 from .util import to_schema_name
 
 from ..logs import get_logger
@@ -50,7 +50,7 @@ allowed_collections = {
         "method",
         "tag",
     ],
-    "analysis": ["datum", "attribute", "constant", "analysis_type", "material", "tag", "session"],
+    "analysis": ["datum", "attribute", "constant", "analysis_type", "material", "tag"],
     "attribute": ["parameter", "unit"],
     "instrument_session": ["session", "project", "researcher"],
     "project": [
@@ -255,9 +255,9 @@ class SparrowConverter(ModelConverter):
         if not allow_nest(this_table.name, prop.target.name):
             # Fields that are not allowed to be nested
             if prop.uselist:
-                return RelatedList(Related, **field_kwargs)
+                return RelatedList(PassThroughRelated, **field_kwargs)
             else:
-                return Related(**field_kwargs)
+                return PassThroughRelated(**field_kwargs)
         if prop.target.schema == "enum":
             # special carve-out for enums represented as foreign keys
             # (these should be stored in the 'enum' schema):
