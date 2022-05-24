@@ -21,6 +21,7 @@ from .config import SparrowConfig
 from .config.environment import is_truthy
 from .config.file_loader import envbash_init_hack
 from .commands import add_commands
+from .util.shell import raise_docker_engine_errors
 from .meta import __version__
 
 envbash_init_hack()
@@ -33,6 +34,7 @@ console = Console(highlight=True)
 def _docker_compose(*args):
     from compose.cli.main import main
 
+    raise_docker_engine_errors()
     sys.argv = ["docker-compose", *args]
     main()
     # If we're still running, escape
@@ -84,6 +86,7 @@ def main(ctx, args):
         return echo_help(cli, ctx, cfg.bin_directories)
 
     if subcommand == "compose":
+        
         # docker-compose respecting sparrow environment
         return _docker_compose(*rest)
 

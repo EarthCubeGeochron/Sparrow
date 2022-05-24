@@ -4,6 +4,8 @@ from pathlib import Path
 from json import loads
 from os import environ
 from json.decoder import JSONDecodeError
+from docker import from_env
+from docker.errors import DockerException
 
 from sparrow_utils.logs import get_logger
 from sparrow_utils.shell import split_args, cmd as cmd_, run as run_
@@ -94,7 +96,7 @@ def exec_sparrow(*args, **kwargs):
     return exec_or_run("backend", "/app/sparrow/__main__.py", *args, **kwargs)
 
 
-def fail_without_docker():
+def fail_without_docker_command():
     res = cmd("which docker", check=True, stdout=PIPE)
     if res.returncode != 0:
         raise SparrowCommandError(
@@ -102,11 +104,21 @@ def fail_without_docker():
         )
 
 
+def fail_without_docker_running():
+    try:
+        from_env()
+    except DockerException as exc:
+        raise SparrowCommandError(
+            "Cannot connect to the Docker daemon. Is Docker running?", details=str(exc)
+        )
+
+
 def raise_docker_engine_errors():
     k = "_SPARROW_CHECKED_DOCKER_ENGINE"
     if environ.get(k) == "1":
         return
-    fail_without_docker()
+    fail_without_docker_command()
+    fail_without_docker_running()
     res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
     environ[k] = "1"
     try:
