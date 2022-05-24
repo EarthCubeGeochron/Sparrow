@@ -34,6 +34,7 @@ def run(*v, **kwargs):
     val = " ".join(v)
     return _run(split(val), **kwargs)
 
+
 def check_secret_key():
     if SECRET_KEY is None:
         raise KeyError("Environment variable `SPARROW_SECRET_KEY` must be set")

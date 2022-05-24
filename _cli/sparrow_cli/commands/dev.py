@@ -38,6 +38,7 @@ def clear_cache():
     cache.unlink(missing_ok=True)
     print(f"Cleared cache file {cache}")
 
+
 @sparrow_dev.command(name="print-config")
 @pass_obj
 def print_config(ctx):

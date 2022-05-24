@@ -601,34 +601,36 @@ class TestResearcherProjectImport:
 
         # Next: check for moved files
 
+
 @fixture()
 def new_analysis_data(db):
     session = json_fixture("sims-session.json")
     res = db.load_data("session", session)
     return {
-            "session": res,
-            "analysis_type": "Grain dimensions",
-            "datum": [
-                {"type": {"parameter": "Length", "unit": "µm"}, "value": 1.0},
-                {"type": {"parameter": "Width", "unit": "µm"}, "value": 2.0},
-            ],
-        }
+        "session": res,
+        "analysis_type": "Grain dimensions",
+        "datum": [
+            {"type": {"parameter": "Length", "unit": "µm"}, "value": 1.0},
+            {"type": {"parameter": "Width", "unit": "µm"}, "value": 2.0},
+        ],
+    }
+
 
 class TestAddToExisting:
     def test_add_session_existing_sample(self, db):
         """Test that we can add to an existing session"""
-        sample = db.load_data("sample", {
-            "name": "Sample 1",
-            "session": [
-                {"name": "Test session", "date": "2022-01-01T00:00:00"},
-            ],
-        })
+        sample = db.load_data(
+            "sample",
+            {
+                "name": "Sample 1",
+                "session": [{"name": "Test session", "date": "2022-01-01T00:00:00"}],
+            },
+        )
 
-        db.load_data("session", {
-            "sample": sample,
-            "name": "Test session 2",
-            "date": "2022-01-02T00:00:00",
-        })
+        db.load_data(
+            "session",
+            {"sample": sample, "name": "Test session 2", "date": "2022-01-02T00:00:00"},
+        )
 
     def test_add_analysis_existing_session(self, db, new_analysis_data):
         """Test that we can add to an existing session"""
@@ -641,16 +643,21 @@ class TestAddToExisting:
         analysis = db.session.query(db.model.analysis).first()
 
         new_datum = {
-            "type": {"parameter": "Roundness", "unit": "dimensionless"}, "value": 0.88, "analysis": analysis}
+            "type": {"parameter": "Roundness", "unit": "dimensionless"},
+            "value": 0.88,
+            "analysis": analysis,
+        }
 
         datum = db.load_data("datum", new_datum, strict=True)
 
         assert datum._analysis == analysis
 
         assert db.session.query(db.model.analysis).count() == start_count
-        assert db.session.query(db.model.datum).count() == datum_count+1
+        assert db.session.query(db.model.datum).count() == datum_count + 1
 
-    @mark.skip("This creates a new analysis right now, rather than updating the current instance.")
+    @mark.skip(
+        "This creates a new analysis right now, rather than updating the current instance."
+    )
     def test_replace_data_for_existing_analysis(self, db, new_analysis_data):
         """Here, we replace all the data with a new set."""
 
@@ -660,14 +667,18 @@ class TestAddToExisting:
 
         new_analysis_data["datum"][0]["value"] = 3.0
 
-        new_analysis = db.load_data("analysis", new_analysis_data, strict=True, instance=analysis)
+        new_analysis = db.load_data(
+            "analysis", new_analysis_data, strict=True, instance=analysis
+        )
 
         assert db.session.query(db.model.analysis).count() == 1
         assert db.session.query(db.model.datum).count() == datum_count
         assert len(new_analysis._datum) == 3
         assert new_analysis._datum[0].value == 4.0
 
-    @mark.skip("This creates a new analysis right now, rather than updating the current instance.")
+    @mark.skip(
+        "This creates a new analysis right now, rather than updating the current instance."
+    )
     def test_extend_analysis_with_new_datum(self, db):
         datum_count = db.session.query(db.model.datum).count()
         analysis_count = db.session.query(db.model.analysis).count()
@@ -675,22 +686,33 @@ class TestAddToExisting:
 
         new_datum = {"type": {"parameter": "Thickness", "unit": "nm"}, "value": 5.0}
         new_analysis_data["datum"].append(new_datum)
-        new_analysis = db.load_data("analysis", new_analysis_data, strict=True, instance=analysis)
+        new_analysis = db.load_data(
+            "analysis", new_analysis_data, strict=True, instance=analysis
+        )
 
         assert db.session.query(db.model.analysis).count() == analysis_count
         assert db.session.query(db.model.datum).count() == datum_count + 1
         assert len(new_analysis._datum) == 4
         assert new_analysis._datum[3].value == 5.0
 
+
 class TestImportDates:
     def test_import_date_iso8601(self, db):
         """Test that we can import dates in ISO 8601 format"""
-        date = {"name": "Test date", "date": "2022-01-01T00:00:00", "sample": {"name": "Sample 1"}}
+        date = {
+            "name": "Test date",
+            "date": "2022-01-01T00:00:00",
+            "sample": {"name": "Sample 1"},
+        }
         db.load_data("session", date, strict=True)
 
     def test_import_date_no_time(self, db):
         """Test that we can import a basic date"""
-        date = {"name": "Test date", "date": "2022-01-01", "sample": {"name": "Sample 1"}}
+        date = {
+            "name": "Test date",
+            "date": "2022-01-01",
+            "sample": {"name": "Sample 1"},
+        }
         db.load_data("session", date, strict=True)
 
     def test_import_python_datetime(self, db):
@@ -698,4 +720,3 @@ class TestImportDates:
         date = datetime(2022, 2, 1)
         session = {"name": "Test date", "date": date, "sample": {"name": "Sample 1"}}
         db.load_data("session", session, strict=True)
-       

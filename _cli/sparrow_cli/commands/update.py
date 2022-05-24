@@ -18,10 +18,8 @@ def sparrow_update(ctx, version):
         chdir(cfg.SPARROW_PATH)
         cmd("make install-dev")
         return
-    fn = str(cfg.SPARROW_PATH/"get-sparrow.sh")
+    fn = str(cfg.SPARROW_PATH / "get-sparrow.sh")
     if version is None:
         cmd(fn)
     else:
         cmd(fn, version)
-
-    

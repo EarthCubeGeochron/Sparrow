@@ -65,7 +65,6 @@ def get_field_json_values(type_: str, name: str, schema):
     if type_name == "datetimeext":
         type_name = "datetime"
 
-
     json_values = api_help["fields"]["json-values"]
 
     if "schema" in type_name:

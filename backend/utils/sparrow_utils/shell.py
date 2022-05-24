@@ -9,10 +9,12 @@ log = get_logger(__name__)
 def split_args(*args):
     return split(" ".join(args))
 
+
 def run(*args, **kwargs):
     logger = kwargs.pop("logger", log)
     logger.debug(args)
     return _run(args, **kwargs)
+
 
 def cmd(*args, **kwargs):
     if kwargs.pop("collect_args", True):
