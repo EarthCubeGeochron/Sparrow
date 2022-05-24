@@ -12,7 +12,7 @@ from sqlalchemy.types import Integer, Numeric
 from sqlalchemy.dialects import postgresql
 
 from ..database.mapper.util import trim_postfix
-from .fields import Geometry, Enum, JSON, SmartNested, UUID
+from .fields import Geometry, Enum, JSON, SmartNested, UUID, PassThroughRelated
 from .util import to_schema_name
 
 from ..logs import get_logger
@@ -78,13 +78,6 @@ def allow_nest(outer, inner):
         return True
     return inner in coll
 
-
-class PassThroughRelated(Related):
-    def _deserialize(self, value, attr=None, data=None, **kwargs):
-        # In cases where we provide a SQLAlchemy model directly, we just pass that along.
-        if isinstance(value, self.related_model):
-            return value
-        return super()._deserialize(value, attr, data, **kwargs)
 
 class SparrowConverter(ModelConverter):
     # Make sure that we can properly convert geometries

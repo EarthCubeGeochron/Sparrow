@@ -654,22 +654,30 @@ class TestAddToExisting:
     def test_replace_data_for_existing_analysis(self, db, new_analysis_data):
         """Here, we replace all the data with a new set."""
 
+        datum_count = db.session.query(db.model.datum).count()
+
+        analysis = db.session.query(db.model.analysis).first()
+
         new_analysis_data["datum"][0]["value"] = 3.0
 
-        new_analysis = db.load_data("analysis", new_analysis_data, strict=True)
+        new_analysis = db.load_data("analysis", new_analysis_data, strict=True, instance=analysis)
 
         assert db.session.query(db.model.analysis).count() == 1
-        assert db.session.query(db.model.datum).count() == 2
-        assert len(new_analysis._datum) == 2
+        assert db.session.query(db.model.datum).count() == datum_count
+        assert len(new_analysis._datum) == 3
         assert new_analysis._datum[0].value == 4.0
 
     @mark.skip("This creates a new analysis right now, rather than updating the current instance.")
     def test_extend_analysis_with_new_datum(self, db):
+        datum_count = db.session.query(db.model.datum).count()
+        analysis_count = db.session.query(db.model.analysis).count()
+        analysis = db.session.query(db.model.analysis).first()
+
         new_datum = {"type": {"parameter": "Thickness", "unit": "nm"}, "value": 5.0}
         new_analysis_data["datum"].append(new_datum)
-        new_analysis = db.load_data("analysis", new_analysis_data, strict=True)
+        new_analysis = db.load_data("analysis", new_analysis_data, strict=True, instance=analysis)
 
-        assert db.session.query(db.model.analysis).count() == 1
-        assert db.session.query(db.model.datum).count() == 3
-        assert len(new_analysis._datum) == 3
-        assert new_analysis._datum[2].value == 5.0
+        assert db.session.query(db.model.analysis).count() == analysis_count
+        assert db.session.query(db.model.datum).count() == datum_count + 1
+        assert len(new_analysis._datum) == 4
+        assert new_analysis._datum[3].value == 5.0
