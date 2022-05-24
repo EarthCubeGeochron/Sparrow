@@ -1,4 +1,4 @@
-from subprocess import PIPE, STDOUT
+from subprocess import PIPE, STDOUT, CalledProcessError
 from typing import List
 from pathlib import Path
 from json import loads
@@ -97,8 +97,13 @@ def exec_sparrow(*args, **kwargs):
 
 
 def fail_without_docker_command():
-    res = cmd("which docker", check=True, stdout=PIPE)
-    if res.returncode != 0:
+    failure = False
+    try:
+        res = cmd("which docker", check=True, stdout=PIPE)
+        failure = res.returncode != 0
+    except CalledProcessError:
+        failure = True
+    if failure:
         raise SparrowCommandError(
             "Cannot find the docker command. Is docker installed?"
         )
