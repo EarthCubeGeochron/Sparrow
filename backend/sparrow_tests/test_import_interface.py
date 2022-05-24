@@ -681,3 +681,21 @@ class TestAddToExisting:
         assert db.session.query(db.model.datum).count() == datum_count + 1
         assert len(new_analysis._datum) == 4
         assert new_analysis._datum[3].value == 5.0
+
+class TestImportDates:
+    def test_import_date_iso8601(self, db):
+        """Test that we can import dates in ISO 8601 format"""
+        date = {"name": "Test date", "date": "2022-01-01T00:00:00", "sample": {"name": "Sample 1"}}
+        db.load_data("session", date, strict=True)
+
+    def test_import_date_no_time(self, db):
+        """Test that we can import a basic date"""
+        date = {"name": "Test date", "date": "2022-01-01", "sample": {"name": "Sample 1"}}
+        db.load_data("session", date, strict=True)
+
+    def test_import_python_datetime(self, db):
+        """Test that we can import a python datetime object"""
+        date = datetime(2022, 2, 1)
+        session = {"name": "Test date", "date": date, "sample": {"name": "Sample 1"}}
+        db.load_data("session", session, strict=True)
+       

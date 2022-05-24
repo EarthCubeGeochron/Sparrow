@@ -20,10 +20,12 @@ to support future frontend updates.
 - Improve bundling of command line application and upgrade PyInstaller.
 - Improve documentation for server setup environment variables
 
-### Data model and importing
+### Data model and ingestion
 
 - Add sample-researcher links
 - Allow SQLAlchemy models to be passed to import schemas for all nested and related fields.
+- Date importing fixes: allow Python `datetime` objects, `YYYY-MM-DD` dates, and `YYYY-MM-DD HH:MM:SS` date/times
+  to be imported as well as ISO 8601 (`YYYY-MM-DDTHH:MM:SS`) date/times.
 - Add tests for importing multiple instances of the same model
 - Add tests for updating a module with new data
 

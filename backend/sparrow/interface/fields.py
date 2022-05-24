@@ -5,12 +5,14 @@ data from the Sparrow database.
 Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
 from marshmallow_sqlalchemy.fields import Related, Nested
-from marshmallow.fields import Field, Raw
+from marshmallow.fields import Field, Raw, DateTime
 from marshmallow.exceptions import ValidationError
 from marshmallow.fields import UUID as _UUID
 from marshmallow.utils import is_collection
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import mapping, shape
+from datetime import datetime
+
 from .util import primary_key
 from ..logs import get_logger
 
@@ -143,3 +145,28 @@ class SmartNested(Nested, PassThroughRelated):
         if self._many:
             return [self._serialize_instance(v) for v in value]
         return self._serialize_instance(value)
+
+
+class DateTimeExt(DateTime):
+    def _deserialize(self, value, attr=None, data=None, **kwargs):
+        # Allow python datetime objects to be deserialized.
+        if isinstance(value, datetime):
+            return value
+
+        # Try to parse YYYY-MM-DD HH:MM:SS strings.
+        try:
+            date = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+            if isinstance(date, datetime):
+                return date
+        except ValueError:
+            pass
+
+        # Try to parse YYYY-MM-DD strings.
+        try:
+            date = datetime.strptime(value, "%Y-%m-%d")
+            if isinstance(date, datetime):
+                return date
+        except ValueError:
+            pass
+
+        return super()._deserialize(value, attr, data, **kwargs)
