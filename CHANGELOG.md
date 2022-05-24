@@ -7,6 +7,32 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[2.1.0]` - 2022-05-23
+
+This version contains many fixes for data importing and some foundational improvements
+to support future frontend updates.
+
+### Command-line interface
+
+- Add a `sparrow update` command that downloads/installs the most recent version of the Sparrow application.
+- Fix `sparrow db import` command to be more reliable at reading database dump files
+- Slightly relax the requirement to set `SPARROW_SECRET_KEY` (now this is only required for starting the application server).
+- Improve bundling of command line application and upgrade PyInstaller.
+- Improve documentation for server setup environment variables
+
+### Data model and importing
+
+- Add sample-researcher links
+- Allow SQLAlchemy models to be passed to import schemas for all nested and related fields.
+- Add tests for importing multiple instances of the same model
+- Add tests for updating a module with new data
+
+### Frontend
+
+- Move to Webpack v5 for frontend bundling
+- Simplify some framework code
+- Vastly increase the performance of map areas with large numbers of data points
+
 ## `[2.0.0]` - 2022-03-27
 
 This is the first non-beta release of the 2.0.0 series. It has most of the tools needed
