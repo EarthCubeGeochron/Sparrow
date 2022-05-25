@@ -92,4 +92,3 @@ class TestProjectImport:
         """We should be able to idempotently import a data file..."""
         data = json_fixture("project-dump.json")
         db.load_data("project", data["data"])
-
