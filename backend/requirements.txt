@@ -87,7 +87,7 @@ deepdiff[murmur]==5.0.2
 pytest-order==0.9.5
 
 # Authentication
-PyJWT==1.7.1
+PyJWT==2.4.0
 
 # ASGI
 starlette==0.13.4
