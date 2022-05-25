@@ -46,6 +46,7 @@ shell_commands = {
     "export": "Export database to a binary `pg_dump` archive",
     "graph": "Graph database schema to `dot` format.",
     "import": "Import database from binary `pg_dump` archive",
+    "drop-cache": "Drop the cache of SQLAlchemy models maintained by the `backend` container.",
 }
 
 

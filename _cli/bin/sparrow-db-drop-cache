@@ -1,0 +1,3 @@
+#!/bin/bash
+# Description: Drop the model cache maintained by Sparrow's backend 
+sparrow compose run backend rm -rf '/root/.sqlalchemy-cache/*'
