@@ -38,6 +38,11 @@ def clear_cache():
     cache.unlink(missing_ok=True)
     print(f"Cleared cache file {cache}")
 
+    # Clear backend SQLAlchemy cache
+    backend_cache = "/root/.sqlalchemy-cache/sparrow-db-cache.pickle"
+    compose("run --no-deps backend rm -f", backend_cache)
+    print(f"Cleared SQLAlchemy cache {backend_cache} in backend container")
+
 
 @sparrow_dev.command(name="print-config")
 @pass_obj

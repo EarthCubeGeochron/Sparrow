@@ -3,7 +3,7 @@ from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
 from sqlalchemy.ext.automap import automap_base, generate_relationship
 from sqlalchemy.ext.declarative import declarative_base
-from os import path, makedirs
+from os import path, makedirs, remove
 from sparrow_utils.logs import get_logger
 from sqlalchemy.ext.automap import automap_base
 from pickle import load, dump
@@ -159,6 +159,11 @@ class SparrowDatabaseMapper:
         if self.automap_base.loaded_from_cache:
             return
         self.automap_base.builder._cache_database_map(self.automap_base.metadata)
+
+    def drop_model_cache(self):
+        if self.automap_base.loaded_from_cache:
+            log.info("Dropping database model cache")
+            remove(self.automap_base.builder._metadata_cache_filename)
 
     def reflect_table(self, tablename, *column_args, **kwargs):
         """

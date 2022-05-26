@@ -45,8 +45,7 @@ shell_commands = {
     "drop": "Drop the `Sparrow` database. [[DANGEROUS]]",
     "export": "Export database to a binary `pg_dump` archive",
     "graph": "Graph database schema to `dot` format.",
-    "import": "Import database from binary `pg_dump` archive",
-    "drop-cache": "Drop the cache of SQLAlchemy models maintained by the `backend` container.",
+    "import": "Import database from binary `pg_dump` archive"
 }
 
 
@@ -63,6 +62,12 @@ def sparrow_db(ctx):
 def migration(args):
     """Generate a changeset against the optimal database schema"""
     exec_sparrow("db-migration", *args)
+
+
+@sparrow_db.command(name="drop-cache")
+def drop_cache():
+    """Drop the cache of SQLAlchemy models maintained by the backend container."""
+    exec_sparrow("db-drop-cache")
 
 
 @sparrow_db.command(name="update", context_settings=dict(ignore_unknown_options=True))
