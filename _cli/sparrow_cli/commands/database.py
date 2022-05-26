@@ -45,7 +45,7 @@ shell_commands = {
     "drop": "Drop the `Sparrow` database. [[DANGEROUS]]",
     "export": "Export database to a binary `pg_dump` archive",
     "graph": "Graph database schema to `dot` format.",
-    "import": "Import database from binary `pg_dump` archive"
+    "import": "Import database from binary `pg_dump` archive",
 }
 
 
