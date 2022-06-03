@@ -40,10 +40,16 @@ def _gen_relationship(
         base, direction, return_fn, attrname, local_cls, referred_cls, **kw
     )
 
-should_enable_cache = environ.get("SPARROW_CACHE_DATABASE_MODELS", "0").lower() in ["true", "1"]
+
+should_enable_cache = environ.get("SPARROW_CACHE_DATABASE_MODELS", "0").lower() in [
+    "true",
+    "1",
+]
+
 
 class AutomapError(Exception):
     pass
+
 
 class DatabaseModelCacher:
     metadata_pickle_filename = "sparrow-db-cache.pickle"
