@@ -1,3 +1,3 @@
 #!/bin/bash
 # Description: Drop the model cache maintained by Sparrow's backend 
-sparrow compose run backend rm -rf '/root/.sqlalchemy-cache/*'
+sparrow compose run --no-deps backend rm -f '/root/.sqlalchemy-cache/sparrow-db-cache.pickle'
