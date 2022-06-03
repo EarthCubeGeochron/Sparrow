@@ -3,7 +3,7 @@ from sqlalchemy.schema import Table
 from sqlalchemy import MetaData
 from sqlalchemy.ext.automap import automap_base, generate_relationship
 from sqlalchemy.ext.declarative import declarative_base
-from os import path, makedirs, remove
+from os import path, makedirs, remove, environ
 from sparrow_utils.logs import get_logger
 from sqlalchemy.ext.automap import automap_base
 from pickle import load, dump
@@ -40,15 +40,15 @@ def _gen_relationship(
         base, direction, return_fn, attrname, local_cls, referred_cls, **kw
     )
 
+should_enable_cache = environ.get("SPARROW_CACHE_DATABASE_MODELS", "0").lower() in ["true", "1"]
 
 class AutomapError(Exception):
     pass
 
-
 class DatabaseModelCacher:
     metadata_pickle_filename = "sparrow-db-cache.pickle"
     cache_path = path.join(path.expanduser("~"), ".sqlalchemy-cache")
-    enabled = True
+    enabled = should_enable_cache
 
     @property
     def _metadata_cache_filename(self):
