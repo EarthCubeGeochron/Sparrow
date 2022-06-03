@@ -24,7 +24,7 @@ x-backend:
     - SPARROW_CACHE_DIR=/cache
     # We have an experimental caching mechanism for SQLAlchemy models, but this
     # may cause bugs for importers and is not enabled by default. (added in v2.2.0)
-    - SPARROW_CACHE_DATABASE_MODELS=false
+    - SPARROW_CACHE_DATABASE_MODELS
     - SPARROW_INIT_SQL=/init-sql
     # For cloud data support
     # NOTE: it may be useful to split this into a
