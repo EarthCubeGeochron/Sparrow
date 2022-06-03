@@ -5,8 +5,6 @@ services:
   # to bring these containers back up on system
   # reboot.
   gateway:
-    volumes:
-      - ./nginx-config/locations/production.conf:/etc/nginx/locations/production.conf:ro
     restart: unless-stopped
   backend:
     restart: unless-stopped
