@@ -7,6 +7,19 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[2.2.0]` - 2022-06-03
+
+- Sparrow's caching mechanism for SQLAlchemy models was disabled, due to some
+  problems with importers. It can be enabled on an opt-in basis using the
+  `SPARROW_CACHE_DATABASE_MODELS` environment variable.
+- More consistently drop caches using the `sparrow db drop-cache` command.
+
+## `[2.1.4]` - 2022-06-03
+
+- Fix a bug with bundling production instances
+- Fix an issue with the `sparrow db import` command
+- Add CLI commands to drop database caches (`sparrow db drop-cache` and `sparrow dev clear-cache` now both do this.)
+
 ## `[2.1.1]` - 2022-05-24
 
 - **Command-line**: CLI returns success even when `docker`
