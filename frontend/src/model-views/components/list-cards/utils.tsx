@@ -47,6 +47,8 @@ export function ModelCard(props: ModelCardProps): ReactNode {
 
   const className = clickedClassname({ clicked, id });
 
+  //if (model == null) return null;
+
   let idInfo = showIdentity == "long" ? `${model} ${id}` : id;
 
   if (link) {
@@ -127,26 +129,29 @@ const SampleModelCard = (props) => {
 
   const sample = { material, id, name, location, session };
 
-  const children = h(
-    Frame,
-    {
-      id: "sampleCardContent",
-      data: { material, id, name, location, session },
-    },
-    h(SampleDefaultContent, { material, id, name, location, session })
-  );
-  if (onClick == null) {
-    return h(ModelCard, { id, children, model: "sample", link, showIdentity });
+  let clickFunc = null;
+  if (onClick != null) {
+    clickFunc = () => onClick(sample);
   }
 
-  return h(ModelCard, {
-    id,
-    children,
-    showIdentity,
-    model: "sample",
-    link,
-    onClick: () => onClick(sample),
-  });
+  return h(
+    ModelCard,
+    {
+      id,
+      showIdentity,
+      model: "sample",
+      link,
+      onClick: clickFunc,
+    },
+    h(
+      Frame,
+      {
+        id: "sampleCardContent",
+        data: { material, id, name, location, session },
+      },
+      h(SampleDefaultContent, { material, id, name, location, session })
+    )
+  );
 };
 
 const interior = ({ doi, title }) => {
@@ -389,7 +394,7 @@ const SessionModelLinkCard = (props) => {
 
   return h(ModelCard, {
     id: session_id,
-    content: cardContent,
+    children: cardContent,
     model: "session",
     link,
     onClick: () => onClick(session_id, date, target, technique),

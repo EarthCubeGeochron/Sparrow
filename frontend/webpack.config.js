@@ -76,7 +76,7 @@ let baseConfig = {
   devServer: {
     compress: false,
     port: 3000,
-    //hot: true,
+    hot: true,
     open: true,
     historyApiFallback: true,
   },
