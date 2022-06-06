@@ -7,6 +7,14 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[2.3.0]` - 2022-06-06
+
+- Added some nicer error pages to guide the user on application startup.
+- Major updates to container orchestration to better differentiate `development` and `production` modes.
+- Fix Webpack development server "hot reloading" for frontend code.
+- Added a `sparrow dev printenv` command.
+- Fixed https://github.com/EarthCubeGeochron/Sparrow/issues/287
+
 ## `[2.2.0]` - 2022-06-03
 
 - Sparrow's caching mechanism for SQLAlchemy models was disabled, due to some

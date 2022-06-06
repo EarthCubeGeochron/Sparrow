@@ -6,6 +6,8 @@ services:
   # reboot.
   gateway:
     restart: unless-stopped
+    volumes:
+      - ./nginx-config/locations/production.conf:/etc/nginx/locations/production.conf:ro
   backend:
     restart: unless-stopped
   db:

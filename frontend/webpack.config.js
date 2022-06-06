@@ -26,6 +26,8 @@ let srcRoot = relativePath("src");
 
 let assetsRoute = process.env.BASE_URL || "/";
 
+console.log("Base URL:", assetsRoute);
+
 let fontLoader = {
   loader: "file-loader",
   options: { name: "fonts/[name].[ext]" },
@@ -75,8 +77,10 @@ let baseConfig = {
   mode,
   devServer: {
     compress: false,
+    // Important for docker.
+    host: "0.0.0.0",
     port: 3000,
-    //hot: true,
+    hot: true,
     open: true,
     historyApiFallback: true,
   },
