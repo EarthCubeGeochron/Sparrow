@@ -1,5 +1,6 @@
 from click import group, pass_obj
 from rich import print
+from os import environ
 from ..release_generation import create_release, check_version
 from ..util import CommandGroup, compose
 
@@ -49,3 +50,10 @@ def clear_cache():
 def print_config(ctx):
     """Print the Sparrow CLI configuration object"""
     print(ctx)
+
+
+@sparrow_dev.command(name="printenv")
+def print_config():
+    """Print the Sparrow CLI environment"""
+    for k, v in sorted(environ.items()):
+        print(f"{k}={v}")
