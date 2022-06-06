@@ -37,7 +37,7 @@
     "@vx/scale": "0.0.182",
     "@vx/shape": "0.0.183",
     "ansicolor": "^1.1.95",
-    "axios": "^0.18.0",
+    "axios": "^0.21.2",
     "babel-polyfill": "^6.26.0",
     "d3-array": "^2.0.3",
     "date-fns": "^1.30.1",
