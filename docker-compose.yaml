@@ -81,9 +81,6 @@ x-backend:
     - model_cache:/root/.sqlalchemy-cache
 services:
   gateway:
-    depends_on:
-      - backend
-      - frontend
     ports:
       - ${SPARROW_HTTP_PORT:-5002}:80
     volumes:
