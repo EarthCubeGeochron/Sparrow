@@ -6,7 +6,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import { Component } from "react";
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import { Button, Intent, Collapse, NonIdealState } from "@blueprintjs/core";
 import { Parameter } from "./parameter";
 import { join } from "path";

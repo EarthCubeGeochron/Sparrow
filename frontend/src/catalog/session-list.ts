@@ -1,4 +1,4 @@
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import { Callout } from "@blueprintjs/core";
 import { SessionInfoLink } from "~/model-views/session/info-card";
 import { FilterListComponent } from "../components/filter-list";

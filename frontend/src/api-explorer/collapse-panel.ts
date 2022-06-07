@@ -7,7 +7,7 @@
 // This component should be refactored into a shared UI component
 
 import { Component } from "react";
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import ReactJson from "react-json-view";
 
 import { CollapsePanel } from "@macrostrat/ui-components";

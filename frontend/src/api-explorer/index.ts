@@ -8,7 +8,7 @@ import "../shared/ui-init";
 import React from "react";
 import { render } from "react-dom";
 import { Route, Link, Redirect } from "react-router-dom";
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import { RouteComponent } from "./route-component";
 import loadable from "@loadable/component";
 
