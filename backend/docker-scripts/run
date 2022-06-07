@@ -17,6 +17,7 @@ if [ $SPARROW_ENV = 'development' ]; then
     -w 1 \
     --config python:sparrow.logs.config \
     --reload \
+    --root-path /api/ \
     --bind $HOST:$PORT \
     "sparrow.__entry__:app"
 else
@@ -24,5 +25,6 @@ else
     -w 1 \
     --log-file - \
     --log-level warning \
+    --root-path /api/ \
     "sparrow.__entry__:app"
 fi
