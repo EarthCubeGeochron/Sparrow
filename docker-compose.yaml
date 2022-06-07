@@ -96,6 +96,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    depends_on:
+      - gateway
     expose:
       - 5000
   db:
@@ -117,7 +119,7 @@ services:
       cache_from:
         - ${SPARROW_FRONTEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/frontend}
     depends_on:
-      - backend
+      - gateway
     environment:
       - CONTAINERIZED=1
       - SPARROW_LAB_NAME
