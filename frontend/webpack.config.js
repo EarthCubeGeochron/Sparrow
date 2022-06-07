@@ -118,12 +118,6 @@ let baseConfig = {
   devtool: "source-map",
   resolve: {
     // Resolve node modules from Sparrow's own node_modules if not found in plugins
-    modules: [
-      "packages",
-      "_local_modules",
-      "node_modules",
-      relativePath("node_modules"),
-    ],
     extensions: [
       ".ts",
       ".tsx",
@@ -143,7 +137,7 @@ let baseConfig = {
       "site-content":
         process.env.SPARROW_SITE_CONTENT || relativePath("default-content"),
       // For node module resolution + hooks
-      react: relativePath("node_modules", "react"),
+      //react: relativePath("node_modules", "react"),
     },
     fallback: { path: false, process: false },
   },
