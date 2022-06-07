@@ -1,2 +1,11 @@
 site-content
 .env
+
+# We are using Yarn v2+, WITHOUT "Zero-install" because it is 
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
