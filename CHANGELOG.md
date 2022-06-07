@@ -7,6 +7,12 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[2.3.1]` - 2022-06-07
+
+- Fixed a bug with resolving the Python API server from the NGINX gateway
+- Improved fault-tolerance of gateway server if API or frontend servers fail.
+- Fix API healthcheck so it correctly reports health if the API is running
+
 ## `[2.3.0]` - 2022-06-06
 
 - Added some nicer error pages to guide the user on application startup.
