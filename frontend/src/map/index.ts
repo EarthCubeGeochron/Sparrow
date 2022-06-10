@@ -51,7 +51,7 @@ const MapHome = (props) => {
     ]),
     h("div.mapHome", [
       h(MapPanel, {
-        width: "750px",
+        width: "100%",
         hide_filter: true,
         mapstyle: StandMapMode,
       }),
