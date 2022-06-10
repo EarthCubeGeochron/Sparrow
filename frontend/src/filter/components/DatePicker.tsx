@@ -14,12 +14,12 @@ const h = hyperStyled(styles);
  *
  */
 export function DatePicker(props) {
-  const { updateDateRange } = props;
+  const { dispatch } = props;
 
   const handleChange = (e) => {
     if (e[0] != null && e[1] != null) {
       const dates = e.map((date) => date.toISOString().split("T")[0]);
-      updateDateRange("date_range", dates);
+      dispatch({ type: "set-date-range", dates });
     }
   };
 

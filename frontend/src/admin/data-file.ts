@@ -29,28 +29,12 @@ export function DataFileAdminPage() {
 
   const initialState = createParamsFromURL(possibleFilters);
 
-  const [params, setParams] = useState(initialState);
-
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      console.log(key, value);
-      if (key == "search") {
-        params["like"] = params[key];
-        delete params[key];
-      }
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
 
   return h(AdminPage, {
     listComponent: h(AdminFilter, {
-      listComponent: h(DataFilesListComponent, { params }),
+      listComponent: DataFilesListComponent,
       possibleFilters,
-      createParams,
-      initParams: params || {},
+      initParams: initialState || {},
     }),
     mainPageComponent: h(DataFilesMainPanel),
   });

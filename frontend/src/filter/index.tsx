@@ -59,15 +59,12 @@ function SampleFilter({ on_map = false }: Filter) {
 
 const TagContainer = (props) => {
   const [tags, setTags] = useState({});
-  const { params, removeParam, createParams } = props;
+  const { params, removeParam } = props;
+  console.log(params);
 
   useEffect(() => {
     setTags(params);
   }, [params]);
-
-  useEffect(() => {
-    createParams(tags);
-  }, [JSON.stringify(tags)]);
 
   function objectFilter(obj, predicate) {
     const newObject = Object.fromEntries(Object.entries(obj).filter(predicate));
@@ -112,52 +109,27 @@ const TagContainer = (props) => {
 function AdminFilter(props) {
   // need a prop that grabs set to create params
   const {
-    createParams,
     possibleFilters,
     listComponent,
     initParams,
-    dropdown = false,
+    componentProps = {},
     addModelButton = null,
   } = props;
 
-  const [params, dispatch] = useReducer(reducer, initParams);
-  const [tags, setTags] = useState(params);
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterState, dispatch] = useReducer(reducer, {
+    params: { ...initParams },
+    isOpen: false,
+  });
 
-  const updateParams = (field, data) => {
-    if (field == "date_range") {
-      dispatch({ type: "date_range", payload: { dates: data } });
-    }
-    if (field == "public") {
-      dispatch({ type: "public", payload: { embargoed: data } });
-    }
-    if (field == "doi_like") {
-      dispatch({ type: "doi_like", payload: { doi_like: data } });
-    }
-    if (field == "geometry") {
-      dispatch({ type: "geometry", payload: { geometry: data } });
-    }
-    if (field == "search") {
-      dispatch({ type: "search", payload: { search: data } });
-    }
-  };
   const removeParam = (key) => {
-    dispatch({ type: "removeSingle", payload: { field: key } });
+    dispatch({ type: "remove-filter", field: key });
   };
 
   const onSubmit = () => {
-    createParams(params);
-    setTags(params);
-    setFilterOpen(!filterOpen);
-    urlSearchFromParams(params);
+    dispatch({ type: "toggle-open" });
+    urlSearchFromParams(filterState);
   };
 
-  const onSearch = (e) => {
-    e.preventDefault();
-    createParams(params);
-    setTags(params);
-    urlSearchFromParams(params);
-  };
   const SumbitFilterButton = () => {
     return h(
       Button,
@@ -173,7 +145,7 @@ function AdminFilter(props) {
       Button,
       {
         intent: "danger",
-        onClick: () => setFilterOpen(!filterOpen),
+        onClick: () => dispatch({ type: "toggle-open" }),
         style: { marginLeft: "10px" },
       },
       ["Cancel"]
@@ -190,21 +162,21 @@ function AdminFilter(props) {
     [
       h("div", [
         h.if(possibleFilters.includes("public"))(EmabrgoSwitch, {
-          updateEmbargoFilter: updateParams,
+          dispatch,
         }),
         h.if(possibleFilters.includes("tag"))(TagFilter, {
-          updateParams,
+          dispatch,
         }),
         h("div", [
           h.if(possibleFilters.includes("date_range"))(DatePicker, {
-            updateDateRange: updateParams,
+            dispatch,
           }),
         ]),
         h.if(possibleFilters.includes("doi_like"))(DoiFilter, {
-          updateDoi: updateParams,
+          dispatch,
         }),
         h.if(possibleFilters.includes("geometry"))(MapPolygon, {
-          updateParams,
+          dispatch,
         }),
         h("div", { style: { margin: "10px", marginLeft: "0px" } }, [
           h(SumbitFilterButton),
@@ -214,59 +186,17 @@ function AdminFilter(props) {
     ]
   );
 
-  const leftElement = () => {
-    const [open, setOpen] = useState(false);
-
-    const changeOpen = () => {
-      setOpen(!open);
-    };
-
-    return h("div", [
-      h(
-        Popover,
-        {
-          isOpen: open,
-          content: Content,
-          minimal: true,
-          position: "bottom",
-        },
-        [
-          h(Tooltip, { content: "Choose Multiple Filters" }, [
-            h(Button, { minimal: true, onClick: changeOpen }, [
-              h(Icon, { icon: "filter" }),
-            ]),
-          ]),
-        ]
-      ),
-    ]);
-  };
-
-  // Allow for filters to also be a dropdown menu
-  if (dropdown) {
-    return Content;
-  }
-
   return h("div", { style: { position: "relative" } }, [
     h("div.list-component", [
       h(SearchInput, {
-        leftElement: h(Button, {
-          icon: "filter",
-          onClick: () => setFilterOpen(!filterOpen),
-          minimal: true,
-        }),
-        updateParams,
-        rightElement: h(Button, {
-          icon: "search",
-          onClick: onSearch,
-          minimal: true,
-          type: "submit",
-        }),
-        text: params.search || "",
+        dispatch,
       }),
-      h(TagContainer, { params: tags, removeParam, createParams }),
+      h(TagContainer, { params: filterState.params, removeParam }),
       addModelButton,
     ]),
-    filterOpen ? Content : listComponent,
+    filterState.isOpen
+      ? Content
+      : h(listComponent, { params: filterState.params, componentProps }),
   ]);
 }
 

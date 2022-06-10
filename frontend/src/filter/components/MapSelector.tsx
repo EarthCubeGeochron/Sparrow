@@ -15,7 +15,7 @@ import { FilterAccordian } from "./utils";
  * */
 
 export function MapPolygon(props) {
-  const { updateParams } = props;
+  const { dispatch } = props;
 
   const [features, setFeatures] = useState({
     type: "Feature",
@@ -36,9 +36,8 @@ export function MapPolygon(props) {
 
   const handleChange = ({ features }) => {
     setFeatures(features[0]);
-    console.log(features[0]);
     const polygon = toWKT(features[0].geometry.coordinates[0]);
-    updateParams("geometry", polygon);
+    dispatch({ type: "set-geometry", geometry: polygon });
   };
 
   const content = h("div", { style: { position: "relative" } }, [

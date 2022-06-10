@@ -6,12 +6,9 @@ import styles from "./module.styl";
 import { NoStateAdmin } from "./baseview";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import {
-  SampleFilterList,
-  PublicationFilterList,
-  ResearcherFilterList,
-  SessionFilterList,
   ProjectMatch,
   ProjectListComponent,
+  ModelFilterLists,
 } from "~/model-views";
 import { NewProjectForm } from "../model-views/project/new-project";
 import { AdminFilter } from "../filter";
@@ -70,9 +67,8 @@ const mainFilterList = (props) => {
   };
 
   return h(AdminFilter, {
-    listComponent: h(ProjectListComponent, { params }),
+    listComponent: ProjectListComponent,
     possibleFilters,
-    createParams,
     initParams: params || {},
   });
 };
@@ -82,17 +78,9 @@ const ProjectAdminList = (props) => {
 
   return h("div", [
     h.if(listName == "main")(mainFilterList),
-    h.if(listName == "sample")(SampleFilterList, {
+    h.if(listName !== "main")(ModelFilterLists, {
       onClick: updateFunction,
-    }),
-    h.if(listName == "publication")(PublicationFilterList, {
-      onClick: updateFunction,
-    }),
-    h.if(listName == "researcher")(ResearcherFilterList, {
-      onClick: updateFunction,
-    }),
-    h.if(listName == "session")(SessionFilterList, {
-      onClick: updateFunction,
+      listName,
     }),
   ]);
 };
