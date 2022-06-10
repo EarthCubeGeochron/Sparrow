@@ -35,7 +35,11 @@ export const MapNav = () => {
   return (
     <div>
       <div className="mappagemenu">
-        <Popover content={dropMenu} minimal={true} position={Position.BOTTOM}>
+        <Popover
+          content={dropMenu}
+          minimal={true}
+          position={Position.BOTTOM_LEFT}
+        >
           <Tooltip content="Navigate">
             <Button minimal={true}>
               <Icon icon="menu" />
