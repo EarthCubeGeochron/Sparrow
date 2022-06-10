@@ -21,8 +21,6 @@ import { VocabularyPage } from "./vocabulary";
 
 import { TagManager } from "~/components/tags";
 
-import { SchemaExplorerMainPanel } from "./schema-explorer";
-
 //@ts-ignore
 import styles from "./module.styl";
 
