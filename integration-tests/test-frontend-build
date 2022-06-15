@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+export SPARROW_ENV=production
+export SPARROW_SECRET_KEY=test
+export COMPOSE_PROFILES=frontend # Only run the frontend and dependent containers
+sparrow compose up -d
+sleep 1
+
+sparrow down

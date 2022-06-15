@@ -66,8 +66,12 @@ def prepare_compose_overrides():
         profiles.append("task-worker")
 
     if len(profiles) > 0:
-        environ["COMPOSE_PROFILES"] = ",".join(profiles)
-        log.info(f"docker-compose profiles: {profiles}")
+        # Only override profiles if they don't already exist in configuration.
+        environ.setdefault("COMPOSE_PROFILES", ",".join(profiles))
+    
+    # Get profiles from environment
+    profiles = environ.get("COMPOSE_PROFILES", "").split(",")
+    log.info(f"docker-compose profiles: {profiles}")
 
     # Use certbot for SSL if certain conditions are met
     use_certbot = (

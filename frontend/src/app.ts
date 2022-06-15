@@ -89,14 +89,23 @@ function App() {
   const baseURL = process.env.BASE_URL ?? "/";
   const apiBaseURL = join(process.env.API_BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
 
-  return h(
+  return h([
     compose(
       C(FrameProvider, { overrides: siteContent }),
       C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
       AuthProvider,
       DarkModeManager,
       C(AppRouter, { baseURL })
-    )
+    ),
+    h(Canary),
+  ]);
+}
+
+function Canary() {
+  return h(
+    "div.__canary",
+    { style: { display: "none" } },
+    "This element is used to test whether the application rendered properly."
   );
 }
 
