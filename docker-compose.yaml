@@ -100,6 +100,8 @@ services:
       - gateway
     expose:
       - 5000
+    profiles:
+      - core
   db:
     image: mdillon/postgis:11
     expose:
@@ -112,12 +114,16 @@ services:
       - POSTGRES_DB=sparrow
     volumes:
       - db_cluster:/var/lib/postgresql/data
+    profiles:
+      - core
   frontend:
     image: ${SPARROW_FRONTEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/frontend}
     build:
       context: frontend
       cache_from:
         - ${SPARROW_FRONTEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/frontend}
+    profiles:
+      - frontend
     depends_on:
       - gateway
     environment:

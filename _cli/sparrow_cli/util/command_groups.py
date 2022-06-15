@@ -9,7 +9,21 @@ from .formatting import format_description, console
 from .shell import find_subcommand, run
 
 
-class SparrowDefaultCommand(DefaultGroup):
+class CommandGroup(click.Group):
+    """A command group that allows us to specify shell subcommands to shadow"""
+
+    def add_shell_command(self, k, v, prefix=""):
+        @self.command(name=k, short_help=format_description(v))
+        @click.argument("args", nargs=-1, type=click.UNPROCESSED)
+        @click.pass_context
+        def command(ctx, args):
+            obj = ctx.find_object(SparrowConfig)
+            fn = find_subcommand(obj.bin_directories, k, prefix=prefix)
+            res = run(fn, *args)
+            sys.exit(res.returncode)
+
+
+class SparrowDefaultCommand(DefaultGroup, CommandGroup):
     def __call__(self, *args, **kwargs):
         try:
             return self.main(*args, **kwargs)
@@ -36,17 +50,3 @@ class SparrowDefaultCommand(DefaultGroup):
         if len(_args) == 0:
             args.append(self.default_cmd_name)
         super().parse_args(ctx, args)
-
-
-class CommandGroup(click.Group):
-    """A command group that allows us to specify shell subcommands to shadow"""
-
-    def add_shell_command(self, k, v, prefix=""):
-        @self.command(name=k, short_help=format_description(v))
-        @click.argument("args", nargs=-1, type=click.UNPROCESSED)
-        @click.pass_context
-        def command(ctx, args):
-            obj = ctx.find_object(SparrowConfig)
-            fn = find_subcommand(obj.bin_directories, k, prefix=prefix)
-            res = run(fn, *args)
-            sys.exit(res.returncode)

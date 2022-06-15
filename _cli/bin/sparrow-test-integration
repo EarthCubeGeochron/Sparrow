@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Run first-step integration tests to check that the frontend comes up.
+export COMPOSE_PROJECT_NAME=sparrow_integration
+export SPARROW_ENV=production
+export SPARROW_SECRET_KEY=test
+export COMPOSE_PROFILES=frontend # Only run the frontend and dependent containers
+
+sparrow compose up -d
+
+# Simulate some testing
+sleep 1
+false # This will fail
+status=$?
+echo "test exit status: $status"
+
+sparrow down
+
+
+exit $status
