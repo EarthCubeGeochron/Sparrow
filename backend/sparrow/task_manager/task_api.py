@@ -21,7 +21,7 @@ class TaskEndpoint(WebSocketEndpoint):
     _listener = None
 
     def start_task(self, name: str, params: object = {}):
-        log.debug("Starting task " + name)
+        log.debug(f"Starting task {name} with params {params}")
         mgr = get_plugin("task-manager")
         task = mgr.get_task(name)
         i = mgr.celery.control.inspect()

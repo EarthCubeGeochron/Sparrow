@@ -62,6 +62,14 @@ class TestSparrowTaskManager:
         assert mgr._tasks["sludge"]["cli_only"]
         assert "sludge" not in tasks_api_response["tasks"]
 
+    def test_task_api_params(self, tasks_api_response):
+        """Make sure that task API parameters are available on the frontend."""
+        for item in tasks_api_response["tasks"]:
+            if item["name"] == "hello":
+                assert item["params"] == [{"name": "name", "type": "string"}]
+            elif item["name"] == "kinda-real":
+                assert task["params"]["check_real"]["type"] == "boolean"
+
     def test_task_manager_api_enabled(self, app, tasks_api_response):
         mgr = app.plugins.get("task-manager")
         assert tasks_api_response["enabled"] == mgr._task_worker_enabled

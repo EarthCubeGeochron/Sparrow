@@ -97,11 +97,11 @@ def task(*args, **kwargs):
             # Register the task right now
             mgr.register_task(func, *args, **kwargs)
 
-        def _run_task(*args, **kwargs):
+        def _run_task(*args, **task_kwargs):
             """Function to run a task that is already registered to the running Sparrow application."""
             mgr = get_plugin("task-manager")
             func = mgr.get_task(task_name)
-            return func(*args, **kwargs)
+            return func(*args, **task_kwargs)
 
         return _run_task
 
