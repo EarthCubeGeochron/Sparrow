@@ -81,9 +81,14 @@ let baseConfig = {
     host: "0.0.0.0",
     port: 3000,
     hot: true,
-    open: true,
+    open: environment == "local-development",
     historyApiFallback: true,
   },
+  // Might be useful for docker?
+  // watchOptions: {
+  //   aggregateTimeout: 300,
+  //   poll: 1000,
+  // },
   module: {
     rules: [
       ...styleRules,

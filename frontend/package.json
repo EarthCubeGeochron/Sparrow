@@ -110,7 +110,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:docker": "SPARROW_ENV=development nodemon --watch package.json --watch webpack.config.js --exec 'yarn install && webpack serve'",
+    "dev:docker": "SPARROW_ENV=development yarn run nodemon --watch package.json --watch webpack.config.js --exec 'yarn install && webpack serve'",
     "dev": "SPARROW_ENV=local-development webpack serve",
     "start": "webpack"
   },

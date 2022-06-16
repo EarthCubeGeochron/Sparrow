@@ -84,21 +84,22 @@ const errorHandler = function (route, response) {
   return AppToaster.show({ message, intent: Intent.DANGER });
 };
 
-function App() {
-  // Nest application in React context providers
-  const baseURL = process.env.BASE_URL ?? "/";
-  const apiBaseURL = join(process.env.API_BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
+const baseURL = process.env.BASE_URL ?? "/";
+const apiBaseURL = join(process.env.API_BASE_URL ?? "/", "/api/v1");
 
-  return h([
-    compose(
-      C(FrameProvider, { overrides: siteContent }),
-      C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
-      AuthProvider,
-      DarkModeManager,
-      C(AppRouter, { baseURL })
-    ),
-    h(Canary),
-  ]);
+// Nest application in React context providers
+const CoreAppComponent = compose(
+  C(FrameProvider, { overrides: siteContent }),
+  C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
+  AuthProvider,
+  DarkModeManager,
+  C(AppRouter, { baseURL })
+);
+
+function App() {
+  //process.env.BASE_URL || "/";
+
+  return h([h(CoreAppComponent), h(Canary)]);
 }
 
 function Canary() {
