@@ -1,12 +1,14 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -e
 
 # Run first-step integration tests to check that the frontend comes up.
 export COMPOSE_PROJECT_NAME=sparrow_integration
 export SPARROW_ENV=production
 export SPARROW_SECRET_KEY=test
+export SPARROW_HTTP_PORT=48412 # Set a random external port
 export COMPOSE_PROFILES=frontend # Only run the frontend and dependent containers
 
-sparrow compose up -d
+sparrow compose build frontend
+sparrow compose up frontend
 
 # Simulate some testing
 sleep 1
@@ -16,5 +18,6 @@ echo "test exit status: $status"
 
 sparrow down
 
+[ $status -eq 0 ] && echo "Integration tests passed" || echo "Integration tests failed"
 
 exit $status
