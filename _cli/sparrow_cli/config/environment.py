@@ -1,11 +1,8 @@
 import sys
-from docker import from_env
-from docker.errors import DockerException
 from os import environ, getenv
 from click import secho
 from rich import print
 from sparrow.utils import relative_path, get_logger
-from ..util.exceptions import SparrowCommandError
 
 log = get_logger(__name__)
 
@@ -18,20 +15,9 @@ def is_truthy(envvar, default="False"):
     return getenv(envvar, "False").lower() in ("true", "1", "t", "y", "yes")
 
 
-def check_docker_availability():
-    try:
-        from_env()
-    except DockerException as exc:
-        raise SparrowCommandError(
-            "Cannot connect to the Docker daemon. Is Docker running?", details=str(exc)
-        )
-
-
 def prepare_docker_environment():
     if environ.get("_SPARROW_ENV_PREPARED", "0") == "1":
         return
-
-    check_docker_availability()
 
     # Convey that we have already prepared the environment
     environ["_SPARROW_ENV_PREPARED"] = "1"
@@ -73,15 +59,19 @@ def prepare_compose_overrides():
     # Use the docker-compose profile tool to enable some services
     # NOTE: this is a nicer way to do some things that needed to be handled by
     # compose-file overrides in the past.
-    profiles = []
+    profiles = ["core", "frontend"]  # We default to always running the 'core' profile.
     if is_production:
         profiles.append("production")
     if is_truthy("SPARROW_TASK_WORKER"):
         profiles.append("task-worker")
 
     if len(profiles) > 0:
-        environ["COMPOSE_PROFILES"] = ",".join(profiles)
-        log.info(f"docker-compose profiles: {profiles}")
+        # Only override profiles if they don't already exist in configuration.
+        environ.setdefault("COMPOSE_PROFILES", ",".join(profiles))
+
+    # Get profiles from environment
+    profiles = environ.get("COMPOSE_PROFILES", "").split(",")
+    log.info(f"docker-compose profiles: {profiles}")
 
     # Use certbot for SSL if certain conditions are met
     use_certbot = (

@@ -185,6 +185,12 @@ def _db_migration(db, safe=True, apply=False, hide_view_changes=False, quiet=Fal
     db_migration(db, safe=safe, apply=apply, hide_view_changes=hide_view_changes)
 
 
+@cli.command(name="db-drop-cache")
+@with_database
+def _db_drop_cache(db):
+    db.mapper.drop_model_cache()
+
+
 @cli.command(name="db-update")
 @with_database
 @click.option("--dry-run", is_flag=True, default=False)

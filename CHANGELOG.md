@@ -7,6 +7,66 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[2.3.1]` - 2022-06-07
+
+- Fixed a bug with resolving the Python API server from the NGINX gateway
+- Improved fault-tolerance of gateway server if API or frontend servers fail.
+- Fix API healthcheck so it correctly reports health if the API is running
+
+## `[2.3.0]` - 2022-06-06
+
+- Added some nicer error pages to guide the user on application startup.
+- Major updates to container orchestration to better differentiate `development` and `production` modes.
+- Fix Webpack development server "hot reloading" for frontend code.
+- Added a `sparrow dev printenv` command.
+- Fixed https://github.com/EarthCubeGeochron/Sparrow/issues/287
+
+## `[2.2.0]` - 2022-06-03
+
+- Sparrow's caching mechanism for SQLAlchemy models was disabled, due to some
+  problems with importers. It can be enabled on an opt-in basis using the
+  `SPARROW_CACHE_DATABASE_MODELS` environment variable.
+- More consistently drop caches using the `sparrow db drop-cache` command.
+
+## `[2.1.4]` - 2022-06-03
+
+- Fix a bug with bundling production instances
+- Fix an issue with the `sparrow db import` command
+- Add CLI commands to drop database caches (`sparrow db drop-cache` and `sparrow dev clear-cache` now both do this.)
+
+## `[2.1.1]` - 2022-05-24
+
+- **Command-line**: CLI returns success even when `docker`
+  is not available, but warns the user.
+
+## `[2.1.0]` - 2022-05-23
+
+This version contains many fixes for data importing and some foundational improvements
+to support future frontend updates.
+
+### Command-line interface
+
+- Add a `sparrow update` command that downloads/installs the most recent version of the Sparrow application.
+- Fix `sparrow db import` command to be more reliable at reading database dump files
+- Slightly relax the requirement to set `SPARROW_SECRET_KEY` (now this is only required for starting the application server).
+- Improve bundling of command line application and upgrade PyInstaller.
+- Improve documentation for server setup environment variables
+
+### Data model and ingestion
+
+- Add sample-researcher links
+- Allow SQLAlchemy models to be passed to import schemas for all nested and related fields.
+- Date importing fixes: allow Python `datetime` objects, `YYYY-MM-DD` dates, and `YYYY-MM-DD HH:MM:SS` date/times
+  to be imported as well as ISO 8601 (`YYYY-MM-DDTHH:MM:SS`) date/times.
+- Add tests for importing multiple instances of the same model
+- Add tests for updating a module with new data
+
+### Frontend
+
+- Move to Webpack v5 for frontend bundling
+- Simplify some framework code
+- Vastly increase the performance of map areas with large numbers of data points
+
 ## `[2.0.0]` - 2022-03-27
 
 This is the first non-beta release of the 2.0.0 series. It has most of the tools needed

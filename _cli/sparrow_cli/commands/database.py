@@ -64,6 +64,12 @@ def migration(args):
     exec_sparrow("db-migration", *args)
 
 
+@sparrow_db.command(name="drop-cache")
+def drop_cache():
+    """Drop the cache of SQLAlchemy models maintained by the backend container."""
+    exec_sparrow("db-drop-cache")
+
+
 @sparrow_db.command(name="update", context_settings=dict(ignore_unknown_options=True))
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def update(args):

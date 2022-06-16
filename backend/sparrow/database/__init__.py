@@ -11,6 +11,7 @@ from marshmallow import RAISE, EXCLUDE
 from sparrow.birdbrain import Database as BaseDatabase
 from sparrow.birdbrain import on_conflict
 from sparrow.birdbrain.utils import run_sql
+import collections.abc
 
 from .models import User, Project, Session, DatumType
 from sparrow.logs import get_logger
@@ -79,16 +80,23 @@ class Database(BaseDatabase):
             - session: the session to use for the import
             - strict: if True, will raise an exception on extra fields
             - unknown: Pass through to Marshmallow's load() behavior on unknown fields
+            - many: whether we should attempt to load multiple objects (default: if input is a list)
         """
         if session is None:
             session = self.session
         # Do an end-around for lack of creating interfaces on app startup
         model = getattr(self.model, model_name)
+
+        # Check if we want to load a list of instances
+        many = isinstance(data, collections.abc.Sequence) and not isinstance(data, str)
+        many = kwargs.pop("many", many)
+
+        many = isinstance(data, list)
         if not hasattr(model, "__mapper__"):
             raise DatabaseMappingError(
                 f"Model {model} does not have appropriate field mapping"
             )
-        schema = model_interface(model, session)()
+        schema = model_interface(model, session)(many=many)
 
         strict_mode = kwargs.pop("strict", False)
         default_unknown = RAISE if strict_mode else EXCLUDE

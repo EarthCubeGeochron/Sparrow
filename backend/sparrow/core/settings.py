@@ -11,6 +11,9 @@ CACHE_DIR = config("SPARROW_CACHE_DIR", default="/cache")
 TASK_BROKER = config("SPARROW_TASK_BROKER", default=None)
 TASK_WORKER_ENABLED = config("SPARROW_TASK_WORKER", cast=bool, default=True)
 
-SECRET_KEY = config("SPARROW_SECRET_KEY", None)
-if SECRET_KEY is None:
-    raise KeyError("Environment variable `SPARROW_SECRET_KEY` must be set")
+SECRET_KEY = config("SPARROW_SECRET_KEY", default=None)
+
+
+def check_secret_key():
+    if SECRET_KEY is None:
+        raise KeyError("Environment variable `SPARROW_SECRET_KEY` must be set")

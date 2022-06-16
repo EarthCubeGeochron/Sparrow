@@ -4,28 +4,49 @@ Server Configuration
 
 import { DocsPage } from "components";
 
-Sparrow is configured using environment variables. Here are a few of the most
-important ones:
+Sparrow is configured using **environment variables**.
+
+Configuration variables are most often set in the `sparrow-config.sh` file,
+which much be present in the root directory of your Sparrow lab instance. If
+available, a `sparrow-config.overrides.sh` and `sparrow-secrets.sh` file will
+also be applied, in that order. These "secret" files are designed to contain lab-specific
+secret keys, tokens, and other values that should not be added to version control.
+
+Here are a few of the most important variables:
 
 - `SPARROW_SECRET_KEY="very secret string"`: A secret key used for management
   of passwords. Set this in your **LOCAL** environment (it will be copied to
   the Docker runtime as needed). It is the only variable required to run a basic test application.
-- `SPARROW_BACKEND_CONFIG="<path>"`: Location of `.cfg` files containing data.
-- The frontend is confugured using the variables `SPARROW_SITE_CONTENT`
-  and `SPARROW_BASE_URL`. These values replace the former function of the `SPARROW_CONFIG_JSON` file.
 - The `SPARROW_ENV=<development,production>` environment variable defaults to
   `production`, which disable development-focused features such
   as live code reloading and sourcemaps for performance and security.
+- `SPARROW_HTTP_PORT` and `SPARROW_HTTPS_PORT` are used to
+  configure the ports on which Sparrow can be accessed. `SPARROW_HTTP_PORT=5002` by default,
+  but `SPARROW_HTTP_PORT=80` and `SPARROW_HTTPS_PORT=443` 5002` are typically used to serve
+  the application publicly.
+- `SPARROW_BACKEND_CONFIG="<path>"`: Location of `.cfg` files containing backend configuration.
+  When running in Docker, these values typically do not need to be changed.
+- The frontend is configured using the variables `SPARROW_SITE_CONTENT`
+  and `SPARROW_BASE_URL`.
+
+## Configuring Sparrow for HTTPS
+
+One of the most important environment variables has to do with running Sparrow
+using HTTPS transport security. Most commonly, this is done using Certbot, a
+free service that manages certificates. Certbot will automatically create
+certificates and update them on a regular basis. To set up Certbot, the
+following config values must be set:
+
+- `SPARROW_DOMAIN=<domain>`: The domain name (including optional subdomain) of the Sparrow instance.
+  For example, `SPARROW_DOMAIN=wiscar-sparrow.geology.wisc.edu`.
+- `CERTBOT_EMAIL=<email>`: The email address associated with the certificate.
+
+If configured, Sparrow will serve SSL on port 443. This can be adjusted with the `SPARROW_HTTPS_PORT`
+variable.
 
 :::note
 More detailed configurations can be set by directly
 using [docker-compose environment variables](https://docs.docker.com/compose/reference/envvars/).
 :::
-
-Configuration variables are most often set in the `sparrow-config.sh` file,
-which much be present in the root directory of your Sparrow lab instance. If
-available, a `sparrow-config.overrides.sh` and `sparrow-secrets.sh` file will
-also be sourced, in that order. These files should not be added to version
-control.
 
 export default DocsPage;

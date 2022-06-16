@@ -22,6 +22,9 @@ x-backend:
     - SPARROW_DATA_DIR=/data
     # A cache for files that need to persist but can be rebuilt.
     - SPARROW_CACHE_DIR=/cache
+    # We have an experimental caching mechanism for SQLAlchemy models, but this
+    # may cause bugs for importers and is not enabled by default. (added in v2.2.0)
+    - SPARROW_CACHE_DATABASE_MODELS
     - SPARROW_INIT_SQL=/init-sql
     # For cloud data support
     # NOTE: it may be useful to split this into a
@@ -78,26 +81,27 @@ x-backend:
     - model_cache:/root/.sqlalchemy-cache
 services:
   gateway:
-    depends_on:
-      - backend
-      - frontend
     ports:
       - ${SPARROW_HTTP_PORT:-5002}:80
     volumes:
       - ./nginx-config/locations/core.conf:/etc/nginx/locations/core.conf:ro
-      - ./nginx-config/locations/browser-sync.conf:/etc/nginx/locations/browser-sync.conf:ro
+      - ./nginx-config/error-pages:/usr/share/nginx/error-pages/error:ro
       - frontend_build:/frontend
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend: 
     <<: *x-backend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 20s
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/v2/"]
+      interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+    depends_on:
+      - gateway
     expose:
       - 5000
+    profiles:
+      - core
   db:
     image: mdillon/postgis:11
     expose:
@@ -110,19 +114,24 @@ services:
       - POSTGRES_DB=sparrow
     volumes:
       - db_cluster:/var/lib/postgresql/data
+    profiles:
+      - core
   frontend:
     image: ${SPARROW_FRONTEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/frontend}
     build:
       context: frontend
       cache_from:
         - ${SPARROW_FRONTEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/frontend}
+    profiles:
+      - frontend
     depends_on:
-      - backend
+      - gateway
     environment:
       - CONTAINERIZED=1
       - SPARROW_LAB_NAME
       - SPARROW_ECHO_SQL
-      - SPARROW_BASE_URL
+      - BASE_URL=${SPARROW_BASE_URL:-/}
+      - API_BASE_URL=${SPARROW_BASE_URL:-/}
       # We need to forward SPARROW_HTTP_PORT to the frontend so that we can
       # load BrowserSync on the correct port if in development mode
       - SPARROW_HTTP_PORT
@@ -181,8 +190,6 @@ services:
     profiles:
       - task-worker
     image: redis:latest
-    ports:
-      - 6379:6379
   worker:
     <<: *x-backend
     depends_on:

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Run first-step integration tests to check that the frontend comes up.
+export COMPOSE_PROJECT_NAME=sparrow_integration
+export SPARROW_ENV=production
+export SPARROW_SECRET_KEY=test
+export SPARROW_HTTP_PORT=48412 # Set a random external port
+export COMPOSE_PROFILES=frontend # Only run the frontend and dependent containers
+
+export MAPBOX_API_TOKEN=test-token
+
+trap 'status=$?; finish; exit $status' EXIT
+
+function finish {
+  sparrow down
+  [ $status -eq 0 ] && echo "Integration tests passed" || echo "Integration tests failed"
+}
+
+sparrow compose build frontend
+sparrow compose up -d frontend
+
+sparrow compose logs -f frontend &
+
+# Check that we get the basic "not bundled yet" error page.
+curl -s http://localhost:$SPARROW_HTTP_PORT/ | grep '<h1>Sparrow frontend not found</h1>'
+
+# Wait 5 minutes for the frontend to come up.
+timeout 300 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:'$SPARROW_HTTP_PORT')" != "200" ]]; do sleep 1; done' || false

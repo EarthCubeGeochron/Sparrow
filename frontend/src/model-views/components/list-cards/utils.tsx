@@ -5,21 +5,18 @@ import { Link } from "react-router-dom";
 import { FormattedLngLat, pluralize } from "../new-model";
 import { useModelURL } from "~/util";
 import styles from "./card.styl";
+import classNames from "classnames";
 import { FormattedDate, ProjectCardContent, Publication } from "~/model-views";
 
 const h = hyperStyled(styles);
 
 function clickedClassname(props) {
   const { clicked, id } = props;
-  if (clicked == `${id}`) {
-    return "model-card.clicked";
-  } else {
-    return "model-card";
-  }
+  return classNames("model-card", { clicked: clicked == id });
 }
 
 type ModelCardProps = {
-  content: ReactNode;
+  children: ReactNode;
   id: number;
   model: string;
   showIdentity?: "long" | "short" | null;
@@ -27,9 +24,9 @@ type ModelCardProps = {
   onClick?: () => void;
 };
 
-export function ModelCard(props: ModelCardProps) {
+export function ModelCard(props: ModelCardProps): ReactNode {
   const {
-    content,
+    children,
     id,
     model,
     showIdentity = null,
@@ -48,25 +45,31 @@ export function ModelCard(props: ModelCardProps) {
 
   const to = useModelURL(`/${model}/${id}`);
 
-  const classname = clickedClassname({ clicked, id });
+  const className = clickedClassname({ clicked, id });
+
+  //if (model == null) return null;
 
   let idInfo = showIdentity == "long" ? `${model} ${id}` : id;
 
   if (link) {
     return h(Link, { to, style: { textDecoration: "none" } }, [
-      h(`div.${classname}`, [
-        h.if(showIdentity != null)("div.id-info", idInfo),
-        content,
-      ]),
+      h(
+        "div",
+        {
+          className,
+        },
+        [h.if(showIdentity != null)("div.id-info", idInfo), children]
+      ),
     ]);
   } else {
     return h("div", [
       h(
-        `div.${classname}`,
+        "div",
         {
+          className,
           onClick,
         },
-        [content]
+        children
       ),
     ]);
   }
@@ -126,26 +129,29 @@ const SampleModelCard = (props) => {
 
   const sample = { material, id, name, location, session };
 
-  const content = h(
-    Frame,
-    {
-      id: "sampleCardContent",
-      data: { material, id, name, location, session },
-    },
-    h(SampleDefaultContent, { material, id, name, location, session })
-  );
-  if (onClick == null) {
-    return h(ModelCard, { id, content, model: "sample", link, showIdentity });
+  let clickFunc = null;
+  if (onClick != null) {
+    clickFunc = () => onClick(sample);
   }
 
-  return h(ModelCard, {
-    id,
-    content,
-    showIdentity,
-    model: "sample",
-    link,
-    onClick: () => onClick(sample),
-  });
+  return h(
+    ModelCard,
+    {
+      id,
+      showIdentity,
+      model: "sample",
+      link,
+      onClick: clickFunc,
+    },
+    h(
+      Frame,
+      {
+        id: "sampleCardContent",
+        data: { material, id, name, location, session },
+      },
+      h(SampleDefaultContent, { material, id, name, location, session })
+    )
+  );
 };
 
 const interior = ({ doi, title }) => {
@@ -169,13 +175,13 @@ const PublicationModelCard = (props) => {
   const { year, id, title, doi, author, journal, onClick, link, showIdentity } =
     props;
 
-  const content = h(Frame, { id: "publicationCardContent" }, [
+  const children = h(Frame, { id: "publicationCardContent" }, [
     h(interior, { title, doi }),
   ]);
 
   return h(ModelCard, {
     id,
-    content,
+    children,
     showIdentity,
     model: "publication",
     link,
@@ -186,7 +192,7 @@ const PublicationModelCard = (props) => {
 export const ResearcherModelCard = (props) => {
   const { id, name, onClick, link, showIdentity } = props;
 
-  const content = h(
+  const children = h(
     Frame,
     { id: "researcherCardContent", data: { id, name } },
     h("h4", { style: { margin: "10px" } }, name)
@@ -194,7 +200,7 @@ export const ResearcherModelCard = (props) => {
 
   return h(ModelCard, {
     id,
-    content,
+    children,
     showIdentity,
     model: "researcher",
     link,
@@ -216,7 +222,7 @@ const ProjectModelCard = (props) => {
     minimal = false,
   } = props;
 
-  const content = h(ProjectCardContent, {
+  const children = h(ProjectCardContent, {
     name,
     description,
     sample,
@@ -230,13 +236,13 @@ const ProjectModelCard = (props) => {
       id: "projectCardContent",
       data: { id, name, description, sample, session, publication },
     },
-    content
+    children
   );
 
   return h(ModelCard, {
     id,
     showIdentity,
-    content: cardContent,
+    children: cardContent,
     model: "project",
     link,
     onClick: () => onClick(id, name),
@@ -245,7 +251,7 @@ const ProjectModelCard = (props) => {
 
 const SessionListContent = (props) => {
   const {
-    classname,
+    className,
     target,
     date,
     technique,
@@ -264,7 +270,7 @@ const SessionListContent = (props) => {
   const analysisName = analysis.length > 1 ? "Analyses" : "Analysis";
   const analysisCount = analysis.length + " " + analysisName;
 
-  return h(`div.${classname}`, [
+  return h("div", { className }, [
     h("div.card-header", [h(FormattedDate, { date }), h("div", sampleName)]),
     h("div.bod", [
       h.if(FCS)("div", [FCS]),
@@ -292,13 +298,15 @@ const SessionListModelCard = (props) => {
     link,
     onClick,
     showIdentity,
-    onHover = false,
+    onHover = null,
   } = props;
 
-  const classname = onHover ? "session-card-hover" : "session-card";
+  const className = classNames("session-card", {
+    "session-card-hover": onHover != null,
+  });
 
-  const content = h(SessionListContent, {
-    classname,
+  const children = h(SessionListContent, {
+    className,
     target,
     date,
     technique,
@@ -323,12 +331,12 @@ const SessionListModelCard = (props) => {
         data,
       },
     },
-    content
+    children
   );
 
   return h(ModelCard, {
     id: id,
-    content: cardContent,
+    children: cardContent,
     showIdentity,
     model: "session",
     link,
@@ -348,13 +356,15 @@ const SessionModelLinkCard = (props) => {
     data,
     link,
     onClick,
-    onHover = false,
+    onHover = null,
   } = props;
 
-  const classname = onHover ? "session-card-hover" : "session-card";
+  const className = classNames("session-card", {
+    "session-card-hover": onHover != null,
+  });
 
-  const content = h(SessionListContent, {
-    classname,
+  const children = h(SessionListContent, {
+    className,
     target,
     date,
     technique,
@@ -379,12 +389,12 @@ const SessionModelLinkCard = (props) => {
         data,
       },
     },
-    content
+    children
   );
 
   return h(ModelCard, {
     id: session_id,
-    content: cardContent,
+    children: cardContent,
     model: "session",
     link,
     onClick: () => onClick(session_id, date, target, technique),
@@ -394,7 +404,7 @@ const SessionModelLinkCard = (props) => {
 const DataFileModelCard = (props) => {
   const { file_hash, basename, type, date } = props;
 
-  const content = h("div.session-card", [
+  const children = h("div.session-card", [
     h("div.card-header", [h(FormattedDate, { date })]),
     h("div.bod", [h("div", [h("span", basename)]), h("div", [type])]),
   ]);
@@ -407,12 +417,12 @@ const DataFileModelCard = (props) => {
       id: "dataFileCardContent",
       data: { dataFile },
     },
-    content
+    children
   );
 
   return h(ModelCard, {
     id: file_hash,
-    content: cardContent,
+    children: cardContent,
     model: "data-file",
   });
 };

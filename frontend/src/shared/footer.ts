@@ -1,4 +1,4 @@
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import { Frame } from "sparrow/frame";
 import { ServerStatus } from "../components";
 

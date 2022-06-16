@@ -7,13 +7,14 @@ import { DarkModeButton } from "@macrostrat/ui-components";
 import { AuthStatus } from "~/auth";
 import { Frame, FrameContext } from "~/frame";
 import styles from "./module.styl";
+import { siteTitle } from "~/config";
 
 const h = hyperStyled(styles);
 
 const NavButton = classed(NavLinkButton, styles["navbar-button"]);
 
 const SiteTitle = () =>
-  h(NavLink, { to: "/" }, h(Frame, { id: "siteTitle" }, "Test Lab"));
+  h(NavLink, { to: "/" }, h(Frame, { id: "siteTitle" }, siteTitle));
 
 const ShortSiteTitle = () => {
   const { getElement } = useContext(FrameContext);
@@ -22,7 +23,9 @@ const ShortSiteTitle = () => {
   return h(
     NavLink,
     { to: "/" },
-    h("div.shortTitle", [h(Frame, { id: "shortSiteTitle" }, [title])])
+    h("div.shortTitle", [
+      h(Frame, { id: "shortSiteTitle" }, [title ?? siteTitle]),
+    ])
   );
 };
 

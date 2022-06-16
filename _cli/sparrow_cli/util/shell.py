@@ -1,11 +1,14 @@
-from subprocess import run, PIPE, STDOUT
-from shlex import split
+from subprocess import PIPE, STDOUT, CalledProcessError
 from typing import List
 from pathlib import Path
 from json import loads
+from os import environ
 from json.decoder import JSONDecodeError
 from sparrow.utils.logs import get_logger
 from sparrow.utils.shell import split_args, cmd as cmd_
+from docker import from_env
+from docker.errors import DockerException
+
 from rich import print
 from .exceptions import SparrowCommandError
 
@@ -28,7 +31,13 @@ def cmd(*v, **kwargs):
     return cmd_(*v, **kwargs)
 
 
+def run(*v, **kwargs):
+    kwargs["logger"] = log
+    return run_(*v, **kwargs)
+
+
 def compose(*args, **kwargs):
+    raise_docker_engine_errors()
     return cmd("sparrow compose", *args, **kwargs)
 
 
@@ -87,13 +96,36 @@ def exec_sparrow(*args, **kwargs):
     return exec_or_run("backend", "poetry run python -m sparrow", *args, **kwargs)
 
 
-def fail_without_docker():
+def fail_without_docker_command():
+    failure = False
     try:
-        res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
-    except FileNotFoundError:
+        res = cmd("which docker", check=True, stdout=PIPE)
+        failure = res.returncode != 0
+    except CalledProcessError:
+        failure = True
+    if failure:
         raise SparrowCommandError(
             "Cannot find the docker command. Is docker installed?"
         )
+
+
+def fail_without_docker_running():
+    try:
+        from_env()
+    except DockerException as exc:
+        raise SparrowCommandError(
+            "Cannot connect to the Docker daemon. Is Docker running?", details=str(exc)
+        )
+
+
+def raise_docker_engine_errors():
+    k = "_SPARROW_CHECKED_DOCKER_ENGINE"
+    if environ.get(k) == "1":
+        return
+    fail_without_docker_command()
+    fail_without_docker_running()
+    res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)
+    environ[k] = "1"
     try:
         errors = loads(str(res.stdout, "utf-8"))
     except JSONDecodeError:

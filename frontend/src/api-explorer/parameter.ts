@@ -7,7 +7,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import styled from "@emotion/styled";
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import { Component } from "react";
 import ReactMarkdown from "react-markdown";
 import {

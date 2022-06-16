@@ -1,6 +1,6 @@
 import { Markdown } from "@macrostrat/ui-components";
 import aboutText from "./about.md";
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 
 const siteTitle = process.env.SPARROW_LAB_NAME ?? "Fab Lab 🔬 🌈";
 

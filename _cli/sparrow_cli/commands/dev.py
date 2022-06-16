@@ -1,5 +1,6 @@
-from click import group
-
+from click import group, pass_obj
+from rich import print
+from os import environ
 from ..release_generation import create_release, check_version
 from ..util import CommandGroup, compose
 
@@ -37,3 +38,22 @@ def clear_cache():
     cache = cli_cache_file()
     cache.unlink(missing_ok=True)
     print(f"Cleared cache file {cache}")
+
+    # Clear backend SQLAlchemy cache
+    backend_cache = "/root/.sqlalchemy-cache/sparrow-db-cache.pickle"
+    compose("run --no-deps backend rm -f", backend_cache)
+    print(f"Cleared SQLAlchemy cache {backend_cache} in backend container")
+
+
+@sparrow_dev.command(name="print-config")
+@pass_obj
+def print_config(ctx):
+    """Print the Sparrow CLI configuration object"""
+    print(ctx)
+
+
+@sparrow_dev.command(name="printenv")
+def print_config():
+    """Print the Sparrow CLI environment"""
+    for k, v in sorted(environ.items()):
+        print(f"{k}={v}")

@@ -8,7 +8,7 @@ from marshmallow_sqlalchemy.fields import Related, RelatedList
 
 import geoalchemy2 as geo
 from sqlalchemy.orm import RelationshipProperty
-from sqlalchemy.types import Integer, Numeric
+from sqlalchemy.types import Integer, Numeric, DateTime
 from sqlalchemy.dialects import postgresql
 
 from sparrow.birdbrain.mapper.utils import trim_postfix
@@ -31,6 +31,7 @@ allowed_collections = {
         "material",
         "project",
         "sample_geo_entity",
+        "researcher",
         "publication",
         "tag",
         "attribute",
@@ -90,6 +91,7 @@ class SparrowConverter(ModelConverter):
                 postgresql.JSON: JSON,
                 postgresql.JSONB: JSON,
                 postgresql.UUID: UUID,
+                DateTime: DateTimeExt,
             }.items()
         )
     )
@@ -254,9 +256,9 @@ class SparrowConverter(ModelConverter):
         if not allow_nest(this_table.name, prop.target.name):
             # Fields that are not allowed to be nested
             if prop.uselist:
-                return RelatedList(Related, **field_kwargs)
+                return RelatedList(PassThroughRelated, **field_kwargs)
             else:
-                return Related(**field_kwargs)
+                return PassThroughRelated(**field_kwargs)
         if prop.target.schema == "enum":
             # special carve-out for enums represented as foreign keys
             # (these should be stored in the 'enum' schema):

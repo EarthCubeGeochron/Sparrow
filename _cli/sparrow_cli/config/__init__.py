@@ -14,7 +14,7 @@ from .version_info import SparrowVersionMatch, test_version
 from .command_cache import get_backend_command_help, CommandDataSource
 from .file_loader import load_config_file
 from ..util.exceptions import SparrowCommandError
-from packaging.version import Version
+from ..util.shell import fail_without_docker_command, fail_without_docker_running
 
 log = get_logger(__file__)
 
@@ -36,9 +36,10 @@ class Message(BaseModel):
 class SparrowConfig:
     bin_directories: typing.List[Path]
     SPARROW_PATH: Path
-    bundle_dir: Path
     path_provided: bool
     is_frozen: bool
+    docker_available: bool = False
+    bundle_dir: Path = None
     config_file: typing.Optional[Path] = None
     config_dir: typing.Optional[Path] = None
     version_info: typing.Optional[SparrowVersionMatch] = None
@@ -55,6 +56,8 @@ class SparrowConfig:
         self.is_frozen = getattr(sys, "frozen", False)
         if self.is_frozen:
             self.bundle_dir = Path(sys._MEIPASS)
+
+        self.check_docker_status()
 
         if verbose:
             setup_stderr_logs("sparrow_cli")
@@ -186,3 +189,28 @@ class SparrowConfig:
 
     def is_source_install(self):
         return not self.is_frozen or self.path_provided
+
+    def check_docker_status(self):
+        try:
+            fail_without_docker_command()
+        except SparrowCommandError as err:
+            self.messages.append(
+                Message(
+                    id="docker-not-installed",
+                    text="Docker is not installed",
+                    details=str(err),
+                    level=Level.ERROR,
+                )
+            )
+        try:
+            fail_without_docker_running()
+        except SparrowCommandError as err:
+            self.messages.append(
+                Message(
+                    id="docker-not-running",
+                    text="Docker is not running",
+                    details=str(err),
+                    level=Level.ERROR,
+                )
+            )
+        self.docker_available = True

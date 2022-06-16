@@ -3,8 +3,7 @@ import { format, getYear } from "date-fns";
 import { useModelURL, useEditingAllowed } from "~/util";
 import { ModelEditableText } from "~/model-views";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useModelEditor } from "@macrostrat/ui-components";
-import { LinkButton } from "@macrostrat/ui-components/src/ext/router-links";
+import { LinkButton } from "@macrostrat/router-components";
 
 //@ts-ignore
 import styles from "./module.styl";

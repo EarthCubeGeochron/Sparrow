@@ -73,7 +73,7 @@ symlink=$install_path/bin/sparrow
 #TMPDIR=$install_path/sparrowtemp
 
 # We now use the download script for local installations as well, because there
-# is a ton of logic aroudn where to install the source root for the Sparrow codebase.
+# is a ton of logic around where to install the source root for the Sparrow codebase.
 # This may be something we can get rid of eventually, or wrap into the CLI itself.
 if ((!local_install)); then
   # Check whether URL exists

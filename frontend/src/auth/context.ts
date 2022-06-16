@@ -1,4 +1,4 @@
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import { useAPIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { createContext, useContext, useEffect, useReducer } from "react";

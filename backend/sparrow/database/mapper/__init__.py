@@ -25,6 +25,12 @@ def _gen_relationship(
     )
 
 
+should_enable_cache = environ.get("SPARROW_CACHE_DATABASE_MODELS", "0").lower() in [
+    "true",
+    "1",
+]
+
+
 class AutomapError(Exception):
     pass
 

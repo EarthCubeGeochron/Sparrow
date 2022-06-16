@@ -6,7 +6,7 @@ from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
 from datetime import datetime
-from pytest import mark, raises
+from pytest import mark, raises, fixture
 from sparrow.logs import get_logger
 from sparrow.core.encoders import JSONEncoder
 from json import dumps
@@ -19,12 +19,7 @@ from .helpers import json_fixture, ensure_single
 
 log = get_logger(__name__)
 
-
 # pytestmark = mark.filterwarnings("ignore", "*", SAWarning)
-
-# This should be in the fixture function ideally but I can't figure out
-# how to cache it so it doesn't repeatedly regenerate.
-app = Sparrow()
 
 session = dict(sample_id="A-0", date=datetime.now())
 
@@ -545,3 +540,183 @@ class TestStrictModeImport:
         new_data["fancy"] = "so_fancy"
         with raises(ValidationError):
             db.load_data("session", new_data, strict=True)
+
+
+class TestResearcherSampleImport:
+    def test_duplicate_import(self, db):
+        byrne = {"name": "David Byrne"}
+        eno = {"name": "Brian Eno"}
+        sample_data = [
+            {"name": "Sample 1", "researcher": [byrne]},
+            {"name": "Sample 2", "researcher": [byrne]},
+            {"name": "Sample 3", "researcher": [byrne, eno]},
+        ]
+
+        for sample in sample_data:
+            db.load_data("sample", sample, strict=True)
+
+        db.session.commit()
+
+        assert db.session.query(db.model.researcher).count() == 2
+
+    def test_same_researcher_import(self, db):
+        """Re-importing the same researcher should lead to no change"""
+        byrne = {"name": "David Byrne"}
+
+        db.load_data("researcher", byrne, strict=True)
+        assert db.session.query(db.model.researcher).count() == 2
+
+    def test_researcher_orcid_import(self, db):
+        """Re-importing the same researcher with a new orcid should add a new researcher."""
+        byrne = {"name": "David Byrne", "orcid": "0000-0002-1825-0097"}
+
+        db.load_data("researcher", byrne, strict=True)
+        assert db.session.query(db.model.researcher).count() == 3
+
+
+class TestResearcherProjectImport:
+    projects = [
+        {"name": "Project 1", "researcher": [{"name": "David Byrne"}]},
+        {"name": "Project 2", "researcher": [{"name": "David Byrne"}]},
+    ]
+
+    def test_researcher_project_import(self, db):
+        """Re-importing the same researcher with a new project should keep the same researcher."""
+
+        for project in self.projects:
+            db.load_data("project", project, strict=True)
+
+        assert db.session.query(db.model.project).count() == 2
+        assert db.session.query(db.model.researcher).count() == 1
+
+    def test_change_researcher(self, db):
+        # Re-import as a single operation (trying out many at once)
+        project = self.projects[0]
+        project["researcher"] = [{"name": "Brian Eno"}]
+
+        db.load_data("project", project, strict=True)
+
+        assert db.session.query(db.model.project).count() == 2
+        assert db.session.query(db.model.researcher).count() == 2
+
+        # Next: check for moved files
+
+
+@fixture()
+def new_analysis_data(db):
+    session = json_fixture("sims-session.json")
+    res = db.load_data("session", session)
+    return {
+        "session": res,
+        "analysis_type": "Grain dimensions",
+        "datum": [
+            {"type": {"parameter": "Length", "unit": "µm"}, "value": 1.0},
+            {"type": {"parameter": "Width", "unit": "µm"}, "value": 2.0},
+        ],
+    }
+
+
+class TestAddToExisting:
+    def test_add_session_existing_sample(self, db):
+        """Test that we can add to an existing session"""
+        sample = db.load_data(
+            "sample",
+            {
+                "name": "Sample 1",
+                "session": [{"name": "Test session", "date": "2022-01-01T00:00:00"}],
+            },
+        )
+
+        db.load_data(
+            "session",
+            {"sample": sample, "name": "Test session 2", "date": "2022-01-02T00:00:00"},
+        )
+
+    def test_add_analysis_existing_session(self, db, new_analysis_data):
+        """Test that we can add to an existing session"""
+
+        db.load_data("analysis", new_analysis_data, strict=True)
+
+    def test_extend_analysis_without_existing_values(self, db):
+        start_count = db.session.query(db.model.analysis).count()
+        datum_count = db.session.query(db.model.datum).count()
+        analysis = db.session.query(db.model.analysis).first()
+
+        new_datum = {
+            "type": {"parameter": "Roundness", "unit": "dimensionless"},
+            "value": 0.88,
+            "analysis": analysis,
+        }
+
+        datum = db.load_data("datum", new_datum, strict=True)
+
+        assert datum._analysis == analysis
+
+        assert db.session.query(db.model.analysis).count() == start_count
+        assert db.session.query(db.model.datum).count() == datum_count + 1
+
+    @mark.skip(
+        "This creates a new analysis right now, rather than updating the current instance."
+    )
+    def test_replace_data_for_existing_analysis(self, db, new_analysis_data):
+        """Here, we replace all the data with a new set."""
+
+        datum_count = db.session.query(db.model.datum).count()
+
+        analysis = db.session.query(db.model.analysis).first()
+
+        new_analysis_data["datum"][0]["value"] = 3.0
+
+        new_analysis = db.load_data(
+            "analysis", new_analysis_data, strict=True, instance=analysis
+        )
+
+        assert db.session.query(db.model.analysis).count() == 1
+        assert db.session.query(db.model.datum).count() == datum_count
+        assert len(new_analysis._datum) == 3
+        assert new_analysis._datum[0].value == 4.0
+
+    @mark.skip(
+        "This creates a new analysis right now, rather than updating the current instance."
+    )
+    def test_extend_analysis_with_new_datum(self, db):
+        datum_count = db.session.query(db.model.datum).count()
+        analysis_count = db.session.query(db.model.analysis).count()
+        analysis = db.session.query(db.model.analysis).first()
+
+        new_datum = {"type": {"parameter": "Thickness", "unit": "nm"}, "value": 5.0}
+        new_analysis_data["datum"].append(new_datum)
+        new_analysis = db.load_data(
+            "analysis", new_analysis_data, strict=True, instance=analysis
+        )
+
+        assert db.session.query(db.model.analysis).count() == analysis_count
+        assert db.session.query(db.model.datum).count() == datum_count + 1
+        assert len(new_analysis._datum) == 4
+        assert new_analysis._datum[3].value == 5.0
+
+
+class TestImportDates:
+    def test_import_date_iso8601(self, db):
+        """Test that we can import dates in ISO 8601 format"""
+        date = {
+            "name": "Test date",
+            "date": "2022-01-01T00:00:00",
+            "sample": {"name": "Sample 1"},
+        }
+        db.load_data("session", date, strict=True)
+
+    def test_import_date_no_time(self, db):
+        """Test that we can import a basic date"""
+        date = {
+            "name": "Test date",
+            "date": "2022-01-01",
+            "sample": {"name": "Sample 1"},
+        }
+        db.load_data("session", date, strict=True)
+
+    def test_import_python_datetime(self, db):
+        """Test that we can import a python datetime object"""
+        date = datetime(2022, 2, 1)
+        session = {"name": "Test date", "date": date, "sample": {"name": "Sample 1"}}
+        db.load_data("session", session, strict=True)

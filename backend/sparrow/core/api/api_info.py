@@ -56,15 +56,24 @@ def get_field_json_values(type_: str, name: str, schema):
     """get the values api_help['fields']"""
 
     schema_name = schema.opts.model.__name__.lower()
+
+    # We have renamed the 'related' and 'datetime' fields. For now, we're just going to rename
+    # these references...but this code is really fragile and should be reworked at some point.
+    type_name = type_.lower()
+    if type_name == "passthroughrelated":
+        type_name = "related"
+    if type_name == "datetimeext":
+        type_name = "datetime"
+
     json_values = api_help["fields"]["json-values"]
 
-    if "schema" in type_.lower():
+    if "schema" in type_name:
         default_value = json_values["related"]
-        if "[]" in type_.lower():
+        if "[]" in type_name:
             default_value = json_values["related-list"]
 
     else:
-        default_value = json_values[type_.lower()]
+        default_value = json_values[type_name]
 
     ## check if schema_name is in api_help
     if schema_name in json_values:

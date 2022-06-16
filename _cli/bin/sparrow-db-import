@@ -2,21 +2,46 @@
 # Description: Import database from binary `pg_dump` archive
 
 [ ! -f "$1" ] \
-&& >&2 echo "File $1 not found" \
+&& >&2 echo "File "$1" not found" \
 && exit 1
 
-internal_name="/tmp/$(basename $1)"
+# Bring up the database if it isn't running
+sparrow compose exec db echo 'Running' > /dev/null
+isdown_db=$?
+if [ $isdown_db -ne 0 ]; then
+  >&2 echo "Database isn't running, starting it up..."
+  sparrow compose up -d db
+fi
 
+# Shut down backend if it's up
+sparrow compose exec backend echo 'Running' > /dev/null
+isdown_backend=$?
+if [ $isdown_backend -eq 0 ]; then
+  >&2 echo "Backend is running, shutting down..."
+  sparrow compose stop backend
+fi
+
+
+internal_name="/tmp/database-backup.pg-dump"
+# Remove the temporary database
 sparrow compose exec -T db bash -s <<EOF
 mkdir -p /tmp
 rm -f "$internal_name"
 EOF
 
-container_id=$(sparrow compose ps -q db)
 
-cd "$(dirname $1)"
-tar -cf - "$(basename $1)" \
-| docker cp - "$container_id":"$(dirname $internal_name)"
+container_id=$(sparrow compose ps -q db)
+if [ -z "$container_id" ]; then
+  >&2 echo "Database container not found"
+  exit 1
+fi
+
+docker exec -i $container_id sh -c "cat > $internal_name" < "$1"
+
+if [ $? -ne 0 ]; then
+  >&2 echo "Failed to import database"
+  exit 1
+fi
 
 if ! sparrow compose exec -T db ls "$internal_name" > /dev/null ; then
   >&2 echo "File $1 not properly copied into docker container"
@@ -25,12 +50,22 @@ fi
 
 >&2 echo "Replacing database"
 
-# Actually run database migration
-sparrow compose stop backend
-sparrow db-await
-sparrow compose exec db dropdb --if-exists -Upostgres sparrow
-sparrow compose exec db createdb -Upostgres sparrow
-sparrow compose exec db pg_restore -v -Upostgres -d sparrow "$internal_name"
-sparrow compose exec db rm -f "$internal_name"
+sparrow db await
 
-sparrow compose start backend
+# Actually run database migration
+sparrow compose exec -T db bash -s <<EOF
+dropdb --if-exists -Upostgres sparrow
+createdb -Upostgres sparrow
+pg_restore -v -Upostgres -d sparrow "$internal_name"
+rm -f "$internal_name"
+EOF
+
+if [ $isdown_db -ne 0 ]; then
+  >&2 echo "Stopping database"
+  sparrow compose stop db
+fi
+
+if [ $isdown_backend -eq 0 ]; then
+  >&2 echo "Restarting backend"
+  sparrow compose stop db
+fi

@@ -1,17 +1,17 @@
 import click
 import sys
-from os import environ, path, chdir
+from os import environ, chdir
 from rich import print
-from click_default_group import DefaultGroup
 from textwrap import dedent
+
+from sparrow_cli.util.command_groups import SparrowDefaultCommand
 from ..util import cmd, exec_or_run
-from ..util import compose as _compose
 from sparrow.utils import get_logger
 
 log = get_logger(__name__)
 
 
-class TestGroup(DefaultGroup):
+class TestGroup(SparrowDefaultCommand):
     """
     Usage: sparrow test \[subcommand?] OPTIONS... PYTEST_OPTIONS...
 
@@ -68,7 +68,7 @@ class TestGroup(DefaultGroup):
             return TestGroup.echo_help(ctx)
         if not args:
             args.insert(0, self.default_cmd_name)
-        return super(DefaultGroup, self).parse_args(ctx, args)
+        return super(SparrowDefaultCommand, self).parse_args(ctx, args)
 
 
 def compose(*args, **kwargs):
@@ -210,3 +210,8 @@ def indb(*args, **kwargs):
 def dump_database():
     """Dump a basic test database containing one detrital zircon sample to stdout"""
     exec_or_run("backend", "sparrow_tests/scripts/dump-test-database.py", tty=False)
+
+
+sparrow_test.add_shell_command(
+    "integration", "Run integration tests", prefix="sparrow-test-"
+)

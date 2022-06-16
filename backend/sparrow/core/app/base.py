@@ -13,6 +13,7 @@ from starlette.routing import Router
 from starlette.responses import JSONResponse
 from webargs_starlette import WebargsHTTPException
 from sparrow.core import settings
+from ..util import check_secret_key
 from ..logs import get_logger
 from .plugins import prepare_plugin_manager, SparrowPluginManager
 from sparrow.birdbrain.utils import wait_for_database
@@ -44,6 +45,7 @@ class Sparrow(Starlette):
         super().__init__(*args, **kwargs)
 
     def bootstrap(self, init=False, force_db_setup=False, use_schema_cache=True):
+        check_secret_key()
         if init:
             self.init_database(force=force_db_setup)
         self.setup_database(use_cache=use_schema_cache)

@@ -449,6 +449,12 @@ CREATE TABLE IF NOT EXISTS instrument_session_researcher (
   PRIMARY KEY (instrument_session_id, researcher_id)
 );
 
+CREATE TABLE IF NOT EXISTS sample_researcher (
+  sample_id integer REFERENCES sample(id) ON DELETE CASCADE,
+  researcher_id integer REFERENCES researcher(id) ON DELETE CASCADE,
+  PRIMARY KEY (sample_id, researcher_id)
+);
+
 CREATE TABLE IF NOT EXISTS project_publication (
   project_id integer REFERENCES project(id) ON DELETE CASCADE,
   publication_id integer REFERENCES publication(id) ON DELETE CASCADE,

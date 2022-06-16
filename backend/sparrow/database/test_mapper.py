@@ -1,4 +1,4 @@
-from sparrow.database.mapper import BaseModel, SparrowDatabaseMapper
+from sparrow.database.mapper import BaseModel, SparrowDatabaseMapper, should_enable_cache
 
 
 def test_db_mapper_cache(db):
@@ -10,4 +10,4 @@ def test_db_mapper_cache(db):
     mapper.automap_base = new_base
     mapper.reflect_database(use_cache=True)
 
-    assert new_base.loaded_from_cache
+    assert new_base.loaded_from_cache == should_enable_cache

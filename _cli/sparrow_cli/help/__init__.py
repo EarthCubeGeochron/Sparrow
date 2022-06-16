@@ -1,6 +1,5 @@
 import sys
 import re
-import click
 from click import style, Context
 from click.formatting import HelpFormatter
 from rich.text import Text
@@ -8,8 +7,6 @@ from os import environ
 from pathlib import Path
 from itertools import chain
 from rich.console import Console
-from setuptools import Command
-from ..util.shell import fail_without_docker
 from ..util.formatting import format_config_path, format_description
 from ..config import Level, SparrowConfig
 
@@ -219,7 +216,6 @@ def command_info(ctx, cli):
 
 
 def echo_help(cli, ctx, core_commands=None, user_commands=None):
-    fail_without_docker()
     # We want to run `sparrow up` first so we don't get surprised by container errors later
     # ...actually we likely don't want to do this. It seems like it pushes errors too early
     # in Sparrow's installation process
