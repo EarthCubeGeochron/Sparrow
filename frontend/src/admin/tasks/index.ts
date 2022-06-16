@@ -57,17 +57,20 @@ function TaskMain({ tasks, task }) {
 
   messageHistory.current = useMemo(() => {
     const chunkedMessages = getChunkedMessages(lastMessage);
+    console.log(chunkedMessages);
     for (const message of chunkedMessages) {
       const { action, text, info, type } = message;
-      if (action == "start") {
+      if (action == "reset") {
+        messageHistory.current = [];
+      } else if (action == "start") {
         setIsRunning(true);
-        return [];
       } else if (isStopMessage(message)) {
         setIsRunning(false);
       }
       if (info != null) {
         console.log(info);
       }
+      // Actually track the message in hostory
       if (text != null) {
         // We could eventually keep track of line type here...
         const lines = text.split("\n").filter((line) => line.length > 0);

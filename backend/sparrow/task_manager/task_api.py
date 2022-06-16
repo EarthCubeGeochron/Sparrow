@@ -39,11 +39,15 @@ class TaskEndpoint(WebSocketEndpoint):
         log.debug(f"Received message {message} for task {task_name}")
 
         if action == "start":
+            # Send the start message before we start the task
+            # ...we could do a better job formatting setup/teardown messages
+            await session.send_json({"action": "reset"})
             try:
                 params = message.get("params", {})
                 self.start_task(task_name, params)
             except Exception as exc:
-                await session.send_json({"text": str(exc)})
+                await session.send_json({"text": "Could not start task: "+str(exc)})
+                return
         if action == "stop" and self._running_task is not None:
             log.debug(f"Stopping task with id {self._running_task.id}")
             self._running_task.revoke(terminate=True)
