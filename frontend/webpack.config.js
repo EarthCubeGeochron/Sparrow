@@ -20,6 +20,8 @@ function relativePath(...tokens) {
   return path.resolve(__dirname, ...tokens);
 }
 
+const devDomain = `localhost:${process.env.SPARROW_HTTP_PORT || "5002"}`;
+
 let assetsDir =
   process.env.SPARROW_FRONTEND_BUILD_DIR || relativePath("_assets");
 let srcRoot = relativePath("src");
@@ -81,9 +83,20 @@ let baseConfig = {
     host: "0.0.0.0",
     port: 3000,
     hot: true,
-    open: true,
+    // Only try to open a browser if we're not running in Docker.
+    open: environment == "local-development",
     historyApiFallback: true,
+    // Make hot-reload listener look for a web server at the same proxy address
+    // as the rest of the app.
+    client: {
+      webSocketURL: `ws://${devDomain}/ws`,
+    },
   },
+  // Might be useful for docker?
+  // watchOptions: {
+  //   aggregateTimeout: 300,
+  //   poll: 1000,
+  // },
   module: {
     rules: [
       ...styleRules,
@@ -118,12 +131,6 @@ let baseConfig = {
   devtool: "source-map",
   resolve: {
     // Resolve node modules from Sparrow's own node_modules if not found in plugins
-    modules: [
-      "packages",
-      "_local_modules",
-      "node_modules",
-      relativePath("node_modules"),
-    ],
     extensions: [
       ".ts",
       ".tsx",
@@ -143,7 +150,7 @@ let baseConfig = {
       "site-content":
         process.env.SPARROW_SITE_CONTENT || relativePath("default-content"),
       // For node module resolution + hooks
-      react: relativePath("node_modules", "react"),
+      //react: relativePath("node_modules", "react"),
     },
     fallback: { path: false, process: false },
   },
@@ -183,8 +190,7 @@ let baseConfig = {
 };
 
 if (environment == "development") {
-  const domain = `localhost:${process.env.SPARROW_HTTP_PORT || "5002"}`;
-  console.log(`Running frontend at ${domain}`);
+  console.log(`Running frontend at ${devDomain}`);
   baseConfig.watch = true;
 }
 

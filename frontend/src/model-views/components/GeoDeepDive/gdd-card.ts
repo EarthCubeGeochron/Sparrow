@@ -3,7 +3,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import styled from "@emotion/styled";
 import { useState } from "react";
 import { Callout, NonIdealState, Drawer, Button } from "@blueprintjs/core";

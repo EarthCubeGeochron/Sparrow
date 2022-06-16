@@ -84,19 +84,27 @@ const errorHandler = function (route, response) {
   return AppToaster.show({ message, intent: Intent.DANGER });
 };
 
-function App() {
-  // Nest application in React context providers
-  const baseURL = process.env.BASE_URL ?? "/";
-  const apiBaseURL = join(process.env.API_BASE_URL ?? "/", "/api/v1"); //process.env.BASE_URL || "/";
+const baseURL = process.env.BASE_URL ?? "/";
+const apiBaseURL = join(process.env.API_BASE_URL ?? "/", "/api/v1");
 
+// Nest application in React context providers
+const CoreAppComponent = compose(
+  C(FrameProvider, { overrides: siteContent }),
+  C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
+  AuthProvider,
+  DarkModeManager,
+  C(AppRouter, { baseURL })
+);
+
+function App() {
+  return h([h(CoreAppComponent), h(Canary)]);
+}
+
+function Canary() {
   return h(
-    compose(
-      C(FrameProvider, { overrides: siteContent }),
-      C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
-      AuthProvider,
-      DarkModeManager,
-      C(AppRouter, { baseURL })
-    )
+    "div.__canary",
+    { style: { display: "none" } },
+    "This element is used to test whether the application rendered properly."
   );
 }
 

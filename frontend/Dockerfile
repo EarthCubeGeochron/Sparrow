@@ -1,17 +1,24 @@
-FROM node:14 AS base
+FROM node:16 AS base
 
 # Yarn is already installed
-RUN npm install -g webpack webpack-cli nodemon
-WORKDIR /app
-
-CMD npm run dev:docker
+CMD yarn run dev:docker
 
 FROM base AS frontend
+
+WORKDIR /app/
+
+COPY package.json .
+
+RUN yarn set version berry && npm install -g nodemon webpack
 
 # This is annoying but I don't see a better alternative
 COPY packages/schema-linker/package.json /app/packages/schema-linker/
 COPY packages/sheet/package.json /app/packages/sheet/
-COPY package.json yarn.lock .npmrc /app/
-RUN yarn install
+
+COPY yarn.lock .yarnrc.yml /app/
+RUN yarn install --frozen-lockfile
+
 COPY ./ /app/
-CMD webpack
+
+CMD yarn run start
+
