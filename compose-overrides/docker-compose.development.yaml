@@ -10,9 +10,6 @@ services:
     command: npm run dev:docker
     expose:
       - 3000
-    ports:
-      # We have to keep this port open for websocket-based hot reloading to work
-      - "3000:3000"
     volumes:
       # Extra bind mounts to local directories for code reloading
       - ./frontend/src:/app/src

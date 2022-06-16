@@ -20,6 +20,8 @@ function relativePath(...tokens) {
   return path.resolve(__dirname, ...tokens);
 }
 
+const devDomain = `localhost:${process.env.SPARROW_HTTP_PORT || "5002"}`;
+
 let assetsDir =
   process.env.SPARROW_FRONTEND_BUILD_DIR || relativePath("_assets");
 let srcRoot = relativePath("src");
@@ -81,8 +83,14 @@ let baseConfig = {
     host: "0.0.0.0",
     port: 3000,
     hot: true,
+    // Only try to open a browser if we're not running in Docker.
     open: environment == "local-development",
     historyApiFallback: true,
+    // Make hot-reload listener look for a web server at the same proxy address
+    // as the rest of the app.
+    client: {
+      webSocketURL: `ws://${devDomain}/ws`,
+    },
   },
   // Might be useful for docker?
   // watchOptions: {
@@ -182,8 +190,7 @@ let baseConfig = {
 };
 
 if (environment == "development") {
-  const domain = `localhost:${process.env.SPARROW_HTTP_PORT || "5002"}`;
-  console.log(`Running frontend at ${domain}`);
+  console.log(`Running frontend at ${devDomain}`);
   baseConfig.watch = true;
 }
 
