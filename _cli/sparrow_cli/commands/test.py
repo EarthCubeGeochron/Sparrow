@@ -100,6 +100,7 @@ def sparrow_test(ctx):
         ctx.exit()
     chdir(pth)
 
+
 # Ideally this would be a subcommand, not its own separate command
 @sparrow_test.command("cli", context_settings=__ctx)
 @click.argument("pytest_args", nargs=-1, type=click.UNPROCESSED)
@@ -211,4 +212,6 @@ def dump_database():
     exec_or_run("backend", "sparrow_tests/scripts/dump-test-database.py", tty=False)
 
 
-sparrow_test.add_shell_command("integration", "Run integration tests", prefix="sparrow-test-")
+sparrow_test.add_shell_command(
+    "integration", "Run integration tests", prefix="sparrow-test-"
+)

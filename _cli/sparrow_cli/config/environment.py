@@ -68,7 +68,7 @@ def prepare_compose_overrides():
     if len(profiles) > 0:
         # Only override profiles if they don't already exist in configuration.
         environ.setdefault("COMPOSE_PROFILES", ",".join(profiles))
-    
+
     # Get profiles from environment
     profiles = environ.get("COMPOSE_PROFILES", "").split(",")
     log.info(f"docker-compose profiles: {profiles}")
