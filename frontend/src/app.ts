@@ -97,8 +97,6 @@ const CoreAppComponent = compose(
 );
 
 function App() {
-  //process.env.BASE_URL || "/";
-
   return h([h(CoreAppComponent), h(Canary)]);
 }
 
