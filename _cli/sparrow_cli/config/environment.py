@@ -59,7 +59,7 @@ def prepare_compose_overrides():
     # Use the docker-compose profile tool to enable some services
     # NOTE: this is a nicer way to do some things that needed to be handled by
     # compose-file overrides in the past.
-    profiles = ["core", "frontend"] # We default to always running the 'core' profile.
+    profiles = ["core", "frontend"]  # We default to always running the 'core' profile.
     if is_production:
         profiles.append("production")
     if is_truthy("SPARROW_TASK_WORKER"):
