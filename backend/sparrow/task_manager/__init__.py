@@ -104,12 +104,9 @@ class SparrowTaskManager(SparrowCorePlugin):
         tasks = self._tasks
         if not include_cli_tasks:
             tasks = {k: v for k, v in self._tasks.items() if not v["cli_only"]}
+
         return [
-            {
-                "name": k,
-                "description": v["func"].__doc__.strip(),
-                "params": v["params"].schema(),
-            }
+            format_task_info(k, tasks)
             for k, v in tasks.items()
         ]
 
@@ -129,3 +126,19 @@ class SparrowTaskManager(SparrowCorePlugin):
     def on_api_initialized_v2(self, api):
         self.broadcast = Broadcast(TASK_BROKER)
         api.mount("/tasks", build_tasks_api(self), name="tasks")
+
+def format_task_info(name, _task):
+    params = _task.get("params", None)
+    if params is not None:
+        params = params.schema()
+
+    description = _task["description"]
+    doc = _task["func"].__doc__
+    if doc is not None:
+        description = doc.strip()
+
+    return {
+        "name": name,
+        "description": description,
+        "params": params,
+    }
