@@ -41,6 +41,7 @@ import { SampleAdminContext } from "~/admin/sample";
 import styles from "./module.styl";
 import { useModelURL } from "~/util";
 import { Button } from "@blueprintjs/core";
+import { MapDrawer } from "~/map/components/MapDrawer";
 
 const h = hyper.styled(styles);
 
@@ -510,6 +511,7 @@ function SamplePage(props: SampleProps) {
           h(PageViewBlock, [
             h("div.flex-row", [
               h("div.info-block", [
+                h(LabIDField),
                 h(MemberOf),
                 h(Material),
                 h.if(Edit)(SampleTagContainer),
@@ -533,6 +535,15 @@ function SamplePage(props: SampleProps) {
       ]
     )
   );
+}
+
+function LabIDField() {
+  const { model } = useModelEditor();
+  const { lab_id } = model;
+  return h.if(model.lab_id != null)(ModelAttributeOneLiner, {
+    title: "Lab ID",
+    content: model.lab_id,
+  });
 }
 
 export { SamplePage };
