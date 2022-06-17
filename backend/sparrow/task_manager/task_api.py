@@ -46,7 +46,7 @@ class TaskEndpoint(WebSocketEndpoint):
                 params = message.get("params", {})
                 self.start_task(task_name, params)
             except Exception as exc:
-                await session.send_json({"text": "Could not start task: "+str(exc)})
+                await session.send_json({"text": "Could not start task: " + str(exc)})
                 return
         if action == "stop" and self._running_task is not None:
             log.debug(f"Stopping task with id {self._running_task.id}")

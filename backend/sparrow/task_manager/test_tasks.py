@@ -27,15 +27,17 @@ def _really_real(name: str, check_real: bool = True):
 
 task(name="kinda-real")(_really_real)
 
+
 @task(name="no-args")
 def a_task_with_no_args():
     return None
+
 
 @task(name="sludge", cli_only=True)
 def dismal_decay():
     """An underworldly task."""
     pass
-  
+
 
 @fixture
 def tasks_api_response(admin_client):
@@ -72,11 +74,11 @@ class TestSparrowTaskManager:
         assert schema["properties"]["name"] == {"title": "Name", "type": "string"}
 
     def test_task_api_defaults(self, tasks_api_response):
-            schema = unwrap_api_schema(tasks_api_response, "kinda-real")
-            cr = schema["properties"]["check_real"]
-            assert cr["type"] == "boolean"
-            assert cr["default"] == True
-    
+        schema = unwrap_api_schema(tasks_api_response, "kinda-real")
+        cr = schema["properties"]["check_real"]
+        assert cr["type"] == "boolean"
+        assert cr["default"] == True
+
     def test_task_api_no_args(self, tasks_api_response):
         schema = unwrap_api_schema(tasks_api_response, "no-args")
         assert schema is None
@@ -117,6 +119,7 @@ class TestSparrowTaskManager:
                 print(bad_arg)
 
         assert "Task terrible-task has untyped arguments" in str(exc_info.value)
+
 
 def unwrap_api_schema(tasks_api_response, name):
     """Unwrap a schema to make it easier to work with."""

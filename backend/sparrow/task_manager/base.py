@@ -80,6 +80,7 @@ class SparrowTask(Task):
         # exit point of the task whatever is the state
         pass
 
+
 def _name_for_task(func, **kwargs):
     return kwargs.get("name", func.__name__).replace("_", "-")
 

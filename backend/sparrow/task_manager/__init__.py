@@ -105,10 +105,7 @@ class SparrowTaskManager(SparrowCorePlugin):
         if not include_cli_tasks:
             tasks = {k: v for k, v in self._tasks.items() if not v["cli_only"]}
 
-        return [
-            format_task_info(k, v)
-            for k, v in tasks.items()
-        ]
+        return [format_task_info(k, v) for k, v in tasks.items()]
 
     def on_plugins_initialized(self):
         global _tasks_to_register
@@ -138,8 +135,4 @@ def format_task_info(name, _task):
     if doc is not None:
         description = doc.strip()
 
-    return {
-        "name": name,
-        "description": description,
-        "params": params,
-    }
+    return {"name": name, "description": description, "params": params}
