@@ -57,7 +57,6 @@ function TaskMain({ tasks, task }) {
 
   messageHistory.current = useMemo(() => {
     const chunkedMessages = getChunkedMessages(lastMessage);
-    console.log(chunkedMessages);
     for (const message of chunkedMessages) {
       const { action, text, info, type } = message;
       if (action == "reset") {

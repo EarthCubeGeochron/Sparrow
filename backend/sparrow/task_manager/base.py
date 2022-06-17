@@ -25,6 +25,8 @@ _tasks_to_register = {}
 def create_args_schema(func):
     """Create a Pydantic representation of sparrow task parameters."""
     params = get_params_from_function(func)
+    if not params:
+        return None
 
     schema_name = pascalcase(func.__name__.strip("_")) + "Params"
 
