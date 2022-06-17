@@ -61,7 +61,6 @@ function SampleFilter({ on_map = false }: Filter) {
 const TagContainer = (props) => {
   const [tags, setTags] = useState({});
   const { params, removeParam } = props;
-  console.log(params);
 
   useEffect(() => {
     setTags(params);
