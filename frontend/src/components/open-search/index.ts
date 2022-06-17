@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Icon } from "@blueprintjs/core";
+import React, { useState, useEffect, ChangeEventHandler } from "react";
+import { Icon, InputGroup, Button } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIv2Result } from "~/api-v2";
 import {
@@ -32,6 +32,29 @@ const OpenSearchCard = (props) => {
   return h(ModelCard, ["Working"]);
 };
 
+interface OpenSearchInputProps {
+  query: string;
+  handleChange: (query: string) => void;
+}
+
+function OpenSearchInput(props: OpenSearchInputProps) {
+  const { query, handleChange } = props;
+
+  return h(InputGroup, {
+    leftElement: h(Icon, { icon: "search" }),
+    placeholder: "Search for anything...",
+    value: query,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+      handleChange(e.target.value),
+    rightElement: h(Button, {
+      icon: "arrow-right",
+      // onClick: onSubmit,
+      minimal: true,
+      type: "submit",
+    }),
+  });
+}
+
 /**
  * React Component to create an open search on several models
  */
@@ -60,16 +83,16 @@ function OpenSearch() {
 
   if (!data) return null;
 
-  const onChange = (text, value) => {
+  const onChange = (value) => {
     setQuery(value);
   };
 
   return h("div", [
     h("div.searchbox", [
-      h(SearchInput, {
-        leftElement: h(Icon, { icon: "search" }),
-        updateParams: onChange,
-        value: query,
+      h(OpenSearchInput, {
+        // onSubmit: ,
+        handleChange: onChange,
+        query,
       }),
     ]),
     h("div.results", [
