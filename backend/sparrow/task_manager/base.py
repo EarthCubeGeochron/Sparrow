@@ -4,6 +4,7 @@ from pydantic import create_model
 import sys
 import traceback
 
+from stringcase import pascalcase
 from contextvars import ContextVar
 from redis import Redis
 
@@ -24,12 +25,16 @@ _tasks_to_register = {}
 def create_args_schema(func):
     """Create a Pydantic representation of sparrow task parameters."""
     params = get_params_from_function(func)
+    if not params:
+        return None
+
+    schema_name = pascalcase(func.__name__.strip("_")) + "Params"
 
     kwargs = {
         k: (v.annotation, ... if v.default is v.empty else v.default)
         for k, v in params.items()
     }
-    return create_model("TaskParamModel", **kwargs)
+    return create_model(schema_name, **kwargs)
 
 
 class SparrowTask(Task):
@@ -75,7 +80,6 @@ class SparrowTask(Task):
         # exit point of the task whatever is the state
         pass
 
-
 def _name_for_task(func, **kwargs):
     return kwargs.get("name", func.__name__).replace("_", "-")
 
@@ -97,11 +101,11 @@ def task(*args, **kwargs):
             # Register the task right now
             mgr.register_task(func, *args, **kwargs)
 
-        def _run_task(*args, **kwargs):
+        def _run_task(*args, **task_kwargs):
             """Function to run a task that is already registered to the running Sparrow application."""
             mgr = get_plugin("task-manager")
             func = mgr.get_task(task_name)
-            return func(*args, **kwargs)
+            return func(*args, **task_kwargs)
 
         return _run_task
 

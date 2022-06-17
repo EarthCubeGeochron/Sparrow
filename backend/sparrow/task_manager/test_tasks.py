@@ -1,3 +1,4 @@
+from re import I
 from click import echo
 from json import loads
 from pytest import fixture, raises, mark
@@ -26,12 +27,15 @@ def _really_real(name: str, check_real: bool = True):
 
 task(name="kinda-real")(_really_real)
 
+@task(name="no-args")
+def a_task_with_no_args():
+    return None
 
 @task(name="sludge", cli_only=True)
 def dismal_decay():
     """An underworldly task."""
     pass
-
+  
 
 @fixture
 def tasks_api_response(admin_client):
@@ -62,6 +66,21 @@ class TestSparrowTaskManager:
         assert mgr._tasks["sludge"]["cli_only"]
         assert "sludge" not in tasks_api_response["tasks"]
 
+    def test_task_api_params(self, tasks_api_response):
+        """Make sure that task API parameters are available on the frontend."""
+        schema = unwrap_api_schema(tasks_api_response, "hello")
+        assert schema["properties"]["name"] == {"title": "Name", "type": "string"}
+
+    def test_task_api_defaults(self, tasks_api_response):
+            schema = unwrap_api_schema(tasks_api_response, "kinda-real")
+            cr = schema["properties"]["check_real"]
+            assert cr["type"] == "boolean"
+            assert cr["default"] == True
+    
+    def test_task_api_no_args(self, tasks_api_response):
+        schema = unwrap_api_schema(tasks_api_response, "no-args")
+        assert schema is None
+
     def test_task_manager_api_enabled(self, app, tasks_api_response):
         mgr = app.plugins.get("task-manager")
         assert tasks_api_response["enabled"] == mgr._task_worker_enabled
@@ -69,9 +88,10 @@ class TestSparrowTaskManager:
     def test_schema_generation(self):
         """Test that a reasonable schema is generated for a function."""
         TaskParamModel = create_args_schema(_really_real)
-        schema = TaskParamModel.schema_json()
-        data = loads(schema)
-        assert data["properties"]["check_real"]["type"] == "boolean"
+        schema = TaskParamModel.schema()
+        assert schema["type"] == "object"
+        assert schema["title"] == "ReallyRealParams"
+        assert schema["properties"]["check_real"]["type"] == "boolean"
 
     def test_websocket_task_unauthorized(self, client):
         with raises(WebSocketDisconnect) as err:
@@ -97,3 +117,10 @@ class TestSparrowTaskManager:
                 print(bad_arg)
 
         assert "Task terrible-task has untyped arguments" in str(exc_info.value)
+
+def unwrap_api_schema(tasks_api_response, name):
+    """Unwrap a schema to make it easier to work with."""
+    for item in tasks_api_response["tasks"]:
+        if item["name"] == name:
+            return item["params"]
+    raise ValueError(f"No task named {name}")
