@@ -1,35 +1,36 @@
-import React, { useState, useEffect, ChangeEventHandler } from "react";
+import React, { useState, useEffect } from "react";
 import { Icon, InputGroup, Button } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useAPIv2Result } from "~/api-v2";
+import {  useAPIv2Result } from "~/api-v2";
 import {
   ProjectModelCard,
   SessionListModelCard,
   SampleModelCard,
-  ModelCard,
 } from "~/model-views/components";
 import ForeverScroll from "~/components/infinite-scroll/forever-scroll";
-import { SearchInput } from "~/filter/components";
 //@ts-ignore
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const OpenSearchCard = (props) => {
-  const { model, data } = props;
+type OpenSearchCardData = { model: string; data: object };
 
-  let possibleModels = {
-    sample: SampleModelCard,
-    project: ProjectModelCard,
-    session: SessionListModelCard,
-  };
-  let data_ = { ...data, showIdentity: "long" };
-  for (const key in possibleModels) {
-    if (model == key) {
-      return h("div", [h(possibleModels[key], data_)]);
-    }
-  }
-  return h(ModelCard, ["Working"]);
+interface OpenSearchCardProps {
+  data: OpenSearchCardData[];
+}
+const OpenSearchCard = (props: OpenSearchCardProps) => {
+  const { data } = props;
+
+  return h(React.Fragment, [
+    data.map((dat, i) => {
+      const { model, data } = dat;
+      return h(React.Fragment, [
+        h.if(model == "sample")(SampleModelCard, { ...data }),
+        h.if(model == "project")(ProjectModelCard, { ...data }),
+        h.if(model == "session")(SessionListModelCard, { ...data }),
+      ]);
+    }),
+  ]);
 };
 
 interface OpenSearchInputProps {
@@ -48,7 +49,6 @@ function OpenSearchInput(props: OpenSearchInputProps) {
       handleChange(e.target.value),
     rightElement: h(Button, {
       icon: "arrow-right",
-      // onClick: onSubmit,
       minimal: true,
       type: "submit",
     }),
@@ -90,17 +90,19 @@ function OpenSearch() {
   return h("div", [
     h("div.searchbox", [
       h(OpenSearchInput, {
-        // onSubmit: ,
         handleChange: onChange,
         query,
       }),
     ]),
     h("div.results", [
-      h.if(scrollData.length > 0)(ForeverScroll, {
-        initialData: scrollData,
-        component: OpenSearchCard,
-        fetch: () => {},
-      }),
+      h.if(scrollData.length > 0)(
+        ForeverScroll,
+        {
+          initialData: scrollData,
+          fetch: () => {},
+        },
+        [h(OpenSearchCard)]
+      ),
     ]),
   ]);
 }
