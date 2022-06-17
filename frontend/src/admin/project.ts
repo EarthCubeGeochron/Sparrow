@@ -9,9 +9,9 @@ import {
   ProjectMatch,
   ProjectListComponent,
   ModelFilterLists,
+  ProjectFilterList,
 } from "~/model-views";
 import { NewProjectForm } from "../model-views/project/new-project";
-import { AdminFilter } from "../filter";
 
 const h = hyperStyled(styles);
 
@@ -50,34 +50,14 @@ export function ProjectMainPanel() {
 
 export const ProjectAdminContext = createContext({});
 
-const mainFilterList = (props) => {
-  const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
-
-  const initialState = createParamsFromURL(possibleFilters);
-
-  const [params, setParams] = useState(initialState);
-
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-
-  return h(AdminFilter, {
-    listComponent: ProjectListComponent,
-    possibleFilters,
-    initParams: params || {},
-  });
-};
-
 const ProjectAdminList = (props) => {
   const { listName, updateFunction } = useContext(ProjectAdminContext);
 
   return h("div", [
-    h.if(listName == "main")(mainFilterList),
+    h.if(listName == "main")(ProjectFilterList, {
+      link: true,
+      onClick: undefined,
+    }),
     h.if(listName !== "main")(ModelFilterLists, {
       onClick: updateFunction,
       listName,

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
 import { DataFileMatch } from "../model-views/data-files/page";
@@ -28,7 +27,6 @@ export function DataFileAdminPage() {
   const possibleFilters = ["date_range"];
 
   const initialState = createParamsFromURL(possibleFilters);
-
 
   return h(AdminPage, {
     listComponent: h(AdminFilter, {

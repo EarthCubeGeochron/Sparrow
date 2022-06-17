@@ -6,7 +6,7 @@ import { SampleMatch } from "~/model-views/sample";
 import { SampleListComponent } from "~/model-views";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
-import { ModelFilterLists } from "../model-views";
+import { ModelFilterLists, SampleFilterList } from "../model-views";
 import { NewSamplePage } from "~/model-views/sample/new-sample";
 
 import styles from "./module.styl";
@@ -49,22 +49,10 @@ export function SampleMainPanel() {
 
 export const SampleAdminContext = createContext({});
 
-const MainFilterList = () => {
-  const possibleFilters = ["public", "geometry", "date_range"]; //needs to work with "doi_like"
-
-  const initialState = createParamsFromURL(possibleFilters);
-
-  return h(AdminFilter, {
-    listComponent: SampleListComponent,
-    possibleFilters,
-    initParams: initialState || {},
-  });
-};
-
 function SampleAdminList() {
   const { listName, updateFunction } = useContext(SampleAdminContext);
   return h("div", [
-    h.if(listName == "main")(MainFilterList),
+    h.if(listName == "main")(SampleFilterList, { link: true }),
     h.if(listName !== "main")(ModelFilterLists, {
       listName,
       onClick: updateFunction,

@@ -2,7 +2,11 @@ import { useState, createContext, useContext } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route } from "react-router-dom";
 import { NoStateAdmin } from "./baseview";
-import { ModelFilterLists, SessionMatch } from "../model-views";
+import {
+  ModelFilterLists,
+  SessionFilterList,
+  SessionMatch,
+} from "../model-views";
 import { SessionListComponent } from "~/model-views";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
@@ -29,23 +33,11 @@ export function SessionMainPanel() {
 
 export const SessionAdminContext = createContext({});
 
-const MainFilterList = () => {
-  const possibleFilters = ["public", "date_range"];
-
-  const initialState = createParamsFromURL(possibleFilters);
-
-  return h(AdminFilter, {
-    listComponent: SessionListComponent,
-    possibleFilters,
-    initParams: initialState || {},
-  });
-};
-
 function SessionAdminList() {
   const { listName, updateFunction } = useContext(SessionAdminContext);
 
   return h("div", [
-    h.if(listName == "main")(MainFilterList),
+    h.if(listName == "main")(SessionFilterList, { link: true }),
     h.if(listName !== "main")(ModelFilterLists, {
       onClick: updateFunction,
       listName,

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { AdminFilter } from "~/filter";
 import {
@@ -18,15 +17,20 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-export function SampleFilterList({ onClick }) {
+interface FilterListProps {
+  onClick?: (e) => void;
+  link?: boolean;
+}
+
+export function SampleFilterList({ onClick, link = false }: FilterListProps) {
   const possibleFilters = ["public", "geometry", "date_range"]; //needs to work with "doi_like"
 
   return h(AdminFilter, {
-    addModelButton: h("div.add-button-top", [
+    addModelButton: h.if(!link)("div.add-button-top", [
       h(EditProjNewSample, { onSubmit: onClick }),
     ]),
     componentProps: {
-      link: false,
+      link,
       onClick,
     },
     listComponent: SampleListComponent,
@@ -34,65 +38,73 @@ export function SampleFilterList({ onClick }) {
   });
 }
 
-export function PublicationFilterList({ onClick }) {
+export function PublicationFilterList({
+  onClick,
+  link = false,
+}: FilterListProps) {
   const possibleFilters = ["date_range", "doi_like"];
 
   return h(AdminFilter, {
-    addModelButton: h("div.add-button-top", [
+    addModelButton: h.if(!link)("div.add-button-top", [
       h(EditProjNewPub, { onSubmit: onClick }),
     ]),
     listComponent: PublicationAddList,
     componentProps: {
-      link: false,
+      link,
       onClick,
     },
     possibleFilters,
   });
 }
 
-export function ResearcherFilterList({ onClick }) {
+export function ResearcherFilterList({
+  onClick,
+  link = false,
+}: FilterListProps) {
   const possibleFilters = [];
 
   return h(AdminFilter, {
-    addModelButton: h("div.add-button-top", [
+    addModelButton: h.if(!link)("div.add-button-top", [
       h(EditProjNewResearcher, { onSubmit: onClick }),
     ]),
     listComponent: ResearcherAddList,
     componentProps: {
-      link: false,
+      link,
       onClick,
     },
     possibleFilters,
   });
 }
 
-export function ProjectFilterList({ onClick }) {
+export function ProjectFilterList({ onClick, link = false }: FilterListProps) {
   const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
 
   return h(AdminFilter, {
     listComponent: ProjectListComponent,
     componentProps: {
-      link: false,
+      link,
       onClick,
     },
     possibleFilters,
   });
 }
 
-export function SessionFilterList({ onClick }) {
+export function SessionFilterList({ onClick, link = false }: FilterListProps) {
   const possibleFilters = ["public", "date_range", "geometry"];
 
   return h(AdminFilter, {
     listComponent: SessionListComponent,
     componentProps: {
-      link: false,
+      link,
       onClick,
     },
     possibleFilters,
   });
 }
 
-export function ModelFilterLists(props) {
+export function ModelFilterLists(
+  props: FilterListProps & { listName: string }
+) {
   const { listName, onClick } = props;
 
   return h("div", [
