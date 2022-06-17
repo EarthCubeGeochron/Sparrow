@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Icon, InputGroup, Button } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import {  useAPIv2Result } from "~/api-v2";
+import { useAPIv2Result } from "~/api-v2";
 import {
   ProjectModelCard,
   SessionListModelCard,
