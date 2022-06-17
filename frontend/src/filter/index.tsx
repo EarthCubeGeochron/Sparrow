@@ -1,5 +1,5 @@
-import { useState, useReducer, useEffect } from "react";
-import { reducer } from "./reducers-filters";
+import React, { useState, useReducer, useEffect } from "react";
+import { FilterActions, reducer } from "./reducers-filters";
 import { Button, Tooltip, Card, Popover, Icon, Tag } from "@blueprintjs/core";
 import {
   AgeSlideSelect,
@@ -106,30 +106,14 @@ const TagContainer = (props) => {
   return null;
 };
 
-function AdminFilter(props) {
-  // need a prop that grabs set to create params
-  const {
-    possibleFilters,
-    listComponent,
-    initParams,
-    componentProps = {},
-    addModelButton = null,
-  } = props;
+interface AdminFilterPanelProps {
+  runAction: (action: FilterActions) => void;
+  possibleFilters: string[];
+  onSubmit: () => void;
+}
 
-  const [filterState, dispatch] = useReducer(reducer, {
-    params: { ...initParams },
-    isOpen: false,
-  });
-
-  const removeParam = (key) => {
-    dispatch({ type: "remove-filter", field: key });
-  };
-
-  const onSubmit = () => {
-    dispatch({ type: "toggle-open" });
-    urlSearchFromParams(filterState);
-  };
-
+function AdminFilterPanel(props: AdminFilterPanelProps) {
+  const { runAction, possibleFilters, onSubmit } = props;
   const SumbitFilterButton = () => {
     return h(
       Button,
@@ -145,14 +129,14 @@ function AdminFilter(props) {
       Button,
       {
         intent: "danger",
-        onClick: () => dispatch({ type: "toggle-open" }),
+        onClick: () => runAction({ type: "toggle-open" }),
         style: { marginLeft: "10px" },
       },
       ["Cancel"]
     );
   };
 
-  const Content = h(
+  return h(
     "div",
     {
       style: {
@@ -162,21 +146,21 @@ function AdminFilter(props) {
     [
       h("div", [
         h.if(possibleFilters.includes("public"))(EmabrgoSwitch, {
-          dispatch,
+          dispatch: runAction,
         }),
         h.if(possibleFilters.includes("tag"))(TagFilter, {
-          dispatch,
+          dispatch: runAction,
         }),
         h("div", [
           h.if(possibleFilters.includes("date_range"))(DatePicker, {
-            dispatch,
+            dispatch: runAction,
           }),
         ]),
         h.if(possibleFilters.includes("doi_like"))(DoiFilter, {
-          dispatch,
+          dispatch: runAction,
         }),
         h.if(possibleFilters.includes("geometry"))(MapPolygon, {
-          dispatch,
+          dispatch: runAction,
         }),
         h("div", { style: { margin: "10px", marginLeft: "0px" } }, [
           h(SumbitFilterButton),
@@ -185,6 +169,34 @@ function AdminFilter(props) {
       ]),
     ]
   );
+}
+
+export interface AdminFilterProps {
+  children: React.ReactChildren;
+  possibleFilters: string[];
+  initParams: object;
+}
+
+function AdminFilter(props: AdminFilterProps) {
+  const { possibleFilters } = props;
+
+  const [filterState, dispatch] = useReducer(reducer, {
+    params: { ...props.initParams },
+    isOpen: false,
+  });
+
+  const runAction = (action: FilterActions) => {
+    dispatch(action);
+  };
+
+  const removeParam = (key) => {
+    dispatch({ type: "remove-filter", field: key });
+  };
+
+  const onSubmit = () => {
+    dispatch({ type: "toggle-open" });
+    urlSearchFromParams(filterState);
+  };
 
   return h("div", { style: { position: "relative" } }, [
     h("div.list-component", [
@@ -192,11 +204,17 @@ function AdminFilter(props) {
         dispatch,
       }),
       h(TagContainer, { params: filterState.params, removeParam }),
-      addModelButton,
     ]),
-    filterState.isOpen
-      ? Content
-      : h(listComponent, { params: filterState.params, componentProps }),
+    h.if(filterState.isOpen)(AdminFilterPanel, {
+      onSubmit,
+      runAction,
+      possibleFilters,
+    }),
+    h.if(!filterState.isOpen)(React.Fragment, [
+      React.Children.map(props.children, (child) =>
+        React.cloneElement(child, { params: filterState.params })
+      ),
+    ]),
   ]);
 }
 

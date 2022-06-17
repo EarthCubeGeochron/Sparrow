@@ -25,17 +25,25 @@ interface FilterListProps {
 export function SampleFilterList({ onClick, link = false }: FilterListProps) {
   const possibleFilters = ["public", "geometry", "date_range"]; //needs to work with "doi_like"
 
-  return h(AdminFilter, {
-    addModelButton: h.if(!link)("div.add-button-top", [
-      h(EditProjNewSample, { onSubmit: onClick }),
-    ]),
-    componentProps: {
-      link,
-      onClick,
+  return h(
+    AdminFilter,
+    {
+      initParams: {},
+      possibleFilters,
     },
-    listComponent: SampleListComponent,
-    possibleFilters,
-  });
+    [
+      !link
+        ? h("div.add-button-top", [h(EditProjNewSample, { onSubmit: onClick })])
+        : h("div"),
+      h(SampleListComponent, {
+        componentProps: {
+          link,
+          onClick,
+        },
+        params: {},
+      }),
+    ]
+  );
 }
 
 export function PublicationFilterList({
@@ -44,17 +52,25 @@ export function PublicationFilterList({
 }: FilterListProps) {
   const possibleFilters = ["date_range", "doi_like"];
 
-  return h(AdminFilter, {
-    addModelButton: h.if(!link)("div.add-button-top", [
-      h(EditProjNewPub, { onSubmit: onClick }),
-    ]),
-    listComponent: PublicationAddList,
-    componentProps: {
-      link,
-      onClick,
+  return h(
+    AdminFilter,
+    {
+      possibleFilters,
+      initParams: {},
     },
-    possibleFilters,
-  });
+    [
+      h.if(!link)("div.add-button-top", [
+        h(EditProjNewPub, { onSubmit: onClick }),
+      ]),
+      h(PublicationAddList, {
+        componentProps: {
+          link,
+          onClick,
+        },
+        params: {},
+      }),
+    ]
+  );
 }
 
 export function ResearcherFilterList({
@@ -63,43 +79,67 @@ export function ResearcherFilterList({
 }: FilterListProps) {
   const possibleFilters = [];
 
-  return h(AdminFilter, {
-    addModelButton: h.if(!link)("div.add-button-top", [
-      h(EditProjNewResearcher, { onSubmit: onClick }),
-    ]),
-    listComponent: ResearcherAddList,
-    componentProps: {
-      link,
-      onClick,
+  return h(
+    AdminFilter,
+    {
+      possibleFilters,
+      initParams: {},
     },
-    possibleFilters,
-  });
+    [
+      h.if(!link)("div.add-button-top", [
+        h(EditProjNewResearcher, { onSubmit: onClick }),
+      ]),
+      h(ResearcherAddList, {
+        componentProps: {
+          link,
+          onClick,
+        },
+        params: {},
+      }),
+    ]
+  );
 }
 
 export function ProjectFilterList({ onClick, link = false }: FilterListProps) {
   const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
 
-  return h(AdminFilter, {
-    listComponent: ProjectListComponent,
-    componentProps: {
-      link,
-      onClick,
+  return h(
+    AdminFilter,
+    {
+      possibleFilters,
+      initParams: {},
     },
-    possibleFilters,
-  });
+    [
+      h(ProjectListComponent, {
+        componentProps: {
+          link,
+          onClick,
+        },
+        params: {},
+      }),
+    ]
+  );
 }
 
 export function SessionFilterList({ onClick, link = false }: FilterListProps) {
   const possibleFilters = ["public", "date_range", "geometry"];
 
-  return h(AdminFilter, {
-    listComponent: SessionListComponent,
-    componentProps: {
-      link,
-      onClick,
+  return h(
+    AdminFilter,
+    {
+      initParams: {},
+      possibleFilters,
     },
-    possibleFilters,
-  });
+    [
+      h(SessionListComponent, {
+        componentProps: {
+          link,
+          onClick,
+        },
+        params: {},
+      }),
+    ]
+  );
 }
 
 export function ModelFilterLists(

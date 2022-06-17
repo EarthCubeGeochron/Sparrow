@@ -29,11 +29,14 @@ export function DataFileAdminPage() {
   const initialState = createParamsFromURL(possibleFilters);
 
   return h(AdminPage, {
-    listComponent: h(AdminFilter, {
-      listComponent: DataFilesListComponent,
-      possibleFilters,
-      initParams: initialState || {},
-    }),
+    listComponent: h(
+      AdminFilter,
+      {
+        possibleFilters,
+        initParams: initialState || {},
+      },
+      [h(DataFilesListComponent)]
+    ),
     mainPageComponent: h(DataFilesMainPanel),
   });
 }
