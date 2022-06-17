@@ -102,12 +102,16 @@ function DataFileListChildren({ data }) {
   return h(React.Fragment, [
     data.map((dat, i) => {
       const dataFileData = unwrapDataFileCardData(dat);
-      return h(DataFileModelCard, { ...dat });
+      return h(DataFileModelCard, { ...dataFileData });
     }),
   ]);
 }
 
 function DataFilesListComponent({ params }) {
+  if ("search" in params) {
+    params["like"] = params["search"];
+    delete params["search"];
+  }
   return h("div", { style: { padding: "1px" } }, [
     h(
       InfiniteAPIView,
