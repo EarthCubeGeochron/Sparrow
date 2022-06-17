@@ -13,7 +13,7 @@ const h = hyperStyled(styles);
 //   modelName: string;
 // }
 export function TagFilter(props) {
-  const { updateParams } = props;
+  const { dispatch } = props;
   const onAdd = () => {};
   const onDelete = () => {};
   return h(TagContainer, {

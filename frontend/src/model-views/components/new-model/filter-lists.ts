@@ -1,12 +1,11 @@
-import { useState } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { AdminFilter } from "~/filter";
 import {
-  SampleAddList,
   PublicationAddList,
   ResearcherAddList,
   ProjectListComponent,
   SessionListComponent,
+  SampleListComponent,
 } from "~/model-views";
 import {
   EditProjNewPub,
@@ -18,152 +17,134 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-export function SampleFilterList({ onClick }) {
+interface FilterListProps {
+  onClick?: (e) => void;
+  link?: boolean;
+}
+
+export function SampleFilterList({ onClick, link = false }: FilterListProps) {
   const possibleFilters = ["public", "geometry", "date_range"]; //needs to work with "doi_like"
 
-  const [params, setParams] = useState({});
-
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-
-  return h(AdminFilter, {
-    addModelButton: h("div.add-button-top", [
-      h(EditProjNewSample, { onSubmit: onClick }),
-    ]),
-    listComponent: h(SampleAddList, {
-      params,
-      componentProps: {
-        link: false,
-        onClick,
-      },
-    }),
-    createParams,
-    possibleFilters,
-    initParams: params || {},
-  });
+  return h(
+    AdminFilter,
+    {
+      initParams: {},
+      possibleFilters,
+    },
+    [
+      !link
+        ? h("div.add-button-top", [h(EditProjNewSample, { onSubmit: onClick })])
+        : h("div"),
+      h(SampleListComponent, {
+        componentProps: {
+          link,
+          onClick,
+        },
+        params: {},
+      }),
+    ]
+  );
 }
 
-export function PublicationFilterList({ onClick }) {
+export function PublicationFilterList({
+  onClick,
+  link = false,
+}: FilterListProps) {
   const possibleFilters = ["date_range", "doi_like"];
 
-  const [params, setParams] = useState({});
-
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-  return h(AdminFilter, {
-    addModelButton: h("div.add-button-top", [
-      h(EditProjNewPub, { onSubmit: onClick }),
-    ]),
-
-    listComponent: h(PublicationAddList, {
-      params,
-      componentProps: {
-        link: false,
-        onClick,
-      },
-    }),
-    createParams,
-    possibleFilters,
-    initParams: params || {},
-  });
+  return h(
+    AdminFilter,
+    {
+      possibleFilters,
+      initParams: {},
+    },
+    [
+      h.if(!link)("div.add-button-top", [
+        h(EditProjNewPub, { onSubmit: onClick }),
+      ]),
+      h(PublicationAddList, {
+        componentProps: {
+          link,
+          onClick,
+        },
+        params: {},
+      }),
+    ]
+  );
 }
 
-export function ResearcherFilterList({ onClick }) {
+export function ResearcherFilterList({
+  onClick,
+  link = false,
+}: FilterListProps) {
   const possibleFilters = [];
-  const [params, setParams] = useState({});
 
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-  return h(AdminFilter, {
-    addModelButton: h("div.add-button-top", [
-      h(EditProjNewResearcher, { onSubmit: onClick }),
-    ]),
-    listComponent: h(ResearcherAddList, {
-      params,
-      componentProps: {
-        link: false,
-        onClick,
-      },
-    }),
-    createParams,
-    possibleFilters,
-    initParams: params || {},
-  });
+  return h(
+    AdminFilter,
+    {
+      possibleFilters,
+      initParams: {},
+    },
+    [
+      h.if(!link)("div.add-button-top", [
+        h(EditProjNewResearcher, { onSubmit: onClick }),
+      ]),
+      h(ResearcherAddList, {
+        componentProps: {
+          link,
+          onClick,
+        },
+        params: {},
+      }),
+    ]
+  );
 }
 
-export function ProjectFilterList({ onClick }) {
+export function ProjectFilterList({ onClick, link = false }: FilterListProps) {
   const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
-  const [params, setParams] = useState({});
 
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-  return h(AdminFilter, {
-    listComponent: h(ProjectListComponent, {
-      params,
-      componentProps: {
-        link: false,
-        onClick,
-      },
-    }),
-    createParams,
-    possibleFilters,
-    initParams: params || {},
-  });
+  return h(
+    AdminFilter,
+    {
+      possibleFilters,
+      initParams: {},
+    },
+    [
+      h(ProjectListComponent, {
+        componentProps: {
+          link,
+          onClick,
+        },
+        params: {},
+      }),
+    ]
+  );
 }
 
-export function SessionFilterList({ onClick }) {
+export function SessionFilterList({ onClick, link = false }: FilterListProps) {
   const possibleFilters = ["public", "date_range", "geometry"];
 
-  const [params, setParams] = useState({});
-
-  const createParams = (params) => {
-    for (let [key, value] of Object.entries(params)) {
-      if (value == null) {
-        delete params[key];
-      }
-    }
-    setParams(params);
-  };
-
-  return h(AdminFilter, {
-    listComponent: h(SessionListComponent, {
-      params,
-      componentProps: {
-        link: false,
-        onClick,
-      },
-    }),
-    createParams,
-    possibleFilters,
-    initParams: params || {},
-  });
+  return h(
+    AdminFilter,
+    {
+      initParams: {},
+      possibleFilters,
+    },
+    [
+      h(SessionListComponent, {
+        componentProps: {
+          link,
+          onClick,
+        },
+        params: {},
+      }),
+    ]
+  );
 }
 
-export function ModelFilterLists(props) {
+export function ModelFilterLists(
+  props: FilterListProps & { listName: string }
+) {
   const { listName, onClick } = props;
 
   return h("div", [

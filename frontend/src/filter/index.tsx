@@ -1,5 +1,5 @@
-import { useState, useReducer, useEffect } from "react";
-import { reducer } from "./reducers-filters";
+import React, { useState, useReducer, useEffect } from "react";
+import { FilterActions, reducer } from "./reducers-filters";
 import { Button, Tooltip, Card, Popover, Icon, Tag } from "@blueprintjs/core";
 import {
   AgeSlideSelect,
@@ -12,6 +12,7 @@ import {
 import { useToggle } from "~/components";
 import { hyperStyled } from "@macrostrat/hyper";
 import { EmabrgoSwitch } from "./components/Embargo";
+//@ts-ignore
 import styles from "./module.styl";
 import { MapPolygon } from "./components/MapSelector";
 import { urlSearchFromParams } from "../components/infinite-scroll/infinite-api-view";
@@ -59,15 +60,11 @@ function SampleFilter({ on_map = false }: Filter) {
 
 const TagContainer = (props) => {
   const [tags, setTags] = useState({});
-  const { params, removeParam, createParams } = props;
+  const { params, removeParam } = props;
 
   useEffect(() => {
     setTags(params);
   }, [params]);
-
-  useEffect(() => {
-    createParams(tags);
-  }, [JSON.stringify(tags)]);
 
   function objectFilter(obj, predicate) {
     const newObject = Object.fromEntries(Object.entries(obj).filter(predicate));
@@ -109,55 +106,14 @@ const TagContainer = (props) => {
   return null;
 };
 
-function AdminFilter(props) {
-  // need a prop that grabs set to create params
-  const {
-    createParams,
-    possibleFilters,
-    listComponent,
-    initParams,
-    dropdown = false,
-    addModelButton = null,
-  } = props;
+interface AdminFilterPanelProps {
+  runAction: (action: FilterActions) => void;
+  possibleFilters: string[];
+  onSubmit: () => void;
+}
 
-  const [params, dispatch] = useReducer(reducer, initParams);
-  const [tags, setTags] = useState(params);
-  const [filterOpen, setFilterOpen] = useState(false);
-
-  const updateParams = (field, data) => {
-    if (field == "date_range") {
-      dispatch({ type: "date_range", payload: { dates: data } });
-    }
-    if (field == "public") {
-      dispatch({ type: "public", payload: { embargoed: data } });
-    }
-    if (field == "doi_like") {
-      dispatch({ type: "doi_like", payload: { doi_like: data } });
-    }
-    if (field == "geometry") {
-      dispatch({ type: "geometry", payload: { geometry: data } });
-    }
-    if (field == "search") {
-      dispatch({ type: "search", payload: { search: data } });
-    }
-  };
-  const removeParam = (key) => {
-    dispatch({ type: "removeSingle", payload: { field: key } });
-  };
-
-  const onSubmit = () => {
-    createParams(params);
-    setTags(params);
-    setFilterOpen(!filterOpen);
-    urlSearchFromParams(params);
-  };
-
-  const onSearch = (e) => {
-    e.preventDefault();
-    createParams(params);
-    setTags(params);
-    urlSearchFromParams(params);
-  };
+function AdminFilterPanel(props: AdminFilterPanelProps) {
+  const { runAction, possibleFilters, onSubmit } = props;
   const SumbitFilterButton = () => {
     return h(
       Button,
@@ -173,14 +129,14 @@ function AdminFilter(props) {
       Button,
       {
         intent: "danger",
-        onClick: () => setFilterOpen(!filterOpen),
+        onClick: () => runAction({ type: "toggle-open" }),
         style: { marginLeft: "10px" },
       },
       ["Cancel"]
     );
   };
 
-  const Content = h(
+  return h(
     "div",
     {
       style: {
@@ -190,21 +146,21 @@ function AdminFilter(props) {
     [
       h("div", [
         h.if(possibleFilters.includes("public"))(EmabrgoSwitch, {
-          updateEmbargoFilter: updateParams,
+          dispatch: runAction,
         }),
         h.if(possibleFilters.includes("tag"))(TagFilter, {
-          updateParams,
+          dispatch: runAction,
         }),
         h("div", [
           h.if(possibleFilters.includes("date_range"))(DatePicker, {
-            updateDateRange: updateParams,
+            dispatch: runAction,
           }),
         ]),
         h.if(possibleFilters.includes("doi_like"))(DoiFilter, {
-          updateDoi: updateParams,
+          dispatch: runAction,
         }),
         h.if(possibleFilters.includes("geometry"))(MapPolygon, {
-          updateParams,
+          dispatch: runAction,
         }),
         h("div", { style: { margin: "10px", marginLeft: "0px" } }, [
           h(SumbitFilterButton),
@@ -213,60 +169,52 @@ function AdminFilter(props) {
       ]),
     ]
   );
+}
 
-  const leftElement = () => {
-    const [open, setOpen] = useState(false);
+export interface AdminFilterProps {
+  children: React.ReactChildren;
+  possibleFilters: string[];
+  initParams: object;
+}
 
-    const changeOpen = () => {
-      setOpen(!open);
-    };
+function AdminFilter(props: AdminFilterProps) {
+  const { possibleFilters } = props;
 
-    return h("div", [
-      h(
-        Popover,
-        {
-          isOpen: open,
-          content: Content,
-          minimal: true,
-          position: "bottom",
-        },
-        [
-          h(Tooltip, { content: "Choose Multiple Filters" }, [
-            h(Button, { minimal: true, onClick: changeOpen }, [
-              h(Icon, { icon: "filter" }),
-            ]),
-          ]),
-        ]
-      ),
-    ]);
+  const [filterState, dispatch] = useReducer(reducer, {
+    params: { ...props.initParams },
+    isOpen: false,
+  });
+
+  const runAction = (action: FilterActions) => {
+    dispatch(action);
   };
 
-  // Allow for filters to also be a dropdown menu
-  if (dropdown) {
-    return Content;
-  }
+  const removeParam = (key) => {
+    dispatch({ type: "remove-filter", field: key });
+  };
+
+  const onSubmit = () => {
+    dispatch({ type: "toggle-open" });
+    urlSearchFromParams(filterState);
+  };
 
   return h("div", { style: { position: "relative" } }, [
     h("div.list-component", [
       h(SearchInput, {
-        leftElement: h(Button, {
-          icon: "filter",
-          onClick: () => setFilterOpen(!filterOpen),
-          minimal: true,
-        }),
-        updateParams,
-        rightElement: h(Button, {
-          icon: "search",
-          onClick: onSearch,
-          minimal: true,
-          type: "submit",
-        }),
-        text: params.search || "",
+        dispatch,
       }),
-      h(TagContainer, { params: tags, removeParam, createParams }),
-      addModelButton,
+      h(TagContainer, { params: filterState.params, removeParam }),
     ]),
-    filterOpen ? Content : listComponent,
+    h.if(filterState.isOpen)(AdminFilterPanel, {
+      onSubmit,
+      runAction,
+      possibleFilters,
+    }),
+    h.if(!filterState.isOpen)(React.Fragment, [
+      React.Children.map(props.children, (child) =>
+        React.cloneElement(child, { params: filterState.params })
+      ),
+    ]),
   ]);
 }
 

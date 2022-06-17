@@ -1,25 +1,36 @@
 import React, { useState } from "react";
 import h from "@macrostrat/hyper";
-import { InputGroup } from "@blueprintjs/core";
+import { InputGroup, Button } from "@blueprintjs/core";
 
 export function SearchInput(props) {
-  const { rightElement, updateParams, leftElement, text } = props;
-
+  const { dispatch } = props;
+  const [search, setSearch] = useState("");
   const handleChange = (e) => {
-    updateParams("search", e.target.value);
+    setSearch(e.target.value);
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
+    dispatch({ type: "set-search", search });
+    setSearch("");
   };
 
   return h("form", { onSubmit }, [
     h(InputGroup, {
-      leftElement,
+      leftElement: h(Button, {
+        icon: "filter",
+        onClick: () => dispatch({ type: "toggle-open" }),
+        minimal: true,
+      }),
       placeholder: "Search for anything...",
-      value: text,
+      value: search,
       onChange: handleChange,
-      rightElement,
+      rightElement: h(Button, {
+        icon: "search",
+        onClick: onSubmit,
+        minimal: true,
+        type: "submit",
+      }),
     }),
   ]);
 }

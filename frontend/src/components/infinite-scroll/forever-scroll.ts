@@ -6,19 +6,6 @@ import { useOnScreen } from "./utils";
 import "./main.styl";
 import { Spinner } from "@blueprintjs/core";
 
-/**
- * How do I make this virtualized?
- *
- * Need to know height of items: need a callback for each item useElementDimensions?
- * The height of the ENTIRE list once rendered (innerHeight)
- * A measurement that shows how far the list has scrolled
- *
- * How to know when items intersect top and bottom of list:
- *  divide pixel position of item by height of items. Math.floor() turns pixel position into index
- *
- *
- */
-
 const reducer = (state, action) => {
   switch (action.type) {
     case "startBottom":
@@ -45,14 +32,7 @@ const perPage = 15;
  * @param component: A component that can take in the mapped data and format it into what the user wants to display
  * @param {function} fetch A function that will call an API to fetch the next page of data when intersection is observed
  */
-function ForeverScroll({
-  initialData,
-  component,
-  fetch,
-  moreAfter = null,
-  modelName = "result",
-  componentProps = {},
-}) {
+function ForeverScroll({ initialData, children, fetch, moreAfter = null }) {
   const initialState = {
     loadingBottom: false,
     data: [],
@@ -94,37 +74,27 @@ function ForeverScroll({
     moreToLoad = hasMoreAfter;
   }
 
-  let name;
+  let name = "result";
   if (data.length > 1) {
-    name = modelName + "s";
-  } else {
-    name = modelName;
+    name = "s";
   }
 
-  return (
-    <div className="ForeverScroll" style={{ marginTop: "10px" }}>
-      <ul>
-        {data.map((d, i) =>
-          h(component, { id: i, key: i, ...componentProps, ...d })
-        )}
-      </ul>
-
-      {loadingBottom && h(Spinner)}
-
-      {moreToLoad && (
+  return h("div.ForeverScroll", { style: { marginTop: "10px" } }, [
+    h("ul", [React.cloneElement(children, { data })]),
+    h.if(loadingBottom)(Spinner),
+    h.if(moreToLoad)(
+      "div",
+      {
         //@ts-ignore
-        <div ref={setBottom} style={{ marginTop: "50px", height: "500px" }}>
-          <Spinner />
-        </div>
-      )}
-
-      {!moreToLoad && (
-        <div className="no-results">
-          Completed, there are {data.length} {name}
-        </div>
-      )}
-    </div>
-  );
+        ref: setBottom,
+        style: { marginTop: "50px", height: "500px" },
+      },
+      [h(Spinner)]
+    ),
+    h.if(!moreToLoad)("div.no-results", [
+      `Completed, there are ${data.length} ${name}`,
+    ]),
+  ]);
 }
 
 export default ForeverScroll;

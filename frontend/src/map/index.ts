@@ -27,31 +27,23 @@ const MapNavbar = function (props) {
 
 const MapHome = (props) => {
   const link = LocationLink(props);
-  const [style, setStyle] = useState("");
-
   const { isEnabled } = useDarkMode();
-
-  useEffect(() => {
-    if (isEnabled) {
-      setStyle("mapbox://styles/mapbox/dark-v10");
-    }
-    setStyle("mapbox://styles/mapbox/outdoors-v9");
-  }, [isEnabled]);
 
   const StandMapMode = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/outdoors-v9";
+
   return h("div.map-home", [
     h("div.map-butn", [
       h(
         Tooltip,
         { content: "Go to Map" },
-        h(Link, { to: "/map" }, h(Button, { icon: "maximize" }))
+        h(Link, { to: "/map" }, h(Button, { icon: "maximize", minimal: true }))
       ),
     ]),
     h("div.mapHome", [
       h(MapPanel, {
-        width: "750px",
+        width: "100%",
         hide_filter: true,
         mapstyle: StandMapMode,
       }),
