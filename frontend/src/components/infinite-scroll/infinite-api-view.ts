@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
-import { Spinner } from "@blueprintjs/core";
+import { Button, Spinner } from "@blueprintjs/core";
 import { NoSearchResults } from "./utils";
 import { ErrorCallout } from "~/util";
 //@ts-ignore
@@ -35,14 +35,11 @@ const h = hyperStyled(styles);
  */
 function InfiniteAPIView({
   url,
-  unwrapData,
   params,
-  component,
-  componentProps = {},
+  children,
   context,
   filterParams,
   errorHandler = ErrorCallout,
-  modelName,
 }) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
@@ -79,8 +76,8 @@ function InfiniteAPIView({
       if (res.data.length == 0) {
         setNoResults(true);
       }
-      const dataObj = unwrapData(res);
-      const newState = [...data, ...dataObj];
+
+      const newState = [...data, ...res.data];
       const next_page = res.next_page;
       if (next_page == null) {
         setMoreAfter(false);
@@ -109,14 +106,15 @@ function InfiniteAPIView({
   }
 
   if (data.length > 0) {
-    return h(ForeverScroll, {
-      initialData: data,
-      fetch: fetchNewData,
-      modelName,
-      component,
-      moreAfter,
-      componentProps,
-    });
+    return h(
+      ForeverScroll,
+      {
+        initialData: data,
+        fetch: fetchNewData,
+        moreAfter,
+      },
+      [children]
+    );
   }
   return h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);
 }

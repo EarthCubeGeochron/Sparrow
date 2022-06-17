@@ -1,3 +1,4 @@
+import React from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import {
   ProjectModelCard,
@@ -14,165 +15,156 @@ import styles from "./main.styl";
 
 const h = hyperStyled(styles);
 
-// unwraps the data to be simpatico with the ProjectLink component, also gets the next page
-function unwrapProjectCardData(data) {
-  const dataObj = data.data.map((obj) => {
-    const { id, name, description, publication, sample, session } = obj;
-    return { id, name, description, publication, sample, session };
-  });
-  return dataObj;
+function ProjectListChildren({
+  data,
+  componentProps,
+}: {
+  data: any[];
+  componentProps: any;
+}) {
+  if (!data.length) return null;
+  return h(React.Fragment, [
+    data.map((dat, i) => {
+      return h(ProjectModelCard, { key: i, ...dat, ...componentProps });
+    }),
+  ]);
 }
 
 const ProjectListComponent = ({ params, componentProps = {} }) => {
   return h("div", { style: { padding: "1px" } }, [
-    h(InfiniteAPIView, {
-      url: "/models/project",
-      unwrapData: unwrapProjectCardData,
-      params: {},
-      filterParams: { ...params },
-      component: ProjectModelCard,
-      componentProps,
-      context: APIV2Context,
-      modelName: "Project",
-    }),
+    h(
+      InfiniteAPIView,
+      {
+        url: "/models/project",
+        params: {},
+        filterParams: { ...params },
+        context: APIV2Context,
+      },
+      [h(ProjectListChildren, { data: [], componentProps })]
+    ),
   ]);
 };
 
-function unwrapSampleCardData(data) {
-  const dataObj = data.data.map((obj) => {
-    const { id, name, material, location, session } = obj;
-    return { id, name, material, location, session };
-  });
-  return dataObj;
-}
+function SampleListChildren({ data, componentProps }) {
+  if (!data.length) return null;
 
-function SampleListComponent({ params }) {
-  return h("div", [
-    h(InfiniteAPIView, {
-      url: "/models/sample",
-      unwrapData: unwrapSampleCardData,
-      params: { nest: "session" },
-      filterParams: { ...params },
-      component: SampleModelCard,
-      context: APIV2Context,
-      modelName: "Sample",
+  return h(React.Fragment, [
+    data.map((dat, i) => {
+      return h(SampleModelCard, { ...dat, ...componentProps });
     }),
   ]);
 }
 
-function unwrapSessionCardData(data) {
-  const dataObj = data.data.map((obj) => {
-    const { id, technique, target, date, instrument, data, analysis, sample } =
-      obj;
-    return {
-      id,
-      technique,
-      target,
-      date,
-      data,
-      instrument,
-      analysis,
-      sample,
-    };
-  });
-  return dataObj;
+function SampleListComponent({ params, componentProps = {} }) {
+  return h("div", [
+    h(
+      InfiniteAPIView,
+      {
+        url: "/models/sample",
+        params: { nest: "session" },
+        filterParams: { ...params },
+        context: APIV2Context,
+      },
+      [h(SampleListChildren, { data: [], componentProps })]
+    ),
+  ]);
+}
+
+function SessionListChildren({ data, componentProps }) {
+  return h(React.Fragment, [
+    data.map((dat, i) => {
+      return h(SessionListModelCard, { ...dat, ...componentProps });
+    }),
+  ]);
 }
 
 function SessionListComponent({ params, componentProps = {} }) {
   return h("div", { style: { padding: "1px" } }, [
-    h(InfiniteAPIView, {
-      url: "/models/session",
-      unwrapData: unwrapSessionCardData,
-      params: { nest: "instrument,sample" },
-      filterParams: { ...params },
-      component: SessionListModelCard,
-      componentProps,
-      context: APIV2Context,
-      modelName: "Session",
-    }),
+    h(
+      InfiniteAPIView,
+      {
+        url: "/models/session",
+        params: { nest: "instrument,sample" },
+        filterParams: { ...params },
+        context: APIV2Context,
+      },
+      [h(SessionListChildren, { data: [], componentProps })]
+    ),
   ]);
 }
 
 function unwrapDataFileCardData(data) {
-  const dataObj = data.data.map((obj) => {
-    const { basename, file_hash, type, file_mtime: date } = obj;
-    return { basename, file_hash, type, date };
-  });
-  return dataObj;
+  const { basename, file_hash, type, file_mtime: date } = data;
+  return { basename, file_hash, type, date };
+}
+
+function DataFileListChildren({ data }) {
+  return h(React.Fragment, [
+    data.map((dat, i) => {
+      const dataFileData = unwrapDataFileCardData(dat);
+      return h(DataFileModelCard, { ...dat });
+    }),
+  ]);
 }
 
 function DataFilesListComponent({ params }) {
   return h("div", { style: { padding: "1px" } }, [
-    h(InfiniteAPIView, {
-      url: "/data_file/list",
-      unwrapData: unwrapDataFileCardData,
-      params: {},
-      filterParams: { ...params },
-      component: DataFileModelCard,
-      context: APIV2Context,
-      modelName: "Datafile",
-    }),
+    h(
+      InfiniteAPIView,
+      {
+        url: "/data_file/list",
+        params: {},
+        filterParams: { ...params },
+        context: APIV2Context,
+      },
+      [h(DataFileListChildren)]
+    ),
   ]);
 }
 
-function SampleAddList({ params, componentProps }) {
-  return h("div", [
-    h(InfiniteAPIView, {
-      url: "/models/sample",
-      unwrapData: unwrapSampleCardData,
-      params: { nest: "session" },
-      filterParams: { ...params },
-      component: SampleModelCard,
-      componentProps,
-      context: APIV2Context,
-      modelName: "Sample",
+function PublicationAddListChildren({ data, componentProps }) {
+  return h(React.Fragment, [
+    data.map((dat, i) => {
+      return h(PublicationModelCard, { ...dat, ...componentProps });
     }),
   ]);
 }
-
-const unwrapPubs = (data) => {
-  const dataObj = data.data.map((obj) => {
-    const { year, id, title, doi, author, journal } = obj;
-    return { year, id, title, doi, author, journal };
-  });
-  return dataObj;
-};
 
 function PublicationAddList({ params, componentProps }) {
   return h("div", [
-    h(InfiniteAPIView, {
-      url: "/models/publication",
-      unwrapData: unwrapPubs,
-      params: {},
-      filterParams: { ...params },
-      component: PublicationModelCard,
-      componentProps,
-      context: APIV2Context,
-      modelName: "Publication",
+    h(
+      InfiniteAPIView,
+      {
+        url: "/models/publication",
+        params: {},
+        filterParams: { ...params },
+        context: APIV2Context,
+      },
+      [h(PublicationAddListChildren, { data: [], componentProps })]
+    ),
+  ]);
+}
+
+function ResearcherAddListChildren({ data, componentProps }) {
+  return h(React.Fragment, [
+    data.map((dat, i) => {
+      return h(ResearcherModelCard, { ...dat, ...componentProps });
     }),
   ]);
 }
 
-const unwrapResearchers = (data) => {
-  const dataObj = data.data.map((obj) => {
-    const { id, name } = obj;
-    return { id, name };
-  });
-  return dataObj;
-};
-
 function ResearcherAddList({ params, componentProps }) {
   return h("div", [
-    h(InfiniteAPIView, {
-      url: "/models/researcher",
-      unwrapData: unwrapResearchers,
-      params: {},
-      filterParams: { ...params },
-      component: ResearcherModelCard,
-      componentProps,
-      context: APIV2Context,
-      modelName: "Researcher",
-    }),
+    h(
+      InfiniteAPIView,
+      {
+        url: "/models/researcher",
+        params: {},
+        filterParams: { ...params },
+        context: APIV2Context,
+      },
+      [h(ResearcherAddListChildren, { data: [], componentProps })]
+    ),
   ]);
 }
 
@@ -181,7 +173,6 @@ export {
   SampleListComponent,
   SessionListComponent,
   DataFilesListComponent,
-  SampleAddList,
   PublicationAddList,
   ResearcherAddList,
 };
