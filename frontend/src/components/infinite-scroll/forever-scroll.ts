@@ -6,19 +6,6 @@ import { useOnScreen } from "./utils";
 import "./main.styl";
 import { Spinner } from "@blueprintjs/core";
 
-/**
- * How do I make this virtualized?
- *
- * Need to know height of items: need a callback for each item useElementDimensions?
- * The height of the ENTIRE list once rendered (innerHeight)
- * A measurement that shows how far the list has scrolled
- *
- * How to know when items intersect top and bottom of list:
- *  divide pixel position of item by height of items. Math.floor() turns pixel position into index
- *
- *
- */
-
 const reducer = (state, action) => {
   switch (action.type) {
     case "startBottom":
