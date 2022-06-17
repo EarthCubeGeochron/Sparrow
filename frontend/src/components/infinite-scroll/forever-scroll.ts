@@ -78,7 +78,7 @@ function ForeverScroll({ initialData, children, fetch, moreAfter = null }) {
   if (data.length > 1) {
     name = "s";
   }
-  console.log({ loadingBottom, moreToLoad });
+
   return h("div.ForeverScroll", { style: { marginTop: "10px" } }, [
     h("ul", [React.cloneElement(children, { data })]),
     h.if(loadingBottom)(Spinner),
