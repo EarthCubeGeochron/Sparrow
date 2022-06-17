@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import {
   ComposableMap,
   ZoomableGlobe,

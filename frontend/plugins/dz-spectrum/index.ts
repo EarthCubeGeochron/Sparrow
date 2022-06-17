@@ -5,7 +5,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import { Component, createElement } from "react";
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import { APIResultView, useAPIResult } from "@macrostrat/ui-components";
 import { scaleLinear } from "@vx/scale";
 import { AreaClosed } from "@vx/shape";

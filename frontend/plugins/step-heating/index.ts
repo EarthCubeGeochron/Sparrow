@@ -1,4 +1,4 @@
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import styled from "@emotion/styled";
 import { scaleLinear } from "@vx/scale";
 import { AxisLeft, AxisBottom } from "@vx/axis";

@@ -1,4 +1,4 @@
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import React from "react";
 import styled from "@emotion/styled";
 // import { appleStock } from '@vx/mock-data';
