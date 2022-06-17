@@ -77,9 +77,8 @@ class TestSparrowTaskManager:
     def test_schema_generation(self):
         """Test that a reasonable schema is generated for a function."""
         TaskParamModel = create_args_schema(_really_real)
-        schema = TaskParamModel.schema_json()
-        data = loads(schema)
-        assert data["properties"]["check_real"]["type"] == "boolean"
+        schema = TaskParamModel.schema()
+        assert schema["properties"]["check_real"]["type"] == "boolean"
 
     def test_websocket_task_unauthorized(self, client):
         with raises(WebSocketDisconnect) as err:

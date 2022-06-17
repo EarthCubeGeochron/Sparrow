@@ -15,7 +15,7 @@ import { LinkButton } from "@macrostrat/ui-components/lib/esm/ext/router-links";
 
 function getDefaultsForSchema(schema) {
   let defaults = {};
-  for (const key of Object.keys(schema)) {
+  for (const key of Object.keys(schema.properties)) {
     defaults[key] = schema[key].default;
   }
   return defaults;

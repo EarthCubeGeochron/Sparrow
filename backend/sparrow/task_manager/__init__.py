@@ -108,7 +108,7 @@ class SparrowTaskManager(SparrowCorePlugin):
             {
                 "name": k,
                 "description": v["func"].__doc__.strip(),
-                "params": loads(v["params"].schema_json()),
+                "params": v["params"].schema(),
             }
             for k, v in tasks.items()
         ]

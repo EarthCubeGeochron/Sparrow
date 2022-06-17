@@ -4,6 +4,7 @@ from pydantic import create_model
 import sys
 import traceback
 
+from stringcase import pascalcase
 from contextvars import ContextVar
 from redis import Redis
 
@@ -25,11 +26,13 @@ def create_args_schema(func):
     """Create a Pydantic representation of sparrow task parameters."""
     params = get_params_from_function(func)
 
+    schema_name = pascalcase(func.__name__) + "Params"
+
     kwargs = {
         k: (v.annotation, ... if v.default is v.empty else v.default)
         for k, v in params.items()
     }
-    return create_model("TaskParamModel", **kwargs)
+    return create_model(schema_name, **kwargs)
 
 
 class SparrowTask(Task):
@@ -74,7 +77,6 @@ class SparrowTask(Task):
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         # exit point of the task whatever is the state
         pass
-
 
 def _name_for_task(func, **kwargs):
     return kwargs.get("name", func.__name__).replace("_", "-")
