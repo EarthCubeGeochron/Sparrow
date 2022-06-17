@@ -2,11 +2,11 @@ import { useState } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
 import { AdminFilter } from "~/filter";
 import {
-  SampleAddList,
   PublicationAddList,
   ResearcherAddList,
   ProjectListComponent,
   SessionListComponent,
+  SampleListComponent,
 } from "~/model-views";
 import {
   EditProjNewPub,
@@ -29,7 +29,7 @@ export function SampleFilterList({ onClick }) {
       link: false,
       onClick,
     },
-    listComponent: SampleAddList,
+    listComponent: SampleListComponent,
     possibleFilters,
   });
 }
