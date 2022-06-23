@@ -7,6 +7,10 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[2.4.1]` - 2022-06-23
+
+- Fix bug with certbot configuration for certificates
+
 ## `[2.4.0]` - 2022-06-17
 
 - Major update to frontend bundling to use [Yarn v3 and "Plug n' Play"](https://yarnpkg.com/features/pnp) dependency management
