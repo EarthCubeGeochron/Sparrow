@@ -85,8 +85,14 @@ services:
       - ${SPARROW_HTTP_PORT:-5002}:80
     volumes:
       - ./nginx-config/locations/core.conf:/etc/nginx/locations/core.conf:ro
-      - ./nginx-config/error-pages:/usr/share/nginx/error-pages/error:ro
+      # By default, in production mode, we serve Sparrow's compiled frontend application
+      # at the root route. In development mode, this is replaced by a dynamic webpack server
+      # that recompiles on application changes.
+      - ./nginx-config/locations/production.conf:/etc/nginx/locations/frontend.conf:ro
       - frontend_build:/frontend
+      # Application error pages
+      - ./nginx-config/error-pages:/usr/share/nginx/error-pages/error:ro
+      # SPARROW_DATA_DIR is made accessible from the server container but not exposed.
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
   backend: 
     <<: *x-backend

@@ -1,0 +1,19 @@
+version: "3.6"
+services:
+  gateway:
+    image: jonasal/nginx-certbot:3.2
+    ports:
+      - ${SPARROW_HTTP_PORT:-80}:80
+      - ${SPARROW_HTTPS_PORT:-443}:443
+    environment:
+      - CERTBOT_EMAIL
+      # Variables will be substituted by envsubst
+      - SPARROW_DOMAIN
+      - SPARROW_CERTIFICATE=/etc/letsencrypt/live/${SPARROW_DOMAIN}/fullchain.pem
+      - SPARROW_CERTIFICATE_KEY=/etc/letsencrypt/live/${SPARROW_DOMAIN}/privkey.pem
+    volumes:
+      # This file will be templated by ENVSUBST and output to conf.d
+      - ./nginx-config/templates/default-ssl.conf:/etc/nginx/user_conf.d/default.conf:ro
+      - certbot_secrets:/etc/letsencrypt
+volumes:
+  certbot_secrets:

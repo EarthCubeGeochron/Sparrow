@@ -1,6 +1,6 @@
 version: "3.6"
 services:
   gateway:
-    image: nginx:1.19
+    image: nginx:1.23
     volumes:
-      - ./nginx-config/base.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-config/templates/default.conf:/etc/nginx/conf.d/default.conf:ro

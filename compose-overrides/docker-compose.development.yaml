@@ -3,7 +3,7 @@ version: "3.6"
 services:
   gateway:
     volumes:
-      - ./nginx-config/locations/development.conf:/etc/nginx/locations/development.conf:ro
+      - ./nginx-config/locations/frontend-development.conf:/etc/nginx/locations/frontend.conf:ro
   frontend:
     build:
       context: frontend
