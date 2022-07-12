@@ -3,6 +3,9 @@ from os import environ, getenv
 from click import secho
 from rich import print
 from sparrow_utils import relative_path, get_logger
+from typing import List
+from textwrap import dedent
+from .models import Message, Level
 
 log = get_logger(__name__)
 
@@ -42,9 +45,11 @@ def prepare_docker_environment():
     environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
 
 
-def prepare_compose_overrides():
+def prepare_compose_overrides() -> List[Message]:
     base = environ["SPARROW_PATH"]
     main = relative_path(base, "docker-compose.yaml")
+
+    messages: List[Message] = []
 
     compose_files = [main]
 
@@ -73,16 +78,41 @@ def prepare_compose_overrides():
     profiles = environ.get("COMPOSE_PROFILES", "").split(",")
     log.info(f"docker-compose profiles: {profiles}")
 
-    # Use certbot for SSL if certain conditions are met
-    use_certbot = (
-        is_production and is_defined("CERTBOT_EMAIL") and is_defined("SPARROW_DOMAIN")
-    )
+    # Use SSL config if certain conditions are met
+    desires_ssl = is_production and is_defined("SPARROW_DOMAIN")
+
+    use_certbot = desires_ssl and is_defined("CERTBOT_EMAIL")
+    use_custom_ssl = desires_ssl and is_defined("SPARROW_CERTIFICATE") and is_defined("SPARROW_CERTIFICATE_KEY")
 
     if use_certbot:
         # add_message("attempting to use Certbot for HTTPS")
-        add_override("certbot")
+        add_override("gateway.certbot-ssl")
+        messages.append(Message(id="certbot-ssl", text="Using Certbot for SSL (https)", level=Level.SUCCESS))
+    elif use_custom_ssl:
+        # add_message("using custom SSL certificate")
+        add_override("gateway.custom-ssl")
+        messages.append(Message(id="custom-ssl", text="Using custom SSL (https) configuration", level=Level.SUCCESS))
     else:
-        add_override("base")
+        no_ssl_message = "To enable SSL (https), set a SPARROW_DOMAIN and either CERTBOT_EMAIL (for autoconfigured Certbot ssl) or SPARROW_CERTIFICATE + SPARROW_CERTIFICATE_KEY pointing to certificate files."
+        if desires_ssl:
+            messages.append(
+                Message(
+                    id="no-ssl",
+                    text="SSL (https) is incorrectly configured",
+                    details="You provided a SPARROW_DOMAIN configuration but no certificates. "+no_ssl_message,
+                    level=Level.ERROR
+                )
+            )
+        elif is_production:
+            messages.append(
+                Message(
+                    id="no-ssl",
+                    text="Using an insecure server in production",
+                    details=no_ssl_message,
+                    level=Level.WARNING
+                )
+            )
+        add_override("gateway.base")
 
     if is_production:
         add_override("production")
@@ -93,19 +123,20 @@ def prepare_compose_overrides():
     # Overrides should now be formatted as a COMPOSE_FILE colon-separated list
     overrides = environ.get("SPARROW_COMPOSE_OVERRIDES", "")
     if overrides.startswith("-f "):
-        secho(
-            "You are using an old signature for the SPARROW_COMPOSE_OVERRIDES "
-            "environment variable. This option must now be formatted as a "
-            "colon-separated path similar to the COMPOSE_FILE docker-compose "
-            "configuration parameter (https://docs.docker.com/compose/reference/envvars/#compose_file)",
-            fg="red",
-            err=True,
+        messages.append(
+            Message(
+                id="old-overrides",
+                text="You are using an old signature for the SPARROW_COMPOSE_OVERRIDES environment variable.",
+                details="This option must now be formatted as a colon-separated path similar to the COMPOSE_FILE docker-compose configuration parameter (https://docs.docker.com/compose/reference/envvars/#compose_file)",
+                level=Level.ERROR
+            )
         )
     elif overrides != "":
         compose_files += overrides.split(":")
 
     environ["COMPOSE_FILE"] = ":".join(compose_files)
     log.info(f"Docker compose overrides: {compose_files}")
+    return messages
 
 
 def validate_environment():

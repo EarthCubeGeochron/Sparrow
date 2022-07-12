@@ -15,22 +15,9 @@ from .command_cache import get_backend_command_help, CommandDataSource
 from .file_loader import load_config_file
 from ..util.exceptions import SparrowCommandError
 from ..util.shell import fail_without_docker_command, fail_without_docker_running
+from .models import Message, Level
 
 log = get_logger(__file__)
-
-
-class Level(str, Enum):
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-    SUCCESS = "SUCCESS"
-
-
-class Message(BaseModel):
-    id: str
-    text: str
-    details: str = None
-    level: str = Level.WARNING
-
 
 @dataclass
 class SparrowConfig:
@@ -143,9 +130,16 @@ class SparrowConfig:
 
         prepare_docker_environment()
         if "COMPOSE_FILE" in environ:
-            log.info("COMPOSE_FILE provided; skipping overrides and profiles.")
+            self.messages.append(
+                Message(
+                    id="custom-compose",
+                    text="COMPOSE_FILE provided, skipping overrides and profiles.",
+                    details="Only do this if you know what you're doing!",
+                    level=Level.WARNING
+                )
+            )
         else:
-            prepare_compose_overrides()
+            self.messages += prepare_compose_overrides()
 
     def _setup_command_path(self):
         _bin = self.SPARROW_PATH / "_cli" / "bin"
@@ -177,8 +171,9 @@ class SparrowConfig:
             return
         rev = "revision" if ver.uses_git else "version"
         msg = "matches" if ver.is_match else "does not match"
+        lvl = Level.SUCCESS if ver.is_match else Level.WARNING
         msg = f"Sparrow {rev} [underline]{ver.available}[/underline] {msg} [underline]{ver.desired}[/underline]"
-        self.messages.append(Message(id="version-match", text=msg, level=Level.SUCCESS))
+        self.messages.append(Message(id="version-match", text=msg, level=lvl))
 
     def find_sparrow_version(self):
         # Get the sparrow version from the command path...

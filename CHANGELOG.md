@@ -7,6 +7,14 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[2.5.0]` - 2022-07-11
+
+- Totally rework certificate generation process for Sparrow's gateway container,
+  providing better support for third-party and Certbot certificates.
+- Update Nginx server to 1.23 and Nginx-Certbot container to the much-improved
+  version by [Jonas Alfredsson](https://github.com/JonasAlfredsson/docker-nginx-certbot).
+- Rework some configuration code for the command-line application to use messages.
+
 ## `[2.4.1]` - 2022-06-23
 
 - Fix bug with certbot configuration for certificates
