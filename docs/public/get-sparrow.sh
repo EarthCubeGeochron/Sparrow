@@ -1,1 +1,0 @@
-../../get-sparrow.sh

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -e
-
-source docs/.ci/_defs.bash
-
-docker push $main_img
