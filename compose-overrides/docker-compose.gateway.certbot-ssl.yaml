@@ -13,7 +13,7 @@ services:
       - SPARROW_CERTIFICATE_KEY=/etc/letsencrypt/live/${SPARROW_DOMAIN}/privkey.pem
     volumes:
       # This file will be templated by ENVSUBST and output to conf.d
-      - ./nginx-config/templates/default-ssl.conf:/etc/nginx/user_conf.d/default.conf:ro
+      - ./nginx-config/templates/default-ssl.conf:/etc/nginx/templates/default.conf.template:ro
       - certbot_secrets:/etc/letsencrypt
 volumes:
   certbot_secrets:
