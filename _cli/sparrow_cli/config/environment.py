@@ -82,16 +82,32 @@ def prepare_compose_overrides() -> List[Message]:
     desires_ssl = is_production and is_defined("SPARROW_DOMAIN")
 
     use_certbot = desires_ssl and is_defined("CERTBOT_EMAIL")
-    use_custom_ssl = desires_ssl and is_defined("SPARROW_CERTIFICATE") and is_defined("SPARROW_CERTIFICATE_KEY")
+    use_custom_ssl = (
+        desires_ssl
+        and is_defined("SPARROW_CERTIFICATE")
+        and is_defined("SPARROW_CERTIFICATE_KEY")
+    )
 
     if use_certbot:
         # add_message("attempting to use Certbot for HTTPS")
         add_override("gateway.certbot-ssl")
-        messages.append(Message(id="certbot-ssl", text="Using Certbot for SSL (https)", level=Level.SUCCESS))
+        messages.append(
+            Message(
+                id="certbot-ssl",
+                text="Using Certbot for SSL (https)",
+                level=Level.SUCCESS,
+            )
+        )
     elif use_custom_ssl:
         # add_message("using custom SSL certificate")
         add_override("gateway.custom-ssl")
-        messages.append(Message(id="custom-ssl", text="Using custom SSL (https) configuration", level=Level.SUCCESS))
+        messages.append(
+            Message(
+                id="custom-ssl",
+                text="Using custom SSL (https) configuration",
+                level=Level.SUCCESS,
+            )
+        )
     else:
         no_ssl_message = "To enable SSL (https), set a SPARROW_DOMAIN and either CERTBOT_EMAIL (for autoconfigured Certbot ssl) or SPARROW_CERTIFICATE + SPARROW_CERTIFICATE_KEY pointing to certificate files."
         if desires_ssl:
@@ -99,8 +115,9 @@ def prepare_compose_overrides() -> List[Message]:
                 Message(
                     id="no-ssl",
                     text="SSL (https) is incorrectly configured",
-                    details="You provided a SPARROW_DOMAIN configuration but no certificates. "+no_ssl_message,
-                    level=Level.ERROR
+                    details="You provided a SPARROW_DOMAIN configuration but no certificates. "
+                    + no_ssl_message,
+                    level=Level.ERROR,
                 )
             )
         elif is_production:
@@ -109,7 +126,7 @@ def prepare_compose_overrides() -> List[Message]:
                     id="no-ssl",
                     text="Using an insecure server in production",
                     details=no_ssl_message,
-                    level=Level.WARNING
+                    level=Level.WARNING,
                 )
             )
         add_override("gateway.base")
@@ -128,7 +145,7 @@ def prepare_compose_overrides() -> List[Message]:
                 id="old-overrides",
                 text="You are using an old signature for the SPARROW_COMPOSE_OVERRIDES environment variable.",
                 details="This option must now be formatted as a colon-separated path similar to the COMPOSE_FILE docker-compose configuration parameter (https://docs.docker.com/compose/reference/envvars/#compose_file)",
-                level=Level.ERROR
+                level=Level.ERROR,
             )
         )
     elif overrides != "":

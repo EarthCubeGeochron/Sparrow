@@ -19,6 +19,7 @@ from .models import Message, Level
 
 log = get_logger(__file__)
 
+
 @dataclass
 class SparrowConfig:
     bin_directories: typing.List[Path]
@@ -135,7 +136,7 @@ class SparrowConfig:
                     id="custom-compose",
                     text="COMPOSE_FILE provided, skipping overrides and profiles.",
                     details="Only do this if you know what you're doing!",
-                    level=Level.WARNING
+                    level=Level.WARNING,
                 )
             )
         else:
