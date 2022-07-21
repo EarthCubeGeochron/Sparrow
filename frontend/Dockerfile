@@ -15,7 +15,7 @@ RUN yarn set version berry && npm install -g nodemon webpack
 COPY packages/schema-linker/package.json /app/packages/schema-linker/
 COPY packages/sheet/package.json /app/packages/sheet/
 
-COPY yarn.lock .yarnrc.yml /app/
+COPY yarn.lock .yarnrc.yml .yarn/releases /app/
 RUN yarn install --frozen-lockfile
 
 COPY ./ /app/
