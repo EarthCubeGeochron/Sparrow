@@ -17,13 +17,16 @@ from .models import User, Project, Session, DatumType
 from sparrow.logs import get_logger
 from macrostrat.utils import relative_path
 from sparrow.loader import ModelSchema, model_interface
-from sparrow.core.exceptions import DatabaseMappingError
+from sparrow.defs import SparrowError
 from .migration import SparrowDatabaseMigrator
-from sparrow.core.settings import ECHO_SQL
 from .mapper import SparrowDatabaseMapper
 from macrostrat.database.mapper.utils import classname_for_table
 
 log = get_logger(__name__)
+
+
+class DatabaseMappingError(SparrowError):
+    """Raised when a problem occurs with finding a database model"""
 
 
 class Database(BaseDatabase):
@@ -55,7 +58,8 @@ class Database(BaseDatabase):
             schema="core_view",
         )
         self.mapper.register_models(cls)
-        self.app.run_hook("database-mapped")
+        if self.app:
+            self.app.run_hook("database-mapped")
         if not use_cache:
             self.mapper._cache_database_map()
         t1 = perf_counter()

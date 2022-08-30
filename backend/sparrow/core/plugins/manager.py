@@ -2,7 +2,8 @@ import sparrow
 from toposort import toposort_flatten
 from packaging.specifiers import InvalidSpecifier, SpecifierSet
 from packaging.version import Version
-from .base import SparrowPlugin, SparrowCorePlugin, SparrowPluginError
+from sparrow.defs import SparrowPlugin, SparrowCorePlugin, SparrowPluginError
+
 from ..logs import get_logger
 
 log = get_logger(__name__)

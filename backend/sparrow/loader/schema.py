@@ -8,14 +8,18 @@ from sqlalchemy.orm import RelationshipProperty, joinedload, defer
 from collections.abc import Mapping
 from sqlalchemy import inspect
 
+from sparrow.defs import SparrowError
 from .fields import SmartNested
-from sparrow.core.exceptions import SparrowSchemaError
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter, allow_nest, exclude_fields
 
 from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
+
+
+class SparrowSchemaError(SparrowError):
+    ...
 
 
 def _jsonschema_type_mapping(self):
@@ -83,6 +87,8 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # log.debug(_message)
         self._show_audit_id = kwargs.pop("audit_id", False)
         self.__instance_cache = {}
+
+        self._mapper = self.opts.model.__mapper__
         super().__init__(*args, **kwargs)
 
     @classmethod
