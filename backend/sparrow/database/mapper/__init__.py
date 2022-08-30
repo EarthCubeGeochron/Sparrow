@@ -36,8 +36,10 @@ class AutomapError(Exception):
 
 
 cache_path = path.join(path.expanduser("~"), ".sqlalchemy-cache", "sparrow-db-cache.pickle")
+if not should_enable_cache:
+    cache_path = None
 
-model_builder = DatabaseModelCache(cache_path)
+model_builder = DatabaseModelCache(cache_file=cache_path)
 BaseModel = model_builder.automap_base()
 
 class SparrowDatabaseMapper(DatabaseMapper):
