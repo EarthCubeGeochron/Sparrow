@@ -21,11 +21,11 @@ numpy = "^1.22.3"
 pandas = "*"
 uvloop = "*"
 
-"sparrow.birdbrain" = {path = "./shared-modules/birdbrain", develop = true }
-"sparrow.utils" = {path = "./shared-modules/utils", develop = true }
+"macrostrat.database" = {path = "./shared-modules/database", develop = true }
+"macrostrat.utils" = {path = "./shared-modules/utils", develop = true }
 sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
 # Legacy application
-Flask = "1.1.4"
+Flask = "^2.0.0"
 Flask-RESTful = "0.3.7"
 # https://serverfault.com/questions/1094062
 # We have to pin Markupsafe to 2.0.1 for now.
@@ -38,7 +38,7 @@ requests = "2.22.0"
 toposort = "1.5"
 
 # Command-line interface
-click = "7.1.2"
+click = "^8.1.0"
 click-plugins = "1.1.1"
 ipython = "7.27.0"
 
@@ -55,13 +55,6 @@ datefinder = "0.7.0"
 #pyarrow = "^7.0.0"
 openpyxl = "3.0.9"
 uncertainties = "3.1.6" 
-
-# Not sure why these were added,
-# may be subdependencies of Click
-# and Flask
-pexpect = "4.8.0"
-traitlets = "4.3.3"
-werkzeug = "0.16.0"
 
 # Serialization/deserialization
 marshmallow = "3.11.1"
@@ -100,13 +93,13 @@ asgiref = "3.2.8"
 # Plugin Dependencies
 crossrefapi = "1.5.0"
 
-# sparrow.utils
+# macrostrat.utils
 # NOTE: we should probably organize these internal
 # packages better...
 # -e ./utils
 
 # Task worker
-celery = "5.1.1"
+celery = "^5.1.1"
 redis = "3.5.3"
 broadcaster = { version = "0.2.0", extras = [ "redis" ] }
 # For worker auto-reloading in development

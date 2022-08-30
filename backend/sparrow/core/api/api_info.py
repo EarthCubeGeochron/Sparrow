@@ -1,5 +1,5 @@
 from yaml import safe_load
-from sparrow.utils import relative_path
+from macrostrat.utils import relative_path
 from sparrow.database import classname_for_table
 
 

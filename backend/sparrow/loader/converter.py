@@ -11,7 +11,7 @@ from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.types import Integer, Numeric, DateTime
 from sqlalchemy.dialects import postgresql
 
-from sparrow.birdbrain.mapper.utils import trim_postfix
+from macrostrat.database.mapper.utils import trim_postfix
 from .fields import Geometry, Enum, JSON, SmartNested, UUID, DateTimeExt, PassThroughRelated
 from .util import to_schema_name
 

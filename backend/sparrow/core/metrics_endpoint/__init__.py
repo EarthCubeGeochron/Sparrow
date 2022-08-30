@@ -1,6 +1,6 @@
 from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.core.context import app_context
-from sparrow.utils import relative_path
+from macrostrat.utils import relative_path
 from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
 import pandas as pd

@@ -4,8 +4,8 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from os import environ
-from sparrow.utils.shell import git_revision_info
-from sparrow.utils.logs import get_logger, setup_stderr_logs
+from macrostrat.utils.shell import git_revision_info
+from macrostrat.utils.logs import get_logger, setup_stderr_logs
 from pydantic import BaseModel
 from enum import Enum
 
@@ -179,7 +179,9 @@ class SparrowConfig:
     def find_sparrow_version(self):
         # Get the sparrow version from the command path...
         version = {}
-        with (self.SPARROW_PATH / "backend" / "sparrow" / "core" / "meta.py").open() as f:
+        with (
+            self.SPARROW_PATH / "backend" / "sparrow" / "core" / "meta.py"
+        ).open() as f:
             exec(f.read(), version)
         return version["__version__"]
 

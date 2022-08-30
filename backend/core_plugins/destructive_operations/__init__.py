@@ -3,7 +3,7 @@ A plugin for destructive operations to the Sparrow database.
 """
 
 from sparrow.core import get_database, task
-from sparrow.utils import relative_path
+from macrostrat.utils import relative_path
 
 
 @task(name="remove-analytical-data", destructive=True)

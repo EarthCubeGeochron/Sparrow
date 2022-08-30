@@ -13,7 +13,7 @@ from sparrow.core.exceptions import SparrowSchemaError
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter, allow_nest, exclude_fields
 
-from sparrow.utils import get_logger
+from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
 

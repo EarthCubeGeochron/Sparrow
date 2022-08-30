@@ -9,7 +9,7 @@ from starlette import status
 from sparrow.core.api import APIResponse
 from sparrow.core.context import get_plugin
 from sparrow.core.auth import get_scopes
-from sparrow.utils import get_logger
+from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
 

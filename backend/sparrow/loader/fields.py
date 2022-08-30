@@ -14,7 +14,7 @@ from shapely.geometry import mapping, shape
 from datetime import datetime
 
 from .util import primary_key
-from sparrow.utils import get_logger
+from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
 

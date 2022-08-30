@@ -4,8 +4,8 @@ from pathlib import Path
 from json import loads
 from os import environ
 from json.decoder import JSONDecodeError
-from sparrow.utils.logs import get_logger
-from sparrow.utils.shell import split_args, cmd as cmd_
+from macrostrat.utils.logs import get_logger
+from macrostrat.utils.shell import split_args, cmd as cmd_
 from docker import from_env
 from docker.errors import DockerException
 

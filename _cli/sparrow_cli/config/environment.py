@@ -3,7 +3,7 @@ from os import environ, getenv
 from rich import print
 from typing import List
 
-from sparrow.utils import relative_path, get_logger
+from macrostrat.utils import relative_path, get_logger
 from .models import Message, Level
 
 log = get_logger(__name__)

@@ -1,9 +1,9 @@
 from sqlalchemy.ext import automap
 from sqlalchemy.ext.automap import generate_relationship
 from os import path, environ
-from sparrow.utils.logs import get_logger
-from sparrow.birdbrain.mapper import DatabaseModelCache
-from sparrow.birdbrain import DatabaseMapper
+from macrostrat.utils.logs import get_logger
+from macrostrat.database.mapper import DatabaseModelCache
+from macrostrat.database import DatabaseMapper
 
 from .shims import _is_many_to_many
 
@@ -35,12 +35,15 @@ class AutomapError(Exception):
     pass
 
 
-cache_path = path.join(path.expanduser("~"), ".sqlalchemy-cache", "sparrow-db-cache.pickle")
+cache_path = path.join(
+    path.expanduser("~"), ".sqlalchemy-cache", "sparrow-db-cache.pickle"
+)
 if not should_enable_cache:
     cache_path = None
 
 model_builder = DatabaseModelCache(cache_file=cache_path)
 BaseModel = model_builder.automap_base()
+
 
 class SparrowDatabaseMapper(DatabaseMapper):
     automap_base = BaseModel
@@ -56,4 +59,7 @@ class SparrowDatabaseMapper(DatabaseMapper):
         self.db = db
         self.automap_base = BaseModel
         if reflect:
-            self.reflect_database(schemas=["vocabulary", "core_view", "tags", "public"], use_cache=use_cache)
+            self.reflect_database(
+                schemas=["vocabulary", "core_view", "tags", "public"],
+                use_cache=use_cache,
+            )

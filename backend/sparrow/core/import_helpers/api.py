@@ -18,7 +18,7 @@ from sparrow_worker import import_task
 from broadcaster import Broadcast
 from starlette.applications import Starlette
 from starlette.routing import Route, WebSocketRoute
-from sparrow.utils import get_logger
+from macrostrat.utils import get_logger
 from .importer import WebSocketLogger
 
 started = False

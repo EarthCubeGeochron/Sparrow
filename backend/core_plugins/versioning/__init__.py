@@ -1,10 +1,10 @@
 from sqlalchemy import inspect, sql
 from sparrow.core.plugins import SparrowCorePlugin
-from sparrow.utils import relative_path
+from macrostrat.utils import relative_path
 from sparrow.core import get_database
 import click
 
-from sparrow.birdbrain.utils import run_sql
+from macrostrat.database.utils import run_sql
 
 exclude_tables = ["spatial_ref_sys"]
 audit_schemas = ["public", "vocabulary", "tags", "geo_context"]

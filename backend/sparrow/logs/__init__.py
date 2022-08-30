@@ -1,1 +1,1 @@
-from sparrow.utils.logs import *
+from macrostrat.utils.logs import *
