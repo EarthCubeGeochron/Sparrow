@@ -96,7 +96,6 @@
     "file-loader": "^6.2.0",
     "html-loader": "^3.1.0",
     "html-webpack-plugin": "^5.5.0",
-    "husky": "4.2.5",
     "lerna": "^3.22.1",
     "lint-staged": "10.2.11",
     "markdown-loader": "^8.0.0",
@@ -117,5 +116,6 @@
   "prettier": {},
   "moduleRoots": "./_webpack/custom-resolver.js",
   "author": "Daven Quinn",
-  "license": "ISC"
+  "license": "ISC",
+  "packageManager": "yarn@3.2.3"
 }
