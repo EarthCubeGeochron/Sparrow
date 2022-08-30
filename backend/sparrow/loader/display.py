@@ -1,6 +1,7 @@
 from marshmallow.fields import Nested
 from marshmallow.exceptions import RegistryError
-from click import echo, secho, style, get_terminal_size
+from click import echo, secho, style
+from shutil import get_terminal_size
 
 
 def styled_key(k, **kwargs):

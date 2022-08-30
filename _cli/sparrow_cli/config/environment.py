@@ -150,7 +150,7 @@ def prepare_compose_overrides() -> List[Message]:
     elif overrides != "":
         compose_files += overrides.split(":")
 
-    environ["COMPOSE_FILE"] = ":".join(compose_files)
+    environ["COMPOSE_FILE"] = ":".join(str(c) for c in compose_files)
     log.info(f"Docker compose overrides: {compose_files}")
     return messages
 
