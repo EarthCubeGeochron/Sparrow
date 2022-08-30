@@ -178,7 +178,8 @@ class SparrowConfig:
         rev = "revision" if ver.uses_git else "version"
         msg = "matches" if ver.is_match else "does not match"
         msg = f"Sparrow {rev} [underline]{ver.available}[/underline] {msg} [underline]{ver.desired}[/underline]"
-        self.messages.append(Message(id="version-match", text=msg, level=Level.SUCCESS))
+        level = Level.SUCCESS if ver.is_match else Level.ERROR
+        self.messages.append(Message(id="version-match", text=msg, level=level))
 
     def find_sparrow_version(self):
         # Get the sparrow version from the command path...
