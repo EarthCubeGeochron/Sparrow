@@ -13,7 +13,7 @@ class APIv1Plugin(SparrowCorePlugin):
     """A plugin that wraps Sparrow's legacy API"""
 
     name = "api-v1"
-    sparrow_version = "==2.*"
+    sparrow_version = "==3.*"
 
     def on_add_routes(self, route_table):
         db = self.app.database

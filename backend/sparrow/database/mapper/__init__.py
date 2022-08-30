@@ -1,6 +1,6 @@
 from sqlalchemy.ext import automap
 from sqlalchemy.ext.automap import generate_relationship
-from os import path
+from os import path, environ
 from sparrow.utils.logs import get_logger
 from sparrow.birdbrain.mapper import DatabaseModelCache
 from sparrow.birdbrain import DatabaseMapper

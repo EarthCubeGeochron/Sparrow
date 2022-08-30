@@ -12,7 +12,7 @@ async def redirect(*args):
 
 class APIv2Plugin(SparrowCorePlugin):
     name = "api-v2"
-    sparrow_version = "==2.*"
+    sparrow_version = "==3.*"
 
     def on_add_routes(self, route_table):
         api_v2 = APIv2(self.app)
