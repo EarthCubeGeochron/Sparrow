@@ -1,6 +1,6 @@
 import { Markdown } from "@macrostrat/ui-components";
 import aboutText from "./landing-text.md";
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import { SampleMap } from "plugins/globe";
 
 const MainComponent = () => {

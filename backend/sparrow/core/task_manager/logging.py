@@ -110,6 +110,9 @@ class ChunkedMessageLogger:
 
     @contextmanager
     def redirect_output(self, disable=False):
+        # Hack: reset the buffer to avoid messages from the previous context
+        # This might cause unforseen prorblems, but it seems fine for now
+        self._buffer = []
         if disable:
             yield
             return

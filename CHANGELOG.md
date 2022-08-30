@@ -7,6 +7,28 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[2.5.0]` - 2022-07-11
+
+- Totally rework certificate generation process for Sparrow's gateway container,
+  providing better support for third-party and Certbot certificates.
+- Update Nginx server to 1.23 and Nginx-Certbot container to the much-improved
+  version by [Jonas Alfredsson](https://github.com/JonasAlfredsson/docker-nginx-certbot).
+- Rework some configuration code for the command-line application to use messages.
+
+## `[2.4.1]` - 2022-06-23
+
+- Fix bug with certbot configuration for certificates
+
+## `[2.4.0]` - 2022-06-17
+
+- Major update to frontend bundling to use [Yarn v3 and "Plug n' Play"](https://yarnpkg.com/features/pnp) dependency management
+  instead of a `node_modules` folder. This allows a huge speedup in frontend bundling times. As part of this,
+  the preferred minimum version of Node JS for frontend compilation has been increased to 16.
+- Many bugfixes to the Task-management API system, and preparation for future improvements there.
+- Added a `lab_id` field to the sample page
+- Added basic integration tests (does the frontend build properly and get served by the gateway container?) to the 
+  Sparrow CI process. These can be expanded and converted to Python in the future.
+
 ## `[2.3.1]` - 2022-06-07
 
 - Fixed a bug with resolving the Python API server from the NGINX gateway

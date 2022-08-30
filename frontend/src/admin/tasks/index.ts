@@ -11,12 +11,12 @@ import { Link, useHistory } from "react-router-dom";
 import Form from "@rjsf/core";
 import { useSparrowWebSocket } from "~/api-v2";
 import { LogWindow } from "./log-window";
-import { LinkButton } from "@macrostrat/ui-components/lib/esm/ext/router-links";
 
 function getDefaultsForSchema(schema) {
+  if (schema == null) return null;
   let defaults = {};
-  for (const key of Object.keys(schema)) {
-    defaults[key] = schema[key].default;
+  for (const key of Object.keys(schema.properties)) {
+    defaults[key] = schema[key]?.default;
   }
   return defaults;
 }
@@ -59,15 +59,17 @@ function TaskMain({ tasks, task }) {
     const chunkedMessages = getChunkedMessages(lastMessage);
     for (const message of chunkedMessages) {
       const { action, text, info, type } = message;
-      if (action == "start") {
-        setIsRunning(true);
+      if (action == "reset") {
         return [];
+      } else if (action == "start") {
+        setIsRunning(true);
       } else if (isStopMessage(message)) {
         setIsRunning(false);
       }
       if (info != null) {
         console.log(info);
       }
+      // Actually track the message in hostory
       if (text != null) {
         // We could eventually keep track of line type here...
         const lines = text.split("\n").filter((line) => line.length > 0);
@@ -90,8 +92,9 @@ function TaskMain({ tasks, task }) {
             active: showParameters,
             rightIcon: showParameters ? "chevron-up" : "chevron-down",
             minimal: true,
+            disabled: schema == null,
           },
-          `Options`
+          `Parameters`
         ),
         h(
           Button,
@@ -101,7 +104,7 @@ function TaskMain({ tasks, task }) {
             minimal: true,
             onClick() {
               let act = { action: isRunning ? "stop" : "start" };
-              if (act.action == "start") act.params = params;
+              if (act.action == "start") act.params = params ?? {};
               sendMessage(JSON.stringify(act));
             },
           },
@@ -110,7 +113,7 @@ function TaskMain({ tasks, task }) {
         h("div.spacer", { style: { flexGrow: 1 } }),
         h(ServerStatus, { socket: ws, small: false }),
       ]),
-      h(
+      h.if(schema != null)(
         CollapseCard,
         { isOpen: showParameters },
         h(

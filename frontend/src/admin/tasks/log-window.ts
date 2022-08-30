@@ -70,7 +70,6 @@ function MessageHistory({ messages, width, height, gutterWidth = 70 }) {
     const currentLength = nChars.current.length;
     const nextMessages = messages.slice(currentLength, messages.length);
     const addedElements = nextMessages.map((m) => strip(m).length);
-    console.log(addedElements, nChars.current);
     nChars.current?.push(...addedElements);
     return nChars.current;
   }, [messages.length]);
@@ -111,7 +110,6 @@ export function LogWindow({ messages }) {
     width = 1,
     height = 1,
   } = useResizeObserver<HTMLDivElement>();
-  console.log(width, height);
 
   return h(
     "div.log-window",
