@@ -4,7 +4,7 @@ from pathlib import Path
 from contextlib import contextmanager
 from subprocess import run as _run
 from shlex import split
-from sparrow.utils import relative_path
+from macrostrat.utils import relative_path
 from .settings import SECRET_KEY
 
 

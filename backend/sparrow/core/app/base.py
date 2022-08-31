@@ -16,7 +16,7 @@ from sparrow.core import settings
 from ..util import check_secret_key
 from ..logs import get_logger
 from .plugins import prepare_plugin_manager, SparrowPluginManager
-from sparrow.birdbrain.utils import wait_for_database
+from macrostrat.database.utils import wait_for_database
 from ..startup import tables_exist
 
 log = get_logger(__name__)

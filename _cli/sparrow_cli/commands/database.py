@@ -7,7 +7,7 @@ from ..util import (
     compose,
     exec_sparrow,
 )
-from sparrow.utils.shell import cmd
+from macrostrat.utils.shell import cmd
 from subprocess import PIPE
 from rich import print
 from rich.console import Console

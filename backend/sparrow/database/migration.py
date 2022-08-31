@@ -4,12 +4,17 @@ from schemainspect import get_inspector
 from migra import Migration
 from migra.statements import check_for_drop
 import sys
-from sparrow.utils import get_logger, cmd
+from macrostrat.utils import get_logger, cmd
 from sqlalchemy import text
 import os
 from rich import print
 
-from sparrow.birdbrain.utils import _exec_raw_sql, run_sql, temp_database, connection_args
+from macrostrat.database.utils import (
+    _exec_raw_sql,
+    run_sql,
+    temp_database,
+    connection_args,
+)
 
 
 log = get_logger(__name__)

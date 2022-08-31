@@ -6,7 +6,7 @@ from textwrap import dedent
 
 from sparrow_cli.util.command_groups import SparrowDefaultCommand
 from ..util import cmd, exec_or_run
-from sparrow.utils import get_logger
+from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
 

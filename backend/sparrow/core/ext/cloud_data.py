@@ -2,7 +2,7 @@ from boto3 import client
 from click import secho, command, option
 from os import environ
 from sparrow.core.plugins import SparrowPlugin
-from sparrow.birdbrain.utils import run_sql
+from macrostrat.database.utils import run_sql
 
 
 class CloudDataPlugin(SparrowPlugin):

@@ -1,6 +1,6 @@
 import os
 from contextlib import contextmanager
-from sparrow.birdbrain.utils import temp_database
+from macrostrat.database.utils import temp_database
 from sqlalchemy_utils import drop_database
 
 

@@ -1,6 +1,6 @@
 from stringcase import pascalcase
 #from marshmallow_sqlalchemy.fields import get_primary_keys
-from sparrow.birdbrain.mapper.utils import primary_key
+from macrostrat.database.mapper.utils import primary_key
 
 
 def column_is_required(col):

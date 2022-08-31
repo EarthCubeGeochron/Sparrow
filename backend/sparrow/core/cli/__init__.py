@@ -10,7 +10,7 @@ from .user import create_user, list_users, reset_password
 from ..util import working_directory
 from ..context import get_sparrow_app
 from sparrow.database.migration import db_migration
-from sparrow.utils.logs import setup_stderr_logs
+from macrostrat.utils.logs import setup_stderr_logs
 from typing import Optional
 from ..plugins import SparrowPlugin
 from logging import INFO

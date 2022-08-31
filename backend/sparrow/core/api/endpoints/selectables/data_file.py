@@ -1,6 +1,6 @@
 from logging import error
 from starlette.endpoints import HTTPEndpoint
-from sparrow.utils.logs import get_logger
+from macrostrat.utils.logs import get_logger
 from webargs_starlette import parser
 from sqlakeyset import get_page
 from starlette.responses import JSONResponse

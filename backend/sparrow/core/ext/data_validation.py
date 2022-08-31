@@ -4,7 +4,7 @@ from sys import stdin
 from time import time
 from sparrow.core.plugins import SparrowPlugin
 from sparrow.core.context import get_database
-from sparrow.birdbrain import on_conflict
+from macrostrat.database import on_conflict
 from sparrow.logs import setup_stderr_logs
 
 

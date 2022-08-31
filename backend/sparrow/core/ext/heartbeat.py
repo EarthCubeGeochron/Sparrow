@@ -1,6 +1,6 @@
 from starlette.endpoints import WebSocketEndpoint
 from sparrow.core.plugins import SparrowCorePlugin
-from sparrow.utils import get_logger
+from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
 

@@ -1,4 +1,8 @@
-class SparrowPluginError(Exception):
+class SparrowError(Exception):
+    """Base class for all sparrow-related errors"""
+
+
+class SparrowPluginError(SparrowError):
     pass
 
 
