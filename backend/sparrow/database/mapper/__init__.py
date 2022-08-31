@@ -35,9 +35,11 @@ class AutomapError(Exception):
     pass
 
 
-cache_path = path.join(
+default_cache_path = path.join(
     path.expanduser("~"), ".sqlalchemy-cache", "sparrow-db-cache.pickle"
 )
+cache_path = environ.get("SPARROW_DATABASE_MODEL_CACHE_PATH", default_cache_path)
+
 if not should_enable_cache:
     cache_path = None
 
