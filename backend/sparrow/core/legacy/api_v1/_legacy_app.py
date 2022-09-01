@@ -45,6 +45,7 @@ class App(Flask):
         dburl = self.config.get("DATABASE")
         self.db_url = make_url(dburl)
         self.dbname = self.db_url.database
+        self.debug = True
 
     @property
     def db(self):

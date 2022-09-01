@@ -5,7 +5,7 @@ from json import loads
 from os import environ
 from json.decoder import JSONDecodeError
 from macrostrat.utils.logs import get_logger
-from macrostrat.utils.shell import split_args, cmd as cmd_
+from macrostrat.utils.shell import split_args, cmd as cmd_, run as run_
 from docker import from_env
 from docker.errors import DockerException
 

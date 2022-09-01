@@ -1,4 +1,4 @@
-from sparrow.defs import SparrowCorePlugin
+from sparrow.core.plugins import SparrowCorePlugin
 from marshmallow_sqlalchemy import exceptions
 from click import secho
 
@@ -53,3 +53,16 @@ class InterfaceCollection(ModelCollection):
         if not hasattr(cls, "__mapper__"):
             return
         self.add(k, model_interface(cls))
+
+
+class InterfacePlugin(SparrowCorePlugin):
+    name = "schema-interface"
+
+    def on_database_ready(self, db):
+        iface = InterfaceCollection(db.model)
+        db.interface = iface
+
+    def on_setup_cli(self, cli):
+        from .cli import show_interface
+
+        cli.add_command(show_interface)
