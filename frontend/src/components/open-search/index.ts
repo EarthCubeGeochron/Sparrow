@@ -1,36 +1,59 @@
-import { useState, useEffect } from "react";
-import { Icon } from "@blueprintjs/core";
+import React, { useState, useEffect } from "react";
+import { Icon, InputGroup, Button } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIv2Result } from "~/api-v2";
 import {
   ProjectModelCard,
   SessionListModelCard,
   SampleModelCard,
-  ModelCard,
 } from "~/model-views/components";
 import ForeverScroll from "~/components/infinite-scroll/forever-scroll";
-import { SearchInput } from "~/filter/components";
 //@ts-ignore
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const OpenSearchCard = (props) => {
-  const { model, data } = props;
+type OpenSearchCardData = { model: string; data: object };
 
-  let possibleModels = {
-    sample: SampleModelCard,
-    project: ProjectModelCard,
-    session: SessionListModelCard,
-  };
-  let data_ = { ...data, showIdentity: "long" };
-  for (const key in possibleModels) {
-    if (model == key) {
-      return h("div", [h(possibleModels[key], data_)]);
-    }
-  }
-  return h(ModelCard, ["Working"]);
+interface OpenSearchCardProps {
+  data: OpenSearchCardData[];
+}
+const OpenSearchCard = (props: OpenSearchCardProps) => {
+  const { data } = props;
+
+  return h(React.Fragment, [
+    data.map((dat, i) => {
+      const { model, data } = dat;
+      return h(React.Fragment, [
+        h.if(model == "sample")(SampleModelCard, { ...data }),
+        h.if(model == "project")(ProjectModelCard, { ...data }),
+        h.if(model == "session")(SessionListModelCard, { ...data }),
+      ]);
+    }),
+  ]);
 };
+
+interface OpenSearchInputProps {
+  query: string;
+  handleChange: (query: string) => void;
+}
+
+function OpenSearchInput(props: OpenSearchInputProps) {
+  const { query, handleChange } = props;
+
+  return h(InputGroup, {
+    leftElement: h(Icon, { icon: "search" }),
+    placeholder: "Search for anything...",
+    value: query,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+      handleChange(e.target.value),
+    rightElement: h(Button, {
+      icon: "arrow-right",
+      minimal: true,
+      type: "submit",
+    }),
+  });
+}
 
 /**
  * React Component to create an open search on several models
@@ -60,24 +83,26 @@ function OpenSearch() {
 
   if (!data) return null;
 
-  const onChange = (text, value) => {
+  const onChange = (value) => {
     setQuery(value);
   };
 
   return h("div", [
     h("div.searchbox", [
-      h(SearchInput, {
-        leftElement: h(Icon, { icon: "search" }),
-        updateParams: onChange,
-        value: query,
+      h(OpenSearchInput, {
+        handleChange: onChange,
+        query,
       }),
     ]),
     h("div.results", [
-      h.if(scrollData.length > 0)(ForeverScroll, {
-        initialData: scrollData,
-        component: OpenSearchCard,
-        fetch: () => {},
-      }),
+      h.if(scrollData.length > 0)(
+        ForeverScroll,
+        {
+          initialData: scrollData,
+          fetch: () => {},
+        },
+        [h(OpenSearchCard)]
+      ),
     ]),
   ]);
 }

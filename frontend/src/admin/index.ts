@@ -21,8 +21,6 @@ import { VocabularyPage } from "./vocabulary";
 
 import { TagManager } from "~/components/tags";
 
-import { SchemaExplorerMainPanel } from "./schema-explorer";
-
 //@ts-ignore
 import styles from "./module.styl";
 
@@ -129,7 +127,13 @@ const AdminBody = ({ base, ...rest }) => {
       "div.admin-homepage",
       { style: { display: "flex", justifyContent: "space-between" } },
       [
-        h("div", { style: { flexGrow: 2 } }, [h(QuickLinks, { base })]),
+        h("div", { style: { flexGrow: 2 } }, [
+          h(QuickLinks, { base }),
+          h("div", { style: { display: "flex" } }, [
+            h(SecondaryPageLinks, { base }),
+            h(NewModelLinks, { base }),
+          ]),
+        ]),
         h(
           "div",
           {
@@ -144,10 +148,6 @@ const AdminBody = ({ base, ...rest }) => {
         ),
       ]
     ),
-    h("div", { style: { position: "fixed", bottom: 70, display: "flex" } }, [
-      h(SecondaryPageLinks, { base }),
-      h(NewModelLinks, { base }),
-    ]),
   ]);
 };
 

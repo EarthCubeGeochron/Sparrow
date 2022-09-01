@@ -5,8 +5,6 @@ import h from "@macrostrat/hyper";
 import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
 import { LayerMenu } from "./components/LayerMenu";
-import { MarkerCluster } from "./components/MarkerCluster";
-import { FilterMenu } from "./components/filterMenu";
 import { MapToast } from "./components/MapToast";
 import { useAPIActions } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
@@ -58,7 +56,7 @@ export function MapPanel({
   height = "500px",
   latitude = 0,
   longitude = 0,
-  zoom = 1,
+  zoom = 0.5,
   login = false,
   mapstyle,
 }: MapProps) {
@@ -71,6 +69,12 @@ export function MapPanel({
   useEffect(() => {
     setState({ ...state, mounted: true });
   }, []);
+
+  useEffect(() => {
+    setState((prevState) => {
+      return { ...prevState, MapStyle: mapstyle };
+    });
+  }, [mapstyle]);
 
   const [params, setParams] = useState({ all: "true", has: "location" });
   const initialData = useAPIv2Result("/map-samples", params);
@@ -184,8 +188,6 @@ export function MapPanel({
     };
   });
 
-  console.log(initialData);
-
   return h("div.map-container", [
     h("div.layer-button", [
       h.if(on_map)(Navbar, { className: styles["map-navbar"] }, [
@@ -204,11 +206,6 @@ export function MapPanel({
             showMarkers={state.showMarkers}
             toggleShowMarkers={toggleShowMarkers}
           ></LayerMenu>
-          {/* <FilterMenu
-                changeParams={changePararms}
-                hide={hide_filter}
-                on_map={on_map}
-              ></FilterMenu> */}
         </Navbar.Group>,
       ]),
     ]),

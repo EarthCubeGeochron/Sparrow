@@ -5,7 +5,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 //http://localhost:3000/api/v1/datum?unit=Ma&parameter=plateau_age&technique=Ar%2FAr%20Fusion
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import { Component } from "react";
 import { Callout, Icon, RangeSlider } from "@blueprintjs/core";
 import { APIResultView } from "@macrostrat/ui-components";

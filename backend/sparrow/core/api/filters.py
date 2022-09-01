@@ -420,8 +420,7 @@ class TextSearchFilter(BaseFilter):
         fields = text_fields(self.model)
         search_string = args[self.key]
 
-        ## TODO: make it non-case sensitive??
-        return query.filter(or_(*[n.like(f"%{search_string}%") for n in fields]))
+        return query.filter(or_(*[n.ilike(f"%{search_string}%") for n in fields]))
 
 
 class IdListFilter(BaseFilter):
