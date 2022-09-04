@@ -118,6 +118,7 @@ services:
       - ${SPARROW_DB_PORT:-54321}:5432
     environment:
       - POSTGRES_DB=sparrow
+      - POSTGRES_USER=postgres
     volumes:
       - db_cluster:/var/lib/postgresql/data
     profiles:
@@ -130,7 +131,7 @@ services:
   api:
     image: postgrest/postgrest:v10.0.0
     environment:
-      - PGRST_DB_URI=postgresql://postgres@db:5432/sparrow
+      - PGRST_DB_URI=postgresql://postgres:@db:5432/sparrow
       - PGRST_DB_SCHEMAS=sparrow_api
       - PGRST_DB_ANON_ROLE=postgres
       - PGRST_JWT_SECRET
