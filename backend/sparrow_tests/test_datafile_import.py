@@ -48,6 +48,20 @@ class IsotopeImporter(BaseImporter):
 
 
 class TestDataFileImport:
-    def test_import_datafile(self, app, db):
+    def test_import_datafile(self, app):
         importer = IsotopeImporter(app)
         importer.import_all()
+
+    def test_import_again(self, app, db):
+        importer = IsotopeImporter(app)
+        importer.import_all()
+
+        n_files = db.session.query(db.model.data_file).count()
+        assert n_files == 1
+
+    def test_import_again_again(self, app, db):
+        importer = IsotopeImporter(app)
+        importer.import_all()
+
+        n_files = db.session.query(db.model.data_file).count()
+        assert n_files == 1
