@@ -118,13 +118,13 @@ services:
       - ${SPARROW_DB_PORT:-54321}:5432
     environment:
       - POSTGRES_DB=sparrow
-      - POSTGRES_USER=postgres
+      - PGUSER=postgres
     volumes:
       - db_cluster:/var/lib/postgresql/data
     profiles:
       - core
     healthcheck:
-      test: ["CMD", "pg_isready"]
+      test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -134,7 +134,6 @@ services:
       - PGRST_DB_URI=postgresql://postgres:@db:5432/sparrow
       - PGRST_DB_SCHEMAS=sparrow_api
       - PGRST_DB_ANON_ROLE=postgres
-      - PGRST_JWT_SECRET
     ports:
       - 3000:3000
     profiles:
