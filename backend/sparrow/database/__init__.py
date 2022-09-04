@@ -145,6 +145,9 @@ class Database(BaseDatabase):
         for fn in filenames:
             self.exec_sql(fn)
 
+        # Reload the Postgrest schema cache
+        self.engine.execute("NOTIFY pgrst, 'reload schema'")
+
         try:
             self.app.run_hook("core-tables-initialized", self)
             self.app.run_hook("finalize-database-schema", self)
