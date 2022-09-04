@@ -48,7 +48,7 @@ class IsotopeImporter(BaseImporter):
 
 
 class TestDataFileImport:
-    def test_import_datafile(self, app):
+    def test_import_datafile(self, app, db):
         importer = IsotopeImporter(app)
         importer.import_all()
 
