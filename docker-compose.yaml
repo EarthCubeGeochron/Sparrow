@@ -122,6 +122,25 @@ services:
       - db_cluster:/var/lib/postgresql/data
     profiles:
       - core
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  api:
+    image: postgrest/postgrest:v10.0.0
+    environment:
+      - PGRST_DB_URI=postgresql://postgres@db:5432/sparrow
+      - PGRST_DB_SCHEMAS=sparrow_api
+      - PGRST_DB_ANON_ROLE=postgres
+      - PGRST_JWT_SECRET
+    profiles:
+      - frontend
+    depends_on:
+      gateway:
+        condition: service_started
+      db:
+        condition: service_healthy
   frontend:
     image: ${SPARROW_FRONTEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/frontend}
     build:
