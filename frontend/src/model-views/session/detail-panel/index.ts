@@ -38,23 +38,10 @@ const Material = function (props) {
   ]);
 };
 
-function analysisAttributeUnwrap(data) {
-  if (data == null || data.length === 0) {
-    return [];
-  }
-  return group(data, (d) => d.parameter);
-}
-
 const AnalysisAttributes = function (props) {
-  const { analysis_id } = props;
-  const data = useAPIv3Result(
-    "/attribute",
-    { analysis_id: `eq.${analysis_id}` },
-    { unwrapResponse: analysisAttributeUnwrap }
-  );
-  if (!data || data.length == 0) {
-    return h("div");
-  }
+  const { attributes = [] } = props;
+  const data = group(attributes, (d) => d.parameter);
+
   return h(
     Array.from(data, ([k, v]) =>
       h("li.attribute", [
@@ -91,10 +78,9 @@ const Datum = function (props) {
   ]);
 };
 
-const DataCollection = function ({ data, analysis_id }) {
+const DataCollection = function ({ data, attributes }) {
   const datumList = h(data.map((d) => h(Datum, { value: d })));
-
-  return h("ul.data", [datumList, h(AnalysisAttributes, { analysis_id })]);
+  return h("ul.data", [datumList, h(AnalysisAttributes, { attributes })]);
 };
 
 const AnalysisDetails = function (props) {
@@ -114,7 +100,10 @@ const AnalysisDetails = function (props) {
     h("div.main", [
       h("div.data", [
         h("h4", "Data"),
-        h(DataCollection, { data: a.data, analysis_id }),
+        h(DataCollection, {
+          data: a.data,
+          attributes: a.attributes ?? [],
+        }),
       ]),
     ]),
   ]);

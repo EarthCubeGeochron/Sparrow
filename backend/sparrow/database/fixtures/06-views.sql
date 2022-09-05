@@ -103,11 +103,25 @@ JOIN analysis a
 JOIN datum_type t
   ON d.type = t.id
 GROUP BY a.id
+),
+__b AS (
+SELECT
+  aa.analysis_id id,
+  json_agg((SELECT r FROM (SELECT
+  	a.id,
+  	a.parameter,
+  	a.value
+  ) AS r)) AS data
+FROM attribute a
+JOIN __analysis_attribute aa
+  ON a.id = aa.attribute_id
+GROUP BY aa.analysis_id
 )
 SELECT
   a.id analysis_id,
   coalesce(a.date, s.date) date,
   __a.data,
+  __b.data attributes,
   a.session_id,
   a.session_index,
   a.is_standard,
@@ -136,13 +150,13 @@ SELECT
   s.project_id,
   sa.location,
   is_public(s)
-FROM __a
-JOIN analysis a USING (id)
+FROM analysis a
+LEFT JOIN __a USING (id)
+LEFT JOIN __b USING (id)
 JOIN session s
   ON s.id = a.session_id
-JOIN sample sa
-  ON s.sample_id = sa.id
-ORDER BY a.id;
+LEFT JOIN sample sa
+  ON s.sample_id = sa.id;
 
 CREATE VIEW core_view.attribute AS
 SELECT
