@@ -6,7 +6,7 @@
  */
 //http://localhost:3000/api/v1/datum?unit=Ma&parameter=plateau_age&technique=Ar%2FAr%20Fusion
 import h from "@macrostrat/hyper";
-import { Component } from "react";
+import { useState, Component } from "react";
 import { Callout, Icon, RangeSlider } from "@blueprintjs/core";
 import { APIResultView } from "@macrostrat/ui-components";
 import { scaleLinear } from "@vx/scale";
@@ -20,6 +20,7 @@ import {
 } from "@data-ui/histogram";
 import md from "./plateau-ages.md";
 import "./main.styl";
+import { useAPIv3Result } from "~/api-v2";
 
 const ResponsiveHistogram = withParentSize(
   ({ parentWidth, parentHeight, ...rest }) =>
@@ -73,69 +74,61 @@ class AgeChart extends Component {
   }
 }
 
-class ChartOuter extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      range: [0, 1500],
-    };
+function ChartOuter(props) {
+  const [range, setRange] = useState([0, 1500]);
+  const params = {
+    unit: "eq.Ma",
+    parameter: "eq.plateau_age",
+    technique: "eq.Ar/Ar Incremental Heating",
+  };
+
+  const min = 0;
+  const max = 2000;
+  const labelRenderer = function (v) {
+    if (v < 1000) {
+      return `${v} Ma`;
+    }
+    v /= 1000;
+    return `${v} Ga`;
+  };
+
+  const data = useAPIv3Result("/datum", params);
+
+  if (data == null) {
+    return null;
   }
-  render() {
-    const { range } = this.state;
-    const params = {
-      unit: "Ma",
-      parameter: "plateau_age",
-      technique: "Ar/Ar Incremental Heating",
-    };
-
-    const min = 0;
-    const max = 2000;
-    const labelRenderer = function (v) {
-      if (v < 1000) {
-        return `${v} Ma`;
-      }
-      v /= 1000;
-      return `${v} Ga`;
-    };
-
-    return h(APIResultView, { route: "/datum", params }, (data) => {
-      if (data == null) {
-        return null;
-      }
-      return h("div.age-chart-container", [
-        h(
-          Callout,
-          {
-            icon: "scatter-plot",
-            title: "Plateau ages",
-          },
-          [
-            h("p", "All of the plateau ages ingested into the lab data system"),
-            h("div.controls", [
-              h("h4", "Age range"),
-              h(RangeSlider, {
-                value: this.state.range,
-                min,
-                max,
-                labelStepSize: 200,
-                labelRenderer,
-                onChange: (range) => {
-                  console.log(range);
-                  if (range[1] - range[0] < 5) {
-                    range[1] = range[0] + 5;
-                  }
-                  return this.setState({ range });
-                },
-              }),
-            ]),
-          ]
-        ),
-        h("div.chart-container", { style: { height: 460 } }, [
-          h(AgeChart, { data, range }),
+  return h("div.age-chart-container", [
+    h(
+      Callout,
+      {
+        icon: "scatter-plot",
+        title: "Plateau ages",
+      },
+      [
+        h("p", "All of the plateau ages ingested into the lab data system"),
+        h("div.controls", [
+          h("h4", "Age range"),
+          h(RangeSlider, {
+            value: range,
+            min,
+            max,
+            labelStepSize: 200,
+            labelRenderer,
+            onChange: (range) => {
+              console.log(range);
+              if (range[1] - range[0] < 5) {
+                range[1] = range[0] + 5;
+              }
+              setRange(range);
+            },
+          }),
         ]),
-      ]);
-    });
-  }
+      ]
+    ),
+    h("div.chart-container", { style: { height: 460 } }, [
+      h(AgeChart, { data, range }),
+    ]),
+  ]);
 }
 
 class PlateauAgesComponent extends Component {

@@ -54,6 +54,20 @@ export function useAPIv2Result(
   return useAPIResult(route, params, opts);
 }
 
+export const APIV3Context = createAPIContext({
+  baseURL: join(process.env.API_BASE_URL ?? "/", "/api/v3"),
+});
+
+export function useAPIv3Result(
+  route,
+  params = {},
+  opts: Partial<APIOptions> = {}
+) {
+  /** Temporary shim to convert V1 API to V2 */
+  opts.context = APIV3Context;
+  return useAPIResult(route, params, opts);
+}
+
 export function useSparrowWebSocket(path: string, options = {}) {
   /** An expanded function to use a websocket */
   const [reconnectAttempt, setReconnectAttempt] = useState(1);

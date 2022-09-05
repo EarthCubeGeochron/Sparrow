@@ -8,6 +8,7 @@ import hyper from "@macrostrat/hyper";
 import styles from "./module.styl";
 import { Card, Breadcrumbs } from "@blueprintjs/core";
 import { useAPIResult } from "@macrostrat/ui-components";
+import { useAPIv3Result } from "~/api-v2";
 import ReactJson from "react-json-view";
 import { format } from "d3-format";
 import { group } from "d3-array";
@@ -46,9 +47,9 @@ function analysisAttributeUnwrap(data) {
 
 const AnalysisAttributes = function (props) {
   const { analysis_id } = props;
-  const data = useAPIResult(
+  const data = useAPIv3Result(
     "/attribute",
-    { analysis_id },
+    { analysis_id: `eq.${analysis_id}` },
     { unwrapResponse: analysisAttributeUnwrap }
   );
   if (!data || data.length == 0) {
@@ -127,13 +128,15 @@ const SessionDetails = function (props) {
   ]);
 };
 
-const SessionDetailPanel = function (props) {
+function SessionDetailPanel(props) {
   const { session_id, ...rest } = props;
-  const data = useAPIResult("/analysis", { session_id });
+  const data = useAPIv3Result("/analysis", {
+    session_id: `eq.${session_id}`,
+  });
 
   if (!data) return h("div");
 
   return h(SessionDetails, { data, ...rest });
-};
+}
 
 export { SessionDetailPanel };
