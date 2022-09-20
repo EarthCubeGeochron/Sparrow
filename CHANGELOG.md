@@ -7,6 +7,29 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[3.0.0]` - Unreleased
+
+- Created API v3 based on Postgrest that can take on many of the functions that still rely on API v1
+- Removed a lot of unnecessary older packages in the Python server installation
+- Move documentation website to a separate code repository
+
+## `[2.5.4]` - 2022-09-20
+
+- Fix a Yarn compilation bug introduced by node v16.17
+- New tests of data file import
+
+## `[2.5.3]` - 2022-07-21
+
+- Removed some outdated modules for globe plugin
+
+## `[2.5.2]` - 2022-07-21
+
+- More bugfixes for Yarn
+
+## `[2.5.1]` - 2022-07-21
+
+- Fix a bug with Yarn building of the frontend container
+
 ## `[2.5.0]` - 2022-07-11
 
 - Totally rework certificate generation process for Sparrow's gateway container,
