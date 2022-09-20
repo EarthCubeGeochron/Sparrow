@@ -5,6 +5,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "moduleResolution": "Node",
+    "declarationMap": true,
     "declaration": true,
     "sourceMap": true,
     "declarationDir": "dist/types",
