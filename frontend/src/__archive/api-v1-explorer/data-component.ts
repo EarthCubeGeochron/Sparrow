@@ -8,8 +8,6 @@
 import { Component } from "react";
 import h from "@macrostrat/hyper";
 import styled from "@emotion/styled";
-import { JSONToggle } from "./utils";
-import { get } from "axios";
 import { JSONCollapsePanel } from "./collapse-panel";
 import { PagedAPIView } from "@macrostrat/ui-components";
 import { Cell, Column, Table } from "@blueprintjs/table";

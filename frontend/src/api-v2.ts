@@ -1,44 +1,11 @@
-import SwaggerUI from "swagger-ui-react";
-import "swagger-ui-react/swagger-ui.css";
-import h from "@macrostrat/hyper";
 import {
   createAPIContext,
   useAPIResult,
   APIOptions,
 } from "@macrostrat/ui-components";
-import { NavButton } from "~/components";
-import { Card } from "@blueprintjs/core";
 import join from "url-join";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useCallback, useContext, useState } from "react";
-
-export function APIExplorerV2(props) {
-  return h(Card, { className: "api-explorer-v2 bp3-light" }, [
-    h("div.minimal-navbar", [
-      h(
-        NavButton,
-        {
-          className: "bp3-light",
-          to: "/api-explorer/v1",
-          minimal: false,
-          large: true,
-        },
-        "Version 1"
-      ),
-      h(
-        NavButton,
-        {
-          className: "bp3-light",
-          to: "/import-schema-explorer",
-          minimal: false,
-          large: true,
-        },
-        "Import schemas"
-      ),
-    ]),
-    h(SwaggerUI, { url: "/api/v2/schema" }),
-  ]);
-}
 
 export const APIV2Context = createAPIContext({
   baseURL: join(process.env.API_BASE_URL ?? "/", "/api/v2"),
