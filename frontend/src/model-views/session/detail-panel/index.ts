@@ -56,7 +56,7 @@ const AnalysisAttributes = function (props) {
 };
 
 const Unit = function ({ unit }) {
-  if (["unknown", "ratio"].includes(unit)) {
+  if (["unknown", "ratio", "dimensionless"].includes(unit)) {
     return null;
   }
   return h("span.unit", unit);
