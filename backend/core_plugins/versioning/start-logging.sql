@@ -27,9 +27,18 @@ SELECT pgmemento.create_schema_audit(
 );
 
 SELECT pgmemento.create_schema_audit(
+  'sparrow_defs',
+  -- Log existing data as imported
+  FALSE,
+  -- Tables to ignore
+  null
+);
+
+SELECT pgmemento.create_schema_audit(
   'tags',
   -- Log existing data as imported
   FALSE,
   -- Tables to ignore
   null
 );
+

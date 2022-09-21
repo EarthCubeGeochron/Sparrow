@@ -86,7 +86,7 @@ def _create_migration(db_engine, target, safe=True):
 
 @contextmanager
 def _target_db(url, quiet=False, redirect=sys.stderr):
-    from sparrow.app import Sparrow
+    from sparrow.core.app import Sparrow
 
     if quiet:
         redirect = open(os.devnull, "w")

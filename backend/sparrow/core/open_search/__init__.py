@@ -40,6 +40,7 @@ class DocumentTableMigration(SparrowMigration):
 
     def apply(self, engine):
         _initialize_tables(engine, refresh=True)
+        run_sql_file(engine, procedures / "drop-extra-triggers.sql")
 
 
 class OpenSearch(SparrowCorePlugin):
