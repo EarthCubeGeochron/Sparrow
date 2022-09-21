@@ -1,7 +1,10 @@
 import hyper from "@macrostrat/hyper";
 import { Callout } from "@blueprintjs/core";
 import { LinkCard } from "@macrostrat/ui-components";
-import { FilterListComponent } from "~/components/filter-list";
+import {
+  FilterListComponent,
+  PostgRESTFilterList,
+} from "~/components/filter-list";
 //@ts-ignore
 import styles from "./module.styl";
 import { useModelURL } from "~/util/router";
@@ -53,7 +56,7 @@ const SampleList = function () {
       "This page lists all samples indexed in the laboratory data system."
     ),
 
-    h(FilterListComponent, {
+    h(PostgRESTFilterList, {
       route,
       filterFields,
       itemComponent: SampleListCard,

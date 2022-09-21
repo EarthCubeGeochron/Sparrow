@@ -15,3 +15,6 @@ SELECT * FROM core_view.project;
 
 CREATE OR REPLACE VIEW sparrow_api.session AS
 SELECT * FROM core_view.session;
+
+CREATE OR REPLACE VIEW sparrow_api.sample AS
+SELECT * FROM core_view.sample;

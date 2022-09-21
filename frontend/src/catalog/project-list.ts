@@ -1,6 +1,9 @@
 import h from "@macrostrat/hyper";
 import { Callout } from "@blueprintjs/core";
-import { FilterListComponent } from "~/components/filter-list";
+import {
+  FilterListComponent,
+  PostgRESTFilterList,
+} from "~/components/filter-list";
 import { ProjectInfoLink } from "~/model-views/project";
 
 // class PostgRESTPagedModelView extends FilterListComponent {
@@ -22,17 +25,8 @@ const ProjectListComponent = () => {
       `This page lists projects of related samples, measurements, and publications. \
 Projects can be imported into Sparrow or defined using the managment interface.`
     ),
-    h(FilterListComponent, {
+    h(PostgRESTFilterList, {
       route: "/project",
-      getTotalCount: (response) => {
-        console.log(response.headers);
-        return parseInt(response.headers["content-range"].split("/")[1]);
-      },
-      opts: {
-        headers: {
-          Prefer: "count=exact",
-        },
-      },
       filterFields: {
         name: "Name",
         description: "Description",

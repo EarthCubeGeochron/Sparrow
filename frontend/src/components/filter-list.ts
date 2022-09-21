@@ -1,9 +1,11 @@
 import h from "@macrostrat/hyper";
+import { Component } from "react";
 import { InputGroup, Menu, Popover, Button, Position } from "@blueprintjs/core";
-import { PagedAPIView, StatefulComponent } from "@macrostrat/ui-components";
+import { PagedAPIView } from "@macrostrat/ui-components";
+import update from "immutability-helper";
 import T from "prop-types";
 
-class FilterListComponent extends StatefulComponent {
+class FilterListComponent extends Component<any, any> {
   static propTypes = {
     route: T.string.isRequired,
     filterFields: T.objectOf(T.string).isRequired,
@@ -21,7 +23,7 @@ class FilterListComponent extends StatefulComponent {
 
   updateFilter(event) {
     const { value } = event.target;
-    return this.updateState({ filter: { $set: value } });
+    return this.setState(update(this.state, { filter: { $set: value } }));
   }
 
   render() {
@@ -35,10 +37,12 @@ class FilterListComponent extends StatefulComponent {
 
     const menuItems = [];
     const onClick = (k) => () =>
-      this.updateState({
-        field: { $set: k },
-        filter: { $set: "" },
-      });
+      this.setState(
+        update(this.state, {
+          field: { $set: k },
+          filter: { $set: "" },
+        })
+      );
 
     for (let k in filterFields) {
       const v = filterFields[k];
@@ -86,4 +90,19 @@ class FilterListComponent extends StatefulComponent {
   }
 }
 
-export { FilterListComponent };
+function PostgRESTFilterList(props) {
+  return h(FilterListComponent, {
+    getTotalCount: (response) => {
+      console.log(response.headers);
+      return parseInt(response.headers["content-range"].split("/")[1]);
+    },
+    opts: {
+      headers: {
+        Prefer: "count=exact",
+      },
+    },
+    ...props,
+  });
+}
+
+export { FilterListComponent, PostgRESTFilterList };
