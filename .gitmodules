@@ -7,3 +7,6 @@
 [submodule "backend/python-tools"]
 	path = backend/shared-modules
 	url = git://github.com/UW-Macrostrat/python-tools.git
+[submodule "deps/postgis-tile-utils"]
+	path = deps/postgis-tile-utils
+	url = https://github.com/UW-Macrostrat/postgis-tile-utils.git
