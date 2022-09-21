@@ -24,6 +24,15 @@ Projects can be imported into Sparrow or defined using the managment interface.`
     ),
     h(FilterListComponent, {
       route: "/project",
+      getTotalCount: (response) => {
+        console.log(response.headers);
+        return parseInt(response.headers["content-range"].split("/")[1]);
+      },
+      opts: {
+        headers: {
+          Prefer: "count=exact",
+        },
+      },
       filterFields: {
         name: "Name",
         description: "Description",

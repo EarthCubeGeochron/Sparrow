@@ -37,12 +37,12 @@ class RouteName extends Component {
         Link,
         {
           to: parent,
-          className: "bp3-button bp3-minimal bp3-intent-primary route-parent",
+          className: "bp4-button bp4-minimal bp4-intent-primary route-parent",
           role: "button",
         },
         [
           h(Icon, { icon: "arrow-left" }),
-          h("span.bp3-button-text", api_route.replace(route, "")),
+          h("span.bp4-button-text", api_route.replace(route, "")),
         ]
       );
     }

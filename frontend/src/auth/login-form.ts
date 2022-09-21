@@ -131,7 +131,7 @@ function _LoginForm() {
     ),
   ]);
 
-  const className = classNames(Classes.INPUT, "bp3-large");
+  const className = classNames(Classes.INPUT, "bp4-large");
   const onKeyUp = function (e) {};
 
   return h(CredentialsDialog, { actionButtons }, [

@@ -64,7 +64,7 @@ const Unit = function ({ unit }) {
 
 const Datum = function (props) {
   const { value: d } = props;
-  return h("li.datum.bp3-text", [
+  return h("li.datum.bp4-text", [
     h("span.parameter", `${d.parameter}:`),
     " ",
     h("span.value", fmt(d.value)),
