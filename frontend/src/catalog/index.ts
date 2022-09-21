@@ -20,7 +20,6 @@ import styles from "./module.styl";
 import { SessionMatch } from "../model-views/session";
 import { DataFilesMain } from "../model-views/data-files";
 import { APIProvider } from "@macrostrat/ui-components";
-import { APIV3Context } from "~/api-v2";
 
 const h = hyperStyled(styles);
 
