@@ -5,6 +5,9 @@ from subprocess import Popen
 from rich import print
 from time import sleep
 
+from sparrow_cli.upgrade_database import check_database_cluster_version
+from sparrow_cli.util.exceptions import SparrowCommandError
+
 from ..config.environment import validate_environment
 from ..config import SparrowConfig
 from ..util import compose, cmd, log
@@ -51,6 +54,14 @@ def sparrow_up(ctx, container="", force_recreate=False):
     prestart = _get_prestart_script(cfg)
     if prestart is not None:
         cmd("bash", str(prestart))
+
+    version = check_database_cluster_version()
+    print(f"Using PostgreSQL version {version}")
+    if version <= 14:
+        raise SparrowCommandError(
+            "PostgreSQL version 14 or greater is required",
+            details=f"Sparrow's database cluster is running PostgreSQL version {version}.",
+        )
 
     # Bring up the application
     res = cmd(
