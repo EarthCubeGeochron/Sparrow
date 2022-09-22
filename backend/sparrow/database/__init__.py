@@ -157,7 +157,7 @@ class Database(BaseDatabase):
 
     def update_schema(self, **kwargs):
         # Might be worth creating an interactive upgrader
-        from sparrow.database import migrations
+        from sparrow import migrations
 
         migrator = SparrowDatabaseMigrator(self)
         migrator.add_module(migrations)

@@ -1,4 +1,4 @@
-from sparrow.core.migrations import InstrumentSessionMigration
+from sparrow.migrations import InstrumentSessionMigration
 from sparrow.database.migration import create_schema_clone
 from sparrow.core.app import Sparrow
 from macrostrat.utils import relative_path, cmd

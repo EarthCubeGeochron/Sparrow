@@ -15,73 +15,10 @@ from macrostrat.database.utils import (
     temp_database,
     connection_args,
 )
+from macrostrat.dinosaur import AutoMigration, _create_migration, create_schema_clone
 
 
 log = get_logger(__name__)
-
-
-class AutoMigration(Migration):
-    def changes_omitting_views(self):
-        nsel_drops = self.changes.non_table_selectable_drops()
-        nsel_creations = self.changes.non_table_selectable_creations()
-        # Warning: this also may omit changes to functions etc. We need to test this.
-        for stmt in self.statements:
-            if stmt in nsel_drops or stmt in nsel_creations:
-                continue
-            yield stmt
-
-    def _exec(self, sql, quiet=False):
-        """Execute SQL unsafely on an sqlalchemy Engine"""
-        if not quiet:
-            return _exec_raw_sql(self.s_from, sql)
-        try:
-            self.s_from.execute(text(sql))
-        except (ProgrammingError, IntegrityError) as err:
-            log.debug(err)
-
-    def apply(self, quiet=False):
-        n = len(self.statements)
-        log.debug(f"Applying migration with {n} operations")
-        for stmt in self.statements:
-            self._exec(stmt, quiet=quiet)
-        self.changes.i_from = get_inspector(
-            self.s_from, schema=self.schema, exclude_schema=self.exclude_schema
-        )
-
-        safety_on = self.statements.safe
-        self.clear()
-        self.set_safety(safety_on)
-
-    @property
-    def is_safe(self):
-        """We have a looser definition of safety than core Migra; ours involves not
-        destroying data.
-        Dropping 'non-table' items (such as views) is OK to do without checking with
-        the user. Usually, these views are just dropped and recreated anyway when dependent
-        tables change."""
-        # We could try to apply 'non-table-selectable drops' first and then check again...
-        unsafe = any(check_for_drop(s) for s in self.changes_omitting_views())
-        return not unsafe
-
-    def unsafe_changes(self):
-        for stmt in self.changes_omitting_views():
-            if check_for_drop(stmt):
-                yield stmt
-
-    def print_changes(self):
-        statements = "\n".join(self.statements)
-        print(statements, file=sys.stderr)
-
-
-def _create_migration(db_engine, target, safe=True):
-    # For some reason we need to patch this...
-    log.info("Creating an automatic migration")
-    target.dialect.server_version_info = db_engine.dialect.server_version_info
-    m = AutoMigration(db_engine, target)  # , exclude_schema="core_view")
-    m.set_safety(safe)
-    # Not sure what this does
-    m.add_all_changes()
-    return m
 
 
 @contextmanager
@@ -128,21 +65,6 @@ def dump_schema(engine):
     flags, dbname = connection_args(engine)
     res = cmd("pg_dump", "--schema-only", flags, dbname, capture_output=True)
     return res.stdout
-
-
-@contextmanager
-def create_schema_clone(
-    engine, db_url="postgresql://postgres@db:5432/sparrow_schema_clone"
-):
-    schema = dump_schema(engine)
-    with temp_database(db_url) as clone_engine:
-        # Not sure why we have to mess with this, but we do
-        clone_engine.dialect.server_version_info = engine.dialect.server_version_info
-        run_sql(clone_engine, schema)
-        # Sometimes, we still have some differences, annoyingly
-        m = _create_migration(clone_engine, engine)
-        m.apply(quiet=True)
-        yield clone_engine
 
 
 def has_table(engine, table):
