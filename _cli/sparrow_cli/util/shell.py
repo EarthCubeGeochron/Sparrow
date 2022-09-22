@@ -93,7 +93,7 @@ def exec_backend_command(ctx, *args, **kwargs):
 
 
 def exec_sparrow(*args, **kwargs):
-    return exec_or_run("backend", "poetry run python -m sparrow.core", *args, **kwargs)
+    return exec_or_run("backend", "python -m sparrow.core", *args, **kwargs)
 
 
 def fail_without_docker_command():

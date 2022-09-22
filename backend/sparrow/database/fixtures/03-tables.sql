@@ -3,6 +3,8 @@ The set of table definitions here builds the fundamental structures
 for data in the **Sparrow** system.
 */
 
+SET sparrow_schema_version = '2.0.0';
+
 CREATE TABLE IF NOT EXISTS researcher (
   id serial PRIMARY KEY,
   name text NOT NULL,

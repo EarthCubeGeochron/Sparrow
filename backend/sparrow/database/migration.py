@@ -29,10 +29,10 @@ class SparrowMigration(SchemaMigration):
 
 
 def initialize(database: Database):
-    from . import Database as SparrowDatabase
+    from sparrow.core import Sparrow
 
-    sparrow_db = SparrowDatabase(database.engine.url)
-    sparrow_db.initialize()
+    sparrow = Sparrow(database=str(database.engine.url))
+    sparrow.init_database(force=True)
 
 
 def db_migration(db, **kwargs):

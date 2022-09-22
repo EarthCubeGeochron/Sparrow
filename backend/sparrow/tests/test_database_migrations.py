@@ -1,9 +1,10 @@
 from os import environ
-from sparrow.migrations import InstrumentSessionMigration
+from sparrow.migrations import InstrumentSessionMigration, SampleCheckMigration
 from sparrow.core.app import Sparrow
 from macrostrat.utils import relative_path, cmd
 from macrostrat.dinosaur import _create_migration, create_schema_clone
 from macrostrat.database.utils import connection_args, temp_database
+from sparrow.core.open_search import DocumentTableMigration
 from pytest import mark, fixture
 
 target_db = environ.get("SPARROW_DATABASE")
@@ -37,26 +38,32 @@ class TestDatabaseMigrations:
         test_app = Sparrow(debug=True, database=migration_base.url)
         test_app.setup_database(automap=False)
         # We can use the existing testing database as a target
-        m = _create_migration(test_app.db.engine, db.engine)
+        migration = _create_migration(test_app.db.engine, db.engine)
 
         # Check that we are not aligned
-        assert not m.is_safe
+        assert not migration.is_safe
 
         # Apply migrations
-        migrations = [BasicMigration, InstrumentSessionMigration]
+        migrations = [
+            BasicMigration,
+            InstrumentSessionMigration,
+            SampleCheckMigration,
+            DocumentTableMigration,
+        ]
         for mgr in migrations:
             migration = mgr()
-            migration.apply(test_app.database)
+            migration.apply(test_app.database.engine)
 
         # Migrating to the new version should now be "safe"
-        m = _create_migration(test_app.database.engine, db.engine)
-        assert m.is_safe
+        migration = _create_migration(test_app.database.engine, db.engine)
+        print(list(migration.unsafe_changes()))
+        assert migration.is_safe
 
-        m.apply(quiet=True)
+        migration.apply(quiet=True)
         # Re-add changes
-        m.add_all_changes()
+        migration.add_all_changes()
 
-        assert len(m.statements) == 0
+        assert len(migration.statements) == 0
 
     @mark.slow
     def test_migration_built_in(self, db):

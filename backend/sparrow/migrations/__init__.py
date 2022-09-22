@@ -33,3 +33,19 @@ class InstrumentSessionMigration(SchemaMigration):
         """,
             stop_on_error=True,
         )
+
+
+class SampleCheckMigration(SchemaMigration):
+    name = "add-sample-check"
+
+    def should_apply(self, source, target, migrator):
+        pub = '"public"."sample"'
+        return not has_column(source, pub, "lab_id")
+
+    def apply(self, db):
+        sess = sessionmaker(bind=db.engine)()
+        run_sql(
+            sess,
+            "ALTER TABLE sample DROP CONSTRAINT sample_check",
+            stop_on_error=True,
+        )
