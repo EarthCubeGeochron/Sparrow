@@ -1,13 +1,13 @@
+from os import environ
 from sparrow.migrations import InstrumentSessionMigration
-from sparrow.database.migration import create_schema_clone
 from sparrow.core.app import Sparrow
 from macrostrat.utils import relative_path, cmd
-from sparrow.database.migration import _create_migration
+from macrostrat.dinosaur import _create_migration, create_schema_clone
 from macrostrat.database.utils import connection_args, temp_database
 from pytest import mark, fixture
 
-target_db = "postgresql://postgres@db:5432/sparrow_test"
-testing_db = "postgresql://postgres@db:5432/sparrow_migration_base"
+target_db = environ.get("SPARROW_DATABASE")
+testing_db = target_db + "_migration"
 
 
 class BasicMigration:
@@ -25,13 +25,13 @@ def migration_base():
     fn = relative_path(__file__, "fixtures", "e57d74b-detrital-zircon-F-90.pg-dump")
     args, dbname = connection_args(testing_db)
     with temp_database(testing_db) as engine:
-        cmd("pg_restore", args, "-d", dbname, fn, check=True)
+        cmd("pg_restore", args, "-d", dbname, str(fn), check=True)
         yield engine
 
 
 # @mark.order(-1)
 class TestDatabaseMigrations:
-    @mark.xfail(reason="There is some interference between plugins right now")
+    # @mark.xfail(reason="There is some interference between plugins right now")
     def test_migration(self, db, migration_base):
 
         test_app = Sparrow(debug=True, database=migration_base.url)

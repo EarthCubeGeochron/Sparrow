@@ -1,10 +1,9 @@
-from sparrow.database.migration import SparrowMigration, has_column, has_table
+from macrostrat.dinosaur import SchemaMigration, has_column, has_table
 from sparrow.database import run_sql
 from sqlalchemy.orm import sessionmaker
-from schemainspect import get_inspector
 
 
-class PlateauMigration(SparrowMigration):
+class PlateauMigration(SchemaMigration):
     name = "remove-in-plateau"
 
     def should_apply(self, source, target, migrator):
@@ -15,7 +14,7 @@ class PlateauMigration(SparrowMigration):
         db.engine.execute("ALTER TABLE analysis DROP COLUMN in_plateau")
 
 
-class InstrumentSessionMigration(SparrowMigration):
+class InstrumentSessionMigration(SchemaMigration):
     name = "add-instrument-session"
 
     def should_apply(self, source, target, migrator):

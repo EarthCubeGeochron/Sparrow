@@ -34,13 +34,13 @@ async def redirect(*args):
 
 
 def construct_app():
-    flask = App(__name__)
-    flask.load()
-    flask.load_phase_2()
+    app = App(__name__)
+    app.load()
+    app.load_phase_2()
 
-    api_v2 = APIv2(flask)
+    api_v2 = APIv2(app)
 
-    _setup_context(flask)
+    _setup_context(app)
 
     routes = [
         Route("/api/v2", endpoint=redirect),
@@ -48,6 +48,6 @@ def construct_app():
         Mount("/", app=WsgiToAsgi(flask)),
     ]
 
-    app = Starlette(routes=routes, debug=True)
-    flask.run_hook("asgi-setup", app)
-    return app
+    _app = Starlette(routes=routes, debug=True)
+    app.run_hook("asgi-setup", _app)
+    return _app
