@@ -131,7 +131,8 @@ markers = { slow = "Slow test that is usually ignored" }
 #log_cli_level = "INFO"
 
 filterwarnings = [
-  "ignore::DeprecationWarning"
+  "ignore::DeprecationWarning",
+  "ignore::UserWarning"
 ]
 
 testpaths = [
