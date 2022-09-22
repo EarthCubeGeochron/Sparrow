@@ -1,11 +1,14 @@
 import click
 import sys
 from os import environ, chdir
+from typing import List
+from pathlib import Path
 from rich import print
 from textwrap import dedent
 
 from sparrow_cli.util.command_groups import SparrowDefaultCommand
-from ..util import cmd, exec_or_run
+from sparrow_cli.util.exceptions import SparrowCommandError
+from ..util import cmd, exec_or_run, container_is_running
 from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
@@ -132,6 +135,12 @@ def cli_tests(ctx, pytest_args):
     help="Provide a psql prompt when testing concludes",
 )
 @click.option(
+    "--local",
+    is_flag=True,
+    default=False,
+    help="Run tests locally instead of in Docker",
+)
+@click.option(
     "--teardown/--no-teardown",
     is_flag=True,
     default=True,
@@ -147,6 +156,7 @@ def sparrow_test_main(
     help=False,
     pytest_help=False,
     psql=False,
+    local=False,
     teardown=True,
     quick=False,
 ):
@@ -161,31 +171,31 @@ def sparrow_test_main(
 
     pth = environ.get("SPARROW_PATH", None)
     if pth is None:
-        print(
-            "SPARROW_PATH not found. For now, tests can "
-            "only be run when a source directory is available."
+        raise SparrowCommandError(
+            "SPARROW_PATH not found",
+            "For now, tests can only be run when a source directory is available.",
         )
-        return
 
-    print("Preparing [cyan]Sparrow[/cyan] application images")
+    use_docker = not local
 
-    res = compose("build")
-    if res.returncode != 0:
-        print("[red]ERROR[/red]: Could not run tests")
-        sys.exit(res.returncode)
+    print(
+        "Running sparrow tests in " + ("Docker" if use_docker else "Python virtualenv")
+    )
+    if use_docker:
+        print("Preparing [cyan]Sparrow[/cyan] application images")
+        res = compose("build")
+        if res.returncode != 0:
+            raise SparrowCommandError("Could not build Sparrow images", res)
 
-    print("Running sparrow tests")
+        res = compose(
+            "run --rm --service-ports backend", "pytest", "/app", *pytest_args
+        )
+    else:
+        res = run_tests_locally(Path(pth), *pytest_args)
 
-    # Need to bring up database separately to ensure ports are mapped...
-    # if not container_is_running("db"):
-    # compose("up -d db")
-    # if container_is_running("backend") and not standalone:
-    #     res = compose("exec backend", "/bin/run-tests", *args, flag)
-    # else:
-
-    res = compose("run --rm --service-ports backend", "pytest", "/app", *pytest_args)
-    # if "--keep-database" not in args:
     if psql:
+        if local:
+            raise SparrowCommandError("psql not supported in local mode")
         print(
             "Initializing psql shell. "
             "The database is also available on localhost port 54322"
@@ -215,3 +225,41 @@ def dump_database():
 sparrow_test.add_shell_command(
     "integration", "Run integration tests", prefix="sparrow-test-"
 )
+
+
+def run_tests_locally(basedir: Path, *pytest_args: List[str]):
+    # Check for the existence of Poetry
+    res = cmd("which poetry")
+    if res.returncode != 0:
+        raise SparrowCommandError("Poetry not found", res)
+
+    workdir = Path(basedir) / "backend"
+
+    test_db = environ.get("SPARROW_TESTING_DATABASE", None)
+    # Need to bring up database separately to ensure ports are mapped...
+    # NOTE: if we specify a local database we would not need to do this
+    if test_db is None and not container_is_running("db"):
+        compose("up -d db")
+
+    # Could use some fancy container magic
+    db_port = environ.get("SPARROW_DB_PORT", 54321)
+    newenv = dict(
+        **environ,
+        SPARROW_TESTING_DATABASE=test_db
+        or f"postgresql://postgres@localhost:{db_port}/sparrow_test"
+        # Reset virtualenv to allow poetry to apply the correct one.
+    )
+    del newenv["VIRTUAL_ENV"]
+
+    # Get virtualenv path
+    cmd("poetry env info -p", cwd=workdir, env=newenv)
+
+    return cmd(
+        "poetry",
+        "run",
+        "pytest",
+        ".",
+        *pytest_args,
+        cwd=workdir,
+        env=newenv,
+    )
