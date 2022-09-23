@@ -31,3 +31,8 @@ packaging = "20.9"
 
 [tool.poetry.scripts]
 sparrow = "sparrow_cli:cli"
+
+[tool.black]
+line-length = 88
+skip-magic-trailing-comma = true
+target-version = ['py38']

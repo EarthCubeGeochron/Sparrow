@@ -38,6 +38,9 @@ class SparrowConfig:
     backend_commands: List[dict] = list
     lab_name: Optional[str] = None
 
+    # The PostgreSQL major version required for this Sparrow instance
+    postgres_version: int = 14
+
     def __init__(self, verbose=False, offline=False):
         self.verbose = verbose
         self.offline = offline
@@ -50,6 +53,7 @@ class SparrowConfig:
 
         if verbose:
             setup_stderr_logs("sparrow_cli")
+            setup_stderr_logs("docker")
             log.info("Verbose logging enabled")
             # Set verbose environment variable for nested commands
             environ["SPARROW_VERBOSE"] = "1"
