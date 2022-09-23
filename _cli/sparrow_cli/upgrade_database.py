@@ -9,16 +9,19 @@ from .util.exceptions import SparrowCommandError
 from .util.shell import compose, cmd
 from rich import print
 from rich.console import Console
-from docker import from_env
+import docker
 from docker.models.containers import Container
 import time
 from datetime import datetime
 import subprocess
 from subprocess import Popen
+import asyncio
+import typing as T
+import sys
 
 environ.setdefault("DOCKER_HOST", "unix:///var/run/docker.sock")
 
-client = from_env()
+client = docker.from_env()
 
 console = Console()
 
@@ -79,8 +82,10 @@ def wait_for_cluster(container: Container):
     while not is_ready:
         time.sleep(0.1)
         log_step(container)
-        res = container.exec_run("pg_isready")
+        res = container.exec_run("pg_isready", user="postgres")
         is_ready = res.exit_code == 0
+    time.sleep(1)
+    log_step(container)
     return
 
 
@@ -109,6 +114,7 @@ def database_cluster(
             detach=True,
             environment=environment,
             volumes={data_volume: {"bind": "/var/lib/postgresql/data", "mode": "rw"}},
+            user="postgres",
         )
         wait_for_cluster(container)
         yield container
@@ -122,6 +128,8 @@ def database_cluster(
 
 def check_database_exists(container: Container, db_name: str) -> bool:
     res = container.exec_run(f"psql -U postgres -lqt", stdout=True, demux=True)
+    if res.exit_code != 0:
+        return False
     stdout = res.output[0].decode("utf-8")
     for line in stdout.splitlines():
         if line.split("|")[0].strip() == db_name:
@@ -134,6 +142,7 @@ def count_database_tables(container: Container, db_name: str) -> int:
         f"psql -U postgres -d {db_name} -c 'SELECT COUNT(*) FROM information_schema.tables;'",
         stdout=True,
         demux=True,
+        user="postgres",
     )
     stdout = res.output[0].decode("utf-8")
     return int(stdout.splitlines()[2].strip())
@@ -146,10 +155,28 @@ def replace_docker_volume(old_name: str, new_name: str):
     print(f"Moving contents of volume {old_name} to {new_name}")
     client.containers.run(
         "bash",
-        "mv /old /new",
+        "cp -r /old /new",
         volumes={old_name: {"bind": "/old"}, new_name: {"bind": "/new"}},
         remove=True,
     )
+
+
+def ensure_empty_docker_volume(volume_name: str):
+    """
+    Ensure that a Docker volume does not exist.
+    """
+    try:
+        client.volumes.get(volume_name).remove()
+    except docker.errors.NotFound:
+        pass
+    return client.volumes.create(name=volume_name)
+
+
+def pg_restore(source: Container, target: Container):
+    loop = asyncio.get_event_loop()
+    task = _pg_restore(source, target)
+    loop.run_until_complete(task)
+    loop.close()
 
 
 def upgrade_database_cluster(cfg: SparrowConfig):
@@ -157,6 +184,9 @@ def upgrade_database_cluster(cfg: SparrowConfig):
     Upgrade a PostgreSQL cluster in a Docker volume
     under a managed installation of Sparrow.
     """
+    cluster_volume_name = cfg.project_name + "_db_cluster"
+    cluster_new_name = cfg.project_name + "_db_cluster_new"
+
     current_version = database_cluster_version(cfg)
     if current_version == cfg.postgres_version:
         print("Database cluster is already up to date.")
@@ -168,12 +198,8 @@ def upgrade_database_cluster(cfg: SparrowConfig):
     if cfg.postgres_version not in version_images:
         raise SparrowCommandError("Target PostgreSQL version is not supported")
 
-    cluster_volume_name = cfg.project_name + "_db_cluster"
-    cluster_new_name = cfg.project_name + "_db_cluster_new"
-
     # Create the volume for the new cluster
-    client.volumes.get(cluster_new_name).remove(force=True)
-    dest_volume = client.volumes.create(name=cluster_new_name)
+    dest_volume = ensure_empty_docker_volume(cluster_new_name)
 
     print(
         f"Upgrading database cluster from version {current_version} to {cfg.postgres_version}..."
@@ -190,6 +216,7 @@ def upgrade_database_cluster(cfg: SparrowConfig):
         environment={"POSTGRES_HOST_AUTH_METHOD": "trust"},
     ) as target:
         # Dump the database
+        time.sleep(2)
 
         # Check if the database exists
         dbname = "sparrow"
@@ -201,45 +228,18 @@ def upgrade_database_cluster(cfg: SparrowConfig):
 
         n_tables = count_database_tables(source, dbname)
 
-        log_step(target)
+        print("Creating database")
+
+        res = target.exec_run("createdb -U postgres sparrow", user="postgres")
+        print(res)
+
+        if not check_database_exists(target, dbname):
+            raise SparrowCommandError("Database not created")
 
         print("Dumping database...")
 
-        res = source.exec_run(
-            "pg_dump -Fc -U postgres sparrow",
-            stream=True,
-            stdout=True,
-            stderr=True,
-            demux=True,
-        )
-
-        target.exec_run("createdb -U postgres sparrow")
-
-        process = Popen(
-            (
-                "docker",
-                "exec",
-                "-i",
-                target.name,
-                "pg_restore",
-                "-U",
-                "postgres",
-                "-d",
-                "sparrow",
-            ),
-            stdin=subprocess.PIPE,
-        )
-
-        with process.stdin as pipe:
-            nbytes = 0
-            for i, (stdout, stderr) in enumerate(res.output):
-                if stderr is not None:
-                    print()
-                    print(stderr.decode("utf-8"))
-                nbytes += len(stdout)
-                pipe.write(stdout)
-                print(f"Dumped {nbytes/1_000_000} MB        ", end="\r")
-            pipe.flush()
+        # Run PG_Restore asynchronously
+        pg_restore(source, target)
 
         db_exists = check_database_exists(target, dbname)
         new_n_tables = count_database_tables(target, dbname)
@@ -259,12 +259,14 @@ def upgrade_database_cluster(cfg: SparrowConfig):
             dest_volume.remove()
             return
 
+    time.sleep(1)
+
     # Remove the old volume
     backup_volume_name = cluster_volume_name + "_backup"
     console.print(f"Backing up old volume to {backup_volume_name}", style="bold")
-    client.volumes.get(backup_volume_name).remove(force=True)
-    client.volumes.create(name=backup_volume_name)
+    ensure_empty_docker_volume(backup_volume_name)
     replace_docker_volume(cluster_volume_name, backup_volume_name)
+    replace_docker_volume(cluster_new_name, cluster_volume_name)
 
     console.print(
         f"Moving contents of new volume to {cluster_volume_name}", style="bold"
@@ -273,3 +275,74 @@ def upgrade_database_cluster(cfg: SparrowConfig):
     client.volumes.get(cluster_new_name).remove(force=True)
 
     console.print("Done!", style="bold green")
+
+
+# Run in asyncio
+
+
+async def _pg_restore(source: Container, target: Container):
+    res = source.exec_run(
+        "pg_dump -Fc --superuser=postgres -U postgres sparrow",
+        stream=True,
+        stdout=True,
+        stderr=True,
+        demux=True,
+    )
+
+    proc = await asyncio.subprocess.create_subprocess_exec(
+        "docker",
+        "exec",
+        "-i",
+        "-u",
+        "postgres",
+        target.name,
+        "pg_restore",
+        "-U",
+        "postgres",
+        "-d",
+        "sparrow",
+        stdin=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+
+    db_dump_stream = transform_pgdump_stream(res.output)
+
+    await asyncio.wait(
+        [enqueue(db_dump_stream, proc.stdin)]
+    )  # , dequeue(proc.stderr)])
+
+    # I'm not completely sure the call to `communicate` is necessary
+    (stdout_data, stderr_data) = await proc.communicate()
+    await proc.wait()
+
+
+async def enqueue(values: T.Iterable[bytes], stream: asyncio.StreamWriter):
+    for line in values:
+        stream.write(line)
+        # Yield to the asyncio loop
+        await stream.drain()
+
+    # Once we've exhausted values, we need to close the async stream to signal to
+    # the subprocess that it can exit
+    stream.close()
+
+
+async def dequeue(stream: asyncio.StreamReader):
+    while True:
+        line = await stream.readline()
+        if not line:
+            break
+        console.print(line.decode("utf-8"), style="dim")
+
+
+def transform_pgdump_stream(
+    output: T.AsyncGenerator[T.Tuple[bytes, bytes], None]
+) -> T.AsyncGenerator[bytes, None]:
+    nbytes = 0
+    for stdout, stderr in output:
+        if stderr is not None:
+            print()
+            print(stderr.decode("utf-8"))
+        nbytes += len(stdout)
+        print(f"Dumped {nbytes/1_000_000} MB        ", end="\r")
+        yield stdout

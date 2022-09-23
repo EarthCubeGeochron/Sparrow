@@ -1,16 +1,18 @@
 from sqlalchemy import inspect, sql
 from sparrow.core.plugins import SparrowCorePlugin
-from macrostrat.utils import relative_path
+from macrostrat.utils import relative_path, cmd
 from sparrow.core import get_database
 import click
+from pathlib import Path
 
-from macrostrat.database.utils import run_sql
+from macrostrat.database.utils import connection_args, run_sql
 
 exclude_tables = ["spatial_ref_sys"]
 audit_schemas = ["public", "vocabulary", "tags", "geo_context"]
 
 # Tables in the pg_memento schema
 memento_tables = [
+    "audit_schema_log",
     "audit_column_log",
     "audit_table_log",
     "table_event_log",
@@ -73,6 +75,21 @@ def drop_audit_trail():
     drop_audit_columns(db)
 
 
+@click.command(name="upgrade-audit-trail")
+def upgrade_audit_trail():
+    """
+    Upgrade PGMemento audit trail
+    """
+    db = get_database()
+    procedures = ["UPGRADE_v061_to_v07", "UPGRADE_v07_to_v073"]
+
+    args = connection_args(db.engine)
+    print(args)
+    for id in procedures:
+        fp = relative_path(__file__, "pg-memento", id + ".sql")
+        cmd(f"psql -f {fp}", *args, cwd=Path(__file__).parent)
+
+
 class VersioningPlugin(SparrowCorePlugin):
     name = "versioning"
 
@@ -98,6 +115,7 @@ class VersioningPlugin(SparrowCorePlugin):
             "RESTORE",
             "REVERT",
             "SCHEMA_MANAGEMENT",
+            "CTL",
         ]
 
         for id in procedures:
@@ -107,3 +125,4 @@ class VersioningPlugin(SparrowCorePlugin):
 
     def on_setup_cli(self, cli):
         cli.add_command(drop_audit_trail)
+        cli.add_command(upgrade_audit_trail)
