@@ -16,6 +16,7 @@ from .file_loader import load_config_file
 from ..util.exceptions import SparrowCommandError
 from ..util.shell import fail_without_docker_command, fail_without_docker_running
 from .models import Message, Level
+from ..upgrade_database import check_database_cluster_version, version_images
 
 log = get_logger(__file__)
 
@@ -39,7 +40,8 @@ class SparrowConfig:
     lab_name: Optional[str] = None
 
     # The PostgreSQL major version required for this Sparrow instance
-    postgres_version: int = 14
+    postgres_supported_version: int = 14
+    postgres_current_version: int = None
 
     def __init__(self, verbose=False, offline=False):
         self.verbose = verbose
@@ -109,6 +111,9 @@ class SparrowConfig:
             )
 
         self.project_name = self.infer_project_name()
+
+        # Check database version
+        self.check_database_version()
 
         self.version_info = test_version(self)
         self.add_revision_message()
@@ -236,3 +241,28 @@ class SparrowConfig:
                 level=Level.ERROR,
             )
         self.docker_available = True
+
+    def check_database_version(self):
+        cluster_volume_name = self.project_name + "_db_cluster"
+        version = check_database_cluster_version(cluster_volume_name)
+        self.postgres_current_version = version
+        upgrade_text = " No upgrade path is available — perhaps you have downgraded your Sparrow installation?"
+        if (
+            version < self.postgres_supported_version
+            and version_images[version] is not None
+        ):
+            upgrade_text = (
+                " Run [cyan]sparrow db update[/cyan] to upgrade the database."
+            )
+        if version < self.postgres_supported_version:
+            self.add_message(
+                id="postgresql-version",
+                text=f"PostgreSQL version {self.postgres_supported_version} is required",
+                details=f"Sparrow's database cluster is running PostgreSQL version {version}."
+                + upgrade_text,
+                level=Level.ERROR,
+            )
+            # Fall back to old database version
+            environ["SPARROW_DATABASE_IMAGE"] = version_images[version]
+        else:
+            print(f"Using PostgreSQL version {version}")

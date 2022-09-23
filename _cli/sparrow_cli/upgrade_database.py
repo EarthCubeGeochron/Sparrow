@@ -4,7 +4,6 @@ Scripts for upgrading the database cluster if it is out of date.
 from contextlib import contextmanager
 from os import environ
 from pathlib import Path
-from .config import SparrowConfig
 from .util.exceptions import SparrowCommandError
 from .util.shell import compose, cmd
 from rich import print
@@ -33,38 +32,25 @@ def check_database_cluster_version(volume_name: str):
     """
     cluster_dir = "/var/lib/postgresql/data"
     version_file = Path(cluster_dir) / "PG_VERSION"
-    stdout = client.containers.run(
-        "bash",
-        f"cat {version_file}",
-        volumes={volume_name: {"bind": cluster_dir, "mode": "ro"}},
-        remove=True,
-        stdout=True,
-    )
+    try:
+        stdout = client.containers.run(
+            "bash",
+            f"cat {version_file}",
+            volumes={volume_name: {"bind": cluster_dir, "mode": "ro"}},
+            remove=True,
+            stdout=True,
+        )
+    except docker.errors.ContainerError as e:
+        return 14
     return int(stdout.decode("utf-8").strip())
 
 
 version_images = {11: "mdillon/postgis:11", 14: "postgis/postgis:14-3.3"}
 
 
-def database_cluster_version(cfg: SparrowConfig):
+def database_cluster_version(cfg):
     cluster_volume_name = cfg.project_name + "_db_cluster"
     return check_database_cluster_version(cluster_volume_name)
-
-
-def check_database_version(cfg: SparrowConfig):
-    cluster_volume_name = cfg.project_name + "_db_cluster"
-    version = check_database_cluster_version(cluster_volume_name)
-    upgrade_text = " No upgrade path is available — perhaps you have downgraded your Sparrow installation?"
-    if version < cfg.postgres_version and version_images[version] is not None:
-        upgrade_text = " Run [cyan]sparrow db update[/cyan] to upgrade the database."
-    if version < cfg.postgres_version:
-        raise SparrowCommandError(
-            f"PostgreSQL version {cfg.postgres_version} is required",
-            details=f"Sparrow's database cluster is running PostgreSQL version {version}."
-            + upgrade_text,
-        )
-    else:
-        print(f"Using PostgreSQL version {version}")
 
 
 def wait_for_cluster(container: Container):
@@ -179,7 +165,7 @@ def pg_restore(source: Container, target: Container):
     loop.close()
 
 
-def upgrade_database_cluster(cfg: SparrowConfig):
+def upgrade_database_cluster(cfg):
     """
     Upgrade a PostgreSQL cluster in a Docker volume
     under a managed installation of Sparrow.

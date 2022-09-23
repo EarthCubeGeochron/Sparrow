@@ -113,7 +113,7 @@ services:
     # In the future, we may loosen this restriction to allow externally-managed databases
     # to ease the integration of Sparrow with other tools. However, managing the database
     # in Docker eliminates a substantial amount of configuration complexity.
-    image: postgis/postgis:14-3.3
+    image: ${SPARROW_DATABASE_IMAGE:-postgis/postgis:14-3.3}
     expose:
       - 5432
     ports:
@@ -123,6 +123,7 @@ services:
     environment:
       - POSTGRES_DB=sparrow
       - PGUSER=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - db_cluster:/var/lib/postgresql/data
     profiles:

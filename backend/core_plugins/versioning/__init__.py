@@ -25,7 +25,7 @@ def has_audit_id(db, schema, table):
     insp = inspect(db.engine)
     cols = insp.get_columns(table, schema=schema)
     col_names = [c["name"] for c in cols]
-    return "audit_id" in col_names
+    return "pgmemento_audit_id" in col_names
 
 
 def audit_tables(db):
@@ -48,7 +48,7 @@ def has_audit_schema(db):
 
 def drop_audit_columns(db):
     for schema, table in audit_tables(db):
-        q = f"ALTER TABLE {schema}.{table} DROP COLUMN audit_id CASCADE"
+        q = f"ALTER TABLE {schema}.{table} DROP COLUMN pgmemento_audit_id CASCADE"
         run_sql(db.session, q)
 
 
@@ -59,7 +59,7 @@ def add_audit_id_sequence(db):
     for schema, table in audit_tables(db):
         q = (
             f"ALTER TABLE {schema}.{table} "
-            "ALTER COLUMN audit_id SET DEFAULT "
+            "ALTER COLUMN pgmemento_audit_id SET DEFAULT "
             "nextval('pgmemento.audit_id_seq'::regclass)"
         )
         run_sql(db.session, q)

@@ -5,11 +5,7 @@ from subprocess import Popen
 from rich import print
 from time import sleep
 
-from sparrow_cli.upgrade_database import (
-    check_database_cluster_version,
-    check_database_version,
-)
-from sparrow_cli.util.exceptions import SparrowCommandError
+from sparrow_cli.help import echo_messages
 
 from ..config.environment import validate_environment
 from ..config import SparrowConfig
@@ -48,6 +44,8 @@ def sparrow_up(ctx, container="", force_recreate=False):
 
     cfg = ctx.find_object(SparrowConfig)
 
+    echo_messages(cfg)
+
     _report_image_versions()
     # build containers
     if not cfg.offline:
@@ -57,8 +55,6 @@ def sparrow_up(ctx, container="", force_recreate=False):
     prestart = _get_prestart_script(cfg)
     if prestart is not None:
         cmd("bash", str(prestart))
-
-    check_database_version(cfg)
 
     # Bring up the application
     res = cmd(
