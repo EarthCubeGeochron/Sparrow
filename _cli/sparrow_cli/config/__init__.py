@@ -246,6 +246,18 @@ class SparrowConfig:
         cluster_volume_name = self.project_name + "_db_cluster"
         version = check_database_cluster_version(cluster_volume_name)
         self.postgres_current_version = version
+        if version is None:
+            self.add_message(
+                id="no-database-cluster",
+                text="No database cluster",
+                details=[
+                    "The database cluster has not yet been initialized.",
+                    "Run [bold]sparrow up[/bold] or [bold]sparrow init[/bold] to create one.",
+                ],
+                level=Level.WARNING,
+            )
+            return
+
         upgrade_text = " No upgrade path is available — perhaps you have downgraded your Sparrow installation?"
         if (
             version < self.postgres_supported_version

@@ -214,8 +214,12 @@ def echo_messages(cfg: SparrowConfig):
         txt = Text.from_markup("• " + message.text)
         txt.style = get_style(message.level)
         console.print(txt)
-        if message.details:
-            console.print(f"  [dim]{message.details}[/dim]")
+        if message.details is not None:
+            details = message.details
+            if isinstance(details, str):
+                details = [details]
+            for det in details:
+                console.print(f"  [dim]{det}[/dim]")
     console.print("")
 
 

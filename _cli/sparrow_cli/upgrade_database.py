@@ -41,7 +41,7 @@ def check_database_cluster_version(volume_name: str):
             stdout=True,
         )
     except docker.errors.ContainerError as e:
-        return 14
+        return None
     return int(stdout.decode("utf-8").strip())
 
 
@@ -188,7 +188,7 @@ def upgrade_database_cluster(cfg):
     dest_volume = ensure_empty_docker_volume(cluster_new_name)
 
     print(
-        f"Upgrading database cluster from version {current_version} to {cfg.postgres_version}..."
+        f"Upgrading database cluster from version {current_version} to {cfg.postgres_supported_version}..."
     )
 
     # Stop the database
