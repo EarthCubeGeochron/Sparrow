@@ -1,4 +1,4 @@
-from macrostrat.dinosaur import SchemaMigration
+from macrostrat.dinosaur import SchemaMigration, AutoMigration
 from sqlalchemy import inspect, sql
 from sparrow.core.plugins import SparrowCorePlugin
 from macrostrat.utils import relative_path, cmd
@@ -80,12 +80,16 @@ def upgrade_audit_trail(engine):
     """
     Upgrade PGMemento audit trail
     """
-    procedures = ["UPGRADE_v060_to_v061", "UPGRADE_v061_to_v07", "UPGRADE_v07_to_v073"]
+    procedures = [
+        "pg-memento/UPGRADE_v061_to_v07",
+        "pg-memento/UPGRADE_v07_to_v073",
+    ]
 
     args = connection_args(engine)
     print(args)
-    for id in procedures:
-        fp = relative_path(__file__, "pg-memento", id + ".sql")
+    for _id in procedures:
+        print("Running PGMemento procedure", _id)
+        fp = relative_path(__file__, _id + ".sql")
         cmd(f"psql -f {fp}", *args, cwd=Path(__file__).parent)
 
 
@@ -93,12 +97,60 @@ class PGMementoMigration(SchemaMigration):
     """Migrate audit logging to version 0.7.3"""
 
     name = "document-table-migration"
+    target = None
 
     def should_apply(self, source, target, migrator):
         return has_audit_id(source, "public", "sample", col_name="audit_id")
 
     def apply(self, engine):
         upgrade_audit_trail(engine)
+        engine.execute("DROP SEQUENCE IF EXISTS pgmemento.audit_id_seq CASCADE")
+        engine.execute("DROP TABLE pgmemento.audit_tables_copy")
+
+        db = get_database()
+        db.exec_sql(relative_path(__file__, "drop-old-audit-id.sql"))
+
+        # migration = AutoMigration(engine, self.target)
+        # migration.add_all_changes()
+        # stmts = migration.statements
+        # print(stmts)
+        # raise
+        # for stmt in stmts:
+        #     _stmt = stmt.lower()
+        #     if (
+        #         _stmt.startswith("alter table")
+        #         and "drop constraint" in _stmt
+        #         and "audit_id" in _stmt
+        #     ):
+        #         engine.execute(stmt.replace(";", " CASCADE;"))
+        #     if "drop column" in _stmt and "audit_id" in _stmt:
+        #         engine.execute(stmt)
+
+
+def build_audit_tables(db):
+    procedures = []
+
+    if not has_audit_schema(db):
+        # Create the schema to hold audited tables
+        # NOTE: this drops all transaction history, so we don't run
+        # it if pgMemento tables already exist.
+        procedures.append("SCHEMA")
+
+    # Basic setup procedures
+    procedures += [
+        "SETUP",
+        "LOG_UTIL",
+        "DDL_LOG",
+        "RESTORE",
+        "REVERT",
+        "SCHEMA_MANAGEMENT",
+        "CTL",
+    ]
+
+    for id in procedures:
+        fp = relative_path(__file__, "pg-memento", "src", id + ".sql")
+        db.exec_sql(fp)
+    db.exec_sql(relative_path(__file__, "start-logging.sql"))
 
 
 class VersioningPlugin(SparrowCorePlugin):
@@ -109,34 +161,10 @@ class VersioningPlugin(SparrowCorePlugin):
         return
 
     def on_finalize_database_schema(self, db):
-
-        procedures = []
-
-        if not has_audit_schema(db):
-            # Create the schema to hold audited tables
-            # NOTE: this drops all transaction history, so we don't run
-            # it if pgMemento tables already exist.
-            procedures.append("SCHEMA")
-
-        # Basic setup procedures
-        procedures += [
-            "SETUP",
-            "LOG_UTIL",
-            "DDL_LOG",
-            "RESTORE",
-            "REVERT",
-            "SCHEMA_MANAGEMENT",
-            "CTL",
-        ]
-
-        for id in procedures:
-            fp = relative_path(__file__, "pg-memento", "src", id + ".sql")
-            db.exec_sql(fp)
-        db.exec_sql(relative_path(__file__, "start-logging.sql"))
+        build_audit_tables(db)
 
     def on_setup_cli(self, cli):
         cli.add_command(drop_audit_trail)
-        cli.add_command(upgrade_audit_trail)
 
     def on_prepare_database_migrations(self, migrator):
         migrator.add_migration(PGMementoMigration)

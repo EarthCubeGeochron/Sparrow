@@ -277,4 +277,8 @@ class SparrowConfig:
             # Fall back to old database version
             environ["SPARROW_DATABASE_IMAGE"] = version_images[version]
         else:
-            print(f"Using PostgreSQL version {version}")
+            self.add_message(
+                id="postgresql-version",
+                text=f"Using PostgreSQL version {version}",
+                level=Level.SUCCESS,
+            )

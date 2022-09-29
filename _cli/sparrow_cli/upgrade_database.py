@@ -40,7 +40,7 @@ def check_database_cluster_version(volume_name: str):
             remove=True,
             stdout=True,
         )
-    except docker.errors.ContainerError as e:
+    except docker.errors.ContainerError:
         return None
     return int(stdout.decode("utf-8").strip())
 
@@ -170,6 +170,7 @@ def upgrade_database_cluster(cfg):
         print("Database cluster is already up to date.")
         return
 
+    print(current_version)
     if current_version not in version_images:
         raise SparrowCommandError("No upgrade path available")
 
