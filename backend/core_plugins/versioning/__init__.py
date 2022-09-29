@@ -1,3 +1,4 @@
+from macrostrat.dinosaur import SchemaMigration
 from sqlalchemy import inspect, sql
 from sparrow.core.plugins import SparrowCorePlugin
 from macrostrat.utils import relative_path, cmd
@@ -21,11 +22,11 @@ memento_tables = [
 ]
 
 
-def has_audit_id(db, schema, table):
+def has_audit_id(db, schema, table, col_name="pgmemento_audit_id"):
     insp = inspect(db.engine)
     cols = insp.get_columns(table, schema=schema)
     col_names = [c["name"] for c in cols]
-    return "pgmemento_audit_id" in col_names
+    return col_name in col_names
 
 
 def audit_tables(db):
@@ -75,19 +76,29 @@ def drop_audit_trail():
     drop_audit_columns(db)
 
 
-@click.command(name="upgrade-audit-trail")
-def upgrade_audit_trail():
+def upgrade_audit_trail(engine):
     """
     Upgrade PGMemento audit trail
     """
-    db = get_database()
-    procedures = ["UPGRADE_v061_to_v07", "UPGRADE_v07_to_v073"]
+    procedures = ["UPGRADE_v060_to_v061", "UPGRADE_v061_to_v07", "UPGRADE_v07_to_v073"]
 
-    args = connection_args(db.engine)
+    args = connection_args(engine)
     print(args)
     for id in procedures:
         fp = relative_path(__file__, "pg-memento", id + ".sql")
         cmd(f"psql -f {fp}", *args, cwd=Path(__file__).parent)
+
+
+class PGMementoMigration(SchemaMigration):
+    """Migrate audit logging to version 0.7.3"""
+
+    name = "document-table-migration"
+
+    def should_apply(self, source, target, migrator):
+        return has_audit_id(source, "public", "sample", col_name="audit_id")
+
+    def apply(self, engine):
+        upgrade_audit_trail(engine)
 
 
 class VersioningPlugin(SparrowCorePlugin):
@@ -126,3 +137,6 @@ class VersioningPlugin(SparrowCorePlugin):
     def on_setup_cli(self, cli):
         cli.add_command(drop_audit_trail)
         cli.add_command(upgrade_audit_trail)
+
+    def on_prepare_database_migrations(self, migrator):
+        migrator.add_migration(PGMementoMigration)

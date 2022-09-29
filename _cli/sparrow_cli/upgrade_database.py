@@ -98,6 +98,8 @@ def database_cluster(
         container = client.containers.run(
             image,
             detach=True,
+            remove=remove,
+            auto_remove=remove,
             environment=environment,
             volumes={data_volume: {"bind": "/var/lib/postgresql/data", "mode": "rw"}},
             user="postgres",
@@ -107,9 +109,6 @@ def database_cluster(
     finally:
         print(f"Stopping database cluster {image}...")
         container.stop()
-        if remove:
-            print(f"Removing database cluster for image {image}...")
-            container.remove()
 
 
 def check_database_exists(container: Container, db_name: str) -> bool:
@@ -141,7 +140,7 @@ def replace_docker_volume(old_name: str, new_name: str):
     print(f"Moving contents of volume {old_name} to {new_name}")
     client.containers.run(
         "bash",
-        "cp -r /old /new",
+        '-c "cd /old ; cp -av . /new"',
         volumes={old_name: {"bind": "/old"}, new_name: {"bind": "/new"}},
         remove=True,
     )
@@ -158,13 +157,6 @@ def ensure_empty_docker_volume(volume_name: str):
     return client.volumes.create(name=volume_name)
 
 
-def pg_restore(source: Container, target: Container):
-    loop = asyncio.get_event_loop()
-    task = _pg_restore(source, target)
-    loop.run_until_complete(task)
-    loop.close()
-
-
 def upgrade_database_cluster(cfg):
     """
     Upgrade a PostgreSQL cluster in a Docker volume
@@ -174,14 +166,14 @@ def upgrade_database_cluster(cfg):
     cluster_new_name = cfg.project_name + "_db_cluster_new"
 
     current_version = database_cluster_version(cfg)
-    if current_version == cfg.postgres_version:
+    if current_version == cfg.postgres_supported_version:
         print("Database cluster is already up to date.")
         return
 
     if current_version not in version_images:
         raise SparrowCommandError("No upgrade path available")
 
-    if cfg.postgres_version not in version_images:
+    if cfg.postgres_supported_version not in version_images:
         raise SparrowCommandError("Target PostgreSQL version is not supported")
 
     # Create the volume for the new cluster
@@ -192,12 +184,12 @@ def upgrade_database_cluster(cfg):
     )
 
     # Stop the database
-    compose("stop", "db")
+    compose("down")
 
     with database_cluster(
         version_images[current_version], cluster_volume_name
     ) as source, database_cluster(
-        version_images[cfg.postgres_version],
+        version_images[cfg.postgres_supported_version],
         dest_volume.name,
         environment={"POSTGRES_HOST_AUTH_METHOD": "trust"},
     ) as target:
@@ -252,7 +244,6 @@ def upgrade_database_cluster(cfg):
     console.print(f"Backing up old volume to {backup_volume_name}", style="bold")
     ensure_empty_docker_volume(backup_volume_name)
     replace_docker_volume(cluster_volume_name, backup_volume_name)
-    replace_docker_volume(cluster_new_name, cluster_volume_name)
 
     console.print(
         f"Moving contents of new volume to {cluster_volume_name}", style="bold"
@@ -267,15 +258,24 @@ def upgrade_database_cluster(cfg):
 
 
 async def _pg_restore(source: Container, target: Container):
-    res = source.exec_run(
-        "pg_dump -Fc --superuser=postgres -U postgres sparrow",
-        stream=True,
-        stdout=True,
-        stderr=True,
-        demux=True,
+    source = await asyncio.create_subprocess_exec(
+        "docker",
+        "exec",
+        "-i",
+        "-u",
+        "postgres",
+        source.name,
+        "pg_dump",
+        "-Fc",
+        "--superuser=postgres",
+        "-U",
+        "postgres",
+        "sparrow",
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
     )
 
-    proc = await asyncio.subprocess.create_subprocess_exec(
+    proc = await asyncio.create_subprocess_exec(
         "docker",
         "exec",
         "-i",
@@ -291,44 +291,33 @@ async def _pg_restore(source: Container, target: Container):
         stderr=asyncio.subprocess.PIPE,
     )
 
-    db_dump_stream = transform_pgdump_stream(res.output)
-
-    await asyncio.wait(
-        [enqueue(db_dump_stream, proc.stdin)]
-    )  # , dequeue(proc.stderr)])
-
-    # I'm not completely sure the call to `communicate` is necessary
-    (stdout_data, stderr_data) = await proc.communicate()
-    await proc.wait()
+    await asyncio.gather(
+        asyncio.create_task(enqueue(source.stdout, proc.stdin)),
+        asyncio.create_task(dequeue(source.stderr)),
+        asyncio.create_task(dequeue(proc.stderr)),
+    )
 
 
-async def enqueue(values: T.Iterable[bytes], stream: asyncio.StreamWriter):
-    for line in values:
-        stream.write(line)
-        # Yield to the asyncio loop
-        await stream.drain()
+def pg_restore(source: Container, target: Container):
+    loop = asyncio.get_event_loop()
+    task = _pg_restore(source, target)
+    loop.run_until_complete(task)
+    loop.close()
 
-    # Once we've exhausted values, we need to close the async stream to signal to
-    # the subprocess that it can exit
-    stream.close()
+
+async def enqueue(in_stream: asyncio.StreamReader, out_stream: asyncio.StreamWriter):
+    nbytes = 0
+    i = 0
+    async for line in in_stream:
+        nbytes += len(line)
+        i += 1
+        if i % 100 == 0:
+            print(f"Dumped {nbytes/1_000_000} MB        ", end="\r")
+        out_stream.write(line)
+        await out_stream.drain()
+    out_stream.close()
 
 
 async def dequeue(stream: asyncio.StreamReader):
-    while True:
-        line = await stream.readline()
-        if not line:
-            break
+    async for line in stream:
         console.print(line.decode("utf-8"), style="dim")
-
-
-def transform_pgdump_stream(
-    output: T.AsyncGenerator[T.Tuple[bytes, bytes], None]
-) -> T.AsyncGenerator[bytes, None]:
-    nbytes = 0
-    for stdout, stderr in output:
-        if stderr is not None:
-            print()
-            print(stderr.decode("utf-8"))
-        nbytes += len(stdout)
-        print(f"Dumped {nbytes/1_000_000} MB        ", end="\r")
-        yield stdout
