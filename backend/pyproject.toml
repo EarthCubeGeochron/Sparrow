@@ -23,18 +23,13 @@ uvloop = "*"
 
 "macrostrat.database" = {path = "./shared-modules/database", develop = true }
 "macrostrat.utils" = {path = "./shared-modules/utils", develop = true }
+"macrostrat.dinosaur" = {path = "./shared-modules/dinosaur", develop = true }
 sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
-# Legacy application
-Flask = "^2.0.0"
-Flask-RESTful = "^0.3.8"
-# https://serverfault.com/questions/1094062
-# We have to pin Markupsafe to 2.0.1 for now.
-markupsafe = "2.0.1"
 
 # Core application
 Pygments = "2.10.0"
 sqlalchemy-utils = "0.37.0"
-requests = "2.22.0"
+requests = "^2.26.0"
 toposort = "1.5"
 
 # Command-line interface
@@ -73,10 +68,10 @@ apispec = "3.3.1"
 starlette-apispec = "1.0.3"
 
 # S3/AWS file access
-boto3 = "1.12.25"
+boto3 = "^1.12.25"
 
 # Testing and logging
-pytest = "6.2.5"
+pytest = "^7.1.3"
 rich = "10.9.0"
 deepdiff = { version = "5.0.2", extras = [ "murmur" ] }
 pytest-order = "0.9.5"
@@ -111,7 +106,30 @@ typer = "0.4.1"
 sqlakeyset = "^1.0.1629029818"
 
 [tool.poetry.dev-dependencies]
+pylint = "^2.15.3"
+black = "^22.8.0"
+docker = "^6.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = "--pdbcls=IPython.terminal.debugger:Pdb --durations 10 --color=yes" # --capture=no --show-capture=no"
+# Also run tests that are imported from core sparrow code
+
+# This cache setup works for docker but may not work outside of it...
+cache_dir = "/tmp/sparrow-pytest-cache"
+markers = { slow = "Slow test that is usually ignored" }
+
+#log_cli = true
+#log_cli_level = "INFO"
+
+filterwarnings = [
+  "ignore::DeprecationWarning",
+  "ignore::UserWarning"
+]
+
+testpaths = [
+  "sparrow"
+]

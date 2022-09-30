@@ -1,6 +1,5 @@
 from ..task_manager import SparrowTaskManager
 from ..api import APIv2Plugin
-from ..legacy.api_v1 import APIv1Plugin
 from ..plugins import SparrowPluginManager
 from sparrow.loader import InterfacePlugin
 from ..auth import AuthPlugin
@@ -24,7 +23,6 @@ def prepare_plugin_manager(app):
 
     mgr = SparrowPluginManager()
     mgr.add_all(
-        APIv1Plugin,
         APIv2Plugin,
         AuthPlugin,
         WebPlugin,

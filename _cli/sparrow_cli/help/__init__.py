@@ -185,16 +185,7 @@ class SparrowHelpFormatter(HelpFormatter):
         self.flush()
 
     def write_messages(self):
-        if len(self.config.messages) == 0:
-            return
-        console.print("[bold]Status:")
-        for message in self.config.messages:
-            txt = Text.from_markup("• " + message.text)
-            txt.style = get_style(message.level)
-            console.print(txt)
-            if message.details:
-                console.print(f"  [dim]{message.details}[/dim]")
-        console.print("")
+        echo_messages(self.config)
 
 
 sections = {
@@ -213,6 +204,23 @@ def command_info(ctx, cli):
             continue
         help = cmd.get_short_help_str()
         yield name, {"help": help, "plugin": None}
+
+
+def echo_messages(cfg: SparrowConfig):
+    if len(cfg.messages) == 0:
+        return
+    console.print("[bold]Status:")
+    for message in cfg.messages:
+        txt = Text.from_markup("• " + message.text)
+        txt.style = get_style(message.level)
+        console.print(txt)
+        if message.details is not None:
+            details = message.details
+            if isinstance(details, str):
+                details = [details]
+            for det in details:
+                console.print(f"  [dim]{det}[/dim]")
+    console.print("")
 
 
 def echo_help(cli, ctx, core_commands=None, user_commands=None):

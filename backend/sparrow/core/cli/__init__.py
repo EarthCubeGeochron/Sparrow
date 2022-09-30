@@ -1,10 +1,9 @@
 import click
+from click import echo, style, secho, pass_context
 import sparrow
-from click import echo, style, secho
 from sys import exit
 from os import environ
 from json import dumps
-from click import pass_context
 from .util import with_database, with_app, with_full_app
 from .user import create_user, list_users, reset_password
 from ..util import working_directory

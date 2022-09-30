@@ -93,7 +93,7 @@ def exec_backend_command(ctx, *args, **kwargs):
 
 
 def exec_sparrow(*args, **kwargs):
-    return exec_or_run("backend", "poetry run python -m sparrow.core", *args, **kwargs)
+    return exec_or_run("backend", "python -m sparrow.core", *args, **kwargs)
 
 
 def fail_without_docker_command():
@@ -115,7 +115,7 @@ def fail_without_docker_running():
     except DockerException as exc:
         raise SparrowCommandError(
             "Cannot connect to the Docker daemon. Is Docker running?", details=str(exc)
-        )
+        ) from exc
 
 
 def raise_docker_engine_errors():

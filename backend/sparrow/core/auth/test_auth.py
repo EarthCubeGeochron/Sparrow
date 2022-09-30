@@ -141,10 +141,6 @@ class TestSparrowAuth:
         )
         assert is_forbidden(res)
 
-    def test_v1_restricted(self, client):
-        res = client.get("/api/v1/sample", params={"all": True})
-        assert res.status_code == 200
-
     def test_status(self, client):
         """We should be logged out"""
         res = client.get("/api/v2/auth/status")

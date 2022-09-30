@@ -5,6 +5,8 @@ from subprocess import Popen
 from rich import print
 from time import sleep
 
+from sparrow_cli.help import echo_messages
+
 from ..config.environment import validate_environment
 from ..config import SparrowConfig
 from ..util import compose, cmd, log
@@ -41,6 +43,8 @@ def sparrow_up(ctx, container="", force_recreate=False):
     validate_environment()
 
     cfg = ctx.find_object(SparrowConfig)
+
+    echo_messages(cfg)
 
     _report_image_versions()
     # build containers

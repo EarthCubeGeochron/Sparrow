@@ -14,7 +14,9 @@ from sqlalchemy import event
 
 # Right now, we run this setup code outside of a fixture so we
 # can see the setup output in real time.
-testing_db = environ.get("SPARROW_TESTING_DATABASE", "postgresql://postgres@db:5432/sparrow_test")
+testing_db = environ.get(
+    "SPARROW_TESTING_DATABASE", "postgresql://postgres@db:5432/sparrow_test"
+)
 environ["SPARROW_DATABASE"] = testing_db
 
 

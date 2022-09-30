@@ -3,7 +3,7 @@ from sqlalchemy import text
 from sparrow import core
 from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.core.task_manager.base import task
-from sparrow.database.migration import SparrowMigration, has_column
+from macrostrat.dinosaur import SchemaMigration, has_column
 from macrostrat.database.utils import run_sql_file
 
 from .base import OpenSearchAPI
@@ -29,7 +29,7 @@ def _initialize_tables(engine, refresh=True):
     run_sql_file(engine, fill_empty_docs)
 
 
-class DocumentTableMigration(SparrowMigration):
+class DocumentTableMigration(SchemaMigration):
     """Remove unintentional application of schema versioning."""
 
     name = "document-table-migration"
@@ -40,6 +40,7 @@ class DocumentTableMigration(SparrowMigration):
 
     def apply(self, engine):
         _initialize_tables(engine, refresh=True)
+        run_sql_file(engine, procedures / "drop-extra-triggers.sql")
 
 
 class OpenSearch(SparrowCorePlugin):

@@ -132,6 +132,7 @@ class Database(BaseDatabase):
         return res
 
     def initialize(self, drop=False, quiet=False):
+        log.info("Initializing database")
         secho("Creating core schema...", bold=True)
 
         if drop:
@@ -146,6 +147,7 @@ class Database(BaseDatabase):
             self.exec_sql(fn)
 
         # Reload the Postgrest schema cache
+        log.info("Reloading PostgREST schema cache")
         self.engine.execute("NOTIFY pgrst, 'reload schema'")
 
         try:

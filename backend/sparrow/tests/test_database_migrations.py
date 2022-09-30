@@ -1,13 +1,14 @@
-from sparrow.core.migrations import InstrumentSessionMigration
-from sparrow.database.migration import create_schema_clone
+from os import environ
+from sparrow.migrations import InstrumentSessionMigration, SampleCheckMigration
 from sparrow.core.app import Sparrow
 from macrostrat.utils import relative_path, cmd
-from sparrow.database.migration import _create_migration
+from macrostrat.dinosaur import _create_migration, create_schema_clone
 from macrostrat.database.utils import connection_args, temp_database
+from sparrow.core.open_search import DocumentTableMigration
 from pytest import mark, fixture
 
-target_db = "postgresql://postgres@db:5432/sparrow_test"
-testing_db = "postgresql://postgres@db:5432/sparrow_migration_base"
+target_db = environ.get("SPARROW_DATABASE")
+testing_db = target_db + "_migration"
 
 
 class BasicMigration:
@@ -25,38 +26,44 @@ def migration_base():
     fn = relative_path(__file__, "fixtures", "e57d74b-detrital-zircon-F-90.pg-dump")
     args, dbname = connection_args(testing_db)
     with temp_database(testing_db) as engine:
-        cmd("pg_restore", args, "-d", dbname, fn, check=True)
+        cmd("pg_restore", args, "-d", dbname, str(fn), check=True)
         yield engine
 
 
 # @mark.order(-1)
 class TestDatabaseMigrations:
-    @mark.xfail(reason="There is some interference between plugins right now")
+    # @mark.xfail(reason="There is some interference between plugins right now")
     def test_migration(self, db, migration_base):
 
         test_app = Sparrow(debug=True, database=migration_base.url)
         test_app.setup_database(automap=False)
         # We can use the existing testing database as a target
-        m = _create_migration(test_app.db.engine, db.engine)
+        migration = _create_migration(test_app.db.engine, db.engine)
 
         # Check that we are not aligned
-        assert not m.is_safe
+        assert not migration.is_safe
 
         # Apply migrations
-        migrations = [BasicMigration, InstrumentSessionMigration]
+        migrations = [
+            BasicMigration,
+            InstrumentSessionMigration,
+            SampleCheckMigration,
+            DocumentTableMigration,
+        ]
         for mgr in migrations:
             migration = mgr()
-            migration.apply(test_app.database)
+            migration.apply(test_app.database.engine)
 
         # Migrating to the new version should now be "safe"
-        m = _create_migration(test_app.database.engine, db.engine)
-        assert m.is_safe
+        migration = _create_migration(test_app.database.engine, db.engine)
+        print(list(migration.unsafe_changes()))
+        assert migration.is_safe
 
-        m.apply(quiet=True)
+        migration.apply(quiet=True)
         # Re-add changes
-        m.add_all_changes()
+        migration.add_all_changes()
 
-        assert len(m.statements) == 0
+        assert len(migration.statements) == 0
 
     @mark.slow
     def test_migration_built_in(self, db):
