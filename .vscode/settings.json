@@ -13,5 +13,6 @@
   "editor.formatOnSave": true,
   "typescript.tsdk": "frontend/.yarn/sdks/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "prettier.prettierPath": "frontend/.yarn/sdks/prettier/index.js"
+  "prettier.prettierPath": "frontend/.yarn/sdks/prettier/index.js",
+  "python.linting.flake8Enabled": false
 }

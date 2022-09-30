@@ -115,7 +115,7 @@ def fail_without_docker_running():
     except DockerException as exc:
         raise SparrowCommandError(
             "Cannot connect to the Docker daemon. Is Docker running?", details=str(exc)
-        )
+        ) from exc
 
 
 def raise_docker_engine_errors():

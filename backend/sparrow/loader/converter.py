@@ -12,7 +12,15 @@ from sqlalchemy.types import Integer, Numeric, DateTime
 from sqlalchemy.dialects import postgresql
 
 from macrostrat.database.mapper.utils import trim_postfix
-from .fields import Geometry, Enum, JSON, SmartNested, UUID, DateTimeExt, PassThroughRelated
+from .fields import (
+    Geometry,
+    Enum,
+    JSON,
+    SmartNested,
+    UUID,
+    DateTimeExt,
+    PassThroughRelated,
+)
 from .util import to_schema_name
 
 from ..logs import get_logger
@@ -202,7 +210,7 @@ class SparrowConverter(ModelConverter):
         for col in prop.columns:
             is_integer = isinstance(col.type, Integer)
             # Special case for audit columns
-            if col.name == "audit_id" and is_integer:
+            if col.name == "pgmemento_audit_id" and is_integer:
                 kwargs["dump_only"] = True
                 return kwargs
 

@@ -325,7 +325,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
     @post_dump
     def remove_internal_fields(self, data, many, **kwargs):
         if not self._show_audit_id:
-            data.pop("audit_id", None)
+            data.pop("pgmemento_audit_id", None)
         return data
 
     def to_json_schema(self, model):

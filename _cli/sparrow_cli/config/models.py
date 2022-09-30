@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from typing import Union, List
 from enum import Enum
+from pydantic import BaseModel
 
 
 class Level(str, Enum):
@@ -11,5 +12,5 @@ class Level(str, Enum):
 class Message(BaseModel):
     id: str
     text: str
-    details: str = None
+    details: Union[str, List[str]] = None
     level: str = Level.WARNING
