@@ -20,6 +20,24 @@ CREATE OR REPLACE VIEW sparrow_api.sample AS
 SELECT * FROM core_view.sample;
 
 
+CREATE OR REPLACE VIEW core_view.sample_v3 AS
+SELECT
+  s.id,
+  s.igsn,
+  s.name,
+  s.material,
+  s.location geometry,
+  s.location_name,
+  s.location_precision,
+  s.location_name_autoset,
+  p.id project_id,
+  p.name project_name,
+  is_public(s)
+FROM sample s
+LEFT JOIN session ss
+  ON s.id = ss.sample_id
+LEFT JOIN project p
+  ON ss.project_id = p.id;
 
 /* A function to create vector tiles that doesn't require a separate tile server.
   This could be upgraded to pg_tileserv eventually.
@@ -38,9 +56,9 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
       id,
       name,
       material,
-      ST_Transform(ST_SetSRID("location", 4326), 3857) location
-    FROM sample
-    WHERE ST_Intersects(ST_SetSRID("location", 4326), ST_Transform((SELECT envelope FROM tile_loc), 4326))
+      ST_Transform(geometry, 3857) geometry
+    FROM core_view.sample_v3
+    WHERE ST_Intersects(geometry, ST_Transform((SELECT envelope FROM tile_loc), 4326))
   ),
   mvt_features AS (
     SELECT
@@ -49,7 +67,7 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
       material,
       -- Get the geometry in vector-tile integer coordinates
       -- Snapping to a grid allows us to group nearby points together
-      ST_SnapToGrid(ST_AsMVTGeom("location", (SELECT envelope FROM tile_loc)), 4, 4) geometry
+      ST_SnapToGrid(ST_AsMVTGeom(geometry, (SELECT envelope FROM tile_loc)), 4, 4) geometry
     FROM tile_features
   ),
   grouped_features AS (
@@ -76,4 +94,4 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
   )
   SELECT ST_AsMVT(grouped_features)
   FROM grouped_features;
-$$ LANGUAGE sql STABLE;
+$$ LANGUAGE sql IMMUTABLE;

@@ -6,31 +6,9 @@ import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
 import { LayerMenu } from "./components/LayerMenu";
 import { MapToast } from "./components/MapToast";
-import { useAPIActions } from "@macrostrat/ui-components";
 import { MapNav } from "./components/map-nav";
 import styles from "./module.styl";
 import { ShortSiteTitle } from "~/components";
-import { useAPIv2Result, APIV2Context } from "~/api-v2";
-
-function changeStateOnParams(params, setData) {
-  const { get } = useAPIActions(APIV2Context);
-
-  async function getData(url, params) {
-    try {
-      const data = await get(url, params, {});
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  useEffect(() => {
-    const url = "/models/sample";
-    const data = getData(url, params);
-    data.then((res) => {
-      setData(res.data);
-    });
-  }, [JSON.stringify(params)]);
-}
 
 export const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
@@ -76,17 +54,7 @@ export function MapPanel({
     });
   }, [mapstyle]);
 
-  const [params, setParams] = useState({ all: "true", has: "location" });
-  const initialData = useAPIv2Result("/map-samples", params);
-
-  const [data, setData] = useState(initialData);
-
   //changeStateOnParams(params, setData);
-
-  const changePararms = (newParams) => {
-    const state = { all: "true", has: "location", ...newParams };
-    setParams(state);
-  };
 
   const initialViewport = {
     latitude,
@@ -132,29 +100,12 @@ export function MapPanel({
 
   const mapRef = useRef();
 
-  const bounds = mapRef.current
-    ? mapRef.current.getMap().getBounds().toArray().flat()
-    : null;
-
   const toggleShowMarkers = () => {
     setState({ ...state, showMarkers: !state.showMarkers });
   };
 
   const chooseMapStyle = (props) => {
     setState({ ...state, MapStyle: props });
-  };
-
-  const changeViewport = ({ expansionZoom, longitude, latitude }) => {
-    setViewport({
-      ...viewport,
-      longitude: longitude,
-      latitude: latitude,
-      zoom: expansionZoom,
-      transitionInterpolator: new FlyToInterpolator({
-        speed: 1,
-      }),
-      transitionDuration: "auto",
-    });
   };
 
   const mapClicked = (e) => {
@@ -176,17 +127,6 @@ export function MapPanel({
       });
     }
   };
-
-  const features = (initialData?.data ?? []).map((d) => {
-    return {
-      type: "Feature",
-      geometry: d.location,
-      properties: {
-        id: d.id,
-        name: d.name,
-      },
-    };
-  });
 
   return h("div.map-container", [
     h("div.layer-button", [
