@@ -1,6 +1,7 @@
 from macrostrat.dinosaur import SchemaMigration, has_column, has_table
 from sparrow.database import run_sql
 from sqlalchemy.orm import sessionmaker
+from pathlib import Path
 
 
 class PlateauMigration(SchemaMigration):
@@ -49,3 +50,16 @@ class SampleCheckMigration(SchemaMigration):
             "ALTER TABLE sample DROP CONSTRAINT sample_check",
             stop_on_error=True,
         )
+
+
+class SampleLocationAddSRID(SchemaMigration):
+    name = "add-srid-to-sample-location"
+
+    def should_apply(self, source, target, migrator):
+        sql = "SELECT srid FROM geometry_columns WHERE f_table_name = 'sample' AND f_geometry_column = 'location'"
+        res = source.execute(sql).fetchone()
+        return res is None or res[0] != 4326
+
+    def apply(self, engine):
+        sql_file = Path(__file__).parent / "sql" / "add-sample-srid.sql"
+        engine.execute(sql_file.read_text())

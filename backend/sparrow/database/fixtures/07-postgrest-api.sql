@@ -38,9 +38,9 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
       id,
       name,
       material,
-      ST_Transform(ST_SetSRID(location, 4326), 3857) location,
+      ST_Transform(ST_SetSRID("location", 4326), 3857) location
     FROM sample
-    WHERE ST_Intersects(location, ST_Transform(tile_loc.envelope, 4326))
+    WHERE ST_Intersects(ST_SetSRID("location", 4326), ST_Transform((SELECT envelope FROM tile_loc), 4326))
   ),
   mvt_features AS (
     SELECT
@@ -48,7 +48,8 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
       name,
       material,
       -- Get the geometry in vector-tile integer coordinates
-      ST_SnapToGrid(ST_AsMVTGeom(location, tile_loc.envelope), 4, 4) geometry
+      -- Snapping to a grid allows us to group nearby points together
+      ST_SnapToGrid(ST_AsMVTGeom("location", (SELECT envelope FROM tile_loc)), 4, 4) geometry
     FROM tile_features
   ),
   grouped_features AS (
@@ -71,7 +72,7 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
         null
       END material
     FROM mvt_features
-    GROUP BY geometry;
+    GROUP BY geometry
   )
   SELECT ST_AsMVT(grouped_features)
   FROM grouped_features;

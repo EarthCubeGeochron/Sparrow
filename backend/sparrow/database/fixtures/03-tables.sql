@@ -3,12 +3,20 @@ The set of table definitions here builds the fundamental structures
 for data in the **Sparrow** system.
 */
 
-SET sparrow_schema_version = '2.0.0';
+-- BEGIN
+--   EXECUTE format('ALTER DATABASE %I SET sparrow.schema_version = %L', current_database(), "2.0.0");
+-- END;
 
 CREATE TABLE IF NOT EXISTS researcher (
   id serial PRIMARY KEY,
   name text NOT NULL,
   orcid text UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS organization (
+  id serial PRIMARY KEY,
+  name text NOT NULL,
+  url text
 );
 
 /*
@@ -240,7 +248,7 @@ CREATE TABLE IF NOT EXISTS sample (
   /* A representative named location */
   location_name text,
   location_name_autoset boolean,
-  location geometry,
+  location geometry(Point, 4326),
   /* NOTE: Elevation and depth are not normalized in the current schema!
   Potentially, these columns should be recast as *references* to a specific
   reference datum (e.g. `vocabulary.entity_reference`); perhaps we want to move towards

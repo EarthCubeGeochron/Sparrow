@@ -231,11 +231,12 @@ export function MapPanel({
             Source,
             {
               id: "sparrow-data",
-              type: "geojson",
-              data: { type: "FeatureCollection", features },
+              type: "vector",
+              tiles: ["http://localhost:5002/api/v3/samples/{z}/{x}/{y}.pbf"],
             },
             [
               h(Layer, {
+                "source-layer": "default",
                 id: "point",
                 type: "circle",
                 paint: {

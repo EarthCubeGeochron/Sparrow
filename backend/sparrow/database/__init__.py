@@ -143,11 +143,13 @@ class Database(BaseDatabase):
         filenames = list(p.glob("*.sql"))
         filenames.sort()
 
-        for fn in filenames:
-            self.exec_sql(fn)
+        for _fn in filenames:
+            self.exec_sql(_fn)
 
         # Reload the Postgrest schema cache
-        log.info("Reloading PostgREST schema cache")
+        msg = "Reloading PostgREST schema cache"
+        secho(msg, bold=True)
+        log.info(msg)
         self.engine.execute("NOTIFY pgrst, 'reload schema'")
 
         try:

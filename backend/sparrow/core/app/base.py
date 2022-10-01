@@ -17,6 +17,7 @@ from ..util import check_secret_key
 from ..logs import get_logger
 from .plugins import prepare_plugin_manager, SparrowPluginManager
 from macrostrat.database.utils import wait_for_database
+from sqlalchemy.exc import NoSuchTableError
 from ..startup import tables_exist
 
 log = get_logger(__name__)

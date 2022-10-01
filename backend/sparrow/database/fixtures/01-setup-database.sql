@@ -16,6 +16,9 @@ drop schema if exists "tiger";
 drop schema if exists "tiger_data";
 drop schema if exists "topology";
 
+-- Prepare for next version where we encapsulate all Sparrow tables in a schema
+CREATE SCHEMA IF NOT EXISTS sparrow;
+
 /*
 Vocabularies
 Tables to integrate units, etc.
