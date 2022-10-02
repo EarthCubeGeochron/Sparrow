@@ -4,13 +4,13 @@ import { hyperStyled } from "@macrostrat/hyper";
 // @ts-ignore
 //import styles from "./module.styl";
 import { SiteTitle } from "app/components";
-import { MapPanel } from "./map-area";
+import { MapPanel } from "./map-panel";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import styles from "./module.styl";
 import { useDarkMode } from "@macrostrat/ui-components";
-import { useEffect, useState } from "react";
 import { useAuth } from "~/auth";
+import { MapArea } from "./map-area";
 
 const h = hyperStyled(styles);
 
@@ -52,27 +52,21 @@ const MapHome = (props) => {
 };
 
 const MapPage = (props) => {
-  //const { isEnabled } = useDarkMode();
+  const { isEnabled } = useDarkMode();
 
-  console.log("Rendering map page");
-
-  const isEnabled = false;
-
-  const StandMapMode = isEnabled
+  const style = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/outdoors-v9";
 
-  //const { login } = useAuth();
+  const { login } = useAuth();
   //console.log(login);
 
   return h("div.map-page", [
-    h(MapPanel, {
+    h(MapArea, {
       on_map: true,
       hide_filter: false,
-      width: "100vw",
-      height: "100vh",
-      mapstyle: StandMapMode,
-      login: false,
+      style,
+      login,
     }),
   ]);
 };

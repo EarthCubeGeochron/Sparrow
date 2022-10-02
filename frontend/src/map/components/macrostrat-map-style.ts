@@ -1,11 +1,22 @@
-import { SETTINGS } from "./Settings";
+export const MacrostratMapSettings = {
+  baseMapURL:
+    "mapbox://styles/jczaplewski/cje04mr9l3mo82spihpralr4i?optimize=true",
+  satelliteMapURL:
+    "mapbox://styles/jczaplewski/cj3bpe4xk00002rqndidf9dw4?optimize=true",
+  burwellTileDomain: "https://devtiles.macrostrat.org",
+  apiDomain: "https://dev.macrostrat.org",
+  gddDomain: "https://geodeepdive.org",
+  pbdbDomain: "https://paleobiodb.org",
+};
 
 export const mapStyle = {
   version: 8,
   sources: {
     burwell: {
       type: "vector",
-      tiles: [`${SETTINGS.burwellTileDomain}/carto-slim/{z}/{x}/{y}.mvt`],
+      tiles: [
+        `${MacrostratMapSettings.burwellTileDomain}/carto-slim/{z}/{x}/{y}.mvt`,
+      ],
       tileSize: 512,
     },
     // "pbdb": {
@@ -51,7 +62,7 @@ export const mapStyle = {
     columns: {
       type: "geojson",
       generateId: true,
-      data: `${SETTINGS.apiDomain}/api/v2/columns?all&format=geojson_bare`,
+      data: `${MacrostratMapSettings.apiDomain}/api/v2/columns?all&format=geojson_bare`,
     },
     filteredColumns: {
       type: "geojson",
