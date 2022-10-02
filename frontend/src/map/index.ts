@@ -52,14 +52,18 @@ const MapHome = (props) => {
 };
 
 const MapPage = (props) => {
-  const { isEnabled } = useDarkMode();
+  //const { isEnabled } = useDarkMode();
+
+  console.log("Rendering map page");
+
+  const isEnabled = false;
 
   const StandMapMode = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/outdoors-v9";
 
-  const { login } = useAuth();
-  console.log(login);
+  //const { login } = useAuth();
+  //console.log(login);
 
   return h("div.map-page", [
     h(MapPanel, {
@@ -68,7 +72,7 @@ const MapPage = (props) => {
       width: "100vw",
       height: "100vh",
       mapstyle: StandMapMode,
-      login,
+      login: false,
     }),
   ]);
 };

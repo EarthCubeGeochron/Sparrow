@@ -1,18 +1,16 @@
-import React, { Component } from "react";
+import React from "react";
 import h from "@macrostrat/hyper";
 import {
   ComposableMap,
   ZoomableGlobe,
   Geographies,
   Geography,
-  Graticule,
   Marker,
   Markers,
 } from "react-simple-maps";
 import worldMap from "./assets/land-110m.json";
-import { APIResultView } from "@macrostrat/ui-components";
 import { useAPIv2Result } from "~/api-v2";
-import { Colors, H1, Tooltip } from "@blueprintjs/core";
+import { Colors } from "@blueprintjs/core";
 import { useHistory } from "react-router-dom";
 
 function MapComponent(props) {

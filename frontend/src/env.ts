@@ -1,10 +1,9 @@
-/*
-Generates site-specific configuration data
-*/
+export const apiBaseURL = process.env.API_BASE_URL ?? "/";
 
-// TODO: move this to a configuration file
 let defaultTitle = process.env.SPARROW_LAB_NAME;
 if (defaultTitle == "") defaultTitle = null;
 defaultTitle ??= "Test Lab";
 
 export const siteTitle = defaultTitle;
+
+export const mapboxAPIToken = process.env.MAPBOX_API_TOKEN;

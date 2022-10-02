@@ -9,6 +9,7 @@ import { MapToast } from "./components/MapToast";
 import { MapNav } from "./components/map-nav";
 import styles from "./module.styl";
 import { ShortSiteTitle } from "~/components";
+import { apiBaseURL, mapboxAPIToken } from "~/env";
 
 export const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
@@ -92,11 +93,11 @@ export function MapPanel({
     return () => MapToaster.clear();
   }, []);
 
-  useEffect(() => {
-    if (firstWindowHash !== "") {
-      setLocationFromHash(firstWindowHash);
-    }
-  }, [firstWindowHash]);
+  // useEffect(() => {
+  //   if (firstWindowHash !== "") {
+  //     setLocationFromHash(firstWindowHash);
+  //   }
+  // }, [firstWindowHash]);
 
   const mapRef = useRef();
 
@@ -153,18 +154,18 @@ export function MapPanel({
       h(
         MapGl,
         {
-          onClick(e) {
-            mapClicked(e);
-          },
+          // onClick(e) {
+          //   mapClicked(e);
+          // },
           mapStyle: state.MapStyle,
-          mapboxApiAccessToken: process.env.MAPBOX_API_TOKEN,
+          mapboxApiAccessToken: mapboxAPIToken,
           ...viewport,
           onViewportChange(viewport) {
             if (state.mounted) {
               setViewport(viewport);
             }
           },
-          ref: mapRef,
+          //ref: mapRef,
         },
         [
           h(
@@ -172,7 +173,7 @@ export function MapPanel({
             {
               id: "sparrow-data",
               type: "vector",
-              tiles: ["http://localhost:5002/api/v3/samples/{z}/{x}/{y}.pbf"],
+              tiles: [`${apiBaseURL}/api/v3/samples/{z}/{x}/{y}.pbf`],
             },
             [
               h(Layer, {
