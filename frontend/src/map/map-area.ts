@@ -54,11 +54,18 @@ export function _MapArea({
   const [state, setState] = useState(initialState);
   const [resolvedStyle, setResolvedStyle] = useState(null);
 
+  // We have to resolve the base URL to an absolute URL so Mapbox GL doesn't complain.
+  let baseURL = apiBaseURL;
+  if (baseURL == "/") {
+    // Set baseURL to current hostname
+    baseURL = window.location.origin + "/";
+  }
+
   const overlays = {
     sources: {
       "sparrow-data": {
         type: "vector",
-        tiles: [`${apiBaseURL}/api/v3/samples/{z}/{x}/{y}.pbf`],
+        tiles: [`${baseURL}api/v3/samples/{z}/{x}/{y}.pbf`],
         maxZoom: 12,
       },
     },

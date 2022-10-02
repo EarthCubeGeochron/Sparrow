@@ -169,17 +169,14 @@ services:
       - MAPBOX_API_TOKEN
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container
-      - SPARROW_SITE_CONTENT=/app/site-content
+      - SPARROW_SITE_CONTENT=/site-content
       - SPARROW_FRONTEND_BUILD_DIR=/build
       - SPARROW_ENV
     volumes:
       - frontend_build:/build
       # Right now, we configure default site content
       # rather than allowing any customization
-      - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/app/site-content
-      # A folder for node modules that will be resolved preferentially
-      # instead of the main node_modules packages.
-      - ${SPARROW_FRONTEND_MODULES:-placeholder}:/app/_local_modules:ro
+      - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/site-content:ro
   # API TESTS container is disabled for now
   # api-tests:
   #   build: api-tests

@@ -95,7 +95,9 @@ if (environment != "local-development") {
   // as the rest of the app.
   devServer = {
     ...devServer,
-    webSocketURL: `ws://${devDomain}/ws`,
+    client: {
+      webSocketURL: `ws://${devDomain}/ws`,
+    },
     // Docker host needs to be able to access the served app
     host: "0.0.0.0",
   };
