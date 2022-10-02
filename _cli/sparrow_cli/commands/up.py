@@ -102,7 +102,7 @@ def sparrow_up(ctx, container="", force_recreate=False):
             cwd=frontend_dir,
             env={
                 **os.environ,
-                "SPARROW_ENV": "development",
+                "SPARROW_ENV": "local-development",
                 "API_BASE_URL": "http://localhost:5002",
                 "BASE_URL": "/",
             },

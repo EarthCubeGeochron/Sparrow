@@ -24,6 +24,7 @@
     "@emotion/styled-base": "10",
     "@loadable/component": "^5.10.2",
     "@macrostrat/hyper": "^2.2.1",
+    "@macrostrat/mapbox-react": "^1.0.4",
     "@macrostrat/router-components": "^1.0.2",
     "@macrostrat/ui-components": "^3.0.0-b8",
     "@mapbox/mapbox-gl-draw": "^1.2.0",
@@ -111,8 +112,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:docker": "SPARROW_ENV=development yarn run nodemon --watch package.json --watch webpack.config.js --exec 'yarn install && webpack serve'",
-    "dev": "SPARROW_ENV=local-development webpack serve",
+    "dev:docker": "SPARROW_ENV=development ./scripts/run-dev",
+    "dev": "SPARROW_ENV=local-development ./scripts/run-dev",
     "start": "webpack",
     "setup-workspace": "yarn dlx @yarnpkg/sdks vscode"
   },

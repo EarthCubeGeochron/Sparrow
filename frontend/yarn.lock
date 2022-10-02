@@ -1445,6 +1445,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@blueprintjs/core@npm:^4.8.0":
+  version: 4.10.2
+  resolution: "@blueprintjs/core@npm:4.10.2"
+  dependencies:
+    "@blueprintjs/colors": ^4.1.6
+    "@blueprintjs/icons": ^4.6.0
+    "@juggle/resize-observer": ^3.3.1
+    "@types/dom4": ^2.0.1
+    classnames: ^2.2
+    dom4: ^2.1.5
+    normalize.css: ^8.0.1
+    popper.js: ^1.16.1
+    react-popper: ^1.3.7
+    react-transition-group: ^4.4.1
+    tslib: ~2.3.1
+  peerDependencies:
+    "@types/react": ^16.14.2 || 17 || 18
+    react: ^16.8 || 17 || 18
+    react-dom: ^16.8 || 17 || 18
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  bin:
+    upgrade-blueprint-2.0.0-rename: scripts/upgrade-blueprint-2.0.0-rename.sh
+    upgrade-blueprint-3.0.0-rename: scripts/upgrade-blueprint-3.0.0-rename.sh
+  checksum: b4842394f2273de4db07f309837787f27d3f0bc8dded9ffe3151a257289a252fca443b0ee3bc5c6b33893770def047e8f29f4af17ac369d99aa3a286b3aaa753
+  languageName: node
+  linkType: hard
+
 "@blueprintjs/datetime@npm:^3.23.19":
   version: 3.24.1
   resolution: "@blueprintjs/datetime@npm:3.24.1"
@@ -1498,6 +1527,17 @@ __metadata:
     classnames: ^2.2
     tslib: ~2.3.1
   checksum: d532e0ef704398504e98d3513932a2db453922f7b67c5b2cef3aeb4a640ca1d6cf218d071cb622dcccbce758af5a82979c6918dbe9e050de245f58fb26c99ad9
+  languageName: node
+  linkType: hard
+
+"@blueprintjs/icons@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "@blueprintjs/icons@npm:4.6.0"
+  dependencies:
+    change-case: ^4.1.2
+    classnames: ^2.2
+    tslib: ~2.3.1
+  checksum: 057698d98739403b9a24ea114a6947842868979f5674d4a0a299a88a1f85893a7e09ce834541c1743e960c055f25af149a5b30362cc2ca17c02e01b0a448ddad
   languageName: node
   linkType: hard
 
@@ -1654,6 +1694,7 @@ __metadata:
     "@emotion/styled-base": 10
     "@loadable/component": ^5.10.2
     "@macrostrat/hyper": ^2.2.1
+    "@macrostrat/mapbox-react": ^1.0.4
     "@macrostrat/router-components": ^1.0.2
     "@macrostrat/ui-components": ^3.0.0-b8
     "@mapbox/mapbox-gl-draw": ^1.2.0
@@ -1693,6 +1734,7 @@ __metadata:
     mapbox-gl: ^2.0.1
     markdown-loader: ^8.0.0
     nodemon: ^2.0.15
+    pnp-webpack-plugin: ^1.7.0
     prettier: ^2.7.1
     prop-types: ^15.8.1
     react: ^17.0.2
@@ -3100,6 +3142,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@macrostrat/mapbox-react@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "@macrostrat/mapbox-react@npm:1.0.4"
+  dependencies:
+    "@blueprintjs/core": ^4.8.0
+    "@macrostrat/hyper": ^2.2.1
+    "@macrostrat/mapbox-utils": ^1.0.0
+    "@types/mapbox-gl": ^2.7.5
+    classnames: ^2.3.1
+    mapbox-gl: ^2.7.0
+    mapbox-gl-controls: ^2.3.5
+  peerDependencies:
+    react: ^16||^17||^18
+    react-dom: ^16||^17||^18
+  checksum: 62c778032924c84114ca088b0f6d674ea379b8f9cba880e67c1e9296da02042ff1076cd02831207151448e66c7389c6d94a9f84d95da202869f66c5073282476
+  languageName: node
+  linkType: hard
+
+"@macrostrat/mapbox-utils@npm:^1.0.0":
+  version: 1.1.1
+  resolution: "@macrostrat/mapbox-utils@npm:1.1.1"
+  dependencies:
+    "@types/mapbox-gl": ^2.7.5
+    axios: ^0.27.2
+    mapbox-gl: ^2.0.0
+  checksum: d7c94bc236b5e7ce20debe933a0a1f151b062f31b6e7f13e7c641b12aa48e8393a69660a5e7ef53533187809f8437ad8f0fce3ba186ebc72ffe9e5d6410b4a36
+  languageName: node
+  linkType: hard
+
 "@macrostrat/router-components@npm:^1.0.2":
   version: 1.0.2
   resolution: "@macrostrat/router-components@npm:1.0.2"
@@ -3348,7 +3419,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mapbox/mapbox-gl-supported@npm:^2.0.0":
+"@mapbox/mapbox-gl-supported@npm:^2.0.0, @mapbox/mapbox-gl-supported@npm:^2.0.1":
   version: 2.0.1
   resolution: "@mapbox/mapbox-gl-supported@npm:2.0.1"
   checksum: 1dffc96baacc56e34b09f2ae6ac4b2b8f10ad51a9d7c4946dc2057f456deeacd5d0729e340120857b3204a14d9961266f3218d26e101d46e81717954f1c129af
@@ -3378,7 +3449,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mapbox/tiny-sdf@npm:^2.0.2":
+"@mapbox/tiny-sdf@npm:^2.0.2, @mapbox/tiny-sdf@npm:^2.0.5":
   version: 2.0.5
   resolution: "@mapbox/tiny-sdf@npm:2.0.5"
   checksum: 23fd158ea795592cf1f825fcac20d48230c54a6985a931f609af8b4e69cd99f1c798dc893baec63f4fd6f42ffc3e7292b39f4126966412edd4606eb3dbf86b54
@@ -3960,6 +4031,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@turf/distance@npm:6.3.0":
+  version: 6.3.0
+  resolution: "@turf/distance@npm:6.3.0"
+  dependencies:
+    "@turf/helpers": ^6.3.0
+    "@turf/invariant": ^6.3.0
+  checksum: 1fdc32c44e154b15a65498e16c97d78dab601b81472c6a0c100e5b5750a08dc4ed48668d2484ab6b09d5aad0883ade7edbd2271831359f3e6127551c912679aa
+  languageName: node
+  linkType: hard
+
 "@turf/distance@npm:>=4.0.0, @turf/distance@npm:^6.5.0":
   version: 6.5.0
   resolution: "@turf/distance@npm:6.5.0"
@@ -3982,7 +4063,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/helpers@npm:6.x, @turf/helpers@npm:>=4.0.0, @turf/helpers@npm:^6.1.4, @turf/helpers@npm:^6.5.0":
+"@turf/helpers@npm:6.x, @turf/helpers@npm:>=4.0.0, @turf/helpers@npm:^6.1.4, @turf/helpers@npm:^6.3.0, @turf/helpers@npm:^6.5.0":
   version: 6.5.0
   resolution: "@turf/helpers@npm:6.5.0"
   checksum: d57f746351357838c654e0a9b98be3285a14b447504fd6d59753d90c6d437410bb24805d61c65b612827f07f6c2ade823bb7e56e41a1a946217abccfbd64c117
@@ -4000,7 +4081,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/invariant@npm:^6.5.0":
+"@turf/invariant@npm:^6.3.0, @turf/invariant@npm:^6.5.0":
   version: 6.5.0
   resolution: "@turf/invariant@npm:6.5.0"
   dependencies:
@@ -4371,6 +4452,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/hammerjs@npm:^2.0.41":
+  version: 2.0.41
+  resolution: "@types/hammerjs@npm:2.0.41"
+  checksum: d16fbd688fc9b18cc270abe8dea8d4c50ef7bd8375e593d92c233d299387933a6b003c8db69819344833052458bc5f9ef1b472001277a49f095928d184356006
+  languageName: node
+  linkType: hard
+
 "@types/hast@npm:^2.0.0":
   version: 2.3.4
   resolution: "@types/hast@npm:2.3.4"
@@ -4435,6 +4523,15 @@ __metadata:
   dependencies:
     "@types/geojson": "*"
   checksum: eb33e19aa8acde4ea34c6b3ea15fd5968c730004e8515550a1bb83688dc1960cfe3fbf37c5c121ad1f99da172ff1de959b8f35ed9b300897cb3807654b609a60
+  languageName: node
+  linkType: hard
+
+"@types/mapbox-gl@npm:^2.7.5":
+  version: 2.7.6
+  resolution: "@types/mapbox-gl@npm:2.7.6"
+  dependencies:
+    "@types/geojson": "*"
+  checksum: 7da0e9ad171172865740fa2abae9f3572ebe625ee2594cffb49f9676eaf7fd85cd78d19a511af4555147bb3a7bae0773c1d2d457cee496ca3f83f6f5de9ba296
   languageName: node
   linkType: hard
 
@@ -8164,7 +8261,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"earcut@npm:^2.1.5, earcut@npm:^2.2.3":
+"earcut@npm:^2.1.5, earcut@npm:^2.2.4":
+  version: 2.2.4
+  resolution: "earcut@npm:2.2.4"
+  checksum: aea0466cb2f24e0c3c57148d8d28ac9846f53c4f43ee66780826474303ac851b305ef988152d0bdeb31e8f7ca939dc0df737e7505cfb1c1bdf2ff9d7f9ea2faa
+  languageName: node
+  linkType: hard
+
+"earcut@npm:^2.2.3":
   version: 2.2.3
   resolution: "earcut@npm:2.2.3"
   checksum: 4e3bab80366c49e0332a0bb061649a3b9354dcbfa636155c7eee250be0670d7139d53f2aebbcf90788507c71b76ec1713c20e36527f202b9abb79c9e5858ec35
@@ -9469,7 +9573,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gl-matrix@npm:^3.0.0, gl-matrix@npm:^3.2.0, gl-matrix@npm:^3.3.0":
+"gl-matrix@npm:^3.0.0, gl-matrix@npm:^3.2.0, gl-matrix@npm:^3.3.0, gl-matrix@npm:^3.4.3":
   version: 3.4.3
   resolution: "gl-matrix@npm:3.4.3"
   checksum: c47830ba727f3d0fab635c48135af96aef66274079a3e0afd6f68b68c98eae9fc1bcfdc7312fe2301e4fd22dd24c5e0f1b5d025960a208e50d07101ed8d940f9
@@ -11878,6 +11982,47 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mapbox-gl-controls@npm:^2.3.5":
+  version: 2.3.5
+  resolution: "mapbox-gl-controls@npm:2.3.5"
+  dependencies:
+    "@turf/distance": 6.3.0
+  peerDependencies:
+    mapbox-gl: ">=1.0.0 <3.0.0"
+  checksum: 740293e30b931bd86151c84d56c46e8f74316654ab2f7fc286fbcedee4248ceef49578ae41bdb58a8ab9f9eaceab5314d830eb13611d84facf0679867f0b9365
+  languageName: node
+  linkType: hard
+
+"mapbox-gl@npm:^2.0.0, mapbox-gl@npm:^2.7.0":
+  version: 2.10.0
+  resolution: "mapbox-gl@npm:2.10.0"
+  dependencies:
+    "@mapbox/geojson-rewind": ^0.5.1
+    "@mapbox/geojson-types": ^1.0.2
+    "@mapbox/jsonlint-lines-primitives": ^2.0.2
+    "@mapbox/mapbox-gl-supported": ^2.0.1
+    "@mapbox/point-geometry": ^0.1.0
+    "@mapbox/tiny-sdf": ^2.0.5
+    "@mapbox/unitbezier": ^0.0.0
+    "@mapbox/vector-tile": ^1.3.1
+    "@mapbox/whoots-js": ^3.1.0
+    csscolorparser: ~1.0.3
+    earcut: ^2.2.4
+    geojson-vt: ^3.2.1
+    gl-matrix: ^3.4.3
+    grid-index: ^1.1.0
+    murmurhash-js: ^1.0.0
+    pbf: ^3.2.1
+    potpack: ^1.0.2
+    quickselect: ^2.0.0
+    rw: ^1.3.3
+    supercluster: ^7.1.4
+    tinyqueue: ^2.0.3
+    vt-pbf: ^3.1.3
+  checksum: e96230b5695a79bb83241028e25ef3c562beffd9c60ac68c78a5fe3f021d1b51e314b43a8c95d4b73da8ef97ac6386b3489319164740e3b84e8188ee3cad8ed9
+  languageName: node
+  linkType: hard
+
 "mapbox-gl@npm:^2.0.1":
   version: 2.8.2
   resolution: "mapbox-gl@npm:2.8.2"
@@ -12377,7 +12522,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mjolnir.js@npm:^2.2.0, mjolnir.js@npm:^2.4.0":
+"mjolnir.js@npm:^2.2.0":
+  version: 2.7.1
+  resolution: "mjolnir.js@npm:2.7.1"
+  dependencies:
+    "@types/hammerjs": ^2.0.41
+    hammerjs: ^2.0.8
+  checksum: 41a8e4d28e9f10ff411a6ca5e67eb35961faea5d284350bc54551a9fd44044e9001b1296c0aef938e6bac6efc7e0d53cf75caa6871e443f87467da788b31e64b
+  languageName: node
+  linkType: hard
+
+"mjolnir.js@npm:^2.4.0":
   version: 2.6.0
   resolution: "mjolnir.js@npm:2.6.0"
   dependencies:
@@ -13601,6 +13756,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pnp-webpack-plugin@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "pnp-webpack-plugin@npm:1.7.0"
+  dependencies:
+    ts-pnp: ^1.1.6
+  checksum: a41716d13607be5a3e06ba58b17e9e619cf07da3a0a7b10bd41cd89362873041054fd2b7966ad30a1b26b826cfb8fecc0469a95902d5b1b8ba8f591e2fe6b96d
+  languageName: node
+  linkType: hard
+
 "polygon-clipping@npm:^0.15.3":
   version: 0.15.3
   resolution: "polygon-clipping@npm:0.15.3"
@@ -13692,7 +13856,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"potpack@npm:^1.0.1":
+"potpack@npm:^1.0.1, potpack@npm:^1.0.2":
   version: 1.0.2
   resolution: "potpack@npm:1.0.2"
   checksum: 9dfdbbce012ce80842249abcdd89e20222eb8ae96beba8d578b7e41e78feefc7e33b5c72d46fb8dd3a1e382cb4da9c34574764d88aa8849ab36f542fd2088b42
@@ -14677,12 +14841,12 @@ __metadata:
   linkType: hard
 
 "react-virtualized-auto-sizer@npm:^1.0.2":
-  version: 1.0.6
-  resolution: "react-virtualized-auto-sizer@npm:1.0.6"
+  version: 1.0.7
+  resolution: "react-virtualized-auto-sizer@npm:1.0.7"
   peerDependencies:
-    react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0
-    react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0
-  checksum: 81270e9d328e9b779515f42b6aa8dea2f21097f69fc776906d6b7d31ada03706d34408a6318baf59531f180402fbf74fdb9928ab65d53442a134b7ee5ba01265
+    react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc
+    react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc
+  checksum: 7f2f013c422771828c6613c7890f792aa90a033ea2b41c489c67ca2c6793eefa94d25232c1050fdf69cdd626fad9e3821c5003d45fa6fc831184cd09232023c2
   languageName: node
   linkType: hard
 
@@ -17058,6 +17222,16 @@ __metadata:
   version: 1.0.5
   resolution: "trough@npm:1.0.5"
   checksum: d6c8564903ed00e5258bab92134b020724dbbe83148dc72e4bf6306c03ed8843efa1bcc773fa62410dd89161ecb067432dd5916501793508a9506cacbc408e25
+  languageName: node
+  linkType: hard
+
+"ts-pnp@npm:^1.1.6":
+  version: 1.2.0
+  resolution: "ts-pnp@npm:1.2.0"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: c2a698b85d521298fe6f2435fbf2d3dc5834b423ea25abd321805ead3f399dbeedce7ca09492d7eb005b9d2c009c6b9587055bc3ab273dc6b9e40eefd7edb5b2
   languageName: node
   linkType: hard
 
