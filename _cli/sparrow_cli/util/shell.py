@@ -96,17 +96,23 @@ def exec_sparrow(*args, **kwargs):
     return exec_or_run("backend", "python -m sparrow.core", *args, **kwargs)
 
 
-def fail_without_docker_command():
-    failure = False
+def has_command(command):
     try:
-        res = cmd("which docker", check=True, stdout=PIPE)
-        failure = res.returncode != 0
+        res = cmd(f"which {command}", check=True, stdout=PIPE)
+        return res.returncode == 0
     except CalledProcessError:
-        failure = True
-    if failure:
+        return False
+
+
+def fail_without_command(command):
+    if not has_command(command):
         raise SparrowCommandError(
-            "Cannot find the docker command. Is docker installed?"
+            f"Cannot find the {command} command. Is it installed?"
         )
+
+
+def fail_without_docker_command():
+    fail_without_command("docker")
 
 
 def fail_without_docker_running():

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+export NODE_ENV=development
+export SPARROW_ENV=${SPARROW_ENV:-"local-development"}
+
+nodemon \
+  --watch package.json \
+  --watch webpack.config.js \
+  --watch yarn.lock \
+  --exec 'yarn install && webpack serve'

@@ -6,9 +6,10 @@ import {
 import join from "url-join";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useCallback, useContext, useState } from "react";
+import { apiBaseURL } from "./env";
 
 export const APIV2Context = createAPIContext({
-  baseURL: join(process.env.API_BASE_URL ?? "/", "/api/v2"),
+  baseURL: join(apiBaseURL, "/api/v2"),
 });
 
 export function useAPIv2Result(
@@ -22,7 +23,7 @@ export function useAPIv2Result(
 }
 
 export const APIV3Context = createAPIContext({
-  baseURL: join(process.env.API_BASE_URL ?? "/", "/api/v3"),
+  baseURL: join(apiBaseURL, "/api/v3"),
 });
 
 export function useAPIv3Result(

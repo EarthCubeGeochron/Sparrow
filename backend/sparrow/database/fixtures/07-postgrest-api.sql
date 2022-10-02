@@ -67,7 +67,7 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
       material,
       -- Get the geometry in vector-tile integer coordinates
       -- Snapping to a grid allows us to group nearby points together
-      ST_SnapToGrid(ST_AsMVTGeom(geometry, (SELECT envelope FROM tile_loc)), 4, 4) geometry
+      ST_SnapToGrid(ST_AsMVTGeom(geometry, (SELECT envelope FROM tile_loc)), 8, 8) geometry
     FROM tile_features
   ),
   grouped_features AS (
@@ -75,17 +75,17 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
       geometry,
       count(*) n,
       CASE WHEN count(*) < 10 THEN
-        array_agg(id)
+        array_agg(id)::text
       ELSE
         null
       END id,
       CASE WHEN count(*) < 10 THEN
-        array_agg(name)
+        array_agg(name)::text
       ELSE
         null
       END AS name,
       CASE WHEN count(*) < 10 THEN
-        array_agg(material)
+        array_agg(material)::text
       ELSE
         null
       END material

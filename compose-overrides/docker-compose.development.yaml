@@ -16,6 +16,8 @@ services:
       - ./frontend/packages:/app/packages
       - ./frontend/plugins:/app/plugins
       - ./frontend/static:/app/static
+      - ./frontend/package.json:/app/package.json:ro
+      - ./frontend/yarn.lock:/app/yarn.lock:ro
       # Keep node_modules in a volume to speed up rebuilding
       - frontend_yarn_cache:/app/.yarn/cache
 volumes:
