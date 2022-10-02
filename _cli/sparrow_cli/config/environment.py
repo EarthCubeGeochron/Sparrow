@@ -44,7 +44,7 @@ def prepare_docker_environment():
     environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
 
 
-def prepare_compose_overrides() -> List[Message]:
+def prepare_compose_overrides(cfg) -> List[Message]:
     base = environ["SPARROW_PATH"]
     main = relative_path(base, "docker-compose.yaml")
 
@@ -68,6 +68,9 @@ def prepare_compose_overrides() -> List[Message]:
         profiles.append("production")
     if is_truthy("SPARROW_TASK_WORKER"):
         profiles.append("task-worker")
+
+    if cfg.local_frontend:
+        profiles.remove("frontend")
 
     if len(profiles) > 0:
         # Only override profiles if they don't already exist in configuration.
