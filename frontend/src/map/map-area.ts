@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
-import MapGl, { FlyToInterpolator, Marker, Source, Layer } from "react-map-gl";
+import MapGl, { Marker } from "react-map-gl";
 import h, { compose } from "@macrostrat/hyper";
 import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
@@ -34,11 +34,6 @@ interface MapProps {
 export function _MapArea({
   on_map,
   hide_filter = false,
-  width = "50vw",
-  height = "500px",
-  latitude = 0,
-  longitude = 0,
-  zoom = 0.5,
   login = false,
   style,
 }: MapProps) {
@@ -55,18 +50,6 @@ export function _MapArea({
   useEffect(() => {
     setState((prevState) => ({ ...prevState, style }));
   }, [style]);
-
-  //changeStateOnParams(params, setData);
-
-  const initialViewport = {
-    latitude,
-    longitude,
-    zoom,
-    width,
-    height,
-    transitionInterpolator: null,
-    transitionDuration: null,
-  };
 
   const [state, setState] = useState(initialState);
   const [resolvedStyle, setResolvedStyle] = useState(null);
@@ -92,9 +75,11 @@ export function _MapArea({
             ["exponential", 1.2],
             ["get", "n"],
             1,
-            2,
-            20,
+            4,
             8,
+            8,
+            20,
+            12,
           ],
           "circle-color": "#ff0000",
           "circle-opacity": 0.5,
