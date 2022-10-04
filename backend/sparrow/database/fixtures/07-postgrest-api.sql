@@ -66,31 +66,56 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
       name,
       material,
       -- Get the geometry in vector-tile integer coordinates
-      -- Snapping to a grid allows us to group nearby points together
-      ST_SnapToGrid(ST_AsMVTGeom(geometry, (SELECT envelope FROM tile_loc)), 8, 8) geometry
+      ST_AsMVTGeom(geometry, (SELECT envelope FROM tile_loc)) geometry
     FROM tile_features
+  ),
+  snapped_features AS (
+    SELECT
+      id,
+      name,
+      material,
+      geometry,
+      -- Snapping to a grid allows us to efficiently group nearby points together
+      -- We could also use the ST_ClusterDBSCAN function for a less naive implementation
+      ST_SnapToGrid(geometry, 8, 8) snapped_geometry,
+      --ST_ClusterDBSCAN(geometry, 16, 2) OVER () cluster_id
+    FROM mvt_features
   ),
   grouped_features AS (
     SELECT
-      geometry,
+      -- Get cluster expansion zoom level
+      tile_utils.cluster_expansion_zoom(ST_Collect(geometry), z) expansion_zoom,
+      snapped_geometry geometry,
       count(*) n,
       CASE WHEN count(*) < 10 THEN
-        array_agg(id)::text
+        string_agg(id::text, ',')
       ELSE
         null
       END id,
       CASE WHEN count(*) < 10 THEN
-        array_agg(name)::text
+        string_agg(replace(name, ',', ';'), ',')
       ELSE
         null
       END AS name,
       CASE WHEN count(*) < 10 THEN
-        array_agg(material)::text
+        string_agg(material, ',')
       ELSE
         null
       END material
-    FROM mvt_features
-    GROUP BY geometry
+    FROM snapped_features
+    GROUP BY snapped_geometry
+    -- WHERE cluster_id IS NOT NULL
+    -- GROUP BY cluster_id
+    -- UNION ALL
+    -- SELECT
+    --   null,
+    --   geometry,
+    --   1 n,
+    --   id::text,
+    --   name,
+    --   material
+    -- FROM snapped_features
+    --WHERE cluster_id IS NULL
   )
   SELECT ST_AsMVT(grouped_features)
   FROM grouped_features;

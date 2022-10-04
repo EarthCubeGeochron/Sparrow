@@ -1,18 +1,25 @@
 from enum import Enum
 from decimal import Decimal
-from typing import List
-from .base import Datum, DataModel
+from typing import List, Optional
+
+from .base import DataModel
 
 
-class Age(Datum):
-    unit = "Myr"
+class NumericDatum(DataModel):
+    value: Decimal
+    error: Optional[Decimal] = None
+    unit: str
+
+
+class Age(NumericDatum):
+    unit = "Ma"
 
 
 class DecaySystem(str, Enum):
-    _207Pb_235U = "207Pb_235U"
-    _206Pb_238U = "207Pb_238U"
-    _206Pb_207Pb = "206Pb_207Pb"
-    _208Pb_232Th = "208Pb_232Th"
+    _207PB_235U = "207Pb_235U"
+    _206PB_238U = "207Pb_238U"
+    _206PB_207PB = "206Pb_207Pb"
+    _208PB_232TH = "208Pb_232Th"
 
 
 class UPbAge(Age):
