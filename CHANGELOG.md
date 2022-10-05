@@ -13,6 +13,10 @@ and this project is working towards adherence to
 - Removed a lot of unnecessary older packages in the Python server installation
 - Move documentation website to a separate code repository
 
+## `[2.5.5]` - 2022-10-04
+
+- Add missing defaults for backup scheduling and database selection
+
 ## `[2.5.4]` - 2022-09-20
 
 - Fix a Yarn compilation bug introduced by node v16.17

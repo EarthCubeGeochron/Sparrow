@@ -7,6 +7,13 @@ get_release() {
     sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
 }
 
+get_latest_prerelease() {
+  curl --silent "https://api.github.com/repos/$1/releases" | # Get latest release from GitHub api
+    grep '"tag_name":' |  # Get tag line
+    sed -E 's/.*"([^"]+)".*/\1/' |  # Pluck JSON value
+    head -n 1
+}
+
 line() {
   >&2 printf -- "$1\n"
 }
@@ -39,6 +46,14 @@ if [ "$1" == "--no-confirm" ]; then
   shift
 fi
 
+# Check whether we should install prereleases
+if [ "$1" == "--prerelease" ]; then
+  prerelease=1
+  shift
+else
+  prerelease=0
+fi
+
 repo_name=EarthCubeGeochron/Sparrow
 
 platform=$(uname -s)
@@ -53,7 +68,13 @@ release="$1"
 local_install=0
 if [ -z $release ]; then
   header "Finding latest Sparrow release"
-  release=$(get_release $repo_name latest)
+  # Check if prereleases are allowed
+  if [ $prerelease -eq 1 ]; then
+    detail "Prereleases allowed"
+    release=$(get_latest_prerelease $repo_name)
+  else
+    release=$(get_release $repo_name latest)
+  fi
   detail "found release $release"
 elif [ -d $release ]; then
   detail "Installing local file $release"
