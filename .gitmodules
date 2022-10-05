@@ -10,3 +10,6 @@
 [submodule "deps/postgis-tile-utils"]
 	path = backend/deps/postgis-tile-utils
 	url = https://github.com/UW-Macrostrat/postgis-tile-utils.git
+[submodule "deps/weaver"]
+	path = deps/weaver
+	url = https://github.com/digitalcrust/weaver.git
