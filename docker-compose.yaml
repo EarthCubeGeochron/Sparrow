@@ -205,6 +205,9 @@ services:
       - DB_BACKUP_VOLUME=/local-backups
       # The unique-ish identifier of the lab (used to prefix backups)
       - DB_BACKUP_PREFIX=${SPARROW_LAB_ID:-""}
+      - POSTGRES_DB=sparrow
+      # Go-cron syntax for backup schedule
+      - SCHEDULE=${SPARROW_BACKUP_SCHEDULE:-@daily}
     tty: true
     command: backup-service
     depends_on:

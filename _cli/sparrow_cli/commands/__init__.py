@@ -9,13 +9,14 @@ from .attach import sparrow_attach
 from .tasks import tasks
 from .logs import sparrow_logs
 from .up import sparrow_up
-from .update import sparrow_update
+from .update import sparrow_update, sparrow_upgrade
 
 _commands = {
     "db": sparrow_db,
     "docs": sparrow_docs,
     "up": sparrow_up,
     "update": sparrow_update,
+    "upgrade": sparrow_upgrade,
     "test": sparrow_test,
     "build": sparrow_build,
     "attach": sparrow_attach,
