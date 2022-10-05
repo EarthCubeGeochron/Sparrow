@@ -1,6 +1,7 @@
 let path = require("path");
 const { EnvironmentPlugin } = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { symlinkSync } = require("fs");
 
 const environment = process.env.SPARROW_ENV || "production";
 
@@ -35,19 +36,11 @@ let fontLoader = {
   options: { name: "fonts/[name].[ext]" },
 };
 
-const cssModuleLoader = {
-  loader: "css-loader",
-  options: {
-    /* CSS Module support with local scope by default
-       This means that module support needs to be explicitly turned
-       off with a `:global` flag
-    */
-    modules: {
-      mode: "local",
-      localIdentName: "[path][name]__[local]--[hash:base64:5]",
-    },
-  },
-};
+// Link site content into frontend cache directory
+const siteContent =
+  process.env.SPARROW_SITE_CONTENT || relativePath("default-content");
+let contentDir = relativePath(".yarn/cache/site-content");
+symlinkSync(siteContent, contentDir, "dir");
 
 // Remember that, counterintuitively, loaders load bottom-to-top
 const styleRules = [
@@ -62,7 +55,19 @@ const styleRules = [
       // Match css modules (.module.(css|styl) files)
       {
         test: /\.?module\.(css|styl)$/,
-        use: cssModuleLoader,
+        use: {
+          loader: "css-loader",
+          options: {
+            /* CSS Module support with local scope by default
+       This means that module support needs to be explicitly turned
+       off with a `:global` flag
+    */
+            modules: {
+              mode: "local",
+              localIdentName: "[path][name]__[local]--[hash:base64:5]",
+            },
+          },
+        },
         exclude: /node_modules/,
       },
       {
@@ -75,28 +80,38 @@ const styleRules = [
   { test: /\.styl$/, use: "stylus-relative-loader" },
 ];
 
-let baseConfig = {
-  mode,
-  devServer: {
-    compress: false,
-    // Important for docker.
-    host: "0.0.0.0",
-    port: 3000,
-    hot: true,
-    // Only try to open a browser if we're not running in Docker.
-    open: environment == "local-development",
-    historyApiFallback: true,
-    // Make hot-reload listener look for a web server at the same proxy address
-    // as the rest of the app.
+let devServer = {
+  compress: false,
+  port: 3000,
+  hot: true,
+  // Don't try to open a browser window
+  open: false,
+  historyApiFallback: true,
+};
+
+if (environment != "local-development") {
+  // Prepare for docker
+  // Make hot-reload listener look for a web server at the same proxy address
+  // as the rest of the app.
+  devServer = {
+    ...devServer,
     client: {
       webSocketURL: `ws://${devDomain}/ws`,
     },
-  },
+    // Docker host needs to be able to access the served app
+    host: "0.0.0.0",
+  };
+}
+
+let baseConfig = {
+  mode,
+  devServer,
   // Might be useful for docker?
   // watchOptions: {
   //   aggregateTimeout: 300,
   //   poll: 1000,
   // },
+  // Resolve local PNP modules
   module: {
     rules: [
       ...styleRules,
@@ -147,11 +162,12 @@ let baseConfig = {
       app: srcRoot,
       sparrow: path.resolve(srcRoot),
       plugins: relativePath("plugins/"),
-      "site-content":
-        process.env.SPARROW_SITE_CONTENT || relativePath("default-content"),
+      "site-content": contentDir,
       // For node module resolution + hooks
       //react: relativePath("node_modules", "react"),
     },
+    // Allow us to resolve site-content plugin directory
+    symlinks: false,
     fallback: { path: false, process: false },
   },
   entry: {
@@ -189,9 +205,10 @@ let baseConfig = {
   ],
 };
 
-if (environment == "development") {
-  console.log(`Running frontend at ${devDomain}`);
-  baseConfig.watch = true;
-}
+console.log(`Running frontend at ${devDomain}`);
+
+// if (environment == "development" || environment == "local-development") {
+//   baseConfig.watch = true;
+// }
 
 module.exports = baseConfig;

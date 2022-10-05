@@ -2,6 +2,7 @@ CREATE ROLE admin;
 CREATE ROLE view_public;
 
 -- Lock down core tables
+
 ALTER TABLE datum ENABLE ROW LEVEL SECURITY;
 ALTER TABLE analysis ENABLE ROW LEVEL SECURITY;
 ALTER TABLE session ENABLE ROW LEVEL SECURITY;
@@ -34,6 +35,7 @@ USING (true);
 CREATE POLICY admin_all
 ON project TO admin
 USING (true);
+
 
 /* Public embargo policies */
 DROP POLICY IF EXISTS public_embargo ON datum;
@@ -85,3 +87,4 @@ GRANT SELECT ON analysis TO view_public;
 GRANT SELECT ON session TO view_public;
 GRANT SELECT ON sample TO view_public;
 GRANT SELECT ON project TO view_public;
+

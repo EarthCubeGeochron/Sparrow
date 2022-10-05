@@ -140,10 +140,8 @@ services:
       - PGRST_DB_SCHEMAS=sparrow_api
       - PGRST_DB_ANON_ROLE=postgres
       - PGRST_DB_MAX_ROWS=1000
-    ports:
-      - 3000:3000
     profiles:
-      - frontend
+      - core
     depends_on:
       gateway:
         condition: service_started
@@ -171,17 +169,14 @@ services:
       - MAPBOX_API_TOKEN
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container
-      - SPARROW_SITE_CONTENT=/app/site-content
+      - SPARROW_SITE_CONTENT=/site-content
       - SPARROW_FRONTEND_BUILD_DIR=/build
       - SPARROW_ENV
     volumes:
       - frontend_build:/build
       # Right now, we configure default site content
       # rather than allowing any customization
-      - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/app/site-content
-      # A folder for node modules that will be resolved preferentially
-      # instead of the main node_modules packages.
-      - ${SPARROW_FRONTEND_MODULES:-placeholder}:/app/_local_modules:ro
+      - ${SPARROW_SITE_CONTENT:-./frontend/default-content}:/site-content:ro
   # API TESTS container is disabled for now
   # api-tests:
   #   build: api-tests
@@ -210,6 +205,9 @@ services:
       - DB_BACKUP_VOLUME=/local-backups
       # The unique-ish identifier of the lab (used to prefix backups)
       - DB_BACKUP_PREFIX=${SPARROW_LAB_ID:-""}
+      - POSTGRES_DB=sparrow
+      # Go-cron syntax for backup schedule
+      - SCHEDULE=${SPARROW_BACKUP_SCHEDULE:-@daily}
     tty: true
     command: backup-service
     depends_on:

@@ -194,7 +194,7 @@ def _db_drop_cache(db):
 @with_database
 @click.option("--dry-run", is_flag=True, default=False)
 def db_update(db, dry_run=False):
-    setup_stderr_logs(level=INFO)
+    setup_stderr_logs("sparrow", "macrostrat.dinosaur", level=INFO)
     db.update_schema(dry_run=True, apply=not dry_run)
 
 

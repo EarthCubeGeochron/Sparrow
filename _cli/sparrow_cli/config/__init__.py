@@ -9,12 +9,20 @@ from macrostrat.utils.logs import get_logger, setup_stderr_logs
 from pydantic import BaseModel
 from enum import Enum
 
-from .environment import prepare_docker_environment, prepare_compose_overrides
+from .environment import (
+    is_truthy,
+    prepare_docker_environment,
+    prepare_compose_overrides,
+)
 from .version_info import SparrowVersionMatch, test_version
 from .command_cache import get_backend_command_help, CommandDataSource
 from .file_loader import load_config_file
 from ..util.exceptions import SparrowCommandError
-from ..util.shell import fail_without_docker_command, fail_without_docker_running
+from ..util.shell import (
+    fail_without_docker_command,
+    has_command,
+    fail_without_docker_running,
+)
 from .models import Message, Level
 from ..upgrade_database import check_database_cluster_version, version_images
 
@@ -43,10 +51,15 @@ class SparrowConfig:
     postgres_supported_version: int = 14
     postgres_current_version: int = None
 
+    # Whether we will try to run the frontend locally
+    local_frontend: bool = False
+
     def __init__(self, verbose=False, offline=False):
         self.verbose = verbose
         self.offline = offline
         self.messages = []
+
+        # Important: define if we're running under pyinstaller.
         self.is_frozen = getattr(sys, "frozen", False)
         if self.is_frozen:
             self.bundle_dir = Path(sys._MEIPASS)
@@ -111,6 +124,7 @@ class SparrowConfig:
             )
 
         self.project_name = self.infer_project_name()
+        self.local_frontend = self.configure_local_frontend()
 
         # Check database version
         self.check_database_version()
@@ -146,7 +160,7 @@ class SparrowConfig:
                 level=Level.WARNING,
             )
         else:
-            self.messages += prepare_compose_overrides()
+            self.messages += prepare_compose_overrides(self)
 
     def _setup_command_path(self):
         _bin = self.SPARROW_PATH / "_cli" / "bin"
@@ -241,6 +255,26 @@ class SparrowConfig:
                 level=Level.ERROR,
             )
         self.docker_available = True
+
+    def configure_local_frontend(self):
+        # If we are running a local frontend
+        _local_frontend = is_truthy("SPARROW_LOCAL_FRONTEND")
+        # Check for yarn
+        if not _local_frontend:
+            return False
+        if not has_command("node"):
+            self.add_message(
+                "Cannot run frontend locally without [bold]node[/bold] available.",
+                level=Level.ERROR,
+            )
+            _local_frontend = False
+        if self.is_frozen:
+            self.add_message(
+                "Cannot run frontend locally in a frozen environment.",
+                level=Level.ERROR,
+            )
+            _local_frontend = False
+        return _local_frontend
 
     def check_database_version(self):
         cluster_volume_name = self.project_name + "_db_cluster"

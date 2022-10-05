@@ -137,10 +137,18 @@ jobs:
         with:
           name: sparrow-Darwin-x86_64.tar.gz
 
-      - name: Get the version
+      - name: Get version information and set prerelease status
         id: get-version
-        run: echo ::set-output name=tag_name::${GITHUB_REF/refs\/tags\//}
-
+        run: |
+          echo ::set-output name=tag_name::${GITHUB_REF/refs\/tags\//}
+          if ${{ contains(github.ref, '.beta') || contains(github.ref, '.dev') || contains(github.ref, '.rc') }} ; then
+            echo ::set-output name=is_prerelease::true
+            echo ::set-output name=prerelease_text::Since this is a prerelease, the you must install it specifically
+          else
+            echo ::set-output name=is_prerelease::false
+            echo ::set-output name=prerelease_text::If you want to install this release specifically, you can add it to the above command
+          fi
+          
       # We create the release only if things work both on Linux and Darwin
       # Note: see https://github.com/overhangio/tutor/releases for a well-developed release schedule
       - name: Create release
@@ -151,19 +159,24 @@ jobs:
           tag_name: ${{ steps.get-version.outputs.tag_name }}
           name: Sparrow ${{ steps.get-version.outputs.tag_name }}
           draft: false
-          prerelease: false
+          # Set prerelease status based on tag name
+          prerelease: ${{ steps.get-version.outputs.is_prerelease }}
           fail_on_unmatched_files: true
-          body: |
+          body: |          
             The latest release of Sparrow can be installed using the following command:
             ```
             bash -c "$(curl -fsSL https://sparrow-data.org/get-sparrow.sh)"
             ```
+            
+            If you are already running Sparrow version `2.1.0` or above, an in-place upgrade is possible:
+            ```sparrow update```
 
-            - If you want to install this release specifically, you can add it to the above command, like so: `bash -c $(...) - ${{ steps.get-version.outputs.tag_name }}`.
-            - You can also download the [`get-sparrow.sh` script](https://github.com/EarthCubeGeochron/Sparrow/blob/HEAD/get-sparrow.sh)
-              manually and run it using `bash get-sparrow.sh` or `bash get-sparrow.sh ${{ steps.get-version.outputs.tag_name }}`.
-            - For complete control over the installation process, you can manually review the [`get-sparrow.sh` script](https://github.com/EarthCubeGeochron/Sparrow/blob/HEAD/get-sparrow.sh)
-              and run the download and installation steps yourself.
+            ${{ steps.get-version.outputs.prerelease_text }}, like so: `bash -c $(...) - ${{ steps.get-version.outputs.tag_name }}`.
+
+            ## Advanced installation
+
+            - You can download the [`get-sparrow.sh`](https://github.com/EarthCubeGeochron/Sparrow/blob/HEAD/get-sparrow.sh) script manually and run it using `bash get-sparrow.sh` or `bash get-sparrow.sh ${{ steps.get-version.outputs.tag_name }}`.
+            - For complete control over the installation process, you can manually review the [`get-sparrow.sh` script](https://github.com/EarthCubeGeochron/Sparrow/blob/HEAD/get-sparrow.sh) and run the download and installation steps yourself.
 
             See the [Getting started documentation](https://sparrow-data.org/docs/getting-started) for more information on how to set up Sparrow.
           files: |

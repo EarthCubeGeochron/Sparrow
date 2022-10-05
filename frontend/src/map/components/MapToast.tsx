@@ -14,7 +14,7 @@ import { useAPIResult, APIHelpers } from "@macrostrat/ui-components";
 import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { useToggle, MySuggest } from "~/components";
 import { GeoContext } from "~/model-views/components";
-import { mapStyle } from "../MapStyle";
+import { mapStyle } from "./macrostrat-map-style";
 import axios from "axios";
 
 const unwrapSamples = (obj) => {
