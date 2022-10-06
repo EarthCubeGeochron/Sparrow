@@ -1,53 +1,53 @@
-from marshmallow_sqlalchemy import exceptions
-
+from typing import List
+from macrostrat.database.mapper.utils import ModelCollection
+from marshmallow.utils import RAISE
+from .interface import model_interface, InterfaceCollection
 from .schema import ModelSchema, BaseMeta
-from .util import to_schema_name
 
-from macrostrat.database.mapper.utils import ModelCollection, classname_for_table
-from macrostrat.utils import get_logger
-
-log = get_logger(__name__)
+from .schema_checking import get_automap_base, get_model
+from .display import print_key
 
 
-def model_interface(model, session=None) -> ModelSchema:
-    """
-    Create a Marshmallow interface to a SQLAlchemy model
-    """
-    # Create a meta class
-    metacls = type(
-        "Meta",
-        (BaseMeta,),
-        dict(
-            model=model,
-            sqla_session=session,
-            load_instance=True,
-            include_relationships=True,
-        ),
-    )
-
-    schema_name = to_schema_name(model.__name__)
-    try:
-        # All conversion logic comes from ModelSchema
-        return type(schema_name, (ModelSchema,), {"Meta": metacls})
-    except exceptions.ModelConversionError as err:
-        log.error(type(err).__name__ + ": " + schema_name + " - " + str(err))
-        return None
+def get_cached_models():
+    """Get a collection of all Sparrow database models available for importing"""
+    base = get_automap_base()
+    return ModelCollection(base.classes)
 
 
-class InterfaceCollection(ModelCollection):
-    def register(self, *classes):
-        for cls in classes:
-            # Don't build model for spatial_ref_sys PostGIS table
-            # TODO: we could probably generalize this.
-            if cls.__table__.name == "spatial_ref_sys":
-                continue
-            if cls.__table__.schema == "enum":
-                continue
-            self._register_model(cls)
+def get_all_loader_schemas():
+    """Get a collection of all Sparrow database loader schemas"""
+    models = get_cached_models()
+    coll = InterfaceCollection(models)
+    return coll
 
-    def _register_model(self, cls):
-        k = classname_for_table(cls.__table__)
-        # Bail if we have a view
-        if not hasattr(cls, "__mapper__"):
-            return
-        self.add(k, model_interface(cls))
+
+def get_loader_schema(name):
+    """Get the loader schema for a Sparrow database model"""
+    return getattr(get_all_loader_schemas(), name)
+
+
+def validate_data(model_name, data):
+    """Check a dictionary of data against a Sparrow database model"""
+
+    interface = get_loader_schema(model_name)
+    return interface(transient=True).load(data, unknown=RAISE)
+
+
+def show_loader_schemas(*schemas: List[str], nest_depth=0):
+    """Print the loader schema for a Sparrow database model"""
+    models = get_cached_models()
+    coll = InterfaceCollection(models)
+
+    if len(schemas) == 0:
+        schemas = coll.keys()
+
+    for name in schemas:
+        schema = getattr(coll, name)
+        schema().pretty_print(nested=nest_depth, model_alias=name)
+        print()
+    print_key()
+
+
+def show_loader_schema(schema: str, nest_depth=0):
+    """Print the loader schema for a Sparrow database model"""
+    show_loader_schemas(schema, nest_depth=nest_depth)

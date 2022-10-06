@@ -1,6 +1,8 @@
 from stringcase import pascalcase
-#from marshmallow_sqlalchemy.fields import get_primary_keys
+
+# from marshmallow_sqlalchemy.fields import get_primary_keys
 from macrostrat.database.mapper.utils import primary_key
+from sqlalchemy.ext.automap import generate_relationship
 
 
 def column_is_required(col):
@@ -42,3 +44,19 @@ def pk_data(model, data):
 def is_pk_defined(instance):
     vals = pk_values(instance)
     return all([v is not None for v in vals])
+
+
+# Copied from sparrow.database.mapper, for now
+def _gen_relationship(
+    base, direction, return_fn, attrname, local_cls, referred_cls, **kw
+):
+    support_schemas = ["vocabulary", "core_view"]
+    if (
+        local_cls.__table__.schema in support_schemas
+        and referred_cls.__table__.schema is None
+    ):
+        # Don't create relationships on vocabulary and core_view models back to the main schema
+        return
+    return generate_relationship(
+        base, direction, return_fn, attrname, local_cls, referred_cls, **kw
+    )

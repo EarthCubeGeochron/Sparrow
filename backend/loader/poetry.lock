@@ -103,37 +103,32 @@ tests = ["pytest", "pytz", "simplejson"]
 
 [[package]]
 name = "marshmallow-jsonschema"
-version = "0.13.0"
-description = "JSON Schema Draft v7 (http://json-schema.org/) formatting with marshmallow"
+version = "0.10.0"
+description = "JSON Schema Draft v4 (http://json-schema.org/) formatting with marshmallow"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+marshmallow = ">=2.9.0"
+
+[[package]]
+name = "marshmallow-sqlalchemy"
+version = "0.24.3"
+description = "SQLAlchemy integration with the marshmallow (de)serialization library"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-marshmallow = ">=3.11"
-
-[package.extras]
-enum = ["marshmallow-enum"]
-union = ["marshmallow-union"]
-
-[[package]]
-name = "marshmallow-sqlalchemy"
-version = "0.28.1"
-description = "SQLAlchemy integration with the marshmallow (de)serialization library"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
 marshmallow = ">=3.0.0"
-packaging = ">=21.3"
-SQLAlchemy = ">=1.3.0"
+SQLAlchemy = ">=1.2.0"
 
 [package.extras]
-dev = ["flake8 (==4.0.1)", "flake8-bugbear (==22.7.1)", "pre-commit (>=2.0,<3.0)", "pytest", "pytest-lazy-fixture (>=0.6.2)", "tox"]
-docs = ["alabaster (==0.7.12)", "sphinx (==4.4.0)", "sphinx-issues (==3.0.1)"]
-lint = ["flake8 (==4.0.1)", "flake8-bugbear (==22.7.1)", "pre-commit (>=2.0,<3.0)"]
-tests = ["pytest", "pytest-lazy-fixture (>=0.6.2)"]
+dev = ["flake8 (==3.9.1)", "flake8-bugbear (==21.4.3)", "pre-commit (>=2.0,<3.0)", "pytest", "pytest-lazy-fixture", "tox"]
+docs = ["alabaster (==0.7.12)", "sphinx (==3.5.4)", "sphinx-issues (==1.2.0)"]
+lint = ["flake8 (==3.9.1)", "flake8-bugbear (==21.4.3)", "pre-commit (>=2.0,<3.0)"]
+tests = ["pytest", "pytest-lazy-fixture"]
 
 [[package]]
 name = "migra"
@@ -295,7 +290,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "1bc7aa42a549a23c6c7c9cdfdf6ca83965d8c51f0eefa318fa566bf305158182"
+content-hash = "f0b22a7f6e98e5b2ccaa91161b2688206251a40fc181006f916417a4a4f77327"
 
 [metadata.files]
 click = [
@@ -383,12 +378,11 @@ marshmallow = [
     {file = "marshmallow-3.18.0.tar.gz", hash = "sha256:6804c16114f7fce1f5b4dadc31f4674af23317fcc7f075da21e35c1a35d781f7"},
 ]
 marshmallow-jsonschema = [
-    {file = "marshmallow-jsonschema-0.13.0.tar.gz", hash = "sha256:f8ce19cfc0edd909e81f141d7420c33544b849bc5ebbfae8f6a3deea5a3b1f47"},
-    {file = "marshmallow_jsonschema-0.13.0-py3-none-any.whl", hash = "sha256:2814f2afb94a6e01b3c0a5795b3dfb142b628763655f20378400af5c0a2307fb"},
+    {file = "marshmallow-jsonschema-0.10.0.tar.gz", hash = "sha256:97b4720b719195007bb73550f4a68a6a4fa30ff160057b33997b8c76996259f0"},
 ]
 marshmallow-sqlalchemy = [
-    {file = "marshmallow-sqlalchemy-0.28.1.tar.gz", hash = "sha256:aa376747296780a56355e3067b9c8bf43a2a1c44ff985de82b3a5d9e161ca2b8"},
-    {file = "marshmallow_sqlalchemy-0.28.1-py2.py3-none-any.whl", hash = "sha256:dbb061c19375eca3a7d18358d2ca8bbaee825fc3000a3f114e2698282362b536"},
+    {file = "marshmallow-sqlalchemy-0.24.3.tar.gz", hash = "sha256:40faf740ff7d95c83bf9178da9a8be33a9b28f9c76020dfa7e82d953acf2acdc"},
+    {file = "marshmallow_sqlalchemy-0.24.3-py2.py3-none-any.whl", hash = "sha256:823ae5ce51cb42522f6185089fbe9551af86198f474b6c805e55292329ec904c"},
 ]
 migra = [
     {file = "migra-3.0.1663481299-py3-none-any.whl", hash = "sha256:061643e9af63488e085d729f267ed4af4249789979732b703ddeb2c478ec9a93"},

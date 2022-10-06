@@ -309,14 +309,15 @@ class ModelSchema(SQLAlchemyAutoSchema):
             instance, cache_key = self._get_cached_instance(data)
 
         # THEN, try to load from existing instances
-        if instance is None:
+        if instance is None and not self.transient:
             instance = self._get_instance(data)
 
         # FINALLY, make a new instance if one can't be found
         if instance is None:
             instance = self.opts.model(**data)
-            log.debug(f"Adding new {instance} to session")
-            self.session.add(instance)
+            if self.session is not None:
+                log.debug(f"Adding new {instance} to session")
+                self.session.add(instance)
         if cache_key is not None:
             self.__instance_cache[cache_key] = instance
         return instance
