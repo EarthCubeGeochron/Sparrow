@@ -19,6 +19,6 @@ the module can be used to insert data into the appropriate tables.
 
 ## Installation
 
-`pip install sparrow.loader`
+`pip install sparrow-loader`
 
 Requires Python `>=3.9`

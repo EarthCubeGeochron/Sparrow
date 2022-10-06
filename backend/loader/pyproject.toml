@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sparrow-loader"
-version = "1.0.0"
+version = "1.0.1"
 description = "Utilities for loading data into Sparrow"
 authors = ["Daven Quinn <dev@davenquinn.com>"]
 license = "MIT"
