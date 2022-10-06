@@ -6,16 +6,17 @@ authors = ["Daven Quinn <dev@davenquinn.com>"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "sparrow"}]
+include = ["sparrow/loader/sparrow-db-models.pickle"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-marshmallow = "^3.18.0"
-marshmallow-sqlalchemy = "^0.28.1"
+marshmallow = "^3.11.1"
+marshmallow-sqlalchemy = "^0.24.2"
 GeoAlchemy2 = "^0.9.4"
 SQLAlchemy = "^1.4.41"
 "macrostrat.database" = "^1.0.2"
 stringcase = "^1.2.0"
-marshmallow-jsonschema = "^0.13.0"
+marshmallow-jsonschema = "^0.10.0"
 
 
 [build-system]

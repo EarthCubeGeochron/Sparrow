@@ -8,7 +8,6 @@ from sqlalchemy.orm import RelationshipProperty, joinedload, defer
 from collections.abc import Mapping
 from sqlalchemy import inspect
 
-from sparrow.defs import SparrowError
 from .fields import SmartNested
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter, allow_nest, exclude_fields

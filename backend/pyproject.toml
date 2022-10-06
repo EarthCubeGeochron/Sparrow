@@ -24,6 +24,8 @@ uvloop = "*"
 "macrostrat.database" = {path = "./shared-modules/database", develop = true }
 "macrostrat.utils" = {path = "./shared-modules/utils", develop = true }
 "macrostrat.dinosaur" = {path = "./shared-modules/dinosaur", develop = true }
+"sparrow.loader" = {path = "./loader", develop = true }
+
 sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
 
 # Core application
