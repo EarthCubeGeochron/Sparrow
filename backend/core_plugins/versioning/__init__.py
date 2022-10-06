@@ -6,6 +6,7 @@ from sparrow.core import get_database
 import click
 from pathlib import Path
 
+from macrostrat.database import Database
 from macrostrat.database.utils import connection_args, run_sql
 
 exclude_tables = ["spatial_ref_sys"]
@@ -107,7 +108,7 @@ class PGMementoMigration(SchemaMigration):
         engine.execute("DROP SEQUENCE IF EXISTS pgmemento.audit_id_seq CASCADE")
         engine.execute("DROP TABLE pgmemento.audit_tables_copy")
 
-        db = get_database()
+        db = Database(engine.url)
         db.exec_sql(relative_path(__file__, "drop-old-audit-id.sql"))
 
         # migration = AutoMigration(engine, self.target)

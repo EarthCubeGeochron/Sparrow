@@ -4,7 +4,7 @@ FROM ghcr.io/earthcubegeochron/sparrow/backend-base:2.0 AS main
 ## Git is required for the PyChron importer
 RUN apt update && \
   apt install -y git && \
-  pip install "poetry==1.1.10" && \
+  pip install "poetry==1.2.1" && \
   rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

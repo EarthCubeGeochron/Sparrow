@@ -1,10 +1,15 @@
 from os import environ
-from sparrow.migrations import InstrumentSessionMigration, SampleCheckMigration
+from sparrow.migrations import (
+    InstrumentSessionMigration,
+    SampleCheckMigration,
+    SampleLocationAddSRID,
+)
 from sparrow.core.app import Sparrow
 from macrostrat.utils import relative_path, cmd
 from macrostrat.dinosaur import _create_migration, create_schema_clone
 from macrostrat.database.utils import connection_args, temp_database
 from sparrow.core.open_search import DocumentTableMigration
+from core_plugins.versioning import PGMementoMigration
 from pytest import mark, fixture
 
 target_db = environ.get("SPARROW_DATABASE")
@@ -49,10 +54,23 @@ class TestDatabaseMigrations:
             InstrumentSessionMigration,
             SampleCheckMigration,
             DocumentTableMigration,
+            PGMementoMigration,
+            SampleLocationAddSRID,
         ]
-        for mgr in migrations:
-            migration = mgr()
-            migration.apply(test_app.database.engine)
+
+        migrations = [
+            m for m in migrations if m.should_apply(test_app.db.engine, db.engine, None)
+        ]
+        while len(migrations) > 0:
+            for m in migrations:
+                m.apply(test_app.db.engine)
+                # We have applied this migration and should not do it again.
+                migrations.remove(m)
+            migrations = [
+                m
+                for m in migrations
+                if m.should_apply(test_app.db.engine, db.engine, None)
+            ]
 
         # Migrating to the new version should now be "safe"
         migration = _create_migration(test_app.database.engine, db.engine)

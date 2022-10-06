@@ -13,6 +13,7 @@ scripts.
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, String, ForeignKey, Table
+from geoalchemy2 import Geometry
 from os import environ
 from sqlalchemy.orm import relationship
 from uuid import uuid4
