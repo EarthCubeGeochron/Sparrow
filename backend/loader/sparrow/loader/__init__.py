@@ -33,7 +33,7 @@ def validate_data(model_name, data):
     return interface(transient=True).load(data, unknown=RAISE)
 
 
-def show_loader_schemas(*schemas: List[str], nest_depth=0):
+def show_loader_schemas(*schemas: List[str], nest_depth=0, show_dump_only=False):
     """Print the loader schema for a Sparrow database model"""
     models = get_cached_models()
     coll = InterfaceCollection(models)
@@ -42,10 +42,13 @@ def show_loader_schemas(*schemas: List[str], nest_depth=0):
         schemas = coll.keys()
 
     for name in schemas:
-        schema = getattr(coll, name)
-        schema().pretty_print(nested=nest_depth, model_alias=name)
+        _schema = getattr(coll, name)
+        schema = _schema()
+        schema.pretty_print(
+            nested=nest_depth, model_alias=name, show_dump_only=show_dump_only
+        )
         print()
-    print_key()
+    print_key(show_dump_only=show_dump_only)
 
 
 def show_loader_schema(schema: str, nest_depth=0):

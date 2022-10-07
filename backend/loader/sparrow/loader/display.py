@@ -13,9 +13,10 @@ indent = 3
 
 
 class ModelPrinter(object):
-    def __init__(self, nest_level=0):
+    def __init__(self, nest_level=0, show_dump_only=False):
         self.nest_level = nest_level
         self.width, _ = get_terminal_size()
+        self.show_dump_only = show_dump_only
 
     def print_nested(self, k, field, level=0):
         prefix = level * indent * " "
@@ -34,6 +35,9 @@ class ModelPrinter(object):
     def print_field(self, key, field, level=0, **kwargs):
         prefix = level * indent * " "
         classname = field.__class__.__name__
+
+        if classname == "Geometry":
+            classname = "Geometry (GeoJSON)"
 
         required = getattr(field, "required", kwargs.pop("required", False))
 
@@ -75,6 +79,8 @@ class ModelPrinter(object):
 
         for k, v in fields:
             name = v.data_key or k
+            if v.dump_only and not self.show_dump_only:
+                continue
             if k in exclude:
                 continue
             if isinstance(v, Nested):
@@ -89,8 +95,8 @@ class ModelPrinter(object):
         self.print_model(model, model_alias=model_alias)
 
 
-def pretty_print(model, nested=0, model_alias=None):
-    printer = ModelPrinter(nest_level=nested)
+def pretty_print(model, nested=0, model_alias=None, show_dump_only=False):
+    printer = ModelPrinter(nest_level=nested, show_dump_only=show_dump_only)
     printer(model, model_alias=model_alias)
 
 
@@ -132,7 +138,7 @@ def print_field(*args, **kwargs):
     echo(row)
 
 
-def print_key():
+def print_key(show_dump_only=False):
     nfill = 40 - 13
     echo(2 * indent * " " + style("Key") + " " * nfill + style("Model type", dim=True))
     print_field("required", "String", required=True)
@@ -141,4 +147,5 @@ def print_key():
     print_field(
         "many-to-one", "AnotherModel", required=False, bold=True, many_to_one=True
     )
-    print_field("dump-only", "String", required=False, dump_only=True)
+    if show_dump_only:
+        print_field("dump-only", "String", required=False, dump_only=True)

@@ -1,3 +1,4 @@
+import marshmallow
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
@@ -68,7 +69,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
     nest_collections = []
 
     def __init__(self, *args, **kwargs):
-        kwargs["unknown"] = True
+        kwargs.setdefault("unknown", marshmallow.EXCLUDE)
         nests = kwargs.pop("allowed_nests", [])
         self.allowed_nests = nests
         model = self.opts.model.__name__
