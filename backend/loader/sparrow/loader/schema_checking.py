@@ -39,7 +39,7 @@ def get_automap_base():
     )
 
     for schema in ["vocabulary", "core_view", "tags", "public"]:
-        base.prepare(None, schema="schema", **kwargs)
+        base.prepare(None, schema=schema, **kwargs)
 
     _model_cache.set(base)
     return base

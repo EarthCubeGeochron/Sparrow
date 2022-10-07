@@ -7,3 +7,6 @@ all:
 
 test:
 	poetry run pytest -W ignore
+
+show-schemas:
+	poetry run python -W ignore -c "from sparrow.loader import show_loader_schemas; show_loader_schemas()"

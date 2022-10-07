@@ -2,6 +2,8 @@ from marshmallow.fields import Nested
 from marshmallow.exceptions import RegistryError
 from click import echo, secho, style
 from shutil import get_terminal_size
+from .fields import PassThroughRelated
+from .util import to_schema_name
 
 
 def styled_key(k, **kwargs):
@@ -36,6 +38,10 @@ class ModelPrinter(object):
         prefix = level * indent * " "
         classname = field.__class__.__name__
 
+        if isinstance(field, PassThroughRelated):
+            name = to_schema_name(field.related_model.__name__)
+            classname = name
+            kwargs["bold"] = True
         if classname == "Geometry":
             classname = "Geometry (GeoJSON)"
 
@@ -52,7 +58,7 @@ class ModelPrinter(object):
             dump_only=field.dump_only,
             required=required,
             many_to_one=many_to_one,
-            **kwargs
+            **kwargs,
         )
 
         echo(row)
@@ -109,7 +115,7 @@ def build_row_styles(
     dump_only=False,
     required=False,
     many_to_one=False,
-    **kwargs
+    **kwargs,
 ):
     modifier = ""
     if many_to_one:
