@@ -41,6 +41,7 @@ def show_loader_schemas(*schemas: List[str], nest_depth=0, show_dump_only=False)
     if len(schemas) == 0:
         schemas = coll.keys()
 
+    schemas = list(schemas)
     schemas.sort()
     prepended = [
         "project",

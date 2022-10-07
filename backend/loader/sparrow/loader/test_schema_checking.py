@@ -7,6 +7,10 @@ def test_show_loader_schemas():
     show_loader_schemas()
 
 
+def test_show_single_schema():
+    show_loader_schemas("sample")
+
+
 def test_validate_data():
     validate_data("sample", {"name": "test"})
 
