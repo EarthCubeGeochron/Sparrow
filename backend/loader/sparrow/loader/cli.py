@@ -14,13 +14,11 @@ app = typer.Typer(no_args_is_help=True)
     name="show-schemas",
     help="Show loader schemas for Sparrow database models",
 )
-def show_schemas(*schemas: List[str], nest_depth: int = 0, show_dump_only=False):
+def show_schemas(nest_depth: int = 0, show_dump_only=False):
     """Print the loader schema for a Sparrow database model"""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        show_loader_schemas(
-            *schemas, nest_depth=nest_depth, show_dump_only=show_dump_only
-        )
+        show_loader_schemas(nest_depth=nest_depth, show_dump_only=show_dump_only)
 
 
 @app.command(name="show-schema")
