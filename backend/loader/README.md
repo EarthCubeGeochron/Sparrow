@@ -17,6 +17,11 @@ the module can be used to insert data into the appropriate tables.
 - `show_loader_schemas(schema_name: str,  ..., nest_depth=0)`  
   Show the fields for one or several loader schemas.
 
+## Command-line application
+
+The `sparrow-loader` command line application allows you to inspect
+and validate import schemas.
+
 ## Installation
 
 `pip install sparrow-loader`
