@@ -14,6 +14,7 @@ COPY poetry.lock pyproject.toml /app/
 COPY shared-modules /app/shared-modules/
 COPY loader /app/loader/
 
+RUN echo ""
 # Project initialization:
 RUN --mount=type=cache,target=/root/.cache \
 poetry config virtualenvs.create false \

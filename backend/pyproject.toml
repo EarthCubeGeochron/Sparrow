@@ -10,7 +10,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 
 # Preinstalled in 'sparrowdata/backend-base image'
 # due to long compile times.
@@ -74,7 +74,7 @@ boto3 = "^1.12.25"
 
 # Testing and logging
 pytest = "^7.1.3"
-rich = "10.9.0"
+rich = "^12"
 deepdiff = { version = "5.0.2", extras = [ "murmur" ] }
 pytest-order = "0.9.5"
 
@@ -104,7 +104,7 @@ watchdog = "2.1.2"
 argh = "0.26.2"
 pydantic = "1.8.2"
 
-typer = "0.4.1"
+typer = "^0.6"
 sqlakeyset = "^1.0.1629029818"
 setuptools = "^65.4.1"
 
