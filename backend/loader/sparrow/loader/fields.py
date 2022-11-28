@@ -47,7 +47,7 @@ class Geometry(Field):
     def _deserialize(self, value, attr, data, **kwargs):
         if value is None:
             return None
-        return from_shape(shape(value))
+        return from_shape(shape(value), srid=4326)
 
 
 class PassThroughRelated(Related):

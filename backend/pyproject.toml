@@ -10,7 +10,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 
 # Preinstalled in 'sparrowdata/backend-base image'
 # due to long compile times.
@@ -24,11 +24,13 @@ uvloop = "*"
 "macrostrat.database" = {path = "./shared-modules/database", develop = true }
 "macrostrat.utils" = {path = "./shared-modules/utils", develop = true }
 "macrostrat.dinosaur" = {path = "./shared-modules/dinosaur", develop = true }
+"sparrow.loader" = {path = "./loader", develop = true }
+
 sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
 
 # Core application
 Pygments = "2.10.0"
-sqlalchemy-utils = "0.37.0"
+sqlalchemy-utils = "^0.37.0"
 requests = "^2.26.0"
 toposort = "1.5"
 
@@ -72,7 +74,7 @@ boto3 = "^1.12.25"
 
 # Testing and logging
 pytest = "^7.1.3"
-rich = "10.9.0"
+rich = "^12"
 deepdiff = { version = "5.0.2", extras = [ "murmur" ] }
 pytest-order = "0.9.5"
 
@@ -102,8 +104,9 @@ watchdog = "2.1.2"
 argh = "0.26.2"
 pydantic = "1.8.2"
 
-typer = "0.4.1"
+typer = "^0.6"
 sqlakeyset = "^1.0.1629029818"
+setuptools = "^65.4.1"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.15.3"

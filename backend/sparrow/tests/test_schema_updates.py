@@ -23,7 +23,7 @@ class TestSchemaUpdates:
         Sample = db.model.sample
         Material = db.model.vocabulary_material
 
-        loc = from_shape(shape(test_sample["location"]))
+        loc = from_shape(shape(test_sample["location"]), srid=4326)
 
         mat = Material(id="Granitic rock")
         obj = Sample(name="3a24aba", location=loc)

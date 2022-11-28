@@ -1,5 +1,5 @@
 import click
-from sparrow.core.cli.util import with_app
+from ..cli.util import with_app
 
 
 @click.command(name="show-interface")

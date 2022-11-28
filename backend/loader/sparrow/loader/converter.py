@@ -10,6 +10,7 @@ import geoalchemy2 as geo
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.types import Integer, Numeric, DateTime
 from sqlalchemy.dialects import postgresql
+from macrostrat.utils import get_logger
 
 from macrostrat.database.mapper.utils import trim_postfix
 from .fields import (
@@ -23,7 +24,6 @@ from .fields import (
 )
 from .util import to_schema_name
 
-from ..logs import get_logger
 
 log = get_logger(__name__)
 

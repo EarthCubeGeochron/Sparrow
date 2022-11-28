@@ -1,3 +1,4 @@
+from sqlalchemy.exc import DataError
 from macrostrat.dinosaur import SchemaMigration, has_column, has_table
 from sparrow.database import run_sql
 from sqlalchemy.orm import sessionmaker
@@ -61,5 +62,8 @@ class SampleLocationAddSRID(SchemaMigration):
         return res is None or res[0] != 4326
 
     def apply(self, engine):
-        sql_file = Path(__file__).parent / "sql" / "add-sample-srid.sql"
-        engine.execute(sql_file.read_text())
+        try:
+            sql_file = Path(__file__).parent / "sql" / "add-sample-srid.sql"
+            engine.execute(sql_file.read_text())
+        except DataError:
+            pass

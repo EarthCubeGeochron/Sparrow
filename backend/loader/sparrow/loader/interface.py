@@ -1,6 +1,4 @@
-from sparrow.core.plugins import SparrowCorePlugin
 from marshmallow_sqlalchemy import exceptions
-from click import secho
 
 from .schema import ModelSchema, BaseMeta
 from .util import to_schema_name
@@ -22,7 +20,7 @@ def model_interface(model, session=None) -> ModelSchema:
         dict(
             model=model,
             sqla_session=session,
-            load_instance=True,
+            load_instance=False,
             include_relationships=True,
         ),
     )
@@ -53,16 +51,3 @@ class InterfaceCollection(ModelCollection):
         if not hasattr(cls, "__mapper__"):
             return
         self.add(k, model_interface(cls))
-
-
-class InterfacePlugin(SparrowCorePlugin):
-    name = "schema-interface"
-
-    def on_database_ready(self, db):
-        iface = InterfaceCollection(db.model)
-        db.interface = iface
-
-    def on_setup_cli(self, cli):
-        from .cli import show_interface
-
-        cli.add_command(show_interface)

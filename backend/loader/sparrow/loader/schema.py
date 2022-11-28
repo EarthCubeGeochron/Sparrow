@@ -1,3 +1,4 @@
+import marshmallow
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow_sqlalchemy.fields import Related
 from marshmallow.fields import Nested
@@ -8,7 +9,6 @@ from sqlalchemy.orm import RelationshipProperty, joinedload, defer
 from collections.abc import Mapping
 from sqlalchemy import inspect
 
-from sparrow.defs import SparrowError
 from .fields import SmartNested
 from .util import is_pk_defined, pk_values, prop_is_required
 from .converter import SparrowConverter, allow_nest, exclude_fields
@@ -18,7 +18,7 @@ from macrostrat.utils import get_logger
 log = get_logger(__name__)
 
 
-class SparrowSchemaError(SparrowError):
+class SparrowSchemaError(Exception):
     ...
 
 
@@ -69,7 +69,7 @@ class ModelSchema(SQLAlchemyAutoSchema):
     nest_collections = []
 
     def __init__(self, *args, **kwargs):
-        kwargs["unknown"] = True
+        kwargs.setdefault("unknown", marshmallow.EXCLUDE)
         nests = kwargs.pop("allowed_nests", [])
         self.allowed_nests = nests
         model = self.opts.model.__name__
@@ -310,14 +310,15 @@ class ModelSchema(SQLAlchemyAutoSchema):
             instance, cache_key = self._get_cached_instance(data)
 
         # THEN, try to load from existing instances
-        if instance is None:
+        if instance is None and not self.transient:
             instance = self._get_instance(data)
 
         # FINALLY, make a new instance if one can't be found
         if instance is None:
             instance = self.opts.model(**data)
-            log.debug(f"Adding new {instance} to session")
-            self.session.add(instance)
+            if self.session is not None:
+                log.debug(f"Adding new {instance} to session")
+                self.session.add(instance)
         if cache_key is not None:
             self.__instance_cache[cache_key] = instance
         return instance
