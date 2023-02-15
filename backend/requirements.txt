@@ -54,7 +54,7 @@ uncertainties==3.1.6
 # and Flask
 pexpect==4.8.0
 traitlets==4.3.3
-werkzeug==0.16.0
+werkzeug==2.2.3
 
 # Serialization/deserialization
 marshmallow==3.11.1
