@@ -14,7 +14,7 @@
     .bp4-button
       justify-content: flex-start
 
-.map-page, .map-container
+.map-page, .fullscreen-map
   position fixed
   top 0
   left 0
@@ -32,6 +32,7 @@
 
 .map-home {
   position: relative;
+  height: 400px;
 }
 .main-map {
   position: "absolute";
@@ -62,9 +63,17 @@
   flex-direction: row;
 }
 
+.map-container
+  width: 100%
+  height: 100%
+
 // New map styles
 
 .map-panel {
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
 }
+
+.homepage-map
+  height: 300px
+  width: 100%

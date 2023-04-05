@@ -2,14 +2,23 @@ import { useContext } from "react";
 import { hyperStyled, classed, addClassNames } from "@macrostrat/hyper";
 import { Navbar } from "@blueprintjs/core";
 import { NavLink } from "react-router-dom";
-import { NavLinkButton } from "@macrostrat/router-components";
 import { DarkModeButton } from "@macrostrat/ui-components";
 import { AuthStatus } from "~/auth";
 import { Frame, FrameContext } from "~/frame";
+import classNames from "classnames";
 import styles from "./module.styl";
 import { siteTitle } from "~/env";
 
 const h = hyperStyled(styles);
+
+const NavLinkButton = function (props: any) {
+  let { className, minimal = true, large = false, ...rest } = props;
+  className = classNames(className, "bp4-button", {
+    "bp4-minimal": minimal,
+    "bp4-large": large,
+  });
+  return h(NavLink, { className, ...rest });
+};
 
 const NavButton = classed(NavLinkButton, styles["navbar-button"]);
 

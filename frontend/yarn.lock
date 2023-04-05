@@ -1376,43 +1376,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blueprintjs/colors@npm:^4.0.0-alpha.3":
-  version: 4.1.3
-  resolution: "@blueprintjs/colors@npm:4.1.3"
-  checksum: 024c37b1d51c1de94a8b495ec7fc4d207a5ec91f39ce48559a43fb268f8d394efaea700718c7a73a54b4d27d99600a206fe5c9a22d239deb0861869292e638e0
-  languageName: node
-  linkType: hard
-
 "@blueprintjs/colors@npm:^4.1.6":
   version: 4.1.6
   resolution: "@blueprintjs/colors@npm:4.1.6"
   checksum: bdcbf4ad43256217bf1f97e2e0fcc8c18eb8b6cee4778b097dd2ac5e5edc64cff3346d939ab34d9528ab74183b7cad2718f45cf8b3819d8d91257730c246cf0f
-  languageName: node
-  linkType: hard
-
-"@blueprintjs/core@npm:^3.23.0, @blueprintjs/core@npm:^3.52.0, @blueprintjs/core@npm:^3.54.0":
-  version: 3.54.0
-  resolution: "@blueprintjs/core@npm:3.54.0"
-  dependencies:
-    "@blueprintjs/colors": ^4.0.0-alpha.3
-    "@blueprintjs/icons": ^3.33.0
-    "@juggle/resize-observer": ^3.3.1
-    "@types/dom4": ^2.0.1
-    classnames: ^2.2
-    dom4: ^2.1.5
-    normalize.css: ^8.0.1
-    popper.js: ^1.16.1
-    react-lifecycles-compat: ^3.0.4
-    react-popper: ^1.3.7
-    react-transition-group: ^2.9.0
-    tslib: ~2.3.1
-  peerDependencies:
-    react: ^15.3.0 || 16 || 17
-    react-dom: ^15.3.0 || 16 || 17
-  bin:
-    upgrade-blueprint-2.0.0-rename: scripts/upgrade-blueprint-2.0.0-rename.sh
-    upgrade-blueprint-3.0.0-rename: scripts/upgrade-blueprint-3.0.0-rename.sh
-  checksum: 97b8811bfc32284bb36e62a44210e84d5abe164ef553670866e0628718db4a98c79b9665f73014b1474f534a3d3260e94af274e669fb0ebfeb323305a81b5375
   languageName: node
   linkType: hard
 
@@ -1474,22 +1441,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blueprintjs/datetime@npm:^3.23.19":
-  version: 3.24.1
-  resolution: "@blueprintjs/datetime@npm:3.24.1"
-  dependencies:
-    "@blueprintjs/core": ^3.54.0
-    classnames: ^2.2
-    react-day-picker: 7.4.9
-    react-lifecycles-compat: ^3.0.4
-    tslib: ~2.3.1
-  peerDependencies:
-    react: ^15.3.0 || 16 || 17
-    react-dom: ^15.3.0 || 16 || 17
-  checksum: 022f8f668b8094350716a57f860415b7a07acf28454c96bd086b39dad3deea93d9019bc46c8d6c044264e06a9d43938a2e5962f87be5a91552a4843e67a9884d
-  languageName: node
-  linkType: hard
-
 "@blueprintjs/datetime@npm:^4.1.2, @blueprintjs/datetime@npm:^4.3.12":
   version: 4.3.12
   resolution: "@blueprintjs/datetime@npm:4.3.12"
@@ -1506,16 +1457,6 @@ __metadata:
     "@types/react":
       optional: true
   checksum: ec4f0e1750a899120ae1772e1cc8511aa939ebe5f9d49ddba0d4b768d8201a4dfc0251e538b00a0a83b7e627f033af907e19b14618d66571a23baf57814a5637
-  languageName: node
-  linkType: hard
-
-"@blueprintjs/icons@npm:^3.33.0":
-  version: 3.33.0
-  resolution: "@blueprintjs/icons@npm:3.33.0"
-  dependencies:
-    classnames: ^2.2
-    tslib: ~2.3.1
-  checksum: 9b1485a3ce17a97596b7fa7276ddbe85e33c56f061358351a626d353bf3eab6ab1b36a1860aec2feb7933ef0293c5f8e1f3342a89051720d1953343aab753cb3
   languageName: node
   linkType: hard
 
@@ -1696,7 +1637,6 @@ __metadata:
     "@macrostrat/hyper": ^2.2.1
     "@macrostrat/mapbox-react": ^1.0.4
     "@macrostrat/mapbox-utils": ^1.1.1
-    "@macrostrat/router-components": ^1.0.2
     "@macrostrat/ui-components": ^3.0.0-b8
     "@mapbox/mapbox-gl-draw": ^1.2.0
     "@rjsf/core": ^3.1.0
@@ -3107,18 +3047,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@macrostrat/hyper@npm:^1.2.0":
-  version: 1.4.2
-  resolution: "@macrostrat/hyper@npm:1.4.2"
-  dependencies:
-    "@types/react": "*"
-    "@types/react-hyperscript": ^3.0.5
-    classnames: ^2.3.1
-    react-hyperscript: ^3.2.0
-  checksum: d443598bd48872758e3bd038e74afcd6af8fac506ac58efe84a5dbd7b4cde1771548ec5d6c89519e32053eb6acee1c307c5aacee986f6ac877e45d22b671af7c
-  languageName: node
-  linkType: hard
-
 "@macrostrat/hyper@npm:^2.0.1":
   version: 2.2.0
   resolution: "@macrostrat/hyper@npm:2.2.0"
@@ -3169,52 +3097,6 @@ __metadata:
     axios: ^0.27.2
     mapbox-gl: ^2.0.0
   checksum: d7c94bc236b5e7ce20debe933a0a1f151b062f31b6e7f13e7c641b12aa48e8393a69660a5e7ef53533187809f8437ad8f0fce3ba186ebc72ffe9e5d6410b4a36
-  languageName: node
-  linkType: hard
-
-"@macrostrat/router-components@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "@macrostrat/router-components@npm:1.0.2"
-  dependencies:
-    "@blueprintjs/core": ^3.23.0
-    "@macrostrat/hyper": ^1.2.0
-    "@macrostrat/ui-components": ">=0.5.0"
-    classnames: ^2.3.1
-  peerDependencies:
-    react-router: ^5.0.1
-    react-router-dom: ^5.0.1
-  checksum: 67b3c0cad35a0d47e2219842b2cd57710b70e7ce56d6614c806ff999165d484f7d48dbd4fc2642869378e00d44ea7a8d21613d1c608560fd9e4b18be72e4bc27
-  languageName: node
-  linkType: hard
-
-"@macrostrat/ui-components@npm:>=0.5.0":
-  version: 1.1.5
-  resolution: "@macrostrat/ui-components@npm:1.1.5"
-  dependencies:
-    "@babel/polyfill": ^7.4.4
-    "@blueprintjs/core": ^3.52.0
-    "@blueprintjs/datetime": ^3.23.19
-    "@macrostrat/hyper": ^2.0.1
-    "@types/react": ^17.0.11
-    "@types/react-dom": ^17.0.8
-    axios: ^0.21.4
-    classnames: ^2.3.0
-    core-js: ^3.6.4
-    d3-array: ^3.0.4
-    date-fns: ^2.15.0
-    fp-ts: ^2.5.3
-    immutability-helper: ^3.1.1
-    io-ts: ^2.1.2
-    query-string: ^7.0.0
-    react-dropzone: ^11.4.2
-    react-intersection-observer: ^8.32.1
-    react-json-tree: ^0.15.0
-    underscore: ^1.9.1
-    use-async-effect: ^2.2.1
-  peerDependencies:
-    react: ^16.8.6 || ^17
-    react-dom: ^16.8.6 || ^17
-  checksum: 11f1294d7513f2baae384613cdd3e48fa914bde5a00272eb47025b9463a77f0c0e511882f7aa07a2d5817a3684b5bb6d04ca4b899d6dfbb64d93978b83d62975
   languageName: node
   linkType: hard
 
@@ -4606,24 +4488,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^17.0.8":
-  version: 17.0.17
-  resolution: "@types/react-dom@npm:17.0.17"
-  dependencies:
-    "@types/react": ^17
-  checksum: 23caf98aa03e968811560f92a2c8f451694253ebe16b670929b24eaf0e7fa62ba549abe9db0ac028a9d8a9086acd6ab9c6c773f163fa21224845edbc00ba6232
-  languageName: node
-  linkType: hard
-
-"@types/react-hyperscript@npm:^3.0.5":
-  version: 3.0.9
-  resolution: "@types/react-hyperscript@npm:3.0.9"
-  dependencies:
-    "@types/react": "*"
-  checksum: 85b224b2683aeffa07be26cf2fb94ae7ea0b090dbefe4b7b31a75b7aa933de49111e439d935c37b69bb11ae3c30f55f59257a311a621588c4b3ae9e257401657
-  languageName: node
-  linkType: hard
-
 "@types/react-map-gl@npm:5.2.2":
   version: 5.2.2
   resolution: "@types/react-map-gl@npm:5.2.2"
@@ -4659,7 +4523,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^17, @types/react@npm:^17.0.11, @types/react@npm:^17.0.22":
+"@types/react@npm:^17.0.22":
   version: 17.0.45
   resolution: "@types/react@npm:17.0.45"
   dependencies:
@@ -5904,15 +5768,6 @@ __metadata:
     follow-redirects: 1.5.10
     is-buffer: ^2.0.2
   checksum: 4a27cea1e3c674d89d9097fe13b62081b692280401b9c4216f37c42dfa8b433091baa15832336523ddad1df2f3f21e1e38a4cff207b4926ead3076c91a8ec5fe
-  languageName: node
-  linkType: hard
-
-"axios@npm:^0.21.4":
-  version: 0.21.4
-  resolution: "axios@npm:0.21.4"
-  dependencies:
-    follow-redirects: ^1.14.0
-  checksum: 44245f24ac971e7458f3120c92f9d66d1fc695e8b97019139de5b0cc65d9b8104647db01e5f46917728edfc0cfd88eb30fc4c55e6053eef4ace76768ce95ff3c
   languageName: node
   linkType: hard
 
@@ -8130,15 +7985,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dom-helpers@npm:^3.4.0":
-  version: 3.4.0
-  resolution: "dom-helpers@npm:3.4.0"
-  dependencies:
-    "@babel/runtime": ^7.1.2
-  checksum: 58d9f1c4a96daf77eddc63ae1236b826e1cddd6db66bbf39b18d7e21896d99365b376593352d52a60969d67fa4a8dbef26adc1439fa2c1b355efa37cacbaf637
-  languageName: node
-  linkType: hard
-
 "dom-helpers@npm:^5.0.1, dom-helpers@npm:^5.1.3":
   version: 5.2.1
   resolution: "dom-helpers@npm:5.2.1"
@@ -9081,7 +8927,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.14.0":
+"follow-redirects@npm:^1.0.0":
   version: 1.15.1
   resolution: "follow-redirects@npm:1.15.1"
   peerDependenciesMeta:
@@ -14403,15 +14249,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hyperscript@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "react-hyperscript@npm:3.2.0"
-  peerDependencies:
-    react: ">= 0.12.0 < 17.0.0"
-  checksum: 90ca70d6a0aa90769db7c92140421746be70c1757bd735e56c2d5f16549de93201d8204d480eeb499f4dcbdd335028ba32dbc7340ab333ae9fd459d3f49564c6
-  languageName: node
-  linkType: hard
-
 "react-icons@npm:^4.2.0":
   version: 4.4.0
   resolution: "react-icons@npm:4.4.0"
@@ -14758,21 +14595,6 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
   checksum: 87360d4392276d4e87511a73be9b0634b8bcce8f4f648cf659334d993f25ad3d4062f468f1e1944fc614123acae4299580aad00b760c6a96cec190e076f847f5
-  languageName: node
-  linkType: hard
-
-"react-transition-group@npm:^2.9.0":
-  version: 2.9.0
-  resolution: "react-transition-group@npm:2.9.0"
-  dependencies:
-    dom-helpers: ^3.4.0
-    loose-envify: ^1.4.0
-    prop-types: ^15.6.2
-    react-lifecycles-compat: ^3.0.4
-  peerDependencies:
-    react: ">=15.0.0"
-    react-dom: ">=15.0.0"
-  checksum: d8c9e50aabdc2cfc324e5cdb0ad1c6eecb02e1c0cd007b26d5b30ccf49015e900683dd489348c71fba4055858308d9ba7019e0d37d0e8d37bd46ed098788f670
   languageName: node
   linkType: hard
 
