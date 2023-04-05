@@ -24,6 +24,7 @@ class TestGroup(SparrowDefaultCommand):
     --help                      Print this page and exit
     --psql                      Provide a psql prompt when testing concludes
     --teardown / --no-teardown  Shut down docker containers on exit
+    --local                     Run tests against a local database [SPARROW_TESTING_DATABASE]
     --quick                     Keep databases and Docker containers
 
     All command line options specified at the end of the command are passed
@@ -254,12 +255,4 @@ def run_tests_locally(basedir: Path, *pytest_args: List[str]):
     # Get virtualenv path
     cmd("poetry env info -p", cwd=workdir, env=newenv)
 
-    return cmd(
-        "poetry",
-        "run",
-        "pytest",
-        ".",
-        *pytest_args,
-        cwd=workdir,
-        env=newenv,
-    )
+    return cmd("poetry", "run", "pytest", ".", *pytest_args, cwd=workdir, env=newenv)
