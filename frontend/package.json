@@ -26,7 +26,6 @@
     "@macrostrat/hyper": "^2.2.1",
     "@macrostrat/mapbox-react": "^1.0.4",
     "@macrostrat/mapbox-utils": "^1.1.1",
-    "@macrostrat/router-components": "^1.0.2",
     "@macrostrat/ui-components": "^3.0.0-b8",
     "@mapbox/mapbox-gl-draw": "^1.2.0",
     "@rjsf/core": "^3.1.0",

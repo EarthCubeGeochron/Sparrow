@@ -1,14 +1,30 @@
-import { Tooltip, Card, Button } from "@blueprintjs/core";
+import { Tooltip, Card, Button, AnchorButton } from "@blueprintjs/core";
 import { format, getYear } from "date-fns";
 import { useModelURL, useEditingAllowed } from "~/util";
 import { ModelEditableText } from "~/model-views";
 import { hyperStyled } from "@macrostrat/hyper";
-import { LinkButton } from "@macrostrat/router-components";
+import { withRouter } from "react-router-dom";
 
 //@ts-ignore
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
+
+// We will need to update this for react router v6
+const LinkButton = withRouter(function (props: any) {
+  let { to, history, staticContext, onClick, match, location, ...rest } = props;
+
+  return h(AnchorButton, {
+    onClick(event: any) {
+      if (to == null) {
+        return;
+      }
+      history.push(to);
+      event.preventDefault();
+    },
+    ...rest,
+  });
+});
 
 export const AddCard = (props) => {
   const { onClick, model } = props;
