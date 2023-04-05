@@ -8,9 +8,10 @@ import { MapPanel } from "./map-panel";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import styles from "./module.styl";
-import { useDarkMode } from "@macrostrat/ui-components";
+import { useDarkMode, useElementSize } from "@macrostrat/ui-components";
 import { useAuth } from "~/auth";
 import { MapArea } from "./map-area";
+import { useRef } from "react";
 
 const h = hyperStyled(styles);
 
@@ -28,12 +29,14 @@ const MapNavbar = function (props) {
 const MapHome = (props) => {
   const link = LocationLink(props);
   const { isEnabled } = useDarkMode();
+  const ref = useRef(null);
+  const size = useElementSize(ref);
 
-  const StandMapMode = isEnabled
+  const style = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/outdoors-v9";
 
-  return h("div.map-home", [
+  return h("div.map-home", { ref }, [
     h("div.map-butn", [
       h(
         Tooltip,
@@ -41,13 +44,17 @@ const MapHome = (props) => {
         h(Link, { to: "/map" }, h(Button, { icon: "maximize", minimal: true }))
       ),
     ]),
-    h("div.mapHome", [
-      h(MapPanel, {
-        width: "100%",
-        hide_filter: true,
-        mapstyle: StandMapMode,
-      }),
-    ]),
+    h(
+      "div.homepage-map",
+      {
+        style: { height: size?.height ?? 0, width: size?.width ?? 0 },
+      },
+      [
+        h(MapArea, {
+          style,
+        }),
+      ]
+    ),
   ]);
 };
 
@@ -65,6 +72,7 @@ const MapPage = (props) => {
     h(MapArea, {
       on_map: true,
       hide_filter: false,
+      className: "fullscreen-map",
       style,
       login,
     }),

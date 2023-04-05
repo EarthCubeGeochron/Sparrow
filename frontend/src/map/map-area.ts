@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
 import MapGl, { Marker } from "react-map-gl";
-import h, { compose } from "@macrostrat/hyper";
+import hyper, { compose } from "@macrostrat/hyper";
 import { Toaster, Position, Icon, Navbar } from "@blueprintjs/core";
 import "./cluster.css";
 import { LayerMenu } from "./components/LayerMenu";
@@ -13,6 +13,8 @@ import { apiBaseURL, mapboxAPIToken } from "~/env";
 import { MapPanel } from "./map-panel";
 import { MapboxMapProvider } from "@macrostrat/mapbox-react";
 import { getMapboxStyle, mergeStyles } from "@macrostrat/mapbox-utils";
+
+const h = hyper.styled(styles);
 
 export const MapToaster = Toaster.create({
   position: Position.TOP_RIGHT,
@@ -29,6 +31,7 @@ interface MapProps {
   zoom?: number;
   login?: boolean;
   style?: any;
+  className: string;
 }
 
 export function _MapArea({
@@ -36,6 +39,7 @@ export function _MapArea({
   hide_filter = false,
   login = false,
   style,
+  className,
 }: MapProps) {
   const initialState = {
     style,
@@ -139,7 +143,7 @@ export function _MapArea({
     }
   };
 
-  return h("div.map-container", [
+  return h("div.map-container", { className }, [
     // Weird
     h("div.layer-button", [
       h.if(on_map)(MapNavbar, {
