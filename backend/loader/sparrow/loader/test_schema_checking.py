@@ -1,15 +1,21 @@
 from marshmallow import ValidationError
 from pytest import raises
 from datetime import datetime
+import warnings
+from sqlalchemy.exc import SAWarning
 from . import show_loader_schemas, validate_data
 
 
 def test_show_loader_schemas():
-    show_loader_schemas()
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=SAWarning)
+        show_loader_schemas()
 
 
 def test_show_single_schema():
-    show_loader_schemas("sample")
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=SAWarning)
+        show_loader_schemas("sample")
 
 
 def test_validate_data():
@@ -56,4 +62,8 @@ def test_validate_complex_sample():
             },
         ],
     }
+    with raises(ValidationError):
+        validate_data("session", test_data)
+
+    test_data["analysis"][0]["datum"][0]["type"]["parameter"] = "delta 13C"
     validate_data("session", test_data)

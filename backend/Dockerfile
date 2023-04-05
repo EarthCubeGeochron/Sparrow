@@ -9,16 +9,21 @@ RUN apt update && \
 
 WORKDIR /app
 
-# Copy only requirements to cache them in docker layer
+# For shared modules, first copy only requirements to install their dependencies.
+# Poetry must see them as a set of modules.
 COPY poetry.lock pyproject.toml /app/
-COPY shared-modules /app/shared-modules/
-COPY loader /app/loader/
+COPY __docker/dummy-shared-module-tree /app/shared-modules
+COPY shared-modules/database/pyproject.toml  /app/shared-modules/database/
+COPY shared-modules/dinosaur/pyproject.toml /app/shared-modules/dinosaur/
+COPY shared-modules/utils/pyproject.toml /app/shared-modules/utils/
+COPY shared-modules/pyproject.toml /app/shared-modules/pyproject.toml
 
-RUN echo ""
+RUN mkdir -p /app/loader/sparrow/loader && touch /app/loader/sparrow/loader/__init__.py
+COPY loader/pyproject.toml /app/loader/
+COPY loader/README.md /app/loader/
+
 # Project initialization:
-RUN --mount=type=cache,target=/root/.cache \
-poetry config virtualenvs.create false \
-&& poetry install --no-interaction --no-ansi --no-root
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root
 
 COPY ./docker.cfg /config/docker.cfg
 # These values should not change between installations

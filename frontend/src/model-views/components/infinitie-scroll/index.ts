@@ -9,7 +9,7 @@ import {
   ResearcherModelCard,
 } from "~/model-views";
 import { InfiniteAPIView } from "~/components/infinite-scroll";
-import { APIV2Context } from "~/api-v2";
+import { APIV2Context, APIV3Context } from "~/api-v2";
 //@ts-ignore
 import styles from "./main.styl";
 

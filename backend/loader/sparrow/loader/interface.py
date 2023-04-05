@@ -20,7 +20,7 @@ def model_interface(model, session=None) -> ModelSchema:
         dict(
             model=model,
             sqla_session=session,
-            load_instance=False,
+            load_instance=True,
             include_relationships=True,
         ),
     )
