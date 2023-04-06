@@ -82,8 +82,8 @@ def upgrade_audit_trail(engine):
     Upgrade PGMemento audit trail
     """
     procedures = [
-        "pg-memento/UPGRADE_v061_to_v07",
         "pg-memento/ctl/UPGRADE",
+        "pg-memento/UPGRADE_v061_to_v07",
         "pg-memento/UPGRADE_v07_to_v074",
     ]
 
@@ -133,9 +133,10 @@ class PGMementoMigration(SchemaMigration):
         )
 
     def apply(self, engine):
-        upgrade_audit_trail(engine)
         db = Database(engine.url)
-        db.exec_sql(relative_path(__file__, "procedures/drop-old-constraints.sql"))
+        upgrade_audit_trail(engine)
+        # A scorched-earth approach to dropping the v1 audit trail
+        db.session.execute("DROP SCHEMA IF EXISTS core_view CASCADE")
 
         sql = ""
         for trigger in get_old_triggers(db.session):
@@ -145,6 +146,10 @@ class PGMementoMigration(SchemaMigration):
             sql += f"ALTER TABLE {audit_id.schema}.{audit_id.table} DROP COLUMN audit_id CASCADE;\n"
         run_sql(db.session, sql)
         db.session.commit()
+        db.exec_sql(relative_path(__file__, "drop-audit.sql"))
+
+        build_audit_tables(db)
+
         db.recreate_views()
 
         # migration = AutoMigration(engine, self.target)
@@ -206,6 +211,7 @@ def build_audit_tables(db):
     procedures += [
         "SETUP",
         "SETUP",  # Run twice to ensure all tables are created
+        "SETUP",
         "LOG_UTIL",
         "DDL_LOG",
         "RESTORE",
@@ -222,10 +228,6 @@ def build_audit_tables(db):
 
 class VersioningPlugin(SparrowCorePlugin):
     name = "versioning"
-
-    def proc(self, id):
-        fn = id + ".sql"
-        return
 
     def on_finalize_database_schema(self, db):
         build_audit_tables(db)

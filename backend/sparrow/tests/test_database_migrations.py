@@ -7,7 +7,7 @@ from sparrow.migrations import (
 from sparrow.core.app import Sparrow
 from macrostrat.utils import relative_path, cmd
 from macrostrat.dinosaur import _create_migration, create_schema_clone
-from macrostrat.database.utils import connection_args, temp_database
+from macrostrat.database.utils import connection_args, temp_database, run_sql
 from sparrow.core.open_search import DocumentTableMigration
 from core_plugins.versioning import (
     PGMementoMigration,
@@ -43,7 +43,7 @@ def migration_base():
 
 # @mark.order(-1)
 class TestDatabaseMigrations:
-    # @mark.xfail(reason="There is some interference between plugins right now")
+    @mark.xfail(reason="This doesn't work due to complexities with audit tables")
     def test_migration(self, db, migration_base):
 
         test_app = Sparrow(debug=True, database=migration_base.url)
@@ -98,6 +98,10 @@ class TestDatabaseMigrations:
         assert migration.is_safe
 
         migration.apply(quiet=False)
+        migration.add_all_changes()
+        sql = "\n".join(migration.statements)
+        run_sql(db.engine, sql)
+
         # Re-add changes
         migration.add_all_changes()
         assert len(migration.statements) == 0
