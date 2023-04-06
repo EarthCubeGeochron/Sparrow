@@ -1,7 +1,7 @@
 import h from "@macrostrat/hyper";
 import { Callout } from "@blueprintjs/core";
 import { SessionInfoLink } from "~/model-views/session/info-card";
-import { FilterListComponent } from "../components/filter-list";
+import { PostgRESTFilterList } from "../components/filter-list";
 
 const SessionListComponent = function () {
   const route = "/session";
@@ -23,7 +23,7 @@ const SessionListComponent = function () {
       },
       "This page lists analytical sessions (individual instrument runs on a single sample)"
     ),
-    h(FilterListComponent, {
+    h(PostgRESTFilterList, {
       route,
       filterFields,
       itemComponent: SessionInfoLink,

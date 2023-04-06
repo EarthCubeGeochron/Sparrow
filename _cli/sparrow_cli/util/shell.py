@@ -4,11 +4,11 @@ from pathlib import Path
 from json import loads
 from os import environ
 from json.decoder import JSONDecodeError
+from macrostrat.utils.logs import get_logger
+from macrostrat.utils.shell import split_args, cmd as cmd_, run as run_
 from docker import from_env
 from docker.errors import DockerException
 
-from sparrow_utils.logs import get_logger
-from sparrow_utils.shell import split_args, cmd as cmd_, run as run_
 from rich import print
 from .exceptions import SparrowCommandError
 
@@ -89,24 +89,30 @@ def exec_backend_command(ctx, *args, **kwargs):
     if cfg.verbose:
         args = ["--verbose"] + list(args)
 
-    return exec_or_run("backend", "/app/sparrow/__main__.py", *args, **kwargs)
+    return exec_sparrow(*args, **kwargs)
 
 
 def exec_sparrow(*args, **kwargs):
-    return exec_or_run("backend", "/app/sparrow/__main__.py", *args, **kwargs)
+    return exec_or_run("backend", "python -m sparrow.core", *args, **kwargs)
+
+
+def has_command(command):
+    try:
+        res = cmd(f"which {command}", check=True, stdout=PIPE)
+        return res.returncode == 0
+    except CalledProcessError:
+        return False
+
+
+def fail_without_command(command):
+    if not has_command(command):
+        raise SparrowCommandError(
+            f"Cannot find the {command} command. Is it installed?"
+        )
 
 
 def fail_without_docker_command():
-    failure = False
-    try:
-        res = cmd("which docker", check=True, stdout=PIPE)
-        failure = res.returncode != 0
-    except CalledProcessError:
-        failure = True
-    if failure:
-        raise SparrowCommandError(
-            "Cannot find the docker command. Is docker installed?"
-        )
+    fail_without_command("docker")
 
 
 def fail_without_docker_running():
@@ -115,7 +121,7 @@ def fail_without_docker_running():
     except DockerException as exc:
         raise SparrowCommandError(
             "Cannot connect to the Docker daemon. Is Docker running?", details=str(exc)
-        )
+        ) from exc
 
 
 def raise_docker_engine_errors():

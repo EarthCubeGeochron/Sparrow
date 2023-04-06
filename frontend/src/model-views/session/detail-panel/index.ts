@@ -8,6 +8,7 @@ import hyper from "@macrostrat/hyper";
 import styles from "./module.styl";
 import { Card, Breadcrumbs } from "@blueprintjs/core";
 import { useAPIResult } from "@macrostrat/ui-components";
+import { useAPIv3Result } from "~/api-v2";
 import ReactJson from "react-json-view";
 import { format } from "d3-format";
 import { group } from "d3-array";
@@ -37,23 +38,10 @@ const Material = function (props) {
   ]);
 };
 
-function analysisAttributeUnwrap(data) {
-  if (data == null || data.length === 0) {
-    return [];
-  }
-  return group(data, (d) => d.parameter);
-}
-
 const AnalysisAttributes = function (props) {
-  const { analysis_id } = props;
-  const data = useAPIResult(
-    "/attribute",
-    { analysis_id },
-    { unwrapResponse: analysisAttributeUnwrap }
-  );
-  if (!data || data.length == 0) {
-    return h("div");
-  }
+  const { attributes = [] } = props;
+  const data = group(attributes, (d) => d.parameter);
+
   return h(
     Array.from(data, ([k, v]) =>
       h("li.attribute", [
@@ -68,7 +56,7 @@ const AnalysisAttributes = function (props) {
 };
 
 const Unit = function ({ unit }) {
-  if (["unknown", "ratio"].includes(unit)) {
+  if (["unknown", "ratio", "dimensionless"].includes(unit)) {
     return null;
   }
   return h("span.unit", unit);
@@ -76,7 +64,7 @@ const Unit = function ({ unit }) {
 
 const Datum = function (props) {
   const { value: d } = props;
-  return h("li.datum.bp3-text", [
+  return h("li.datum.bp4-text", [
     h("span.parameter", `${d.parameter}:`),
     " ",
     h("span.value", fmt(d.value)),
@@ -90,10 +78,9 @@ const Datum = function (props) {
   ]);
 };
 
-const DataCollection = function ({ data, analysis_id }) {
+const DataCollection = function ({ data, attributes }) {
   const datumList = h(data.map((d) => h(Datum, { value: d })));
-
-  return h("ul.data", [datumList, h(AnalysisAttributes, { analysis_id })]);
+  return h("ul.data", [datumList, h(AnalysisAttributes, { attributes })]);
 };
 
 const AnalysisDetails = function (props) {
@@ -113,7 +100,10 @@ const AnalysisDetails = function (props) {
     h("div.main", [
       h("div.data", [
         h("h4", "Data"),
-        h(DataCollection, { data: a.data, analysis_id }),
+        h(DataCollection, {
+          data: a.data,
+          attributes: a.attributes ?? [],
+        }),
       ]),
     ]),
   ]);
@@ -127,13 +117,15 @@ const SessionDetails = function (props) {
   ]);
 };
 
-const SessionDetailPanel = function (props) {
+function SessionDetailPanel(props) {
   const { session_id, ...rest } = props;
-  const data = useAPIResult("/analysis", { session_id });
+  const data = useAPIv3Result("/analysis", {
+    session_id: `eq.${session_id}`,
+  });
 
   if (!data) return h("div");
 
   return h(SessionDetails, { data, ...rest });
-};
+}
 
 export { SessionDetailPanel };

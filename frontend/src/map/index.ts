@@ -4,13 +4,14 @@ import { hyperStyled } from "@macrostrat/hyper";
 // @ts-ignore
 //import styles from "./module.styl";
 import { SiteTitle } from "app/components";
-import { MapPanel } from "./map-area";
+import { MapPanel } from "./map-panel";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import styles from "./module.styl";
-import { useDarkMode } from "@macrostrat/ui-components";
-import { useEffect, useState } from "react";
+import { useDarkMode, useElementSize } from "@macrostrat/ui-components";
 import { useAuth } from "~/auth";
+import { MapArea } from "./map-area";
+import { useRef } from "react";
 
 const h = hyperStyled(styles);
 
@@ -27,55 +28,52 @@ const MapNavbar = function (props) {
 
 const MapHome = (props) => {
   const link = LocationLink(props);
-  const [style, setStyle] = useState("");
-
   const { isEnabled } = useDarkMode();
+  const ref = useRef(null);
+  const size = useElementSize(ref);
 
-  useEffect(() => {
-    if (isEnabled) {
-      setStyle("mapbox://styles/mapbox/dark-v10");
-    }
-    setStyle("mapbox://styles/mapbox/outdoors-v9");
-  }, [isEnabled]);
-
-  const StandMapMode = isEnabled
+  const style = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/outdoors-v9";
-  return h("div.map-home", [
+
+  return h("div.map-home", { ref }, [
     h("div.map-butn", [
       h(
         Tooltip,
         { content: "Go to Map" },
-        h(Link, { to: "/map" }, h(Button, { icon: "maximize" }))
+        h(Link, { to: "/map" }, h(Button, { icon: "maximize", minimal: true }))
       ),
     ]),
-    h("div.mapHome", [
-      h(MapPanel, {
-        width: "750px",
-        hide_filter: true,
-        mapstyle: StandMapMode,
-      }),
-    ]),
+    h(
+      "div.homepage-map",
+      {
+        style: { height: size?.height ?? 0, width: size?.width ?? 0 },
+      },
+      [
+        h(MapArea, {
+          style,
+        }),
+      ]
+    ),
   ]);
 };
 
 const MapPage = (props) => {
   const { isEnabled } = useDarkMode();
 
-  const StandMapMode = isEnabled
+  const style = isEnabled
     ? "mapbox://styles/mapbox/dark-v10"
     : "mapbox://styles/mapbox/outdoors-v9";
 
   const { login } = useAuth();
-  console.log(login);
+  //console.log(login);
 
   return h("div.map-page", [
-    h(MapPanel, {
+    h(MapArea, {
       on_map: true,
       hide_filter: false,
-      width: "100vw",
-      height: "100vh",
-      mapstyle: StandMapMode,
+      className: "fullscreen-map",
+      style,
       login,
     }),
   ]);

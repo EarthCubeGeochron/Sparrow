@@ -5,7 +5,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import { Component, createElement } from "react";
-import h from "react-hyperscript";
+import h from "@macrostrat/hyper";
 import { APIResultView, useAPIResult } from "@macrostrat/ui-components";
 import { scaleLinear } from "@vx/scale";
 import { AreaClosed } from "@vx/shape";
@@ -19,7 +19,7 @@ import {
 } from "./kernel-density";
 
 import "./main.styl";
-import { useAPIv2Result } from "~/api-v2";
+import { useAPIv3Result } from "~/api-v2";
 
 function DZPlotInner(props) {
   const {
@@ -109,12 +109,13 @@ function DZPlotInner(props) {
 }
 
 function DetritalZirconComponent(props) {
-  const data = useAPIResult("/datum", {
-    unit: "Ma",
-    is_accepted: true,
-    ...props,
-  });
   const { session_id } = props;
+
+  const data = useAPIv3Result("/datum", {
+    unit: "eq.Ma",
+    is_accepted: "eq.true",
+    session_id: `eq.${session_id}`,
+  });
 
   if (data == null) {
     return null;
@@ -152,10 +153,10 @@ function DZSessionData({ id, date, sample }) {
   const name = sample?.name ?? "";
   const height = 50;
   const width = 340;
-  const data = useAPIResult("/datum", {
-    unit: "Ma",
-    is_accepted: true,
-    session_id: id,
+  const data = useAPIv3Result("/datum", {
+    unit: "eq.Ma",
+    is_accepted: "eq.true",
+    session_id: `eq.${id}`,
   });
 
   let text = name;

@@ -33,7 +33,7 @@ def _is_many_to_many(automap_base, table):
     # Patch columns to ignore audit_id in calculation of number of columns
     # (only ForeignKey columns should be defined in order to
     #  establish this as a secondary model)
-    if set(cols) != set([c for c in table.c if c.name != "audit_id"]):
+    if set(cols) != set([c for c in table.c if c.name != "pgmemento_audit_id"]):
         return None, None, None
 
     return (
@@ -41,7 +41,3 @@ def _is_many_to_many(automap_base, table):
         fk_constraints[1].elements[0].column.table,
         fk_constraints,
     )
-
-
-# Apply the hotfix to the SQLAlchemy model.
-automap._is_many_to_many = _is_many_to_many

@@ -11,12 +11,12 @@ import {
 } from "@blueprintjs/core";
 import "../cluster.css";
 import { useDarkMode } from "@macrostrat/ui-components";
-import { mapStyle } from "../MapStyle";
+import { mapStyle } from "./macrostrat-map-style";
 import { FrameContext } from "~/frame";
 
 export const LayerMenu = ({
   hide,
-  MapStyle,
+  mapStyle,
   chooseMapStyle,
   showMarkers,
   toggleShowMarkers,
@@ -49,8 +49,8 @@ export const LayerMenu = ({
         return (
           <MenuItem
             key={name}
-            intent={MapStyle == style ? "primary" : null}
-            labelElement={MapStyle == style ? <Icon icon="tick"></Icon> : null}
+            intent={mapStyle == style ? "primary" : null}
+            labelElement={mapStyle == style ? <Icon icon="tick"></Icon> : null}
             text={name}
             onClick={() => {
               chooseMapStyle(style);
@@ -73,7 +73,11 @@ export const LayerMenu = ({
     <div>
       {hide ? null : (
         <div className="mappagemenu">
-          <Popover content={dropMenu} minimal={true} position={Position.BOTTOM}>
+          <Popover
+            content={dropMenu}
+            minimal={true}
+            position={Position.BOTTOM_LEFT}
+          >
             <Tooltip content="Change Map">
               <Button minimal={true}>
                 <Icon icon="layers" iconSize={17} />

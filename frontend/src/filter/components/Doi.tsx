@@ -5,10 +5,10 @@ import styles from "./module.styl";
 const h = hyperStyled(styles);
 
 export function DoiFilter(props) {
-  const { updateDoi } = props;
+  const { dispatch } = props;
 
   const handleChange = (e) => {
-    updateDoi("doi_like", e.target.value);
+    dispatch({ type: "set-doi-like", doi: e.target.value });
   };
 
   return h("div.filter-card", [

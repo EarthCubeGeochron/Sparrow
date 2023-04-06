@@ -1,6 +1,6 @@
-from sparrow.plugins import SparrowCorePlugin
+from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.context import app_context
-from sparrow.util import relative_path
+from sparrow.core.util import relative_path
 from sparrow.database.util import run_sql_query_file
 from starlette.routing import Route, Router
 from starlette.responses import JSONResponse

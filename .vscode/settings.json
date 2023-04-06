@@ -1,10 +1,18 @@
 {
+  "search.exclude": {
+    "**/.yarn": true,
+    "**/.pnp.*": true
+  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[python]": {
     "editor.defaultFormatter": null
   },
   "python.formatting.provider": "black",
-
-  "python.linting.pylintEnabled": false,
-  "python.linting.enabled": true
+  "python.linting.pylintEnabled": true,
+  "python.linting.enabled": true,
+  "editor.formatOnSave": true,
+  "typescript.tsdk": "frontend/.yarn/sdks/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "prettier.prettierPath": "frontend/.yarn/sdks/prettier/index.js",
+  "python.linting.flake8Enabled": false
 }

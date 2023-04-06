@@ -1,10 +1,9 @@
 import sys
 from os import environ, getenv
-from click import secho
 from rich import print
-from sparrow_utils import relative_path, get_logger
 from typing import List
-from textwrap import dedent
+
+from macrostrat.utils import relative_path, get_logger
 from .models import Message, Level
 
 log = get_logger(__name__)
@@ -45,7 +44,7 @@ def prepare_docker_environment():
     environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
 
 
-def prepare_compose_overrides() -> List[Message]:
+def prepare_compose_overrides(cfg) -> List[Message]:
     base = environ["SPARROW_PATH"]
     main = relative_path(base, "docker-compose.yaml")
 
@@ -69,6 +68,9 @@ def prepare_compose_overrides() -> List[Message]:
         profiles.append("production")
     if is_truthy("SPARROW_TASK_WORKER"):
         profiles.append("task-worker")
+
+    if cfg.local_frontend:
+        profiles.remove("frontend")
 
     if len(profiles) > 0:
         # Only override profiles if they don't already exist in configuration.
@@ -151,7 +153,7 @@ def prepare_compose_overrides() -> List[Message]:
     elif overrides != "":
         compose_files += overrides.split(":")
 
-    environ["COMPOSE_FILE"] = ":".join(compose_files)
+    environ["COMPOSE_FILE"] = ":".join(str(c) for c in compose_files)
     log.info(f"Docker compose overrides: {compose_files}")
     return messages
 

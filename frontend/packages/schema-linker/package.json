@@ -9,8 +9,8 @@
   "author": "Daven Quinn",
   "license": "ISC",
   "dependencies": {
-    "@blueprintjs/core": "^3.39.0",
-    "@macrostrat/hyper": "^1.2.12"
+    "@blueprintjs/core": "^4.10.1",
+    "@macrostrat/hyper": "^2.2.1"
   },
   "devDependencies": {
     "typescript": "^4.2.3"

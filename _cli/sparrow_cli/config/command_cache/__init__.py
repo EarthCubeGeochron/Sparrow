@@ -37,15 +37,20 @@ def cli_cache_file():
 def get_backend_help_info(write_cache=True):
     env = dict(**os.environ)
     env["SPARROW_SECRET_KEY"] = env.get("SPARROW_SECRET_KEY", "Test")
-    out = exec_or_run(
-        "backend",
-        "/app/sparrow/__main__.py",
-        "get-cli-info",
-        stdout=PIPE,
-        env=env,
-        tty=False,
-        run_args=("--no-deps --rm",),
-    )
+    out = None
+    # In sparrow.core > 3, we no can longer import from the global namespace
+    for location in ["/app/sparrow/core/__main__.py", "/app/sparrow/__main__.py"]:
+        out = exec_or_run(
+            "backend",
+            location,
+            "get-cli-info",
+            stdout=PIPE,
+            env=env,
+            tty=False,
+            run_args=("--no-deps --rm",),
+        )
+        if out.returncode == 0:
+            break
     if out.returncode != 0:
         details = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"
         raise SparrowCommandError(

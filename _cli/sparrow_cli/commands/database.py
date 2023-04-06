@@ -1,5 +1,8 @@
 import click
 import sys
+
+from sparrow_cli.config import SparrowConfig
+from sparrow_cli.upgrade_database import upgrade_database_cluster
 from ..util import (
     CommandGroup,
     container_id,
@@ -7,7 +10,7 @@ from ..util import (
     compose,
     exec_sparrow,
 )
-from sparrow_utils.shell import cmd
+from macrostrat.utils.shell import cmd
 from subprocess import PIPE
 from rich import print
 from rich.console import Console
@@ -72,9 +75,22 @@ def drop_cache():
 
 @sparrow_db.command(name="update", context_settings=dict(ignore_unknown_options=True))
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
-def update(args):
+@click.pass_context
+def update(ctx, args):
     """Update the database schema"""
+    cfg = ctx.find_object(SparrowConfig)
+    # If needed, we upgrade the database cluster.
+    upgrade_database_cluster(cfg)
+
     exec_sparrow("db-update", *args)
+
+
+@sparrow_db.command(name="upgrade")
+@click.pass_context
+def upgrade(ctx):
+    """Upgrade the database cluster to the latest version"""
+    cfg = ctx.find_object(SparrowConfig)
+    upgrade_database_cluster(cfg)
 
 
 @sparrow_db.command(name="check-schema")

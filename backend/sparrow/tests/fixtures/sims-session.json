@@ -1,0 +1,29 @@
+{
+  "name": "20140513_d18O_Jake_Adam_Maciej.xls_10A-35_cc",
+  "sample": { "name": "10A-35_cc" },
+  "date": "2014-05-13T16:58:00",
+  "analysis": [
+    {
+      "analysis_name": "20140513@171.asc",
+      "analysis_type": "d18O10",
+      "datum": [
+        {
+          "value": 251,
+          "type": { "parameter": "INDEX", "unit": "INDEXexcel" }
+        },
+        {
+          "value": -1042,
+          "type": { "parameter": "d18OVSMOW", "unit": "permille_VSMOW" }
+        },
+        {
+          "value": -1042,
+          "type": { "parameter": "SD2ext", "unit": "permille" }
+        },
+        {
+          "value": -1042,
+          "type": { "parameter": "IMF", "unit": "permille" }
+        }
+      ]
+    }
+  ]
+}

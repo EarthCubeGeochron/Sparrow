@@ -2,10 +2,28 @@ FROM ghcr.io/earthcubegeochron/sparrow/backend-base:2.0 AS main
 # Multi-stage build of Sparrow backend.
 
 ## Git is required for the PyChron importer
-RUN apt update && apt install -y git
+RUN apt update && \
+  apt install -y git && \
+  pip install "poetry==1.2.1" && \
+  rm -rf /var/lib/apt/lists/*
 
-COPY ./requirements.txt /install/requirements.txt
-RUN pip install --no-cache -r /install/requirements.txt
+WORKDIR /app
+
+# For shared modules, first copy only requirements to install their dependencies.
+# Poetry must see them as a set of modules.
+COPY poetry.lock pyproject.toml /app/
+COPY __docker/dummy-shared-module-tree /app/shared-modules
+COPY shared-modules/database/pyproject.toml  /app/shared-modules/database/
+COPY shared-modules/dinosaur/pyproject.toml /app/shared-modules/dinosaur/
+COPY shared-modules/utils/pyproject.toml /app/shared-modules/utils/
+COPY shared-modules/pyproject.toml /app/shared-modules/pyproject.toml
+
+RUN mkdir -p /app/loader/sparrow/loader && touch /app/loader/sparrow/loader/__init__.py
+COPY loader/pyproject.toml /app/loader/
+COPY loader/README.md /app/loader/
+
+# Project initialization:
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root
 
 COPY ./docker.cfg /config/docker.cfg
 # These values should not change between installations
@@ -18,25 +36,17 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # This warning can get confused with an error,
 # but it's just pip being self-important
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
-# Disable caching to slim down image
-ENV PIP_NO_CACHE_DIR=1
-
-# For graphing the database schema
-RUN git clone https://github.com/davenquinn/sadisplay.git /ext/sadisplay \
-  && pip install -e /ext/sadisplay
 
 COPY ./docker-scripts/* /bin/
-RUN mkdir /app
-WORKDIR /app
 
 ## Copy app core
 COPY ./ /app/
 
-RUN pip install -e utils && pip install -e .
+RUN poetry install --no-interaction --no-ansi 
 
 # Copy command-line options to a place where they can be easily accessed
 # by the wrapper CLI.
-RUN SPARROW_SECRET_KEY=test /app/sparrow/__main__.py get-cli-info > /run/cli-info.json
+RUN SPARROW_SECRET_KEY=test /app/sparrow/core/__main__.py get-cli-info > /run/cli-info.json
 
 CMD ["/bin/run"]
 

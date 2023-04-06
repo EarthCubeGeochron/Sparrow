@@ -12,4 +12,9 @@ WHERE
   upper(txid_range) IS NULL
   AND lower(txid_range) IS NOT NULL;
 
-DROP SCHEMA pgmemento CASCADE;
+drop trigger if exists "log_transaction_trigger" on "public"."user";
+drop index if exists "pgmemento"."transaction_log_date_idx";
+drop index if exists "pgmemento"."transaction_log_unique_idx_2";
+drop index if exists "pgmemento"."transaction_log_unique_idx";
+
+DROP SCHEMA pgmemento;

@@ -15,7 +15,7 @@ export function Publication(props) {
         " – ",
         h("span.doi-info", [
           h("span.label", "DOI:"),
-          h("span.doi.bp3-monospace-text", doi),
+          h("span.doi.bp4-monospace-text", doi),
         ]),
       ];
     }

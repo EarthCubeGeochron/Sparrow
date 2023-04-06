@@ -11,22 +11,28 @@
     .site-title
       margin-top 0
       margin-bottom 0
-    .bp3-button
+    .bp4-button
       justify-content: flex-start
 
-.map-page
+.map-page, .fullscreen-map
   position fixed
   top 0
   left 0
+  right 0
+  bottom 0
   /* width 100vw
   height 100vh */
   .main-map
     position absolute
     top 0
     left 0
+    right 0
+    bottom 0
+
 
 .map-home {
   position: relative;
+  height: 400px;
 }
 .main-map {
   position: "absolute";
@@ -56,3 +62,18 @@
   display: flex;
   flex-direction: row;
 }
+
+.map-container
+  width: 100%
+  height: 100%
+
+// New map styles
+
+.map-panel {
+  height: 100%;
+  width: 100%;
+}
+
+.homepage-map
+  height: 300px
+  width: 100%

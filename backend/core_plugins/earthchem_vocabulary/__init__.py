@@ -1,4 +1,4 @@
-from sparrow.plugins import SparrowPlugin
+from sparrow.core.plugins import SparrowPlugin
 
 # Basic shim plugin that loads an external CLI
 class EarthChemVocabularyPlugin(SparrowPlugin):

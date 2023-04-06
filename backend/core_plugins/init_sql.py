@@ -1,4 +1,4 @@
-from sparrow.plugins import SparrowCorePlugin
+from sparrow.core.plugins import SparrowCorePlugin
 from os import environ
 from pathlib import Path
 from click import secho

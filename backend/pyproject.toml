@@ -1,0 +1,138 @@
+[tool.poetry]
+name = "sparrow"
+version = "0.1.0"
+description = ""
+authors = ["Daven Quinn <dev@davenquinn.com>"]
+packages = [
+  {include= "sparrow"},
+  {include = "core_plugins"},
+  {include = "sparrow_worker"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+# Preinstalled in 'sparrowdata/backend-base image'
+# due to long compile times.
+psycopg2 = "^2.9.6"
+shapely = "*"
+lxml = "*"
+numpy = "^1.22.3"
+pandas = "*"
+uvloop = "*"
+
+"macrostrat.database" = {path = "./shared-modules/database", develop = true }
+"macrostrat.utils" = {path = "./shared-modules/utils", develop = true }
+"macrostrat.dinosaur" = {path = "./shared-modules/dinosaur", develop = true }
+"sparrow.loader" = {path = "./loader", develop = true }
+
+sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
+
+# Core application
+Pygments = "2.10.0"
+sqlalchemy-utils = "^0.37.0"
+requests = "^2.26.0"
+toposort = "1.5"
+
+# Command-line interface
+click = "^8.1.0"
+click-plugins = "1.1.1"
+ipython = "7.27.0"
+
+# Static files
+aiofiles = "0.6.0"
+
+# Import file reading
+xlrd = "1.2.0"
+pyyaml = "5.4"
+beautifulsoup4 = "4.8.2"
+html5lib = "1.0.1"
+datefinder = "0.7.0"
+# Version 3.0 note: had to disable PyArrow due to build complexity.
+#pyarrow = "^7.0.0"
+openpyxl = "3.0.9"
+uncertainties = "3.1.6" 
+
+# Serialization/deserialization
+marshmallow = "3.11.1"
+marshmallow-sqlalchemy = "0.24.2"
+marshmallow-jsonschema = "0.10.0"
+stringcase = "1.2.0"
+
+# Prototype GraphQL API
+Flask-GraphQL = "2.0.1"
+graphene = "2.1.8"
+graphene_sqlalchemy = "2.2.2"
+
+# API version 2
+webargs-starlette = "2.0.0"
+apispec = "3.3.1"
+starlette-apispec = "1.0.3"
+
+# S3/AWS file access
+boto3 = "^1.12.25"
+
+# Testing and logging
+pytest = "^7.1.3"
+rich = "^12"
+deepdiff = { version = "5.0.2", extras = [ "murmur" ] }
+pytest-order = "0.9.5"
+
+# Authentication
+PyJWT = "1.7.1"
+
+# ASGI
+starlette = "0.13.4"
+Hypercorn = "0.11.1"
+asgiref = "3.2.8"
+
+
+# Plugin Dependencies
+crossrefapi = "1.5.0"
+
+# macrostrat.utils
+# NOTE: we should probably organize these internal
+# packages better...
+# -e ./utils
+
+# Task worker
+celery = "^5.1.1"
+redis = "3.5.3"
+broadcaster = { version = "0.2.0", extras = [ "redis" ] }
+# For worker auto-reloading in development
+watchdog = "2.1.2"
+argh = "0.26.2"
+pydantic = "1.8.2"
+
+typer = "^0.6"
+sqlakeyset = "^1.0.1629029818"
+setuptools = "^65.4.1"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.15.3"
+black = "^22.8.0"
+docker = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = "--pdbcls=IPython.terminal.debugger:Pdb --durations 10 --color=yes" # --capture=no --show-capture=no"
+# Also run tests that are imported from core sparrow code
+
+# This cache setup works for docker but may not work outside of it...
+cache_dir = "/tmp/sparrow-pytest-cache"
+markers = { slow = "Slow test that is usually ignored" }
+
+#log_cli = true
+#log_cli_level = "INFO"
+
+filterwarnings = [
+  "ignore::DeprecationWarning",
+  "ignore::UserWarning"
+]
+
+testpaths = [
+  "sparrow"
+]

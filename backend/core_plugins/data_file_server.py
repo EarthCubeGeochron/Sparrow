@@ -6,10 +6,10 @@ via the Sparrow API using x-accel-redirect
 import os
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import RedirectResponse, JSONResponse, Response
-from sparrow.plugins import SparrowCorePlugin
-from sparrow.context import get_sparrow_app
+from sparrow.core.plugins import SparrowCorePlugin
+from sparrow.core import get_sparrow_app
 from starlette.exceptions import HTTPException
-from sparrow_utils import get_logger
+from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
 

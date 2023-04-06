@@ -80,7 +80,7 @@ const errorHandler = function (route, response) {
   if (error != null) {
     msg = error.message;
   }
-  const message = h("div.api-error", [h("code.bp3-code", route), h("p", msg)]);
+  const message = h("div.api-error", [h("code.bp4-code", route), h("p", msg)]);
   return AppToaster.show({ message, intent: Intent.DANGER });
 };
 

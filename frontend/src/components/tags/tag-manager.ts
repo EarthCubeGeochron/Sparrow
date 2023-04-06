@@ -93,7 +93,7 @@ function TagRow(props) {
 }
 
 function TagManager() {
-  const data = useAPIv2Result("/api/v2/tags/tag?all=true");
+  const data = useAPIv2Result("/tags/tag?all=true");
   if (!data) return null;
 
   const total_count = data["total_count"];

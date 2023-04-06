@@ -1,11 +1,11 @@
 from pytest import fixture
 from os import environ
 from starlette.testclient import TestClient
-from sparrow.app import Sparrow
-from sparrow.context import _setup_context
-from sparrow.database.util import wait_for_database
-from sparrow.auth.create_user import _create_user
-from sparrow_tests.helpers.database import testing_database
+from sparrow.core.app import Sparrow
+from sparrow.core.context import _setup_context
+from macrostrat.database.utils import wait_for_database
+from sparrow.core.auth.create_user import _create_user
+from sparrow.tests.helpers.database import testing_database
 from sqlalchemy.orm import Session
 from sqlalchemy import event
 
@@ -14,7 +14,9 @@ from sqlalchemy import event
 
 # Right now, we run this setup code outside of a fixture so we
 # can see the setup output in real time.
-testing_db = "postgresql://postgres@db:5432/sparrow_test"
+testing_db = environ.get(
+    "SPARROW_TESTING_DATABASE", "postgresql://postgres@db:5432/sparrow_test"
+)
 environ["SPARROW_DATABASE"] = testing_db
 
 

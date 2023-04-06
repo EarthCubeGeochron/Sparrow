@@ -5,6 +5,8 @@ from subprocess import Popen
 from rich import print
 from time import sleep
 
+from sparrow_cli.help import echo_messages
+
 from ..config.environment import validate_environment
 from ..config import SparrowConfig
 from ..util import compose, cmd, log
@@ -41,6 +43,8 @@ def sparrow_up(ctx, container="", force_recreate=False):
     validate_environment()
 
     cfg = ctx.find_object(SparrowConfig)
+
+    echo_messages(cfg)
 
     _report_image_versions()
     # build containers
@@ -85,6 +89,26 @@ def sparrow_up(ctx, container="", force_recreate=False):
     print("[dim]- Sparrow can be stopped with the [cyan]sparrow down[/cyan] command.")
     print()
 
+    # Run frontend locally if desired
+    frontend_proc = None
+    if cfg.local_frontend:
+        frontend_dir = cfg.SPARROW_PATH / "frontend"
+        print("[green bold]Installing frontend dependencies")
+        cmd("yarn", cwd=frontend_dir)
+
+        print("[green bold]Starting frontend locally")
+        frontend_proc = Popen(
+            ["yarn", "run", "dev"],
+            cwd=frontend_dir,
+            env={
+                **os.environ,
+                "SPARROW_ENV": "local-development",
+                "API_BASE_URL": "http://localhost:5002/",
+                "BASE_URL": "/",
+            },
+        )
+        print()
+
     # Make sure popen call gets logged...
     _log_cmd = ["sparrow", "logs", container]
     log.debug(" ".join(_log_cmd))
@@ -107,3 +131,5 @@ def sparrow_up(ctx, container="", force_recreate=False):
         cmd("sparrow", "db", "check-schema")
 
     p.wait()
+    if frontend_proc is not None:
+        frontend_proc.wait()

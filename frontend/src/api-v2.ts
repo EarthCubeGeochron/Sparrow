@@ -1,47 +1,15 @@
-import SwaggerUI from "swagger-ui-react";
-import "swagger-ui-react/swagger-ui.css";
-import h from "@macrostrat/hyper";
 import {
   createAPIContext,
   useAPIResult,
   APIOptions,
 } from "@macrostrat/ui-components";
-import { NavButton } from "~/components";
-import { Card } from "@blueprintjs/core";
 import join from "url-join";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useCallback, useContext, useState } from "react";
-
-export function APIExplorerV2(props) {
-  return h(Card, { className: "api-explorer-v2 bp3-light" }, [
-    h("div.minimal-navbar", [
-      h(
-        NavButton,
-        {
-          className: "bp3-light",
-          to: "/api-explorer/v1",
-          minimal: false,
-          large: true,
-        },
-        "Version 1"
-      ),
-      h(
-        NavButton,
-        {
-          className: "bp3-light",
-          to: "/import-schema-explorer",
-          minimal: false,
-          large: true,
-        },
-        "Import schemas"
-      ),
-    ]),
-    h(SwaggerUI, { url: "/api/v2/schema" }),
-  ]);
-}
+import { apiBaseURL } from "./env";
 
 export const APIV2Context = createAPIContext({
-  baseURL: join(process.env.API_BASE_URL ?? "/", "/api/v2"),
+  baseURL: join(apiBaseURL, "/api/v2"),
 });
 
 export function useAPIv2Result(
@@ -51,6 +19,20 @@ export function useAPIv2Result(
 ) {
   /** Temporary shim to convert V1 API to V2 */
   opts.context = APIV2Context;
+  return useAPIResult(route, params, opts);
+}
+
+export const APIV3Context = createAPIContext({
+  baseURL: join(apiBaseURL, "/api/v3"),
+});
+
+export function useAPIv3Result(
+  route,
+  params = {},
+  opts: Partial<APIOptions> = {}
+) {
+  /** Temporary shim to convert V1 API to V2 */
+  opts.context = APIV3Context;
   return useAPIResult(route, params, opts);
 }
 

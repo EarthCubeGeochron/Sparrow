@@ -1,11 +1,8 @@
 FROM node:16 AS base
 
-# Yarn is already installed
-CMD yarn run dev:docker
+WORKDIR /app/
 
 FROM base AS frontend
-
-WORKDIR /app/
 
 COPY package.json .
 
