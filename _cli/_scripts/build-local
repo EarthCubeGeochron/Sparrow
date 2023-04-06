@@ -4,6 +4,7 @@
 if ! command -v poetry &> /dev/null
 then
   curl -ksSL https://install.python-poetry.org | python3 -
+  export PATH="$HOME/.local/bin:$PATH"
 fi
 
 # Meant to be run from the repository root folder
