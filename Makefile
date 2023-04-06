@@ -70,3 +70,7 @@ install-hooks:
 format-code:
 	black backend/**/*.py _cli/**/*.py
 	prettier --ignore-path frontend/.prettierignore --write frontend
+
+get-poetry-installer: 
+	rm -f _cli/_scripts/install-poetry.py && \
+  curl -sSL https://install.python-poetry.org > _cli/_scripts/install-poetry.py
