@@ -17,7 +17,7 @@ services:
     volumes:
       - pytest_cache:/run/.pytest_cache
   db:
-    image: mdillon/postgis:11
+    image: postgis/postgis:14-3.3
     ports:
       # We could change this to port 54321 if we were cool with
       # it conflicting with our default for Sparrow itself. This
@@ -27,5 +27,7 @@ services:
       - 5432
     environment:
       - POSTGRES_DB=sparrow
+      - PGUSER=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
 volumes:
   pytest_cache:

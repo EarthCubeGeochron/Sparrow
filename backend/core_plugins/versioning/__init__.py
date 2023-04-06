@@ -5,8 +5,8 @@ from macrostrat.utils import relative_path, cmd
 from sparrow.core import get_database
 import click
 from pathlib import Path
-
-from macrostrat.database import Database
+from sqlalchemy.exc import ProgrammingError
+from sparrow.database import Database
 from macrostrat.database.utils import connection_args, run_sql
 
 exclude_tables = ["spatial_ref_sys"]
@@ -82,8 +82,9 @@ def upgrade_audit_trail(engine):
     Upgrade PGMemento audit trail
     """
     procedures = [
+        "pg-memento/ctl/UPGRADE",
         "pg-memento/UPGRADE_v061_to_v07",
-        "pg-memento/UPGRADE_v07_to_v073",
+        "pg-memento/UPGRADE_v07_to_v074",
     ]
 
     args = connection_args(engine)
@@ -91,25 +92,65 @@ def upgrade_audit_trail(engine):
     for _id in procedures:
         print("Running PGMemento procedure", _id)
         fp = relative_path(__file__, _id + ".sql")
-        cmd(f"psql -f {fp}", *args, cwd=Path(__file__).parent)
+        run_psql(engine, fp)
+
+
+def run_psql(engine, fp):
+    args = connection_args(engine)
+    cmd(f"psql -f {fp}", *args, cwd=Path(__file__).parent)
+
+
+def get_procedure(name):
+    sql = relative_path(__file__, "procedures", name + ".sql")
+    return open(sql).read()
+
+
+def get_old_triggers(engine):
+    """
+    Get the old triggers that need to be dropped
+    """
+    return engine.execute(get_procedure("get-old-triggers")).fetchall()
+
+
+def get_old_audit_id(engine):
+    return engine.execute(get_procedure("get-old-audit-id")).fetchall()
 
 
 class PGMementoMigration(SchemaMigration):
-    """Migrate audit logging to version 0.7.3"""
+    """Migrate audit logging to version 0.7.4 from the 0.6 series"""
 
     name = "document-table-migration"
     target = None
 
     def should_apply(self, source, target, migrator):
-        return has_audit_id(source, "public", "sample", col_name="audit_id")
+        db = Database(source.url)
+        old_triggers = get_old_triggers(db.session)
+        old_audit_id = get_old_audit_id(db.session)
+        return (
+            has_audit_id(source, "public", "sample", col_name="audit_id")
+            and len(old_triggers) > 0
+            and len(old_audit_id) > 0
+        )
 
     def apply(self, engine):
-        upgrade_audit_trail(engine)
-        engine.execute("DROP SEQUENCE IF EXISTS pgmemento.audit_id_seq CASCADE")
-        engine.execute("DROP TABLE pgmemento.audit_tables_copy")
-
         db = Database(engine.url)
-        db.exec_sql(relative_path(__file__, "drop-old-audit-id.sql"))
+        upgrade_audit_trail(engine)
+        # A scorched-earth approach to dropping the v1 audit trail
+        db.session.execute("DROP SCHEMA IF EXISTS core_view CASCADE")
+
+        sql = ""
+        for trigger in get_old_triggers(db.session):
+            for op in ["insert", "update", "delete", "truncate"]:
+                sql += f"DROP TRIGGER IF EXISTS log_{op}_trigger ON {trigger.schema}.{trigger.table} CASCADE;\n"
+        for audit_id in get_old_audit_id(db.session):
+            sql += f"ALTER TABLE {audit_id.schema}.{audit_id.table} DROP COLUMN audit_id CASCADE;\n"
+        run_sql(db.session, sql)
+        db.session.commit()
+        db.exec_sql(relative_path(__file__, "drop-audit.sql"))
+
+        build_audit_tables(db)
+
+        db.recreate_views()
 
         # migration = AutoMigration(engine, self.target)
         # migration.add_all_changes()
@@ -128,6 +169,35 @@ class PGMementoMigration(SchemaMigration):
         #         engine.execute(stmt)
 
 
+class PGMemento074Migration(SchemaMigration):
+    """
+    Migrate PGMemento to a bugfix release to handle PostgreSQL 15.
+    This migration only runs if we are on version 0.7.3.
+    """
+
+    def should_apply(self, source, target, migrator):
+        # Get the version of PGMemento
+        try:
+            version = source.execute(
+                "SELECT major_version, minor_version, revision FROM pgmemento.version()"
+            ).scalar()
+        except ProgrammingError:
+            return False
+        # Parse version string
+        print(version)
+        return (
+            version.major_version == 0
+            and version.minor_version == 7
+            and version.revision < 4
+        )
+
+    def apply(self, engine):
+        fp = relative_path(__file__, "pg-memento/UPGRADE_v07_to_v074.sql")
+        run_psql(engine, fp)
+        db = Database(engine.url)
+        db.initialize()
+
+
 def build_audit_tables(db):
     procedures = []
 
@@ -139,6 +209,8 @@ def build_audit_tables(db):
 
     # Basic setup procedures
     procedures += [
+        "SETUP",
+        "SETUP",  # Run twice to ensure all tables are created
         "SETUP",
         "LOG_UTIL",
         "DDL_LOG",
@@ -157,10 +229,6 @@ def build_audit_tables(db):
 class VersioningPlugin(SparrowCorePlugin):
     name = "versioning"
 
-    def proc(self, id):
-        fn = id + ".sql"
-        return
-
     def on_finalize_database_schema(self, db):
         build_audit_tables(db)
 
@@ -169,3 +237,4 @@ class VersioningPlugin(SparrowCorePlugin):
 
     def on_prepare_database_migrations(self, migrator):
         migrator.add_migration(PGMementoMigration)
+        migrator.add_migration(PGMemento074Migration)

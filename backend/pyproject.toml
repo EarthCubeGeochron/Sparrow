@@ -14,7 +14,7 @@ python = "^3.9"
 
 # Preinstalled in 'sparrowdata/backend-base image'
 # due to long compile times.
-psycopg2 = "*"
+psycopg2 = "^2.9.6"
 shapely = "*"
 lxml = "*"
 numpy = "^1.22.3"
