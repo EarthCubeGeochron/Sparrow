@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# Install poetry if not already installed
+if ! command -v poetry &> /dev/null
+then
+  pip3 install poetry
+fi
+
 # Meant to be run from the repository root folder
 cd _cli
 poetry install
