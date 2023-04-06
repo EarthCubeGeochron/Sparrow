@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 from os import path
-from sparrow_utils.shell import git_revision_info
+from macrostrat.utils.shell import git_revision_info
 from importlib import import_module
 
 block_cipher = None
