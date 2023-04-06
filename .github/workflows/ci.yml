@@ -11,12 +11,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
+      # We had to remove submodule recursion due to changes in pgMemento
       - name: Update submodules
-        run: git submodule update --init --recursive
+        run: git submodule update --init
 
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.9'
 
       # Bundling
       - name: Install software for local development 
