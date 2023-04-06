@@ -52,7 +52,6 @@ class ImporterEndpoint(WebSocketEndpoint):
         return plugin.loop
 
     async def on_receive(self, session, message):
-
         log.debug(f"Received message {message}")
         action = message.get("action", None)
         name = session.path_params["pipeline"]

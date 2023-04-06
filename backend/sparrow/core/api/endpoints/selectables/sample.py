@@ -61,7 +61,6 @@ class MapSamples(HTTPEndpoint):
     """
 
     async def get(self, request):
-
         db = get_database()
         sample = db.model.sample
         sampleSchema = db.interface.sample(many=True)

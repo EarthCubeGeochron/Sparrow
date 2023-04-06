@@ -77,7 +77,6 @@ class DataFileListEndpoint(HTTPEndpoint):
         # We should probably make this a "with" statement or something
         # to use throughout our API code.
         with db.session_scope(commit=False):
-
             try:
                 DataFile = self.model
 
@@ -147,13 +146,11 @@ class DataFileFilterByModelID(HTTPEndpoint):
         # We should probably make this a "with" statement or something
         # to use throughout our API code.
         with db.session_scope(commit=False):
-
             DataFile = db.model.data_file
             DataFileLink = db.model.data_file_link
 
             data = []
             for model_name, model_ids in model_names.items():
-
                 q = db.session.query(
                     DataFile.file_hash,
                     DataFile.file_mtime,

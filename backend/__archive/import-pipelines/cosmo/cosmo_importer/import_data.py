@@ -97,7 +97,6 @@ class CosmoImporter(BaseImporter):
 
 
 def import_datafile(db, fn):
-
     input = read_excel(fn, sheet_name=0, index_col=0, header=0)
     output = read_excel(fn, sheet_name=1, index_col=0, header=0)
 

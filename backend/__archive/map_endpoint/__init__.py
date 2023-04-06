@@ -10,11 +10,9 @@ import json
 
 
 class MapGeoJSONEndpoint(SparrowCorePlugin):
-
     name = "map-geojson"
 
     def geojson_view(self):
-
         db = self.app.database
         p = Path(relative_path(__file__, "geojson.sql"))
 
@@ -25,7 +23,6 @@ class MapGeoJSONEndpoint(SparrowCorePlugin):
         return JSONResponse(a)  # a is a list of geojson objects
 
     def on_api_initialized_v2(self, api):
-
         root_route = "core_view"
         basic_info = dict(
             route="/core_view/all_samples",

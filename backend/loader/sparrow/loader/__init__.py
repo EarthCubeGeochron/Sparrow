@@ -43,14 +43,7 @@ def show_loader_schemas(*schemas: List[str], nest_depth=0, show_dump_only=False)
 
         schemas = list(schemas)
         schemas.sort()
-        prepended = [
-            "project",
-            "sample",
-            "session",
-            "analysis",
-            "datum",
-            "datum_type",
-        ]
+        prepended = ["project", "sample", "session", "analysis", "datum", "datum_type"]
         schemas = [s for s in schemas if s not in prepended]
         schemas = prepended + schemas
 

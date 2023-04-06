@@ -55,7 +55,6 @@ class TestAPIImporter:
         db.load_data("session", complex_data["data"])
 
     def test_very_large_import(self, client, token):
-
         import_size = 10
 
         i = 0

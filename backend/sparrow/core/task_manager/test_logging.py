@@ -19,7 +19,6 @@ class MockLogger(ChunkedMessageLogger):
 
 
 def test_remote_logging():
-
     logger = MockLogger()
 
     with logger.redirect_output():

@@ -35,7 +35,6 @@ def construct_error_response(err: Exception, code: int):
 
 
 class ImportData(HTTPEndpoint):
-
     # http://localhost:5002/api/v2/import-data/models/{model_name}
 
     # Raises a https://marshmallow.readthedocs.io/en/stable/api_reference.html#marshmallow.exceptions.ValidationError

@@ -176,7 +176,6 @@ class BaseImporter(ImperativeImportHelperMixin):
         return None
 
     def _create_data_file_record(self, fn, extra_data):
-
         # Get the path location (this must be unique)
         _infile = Path(fn)
         file_path = self.build_reference_path(_infile, extra_data)

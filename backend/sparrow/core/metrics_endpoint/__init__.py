@@ -22,7 +22,6 @@ class MetricsEndpoint(SparrowCorePlugin):
     name = "metrics"
 
     def metrics_view(self):
-
         db = self.app.database
         p = Path(relative_path(__file__, "metrics.sql"))
         sqlfile = open(p, "r")
@@ -34,7 +33,6 @@ class MetricsEndpoint(SparrowCorePlugin):
         return JSONResponse(json.loads(res))
 
     def on_api_initialized_v2(self, api):
-
         root_route = "core_view"
         basic_info = dict(
             route="/core_view/metrics", description="A metrics route for Sparrow"

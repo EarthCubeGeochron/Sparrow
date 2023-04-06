@@ -19,7 +19,7 @@ class PyChronImporter(BaseImporter):
     def import_all(self, remote, repo_names, **kwargs):
         local_root = path.join(environ["SPARROW_DATA_DIR"], ".pychron-repo-cache")
         pr = PyChronRepoCrawler(remote, repo_names, local_root=local_root)
-        for (uid, local_path, remote_url) in pr.scan():
+        for uid, local_path, remote_url in pr.scan():
             self._import_datafile(
                 local_path,
                 rec=None,

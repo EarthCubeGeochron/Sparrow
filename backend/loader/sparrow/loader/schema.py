@@ -123,7 +123,6 @@ class ModelSchema(SQLAlchemyAutoSchema):
         # It would be nice if we didn't have to pass nests down here...
         _nests = nests or self.allowed_nests
         for key, field in self.fields.items():
-
             if not isinstance(field, Related):
                 continue
             # Yield this relationship

@@ -224,7 +224,6 @@ class APIv1(API):
 
             # JWT is optional...
             def get(self):
-
                 args = parser.parse_args()
 
                 # Check identity and abort if unauthorized

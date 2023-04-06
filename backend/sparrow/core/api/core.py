@@ -143,7 +143,6 @@ class APIv2(Starlette):
         )
 
     def _add_routes(self):
-
         self.add_route("/", APIEntry)
 
         db = self._app.database

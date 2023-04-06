@@ -33,7 +33,7 @@ class API(Api):
                 )
             (endpoint,) = endpoints
 
-            for (args, kwargs) in resource.resource_arguments:
+            for args, kwargs in resource.resource_arguments:
                 (r, e) = args
                 e = endpoint + e
                 super().add_resource(r, e, **kwargs)

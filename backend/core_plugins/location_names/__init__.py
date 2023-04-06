@@ -52,7 +52,7 @@ class LocationNamesPlugin(SparrowPlugin):
             q = q.filter(s.location_name == None)
 
         i = 0
-        for (s, json_string) in q:
+        for s, json_string in q:
             # Get point coordinate
             coord = loads(json_string)["coordinates"]
 

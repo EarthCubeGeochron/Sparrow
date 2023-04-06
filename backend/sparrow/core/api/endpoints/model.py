@@ -209,7 +209,6 @@ class ModelAPIEndpoint(HTTPEndpoint):
         # We should probably make this a "with" statement or something
         # to use throughout our API code.
         with db.session_scope(commit=False):
-
             q = db.session.query(schema.opts.model)
 
             for _filter in self._filters:

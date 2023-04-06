@@ -53,7 +53,6 @@ def make_changes(tablename, changes, session):
     new_changes = project_pub_check(changes)
 
     for ele in new_changes:
-
         ## make sure the ID was passed
         if "id" not in ele:
             raise Exception("You need to pass the row ID")

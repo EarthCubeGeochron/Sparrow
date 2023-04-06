@@ -9,10 +9,7 @@ from macrostrat.utils import relative_path, cmd
 from macrostrat.dinosaur import _create_migration, create_schema_clone
 from macrostrat.database.utils import connection_args, temp_database, run_sql
 from sparrow.core.open_search import DocumentTableMigration
-from core_plugins.versioning import (
-    PGMementoMigration,
-    PGMemento074Migration,
-)
+from core_plugins.versioning import PGMementoMigration, PGMemento074Migration
 from pytest import mark, fixture
 from macrostrat.utils import get_logger
 
@@ -45,7 +42,6 @@ def migration_base():
 class TestDatabaseMigrations:
     @mark.xfail(reason="This doesn't work due to complexities with audit tables")
     def test_migration(self, db, migration_base):
-
         test_app = Sparrow(debug=True, database=migration_base.url)
         test_app.setup_database(automap=False)
         # We can use the existing testing database as a target

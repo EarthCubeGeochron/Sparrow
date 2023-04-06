@@ -4,6 +4,7 @@ from .core import APIv2
 from .response import APIResponse
 from .exceptions import SparrowAPIError
 
+
 # Shim redirect for root path.
 # TODO: clean this up
 async def redirect(*args):

@@ -223,7 +223,6 @@ class TestDeclarativeImporter:
         ensure_single(db, "session", name="Declarative import test")
 
     def test_duplicate_parameter(self, db):
-
         data = {
             "date": "2020-02-02T10:20:02",
             "name": "Declarative import test 2",
@@ -399,7 +398,6 @@ class TestDeclarativeImporter:
             assert err.messages["session"][0] == "Missing data for required field."
 
     def test_duplicate_datum_type(self, db):
-
         data = {
             "date": str(datetime.now()),
             "name": "Session with existing instances",

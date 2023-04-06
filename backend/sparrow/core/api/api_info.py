@@ -34,7 +34,6 @@ def meta_info():
 
 
 def get_field_description(type_: str, field_name: str, schema):
-
     schema_name = schema.opts.model.__name__.lower()
 
     field_descriptions = api_help["fields"]["descriptions"]

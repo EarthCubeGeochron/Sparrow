@@ -37,7 +37,6 @@ class TagsEdits(HTTPEndpoint):
         data = await request.json()
 
         with db.session_scope():
-
             tag_ids = data["tag_ids"]
             model_id = data["model_id"]
 
@@ -103,7 +102,6 @@ class Tags(SparrowCorePlugin):
             db.exec_sql(f)
 
     def on_api_initialized_v2(self, api):
-
         # Initialize tag data if none
         self.default_tags()
         api.mount("/tags", TagsEditsRouter, name=TagsEdits.name)

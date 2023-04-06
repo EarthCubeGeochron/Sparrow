@@ -47,9 +47,7 @@ class SampleCheckMigration(SchemaMigration):
     def apply(self, db):
         sess = sessionmaker(bind=db.engine)()
         run_sql(
-            sess,
-            "ALTER TABLE sample DROP CONSTRAINT sample_check",
-            stop_on_error=True,
+            sess, "ALTER TABLE sample DROP CONSTRAINT sample_check", stop_on_error=True
         )
 
 

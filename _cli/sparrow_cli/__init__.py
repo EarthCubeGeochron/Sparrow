@@ -86,7 +86,6 @@ def main(ctx, args):
         return echo_help(cli, ctx, cfg.bin_directories)
 
     if subcommand == "compose":
-
         # docker-compose respecting sparrow environment
         return _docker_compose(*rest)
 

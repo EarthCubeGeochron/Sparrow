@@ -18,8 +18,7 @@ db = Database(uri)
 
 mapper = DatabaseMapper(db)
 mapper.reflect_database(
-    schemas=["vocabulary", "core_view", "tags", "public"],
-    use_cache=False,
+    schemas=["vocabulary", "core_view", "tags", "public"], use_cache=False
 )
 
 cache_builder = DatabaseModelCache(

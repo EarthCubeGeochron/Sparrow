@@ -11,8 +11,7 @@ app = typer.Typer(no_args_is_help=True)
 
 
 @app.command(
-    name="show-schemas",
-    help="Show loader schemas for Sparrow database models",
+    name="show-schemas", help="Show loader schemas for Sparrow database models"
 )
 def show_schemas(nest_depth: int = 0, show_dump_only=False):
     """Print the loader schema for a Sparrow database model"""
@@ -31,10 +30,7 @@ def show_schema(schema: str, nest_depth: int = 0, show_dump_only=False):
         )
 
 
-@app.command(
-    name="validate",
-    help="Validate data piped from stdin",
-)
+@app.command(name="validate", help="Validate data piped from stdin")
 def _validate_data(model_name: str):
     """Check a dictionary of data against a Sparrow database model"""
     data = json.load(sys.stdin)

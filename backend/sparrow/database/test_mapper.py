@@ -1,4 +1,8 @@
-from sparrow.database.mapper import BaseModel, SparrowDatabaseMapper, should_enable_cache
+from sparrow.database.mapper import (
+    BaseModel,
+    SparrowDatabaseMapper,
+    should_enable_cache,
+)
 
 
 def test_db_mapper_cache(db):

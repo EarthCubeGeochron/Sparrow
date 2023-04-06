@@ -156,10 +156,7 @@ class Database(BaseDatabase):
             secho(str(err))
 
     def recreate_views(self):
-        views = [
-            "06-views.sql",
-            "07-postgrest-api.sql",
-        ]
+        views = ["06-views.sql", "07-postgrest-api.sql"]
         for view in views:
             fp = relative_path(__file__, "fixtures", view)
             self.exec_sql(fp)

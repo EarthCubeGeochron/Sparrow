@@ -91,7 +91,6 @@ def db(app, pytestconfig):
         @event.listens_for(session, "after_transaction_end")
         def restart_savepoint(session, transaction):
             if transaction.nested and not transaction._parent.nested:
-
                 # ensure that state is expired the way
                 # session.commit() at the top level normally does
                 # (optional step)

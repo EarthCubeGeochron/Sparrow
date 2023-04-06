@@ -18,7 +18,6 @@ search_total = queries / "open-search.sql"
 
 
 class OpenSearchEndpoint(HTTPEndpoint):
-
     args_schema = dict(
         page=Str(missing=None, description="Page"),
         per_page=Int(missing=20, description="Number to show"),
@@ -29,7 +28,6 @@ class OpenSearchEndpoint(HTTPEndpoint):
         super().__init__(*args, **kwargs)
 
     async def get(self, request):
-
         db = app_context().database
         query_params = request.query_params
         if "query" not in query_params or "model" not in query_params:

@@ -76,7 +76,6 @@ def construct_example_json(type_, name, field, schema):
 
 
 def construct_field_info(field):
-
     is_schema = False
     is_list = False
     id_type = None
