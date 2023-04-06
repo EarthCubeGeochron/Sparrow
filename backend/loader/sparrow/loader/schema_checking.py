@@ -48,3 +48,7 @@ def get_automap_base():
 def get_model(name):
     base = get_automap_base()
     return getattr(base.classes, name)
+
+
+def clear_model_cache():
+    _model_cache.set(None)

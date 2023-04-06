@@ -9,15 +9,21 @@ from macrostrat.utils import relative_path, cmd
 from macrostrat.dinosaur import _create_migration, create_schema_clone
 from macrostrat.database.utils import connection_args, temp_database
 from sparrow.core.open_search import DocumentTableMigration
-from core_plugins.versioning import PGMementoMigration
+from core_plugins.versioning import (
+    PGMementoMigration,
+    PGMemento074Migration,
+)
 from pytest import mark, fixture
+from macrostrat.utils import get_logger
 
 target_db = environ.get("SPARROW_DATABASE")
 testing_db = target_db + "_migration"
 
+log = get_logger(__name__)
+
 
 class BasicMigration:
-    def should_apply(self, db, target):
+    def should_apply(self, db, target, migrator):
         # If analysis has column but target db does not
         # we should return true
         return True
@@ -50,22 +56,35 @@ class TestDatabaseMigrations:
 
         # Apply migrations
         migrations = [
-            BasicMigration,
-            InstrumentSessionMigration,
-            SampleCheckMigration,
             DocumentTableMigration,
             PGMementoMigration,
+            PGMemento074Migration,
+            InstrumentSessionMigration,
+            SampleCheckMigration,
             SampleLocationAddSRID,
+            BasicMigration,
         ]
+
+        migrations = [m() for m in migrations]
 
         migrations = [
             m for m in migrations if m.should_apply(test_app.db.engine, db.engine, None)
         ]
         while len(migrations) > 0:
+            errors = []
             for m in migrations:
-                m.apply(test_app.db.engine)
-                # We have applied this migration and should not do it again.
-                migrations.remove(m)
+                log.info(f"Applying migration {type(m).__name__}")
+                try:
+                    m.apply(test_app.db.engine)
+                    # We have applied this migration and should not do it again.
+                    migrations.remove(m)
+                    log.info(f"Applied migration {type(m).__name__}")
+                except Exception as exc:
+                    log.error(f"Failed to apply migration {type(m).__name__}")
+                    errors.append(exc)
+            if len(errors) > 0 and len(errors) == len(migrations):
+                log.error("Failed to apply all migrations")
+                raise errors[0]
             migrations = [
                 m
                 for m in migrations
@@ -74,13 +93,13 @@ class TestDatabaseMigrations:
 
         # Migrating to the new version should now be "safe"
         migration = _create_migration(test_app.database.engine, db.engine)
-        print(list(migration.unsafe_changes()))
+        for change in migration.unsafe_changes():
+            print(change)
         assert migration.is_safe
 
-        migration.apply(quiet=True)
+        migration.apply(quiet=False)
         # Re-add changes
         migration.add_all_changes()
-
         assert len(migration.statements) == 0
 
     @mark.slow

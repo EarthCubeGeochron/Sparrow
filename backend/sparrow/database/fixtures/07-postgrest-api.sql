@@ -77,7 +77,7 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
       geometry,
       -- Snapping to a grid allows us to efficiently group nearby points together
       -- We could also use the ST_ClusterDBSCAN function for a less naive implementation
-      ST_SnapToGrid(geometry, 8, 8) snapped_geometry,
+      ST_SnapToGrid(geometry, 8, 8) snapped_geometry
       --ST_ClusterDBSCAN(geometry, 16, 2) OVER () cluster_id
     FROM mvt_features
   ),
