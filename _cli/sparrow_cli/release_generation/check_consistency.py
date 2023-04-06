@@ -39,7 +39,7 @@ def _check_consistency(version=None, exact=False):
         assert latest_tag == current_rev
 
     # Check backend version
-    backend_meta = path.join("backend", "sparrow", "meta.py")
+    backend_meta = path.join("backend", "sparrow", "core", "meta.py")
     meta = run_path(backend_meta)
     _version = meta["__version__"]
     assert _version == version

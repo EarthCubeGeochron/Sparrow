@@ -277,7 +277,7 @@ class SparrowConfig:
         return _local_frontend
 
     def check_database_version(self):
-        cluster_volume_name = self.project_name + "_db_cluster"
+        cluster_volume_name = self.project_name.lower() + "_db_cluster"
         version = check_database_cluster_version(cluster_volume_name)
         self.postgres_current_version = version
         if version is None:

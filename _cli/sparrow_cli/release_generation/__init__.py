@@ -13,7 +13,7 @@ from .check_consistency import check_consistency
 
 
 def write_version_info(version):
-    backend_meta = path.join("backend", "sparrow", "meta.py")
+    backend_meta = path.join("backend", "sparrow", "core", "meta.py")
     with open(backend_meta, "w") as f:
         f.write(f'__version__ = "{version}"\n')
 

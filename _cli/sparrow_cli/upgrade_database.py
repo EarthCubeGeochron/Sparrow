@@ -17,6 +17,9 @@ from subprocess import Popen
 import asyncio
 import typing as T
 import sys
+from macrostrat.utils import get_logger
+
+log = get_logger(__name__)
 
 environ.setdefault("DOCKER_HOST", "unix:///var/run/docker.sock")
 
@@ -32,6 +35,7 @@ def check_database_cluster_version(volume_name: str):
     """
     cluster_dir = "/var/lib/postgresql/data"
     version_file = Path(cluster_dir) / "PG_VERSION"
+    log.info(f"Checking version of database cluster in volume {volume_name}")
     try:
         stdout = client.containers.run(
             "bash",
@@ -40,7 +44,8 @@ def check_database_cluster_version(volume_name: str):
             remove=True,
             stdout=True,
         )
-    except docker.errors.ContainerError:
+    except docker.errors.ContainerError as exc:
+        log.error(exc)
         return None
     return int(stdout.decode("utf-8").strip())
 
@@ -48,8 +53,8 @@ def check_database_cluster_version(volume_name: str):
 version_images = {11: "mdillon/postgis:11", 14: "postgis/postgis:14-3.3"}
 
 
-def database_cluster_version(cfg):
-    cluster_volume_name = cfg.project_name + "_db_cluster"
+def database_cluster_version(cfg: str):
+    cluster_volume_name = cfg.project_name.lower() + "_db_cluster"
     return check_database_cluster_version(cluster_volume_name)
 
 
