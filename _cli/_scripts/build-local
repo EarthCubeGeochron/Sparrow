@@ -3,7 +3,7 @@
 # Install poetry if not already installed
 if ! command -v poetry &> /dev/null
 then
-  curl -sSL https://install.python-poetry.org | python3 -
+  curl -ksSL https://install.python-poetry.org | python3 -
 fi
 
 # Meant to be run from the repository root folder
