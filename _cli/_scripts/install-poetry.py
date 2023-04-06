@@ -348,10 +348,7 @@ class VirtualEnvironment:
     @staticmethod
     def run(*args, **kwargs) -> subprocess.CompletedProcess:
         completed_process = subprocess.run(
-            args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            **kwargs,
+            args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargs
         )
         if completed_process.returncode != 0:
             raise PoetryInstallationError(
