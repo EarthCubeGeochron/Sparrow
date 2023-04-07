@@ -181,7 +181,7 @@ def upgrade_database_cluster(cfg):
         raise SparrowCommandError("Target PostgreSQL version is not supported")
 
     # Create the volume for the new cluster
-    dest_volume = ensure_empty_docker_volume(cluster_new_name)
+    dest_volume = ensure_empty_docker_volume(cfg.docker_client, cluster_new_name)
 
     print(
         f"Upgrading database cluster from version {current_version} to {cfg.postgres_supported_version}..."
@@ -255,7 +255,7 @@ def upgrade_database_cluster(cfg):
     console.print(
         f"Moving contents of new volume to {cluster_volume_name}", style="bold"
     )
-    replace_docker_volume(cluster_new_name, cluster_volume_name)
+    replace_docker_volume(client, cluster_new_name, cluster_volume_name)
     client.volumes.get(cluster_new_name).remove(force=True)
 
     console.print("Done!", style="bold green")
