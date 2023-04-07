@@ -1,12 +1,12 @@
 from celery import Celery
 from celery.signals import after_setup_logger
 from macrostrat.utils import setup_stderr_logs
-import sparrow
+from sparrow.core import get_app
 import redis
 import json
 import time
 
-_app = sparrow.core.get_app()
+_app = get_app()
 _app.setup_database()
 
 app = _app.plugins.get("task-manager").celery
