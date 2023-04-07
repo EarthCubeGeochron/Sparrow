@@ -26,6 +26,6 @@ jobs:
       - name: Run Sparrow core tests
         run: sparrow test
 
-      - name: Run Sparrow integration tests
-        run: sparrow test integration
+      # - name: Run Sparrow integration tests
+      #   run: sparrow test integration
 

@@ -3,7 +3,7 @@
 # Install poetry if not already installed
 if ! command -v poetry &> /dev/null
 then
-  python3 _cli/_scripts/install-poetry.py
+  curl -sSL https://install.python-poetry.org | python3 - 
   export PATH="$HOME/.local/bin:$PATH"
 fi
 
