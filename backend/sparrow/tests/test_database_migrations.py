@@ -40,7 +40,6 @@ def migration_base():
 
 # @mark.order(-1)
 class TestDatabaseMigrations:
-    @mark.xfail(reason="This doesn't work due to complexities with audit tables")
     def test_migration(self, db, migration_base):
         test_app = Sparrow(debug=True, database=migration_base.url)
         test_app.setup_database(automap=False)

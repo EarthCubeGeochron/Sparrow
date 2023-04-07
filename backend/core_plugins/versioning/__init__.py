@@ -97,7 +97,8 @@ def upgrade_audit_trail(engine):
 
 def run_psql(engine, fp):
     args = connection_args(engine)
-    cmd(f"psql -f {fp}", *args, cwd=Path(__file__).parent)
+    # Inherit stdout from parent process
+    cmd(f"psql -f {fp}", *args, cwd=Path(__file__).parent, stdout=True, stderr=True)
 
 
 def get_procedure(name):
@@ -135,20 +136,19 @@ class PGMementoMigration(SchemaMigration):
     def apply(self, engine):
         db = Database(engine.url)
         upgrade_audit_trail(engine)
-        # A scorched-earth approach to dropping the v1 audit trail
-        db.session.execute("DROP SCHEMA IF EXISTS core_view CASCADE")
 
         sql = ""
         for trigger in get_old_triggers(db.session):
             for op in ["insert", "update", "delete", "truncate"]:
                 sql += f"DROP TRIGGER IF EXISTS log_{op}_trigger ON {trigger.schema}.{trigger.table} CASCADE;\n"
+
+        # A scorched-earth approach to dropping the v1 audit trail
+        db.session.execute("DROP SCHEMA IF EXISTS core_view CASCADE")
         for audit_id in get_old_audit_id(db.session):
             sql += f"ALTER TABLE {audit_id.schema}.{audit_id.table} DROP COLUMN audit_id CASCADE;\n"
         run_sql(db.session, sql)
         db.session.commit()
-        db.exec_sql(relative_path(__file__, "drop-audit.sql"))
-
-        build_audit_tables(db)
+        # db.exec_sql(relative_path(__file__, "drop-audit.sql"))
 
         db.recreate_views()
 
@@ -201,6 +201,11 @@ class PGMemento074Migration(SchemaMigration):
 def build_audit_tables(db):
     procedures = []
 
+    m = PGMementoMigration()
+    if m.should_apply(db.engine, None, None):
+        m.apply(db.engine)
+        return
+
     if not has_audit_schema(db):
         # Create the schema to hold audited tables
         # NOTE: this drops all transaction history, so we don't run
@@ -209,8 +214,6 @@ def build_audit_tables(db):
 
     # Basic setup procedures
     procedures += [
-        "SETUP",
-        "SETUP",  # Run twice to ensure all tables are created
         "SETUP",
         "LOG_UTIL",
         "DDL_LOG",
