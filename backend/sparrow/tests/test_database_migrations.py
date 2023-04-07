@@ -40,7 +40,6 @@ def migration_base():
 
 # @mark.order(-1)
 class TestDatabaseMigrations:
-    @mark.xfail(reason="This doesn't work due to complexities with audit tables")
     def test_migration(self, db, migration_base):
         test_app = Sparrow(debug=True, database=migration_base.url)
         test_app.setup_database(automap=False)
@@ -63,11 +62,13 @@ class TestDatabaseMigrations:
 
         migrations = [m() for m in migrations]
 
-        migrations = [
-            m for m in migrations if m.should_apply(test_app.db.engine, db.engine, None)
-        ]
         while len(migrations) > 0:
             errors = []
+            migrations = [
+                m
+                for m in migrations
+                if m.should_apply(test_app.db.engine, db.engine, None)
+            ]
             for m in migrations:
                 log.info(f"Applying migration {type(m).__name__}")
                 try:
@@ -77,6 +78,7 @@ class TestDatabaseMigrations:
                     log.info(f"Applied migration {type(m).__name__}")
                 except Exception as exc:
                     log.error(f"Failed to apply migration {type(m).__name__}")
+                    log.error(exc)
                     errors.append(exc)
             if len(errors) > 0 and len(errors) == len(migrations):
                 log.error("Failed to apply all migrations")
@@ -87,6 +89,11 @@ class TestDatabaseMigrations:
                 if m.should_apply(test_app.db.engine, db.engine, None)
             ]
 
+        log.info("Initializing database")
+        test_app.database.initialize()
+
+        log.info("Applying automatic migration")
+
         # Migrating to the new version should now be "safe"
         migration = _create_migration(test_app.database.engine, db.engine)
         for change in migration.unsafe_changes():
@@ -94,12 +101,9 @@ class TestDatabaseMigrations:
         assert migration.is_safe
 
         migration.apply(quiet=False)
+        migration.clear()
         migration.add_all_changes()
-        sql = "\n".join(migration.statements)
-        run_sql(db.engine, sql)
-
         # Re-add changes
-        migration.add_all_changes()
         assert len(migration.statements) == 0
 
     @mark.slow

@@ -1,1 +1,1 @@
-drop table if exists "pgmemento"."audit_tables_copy";
+DROP SCHEMA IF EXISTS "pgmemento" CASCADE;

@@ -82,7 +82,7 @@ def upgrade_audit_trail(engine):
     Upgrade PGMemento audit trail
     """
     procedures = [
-        "pg-memento/ctl/UPGRADE",
+        # "pg-memento/ctl/UPGRADE",
         "pg-memento/UPGRADE_v061_to_v07",
         "pg-memento/UPGRADE_v07_to_v074",
     ]
@@ -97,7 +97,8 @@ def upgrade_audit_trail(engine):
 
 def run_psql(engine, fp):
     args = connection_args(engine)
-    cmd(f"psql -f {fp}", *args, cwd=Path(__file__).parent)
+    # Inherit stdout from parent process
+    cmd(f"psql -f {fp}", *args, cwd=Path(__file__).parent, stdout=True, stderr=True)
 
 
 def get_procedure(name):
@@ -134,39 +135,52 @@ class PGMementoMigration(SchemaMigration):
 
     def apply(self, engine):
         db = Database(engine.url)
-        upgrade_audit_trail(engine)
-        # A scorched-earth approach to dropping the v1 audit trail
-        db.session.execute("DROP SCHEMA IF EXISTS core_view CASCADE")
+
+        old_triggers = [
+            "schema_drop_pre_trigger",
+            "table_alter_post_trigger",
+            "table_alter_pre_trigger",
+            "table_create_post_trigger",
+            "table_drop_post_trigger",
+            "table_drop_pre_trigger",
+        ]
+
+        # Drop views
+        db.engine.execute("DROP SCHEMA IF EXISTS core_view CASCADE;")
+
+        # Drop old triggers
+        for trigger in old_triggers:
+            db.engine.execute(f"DROP EVENT TRIGGER IF EXISTS {trigger};")
+
+        # db.engine.execute("SELECT pgmemento.drop_schema_event_trigger()")
+        # for schema in ["public", "vocabulary", "tags", "geo_context", "core_view"]:
+        #     db.engine.execute(
+        #         f"SELECT pgmemento.drop_schema_log_trigger('{schema}', ARRAY[]::text[])",
+        #     )
 
         sql = ""
         for trigger in get_old_triggers(db.session):
-            for op in ["insert", "update", "delete", "truncate"]:
-                sql += f"DROP TRIGGER IF EXISTS log_{op}_trigger ON {trigger.schema}.{trigger.table} CASCADE;\n"
+            for op in ["insert", "update", "delete", "truncate", "transaction"]:
+                sql += f"DROP TRIGGER IF EXISTS log_{op}_trigger ON {trigger.schema}.{trigger.table};\n"
+
+        # We have to drop old triggers explicitly because they are incompatible with PostgreSQL 14 and will complain if fired
+        run_sql(db.engine, sql)
+        # db.session.execute("DROP SCHEMA IF EXISTS core_view CASCADE")
+
+        # Drop schema event trigger
+
+        sql = ""
+        # A scorched-earth approach to dropping the v1 audit trai
         for audit_id in get_old_audit_id(db.session):
-            sql += f"ALTER TABLE {audit_id.schema}.{audit_id.table} DROP COLUMN audit_id CASCADE;\n"
-        run_sql(db.session, sql)
-        db.session.commit()
-        db.exec_sql(relative_path(__file__, "drop-audit.sql"))
+            sql += f"ALTER TABLE {audit_id.schema}.{audit_id.table} DROP COLUMN audit_id;\n"
+        run_sql(db.engine, sql)
 
-        build_audit_tables(db)
-
+        # Complete drop of old audit trail
+        sqlfile = relative_path(__file__, "procedures", "drop-old-constraints.sql")
+        run_sql(db.engine, open(sqlfile).read())
         db.recreate_views()
 
-        # migration = AutoMigration(engine, self.target)
-        # migration.add_all_changes()
-        # stmts = migration.statements
-        # print(stmts)
-        # raise
-        # for stmt in stmts:
-        #     _stmt = stmt.lower()
-        #     if (
-        #         _stmt.startswith("alter table")
-        #         and "drop constraint" in _stmt
-        #         and "audit_id" in _stmt
-        #     ):
-        #         engine.execute(stmt.replace(";", " CASCADE;"))
-        #     if "drop column" in _stmt and "audit_id" in _stmt:
-        #         engine.execute(stmt)
+        build_audit_tables(db)
 
 
 class PGMemento074Migration(SchemaMigration):
@@ -209,8 +223,6 @@ def build_audit_tables(db):
 
     # Basic setup procedures
     procedures += [
-        "SETUP",
-        "SETUP",  # Run twice to ensure all tables are created
         "SETUP",
         "LOG_UTIL",
         "DDL_LOG",
