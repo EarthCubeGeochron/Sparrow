@@ -13,7 +13,7 @@ from docker.models.containers import Container
 import time
 from datetime import datetime
 import subprocess
-from subprocess import Popen
+from subprocess import CalledProcessError
 import asyncio
 import typing as T
 import sys
@@ -44,7 +44,7 @@ def check_database_cluster_version(volume_name: str):
             remove=True,
             stdout=True,
         )
-    except docker.errors.ContainerError as exc:
+    except (docker.errors.ContainerError, subprocess.CalledProcessError) as exc:
         log.error(exc)
         return None
     return int(stdout.decode("utf-8").strip())
