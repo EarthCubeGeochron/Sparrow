@@ -23,6 +23,7 @@ jobs:
 
       # Bundling (note: we build the CLI in Docker to support older Linux platforms)
       # 2023-04-07: We had to fall back to a standard build (for modern platforms)
+      # because the cdrx/docker-pyinstaller image has not been updated with new CA certificates.
       - name: Bundle command-line application with PyInstaller
         # run: make build-linux && sudo make install-dist
         run: make build && sudo make install-dist
