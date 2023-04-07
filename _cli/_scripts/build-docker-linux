@@ -5,4 +5,4 @@
 apt-get update
 apt-get install ca-certificates
 
-_cli/scripts/build-dist
+_cli/_scripts/build-dist
