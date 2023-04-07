@@ -216,7 +216,7 @@ class SparrowConfig:
         """
         project_name = environ.get("COMPOSE_PROJECT_NAME")
         if project_name is not None:
-            return project_name
+            return project_name.lower()
         # We could eventually start referring to projects by the SPARROW_LAB_NAME
         # environment variable, but for now we'll just use the current directory name
         # (the default for docker-compose)
@@ -277,7 +277,7 @@ class SparrowConfig:
         return _local_frontend
 
     def check_database_version(self):
-        cluster_volume_name = self.project_name.lower() + "_db_cluster"
+        cluster_volume_name = self.project_name + "_db_cluster"
         version = check_database_cluster_version(cluster_volume_name)
         self.postgres_current_version = version
         if version is None:

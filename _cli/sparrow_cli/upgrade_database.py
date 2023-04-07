@@ -54,7 +54,7 @@ version_images = {11: "mdillon/postgis:11", 14: "postgis/postgis:14-3.3"}
 
 
 def database_cluster_version(cfg: str):
-    cluster_volume_name = cfg.project_name.lower() + "_db_cluster"
+    cluster_volume_name = cfg.project_name + "_db_cluster"
     return check_database_cluster_version(cluster_volume_name)
 
 

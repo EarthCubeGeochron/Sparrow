@@ -4,3 +4,4 @@ _assets
 .yarn
 !.yarn/sdks
 !.yarn/releases
+.pnp.*

@@ -18,5 +18,7 @@ RUN yarn install --frozen-lockfile
 
 COPY ./ /app/
 
+RUN yarn install --frozen-lockfile
+
 CMD yarn run start
 
