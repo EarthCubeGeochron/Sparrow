@@ -199,6 +199,9 @@ class PGMemento074Migration(SchemaMigration):
             return False
         # Parse version string
         print(version)
+        if version == 0:
+            return False
+
         return (
             version.major_version == 0
             and version.minor_version == 7

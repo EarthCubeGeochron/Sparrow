@@ -45,3 +45,9 @@ class SparrowDatabaseMigrator(MigrationManager):
 
     def __init__(self, db, migrations=None):
         super().__init__(db, initialize, migrations)
+
+    def _pre_auto_migration(self, engine, target):
+        from . import Database
+
+        db = Database(engine.url)
+        db.initialize()
