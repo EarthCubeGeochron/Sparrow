@@ -7,6 +7,8 @@ from os import environ
 from macrostrat.utils.shell import git_revision_info
 from macrostrat.utils.logs import get_logger, setup_stderr_logs
 from pydantic import BaseModel
+import docker
+from docker.client import DockerClient
 from enum import Enum
 
 from .environment import (
@@ -37,6 +39,7 @@ class SparrowConfig:
     path_provided: bool
     is_frozen: bool
     docker_available: bool = False
+    docker_client: typing.Optional[DockerClient] = None
     bundle_dir: Path = None
     config_file: typing.Optional[Path] = None
     config_dir: typing.Optional[Path] = None
@@ -236,6 +239,8 @@ class SparrowConfig:
         return not self.is_frozen or self.path_provided
 
     def check_docker_status(self):
+        environ.setdefault("DOCKER_HOST", "unix:///var/run/docker.sock")
+
         try:
             fail_without_docker_command()
         except SparrowCommandError as err:
@@ -247,7 +252,8 @@ class SparrowConfig:
             )
         try:
             fail_without_docker_running()
-        except SparrowCommandError as err:
+            self.docker_client = docker.from_env()
+        except (SparrowCommandError, docker.errors.DockerException) as err:
             self.add_message(
                 id="docker-not-running",
                 text="Docker is not running",
@@ -277,8 +283,21 @@ class SparrowConfig:
         return _local_frontend
 
     def check_database_version(self):
+        if self.docker_client is None:
+            self.add_message(
+                id="unknown-database-cluster",
+                text="Unknown database cluster version",
+                details=[
+                    "Could not determine the database cluster version because Docker is not available."
+                ],
+                level=Level.WARNING,
+            )
+            return
+
         cluster_volume_name = self.project_name + "_db_cluster"
-        version = check_database_cluster_version(cluster_volume_name)
+        version = check_database_cluster_version(
+            self.docker_client, cluster_volume_name
+        )
         self.postgres_current_version = version
         if version is None:
             self.add_message(

@@ -18,17 +18,15 @@ import asyncio
 import typing as T
 import sys
 from macrostrat.utils import get_logger
+from docker.client import DockerClient
 
 log = get_logger(__name__)
 
-environ.setdefault("DOCKER_HOST", "unix:///var/run/docker.sock")
-
-client = docker.from_env()
 
 console = Console()
 
 
-def check_database_cluster_version(volume_name: str):
+def check_database_cluster_version(client: DockerClient, volume_name: str):
     """
     Check the version of a PostgreSQL cluster in a Docker volume
     under a managed installation of Sparrow.
@@ -53,9 +51,9 @@ def check_database_cluster_version(volume_name: str):
 version_images = {11: "mdillon/postgis:11", 14: "postgis/postgis:14-3.3"}
 
 
-def database_cluster_version(cfg: str):
+def database_cluster_version(cfg):
     cluster_volume_name = cfg.project_name + "_db_cluster"
-    return check_database_cluster_version(cluster_volume_name)
+    return check_database_cluster_version(cfg.docker_client, cluster_volume_name)
 
 
 def wait_for_cluster(container: Container):
@@ -92,7 +90,7 @@ def log_step(container: Container):
 
 @contextmanager
 def database_cluster(
-    image: str, data_volume: str, remove=True, environment=None
+    client: DockerClient, image: str, data_volume: str, remove=True, environment=None
 ) -> Container:
     """do
     Start a database cluster in a Docker volume
@@ -138,7 +136,7 @@ def count_database_tables(container: Container, db_name: str) -> int:
     return int(stdout.splitlines()[2].strip())
 
 
-def replace_docker_volume(old_name: str, new_name: str):
+def replace_docker_volume(client: DockerClient, old_name: str, new_name: str):
     """
     Replace the contents of a Docker volume.
     """
@@ -151,7 +149,7 @@ def replace_docker_volume(old_name: str, new_name: str):
     )
 
 
-def ensure_empty_docker_volume(volume_name: str):
+def ensure_empty_docker_volume(client: DockerClient, volume_name: str):
     """
     Ensure that a Docker volume does not exist.
     """
@@ -193,8 +191,9 @@ def upgrade_database_cluster(cfg):
     compose("down")
 
     with database_cluster(
-        version_images[current_version], cluster_volume_name
+        cfg.docker_client, version_images[current_version], cluster_volume_name
     ) as source, database_cluster(
+        cfg.docker_client,
         version_images[cfg.postgres_supported_version],
         dest_volume.name,
         environment={"POSTGRES_HOST_AUTH_METHOD": "trust"},
@@ -245,11 +244,13 @@ def upgrade_database_cluster(cfg):
 
     time.sleep(1)
 
+    client = cfg.docker_client
+
     # Remove the old volume
     backup_volume_name = cluster_volume_name + "_backup"
     console.print(f"Backing up old volume to {backup_volume_name}", style="bold")
-    ensure_empty_docker_volume(backup_volume_name)
-    replace_docker_volume(cluster_volume_name, backup_volume_name)
+    ensure_empty_docker_volume(client, backup_volume_name)
+    replace_docker_volume(client, cluster_volume_name, backup_volume_name)
 
     console.print(
         f"Moving contents of new volume to {cluster_volume_name}", style="bold"
