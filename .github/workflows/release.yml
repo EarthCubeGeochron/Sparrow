@@ -24,7 +24,7 @@ jobs:
       # Bundling (note: we build the CLI in Docker to support older Linux platforms)
       # 2023-04-07: We had to fall back to a standard build (for modern platforms)
       - name: Bundle command-line application with PyInstaller
-        run: make build && sudo make install-dist
+        run: make build-linux && sudo make install-dist
 
       - name: Check version consistency
         run: SPARROW_PATH=$(pwd) sparrow dev check-version --exact

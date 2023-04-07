@@ -42,7 +42,7 @@ build-linux:
 	docker run \
 		-v "$(shell pwd):/src/" \
 		cdrx/pyinstaller-linux:latest \
-		_cli/_scripts/build-dist
+		_cli/_scripts/build-docker-linux
 
 # This will build the CLI for windows, which is currently unsupported
 # (WSL integration with the linux binaries should be used instead)

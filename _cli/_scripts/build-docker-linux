@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# The CA certificates in the Docker image are out of date
+# Update CA certificates
+apt-get update
+apt-get install ca-certificates
+
+_cli/scripts/build-dist
