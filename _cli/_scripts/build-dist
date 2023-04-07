@@ -3,7 +3,7 @@
 # Meant to be run from the repository root folder
 _cli/_scripts/build-local
 # Activate virtual environment without actually activating
-export VIRTUAL_ENV="$(poetry env info --path)"
+export VIRTUAL_ENV="$(cd _cli && poetry env info --path)"
 export PATH="$VIRTUAL_ENV/bin:$PATH"
 
 pip3 install pyinstaller==5.0.1
