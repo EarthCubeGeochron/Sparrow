@@ -74,3 +74,8 @@ format-code:
 get-poetry-installer: 
 	rm -f _cli/_scripts/install-poetry.py && \
   curl -sSL https://install.python-poetry.org > _cli/_scripts/install-poetry.py
+
+prepare:
+	pip3 install "poetry>=1.4.2"
+	cd _cli && poetry update
+	cd backend && poetry update

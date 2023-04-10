@@ -19,6 +19,8 @@ testing_db = environ.get(
 )
 environ["SPARROW_DATABASE"] = testing_db
 
+collect_ignore = ["shared-modules"]
+
 
 def pytest_addoption(parser):
     parser.addoption(
