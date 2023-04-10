@@ -8,6 +8,9 @@ from sparrow.core.auth.create_user import _create_user
 from sparrow.tests.helpers.database import testing_database
 from sqlalchemy.orm import Session
 from sqlalchemy import event
+import logging
+
+disable_loggers = ["macrostrat.database.utils"]
 
 # Slow tests are opt-in
 
@@ -52,6 +55,10 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     if not config.option.slow:
         setattr(config.option, "markexpr", "not slow")
+
+    for logger_name in disable_loggers:
+        logger = logging.getLogger(logger_name)
+        logger.disabled = True
 
 
 @fixture(scope="session")

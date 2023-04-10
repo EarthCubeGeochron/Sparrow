@@ -1,9 +1,9 @@
 from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.core.context import app_context
+from macrostrat.database.utils import get_dataframe
 from macrostrat.utils import relative_path
 from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
-import pandas as pd
 from pathlib import Path
 import json
 
@@ -27,7 +27,7 @@ class MetricsEndpoint(SparrowCorePlugin):
         sqlfile = open(p, "r")
         query = sqlfile.read()
 
-        metrics = db.exec_query(query)
+        metrics = get_dataframe(db.engine, query)
         res = metrics.to_json(orient="records")
 
         return JSONResponse(json.loads(res))
