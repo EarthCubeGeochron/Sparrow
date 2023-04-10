@@ -44,6 +44,7 @@ class TestDatabaseMigrations:
         test_app = Sparrow(debug=True, database=migration_base.url)
         test_app.setup_database(automap=False)
         # We can use the existing testing database as a target
+
         migration = _create_migration(test_app.db.engine, db.engine)
 
         # Check that we are not aligned

@@ -26,7 +26,8 @@ from ..util.shell import (
     fail_without_docker_running,
 )
 from .models import Message, Level
-from ..upgrade_database import check_database_cluster_version, version_images
+from macrostrat.dinosaur.upgrade_cluster.describe import check_database_cluster_version
+from ..upgrade_database import version_images
 
 log = get_logger(__file__)
 

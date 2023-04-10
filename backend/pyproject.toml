@@ -102,7 +102,7 @@ broadcaster = { version = "0.2.0", extras = [ "redis" ] }
 # For worker auto-reloading in development
 watchdog = "2.1.2"
 argh = "0.26.2"
-pydantic = "1.8.2"
+pydantic = "^1.8.2"
 
 typer = "^0.6"
 sqlakeyset = "^1.0.1629029818"
