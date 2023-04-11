@@ -81,9 +81,12 @@ def update(ctx, args, skip_cluster_upgrade=False):
     """Update the database schema"""
     cfg = ctx.find_object(SparrowConfig)
     # If needed, we upgrade the database cluster.
+    if cfg.postgres_current_version == cfg.postgres_supported_version:
+        skip_cluster_upgrade = True
     if not skip_cluster_upgrade:
         upgrade_database_cluster(cfg)
-
+    # Ensure that the database is running for this step.
+    compose("up -d db")
     exec_sparrow("db-update", *args)
 
 
