@@ -24,6 +24,9 @@ for fn in _compose_files:
     fullpath = path.join(compose_root, fn)
     data_files[fullpath] = "compose/config"
 
+_schemainspect_root = path.dirname(import_module("schemainspect").__file__)
+fullpath = path.join(_schemainspect_root, "pg", "sql")
+data_files[fullpath] = "schemainspect/pg/sql"
 
 a = Analysis(
     ["sparrow_cli/__main__.py"],
@@ -49,7 +52,7 @@ exe = EXE(
     strip=False,
     upx=True,
     console=True,
-    debug=False
+    debug=False,
 )
 coll = COLLECT(
     exe,
@@ -74,7 +77,7 @@ coll = COLLECT(
             "build",
             "dist",
             "__pycache__",
-            "node_modules"
+            "node_modules",
         ],
     ),
     # We have to include subfolders as separate trees, apparently, to allow
@@ -84,7 +87,11 @@ coll = COLLECT(
         prefix="srcroot/frontend",
         excludes=["node_modules", "examples", ".parcel-cache"],
     ),
-    Tree(path.join(src_root, "_cli"), prefix="srcroot/_cli", excludes=["build", "dist", ".venv"]),
+    Tree(
+        path.join(src_root, "_cli"),
+        prefix="srcroot/_cli",
+        excludes=["build", "dist", ".venv"],
+    ),
     strip=False,
     upx=True,
     upx_exclude=[],

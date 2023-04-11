@@ -2,7 +2,8 @@
 
 # The CA certificates in the Docker image are out of date
 # Update CA certificates
+rm -rf /var/lib/apt/lists/*
 apt-get update
-apt-get install ca-certificates
+apt-get --no-install-recommends install -y ca-certificates
 
 _cli/_scripts/build-dist

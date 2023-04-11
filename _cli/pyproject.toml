@@ -32,6 +32,8 @@ packaging = "20.9"
 # Database backup and schema migration functionality
 "macrostrat.dinosaur" = {path = "../backend/shared-modules/dinosaur", develop = true }
 "macrostrat.database" = {path = "../backend/shared-modules/database", develop = true }
+chardet = "^5.1.0"
+charset-normalizer = "2.1.0"
 
 
 [tool.poetry.scripts]
