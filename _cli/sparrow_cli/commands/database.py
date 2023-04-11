@@ -75,12 +75,14 @@ def drop_cache():
 
 @sparrow_db.command(name="update", context_settings=dict(ignore_unknown_options=True))
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
+@click.option("--skip-cluster-upgrade", is_flag=True, default=False)
 @click.pass_context
-def update(ctx, args):
+def update(ctx, args, skip_cluster_upgrade=False):
     """Update the database schema"""
     cfg = ctx.find_object(SparrowConfig)
     # If needed, we upgrade the database cluster.
-    upgrade_database_cluster(cfg)
+    if not skip_cluster_upgrade:
+        upgrade_database_cluster(cfg)
 
     exec_sparrow("db-update", *args)
 

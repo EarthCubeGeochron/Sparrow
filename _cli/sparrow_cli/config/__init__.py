@@ -71,8 +71,14 @@ class SparrowConfig:
         self.check_docker_status()
 
         if verbose:
-            setup_stderr_logs("sparrow_cli")
-            setup_stderr_logs("docker")
+            for mod in [
+                "sparrow_cli",
+                "docker",
+                "macrostrat.database",
+                "macrostrat.dinosaur",
+                "macrostrat.utils",
+            ]:
+                setup_stderr_logs(mod)
             log.info("Verbose logging enabled")
             # Set verbose environment variable for nested commands
             environ["SPARROW_VERBOSE"] = "1"
