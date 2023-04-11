@@ -41,7 +41,7 @@ def upgrade_database_cluster(cfg):
         cfg.docker_client,
         cluster_volume_name,
         cfg.postgres_supported_version,
-        "sparrow",
+        ["sparrow"],
         version_images=version_images,
     )
 
