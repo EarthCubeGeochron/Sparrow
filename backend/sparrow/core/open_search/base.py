@@ -49,7 +49,7 @@ class OpenSearchEndpoint(HTTPEndpoint):
         }
         if model == "all":
             sql_fn = search_total
-            query_res = db.exec_sql_query(fn=sql_fn, params=params)
+            query_res = db.exec_sql(sql_fn, params=params)
 
             json_res = [dict(model=x, data=y) for x, y in query_res]
             json_res.reverse()
@@ -61,7 +61,7 @@ class OpenSearchEndpoint(HTTPEndpoint):
                     sql_fn = value
                     schema = getattr(db.interface, key)(many=True)
 
-        query_res = db.exec_sql_query(fn=sql_fn, params=params)
+        query_res = db.exec_sql(sql_fn, params=params)
 
         json_res = [dict(r) for r in query_res]
 

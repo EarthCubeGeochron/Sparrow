@@ -49,7 +49,7 @@ def prepare_plugin_manager(app):
         mgr.add_module(sparrow_plugins)
     except ModuleNotFoundError as err:
         log.info("Could not load external Sparrow plugins.")
-        log.info(err)
+        log.exception(err)
 
     mgr.finalize(app)
     return mgr
