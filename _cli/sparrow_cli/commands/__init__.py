@@ -8,13 +8,14 @@ from .build import sparrow_build
 from .attach import sparrow_attach
 from .tasks import tasks
 from .logs import sparrow_logs
-from .up import sparrow_up
+from .up import sparrow_up, sparrow_restart
 from .update import sparrow_update, sparrow_upgrade
 
 _commands = {
     "db": sparrow_db,
     "docs": sparrow_docs,
     "up": sparrow_up,
+    "restart": sparrow_restart,
     "update": sparrow_update,
     "upgrade": sparrow_upgrade,
     "test": sparrow_test,

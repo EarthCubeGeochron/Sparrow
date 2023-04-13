@@ -161,7 +161,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
 
             res = q.get(id)
             if not request.user.is_authenticated:
-                if res.embargo_date is not None:
+                if hasattr(res, "embargo_date") and res.embargo_date is not None:
                     return UnauthorizedResponse()
 
             # https://github.com/djrobstep/sqlakeyset
@@ -190,7 +190,7 @@ class ModelAPIEndpoint(HTTPEndpoint):
         except Exception:
             raise ValidationError("Failed parsing query string {request.query_params}")
 
-    async def get(self, request):
+    async def _get(self, request):
         """Handler for all GET requests"""
 
         if request.path_params.get("id") is not None:
@@ -236,6 +236,16 @@ class ModelAPIEndpoint(HTTPEndpoint):
                 raise ValidationError("Invalid page token.")
 
             return APIResponse(res, schema=schema, total_count=q.count())
+
+    async def get(self, request):
+        # Wrap all get requests in an error-handling block
+        try:
+            return await self._get(request)
+        except Exception as e:
+            if isinstance(e, HTTPException):
+                raise e
+            else:
+                raise HTTPException(500, str(e))
 
     @requires("admin")
     async def put(self, request):

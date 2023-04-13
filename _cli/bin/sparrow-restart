@@ -1,3 +1,0 @@
-#!/bin/bash
-# Description: Fully restart all `sparrow` containers
-sparrow up --force-recreate $@

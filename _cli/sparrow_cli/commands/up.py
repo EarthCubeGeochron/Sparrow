@@ -49,7 +49,7 @@ def sparrow_up(ctx, container="", force_recreate=False):
     _report_image_versions()
     # build containers
     if not cfg.offline:
-        cmd("sparrow compose build")
+        cmd("sparrow compose build", container)
 
     # Run the prebuild script
     prestart = _get_prestart_script(cfg)
@@ -133,3 +133,10 @@ def sparrow_up(ctx, container="", force_recreate=False):
     p.wait()
     if frontend_proc is not None:
         frontend_proc.wait()
+
+
+@click.command()
+@click.argument("container", type=str, required=False, default="")
+@click.pass_context
+def sparrow_restart(ctx, container="", force_recreate=False):
+    ctx.invoke(sparrow_up, container=container, force_recreate=True)
