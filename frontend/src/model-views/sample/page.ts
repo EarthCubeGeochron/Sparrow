@@ -512,6 +512,7 @@ function SamplePage(props: SampleProps) {
             h("div.flex-row", [
               h("div.info-block", [
                 h(LabIDField),
+                h(LabOwnerField),
                 h(MemberOf),
                 h(Material),
                 h.if(Edit)(SampleTagContainer),
@@ -543,6 +544,15 @@ function LabIDField() {
   return h.if(model.lab_id != null)(ModelAttributeOneLiner, {
     title: "Lab ID",
     content: model.lab_id,
+  });
+}
+
+function LabOwnerField() {
+  const { model } = useModelEditor();
+  const { lab_owner } = model;
+  return h.if(model.lab_owner != null)(ModelAttributeOneLiner, {
+    title: "Lab Owner",
+    content: model.lab_owner,
   });
 }
 
