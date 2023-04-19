@@ -1,6 +1,6 @@
 import sparrow
 from sparrow.tests.helpers import json_fixture
-from sqlalchemy import Table, or_
+from sqlalchemy import Table, or_, MetaData
 from .filter import get_document_tables
 from pytest import mark
 
@@ -12,6 +12,15 @@ class TestOpenSearch:
     """
 
     data = json_fixture("project-edits.json")
+
+    def test_get_database_meta(self, db):
+        """test if we can get the database meta"""
+        assert isinstance(db.metadata, MetaData)
+
+    def test_get_document_tables(self, db):
+        """Ensure that we can get the generated document tables"""
+        tables = get_document_tables(db)
+        assert len(tables) == 3
 
     @mark.skip(reason="it fails and we're short on time")
     def test_project_edits(self, db):
