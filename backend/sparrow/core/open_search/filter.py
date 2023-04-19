@@ -2,20 +2,31 @@ from sparrow.core.api.filters import BaseFilter, create_params
 from sparrow.core.context import app_context
 from webargs.fields import Str
 from sqlalchemy import text, Table, or_
+from contextvars import ContextVar
+from sparrow.logs import get_logger
+
+doc_table_cache = ContextVar("doc_table_cache")
+
+log = get_logger(__name__)
 
 
 def get_document_tables(db):
     """returns array of document tables
     [project, sample, session]
     """
+    if doc_table_cache.get(None) is not None:
+        return doc_table_cache.get(None)
+
     document_names = ["project", "sample", "session"]
 
     doc_tables = []
     for name in document_names:
         doc_table = Table(
-            f"{name}_document", db.meta, autoload_with=db.engine, schema="documents"
+            f"{name}_document", db.metadata, autoload_with=db.engine, schema="documents"
         )
         doc_tables.append(doc_table)
+
+    doc_table_cache.set(doc_tables)
     return doc_tables
 
 
@@ -81,20 +92,24 @@ def construct_query(db, model, search, document_tables):
     query = db.session.query(model)
 
     if model == getattr(db.model, "session"):
+        log.info("session document query")
         query = session_joins(db, query, document_tables)
     elif model == getattr(db.model, "sample"):
+        log.info("sample document query")
         query = sample_joins(db, query, document_tables)
     else:
+        log.info("project document query")
         query = project_joins(db, query, document_tables)
 
+    tsquery = text("to_tsquery(:search)")
     # construct filter using the match operator
     query = query.filter(
         or_(
-            sample_doc.c.sample_token.match(search),
-            project_doc.c.project_token.match(search),
-            session_doc.c.session_token.match(search),
+            sample_doc.c.sample_token.op("@@")(tsquery),
+            project_doc.c.project_token.op("@@")(tsquery),
+            session_doc.c.session_token.op("@@")(tsquery),
         )
-    )
+    ).params(search=search + ":*")
 
     return query
 

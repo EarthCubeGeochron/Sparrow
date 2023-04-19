@@ -9,6 +9,7 @@ import { useAPIv2Result, APIV2Context } from "~/api-v2";
 import { useAuth } from "~/auth";
 import { put } from "axios";
 import { useModelURL, useEditingAllowed } from "~/util/router";
+import { Spinner } from "@blueprintjs/core";
 import {
   Instrument,
   Technique,
@@ -269,7 +270,7 @@ export function EditableSessionDetails(props) {
   const { login } = useAuth();
   const { buildURL } = APIHelpers(useContext(APIV2Context));
 
-  if (!res) return null;
+  if (res == null) return h(Spinner);
 
   return h(
     ModelEditor,

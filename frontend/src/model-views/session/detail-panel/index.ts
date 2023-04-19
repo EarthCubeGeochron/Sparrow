@@ -79,6 +79,7 @@ const Datum = function (props) {
 };
 
 const DataCollection = function ({ data, attributes }) {
+  if (data == null) return null;
   const datumList = h(data.map((d) => h(Datum, { value: d })));
   return h("ul.data", [datumList, h(AnalysisAttributes, { attributes })]);
 };
