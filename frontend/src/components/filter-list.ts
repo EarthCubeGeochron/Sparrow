@@ -31,7 +31,7 @@ class FilterListComponent extends Component<any, any> {
     const { filter, field } = this.state;
     let params = {};
     if (filter != null && filter !== "") {
-      const val = `%${filter}%`;
+      const val = `ilike.*${filter}*`;
       params = { [field]: val };
     }
 
