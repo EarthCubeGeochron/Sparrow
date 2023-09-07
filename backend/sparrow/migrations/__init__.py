@@ -3,6 +3,7 @@ from macrostrat.dinosaur import SchemaMigration, has_column, has_table
 from sparrow.database import run_sql
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
+from sqlalchemy import text
 
 
 class PlateauMigration(SchemaMigration):
@@ -26,13 +27,15 @@ class InstrumentSessionMigration(SchemaMigration):
     def apply(self, db):
         ix = "data_file_link_file_hash_session_id_analysis_id_sample_id_key"
         sess = sessionmaker(bind=db.engine)()
-        run_sql(
-            sess,
-            f"""
+        list(
+            run_sql(
+                sess,
+                f"""
         ALTER TABLE data_file_link DROP CONSTRAINT {ix};
         ALTER TABLE data_file_link DROP CONSTRAINT data_file_link_check;
         DROP INDEX IF EXISTS {ix};
         """,
+            )
         )
 
 
@@ -60,5 +63,25 @@ class SampleLocationAddSRID(SchemaMigration):
         try:
             sql_file = Path(__file__).parent / "sql" / "add-sample-srid.sql"
             engine.execute(sql_file.read_text())
+        except DataError:
+            pass
+
+
+class SampleAttributeCascadeMigration(SchemaMigration):
+    name = "sample-attribute-cascade"
+
+    def should_apply(self, source, target, migrator):
+        """If there are no foreign key cascades on __sample_attribute"""
+        sql = """SELECT count(*) = 0 FROM pg_constraint
+        WHERE conrelid = '__analysis_attribute'::regclass
+        AND pg_get_constraintdef(oid) ILIKE '%ON DELETE CASCADE%'
+        """
+        res = source.execute(text(sql)).fetchone()
+        return res[0]
+
+    def apply(self, engine):
+        try:
+            sql_file = Path(__file__).parent / "sql" / "add-sample-delete-cascades.sql"
+            list(run_sql(engine, sql_file.read_text()))
         except DataError:
             pass
