@@ -521,20 +521,20 @@ CREATE TABLE IF NOT EXISTS attribute (
 );
 
 CREATE TABLE IF NOT EXISTS __analysis_attribute (
-  analysis_id integer NOT NULL REFERENCES analysis(id),
-  attribute_id integer NOT NULL REFERENCES attribute(id),
+  analysis_id integer NOT NULL REFERENCES analysis(id) ON DELETE CASCADE,
+  attribute_id integer NOT NULL REFERENCES attribute(id) ON DELETE CASCADE,
   PRIMARY KEY (analysis_id, attribute_id)
 );
 
 CREATE TABLE IF NOT EXISTS __session_attribute (
-  session_id integer NOT NULL REFERENCES session(id),
-  attribute_id integer NOT NULL REFERENCES attribute(id),
+  session_id integer NOT NULL REFERENCES session(id) ON DELETE CASCADE,
+  attribute_id integer NOT NULL REFERENCES attribute(id) ON DELETE CASCADE,
   PRIMARY KEY (session_id, attribute_id)
 );
 
 CREATE TABLE IF NOT EXISTS sample_attribute (
-  sample_id integer NOT NULL REFERENCES sample(id),
-  attribute_id integer NOT NULL REFERENCES attribute(id),
+  sample_id integer NOT NULL REFERENCES sample(id) ON DELETE CASCADE,
+  attribute_id integer NOT NULL REFERENCES attribute(id) ON DELETE CASCADE,
   PRIMARY KEY (sample_id, attribute_id)
 );
 
@@ -563,8 +563,8 @@ CREATE TABLE IF NOT EXISTS constant (
 );
 
 CREATE TABLE IF NOT EXISTS __analysis_constant (
-  analysis_id integer NOT NULL REFERENCES analysis(id),
-  constant_id integer NOT NULL REFERENCES constant(id),
+  analysis_id integer NOT NULL REFERENCES analysis(id) ON DELETE CASCADE,
+  constant_id integer NOT NULL REFERENCES constant(id) ON DELETE CASCADE,
   PRIMARY KEY (analysis_id, constant_id)
 );
 
