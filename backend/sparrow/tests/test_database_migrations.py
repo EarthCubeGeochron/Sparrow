@@ -3,6 +3,7 @@ from sparrow.migrations import (
     InstrumentSessionMigration,
     SampleCheckMigration,
     SampleLocationAddSRID,
+    SampleAttributeCascadeMigration,
 )
 from sparrow.core.app import Sparrow
 from macrostrat.utils import relative_path, cmd
@@ -10,6 +11,7 @@ from macrostrat.dinosaur import _create_migration, create_schema_clone
 from macrostrat.database.utils import connection_args, temp_database, run_sql
 from sparrow.core.open_search import DocumentTableMigration
 from core_plugins.versioning import PGMementoMigration, PGMemento074Migration
+
 from pytest import mark, fixture
 from macrostrat.utils import get_logger
 
@@ -59,6 +61,7 @@ class TestDatabaseMigrations:
             SampleCheckMigration,
             SampleLocationAddSRID,
             BasicMigration,
+            SampleAttributeCascadeMigration,
         ]
 
         migrations = [m() for m in migrations]
