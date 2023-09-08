@@ -277,13 +277,19 @@ class SparrowConfig:
             return False
         if not has_command("node"):
             self.add_message(
-                "Cannot run frontend locally without [bold]node[/bold] available.",
+                id="no-node",
+                text="Node is not installed",
+                details=[
+                    "Cannot run frontend locally without [bold]node[/bold] available."
+                ],
                 level=Level.ERROR,
             )
             _local_frontend = False
         if self.is_frozen:
             self.add_message(
-                "Cannot run frontend locally in a frozen environment.",
+                id="frozen-env",
+                text="Frozen environment",
+                details=["Cannot run frontend locally in a frozen environment."],
                 level=Level.ERROR,
             )
             _local_frontend = False
