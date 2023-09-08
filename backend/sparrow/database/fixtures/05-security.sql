@@ -1,6 +1,11 @@
 CREATE ROLE admin;
 CREATE ROLE view_public;
 
+GRANT USAGE ON SCHEMA public TO view_public;
+GRANT USAGE ON SCHEMA vocabulary TO view_public;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO view_public;
+GRANT SELECT ON ALL TABLES IN SCHEMA vocabulary TO view_public;
+
 -- Lock down core tables
 
 ALTER TABLE datum ENABLE ROW LEVEL SECURITY;
@@ -87,4 +92,5 @@ GRANT SELECT ON analysis TO view_public;
 GRANT SELECT ON session TO view_public;
 GRANT SELECT ON sample TO view_public;
 GRANT SELECT ON project TO view_public;
+
 

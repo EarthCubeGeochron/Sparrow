@@ -41,7 +41,8 @@ def prepare_docker_environment():
     # Have to get rid of random printing to stdout in order to not break
     # logging and container ID
     # https://github.com/docker/scan-cli-plugin/issues/149
-    environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
+    # environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
+    environ.setdefault("DOCKER_CLI_HINTS", "false")
 
 
 def prepare_compose_overrides(cfg) -> List[Message]:
