@@ -7,7 +7,6 @@ from time import sleep
 
 from sparrow_cli.help import echo_messages
 
-from ..config.environment import validate_environment
 from ..config import SparrowConfig
 from ..util import compose, cmd, log
 from ..config.command_cache import get_backend_help_info
@@ -40,9 +39,9 @@ def sparrow_up(ctx, container="", force_recreate=False):
     # Validate the presence of SPARROW_SECREY_KEY only if we are bringing
     # the application up. Eventually, this should be wrapped into a Python
     # version of the `sparrow up` command.
-    validate_environment()
 
     cfg = ctx.find_object(SparrowConfig)
+    cfg.validate_environment()
 
     echo_messages(cfg)
 

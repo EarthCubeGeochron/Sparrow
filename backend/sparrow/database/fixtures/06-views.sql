@@ -212,7 +212,7 @@ SELECT id, description, authority
 FROM vocabulary.material;
 
 CREATE VIEW core_view.sample AS
-SELECT DISTINCT ON (s.id)
+SELECT
   s.id,
   s.igsn,
   s.name,

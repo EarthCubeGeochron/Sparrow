@@ -1,4 +1,5 @@
 DROP SCHEMA IF EXISTS core_view CASCADE;
+DROP SCHEMA IF EXISTS sparrow_api CASCADE;
 
 UPDATE sample
 SET "location" = ST_Transform("location", 4326)

@@ -6,7 +6,7 @@ from pathlib import Path
 from os import environ
 from macrostrat.utils.shell import git_revision_info
 from macrostrat.utils.logs import get_logger, setup_stderr_logs
-from pydantic import BaseModel
+import hashlib
 import docker
 from docker.client import DockerClient
 from enum import Enum
@@ -133,6 +133,8 @@ class SparrowConfig:
                 details=f"SPARROW_PATH={environ['SPARROW_PATH']}",
             )
 
+        self.enhance_secret_key()
+
         self.project_name = self.infer_project_name()
         self.local_frontend = self.configure_local_frontend()
 
@@ -171,6 +173,30 @@ class SparrowConfig:
             )
         else:
             self.messages += prepare_compose_overrides(self)
+
+    def enhance_secret_key(self):
+        secret_key = environ.get("SPARROW_SECRET_KEY")
+        if secret_key is None:
+            return
+        if len(secret_key) < 32:
+            self.add_message(
+                id="short-secret-key",
+                text="SPARROW_SECRET_KEY is shorter than 32 characters",
+                level=Level.WARNING,
+                details="This should be a randomly generated string of at least 32 characters.",
+            )
+            environ["SPARROW_SECRET_KEY"] = hashlib.md5(
+                secret_key.encode("utf-8")
+            ).hexdigest()
+
+    def validate_environment(self):
+        """Validate environment for services"""
+        # Ensure that the SPARROW_SECRET_KEY is set and >= 32 characters long
+        secret_key = environ.get("SPARROW_SECRET_KEY")
+        if secret_key is None:
+            raise SparrowCommandError(
+                "You must set the SPARROW_SECRET_KEY environment variable."
+            )
 
     def _setup_command_path(self):
         _bin = self.SPARROW_PATH / "_cli" / "bin"
@@ -277,13 +303,19 @@ class SparrowConfig:
             return False
         if not has_command("node"):
             self.add_message(
-                "Cannot run frontend locally without [bold]node[/bold] available.",
+                id="no-node",
+                text="Node is not installed",
+                details=[
+                    "Cannot run frontend locally without [bold]node[/bold] available."
+                ],
                 level=Level.ERROR,
             )
             _local_frontend = False
         if self.is_frozen:
             self.add_message(
-                "Cannot run frontend locally in a frozen environment.",
+                id="frozen-env",
+                text="Frozen environment",
+                details=["Cannot run frontend locally in a frozen environment."],
                 level=Level.ERROR,
             )
             _local_frontend = False

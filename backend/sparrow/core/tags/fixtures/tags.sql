@@ -42,3 +42,10 @@ CREATE TABLE IF NOT EXISTS tags.project_tag (
     project_id integer REFERENCES project(id) ON DELETE CASCADE,
     PRIMARY KEY (tag_id, project_id)
 );
+
+-- Add privileges
+GRANT USAGE ON SCHEMA tags TO view_public;
+GRANT SELECT ON ALL TABLES IN SCHEMA tags TO view_public;
+
+GRANT USAGE ON SCHEMA tags TO admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA tags TO admin;

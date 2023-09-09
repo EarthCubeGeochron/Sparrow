@@ -6,6 +6,7 @@ import time
 from typing import Tuple, Any
 
 import jwt
+import warnings
 from starlette.authentication import (
     BaseUser,
     SimpleUser,
@@ -83,7 +84,14 @@ class JWTBackend(AuthenticationBackend):
                 if "Authorization" not in request.headers:
                     raise AuthenticationError(f"Could not find {name} on request")
                 else:
-                    value = self._decode(request.headers["Authorization"])
+                    header = request.headers["Authorization"]
+                    if header.startswith("Bearer "):
+                        header = header[7:]
+                    else:
+                        warnings.warn(
+                            "Authorization header did not start with 'Bearer '. This is invalid and deprecated."
+                        )
+                    value = self._decode(header)
             else:
                 value = self._decode(cookie)
 

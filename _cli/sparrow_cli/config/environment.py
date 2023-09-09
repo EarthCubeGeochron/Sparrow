@@ -41,7 +41,8 @@ def prepare_docker_environment():
     # Have to get rid of random printing to stdout in order to not break
     # logging and container ID
     # https://github.com/docker/scan-cli-plugin/issues/149
-    environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
+    # environ.setdefault("DOCKER_SCAN_SUGGEST", "false")
+    environ.setdefault("DOCKER_CLI_HINTS", "false")
 
 
 def prepare_compose_overrides(cfg) -> List[Message]:
@@ -156,12 +157,3 @@ def prepare_compose_overrides(cfg) -> List[Message]:
     environ["COMPOSE_FILE"] = ":".join(str(c) for c in compose_files)
     log.info(f"Docker compose overrides: {compose_files}")
     return messages
-
-
-def validate_environment():
-    # Check for failing environment
-    if environ.get("SPARROW_SECRET_KEY") is None:
-        print(
-            "[red]You [underline]must[/underline] set [bold]SPARROW_SECRET_KEY[/bold]. Exiting..."
-        )
-        sys.exit(1)

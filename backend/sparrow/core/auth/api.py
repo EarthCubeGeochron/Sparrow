@@ -30,7 +30,9 @@ async def login(request, username: str, password: str):
 
     if current_user is not None and current_user.is_correct_password(password):
         day = 24 * 60 * 60
-        token = backend.set_cookie(None, "access", max_age=day, identity=username)
+        token = backend.set_cookie(
+            None, "access", max_age=day, identity=username, role="admin"
+        )
         resp = JSONResponse(dict(login=True, username=username, token=token))
         return backend.set_login_cookies(resp, identity=username)
 
@@ -59,7 +61,7 @@ def refresh(request):
     identity = backend.get_identity(request, type="refresh")
     response = JSONResponse(dict(login=True, refresh=True, username=identity))
 
-    return backend.set_access_cookie(response, identity=identity)
+    return backend.set_access_cookie(response, identity=identity, role="admin")
 
 
 @requires("admin")
