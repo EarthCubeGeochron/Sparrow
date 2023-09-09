@@ -1,5 +1,5 @@
-FROM python:3.9
-LABEL version="2.0"
+FROM python:3.11
+LABEL version="3.0-beta1"
 
 # Install general and build dependencies
 # Note: geos and geos-dev are in the community apk repository
