@@ -10,16 +10,17 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 
 # Preinstalled in 'sparrowdata/backend-base image'
 # due to long compile times.
-psycopg2 = "^2.9.6"
-shapely = "*"
+psycopg = "^3.1.0"
+shapely = "^2"
 lxml = "*"
 numpy = "^1.22.3"
-pandas = "*"
+pandas = "^2"
 uvloop = "*"
+pyarrow = "*"
 
 "macrostrat.database" = {path = "./shared-modules/database", develop = true }
 "macrostrat.utils" = {path = "./shared-modules/utils", develop = true }
