@@ -1,9 +1,6 @@
 [submodule "deps/sadisplay"]
 	path = deps/sadisplay
 	url = https://github.com/davenquinn/sadisplay.git
-[submodule "backend/core_plugins/versioning/pg-memento"]
-	path = backend/core_plugins/versioning/pg-memento
-	url = https://github.com/pgMemento/pgMemento.git
 [submodule "backend/python-tools"]
 	path = backend/shared-modules
 	url = https://github.com/UW-Macrostrat/python-tools.git
