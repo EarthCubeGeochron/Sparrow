@@ -39,7 +39,6 @@ def prepare_plugin_manager(app):
         SparrowTaskManager,
     )
     # GraphQL is disabled for now
-    # self.plugins.add(GraphQLPlugin)
     mgr.add_module(core_plugins)
 
     # Try to import external plugins, but they might not be defined.
