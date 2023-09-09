@@ -133,7 +133,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-  api:
+  pg_api:
     image: postgrest/postgrest:v10.0.0
     environment:
       - PGRST_DB_URI=postgresql://postgres:@db:5432/sparrow

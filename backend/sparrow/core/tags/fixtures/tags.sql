@@ -46,3 +46,6 @@ CREATE TABLE IF NOT EXISTS tags.project_tag (
 -- Add privileges
 GRANT USAGE ON SCHEMA tags TO view_public;
 GRANT SELECT ON ALL TABLES IN SCHEMA tags TO view_public;
+
+GRANT USAGE ON SCHEMA tags TO admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA tags TO admin;

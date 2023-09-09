@@ -69,3 +69,54 @@ class TestSampleCRUD:
         Sample = db.model.sample
         model = db.session.query(Sample).filter_by(name="Soil 003").one()
         db.session.delete(model)
+
+
+class TestSamplePostgRESTAPI:
+    # When we are including external APIs like PostgREST, we need to
+    # disable the database isolation fixture, since it will prevent
+    # the external API from seeing the data we have loaded.
+    use_isolation = False
+
+    def test_load_data(self, client, token):
+        data = {"name": "test sample 1"}
+        res = client.put(
+            "/api/v2/import-data/models/sample",
+            headers={"Authorization": "Bearer " + token},
+            json={"data": data, "filename": None},
+        )
+        assert res.status_code == 200
+
+    def test_postgrest_api_accessible(self, pg_api):
+        """We should be able to access the PostgREST API."""
+        res = pg_api.get("/")
+        assert res.status_code == 200
+
+    def test_sample_api_get(self, pg_api):
+        """We should be able to delete a sample via the API."""
+        res = pg_api.get("/sample", params={"name": "eq.test sample 1"})
+        assert res.status_code == 200
+        data = res.json()
+        assert len(data) == 1
+        name = data[0]["name"]
+        assert name == "test sample 1"
+
+    def test_sample_api_delete_failed(self, pg_api):
+        """We should be prevented from deleting a sample via API without the right permissions."""
+        res = pg_api.delete("/sample", params={"name": "eq.test sample 1"})
+        assert res.status_code == 401
+        data = res.json()
+        assert data["message"] == "permission denied for view sample"
+
+    def test_sample_api_delete_authenticated(self, pg_api, token):
+        res = pg_api.delete(
+            "/sample",
+            params={"name": "eq.test sample 1"},
+            headers={"Authorization": "Bearer " + token},
+        )
+        assert res.status_code == 204
+
+    def test_sample_was_deleted(self, pg_api):
+        res = pg_api.get("/sample", params={"name": "eq.test sample 1"})
+        assert res.status_code == 200
+        data = res.json()
+        assert len(data) == 0

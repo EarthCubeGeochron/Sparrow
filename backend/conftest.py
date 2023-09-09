@@ -1,11 +1,13 @@
 from pytest import fixture
 from os import environ
 from starlette.testclient import TestClient
+from requests import Session as RequestsSession
 from sparrow.core.app import Sparrow
 from sparrow.core.context import _setup_context
 from macrostrat.database.utils import wait_for_database
 from sparrow.core.auth.create_user import _create_user
 from sparrow.tests.helpers.database import testing_database
+from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import Session
 from sqlalchemy import event
 import logging
@@ -71,6 +73,43 @@ def app(pytestconfig):
         yield _app
 
 
+def wait_for_pgrest_api(postgrest_url):
+    """Wait for the PostgREST API to be available"""
+    from requests import get
+    from time import sleep
+
+    while True:
+        try:
+            get(postgrest_url)
+        except Exception as err:
+            print(err)
+            sleep(0.5)
+        else:
+            break
+
+
+@fixture(scope="session")
+def pg_api():
+    """PostgREST API client for testing"""
+    postgrest_url = environ.get("SPARROW_POSTGREST_URL")
+
+    if postgrest_url is None:
+        raise ValueError("SPARROW_POSTGREST_URL not set")
+
+    wait_for_pgrest_api(postgrest_url)
+
+    class PostgRESTSession(RequestsSession):
+        def request(self, method, url, *args, **kwargs):
+            if url.startswith("/"):
+                url = postgrest_url + url
+            return super().request(method, url, *args, **kwargs)
+
+    session = PostgRESTSession()
+    session.headers.update({"Accept": "application/json"})
+    yield session
+    session.close()
+
+
 @fixture(scope="function")
 def statements(db):
     stmts = []
@@ -84,10 +123,14 @@ def statements(db):
 
 
 @fixture(scope="class")
-def db(app, pytestconfig):
+def db(app, pytestconfig, request):
     # https://docs.sqlalchemy.org/en/13/orm/session_transaction.html
     # https://gist.github.com/zzzeek/8443477
-    if pytestconfig.option.use_isolation:
+    use_isolation = pytestconfig.option.use_isolation
+    if request.cls is not None:
+        use_isolation = getattr(request.cls, "use_isolation", use_isolation)
+
+    if use_isolation:
         connection = app.database.engine.connect()
         transaction = connection.begin()
         session = Session(bind=connection)
@@ -114,6 +157,7 @@ def db(app, pytestconfig):
         transaction.rollback()
         connection.close()
     else:
+        app.database.session = scoped_session(app.database._session_factory)
         yield app.database
 
 

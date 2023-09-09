@@ -1,4 +1,12 @@
+-- Admin user can see all data in the database
 CREATE ROLE admin;
+
+GRANT USAGE ON SCHEMA public TO admin;
+GRANT USAGE ON SCHEMA vocabulary TO admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public TO admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA vocabulary TO admin;
+
+-- Public user can see only public data
 CREATE ROLE view_public;
 
 GRANT USAGE ON SCHEMA public TO view_public;
@@ -79,18 +87,6 @@ FOR SELECT
 TO view_public
 USING (is_public(project));
 
-/* Allow admin to do everything */
-GRANT ALL ON datum TO admin;
-GRANT ALL ON analysis TO admin;
-GRANT ALL ON session TO admin;
-GRANT ALL ON sample TO admin;
-GRANT ALL ON project TO admin;
 
-/* Allow public to select only */
-GRANT SELECT ON datum TO view_public;
-GRANT SELECT ON analysis TO view_public;
-GRANT SELECT ON session TO view_public;
-GRANT SELECT ON sample TO view_public;
-GRANT SELECT ON project TO view_public;
 
 

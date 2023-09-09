@@ -6,22 +6,28 @@
 version: "3.6"
 x-backend:
   &x-backend
-  build:
-    context: ./backend
-    target: testing
+  image: ${SPARROW_BACKEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/backend}
   # Make sure we get colorized terminal output
   depends_on:
     - db
+    - pg_api
   environment:
-    - SPARROW_SECRET_KEY=test_secret
+    - SPARROW_SECRET_KEY=test_secret_must_be_at_least_32_characters
     - SPARROW_CACHE_DATABASE_MODELS
     # Whether we should enable a worker pool for running tasks.
     # If we don't, tasks must be run via the command line.
     - SPARROW_TASK_WORKER=0
     - SPARROW_TASK_BROKER=redis://broker:6379/0
+    - SPARROW_POSTGREST_URL=http://pg_api:3000
 services:
   backend:
     <<: *x-backend
+    # We place the build context here rather than in the shared section
+    # so we don't build the backend image twice before starting tests.
+    build:
+      context: backend
+      cache_from:
+        - ${SPARROW_BACKEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/backend}
     command: pytest /app/sparrow_tests --teardown 
     tty: true
     volumes:
@@ -36,9 +42,29 @@ services:
     expose:
       - 5432
     environment:
-      - POSTGRES_DB=sparrow
+      - POSTGRES_DB=sparrow_test
       - PGUSER=postgres
       - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  pg_api:
+    image: postgrest/postgrest:v11.2.0
+    environment:
+      - PGRST_DB_URI=postgresql://postgres:@db:5432/sparrow_test
+      - PGRST_DB_SCHEMAS=sparrow_api
+      - PGRST_DB_ANON_ROLE=view_public
+      - PGRST_JWT_SECRET=test_secret_must_be_at_least_32_characters
+      - PGRST_DB_MAX_ROWS=100
+      - PGRST_SERVER_PORT=3000
+    expose:
+      - 3000
+    depends_on:
+      - db
+    ports:
+      - "${SPARROW_TEST_POSTGREST_PORT:-3001}:3000"
   # Additional testing of broker-based functionality.
   # Broker and worker are for testing task-based functionality
   # We disable this for minimal tests, but we can test with the brokers

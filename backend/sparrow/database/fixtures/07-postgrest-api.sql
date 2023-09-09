@@ -1,3 +1,6 @@
+-- API-specific roles
+-- CREATE ROLE IF NOT EXISTS authenticator LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
+
 
 CREATE SCHEMA IF NOT EXISTS sparrow_api;
 
@@ -17,8 +20,10 @@ CREATE OR REPLACE VIEW sparrow_api.session AS
 SELECT * FROM core_view.session;
 
 CREATE OR REPLACE VIEW sparrow_api.sample AS
-SELECT * FROM core_view.sample;
+SELECT * FROM sample;
 
+CREATE OR REPLACE VIEW sparrow_api.sample_data AS
+SELECT * FROM core_view.sample;
 
 CREATE OR REPLACE VIEW core_view.sample_v3 AS
 SELECT
@@ -120,3 +125,12 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
   SELECT ST_AsMVT(grouped_features)
   FROM grouped_features;
 $$ LANGUAGE sql IMMUTABLE;
+
+
+GRANT USAGE ON SCHEMA sparrow_api TO view_public;
+GRANT SELECT ON ALL TABLES IN SCHEMA sparrow_api TO view_public;
+GRANT USAGE ON SCHEMA sparrow_api TO admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA sparrow_api TO admin;
+
+
+NOTIFY pgrst, 'reload schema'

@@ -10,3 +10,5 @@ services:
     restart: unless-stopped
   db:
     restart: unless-stopped
+  api:
+    restart: unless-stopped
