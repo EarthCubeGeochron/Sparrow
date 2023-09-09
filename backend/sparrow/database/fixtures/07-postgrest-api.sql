@@ -1,6 +1,9 @@
 -- API-specific roles
--- CREATE ROLE IF NOT EXISTS authenticator LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
+-- https://postgrest.org/en/stable/tutorials/tut0.html
+CREATE ROLE authenticator LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
 
+GRANT admin TO authenticator;
+GRANT view_public TO authenticator;
 
 CREATE SCHEMA IF NOT EXISTS sparrow_api;
 

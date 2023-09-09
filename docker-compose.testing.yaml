@@ -53,7 +53,7 @@ services:
   pg_api:
     image: postgrest/postgrest:v11.2.0
     environment:
-      - PGRST_DB_URI=postgresql://postgres:@db:5432/sparrow_test
+      - PGRST_DB_URI=postgresql://authenticator:@db:5432/sparrow_test
       - PGRST_DB_SCHEMAS=sparrow_api
       - PGRST_DB_ANON_ROLE=view_public
       - PGRST_JWT_SECRET=test_secret_must_be_at_least_32_characters
