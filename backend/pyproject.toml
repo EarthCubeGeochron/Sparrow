@@ -59,11 +59,6 @@ marshmallow-sqlalchemy = "0.24.2"
 marshmallow-jsonschema = "0.10.0"
 stringcase = "1.2.0"
 
-# Prototype GraphQL API
-Flask-GraphQL = "2.0.1"
-graphene = "2.1.8"
-graphene_sqlalchemy = "2.2.2"
-
 # API version 2
 webargs-starlette = "2.0.0"
 apispec = "3.3.1"
@@ -78,8 +73,12 @@ rich = "^12"
 deepdiff = { version = "5.0.2", extras = [ "murmur" ] }
 pytest-order = "0.9.5"
 
+# Legacy file routes
+flask = "^2.2.3"
+
 # Authentication
 PyJWT = "1.7.1"
+werkzeug = "^2.3.7"
 
 # ASGI
 starlette = "0.13.4"
