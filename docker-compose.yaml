@@ -134,12 +134,13 @@ services:
       timeout: 5s
       retries: 3
   pg_api:
-    image: postgrest/postgrest:v10.0.0
+    image: postgrest/postgrest:v11.2.0
     environment:
-      - PGRST_DB_URI=postgresql://postgres:@db:5432/sparrow
+      - PGRST_DB_URI=postgresql://authenticator:@db:5432/sparrow
       - PGRST_DB_SCHEMAS=sparrow_api
-      - PGRST_DB_ANON_ROLE=postgres
-      - PGRST_DB_MAX_ROWS=1000
+      - PGRST_DB_ANON_ROLE=view_public
+      - PGRST_JWT_SECRET=${SPARROW_SECRET_KEY}
+      - PGRST_DB_MAX_ROWS=100
     profiles:
       - core
     depends_on:
