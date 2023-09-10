@@ -1,5 +1,5 @@
-from macrostrat.dinosaur import SchemaMigration, AutoMigration
-from sqlalchemy import inspect, sql
+from macrostrat.dinosaur import SchemaMigration
+from sqlalchemy import inspect
 from sparrow.core.plugins import SparrowCorePlugin
 from macrostrat.utils import relative_path, cmd
 from sparrow.core import get_database
@@ -8,6 +8,7 @@ from pathlib import Path
 from sqlalchemy.exc import ProgrammingError
 from sparrow.database import Database
 from macrostrat.database.utils import connection_args, run_sql
+import warnings
 
 exclude_tables = ["spatial_ref_sys"]
 audit_schemas = ["public", "vocabulary", "tags", "geo_context"]
@@ -83,8 +84,8 @@ def upgrade_audit_trail(engine):
     """
     procedures = [
         # "pg-memento/ctl/UPGRADE",
-        "pg-memento/UPGRADE_v061_to_v07",
-        "pg-memento/UPGRADE_v07_to_v074",
+        "pg-memento-legacy/UPGRADE_v061_to_v07",
+        "pg-memento-legacy/UPGRADE_v07_to_v074",
     ]
 
     args = connection_args(engine)
@@ -120,7 +121,7 @@ def get_old_audit_id(engine):
 class PGMementoMigration(SchemaMigration):
     """Migrate audit logging to version 0.7.4 from the 0.6 series"""
 
-    name = "document-table-migration"
+    name = "pgmemento-upgrade-migration"
     target = None
 
     def should_apply(self, source, target, migrator):
@@ -209,13 +210,22 @@ class PGMemento074Migration(SchemaMigration):
         )
 
     def apply(self, engine):
-        fp = relative_path(__file__, "pg-memento/UPGRADE_v07_to_v074.sql")
+        fp = relative_path(__file__, "pg-memento-legacy/UPGRADE_v07_to_v074.sql")
         run_psql(engine, fp)
         db = Database(engine.url)
         db.initialize()
 
 
 def build_audit_tables(db):
+    # Check if extension is available
+    try:
+        db.engine.execute("CREATE EXTENSION IF NOT EXISTS pgmemento")
+    except ProgrammingError:
+        # Extension is not available
+        pass
+
+    warnings.warn("Using legacy PGMemento installation process")
+
     procedures = []
 
     if not has_audit_schema(db):
@@ -236,9 +246,8 @@ def build_audit_tables(db):
     ]
 
     for id in procedures:
-        fp = relative_path(__file__, "pg-memento", "src", id + ".sql")
+        fp = relative_path(__file__, "pg-memento-legacy", "src", id + ".sql")
         db.exec_sql(fp)
-    db.exec_sql(relative_path(__file__, "start-logging.sql"))
 
 
 class VersioningPlugin(SparrowCorePlugin):
@@ -246,6 +255,7 @@ class VersioningPlugin(SparrowCorePlugin):
 
     def on_finalize_database_schema(self, db):
         build_audit_tables(db)
+        db.exec_sql(relative_path(__file__, "start-logging.sql"))
 
     def on_setup_cli(self, cli):
         cli.add_command(drop_audit_trail)

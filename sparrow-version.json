@@ -12,6 +12,10 @@
       "context": "./base-images/postgis-mysql-fdw",
       "version": "1.0"
     },
+    "database": {
+      "context": "./base-images/database",
+      "version": "2.0"
+    },
     "frontend": {
       "version": "@core",
       "context": "./frontend"

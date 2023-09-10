@@ -61,6 +61,20 @@ class TestDatabaseInitialization:
     def test_correct_db(self, db):
         assert str(db.engine.url) == environ.get("SPARROW_DATABASE")
 
+    def test_postgis_installed(self, db):
+        """
+        Make sure that the postgis extension is installed.
+        """
+        exts = db.engine.execute("SELECT extname FROM pg_extension").fetchall()
+        extensions = [e[0] for e in exts]
+        assert "postgis" in extensions
+        assert "pgmemento" in extensions
+
+    def test_pgmemento_loaded(self, db):
+        from core_plugins.versioning import has_audit_schema
+
+        assert has_audit_schema(db.engine)
+
     def test_db_automap(self, db):
         """
         Make sure that all core tables are automapped by the
