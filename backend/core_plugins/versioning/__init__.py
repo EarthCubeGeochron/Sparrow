@@ -8,6 +8,7 @@ from pathlib import Path
 from sqlalchemy.exc import ProgrammingError
 from sparrow.database import Database
 from macrostrat.database.utils import connection_args, run_sql
+import warnings
 
 exclude_tables = ["spatial_ref_sys"]
 audit_schemas = ["public", "vocabulary", "tags", "geo_context"]
@@ -216,6 +217,15 @@ class PGMemento074Migration(SchemaMigration):
 
 
 def build_audit_tables(db):
+    # Check if extension is available
+    try:
+        db.engine.execute("CREATE EXTENSION IF NOT EXISTS pgmemento")
+    except ProgrammingError:
+        # Extension is not available
+        pass
+
+    warnings.warn("Using legacy PGMemento installation process")
+
     procedures = []
 
     if not has_audit_schema(db):
@@ -238,7 +248,6 @@ def build_audit_tables(db):
     for id in procedures:
         fp = relative_path(__file__, "pg-memento-legacy", "src", id + ".sql")
         db.exec_sql(fp)
-    db.exec_sql(relative_path(__file__, "start-logging.sql"))
 
 
 class VersioningPlugin(SparrowCorePlugin):
@@ -246,6 +255,7 @@ class VersioningPlugin(SparrowCorePlugin):
 
     def on_finalize_database_schema(self, db):
         build_audit_tables(db)
+        db.exec_sql(relative_path(__file__, "start-logging.sql"))
 
     def on_setup_cli(self, cli):
         cli.add_command(drop_audit_trail)

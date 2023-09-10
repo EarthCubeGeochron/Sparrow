@@ -33,7 +33,7 @@ services:
     volumes:
       - pytest_cache:/run/.pytest_cache
   db:
-    image: postgis/postgis:14-3.3
+    image: ghcr.io/earthcubegeochron/sparrow/database:2.0
     ports:
       # We could change this to port 54321 if we were cool with
       # it conflicting with our default for Sparrow itself. This

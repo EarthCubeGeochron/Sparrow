@@ -5,6 +5,8 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- TODO: Add safeupdate to preload libraries
+
 /*
 Drop extra schemas and extensions created by PostGIS,
 because they interfere with generation of migrations

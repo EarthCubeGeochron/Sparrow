@@ -10,7 +10,7 @@ from json import load
 from ..config import SparrowConfig
 from ..util import cmd, SparrowCommandError
 
-images_ = ["backend-base", "postgis-mysql-fdw", "backend", "frontend"]
+images_ = ["backend-base", "postgis-mysql-fdw", "backend", "frontend", "database"]
 
 prefix = "ghcr.io/earthcubegeochron/sparrow"
 
