@@ -1,10 +1,10 @@
-FROM ghcr.io/earthcubegeochron/sparrow/backend-base:2.0 AS main
+FROM ghcr.io/earthcubegeochron/sparrow/backend-base:3.0-beta1 AS main
 # Multi-stage build of Sparrow backend.
 
 ## Git is required for the PyChron importer
 RUN apt update && \
   apt install -y git && \
-  pip install "poetry==1.4.2" && \
+  pip install "poetry==1.6.1" && \
   rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -31,7 +31,7 @@ sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "mas
 
 # Core application
 Pygments = "2.10.0"
-sqlalchemy-utils = "^0.37.0"
+sqlalchemy-utils = "^0.41.1"
 requests = "^2.26.0"
 toposort = "1.5"
 
