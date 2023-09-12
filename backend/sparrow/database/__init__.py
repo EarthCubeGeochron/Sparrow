@@ -2,6 +2,7 @@ from pathlib import Path
 from click import secho
 from time import perf_counter
 
+from sqlalchemy import text
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
@@ -38,7 +39,7 @@ class Database(BaseDatabase):
         log.info("Automapping the database")
         t0 = perf_counter()
 
-        self.mapper = SparrowDatabaseMapper(self, use_cache=use_cache)
+        self.mapper = SparrowDatabaseMapper(self, use_cache=use_cache, reflect=True)
 
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
@@ -172,7 +173,9 @@ class Database(BaseDatabase):
         msg = "Reloading PostgREST schema cache"
         secho(msg, bold=True)
         log.info(msg)
-        self.engine.execute("NOTIFY pgrst, 'reload schema'")
+        conn = self.engine.connect()
+        sql = text("NOTIFY pgrst, 'reload schema'")
+        conn.execute(sql)
 
     def update_schema(self, **kwargs):
         # Might be worth creating an interactive upgrader

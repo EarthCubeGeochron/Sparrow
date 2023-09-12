@@ -1,7 +1,7 @@
 from macrostrat.dinosaur import SchemaMigration
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 from sparrow.core.plugins import SparrowCorePlugin
-from macrostrat.utils import relative_path, cmd
+from macrostrat.utils import relative_path, cmd, get_logger
 from sparrow.core import get_database
 import click
 from pathlib import Path
@@ -9,6 +9,8 @@ from sqlalchemy.exc import ProgrammingError
 from sparrow.database import Database
 from macrostrat.database.utils import connection_args, run_sql
 import warnings
+
+log = get_logger(__name__)
 
 exclude_tables = ["spatial_ref_sys"]
 audit_schemas = ["public", "vocabulary", "tags", "geo_context"]
@@ -219,10 +221,10 @@ class PGMemento074Migration(SchemaMigration):
 def build_audit_tables(db):
     # Check if extension is available
     try:
-        db.engine.execute("CREATE EXTENSION IF NOT EXISTS pgmemento")
-    except ProgrammingError:
+        create_extension(db)
+    except ProgrammingError as exc:
         # Extension is not available
-        pass
+        log.exception(exc)
 
     warnings.warn("Using legacy PGMemento installation process")
 
@@ -250,11 +252,16 @@ def build_audit_tables(db):
         db.exec_sql(fp)
 
 
+def create_extension(db):
+    sql = text("CREATE EXTENSION IF NOT EXISTS pgmemento")
+    db.run_sql(sql)
+
+
 class VersioningPlugin(SparrowCorePlugin):
     name = "versioning"
 
     def on_finalize_database_schema(self, db):
-        build_audit_tables(db)
+        create_extension(db)
         db.exec_sql(relative_path(__file__, "start-logging.sql"))
 
     def on_setup_cli(self, cli):

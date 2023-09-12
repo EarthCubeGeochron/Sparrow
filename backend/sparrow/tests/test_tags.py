@@ -1,6 +1,6 @@
 from .helpers import json_fixture
 from pytest import mark
-import json
+from sqlalchemy import inspect
 
 
 class TestTags:
@@ -16,8 +16,9 @@ class TestTags:
             "sample_tag",
             "project_tag",
         ]
+        insp = inspect(db.engine)
         for table in tables:
-            assert db.engine.has_table(table, schema="tags")
+            assert insp.has_table(table, schema="tags")
 
     def test_default_tags_exist(self, client, db):
         """Checks to make sure the default tags are in the db"""

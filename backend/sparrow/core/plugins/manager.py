@@ -131,11 +131,12 @@ class SparrowPluginManager(object):
 
     def _iter_hooks(self, hook_name):
         method_name = "on_" + hook_name.replace("-", "_")
+        log.info(f"Running hook: {hook_name}")
         for plugin in self.__store:
             method = getattr(plugin, method_name, None)
             if method is None:
                 continue
-            log.info("  plugin: " + plugin.name)
+            log.debug(f"Hook {hook_name}, plugin: " + plugin.name)
             yield plugin, method
 
     def run_hook(self, hook_name, *args, **kwargs):

@@ -2,3 +2,8 @@
 __archive
 Dockerfile
 .venv
+dist
+loader/dist
+loader/.venv
+shared-modules/.pytest_cache
+shared-modules/.venv

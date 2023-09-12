@@ -13,7 +13,7 @@ log = get_logger(__name__)
 def _gen_relationship(
     base, direction, return_fn, attrname, local_cls, referred_cls, **kw
 ):
-    support_schemas = ["vocabulary", "core_view"]
+    support_schemas = ["vocabulary", "core_view", "tags"]
     if (
         local_cls.__table__.schema in support_schemas
         and referred_cls.__table__.schema is None
@@ -62,6 +62,6 @@ class SparrowDatabaseMapper(DatabaseMapper):
         self.automap_base = BaseModel
         if reflect:
             self.reflect_database(
-                schemas=["vocabulary", "core_view", "tags", "public"],
+                schemas=["public", "vocabulary", "core_view", "tags"],
                 use_cache=use_cache,
             )

@@ -68,6 +68,7 @@ class Sparrow(Starlette):
         if not _exists or drop or force:
             log.info("Creating database tables")
             self.db.initialize(drop=drop)
+            self.setup_database(use_cache=False)
         elif _exists:
             log.info("Application tables exist")
 

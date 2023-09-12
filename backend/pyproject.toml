@@ -107,6 +107,7 @@ pydantic = "^1.8.2"
 typer = "^0.6"
 sqlakeyset = "^1.0.1629029818"
 setuptools = "^65.4.1"
+httpx = "^0.24.1"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.15.3"

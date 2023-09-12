@@ -2,6 +2,7 @@ from datetime import datetime
 from pytest import mark
 from sparrow.logs import get_logger
 from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy import text
 from os import environ
 import numpy as N
 
@@ -61,11 +62,11 @@ class TestDatabaseInitialization:
     def test_correct_db(self, db):
         assert str(db.engine.url) == environ.get("SPARROW_DATABASE")
 
-    def test_postgis_installed(self, db):
+    def test_extensions_installed(self, db):
         """
         Make sure that the postgis extension is installed.
         """
-        exts = db.engine.execute("SELECT extname FROM pg_extension").fetchall()
+        exts = db.session.execute(text("SELECT extname FROM pg_extension")).fetchall()
         extensions = [e[0] for e in exts]
         assert "postgis" in extensions
         assert "pgmemento" in extensions

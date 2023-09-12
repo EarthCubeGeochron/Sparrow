@@ -1,15 +1,16 @@
-import click
 import sys
-from os import environ, chdir
-from typing import List
+from os import chdir, environ
 from pathlib import Path
-from rich import print
 from textwrap import dedent
+from typing import List
 
+import click
+from macrostrat.utils import get_logger
+from rich import print
 from sparrow_cli.util.command_groups import SparrowDefaultCommand
 from sparrow_cli.util.exceptions import SparrowCommandError
-from ..util import cmd, exec_or_run, container_is_running
-from macrostrat.utils import get_logger
+
+from ..util import cmd, container_is_running, exec_or_run
 
 log = get_logger(__name__)
 
@@ -246,6 +247,7 @@ def run_tests_locally(basedir: Path, *pytest_args: List[str]):
     db_port = environ.get("SPARROW_DB_PORT", 54321)
     newenv = dict(
         **environ,
+        SPARROW_SECRET_KEY="test" * 20,
         SPARROW_TESTING_DATABASE=test_db
         or f"postgresql://postgres@localhost:{db_port}/sparrow_test"
         # Reset virtualenv to allow poetry to apply the correct one.
