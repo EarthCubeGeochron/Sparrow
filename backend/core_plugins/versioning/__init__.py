@@ -6,6 +6,7 @@ from sparrow.core import get_database
 import click
 from pathlib import Path
 from sqlalchemy.exc import ProgrammingError
+from sqlalchemy import Connection, Engine
 from sparrow.database import Database
 from macrostrat.database.utils import connection_args, run_sql
 import warnings
@@ -26,48 +27,50 @@ memento_tables = [
 ]
 
 
-def has_audit_id(db, schema, table, col_name="pgmemento_audit_id"):
-    insp = inspect(db.engine)
+def has_audit_id(
+    conn: Connection, schema: str, table: str, col_name="pgmemento_audit_id"
+):
+    insp = inspect(conn)
     cols = insp.get_columns(table, schema=schema)
     col_names = [c["name"] for c in cols]
     return col_name in col_names
 
 
-def audit_tables(db):
-    insp = inspect(db.engine)
+def audit_tables(conn: Connection):
+    insp = inspect(conn)
     for schema in audit_schemas:
         for table in insp.get_table_names(schema=schema):
             if table in exclude_tables:
                 continue
-            if not has_audit_id(db, schema, table):
+            if not has_audit_id(conn, schema, table):
                 continue
             yield schema, table
 
 
-def has_audit_schema(db):
-    insp = inspect(db.engine)
+def has_audit_schema(conn: Connection) -> bool:
+    insp = inspect(conn)
     realized_tables = insp.get_table_names(schema="pgmemento")
     # Some of the pg_memento tables are not created...
     return all(t in realized_tables for t in memento_tables)
 
 
-def drop_audit_columns(db):
-    for schema, table in audit_tables(db):
+def drop_audit_columns(conn: Connection):
+    for schema, table in audit_tables(conn):
         q = f"ALTER TABLE {schema}.{table} DROP COLUMN pgmemento_audit_id CASCADE"
-        run_sql(db.session, q)
+        run_sql(conn, q)
 
 
-def add_audit_id_sequence(db):
+def add_audit_id_sequence(conn: Connection):
     """
     Re-add audit sequences (this seems necessary sometimes)
     """
-    for schema, table in audit_tables(db):
+    for schema, table in audit_tables(conn):
         q = (
             f"ALTER TABLE {schema}.{table} "
             "ALTER COLUMN pgmemento_audit_id SET DEFAULT "
             "nextval('pgmemento.audit_id_seq'::regclass)"
         )
-        run_sql(db.session, q)
+        run_sql(conn, q)
 
 
 @click.command(name="remove-audit-trail")
@@ -77,7 +80,7 @@ def drop_audit_trail():
     """
     db = get_database()
     db.exec_sql(relative_path(__file__, "drop-audit.sql"))
-    drop_audit_columns(db)
+    drop_audit_columns(db.engine.connect())
 
 
 def upgrade_audit_trail(engine):
@@ -106,18 +109,18 @@ def run_psql(engine, fp):
 
 def get_procedure(name):
     sql = relative_path(__file__, "procedures", name + ".sql")
-    return open(sql).read()
+    return text(open(sql, encoding="utf-8").read())
 
 
-def get_old_triggers(engine):
+def get_old_triggers(conn: Connection):
     """
     Get the old triggers that need to be dropped
     """
-    return engine.execute(get_procedure("get-old-triggers")).fetchall()
+    return conn.execute(get_procedure("get-old-triggers")).fetchall()
 
 
-def get_old_audit_id(engine):
-    return engine.execute(get_procedure("get-old-audit-id")).fetchall()
+def get_old_audit_id(conn: Connection):
+    return conn.execute(get_procedure("get-old-audit-id")).fetchall()
 
 
 class PGMementoMigration(SchemaMigration):
@@ -126,19 +129,25 @@ class PGMementoMigration(SchemaMigration):
     name = "pgmemento-upgrade-migration"
     target = None
 
-    def should_apply(self, source, target, migrator):
-        db = Database(source.url)
-        old_triggers = get_old_triggers(db.session)
-        old_audit_id = get_old_audit_id(db.session)
-        return (
-            has_audit_id(source, "public", "sample", col_name="audit_id")
-            and len(old_triggers) > 0
-            and len(old_audit_id) > 0
-        )
+    def should_apply(self, source: Engine, target: Engine, migrator):
+        with source.connect() as conn:
+            old_triggers = get_old_triggers(conn)
+            old_audit_id = get_old_audit_id(conn)
+            return (
+                has_audit_id(conn, "public", "sample", col_name="audit_id")
+                and len(old_triggers) > 0
+                and len(old_audit_id) > 0
+            )
 
-    def apply(self, engine):
-        db = Database(engine.url)
+    def apply(self, engine: Engine):
+        with engine.connect() as conn:
+            log.info(f"Connected to database {engine.url}")
+            self._drop_old(conn)
+        db = Database(engine)
+        db.recreate_views()
+        build_audit_tables(db)
 
+    def _drop_old(self, conn: Connection):
         old_triggers = [
             "schema_drop_pre_trigger",
             "table_alter_post_trigger",
@@ -149,11 +158,11 @@ class PGMementoMigration(SchemaMigration):
         ]
 
         # Drop views
-        db.engine.execute("DROP SCHEMA IF EXISTS core_view CASCADE;")
+        run_sql(conn, "DROP SCHEMA IF EXISTS core_view CASCADE")
 
         # Drop old triggers
         for trigger in old_triggers:
-            db.engine.execute(f"DROP EVENT TRIGGER IF EXISTS {trigger};")
+            run_sql(conn, f"DROP EVENT TRIGGER IF EXISTS {trigger}")
 
         # db.engine.execute("SELECT pgmemento.drop_schema_event_trigger()")
         # for schema in ["public", "vocabulary", "tags", "geo_context", "core_view"]:
@@ -162,28 +171,25 @@ class PGMementoMigration(SchemaMigration):
         #     )
 
         sql = ""
-        for trigger in get_old_triggers(db.session):
+        for trigger in get_old_triggers(conn):
             for op in ["insert", "update", "delete", "truncate", "transaction"]:
                 sql += f"DROP TRIGGER IF EXISTS log_{op}_trigger ON {trigger.schema}.{trigger.table};\n"
 
         # We have to drop old triggers explicitly because they are incompatible with PostgreSQL 14 and will complain if fired
-        run_sql(db.engine, sql)
+        run_sql(conn, sql)
         # db.session.execute("DROP SCHEMA IF EXISTS core_view CASCADE")
 
         # Drop schema event trigger
 
         sql = ""
         # A scorched-earth approach to dropping the v1 audit trai
-        for audit_id in get_old_audit_id(db.session):
+        for audit_id in get_old_audit_id(conn):
             sql += f"ALTER TABLE {audit_id.schema}.{audit_id.table} DROP COLUMN audit_id;\n"
-        run_sql(db.engine, sql)
+        run_sql(conn, sql)
 
         # Complete drop of old audit trail
         sqlfile = relative_path(__file__, "procedures", "drop-old-constraints.sql")
-        run_sql(db.engine, open(sqlfile).read())
-        db.recreate_views()
-
-        build_audit_tables(db)
+        run_sql(conn, sqlfile)
 
 
 class PGMemento074Migration(SchemaMigration):
@@ -194,10 +200,12 @@ class PGMemento074Migration(SchemaMigration):
 
     def should_apply(self, source, target, migrator):
         # Get the version of PGMemento
+        sql = text(
+            "SELECT major_version, minor_version, revision FROM pgmemento.version()"
+        )
         try:
-            version = source.execute(
-                "SELECT major_version, minor_version, revision FROM pgmemento.version()"
-            ).scalar()
+            with source.connect() as conn:
+                version = conn.execute(sql).scalar()
         except ProgrammingError:
             return False
         # Parse version string
@@ -230,7 +238,7 @@ def build_audit_tables(db):
 
     procedures = []
 
-    if not has_audit_schema(db):
+    if not has_audit_schema(db.engine.connect()):
         # Create the schema to hold audited tables
         # NOTE: this drops all transaction history, so we don't run
         # it if pgMemento tables already exist.

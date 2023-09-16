@@ -13,8 +13,9 @@ class PlateauMigration(SchemaMigration):
         args = ('"public"."session"', "in_plateau")
         return has_column(source, *args) and not has_column(target, *args)
 
-    def apply(self, db):
-        db.engine.execute("ALTER TABLE analysis DROP COLUMN in_plateau")
+    def apply(self, engine):
+        with engine.connect() as conn:
+            conn.execute("ALTER TABLE session DROP COLUMN in_plateau")
 
 
 class InstrumentSessionMigration(SchemaMigration):
@@ -22,20 +23,17 @@ class InstrumentSessionMigration(SchemaMigration):
 
     def should_apply(self, source, target, migrator):
         pub = '"public"."instrument_session"'
-        return has_table(target, pub)
+        return has_table(target, pub) and not has_table(source, pub)
 
-    def apply(self, db):
+    def apply(self, engine):
         ix = "data_file_link_file_hash_session_id_analysis_id_sample_id_key"
-        sess = sessionmaker(bind=db.engine)()
-        list(
-            run_sql(
-                sess,
-                f"""
+        run_sql(
+            engine,
+            f"""
         ALTER TABLE data_file_link DROP CONSTRAINT {ix};
         ALTER TABLE data_file_link DROP CONSTRAINT data_file_link_check;
         DROP INDEX IF EXISTS {ix};
         """,
-            )
         )
 
 
@@ -46,8 +44,8 @@ class SampleCheckMigration(SchemaMigration):
         pub = '"public"."sample"'
         return not has_column(source, pub, "lab_id")
 
-    def apply(self, db):
-        sess = sessionmaker(bind=db.engine)()
+    def apply(self, engine):
+        sess = sessionmaker(bind=engine)()
         run_sql(sess, "ALTER TABLE sample DROP CONSTRAINT sample_check")
 
 
@@ -56,13 +54,13 @@ class SampleLocationAddSRID(SchemaMigration):
 
     def should_apply(self, source, target, migrator):
         sql = "SELECT srid FROM geometry_columns WHERE f_table_name = 'sample' AND f_geometry_column = 'location'"
-        res = source.execute(sql).fetchone()
+        res = run_sql(source, sql)[0].fetchone()
         return res is None or res[0] != 4326
 
     def apply(self, engine):
         try:
             sql_file = Path(__file__).parent / "sql" / "add-sample-srid.sql"
-            engine.execute(sql_file.read_text())
+            run_sql(engine, sql_file)
         except DataError:
             pass
 
@@ -76,12 +74,13 @@ class SampleAttributeCascadeMigration(SchemaMigration):
         WHERE conrelid = '__analysis_attribute'::regclass
         AND pg_get_constraintdef(oid) ILIKE '%ON DELETE CASCADE%'
         """
-        res = source.execute(text(sql)).fetchone()
-        return res[0]
+        with source.connect() as conn:
+            res = conn.execute(text(sql)).fetchone()
+            return res[0]
 
     def apply(self, engine):
         try:
             sql_file = Path(__file__).parent / "sql" / "add-sample-delete-cascades.sql"
-            list(run_sql(engine, sql_file.read_text()))
+            list(run_sql(engine, sql_file))
         except DataError:
             pass

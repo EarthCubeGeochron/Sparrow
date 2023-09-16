@@ -147,26 +147,25 @@ class Database(BaseDatabase):
         for _fn in filenames:
             self.exec_sql(_fn)
 
-        self.reload_postgrest_cache()
-
         try:
             self.app.run_hook("core-tables-initialized", self)
             self.app.run_hook("finalize-database-schema", self)
         except AttributeError as err:
             secho("Could not load plugins", fg="red", dim=True)
             secho(str(err))
+        self.reload_postgrest_cache()
 
     def recreate_views(self):
         views = ["06-views.sql", "07-postgrest-api.sql"]
         for view in views:
             fp = relative_path(__file__, "fixtures", view)
             self.exec_sql(fp)
-        self.reload_postgrest_cache()
         try:
             self.app.run_hook("finalize-database-schema", self)
         except AttributeError as err:
             secho("Could not load plugins", fg="red", dim=True)
             secho(str(err))
+        self.reload_postgrest_cache()
 
     def reload_postgrest_cache(self):
         # Reload the Postgrest schema cache

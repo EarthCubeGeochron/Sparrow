@@ -74,7 +74,7 @@ class TestDatabaseInitialization:
     def test_pgmemento_loaded(self, db):
         from core_plugins.versioning import has_audit_schema
 
-        assert has_audit_schema(db.engine)
+        assert has_audit_schema(db.engine.connect())
 
     def test_db_automap(self, db):
         """
