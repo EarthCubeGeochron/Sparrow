@@ -32,6 +32,8 @@ services:
     tty: true
     volumes:
       - pytest_cache:/run/.pytest_cache
+    profiles:
+      - main
   db:
     image: ghcr.io/earthcubegeochron/sparrow/database:2.0
     ports:

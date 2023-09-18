@@ -239,17 +239,24 @@ def run_tests_locally(basedir: Path, *pytest_args: List[str]):
     test_db = environ.get("SPARROW_TESTING_DATABASE", None)
     # Need to bring up database separately to ensure ports are mapped...
     # NOTE: if we specify a local database we would not need to do this
-    if test_db is None and not container_is_running("db"):
-        compose("up -d db")
+    db_port = environ.get("SPARROW_TEST_DATABASE_PORT", 54322)
+    postgrest_port = environ.get("SPARROW_TEST_POSTGREST_PORT", 3001)
 
-    # Could use some fancy container magic
-    db_port = environ.get("SPARROW_DB_PORT", 54321)
-    newenv = dict(
-        **environ,
-        SPARROW_TESTING_DATABASE=test_db
-        or f"postgresql://postgres@localhost:{db_port}/sparrow_test"
-        # Reset virtualenv to allow poetry to apply the correct one.
+    newenv = dict(**environ)
+    newenv.setdefault(
+        "SPARROW_SECRET_KEY", "test_secret_must_be_at_least_32_characters"
     )
+
+    if test_db is None:
+        env = dict(**newenv)
+        env["COMPOSE_PROFILES"] = "data-services"
+        compose("up -d", env=env)
+        newenv.setdefault(
+            "SPARROW_TESTING_DATABASE",
+            f"postgresql://postgres@localhost:{db_port}/sparrow_test",
+        )
+        newenv.setdefault("SPARROW_POSTGREST_URL", f"http://localhost:{postgrest_port}")
+
     del newenv["VIRTUAL_ENV"]
 
     # Get virtualenv path

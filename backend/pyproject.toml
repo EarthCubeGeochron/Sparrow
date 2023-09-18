@@ -44,7 +44,7 @@ aiofiles = "0.6.0"
 
 # Import file reading
 xlrd = "1.2.0"
-pyyaml = "5.4"
+pyyaml = "^6.0.1"
 beautifulsoup4 = "4.8.2"
 html5lib = "1.0.1"
 datefinder = "0.7.0"
@@ -54,15 +54,15 @@ openpyxl = "3.0.9"
 uncertainties = "3.1.6" 
 
 # Serialization/deserialization
-marshmallow = "3.11.1"
-marshmallow-sqlalchemy = "0.24.2"
-marshmallow-jsonschema = "0.10.0"
+marshmallow = "^3.20.1"
+marshmallow-sqlalchemy = "^0.29.0"
+marshmallow-jsonschema = "^0.13.0"
 stringcase = "1.2.0"
 
 # API version 2
 webargs-starlette = "2.0.0"
-apispec = "3.3.1"
-starlette-apispec = "1.0.3"
+apispec = "^6.3.0"
+starlette-apispec = "^2.1.0"
 
 # S3/AWS file access
 boto3 = "^1.12.25"
@@ -81,7 +81,7 @@ PyJWT = "1.7.1"
 werkzeug = "^2.3.7"
 
 # ASGI
-starlette = "0.13.4"
+starlette = "^0.31.1"
 Hypercorn = "0.11.1"
 asgiref = "3.2.8"
 
@@ -106,6 +106,7 @@ pydantic = "^1.8.2"
 typer = "^0.6"
 sqlakeyset = "^1.0.1629029818"
 setuptools = "^65.4.1"
+httpx = "^0.25.0"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.15.3"
