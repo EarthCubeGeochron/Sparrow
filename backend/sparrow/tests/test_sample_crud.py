@@ -59,10 +59,12 @@ class TestSampleCRUD:
         model = db.session.query(Sample).filter_by(name="Soil 003").one()
         try:
             db.session.delete(model)
+            db.session.commit()
             assert False
         except ProgrammingError as err:
             assert isinstance(err.orig, InsufficientPrivilege)
             assert "permission denied for table sample" in str(err.orig)
+            db.session.rollback()
 
     def test_sample_deletion(self, db):
         """We should be able to delete a sample and all associated data."""
