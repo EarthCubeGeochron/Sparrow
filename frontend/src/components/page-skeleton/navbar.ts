@@ -6,7 +6,7 @@ import { DarkModeButton } from "@macrostrat/ui-components";
 import { AuthStatus } from "~/auth";
 import { Frame, FrameContext } from "~/frame";
 import classNames from "classnames";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { siteTitle } from "~/env";
 
 const h = hyperStyled(styles);

@@ -35,7 +35,7 @@ function AppRouter(props) {
   // Tab Title becomes WiscAr-Sparrow
   // TODO: We could use the 'react-helmet' library to manage this...
   useEffect(() => {
-    const labname = process.env.SPARROW_LAB_NAME;
+    const labname = import.meta.env.SPARROW_LAB_NAME;
     document.title = labname != null ? `${labname} – Sparrow` : "Sparrow";
   }, []);
 
@@ -84,8 +84,8 @@ const errorHandler = function (route, response) {
   return AppToaster.show({ message, intent: Intent.DANGER });
 };
 
-const baseURL = process.env.BASE_URL ?? "/";
-const apiBaseURL = join(process.env.API_BASE_URL ?? "/", "/api/v1");
+const baseURL = import.meta.env.BASE_URL ?? "/";
+const apiBaseURL = join(import.meta.env.API_BASE_URL ?? "/", "/api/v1");
 
 // Nest application in React context providers
 const CoreAppComponent = compose(

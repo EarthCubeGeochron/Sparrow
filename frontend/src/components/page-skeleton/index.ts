@@ -3,7 +3,7 @@ import { PageFooter } from "app/shared/footer";
 import { AppNavbar, NavButton } from "./navbar";
 import { PropsWithChildren, memo } from "react";
 import { Route } from "react-router-dom";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

@@ -3,13 +3,13 @@
   "version": "2.0.0-beta4",
   "private": true,
   "description": "EarthCube geochronology lab data interface",
-  "main": "./src/index.coffee",
   "directories": {
     "doc": "docs"
   },
   "workspaces": [
     "./packages/*"
   ],
+  "type": "module",
   "dependencies": {
     "@blueprintjs/core": "^4.0.0",
     "@blueprintjs/datetime": "^4.3.12",
@@ -88,6 +88,7 @@
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-react": "^7.10.1",
     "@babel/preset-typescript": "^7.10.1",
+    "@mdx-js/rollup": "^2.3.0",
     "@types/node": "^18.7.23",
     "babel-loader": "^8.1.0",
     "babel-plugin-emotion": "^10.0.7",
@@ -101,20 +102,17 @@
     "lerna": "^3.22.1",
     "lint-staged": "10.2.11",
     "markdown-loader": "^8.0.0",
-    "nodemon": "^2.0.15",
     "prettier": "^2.7.1",
     "style-loader": "^3.3.1",
     "stylus": "^0.57.0",
     "stylus-relative-loader": "^4.0.0",
     "typescript": "^4.8.3",
-    "webpack": "^5.72.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.9.2"
+    "vite": "^4.4.9"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:docker": "SPARROW_ENV=development ./scripts/run-dev",
-    "dev": "SPARROW_ENV=local-development ./scripts/run-dev",
+    "dev:docker": "SPARROW_ENV=development vite",
+    "dev": "SPARROW_ENV=local-development vite",
     "start": "webpack",
     "setup-workspace": "yarn dlx @yarnpkg/sdks vscode"
   },

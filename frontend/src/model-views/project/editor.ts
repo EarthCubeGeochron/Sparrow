@@ -422,8 +422,8 @@ const EditableProjectDetails = function (props) {
           updatedModel
         );
         const { data } = response;
-        console.log(data);
-        ({ data } = data);
+        // console.log(data);
+        // ({ data } = data);
         return data;
       },
     },

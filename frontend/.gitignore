@@ -1,5 +1,6 @@
 site-content
 .env
+.vite
 
 # We are using Yarn v2+, WITHOUT "Zero-install" because it is 
 .pnp.*
