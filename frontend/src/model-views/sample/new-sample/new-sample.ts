@@ -25,7 +25,7 @@ import {
   sampleContext,
 } from "./types";
 // @ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { SampleAdminContext } from "~/admin/sample";
 
 const h = hyperStyled(styles);

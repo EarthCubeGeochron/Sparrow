@@ -10,7 +10,7 @@ import {
 import { put } from "axios";
 import "../main.styl";
 //@ts-ignore
-import styles from "~/admin/module.styl";
+import styles from "~/admin/main.module.styl";
 import {
   ResearcherAdd,
   PubAdd,

@@ -4,7 +4,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import React from "react";
 import { useModelURL } from "~/util";
 

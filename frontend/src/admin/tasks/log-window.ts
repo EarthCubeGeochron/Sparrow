@@ -5,7 +5,7 @@ import { VariableSizeList as List } from "react-window";
 import { parse, strip } from "ansicolor";
 import classNames from "classnames";
 
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 const h = hyperStyled(styles);
 
 const MessageText = ({ text = "" }) => {

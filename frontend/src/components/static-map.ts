@@ -2,7 +2,7 @@ import { StaticMap as MGLStaticMap, Marker } from "react-map-gl";
 import { hyperStyled, classed } from "@macrostrat/hyper";
 import { Component } from "react";
 import T from "prop-types";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

@@ -1,5 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { Icon, NonIdealState } from "@blueprintjs/core";
 
 const h = hyperStyled(styles);

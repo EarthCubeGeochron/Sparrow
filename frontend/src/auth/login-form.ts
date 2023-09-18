@@ -4,7 +4,7 @@ import { useAuth } from "./context";
 import { Button, Dialog, Callout, Intent, Classes } from "@blueprintjs/core";
 import { ServerStatus } from "~/components";
 import classNames from "classnames";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

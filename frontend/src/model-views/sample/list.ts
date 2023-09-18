@@ -6,7 +6,7 @@ import {
   PostgRESTFilterList,
 } from "~/components/filter-list";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { useModelURL } from "~/util/router";
 import { SampleModelCard } from "../components/list-cards/utils";
 

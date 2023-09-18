@@ -4,7 +4,7 @@ import { Button, Popover, MenuDivider, Card } from "@blueprintjs/core";
 import { useAPIv2Result } from "~/api-v2";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { ModelAttributeOneLiner } from "./common";
 
 const h = hyperStyled(styles);

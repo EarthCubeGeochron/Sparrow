@@ -1,7 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { EditableProjectDetails } from "./editor";
 import "../main.styl";
-import styles from "~/admin/module.styl";
+import styles from "~/admin/main.module.styl";
 
 const h = hyperStyled(styles);
 

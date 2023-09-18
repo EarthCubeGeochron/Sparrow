@@ -1,7 +1,7 @@
 import { DateRangeInput } from "@blueprintjs/datetime";
 import { Card } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

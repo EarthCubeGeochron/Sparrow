@@ -2,12 +2,12 @@ import { Menu, MenuItem, Tooltip, Button } from "@blueprintjs/core";
 // @ts-ignore
 import { hyperStyled } from "@macrostrat/hyper";
 // @ts-ignore
-//import styles from "./module.styl";
+//import styles from "./main.module.styl";
 import { SiteTitle } from "app/components";
 import { MapPanel } from "./map-panel";
 import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { useDarkMode, useElementSize } from "@macrostrat/ui-components";
 import { useAuth } from "~/auth";
 import { MapArea } from "./map-area";

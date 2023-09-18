@@ -1,7 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { AddCard, ModelLinkCard, PageViewBlock } from "~/model-views";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

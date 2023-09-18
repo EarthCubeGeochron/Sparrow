@@ -6,7 +6,7 @@ import { Popover2 } from "@blueprintjs/popover2";
 import { createSettingsContext } from "@macrostrat/ui-components";
 
 import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

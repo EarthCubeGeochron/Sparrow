@@ -4,7 +4,7 @@ import { CollapseCard } from "@macrostrat/ui-components";
 import { useAPIv2Result } from "~/api-v2";
 import { MinimalNavbar, ServerStatus } from "~/components";
 import { Button, Menu, MenuItem, NonIdealState } from "@blueprintjs/core";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 const h = hyperStyled(styles);
 import { useParams, Switch, Route } from "react-router";
 import { Link, useHistory } from "react-router-dom";

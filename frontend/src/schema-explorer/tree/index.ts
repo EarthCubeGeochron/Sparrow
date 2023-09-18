@@ -5,7 +5,7 @@ import { SchemaExplorerContext } from "../context";
 import { Link } from "react-router-dom";
 import React, { useContext, useEffect, useState } from "react";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 export * from "./json-tree";
 export * from "./tree-legend";
 import ReactJson from "react-json-view";

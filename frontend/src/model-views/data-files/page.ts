@@ -1,6 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useParams } from "react-router-dom";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { DownloadButton, SampleAdd } from "~/model-views";
 import { Divider, Spinner } from "@blueprintjs/core";
 import { format } from "date-fns";

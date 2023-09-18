@@ -22,7 +22,7 @@ import {
 import { Frame } from "~/frame";
 import { useModelURL } from "~/util";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 const h = hyperStyled(styles);
 
 const iconIndex = {

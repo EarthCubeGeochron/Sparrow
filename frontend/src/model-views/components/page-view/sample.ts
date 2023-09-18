@@ -3,7 +3,7 @@ import { ModelLinkCard, PageViewBlock, FormattedDate } from "~/model-views";
 import { DndChild } from "~/components";
 import { useModelURL } from "~/util";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { Frame } from "~/frame";
 import { useAPIv2Result } from "~/api-v2";
 import { FormattedLngLat } from "./common";

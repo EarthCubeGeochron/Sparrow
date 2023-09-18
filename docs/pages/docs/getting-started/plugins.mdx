@@ -40,7 +40,7 @@ Some hooks will receive other parameters. For instance, the "database-available"
 - "core-tables-initialized": Run on database initialization
 - "finalize-database-schema": Run on database initialization
 - "prepare-database-migrations": Runs on schema upgrade
-- "prepare-database-upgrade": Runs on Schema upgrade, ****DEPRECATED****
+- "prepare-database-upgrade": Runs on Schema upgrade, \***\*DEPRECATED\*\***
 - "plugins-initialized" : Runs after Sparrow plugins have been initialized
 - "add-routes": Runs before the sparrow API is mounted
 - "finalize-routes": Runs after the api router is mounted
@@ -138,7 +138,7 @@ import html2canvas from "html2canvas";
 import { Button } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

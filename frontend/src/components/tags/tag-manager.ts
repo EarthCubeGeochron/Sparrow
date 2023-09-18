@@ -8,7 +8,7 @@ import { TagBody } from "./tag-body";
 import { tagBody } from "./types";
 import { TagEditor } from "./tag-creator";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import Axios from "axios";
 
 const h = hyperStyled(styles);

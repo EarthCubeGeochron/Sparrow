@@ -1,7 +1,7 @@
 import { TagContainer } from "~/model-views";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

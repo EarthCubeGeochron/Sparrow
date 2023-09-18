@@ -5,7 +5,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import hyper from "@macrostrat/hyper";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { Card, Breadcrumbs } from "@blueprintjs/core";
 import { useAPIResult } from "@macrostrat/ui-components";
 import { useAPIv3Result } from "~/api-v2";

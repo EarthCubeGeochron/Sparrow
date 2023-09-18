@@ -3,7 +3,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { Icon, Button } from "@blueprintjs/core";
 import { getQueryString } from "@macrostrat/ui-components";
 import classNames from "classnames";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

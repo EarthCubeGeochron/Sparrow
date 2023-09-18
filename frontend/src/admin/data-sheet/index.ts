@@ -25,7 +25,7 @@ import {
 } from "./settings";
 
 import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

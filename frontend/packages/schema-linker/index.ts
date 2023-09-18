@@ -1,6 +1,6 @@
 import h from "@macrostrat/hyper";
 import { Card } from "@blueprintjs/core";
-import "./module.styl";
+import "./main.module.styl";
 
 export function CompositeTermCard(props) {
   const { data } = props;

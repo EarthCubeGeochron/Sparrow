@@ -2,7 +2,7 @@ import { compose, hyperStyled } from "@macrostrat/hyper";
 import { useMapRef, MapboxMapProvider } from "@macrostrat/mapbox-react";
 import { useRef, useEffect } from "react";
 import { Map } from "mapbox-gl";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

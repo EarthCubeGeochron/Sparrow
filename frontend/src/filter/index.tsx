@@ -13,7 +13,7 @@ import { useToggle } from "~/components";
 import { hyperStyled } from "@macrostrat/hyper";
 import { EmabrgoSwitch } from "./components/Embargo";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { MapPolygon } from "./components/MapSelector";
 import { urlSearchFromParams } from "../components/infinite-scroll/infinite-api-view";
 

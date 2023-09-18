@@ -32,7 +32,7 @@ import {
 } from "../components";
 import { ModelTitleBar } from "~/model-views/components";
 import { SessionAdminContext } from "~/admin/session";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

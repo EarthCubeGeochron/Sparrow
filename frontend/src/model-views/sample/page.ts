@@ -38,7 +38,7 @@ import {
   SampleCard,
 } from "../components";
 import { SampleAdminContext } from "~/admin/sample";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { useModelURL } from "~/util";
 import { Button } from "@blueprintjs/core";
 import { MapDrawer } from "~/map/components/MapDrawer";

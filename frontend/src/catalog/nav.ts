@@ -1,7 +1,7 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { LinkCard } from "@macrostrat/ui-components";
 import { NavButton } from "~/components";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

@@ -16,7 +16,7 @@ import { LoginSuggest } from "~/auth";
 import { InsetText } from "~/components/layout";
 import { CatalogNavbar } from "./nav";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { SessionMatch } from "../model-views/session";
 import { DataFilesMain } from "../model-views/data-files";
 import { APIProvider } from "@macrostrat/ui-components";

@@ -14,7 +14,7 @@ import { Switch, Route, useRouteMatch } from "react-router-dom";
 import { MinimalNavbar, NavButton } from "~/components";
 import { TermCard } from "@earthdata/schema-linker";
 
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 const h = hyperStyled(styles);
 
 enum Term {

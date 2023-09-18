@@ -5,7 +5,7 @@ import { useAPIv2Result } from "~/api-v2";
 import { pluralize } from "../new-model";
 import { ModelLinkCard, PageViewBlock } from "~/model-views";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

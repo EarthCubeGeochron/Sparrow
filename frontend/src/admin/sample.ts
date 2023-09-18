@@ -7,7 +7,7 @@ import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { ModelFilterLists, SampleFilterList } from "../model-views";
 import { NewSamplePage } from "~/model-views/sample/new-sample";
 
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

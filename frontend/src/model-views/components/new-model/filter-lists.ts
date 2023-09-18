@@ -13,7 +13,7 @@ import {
   EditProjNewSample,
 } from "./index";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

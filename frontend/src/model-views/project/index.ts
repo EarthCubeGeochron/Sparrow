@@ -7,7 +7,7 @@ import { ProjectPage } from "./page";
 import { useModelURL } from "~/util/router";
 import { pluralize } from "../components";
 import "../main.styl";
-import styles from "~/admin/module.styl";
+import styles from "~/admin/main.module.styl";
 const h = hyperStyled(styles);
 
 interface Project {

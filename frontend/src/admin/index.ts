@@ -22,7 +22,7 @@ import { VocabularyPage } from "./vocabulary";
 import { TagManager } from "~/components/tags";
 
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

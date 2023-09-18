@@ -7,7 +7,7 @@ import "./cluster.css";
 import { LayerMenu } from "./components/LayerMenu";
 import { MapToast } from "./components/MapToast";
 import { MapNav } from "./components/map-nav";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { ShortSiteTitle } from "~/components";
 import { apiBaseURL, mapboxAPIToken } from "~/env";
 import { MapPanel } from "./map-panel";

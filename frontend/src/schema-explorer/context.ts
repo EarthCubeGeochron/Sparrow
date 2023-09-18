@@ -3,7 +3,7 @@ import { useAPIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { createContext, useContext, useEffect, useReducer } from "react";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { fetchFields, getPossibleModels } from "./fetch";
 import { useRouteMatch } from "react-router";
 

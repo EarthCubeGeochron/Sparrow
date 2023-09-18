@@ -2,7 +2,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { Switch, Route, Link } from "react-router-dom";
 import { useState, createContext, useContext, useEffect } from "react";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import { NoStateAdmin } from "./baseview";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import {

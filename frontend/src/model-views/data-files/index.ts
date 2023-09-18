@@ -6,7 +6,7 @@ import { useModelURL } from "~/util/router";
 import { Route, Switch } from "react-router-dom";
 import { DataFileMatch } from "./page";
 import { format } from "date-fns";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

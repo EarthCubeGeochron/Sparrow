@@ -5,7 +5,7 @@ import { NoStateAdmin } from "./baseview";
 import { AdminPage, createParamsFromURL } from "./AdminPage";
 import { AdminFilter } from "../filter";
 import { DataFilesListComponent } from "~/model-views";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

@@ -6,7 +6,7 @@ import { SchemaExplorerContext } from "./context";
 import { JsonTree, Tree, TreeLegend } from "./tree";
 import { CollapsePanel } from "@macrostrat/ui-components";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

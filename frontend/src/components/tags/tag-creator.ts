@@ -12,7 +12,7 @@ import { randomHexColor } from "../misscel";
 import { tag_reducer, tagBody } from "./types";
 import { TagBody } from "./tag-body";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

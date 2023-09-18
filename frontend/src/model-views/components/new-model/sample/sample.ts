@@ -13,7 +13,7 @@ import { HelpButton, MySwitch } from "~/components";
 import { MyNumericInput } from "../../../../components/edit-sample";
 import { GeoContext } from "./geo-entity";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

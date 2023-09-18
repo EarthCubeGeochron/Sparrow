@@ -6,7 +6,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { withRouter } from "react-router-dom";
 
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

@@ -2,7 +2,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIv2Result } from "~/api-v2";
 import { Divider } from "@blueprintjs/core";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 import ReactJson from "react-json-view";
 import { TreeProps } from "./index";
 

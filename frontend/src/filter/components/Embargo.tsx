@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, Button, ButtonGroup, Intent } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import { FilterAccordian } from "./utils";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 /**

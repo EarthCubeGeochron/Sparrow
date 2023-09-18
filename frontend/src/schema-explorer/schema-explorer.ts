@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { SchemaTree } from "./schema-tree";
 import { CollapsePanel } from "@macrostrat/ui-components";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

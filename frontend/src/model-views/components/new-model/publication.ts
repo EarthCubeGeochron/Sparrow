@@ -9,7 +9,7 @@ import { useAPIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { FilterAccordian } from "../../../filter/components/utils";
 import { ProjectFormContext } from "../../project/new-project";
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 

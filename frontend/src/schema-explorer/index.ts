@@ -4,7 +4,7 @@ import { SchemaExplorer } from "./schema-explorer";
 import { SchemaExplorerContextProvider } from "./context";
 import { ErrorBoundary } from "@macrostrat/ui-components";
 //@ts-ignore
-import styles from "./module.styl";
+import styles from "./main.module.styl";
 
 const h = hyperStyled(styles);
 
