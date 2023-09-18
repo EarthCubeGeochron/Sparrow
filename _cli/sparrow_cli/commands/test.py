@@ -77,7 +77,7 @@ class TestGroup(SparrowDefaultCommand):
 
 
 def compose(*args, **kwargs):
-    env = dict(**environ)
+    env = kwargs.pop("env", dict(**environ))
     env.update(
         # Set a different compose project name so we don't step on running
         # applications.
@@ -238,21 +238,28 @@ def run_tests_locally(basedir: Path, *pytest_args: List[str]):
     workdir = Path(basedir) / "backend"
 
     test_db = environ.get("SPARROW_TESTING_DATABASE", None)
-    # Need to bring up database separately to ensure ports are mapped...
+    # We bring up data services to ensure databases are mapped
     # NOTE: if we specify a local database we would not need to do this
-    if test_db is None and not container_is_running("db"):
-        compose("up -d db")
+    env = dict(**environ)
+    env["COMPOSE_PROFILES"] = "data-services"
+    if test_db is None:
+        compose("up -d", env=env)
+        compose("ps", env=env)
+
+    postgrest_port = environ.get("SPARROW_TEST_POSTGREST_PORT", 3001)
 
     # Could use some fancy container magic
-    db_port = environ.get("SPARROW_DB_PORT", 54321)
+    db_port = environ.get("SPARROW_TEST_DATABASE_PORT", 54322)
     newenv = dict(
         **environ,
         SPARROW_SECRET_KEY="test" * 20,
         SPARROW_TESTING_DATABASE=test_db
-        or f"postgresql://postgres@localhost:{db_port}/sparrow_test"
+        or f"postgresql://postgres@localhost:{db_port}/sparrow_test",
         # Reset virtualenv to allow poetry to apply the correct one.
     )
     del newenv["VIRTUAL_ENV"]
+
+    newenv.setdefault("SPARROW_POSTGREST_URL", f"http://localhost:{postgrest_port}")
 
     # Get virtualenv path
     cmd("poetry env info -p", cwd=workdir, env=newenv)

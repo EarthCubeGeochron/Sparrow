@@ -18,6 +18,7 @@ x-backend:
     # If we don't, tasks must be run via the command line.
     - SPARROW_TASK_WORKER=0
     - SPARROW_TASK_BROKER=redis://broker:6379/0
+    - SPARROW_TESTING_DATABASE=postgresql://postgres:@db:5432/sparrow_test
     - SPARROW_POSTGREST_URL=http://pg_api:3000
 services:
   backend:
@@ -32,6 +33,8 @@ services:
     tty: true
     volumes:
       - pytest_cache:/run/.pytest_cache
+    profiles:
+      - main
   db:
     image: ghcr.io/earthcubegeochron/sparrow/database:2.0
     ports:
@@ -50,6 +53,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    profiles:
+      - data-services
+      - main
   pg_api:
     image: postgrest/postgrest:v11.2.0
     environment:
@@ -65,6 +71,9 @@ services:
       - db
     ports:
       - "${SPARROW_TEST_POSTGREST_PORT:-3001}:3000"
+    profiles:
+      - data-services
+      - main
   # Additional testing of broker-based functionality.
   # Broker and worker are for testing task-based functionality
   # We disable this for minimal tests, but we can test with the brokers

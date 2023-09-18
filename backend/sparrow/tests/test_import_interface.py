@@ -125,16 +125,16 @@ class TestImperativeImport(object):
         Test whether our PGMemento audit trail is working
         """
 
-        res = db.session.execute("SELECT count(*) " "FROM pgmemento.table_event_log")
-        total_ops = res.scalar()
+        res = db.run_sql("SELECT count(*) " "FROM pgmemento.table_event_log")
+        total_ops = next(res).scalar()
         assert total_ops > 0
 
-        res = db.session.execute(
+        res = db.run_sql(
             "SELECT table_operation, table_name "
             "FROM pgmemento.table_event_log "
             "ORDER BY id DESC LIMIT 1"
         )
-        (op, tbl) = res.first()
+        (op, tbl) = next(res).first()
         assert op == "INSERT"
         assert tbl == "datum"
 

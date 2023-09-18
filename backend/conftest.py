@@ -10,6 +10,7 @@ from sparrow.tests.helpers.database import testing_database
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import Session
 from sqlalchemy import event
+from sqlalchemy_utils import drop_database
 import logging
 
 disable_loggers = ["macrostrat.database.utils"]
