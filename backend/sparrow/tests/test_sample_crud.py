@@ -52,23 +52,29 @@ class TestSampleCRUD:
 
         db.load_data("sample", data)
 
+        # Check whether sample was added
+        res = db.session.query(db.model.sample).filter_by(name="Soil 003").one()
+        assert res is not None
+
     def test_sample_deletion_unauthorized(self, db):
         """We should not be able to delete a sample without the right permissions."""
-
-        db.session.execute(text("SET ROLE 'view_public'"))
+        sess = db.session
+        sess.begin_nested()
+        sess.execute(text("SET LOCAL ROLE :role_name"), dict(role_name="view_public"))
         Sample = db.model.sample
-        model = db.session.query(Sample).filter_by(name="Soil 003").one()
+        model = sess.query(Sample).filter_by(name="Soil 003").one()
         try:
-            db.session.delete(model)
+            sess.delete(model)
+            sess.commit()
+            assert False
         except ProgrammingError as err:
             assert isinstance(err.orig, InsufficientPrivilege)
             assert "permission denied for table sample" in str(err.orig)
+            sess.rollback()
 
     def test_sample_deletion(self, db):
         """We should be able to delete a sample and all associated data."""
-        db.session.rollback()
-        Sample = db.model.sample
-        model = db.session.query(Sample).filter_by(name="Soil 003").one()
+        model = db.session.query(db.model.sample).filter_by(name="Soil 003").one()
         db.session.delete(model)
 
 

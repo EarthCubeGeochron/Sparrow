@@ -53,9 +53,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-    profiles:
-      - data-services
-      - main
   pg_api:
     image: postgrest/postgrest:v11.2.0
     environment:
@@ -71,9 +68,6 @@ services:
       - db
     ports:
       - "${SPARROW_TEST_POSTGREST_PORT:-3001}:3000"
-    profiles:
-      - data-services
-      - main
   # Additional testing of broker-based functionality.
   # Broker and worker are for testing task-based functionality
   # We disable this for minimal tests, but we can test with the brokers

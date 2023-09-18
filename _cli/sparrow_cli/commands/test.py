@@ -189,8 +189,11 @@ def sparrow_test_main(
         if res.returncode != 0:
             raise SparrowCommandError("Could not build Sparrow images", res)
 
+        env = dict(**environ)
+        env["COMPOSE_PROFILE"] = "main"
+
         res = compose(
-            "run --rm --service-ports backend", "pytest", "/app", *pytest_args
+            "run --rm --service-ports backend", "pytest", "/app", *pytest_args, env=env
         )
     else:
         res = run_tests_locally(Path(pth), *pytest_args)
@@ -244,7 +247,6 @@ def run_tests_locally(basedir: Path, *pytest_args: List[str]):
     env["COMPOSE_PROFILES"] = "data-services"
     if test_db is None:
         compose("up -d", env=env)
-        compose("ps", env=env)
 
     postgrest_port = environ.get("SPARROW_TEST_POSTGREST_PORT", 3001)
 
