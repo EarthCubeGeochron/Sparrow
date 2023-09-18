@@ -59,6 +59,7 @@ class TestSampleCRUD:
         model = db.session.query(Sample).filter_by(name="Soil 003").one()
         try:
             db.session.delete(model)
+            assert False
         except ProgrammingError as err:
             assert isinstance(err.orig, InsufficientPrivilege)
             assert "permission denied for table sample" in str(err.orig)

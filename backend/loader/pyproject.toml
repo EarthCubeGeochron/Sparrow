@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sparrow-loader"
-version = "1.0.9"
+version = "1.1.0"
 description = "Utilities for loading data into Sparrow"
 authors = ["Daven Quinn <dev@davenquinn.com>"]
 license = "MIT"
@@ -10,13 +10,13 @@ include = ["sparrow/loader/sparrow-db-models.pickle"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-marshmallow = "^3.11.1"
-marshmallow-sqlalchemy = "^0.24.2"
+marshmallow = "^3.20.1"
+marshmallow-sqlalchemy = "^0.29.0"
+marshmallow-jsonschema = "^0.13.0"
 GeoAlchemy2 = "^0.9.4"
 SQLAlchemy = "^1.4.41"
 "macrostrat.database" = "^2.0.1"
 stringcase = "^1.2.0"
-marshmallow-jsonschema = "^0.10.0"
 shapely = "^1"
 typer = "^0.6.1"
 rich = "^12.6.0"
