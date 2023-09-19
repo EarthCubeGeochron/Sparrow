@@ -20,6 +20,7 @@ import styles from "./main.module.styl";
 import { SessionMatch } from "../model-views/session";
 import { DataFilesMain } from "../model-views/data-files";
 import { APIProvider } from "@macrostrat/ui-components";
+import { apiBaseURL } from "~/env";
 
 const h = hyperStyled(styles);
 
@@ -76,7 +77,7 @@ const CatalogBody = (
   ]);
 
 const Catalog = ({ base }) =>
-  h(APIProvider, { baseURL: "/api/v3/" }, [
+  h(APIProvider, { baseURL: apiBaseURL + "/api/v3/" }, [
     h("div.catalog", [
       h(CatalogNavbar, { base }),
       h(LoginSuggest),

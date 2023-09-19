@@ -101,9 +101,11 @@ def sparrow_up(ctx, container="", force_recreate=False):
             cwd=frontend_dir,
             env={
                 **os.environ,
-                "SPARROW_ENV": "local-development",
-                "API_BASE_URL": "http://localhost:5002/",
-                "BASE_URL": "/",
+                "VITE_MAPBOX_API_TOKEN": os.environ["MAPBOX_API_TOKEN"],
+                "VITE_SPARROW_LAB_NAME": os.environ["SPARROW_LAB_NAME"],
+                "VITE_SPARROW_ENV": "local-development",
+                "VITE_API_BASE_URL": "http://localhost:5002/",
+                "VITE_BASE_URL": "/",
             },
         )
         print()

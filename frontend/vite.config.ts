@@ -3,6 +3,9 @@ import path from "path";
 import { symlinkSync } from "fs";
 import mdx from "@mdx-js/rollup";
 
+// Print environment
+console.log(process.env);
+
 function relativePath(...tokens) {
   return path.resolve(__dirname, ...tokens);
 }

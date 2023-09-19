@@ -41,7 +41,7 @@ class StaticMap extends Component {
       markCenter: T.bool,
     };
     this.defaultProps = {
-      accessToken: import.meta.env.MAPBOX_API_TOKEN,
+      accessToken: import.meta.env.VITE_MAPBOX_API_TOKEN,
       width: 200,
       height: 150,
       mapStyle: "mapbox://styles/mapbox/outdoors-v9",

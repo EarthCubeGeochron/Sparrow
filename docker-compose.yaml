@@ -160,19 +160,19 @@ services:
       - gateway
     environment:
       - CONTAINERIZED=1
-      - SPARROW_LAB_NAME
+      - VITE_SPARROW_LAB_NAME=${SPARROW_LAB_NAME}
       - SPARROW_ECHO_SQL
-      - BASE_URL=${SPARROW_BASE_URL:-/}
-      - API_BASE_URL=${SPARROW_BASE_URL:-/}
+      - VITE_BASE_URL=${SPARROW_BASE_URL:-/}
+      - VITE_API_BASE_URL=${SPARROW_BASE_URL:-/}
       # We need to forward SPARROW_HTTP_PORT to the frontend so that we can
       # load BrowserSync on the correct port if in development mode
       - SPARROW_HTTP_PORT
-      - MAPBOX_API_TOKEN
+      - VITE_MAPBOX_API_TOKEN=${MAPBOX_API_TOKEN}
       # SPARROW_SITE_CONTENT variable is different
       # inside and outside of the container
       - SPARROW_SITE_CONTENT=/site-content
       - SPARROW_FRONTEND_BUILD_DIR=/build
-      - SPARROW_ENV
+      - VITE_SPARROW_ENV=${SPARROW_ENV}
     volumes:
       - frontend_build:/build
       # Right now, we configure default site content
