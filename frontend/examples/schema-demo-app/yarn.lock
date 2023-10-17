@@ -264,6 +264,19 @@
     classnames "^2.2"
     tslib "~1.13.0"
 
+"@blueprintjs/popover2@^0.10.0":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/popover2/-/popover2-0.10.1.tgz#30f79909618045e13095f025dd0cd20667221248"
+  integrity sha512-5zo4TsoGO79yA/CCsENE7cVuSk3BEMzS99iWDdesyh9I9AU0rkSYcaKbAmpIrWfO9Oe4s8lRPms0OrXF2fs94Q==
+  dependencies:
+    "@blueprintjs/core" "^3.45.0"
+    "@popperjs/core" "^2.5.4"
+    classnames "^2.2"
+    dom4 "^2.1.5"
+    react-popper "^2.2.4"
+    resize-observer-polyfill "^1.5.1"
+    tslib "~1.13.0"
+
 "@emotion/cache@^10.0.27":
   version "10.0.29"
   resolved "https://registry.yarnpkg.com/@emotion/cache/-/cache-10.0.29.tgz#87e7e64f412c060102d589fe7c6dc042e6f9d1e0"
@@ -997,6 +1010,11 @@
     "@parcel/utils" "2.0.0-nightly.690+8c0721e5"
     chrome-trace-event "^1.0.2"
     nullthrows "^1.1.1"
+
+"@popperjs/core@^2.5.4":
+  version "2.11.6"
+  resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.6.tgz#cee20bd55e68a1720bdab363ecf0c821ded4cd45"
+  integrity sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==
 
 "@react-dnd/asap@^4.0.0":
   version "4.0.0"
@@ -2275,12 +2293,19 @@ d3-color@1:
   resolved "https://registry.yarnpkg.com/d3-color/-/d3-color-2.0.0.tgz#8d625cab42ed9b8f601a1760a389f7ea9189d62e"
   integrity sha512-SPXi0TSKPD4g9tw0NMZFnR95XVgUZiBH+uUTqQuDu1OsE2zomHU7ho0FISciaPvosimixwHFl3WHLGabv6dDgQ==
 
+d3-flextree@^2.1.1:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/d3-flextree/-/d3-flextree-2.1.2.tgz#1f0419f4e6c972e096dd884627a87b6b38e7ba73"
+  integrity sha512-gJiHrx5uTTHq44bjyIb3xpbmmdZcWLYPKeO9EPVOq8EylMFOiH2+9sWqKAiQ4DcFuOZTAxPOQyv0Rnmji/g15A==
+  dependencies:
+    d3-hierarchy "^1.1.5"
+
 "d3-format@1 - 2":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/d3-format/-/d3-format-2.0.0.tgz#a10bcc0f986c372b729ba447382413aabf5b0767"
   integrity sha512-Ab3S6XuE/Q+flY96HXT0jOXcM4EAClYFnRGY5zsjRGNy6qCYrQsMffs7cV5Q9xejb35zxW5hf/guKw34kvIKsA==
 
-d3-hierarchy@^1.1.4:
+d3-hierarchy@^1.1.4, d3-hierarchy@^1.1.5:
   version "1.1.9"
   resolved "https://registry.yarnpkg.com/d3-hierarchy/-/d3-hierarchy-1.1.9.tgz#2f6bee24caaea43f8dc37545fa01628559647a83"
   integrity sha512-j8tPxlqh1srJHAtxfvOUwKNYJkQuBFdM1+JAUfq6xqH5eAqf93L7oG1NVqDa4CpFZNvnNKtCYEUC8KY9yEn9lQ==
@@ -2379,9 +2404,9 @@ debug@~3.1.0:
     ms "2.0.0"
 
 decode-uri-component@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.0.tgz#eb3913333458775cb84cd1a1fae062106bb87545"
-  integrity sha1-6zkTMzRYd1y4TNGh+uBiEGu4dUU=
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.2.tgz#e69dbe25d37941171dd540e024c444cd5188e1e9"
+  integrity sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==
 
 deep-equal@^1.1.1:
   version "1.1.1"
@@ -5115,6 +5140,11 @@ react-dropzone@^11.0.3:
     file-selector "^0.2.2"
     prop-types "^15.7.2"
 
+react-fast-compare@^3.0.1:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-3.2.0.tgz#641a9da81b6a6320f270e89724fb45a0b39e43bb"
+  integrity sha512-rtGImPZ0YyLrscKI9xTpV8psd6I8VAtjKCzQDlzyDvqJA8XOW78TXYQwNRNd8g8JZnDu8q9Fu/1v4HPAVwVdHA==
+
 react-hyperscript@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/react-hyperscript/-/react-hyperscript-3.2.0.tgz#24144ff6b1beb07af7154794a782a74b34920868"
@@ -5158,6 +5188,14 @@ react-popper@^1.3.7:
     popper.js "^1.14.4"
     prop-types "^15.6.1"
     typed-styles "^0.0.7"
+    warning "^4.0.2"
+
+react-popper@^2.2.4:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-2.3.0.tgz#17891c620e1320dce318bad9fede46a5f71c70ba"
+  integrity sha512-e1hj8lL3uM+sgSR4Lxzn5h1GxBlpa4CQz0XLF8kx4MDrDRWY0Ena4c97PUeSX9i5W3UAfDP0z0FXCTQkoXUl3Q==
+  dependencies:
+    react-fast-compare "^3.0.1"
     warning "^4.0.2"
 
 react-refresh@^0.9.0:
