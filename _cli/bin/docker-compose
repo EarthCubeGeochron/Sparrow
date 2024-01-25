@@ -1,3 +1,0 @@
-#!/bin/bash
-# Description: A way to access docker-compose wrapped in the application.
-sparrow _docker-compose $@
