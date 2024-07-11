@@ -251,22 +251,33 @@ class SparrowConfig:
         service and volume names.
         """
         project_name = environ.get("COMPOSE_PROJECT_NAME")
-        if project_name is not None:
-            return project_name.lower()
-        # We could eventually start referring to projects by the SPARROW_LAB_NAME
-        # environment variable, but for now we'll just use the current directory name
-        # (the default for docker-compose)
-        project_name = (
-            self.SPARROW_PATH.stem.replace("-", "_").replace(" ", "_").lower()
-        )
+        inferred_from = None
+        level = Level.SUCCESS
 
-        self.add_message(
-            id="project-name",
-            text=f"Project name [underline]{project_name}[/underline] inferred",
-            details="COMPOSE_PROJECT_NAME not set, inferring from Sparrow root directory name.",
-            level=Level.WARNING,
-        )
+        if project_name is None:
+            # Standardize project name to Sparrow lab name
+            project_name = self.lab_name
+            inferred_from = "lab name"
+
+        if project_name is None:
+            project_name = self.SPARROW_PATH.stem
+            inferred_from = "Sparrow root directory name"
+            level = Level.WARNING
+
+        if inferred_from is not None:
+            project_name = project_name.replace("-", "_").replace(" ", "_").lower()
+            # Ensure validity of the COMPOSE_PROJECT_NAME environment variable
+            environ["COMPOSE_PROJECT_NAME"] = project_name
+
+            self.add_message(
+                id="project-name",
+                text=f"[bold]Docker Compose[/bold] configuration inferred from {inferred_from}.",
+                details=[f"Container names will be prefixed with [underline]{project_name}_[/underline].","This can be adjusted using the [cyan]COMPOSE_PROJECT_NAME[/cyan] environment variable."],
+                level=level,
+            )
         return project_name
+
+
 
     def is_source_install(self):
         return not self.is_frozen or self.path_provided
