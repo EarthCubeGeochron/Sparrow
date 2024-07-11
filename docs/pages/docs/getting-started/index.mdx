@@ -51,6 +51,13 @@ ensure that your user can run `docker` without root permissions, by running
 `sudo usermod -aG docker ${USER}` or your distribution's equivalent.
 This is automatically set up when using **Docker Desktop**.
 
+## Install `docker compose`
+
+The `compose` tool is used to manage the set of Docker containers that comprise
+the Sparrow application. As of Sparrow version 3.2.0 (early 2024), `docker-compose` is no longer
+bundled with Sparrow, and must be installed separately. See the [Docker compose installation guide](https://docs.docker.com/compose/install/)
+for platform-specific installation instructions.
+
 ## Install the `sparrow` executable
 
 Sparrow's stack of Docker containers are wrapped in a command-line interface
