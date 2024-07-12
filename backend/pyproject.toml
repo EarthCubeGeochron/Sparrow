@@ -29,10 +29,10 @@ uvloop = "*"
 sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
 
 # Core application
-Pygments = "2.10.0"
-sqlalchemy-utils = "^0.37.0"
+Pygments = "^2.10.0"
+sqlalchemy-utils = "^0.41.1"
 requests = "^2.26.0"
-toposort = "1.5"
+toposort = "^1.5"
 
 # Command-line interface
 click = "^8.1.0"
@@ -40,7 +40,7 @@ click-plugins = "1.1.1"
 ipython = "7.27.0"
 
 # Static files
-aiofiles = "0.6.0"
+aiofiles = "^23.2"
 
 # Import file reading
 xlrd = "1.2.0"
@@ -51,7 +51,7 @@ datefinder = "0.7.0"
 # Version 3.0 note: had to disable PyArrow due to build complexity.
 #pyarrow = "^7.0.0"
 openpyxl = "3.0.9"
-uncertainties = "3.1.6" 
+uncertainties = "3.1.6"
 
 # Serialization/deserialization
 marshmallow = "^3.20.1"
@@ -69,7 +69,7 @@ boto3 = "^1.12.25"
 
 # Testing and logging
 pytest = "^7.1.3"
-rich = "^12"
+rich = "^13"
 deepdiff = { version = "5.0.2", extras = [ "murmur" ] }
 pytest-order = "0.9.5"
 
