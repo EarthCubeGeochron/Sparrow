@@ -45,7 +45,7 @@ html5lib = "1.0.1"
 datefinder = "0.7.0"
 # Version 3.0 note: had to disable PyArrow due to build complexity.
 #pyarrow = "^7.0.0"
-openpyxl = "3.0.9"
+openpyxl = "^3.1.0"
 uncertainties = "3.1.6"
 
 # Serialization/deserialization
@@ -63,7 +63,7 @@ starlette-apispec = "^2.1.0"
 boto3 = "^1.12.25"
 
 # Testing and logging
-pytest = "^7.1.3"
+pytest = "^8.3.2"
 rich = "^13"
 deepdiff = { version = "5.0.2", extras = [ "murmur" ] }
 pytest-order = "0.9.5"
