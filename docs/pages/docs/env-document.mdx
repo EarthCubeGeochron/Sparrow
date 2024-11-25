@@ -1,0 +1,17 @@
+### Setting up the environment file
+
+To correctly run Sparrow instances either locally or on the server, a shell script for environment settings named `sparrow-config.overrides.sh` is required in the root folder of the Sparrow project.
+
+Key environmental information should be in this file, such as:
+
+```
+export SPARROW_ENV=“production/development”
+export SPARROW_SECRET_KEY="your secret key"
+export MAPBOX_API_TOKEN="your mapbox api token"
+export SPARROW_HTTP_PORT=your HTTP Port
+export SPARROW_HTTPS_PORT=your HTTPS Port
+export CERTBOT_EMAIL="your email"
+```
+
+If the `sparrow up` is run without this file, the gateway page of your Sparrow instance may not correctly load, and the `sparrow status` will tell you that the backend is up but unhealthy.
+
