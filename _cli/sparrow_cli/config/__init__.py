@@ -136,6 +136,8 @@ class SparrowConfig:
         self.enhance_secret_key()
 
         self.project_name = self.infer_project_name()
+        environ.setdefault("COMPOSE_PROJECT_NAME", self.project_name)
+
         self.local_frontend = self.configure_local_frontend()
 
         # Check database version
