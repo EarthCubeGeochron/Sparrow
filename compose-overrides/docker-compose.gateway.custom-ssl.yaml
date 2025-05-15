@@ -1,5 +1,4 @@
 # A configuration snippet to allow loading user-provided SSL certificates.
-version: "3.6"
 services:
   gateway:
     image: nginx:1.23.0
