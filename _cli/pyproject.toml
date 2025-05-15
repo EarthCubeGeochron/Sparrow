@@ -3,12 +3,10 @@ name = "sparrow_cli"
 version = "4.0.0"
 description = ""
 authors = ["Daven Quinn <dev@davenquinn.com>"]
-packages = [
-  {include= "sparrow_cli"},
-]
+packages = [{ include = "sparrow_cli" }]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 
 click = "^8.0.1"
 rich = "*"
@@ -30,6 +28,7 @@ packaging = "^23.2"
 "macrostrat.database" = "^3.3.1"
 chardet = "^5.1.0"
 charset-normalizer = "2.1.0"
+setuptools = "^80.7.1"
 
 
 [tool.poetry.scripts]
@@ -38,4 +37,4 @@ sparrow = "sparrow_cli:cli"
 [tool.black]
 line-length = 88
 skip-magic-trailing-comma = true
-target-version = ['py38']
+target-version = ['py39']
