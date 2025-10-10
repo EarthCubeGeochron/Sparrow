@@ -1,5 +1,4 @@
 # Modifies containers for dev hot reloading
-version: "3.6"
 services:
   gateway:
     volumes:

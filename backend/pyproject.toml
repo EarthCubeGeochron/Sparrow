@@ -21,16 +21,14 @@ numpy = "^1.22.3"
 pandas = "*"
 uvloop = "*"
 
-"macrostrat.database" = {path = "./shared-modules/database", develop = true }
-"macrostrat.utils" = {path = "./shared-modules/utils", develop = true }
-"macrostrat.dinosaur" = {path = "./shared-modules/dinosaur", develop = true }
+"macrostrat.database" = "^3.3.1"
+"macrostrat.utils" = "^1.2.0"
+"macrostrat.dinosaur" = "^3.1.0"
 "sparrow.loader" = {path = "./loader", develop = true }
 
 sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
 
 # Core application
-Pygments = "^2.10.0"
-sqlalchemy-utils = "^0.41.1"
 requests = "^2.26.0"
 toposort = "^1.5"
 
@@ -38,9 +36,6 @@ toposort = "^1.5"
 click = "^8.1.0"
 click-plugins = "1.1.1"
 ipython = "7.27.0"
-
-# Static files
-aiofiles = "^23.2"
 
 # Import file reading
 xlrd = "1.2.0"
@@ -111,7 +106,7 @@ httpx = "^0.25.0"
 [tool.poetry.dev-dependencies]
 pylint = "^2.15.3"
 black = "^22.8.0"
-docker = "^6.0.0"
+docker = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

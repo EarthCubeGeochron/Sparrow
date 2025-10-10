@@ -1,4 +1,3 @@
-version: "3.6"
 x-backend:
   &x-backend
   image: ${SPARROW_BACKEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/backend}
@@ -94,7 +93,7 @@ services:
       - ./nginx-config/error-pages:/usr/share/nginx/error-pages/error:ro
       # SPARROW_DATA_DIR is made accessible from the server container but not exposed.
       - ${SPARROW_DATA_DIR:-placeholder}:/data:ro
-  backend: 
+  backend:
     <<: *x-backend
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/v2/"]

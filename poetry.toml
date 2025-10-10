@@ -1,3 +1,0 @@
-# Prefer virtual environments to be created in the project directory
-[virtualenvs]
-in-project = true

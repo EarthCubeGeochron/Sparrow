@@ -136,6 +136,8 @@ class SparrowConfig:
         self.enhance_secret_key()
 
         self.project_name = self.infer_project_name()
+        environ.setdefault("COMPOSE_PROJECT_NAME", self.project_name)
+
         self.local_frontend = self.configure_local_frontend()
 
         # Check database version
@@ -254,30 +256,35 @@ class SparrowConfig:
         inferred_from = None
         level = Level.SUCCESS
 
+        msg = None
         if project_name is None:
-            # Standardize project name to Sparrow lab name
+            # If the user has set SPARROW_LAB_NAME, we will use that as the project name
             project_name = self.lab_name
             inferred_from = "lab name"
 
         if project_name is None:
-            project_name = self.SPARROW_PATH.stem
-            inferred_from = "Sparrow root directory name"
+            if self.config_dir is not None:
+                # If the user has set a config file, we will use that as the project name
+                project_name = self.config_file.stem
+                inferred_from = "project directory name"
+                level = Level.WARNING
+
+        if project_name is None:
+            project_name = "sparrow"
+            inferred_from = "default name"
             level = Level.WARNING
 
-        if inferred_from is not None:
-            project_name = project_name.replace("-", "_").replace(" ", "_").lower()
-            # Ensure validity of the COMPOSE_PROJECT_NAME environment variable
-            environ["COMPOSE_PROJECT_NAME"] = project_name
+        project_name = project_name.replace("-", "_").replace(" ", "_").lower()
 
+        if msg is not None:
             self.add_message(
                 id="project-name",
-                text=f"[bold]Docker Compose[/bold] configuration inferred from {inferred_from}.",
+                text=f"[bold]Docker Compose[/bold] project name set from {inferred_from}.",
                 details=[f"Container names will be prefixed with [underline]{project_name}_[/underline].","This can be adjusted using the [cyan]COMPOSE_PROJECT_NAME[/cyan] environment variable."],
                 level=level,
             )
+
         return project_name
-
-
 
     def is_source_install(self):
         return not self.is_frozen or self.path_provided
