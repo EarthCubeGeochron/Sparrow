@@ -1,9 +1,13 @@
 FROM python:3.9
-LABEL version="2.0"
+LABEL version="2.1"
 
 # Install general and build dependencies
 # Note: geos and geos-dev are in the community apk repository
-RUN apt-get update && apt-get install -y postgresql-client
+
+#RUN apt-get update && apt-get install -y software-properties-common
+#RUN add-apt-repository ppa:ubuntugis/ppa
+
+RUN apt-get update && apt-get install -y postgresql-client libgeos-dev
 # RUN apk update \
 #  && apk upgrade \
 #  && echo http://dl-cdn.alpinelinux.org/alpine/edge/community \
