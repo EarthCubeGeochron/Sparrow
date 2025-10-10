@@ -136,6 +136,8 @@ class SparrowConfig:
         self.enhance_secret_key()
 
         self.project_name = self.infer_project_name()
+        environ.setdefault("COMPOSE_PROJECT_NAME", self.project_name)
+
         self.local_frontend = self.configure_local_frontend()
 
         # Check database version
@@ -251,21 +253,33 @@ class SparrowConfig:
         service and volume names.
         """
         project_name = environ.get("COMPOSE_PROJECT_NAME")
-        if project_name is not None:
-            return project_name.lower()
-        # We could eventually start referring to projects by the SPARROW_LAB_NAME
-        # environment variable, but for now we'll just use the current directory name
-        # (the default for docker-compose)
-        project_name = (
-            self.SPARROW_PATH.stem.replace("-", "_").replace(" ", "_").lower()
-        )
 
-        self.add_message(
-            id="project-name",
-            text=f"Project name [underline]{project_name}[/underline] inferred",
-            details="COMPOSE_PROJECT_NAME not set, inferring from Sparrow root directory name.",
-            level=Level.WARNING,
-        )
+        msg = None
+        if project_name is None:
+            # If the user has set SPARROW_LAB_NAME, we will use that as the project name
+            project_name = self.lab_name
+            msg = "inferred from lab name"
+
+        if project_name is None:
+            if self.config_dir is not None:
+                # If the user has set a config file, we will use that as the project name
+                project_name = self.config_file.stem
+                msg = "inferred from root directory name"
+
+        if project_name is None:
+            project_name = "sparrow"
+            msg = "set to default name"
+
+        project_name = project_name.replace("-", "_").replace(" ", "_").lower()
+
+        if msg is not None:
+            self.add_message(
+                id="project-name",
+                text=f"Project name [underline]{project_name}[/underline] inferred",
+                details=f"COMPOSE_PROJECT_NAME not set, {msg}.",
+                level=Level.WARNING,
+            )
+
         return project_name
 
     def is_source_install(self):

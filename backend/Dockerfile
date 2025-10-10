@@ -12,11 +12,6 @@ WORKDIR /app
 # For shared modules, first copy only requirements to install their dependencies.
 # Poetry must see them as a set of modules.
 COPY poetry.lock pyproject.toml /app/
-COPY __docker/dummy-shared-module-tree /app/shared-modules
-COPY shared-modules/database/pyproject.toml  /app/shared-modules/database/
-COPY shared-modules/dinosaur/pyproject.toml /app/shared-modules/dinosaur/
-COPY shared-modules/utils/pyproject.toml /app/shared-modules/utils/
-COPY shared-modules/pyproject.toml /app/shared-modules/pyproject.toml
 
 RUN mkdir -p /app/loader/sparrow/loader && touch /app/loader/sparrow/loader/__init__.py
 COPY loader/pyproject.toml /app/loader/
@@ -42,7 +37,7 @@ COPY ./docker-scripts/* /bin/
 ## Copy app core
 COPY ./ /app/
 
-RUN poetry install --no-interaction --no-ansi 
+RUN poetry install --no-interaction --no-ansi
 
 # Copy command-line options to a place where they can be easily accessed
 # by the wrapper CLI.

@@ -58,7 +58,7 @@ Sparrow commands can be created within plugins with using the `on_setup_cli` hoo
 
 ```text
 from click import command
-from sparrow.plugins import SparrowPlugin
+from sparrow.core.plugins import SparrowPlugin
 
 @command(name="import-data")
 def import_data():

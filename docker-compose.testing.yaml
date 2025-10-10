@@ -3,7 +3,6 @@
 # If the appropriate environment variables are set,
 # it will create a worker and task broker. These aren't
 # currently used, but they could be in the future.
-version: "3.6"
 x-backend:
   &x-backend
   image: ${SPARROW_BACKEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/backend}
@@ -28,7 +27,7 @@ services:
       context: backend
       cache_from:
         - ${SPARROW_BACKEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/backend}
-    command: pytest /app/sparrow_tests --teardown 
+    command: pytest /app/sparrow_tests --teardown
     tty: true
     volumes:
       - pytest_cache:/run/.pytest_cache

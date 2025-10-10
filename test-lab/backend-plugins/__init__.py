@@ -1,5 +1,5 @@
 import sparrow
-from sparrow.plugins import SparrowPlugin
+from sparrow.core.plugins import SparrowPlugin
 from sparrow.database import User, on_conflict
 from json import load
 from os import path
