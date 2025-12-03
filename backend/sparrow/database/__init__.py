@@ -38,7 +38,7 @@ class Database(BaseDatabase):
         log.info("Automapping the database")
         t0 = perf_counter()
 
-        self.mapper = SparrowDatabaseMapper(self, use_cache=use_cache)
+        self.mapper = SparrowDatabaseMapper(self, use_cache=use_cache, reflect=False)
 
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
@@ -47,6 +47,8 @@ class Database(BaseDatabase):
         # manually register the models
         log.info("Registering model overrides")
         self.mapper.register_models(User, Project, Session, DatumType)
+
+        self.mapper.reflect_all_schemas(use_cache=use_cache)
 
         # Register a new class
         # Automap the core_view.datum relationship
@@ -172,7 +174,8 @@ class Database(BaseDatabase):
         msg = "Reloading PostgREST schema cache"
         secho(msg, bold=True)
         log.info(msg)
-        self.engine.execute("NOTIFY pgrst, 'reload schema'")
+        with self.engine.connect() as conn:
+            run_sql(conn, "NOTIFY pgrst, 'reload schema'")
 
     def update_schema(self, **kwargs):
         # Might be worth creating an interactive upgrader

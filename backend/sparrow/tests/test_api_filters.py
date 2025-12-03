@@ -107,6 +107,7 @@ class TestAPIV2_filters:
     def test_doi_filter(self, client, db):
         data = json_fixture("projects-post.json")
         db.load_data("project", data[0])
+        db.session.commit()
 
         pub_res = client.get("/api/v2/models/publication?doi_like=10.10")
         pub_json = pub_res.json()

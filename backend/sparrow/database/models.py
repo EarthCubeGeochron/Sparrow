@@ -12,7 +12,7 @@ scripts.
 """
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, String, ForeignKey, Table
+from sqlalchemy import Column, String, ForeignKey, Table, Integer
 from geoalchemy2 import Geometry
 from os import environ
 from sqlalchemy.orm import relationship
@@ -25,7 +25,10 @@ class User(BaseModel):
         __table__ = BaseModel.metadata.tables["user"]
     else:
         __tablename__ = "user"
-        __table_args__ = {"extend_existing": True}
+        __table_args__ = {"extend_existing": True, "schema": "public"}
+
+    username = Column("username", String, unique=True, nullable=False, primary_key=True)
+    password = Column("password", String, nullable=False)
 
     # Columns are automagically mapped from database
     # *NEVER* directly set the password column.
@@ -40,12 +43,15 @@ class User(BaseModel):
         return check_password_hash(self.password, salt + str(plaintext))
 
 
+
 class Project(BaseModel):
     if BaseModel.loaded_from_cache:
         __table__ = BaseModel.metadata.tables["project"]
     else:
         __tablename__ = "project"
-        __table_args__ = {"extend_existing": True}
+        __table_args__ = {"extend_existing": True, "schema": "public"}
+
+    id = Column("id", Integer, primary_key=True)
 
     def add_researcher(self, researcher):
         self.researcher_collection.append(researcher)
@@ -59,7 +65,10 @@ class Session(BaseModel):
         __table__ = BaseModel.metadata.tables["session"]
     else:
         __tablename__ = "session"
-        __table_args__ = {"extend_existing": True}
+        __table_args__ = {"extend_existing": True, "schema": "public"}
+
+        id = Column("id", Integer, primary_key=True)
+
         # Define UUID column so it is caught as unique
         uuid = Column(
             "uuid",
@@ -86,7 +95,9 @@ class DatumType(BaseModel):
         __table__ = BaseModel.metadata.tables["datum_type"]
     else:
         __tablename__ = "datum_type"
-        __table_args__ = {"extend_existing": True}
+        __table_args__ = {"extend_existing": True, "schema": "public"}
+
+        id = Column("id", Integer, primary_key=True)
 
         # We need to override foreign keys
         unit = Column("unit", String, ForeignKey("vocabulary.unit.id"))

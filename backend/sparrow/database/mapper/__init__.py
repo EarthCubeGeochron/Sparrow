@@ -61,7 +61,10 @@ class SparrowDatabaseMapper(DatabaseMapper):
         self.db = db
         self.automap_base = BaseModel
         if reflect:
-            self.reflect_database(
-                schemas=["vocabulary", "core_view", "tags", "public"],
-                use_cache=use_cache,
-            )
+            self.reflect_all_schemas(use_cache=use_cache)
+
+    def reflect_all_schemas(self, use_cache=True):
+        self.reflect_database(
+            schemas=["vocabulary", "core_view", "tags", "public"],
+            use_cache=use_cache,
+        )
