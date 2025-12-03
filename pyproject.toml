@@ -16,3 +16,6 @@ disable = [
   "too-few-public-methods",
   "logging-fstring-interpolation"
 ]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.12"

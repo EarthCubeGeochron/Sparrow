@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.11
 LABEL version="2.1"
 
 # Install general and build dependencies

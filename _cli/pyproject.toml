@@ -6,7 +6,7 @@ authors = ["Daven Quinn <dev@davenquinn.com>"]
 packages = [{ include = "sparrow_cli" }]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.12"
 
 click = "^8.0.1"
 rich = "*"

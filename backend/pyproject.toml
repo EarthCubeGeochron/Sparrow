@@ -10,7 +10,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.10,<3.12"
 
 # Preinstalled in 'sparrowdata/backend-base image'
 # due to long compile times.
@@ -27,6 +27,9 @@ uvloop = "*"
 "sparrow.loader" = {path = "./loader", develop = true }
 
 sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
+
+# Ensure we stick on SQLAlchemy 1.x for now.
+# sqlalchemy = "^1.4.46"
 
 # Core application
 requests = "^2.26.0"

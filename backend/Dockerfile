@@ -1,10 +1,21 @@
-FROM ghcr.io/earthcubegeochron/sparrow/backend-base:2.0 AS main
+#FROM ghcr.io/earthcubegeochron/sparrow/backend-base:2.0 AS main
+
+FROM python:3.11 AS main
+
+# Install general and build dependencies
+# Note: geos and geos-dev are in the community apk repository
+
+#RUN apt-get update && apt-get install -y software-properties-common
+#RUN add-apt-repository ppa:ubuntugis/ppa
+
+RUN apt-get update && apt-get install -y postgresql-client libgeos-dev
+
 # Multi-stage build of Sparrow backend.
 
 ## Git is required for the PyChron importer
 RUN apt update && \
   apt install -y git && \
-  pip install "poetry==1.4.2" && \
+  pip install "poetry==1.8.5" && \
   rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
