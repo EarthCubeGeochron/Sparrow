@@ -147,11 +147,11 @@ class PGMementoMigration(SchemaMigration):
         ]
 
         # Drop views
-        db.engine.execute("DROP SCHEMA IF EXISTS core_view CASCADE;")
+        db.run_sql("DROP SCHEMA IF EXISTS core_view CASCADE;")
 
         # Drop old triggers
         for trigger in old_triggers:
-            db.engine.execute(f"DROP EVENT TRIGGER IF EXISTS {trigger};")
+            db.run_sql(f"DROP EVENT TRIGGER IF EXISTS {trigger};")
 
         # db.engine.execute("SELECT pgmemento.drop_schema_event_trigger()")
         # for schema in ["public", "vocabulary", "tags", "geo_context", "core_view"]:
@@ -219,7 +219,7 @@ class PGMemento074Migration(SchemaMigration):
 def build_audit_tables(db):
     # Check if extension is available
     try:
-        db.engine.execute("CREATE EXTENSION IF NOT EXISTS pgmemento")
+        db.run_sql("CREATE EXTENSION IF NOT EXISTS pgmemento")
     except ProgrammingError:
         # Extension is not available
         pass
@@ -247,7 +247,7 @@ def build_audit_tables(db):
 
     for id in procedures:
         fp = relative_path(__file__, "pg-memento-legacy", "src", id + ".sql")
-        db.exec_sql(fp)
+        run_psql(db.engine, fp)
 
 
 class VersioningPlugin(SparrowCorePlugin):
