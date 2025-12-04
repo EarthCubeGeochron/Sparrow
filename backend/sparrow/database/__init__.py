@@ -48,7 +48,7 @@ class Database(BaseDatabase):
         log.info("Registering model overrides")
         self.mapper.register_models(User, Project, Session, DatumType)
 
-        self.mapper.reflect_all_schemas(use_cache=use_cache)
+        self.mapper.reflect_all_schemas()
 
         # Register a new class
         # Automap the core_view.datum relationship

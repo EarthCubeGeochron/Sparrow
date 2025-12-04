@@ -18,13 +18,15 @@ psycopg2 = "^2.9.6"
 shapely = "*"
 lxml = "*"
 numpy = "^1.22.3"
-pandas = "*"
+pandas = "^1.5.3"
 uvloop = "*"
 
-"macrostrat.database" = "^3.3.1"
+"macrostrat.database" = "^2.0.1"
 "macrostrat.utils" = "^1.2.0"
-"macrostrat.dinosaur" = "^3.1.0"
+"macrostrat.dinosaur" = "^1.0.2"
 "sparrow.loader" = {path = "./loader", develop = true }
+
+sqlalchemy = "^1.4.46"
 
 sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "master" }
 
@@ -32,7 +34,7 @@ sadisplay = { git = "https://github.com/davenquinn/sadisplay.git", branch = "mas
 # sqlalchemy = "^1.4.46"
 
 # Core application
-requests = "^2.26.0"
+requests = ">=2.26.0,<2.32.0"
 toposort = "^1.5"
 
 # Command-line interface
@@ -109,7 +111,7 @@ httpx = "^0.25.0"
 [tool.poetry.dev-dependencies]
 pylint = "^2.15.3"
 black = "^22.8.0"
-docker = "^7.0.0"
+docker = "^6.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

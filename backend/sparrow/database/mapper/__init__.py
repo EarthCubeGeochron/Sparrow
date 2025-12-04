@@ -1,8 +1,9 @@
 from sqlalchemy.ext import automap
-from sqlalchemy.ext.automap import generate_relationship
+from sqlalchemy.ext.automap import generate_relationship, automap_base
 from os import path, environ
 from macrostrat.utils.logs import get_logger
-from macrostrat.database.mapper import DatabaseModelCache
+from macrostrat.database.mapper import DatabaseModelCache, BaseModel
+from macrostrat.database.mapper.base import ModelHelperMixins
 from macrostrat.database import DatabaseMapper
 
 from .shims import _is_many_to_many
@@ -25,31 +26,14 @@ def _gen_relationship(
     )
 
 
-should_enable_cache = environ.get("SPARROW_CACHE_DATABASE_MODELS", "0").lower() in [
-    "true",
-    "1",
-]
+should_enable_cache = False
 
 
 class AutomapError(Exception):
     pass
 
 
-default_cache_path = path.join(
-    path.expanduser("~"), ".sqlalchemy-cache", "sparrow-db-cache.pickle"
-)
-cache_path = environ.get("SPARROW_DATABASE_MODEL_CACHE_PATH", default_cache_path)
-
-if not should_enable_cache:
-    cache_path = None
-
-model_builder = DatabaseModelCache(cache_file=cache_path)
-BaseModel = model_builder.automap_base()
-
-
 class SparrowDatabaseMapper(DatabaseMapper):
-    automap_base = BaseModel
-
     def __init__(self, db, use_cache=True, reflect=True):
         # Apply the hotfix to the SQLAlchemy model.
         automap._is_many_to_many = _is_many_to_many
@@ -59,12 +43,11 @@ class SparrowDatabaseMapper(DatabaseMapper):
         # TODO: add the process flow described below:
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#generating-mappings-from-an-existing-metadata
         self.db = db
-        self.automap_base = BaseModel
         if reflect:
-            self.reflect_all_schemas(use_cache=use_cache)
+            self.reflect_all_schemas()
 
-    def reflect_all_schemas(self, use_cache=True):
+    def reflect_all_schemas(self):
         self.reflect_database(
             schemas=["vocabulary", "core_view", "tags", "public"],
-            use_cache=use_cache,
+            use_cache=False,
         )
