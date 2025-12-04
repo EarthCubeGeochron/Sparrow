@@ -14,7 +14,7 @@ envbash = "*"
 pytest = "*"
 pyyaml = "^6.0.1"
 pydantic = "^1.9.0"
-docker = "^6.0.0"
+docker = "^7.0.0"
 
 click-default-group = "^1.2.2"
 keepachangelog = "2.0.0.dev2"
@@ -24,12 +24,11 @@ packaging = "^23.2"
 "macrostrat.utils" = "^1.2.1"
 
 # Database backup and schema migration functionality
-"macrostrat.dinosaur" = "^1.0.2"
-"macrostrat.database" = "^2.0.1"
+"macrostrat.dinosaur" = "^3.0.0"
+"macrostrat.database" = "^3.0.0"
 chardet = "^5.1.0"
 charset-normalizer = "2.1.0"
 setuptools = "^80.7.1"
-requests = ">=2.26.0,<2.32.0"
 
 
 [tool.poetry.scripts]

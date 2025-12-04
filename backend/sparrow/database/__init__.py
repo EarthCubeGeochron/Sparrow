@@ -156,7 +156,6 @@ class Database(BaseDatabase):
         except AttributeError as err:
             secho("Could not load plugins", fg="red", dim=True)
             secho(str(err))
-            raise err
 
     def recreate_views(self):
         views = ["06-views.sql", "07-postgrest-api.sql"]

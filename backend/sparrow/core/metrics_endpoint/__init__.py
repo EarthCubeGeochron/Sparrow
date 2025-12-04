@@ -6,6 +6,8 @@ from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
 from pathlib import Path
 import json
+from sqlalchemy import text
+from pandas import read_sql
 
 
 class MetricsEndpoint(SparrowCorePlugin):
@@ -27,7 +29,8 @@ class MetricsEndpoint(SparrowCorePlugin):
         sqlfile = open(p, "r")
         query = sqlfile.read()
 
-        metrics = get_dataframe(db.engine, query)
+        with db.engine.connect() as conn:
+            metrics = read_sql(text(query), conn)
         res = metrics.to_json(orient="records")
 
         return JSONResponse(json.loads(res))

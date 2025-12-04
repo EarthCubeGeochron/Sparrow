@@ -36,7 +36,7 @@ class AutomapError(Exception):
 class SparrowDatabaseMapper(DatabaseMapper):
     def __init__(self, db, use_cache=True, reflect=True):
         # Apply the hotfix to the SQLAlchemy model.
-        automap._is_many_to_many = _is_many_to_many
+        #automap._is_many_to_many = _is_many_to_many
         super().__init__(db, generate_relationship=_gen_relationship)
 
         # https://docs.sqlalchemy.org/en/13/orm/extensions/automap.html#sqlalchemy.ext.automap.AutomapBase.prepare

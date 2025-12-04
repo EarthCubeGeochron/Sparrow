@@ -91,18 +91,15 @@ class Session(BaseModel):
 
 
 class DatumType(BaseModel):
-    if BaseModel.loaded_from_cache:
-        __table__ = BaseModel.metadata.tables["datum_type"]
-    else:
-        __tablename__ = "datum_type"
-        __table_args__ = {"extend_existing": True, "schema": "public"}
+    __tablename__ = "datum_type"
+    __table_args__ = {"extend_existing": True, "schema": "public"}
 
-        id = Column("id", Integer, primary_key=True)
+    id = Column("id", Integer, primary_key=True)
 
-        # We need to override foreign keys
-        unit = Column("unit", String, ForeignKey("vocabulary.unit.id"))
-        error_unit = Column("error_unit", String, ForeignKey("vocabulary.unit.id"))
-        _unit = relationship("vocabulary_unit", foreign_keys=[unit])
-        _error_unit = relationship(
-            "vocabulary_unit", foreign_keys=[error_unit], back_populates=None
-        )
+    # We need to override foreign keys
+    unit = Column("unit", String, ForeignKey("vocabulary.unit.id"))
+    error_unit = Column("error_unit", String, ForeignKey("vocabulary.unit.id"))
+    # _unit = relationship("vocabulary_unit", foreign_keys=[unit])
+    # _error_unit = relationship(
+    #     "vocabulary_unit", foreign_keys=[error_unit], back_populates=None
+    # )
