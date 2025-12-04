@@ -12,7 +12,7 @@ scripts.
 """
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, String, ForeignKey, Table, Integer
+from sqlalchemy import Column, String, ForeignKey, Table, Integer, Boolean
 from geoalchemy2 import Geometry
 from os import environ
 from sqlalchemy.orm import relationship
@@ -25,7 +25,7 @@ class User(BaseModel):
         __table__ = BaseModel.metadata.tables["user"]
     else:
         __tablename__ = "user"
-        __table_args__ = {"extend_existing": True, "schema": "public"}
+        __table_args__ = {"extend_existing": True, "schema": None}
 
     username = Column("username", String, unique=True, nullable=False, primary_key=True)
     password = Column("password", String, nullable=False)
@@ -49,7 +49,7 @@ class Project(BaseModel):
         __table__ = BaseModel.metadata.tables["project"]
     else:
         __tablename__ = "project"
-        __table_args__ = {"extend_existing": True, "schema": "public"}
+        __table_args__ = {"extend_existing": True, "schema": None}
 
     id = Column("id", Integer, primary_key=True)
 
@@ -65,7 +65,7 @@ class Session(BaseModel):
         __table__ = BaseModel.metadata.tables["session"]
     else:
         __tablename__ = "session"
-        __table_args__ = {"extend_existing": True, "schema": "public"}
+        __table_args__ = {"extend_existing": True, "schema": None}
 
         id = Column("id", Integer, primary_key=True)
 
@@ -90,16 +90,40 @@ class Session(BaseModel):
         ).all()
 
 
+# CREATE TABLE IF NOT EXISTS datum_type (
+#   id serial PRIMARY KEY,
+#   parameter text REFERENCES vocabulary.parameter(id) NOT NULL,
+#   unit text REFERENCES vocabulary.unit(id) NOT NULL,
+#   error_unit text REFERENCES vocabulary.unit(id),
+#   error_metric text REFERENCES vocabulary.error_metric(id),
+#   is_computed boolean DEFAULT false, -- Can be rebuilt from data IN THE DATABASE
+#   is_interpreted boolean DEFAULT false, -- Results from a data-reduction process
+#   description text,
+#   UNIQUE (parameter, unit, error_unit, error_metric)
+# );
+
 class DatumType(BaseModel):
     __tablename__ = "datum_type"
-    __table_args__ = {"extend_existing": True, "schema": "public"}
+    __table_args__ = {"extend_existing": True, "schema": None}
 
     id = Column("id", Integer, primary_key=True)
+    parameter = Column("parameter", String, ForeignKey("vocabulary.parameter.id"))
+    _parameter = relationship("vocabulary_parameter", back_populates=None)
 
     # We need to override foreign keys
     unit = Column("unit", String, ForeignKey("vocabulary.unit.id"))
+    _unit = relationship("vocabulary_unit", foreign_keys=unit, back_populates=None)
+
     error_unit = Column("error_unit", String, ForeignKey("vocabulary.unit.id"))
-    # _unit = relationship("vocabulary_unit", foreign_keys=[unit])
-    # _error_unit = relationship(
-    #     "vocabulary_unit", foreign_keys=[error_unit], back_populates=None
-    # )
+    _error_unit = relationship(
+        "vocabulary_unit", foreign_keys=error_unit, back_populates=None
+    )
+
+    error_metric = Column(
+        "error_metric", String, ForeignKey("vocabulary.error_metric.id")
+    )
+
+    is_computed = Column("is_computed", Boolean, default=False)
+    is_interpreted = Column("is_interpreted", Boolean, default=False)
+    description = Column("description", String)
+

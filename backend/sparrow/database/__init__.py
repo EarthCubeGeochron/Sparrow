@@ -40,6 +40,8 @@ class Database(BaseDatabase):
 
         self.mapper = SparrowDatabaseMapper(self, use_cache=use_cache, reflect=False)
 
+        self.mapper.reflect_all_schemas()
+
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
         #  they are not included by default)
@@ -48,7 +50,6 @@ class Database(BaseDatabase):
         log.info("Registering model overrides")
         self.mapper.register_models(User, Project, Session, DatumType)
 
-        self.mapper.reflect_all_schemas()
 
         # Register a new class
         # Automap the core_view.datum relationship

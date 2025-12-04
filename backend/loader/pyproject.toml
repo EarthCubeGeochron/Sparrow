@@ -10,8 +10,9 @@ include = ["sparrow/loader/sparrow-db-models.pickle"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-marshmallow = "^3.20.1"
-marshmallow-sqlalchemy = "^0.29.0"
+
+marshmallow = "^3.0.0"
+marshmallow-sqlalchemy = "^1.4.2"
 marshmallow-jsonschema = "^0.13.0"
 "macrostrat.database" = "^3.0.0"
 stringcase = "^1.2.0"

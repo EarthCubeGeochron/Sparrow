@@ -20,7 +20,8 @@ def _gen_relationship(
         and referred_cls.__table__.schema is None
     ):
         # Don't create relationships on vocabulary and core_view models back to the main schema
-        return
+        log.info("Skipping relationship from %s to %s", local_cls, referred_cls)
+        return None
     return generate_relationship(
         base, direction, return_fn, attrname, local_cls, referred_cls, **kw
     )
