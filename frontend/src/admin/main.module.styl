@@ -108,3 +108,16 @@
 .vertical
   transform rotate(90deg)
   float left
+
+.admin-navbar-links
+  display flex
+  flex-direction row
+  margin 0
+  padding 0
+  white-space nowrap
+  
+  @media (max-width: 768px)
+    display grid
+    grid-template-columns repeat(2, 1fr)
+    column-gap 0.5rem
+

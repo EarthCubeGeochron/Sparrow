@@ -11,7 +11,7 @@ import {
 import { InfiniteAPIView } from "~/components/infinite-scroll";
 import { APIV2Context, APIV3Context } from "~/api-v2";
 //@ts-ignore
-import styles from "./main.styl";
+import styles from "./main.styl?inline";
 
 const h = hyperStyled(styles);
 

@@ -4,7 +4,7 @@ import { hyperStyled } from "@macrostrat/hyper";
 import { Link } from "react-router-dom";
 import { FormattedLngLat, pluralize } from "../new-model";
 import { useModelURL } from "~/util";
-import styles from "./card.styl";
+import styles from "./card.styl?inline";
 import classNames from "classnames";
 import { FormattedDate, ProjectCardContent, Publication } from "~/model-views";
 

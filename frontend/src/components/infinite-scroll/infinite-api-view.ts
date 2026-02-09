@@ -6,7 +6,7 @@ import { Button, Spinner } from "@blueprintjs/core";
 import { NoSearchResults } from "./utils";
 import { ErrorCallout } from "~/util";
 //@ts-ignore
-import styles from "./main.styl";
+import styles from "./main.styl?inline";
 
 const h = hyperStyled(styles);
 

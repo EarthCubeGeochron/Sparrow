@@ -1,7 +1,7 @@
 import { UserConfig } from "vite";
 import path from "path";
 import { symlinkSync } from "fs";
-import mdx from "@mdx-js/rollup";
+import mdx from "@mdx-js/rollup/index.js";
 
 // Print environment
 console.log(process.env);

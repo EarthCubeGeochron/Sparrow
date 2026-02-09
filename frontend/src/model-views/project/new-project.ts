@@ -18,7 +18,7 @@ import { MinimalNavbar } from "~/components";
 import { APIV2Context } from "../../api-v2";
 import axios from "axios";
 //@ts-ignore
-import styles from "./project-form.styl";
+import styles from "./project-form.styl?inline";
 
 const h = hyperStyled(styles);
 
