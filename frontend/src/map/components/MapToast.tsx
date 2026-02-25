@@ -187,7 +187,7 @@ export function MapToast({ lng, lat, mapstyle, login }) {
     lng: lng,
   });
 
-  const MacostratData = useAPIResult(MacURl, {
+  const MacrostratData = useAPIResult(MacURl, {
     lng: lng,
     lat: lat,
   });
@@ -222,33 +222,35 @@ export function MapToast({ lng, lat, mapstyle, login }) {
     );
   };
 
+  // Removed keys from p tags and added key to div instead to avoid react key warning. 
+  // Also added null check for data length to avoid rendering empty information box when there are no nearby geologic formations.
   const NearbyGeologicFormations = () => {
+    const data = MacrostratData?.success?.data;
+
     return (
       <div>
-        {MacostratData == null ? (
+        {data == null ? (
           <Spinner size={50} />
-        ) : MacostratData.success.data.length == 0 ? null : (
+        ) : data.length === 0 ? null : (
           <div>
             <h5>
               Information Provided by{" "}
               <a href="https://macrostrat.org/">MacroStrat</a>
             </h5>
 
-            {MacostratData.success.data.map((object) => {
-              return (
-                <div>
-                  <h4 style={{ color: "black" }}>
-                    {object.name + ": "}
-                    <i>{object.b_age + " Ma" + " - " + object.t_age + " Ma"}</i>
-                  </h4>
-                  <h5>
-                    <p key={object.name}>{object.b_init_name}</p>
-                    <p key={object.name}>{object.descrip}</p>
-                  </h5>
-                  <Divider />
-                </div>
-              );
-            })}
+            {data.map((object) => (
+              <div key={object.name}>
+                <h4 style={{ color: "black" }}>
+                  {object.name + ": "}
+                  <i>{object.b_age + " Ma" + " - " + object.t_age + " Ma"}</i>
+                </h4>
+                <h5>
+                  <p>{object.b_init_name}</p>
+                  <p>{object.descrip}</p>
+                </h5>
+                <Divider />
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -284,7 +286,7 @@ export function MapToast({ lng, lat, mapstyle, login }) {
             <AddSampleAtLocal
               lng={lng}
               lat={lat}
-              data={MacostratData}
+              data={MacrostratData}
               open={open}
               toggleOpen={toggleOpen}
             />
