@@ -1,5 +1,5 @@
 from macrostrat.dinosaur import SchemaMigration
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 from sparrow.core.plugins import SparrowCorePlugin
 from macrostrat.utils import relative_path, cmd
 from sparrow.core import get_database
@@ -22,6 +22,14 @@ memento_tables = [
     "transaction_log",
     "row_log",
 ]
+
+
+def execute_sql(bind, sql):
+    stmt = text(sql)
+    if hasattr(bind, "connect"):
+        with bind.begin() as conn:
+            return conn.execute(stmt)
+    return bind.execute(stmt)
 
 
 def has_audit_id(db, schema, table, col_name="pgmemento_audit_id"):
@@ -111,11 +119,11 @@ def get_old_triggers(engine):
     """
     Get the old triggers that need to be dropped
     """
-    return engine.execute(get_procedure("get-old-triggers")).fetchall()
+    return execute_sql(engine, get_procedure("get-old-triggers")).fetchall()
 
 
 def get_old_audit_id(engine):
-    return engine.execute(get_procedure("get-old-audit-id")).fetchall()
+    return execute_sql(engine, get_procedure("get-old-audit-id")).fetchall()
 
 
 class PGMementoMigration(SchemaMigration):
@@ -147,11 +155,11 @@ class PGMementoMigration(SchemaMigration):
         ]
 
         # Drop views
-        db.engine.execute("DROP SCHEMA IF EXISTS core_view CASCADE;")
+        execute_sql(db.engine, "DROP SCHEMA IF EXISTS core_view CASCADE;")
 
         # Drop old triggers
         for trigger in old_triggers:
-            db.engine.execute(f"DROP EVENT TRIGGER IF EXISTS {trigger};")
+            execute_sql(db.engine, f"DROP EVENT TRIGGER IF EXISTS {trigger};")
 
         # db.engine.execute("SELECT pgmemento.drop_schema_event_trigger()")
         # for schema in ["public", "vocabulary", "tags", "geo_context", "core_view"]:
@@ -219,7 +227,7 @@ class PGMemento074Migration(SchemaMigration):
 def build_audit_tables(db):
     # Check if extension is available
     try:
-        db.engine.execute("CREATE EXTENSION IF NOT EXISTS pgmemento")
+        execute_sql(db.engine, "CREATE EXTENSION IF NOT EXISTS pgmemento")
     except ProgrammingError:
         # Extension is not available
         pass

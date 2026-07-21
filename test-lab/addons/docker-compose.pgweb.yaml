@@ -5,7 +5,7 @@ services:
     expose:
       - 8081
     environment:
-      - DATABASE_URL=postgres://postgres@db:5432/sparrow?sslmode=disable
+      - PGWEB_DATABASE_URL=postgres://postgres@db:5432/sparrow?sslmode=disable
     depends_on:
       - db
       - gateway

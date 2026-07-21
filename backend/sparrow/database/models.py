@@ -11,8 +11,8 @@ in the API should be separately handled than things only used in import
 scripts.
 """
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, String, ForeignKey, Table
+from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, ForeignKey, Table
 from geoalchemy2 import Geometry
 from os import environ
 from sqlalchemy.orm import relationship
@@ -26,6 +26,9 @@ class User(BaseModel):
     else:
         __tablename__ = "user"
         __table_args__ = {"extend_existing": True}
+        username = Column(String, primary_key=True)
+        password = Column(String)
+        researcher_id = Column(Integer)
 
     # Columns are automagically mapped from database
     # *NEVER* directly set the password column.
@@ -46,6 +49,14 @@ class Project(BaseModel):
     else:
         __tablename__ = "project"
         __table_args__ = {"extend_existing": True}
+        id = Column(Integer, primary_key=True)
+        name = Column(String, nullable=False)
+        description = Column(String)
+        embargo_date = Column(DateTime)
+        location_name = Column(String)
+        location_name_autoset = Column(Boolean)
+        location = Column(Geometry)
+        location_precision = Column(Integer)
 
     def add_researcher(self, researcher):
         self.researcher_collection.append(researcher)
@@ -60,6 +71,7 @@ class Session(BaseModel):
     else:
         __tablename__ = "session"
         __table_args__ = {"extend_existing": True}
+        id = Column(Integer, primary_key=True)
         # Define UUID column so it is caught as unique
         uuid = Column(
             "uuid",
@@ -68,6 +80,20 @@ class Session(BaseModel):
             nullable=False,
             server_default="uuid_generate_v4()",
         )
+        instrument_session_id = Column(Integer)
+        sample_id = Column(Integer)
+        project_id = Column(Integer)
+        publication_id = Column(Integer)
+        date = Column(DateTime, nullable=False)
+        end_date = Column(DateTime)
+        date_precision = Column(String)
+        name = Column(String)
+        instrument = Column(Integer)
+        technique = Column(String)
+        target = Column(String)
+        embargo_date = Column(DateTime)
+        note = Column(String)
+        data = Column(JSONB)
 
     def get_attribute(self, type):
         # There has got to be a better way to get self!
@@ -87,10 +113,18 @@ class DatumType(BaseModel):
     else:
         __tablename__ = "datum_type"
         __table_args__ = {"extend_existing": True}
+        id = Column(Integer, primary_key=True)
+        parameter = Column("parameter", String)
 
         # We need to override foreign keys
         unit = Column("unit", String, ForeignKey("vocabulary.unit.id"))
         error_unit = Column("error_unit", String, ForeignKey("vocabulary.unit.id"))
+        error_metric = Column(
+            "error_metric", String
+        )
+        is_computed = Column(Boolean)
+        is_interpreted = Column(Boolean)
+        description = Column(String)
         _unit = relationship("vocabulary_unit", foreign_keys=[unit])
         _error_unit = relationship(
             "vocabulary_unit", foreign_keys=[error_unit], back_populates=None

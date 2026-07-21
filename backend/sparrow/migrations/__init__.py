@@ -14,7 +14,8 @@ class PlateauMigration(SchemaMigration):
         return has_column(source, *args) and not has_column(target, *args)
 
     def apply(self, db):
-        db.engine.execute("ALTER TABLE analysis DROP COLUMN in_plateau")
+        with db.engine.begin() as conn:
+            conn.execute(text("ALTER TABLE analysis DROP COLUMN in_plateau"))
 
 
 class InstrumentSessionMigration(SchemaMigration):
@@ -56,13 +57,14 @@ class SampleLocationAddSRID(SchemaMigration):
 
     def should_apply(self, source, target, migrator):
         sql = "SELECT srid FROM geometry_columns WHERE f_table_name = 'sample' AND f_geometry_column = 'location'"
-        res = source.execute(sql).fetchone()
+        res = source.execute(text(sql)).fetchone()
         return res is None or res[0] != 4326
 
     def apply(self, engine):
         try:
             sql_file = Path(__file__).parent / "sql" / "add-sample-srid.sql"
-            engine.execute(sql_file.read_text())
+            with engine.begin() as conn:
+                conn.execute(text(sql_file.read_text()))
         except DataError:
             pass
 

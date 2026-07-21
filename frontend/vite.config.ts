@@ -23,6 +23,11 @@ try {
 const config: UserConfig = {
   cacheDir: path.resolve(".vite"),
   root: "./src",
+  server: {
+    host: "0.0.0.0",
+    port: 3000,
+    strictPort: true,
+  },
   plugins: [
     mdx({
       mdxExtensions: [".mdx", ".md"],
@@ -35,6 +40,7 @@ const config: UserConfig = {
       "~": path.resolve("./src"),
       app: path.resolve("./src"),
       sparrow: path.resolve("./src"),
+      plugins: path.resolve("./plugins"),
       "site-content": contentDir,
     },
     preserveSymlinks: true,

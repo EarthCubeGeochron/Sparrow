@@ -1,4 +1,4 @@
-import sparrow
+from sparrow.core import get_database, task
 from sparrow.core.plugins import SparrowPlugin
 from sparrow.database import User, on_conflict
 from json import load
@@ -35,9 +35,9 @@ class TestDataInitPlugin(SparrowPlugin):
         db.load_data("project", data["data"])
 
 
-@sparrow.task()
+@task()
 def log_sessions():
-    db = sparrow.get_database()
+    db = get_database()
     sessions = db.session.query(db.model.session).all()
     for session in sessions:
         print(session.uuid)

@@ -13,4 +13,4 @@ export SPARROW_COMPOSE_OVERRIDES="$SPARROW_CONFIG_DIR/addons/docker-compose.pgwe
 export SPARROW_SECRET_KEY="testkey"
 # Required for default maps. Mapbox's APIs have a generous free tier that should be fine
 # for use by a single lab.
-export MAPBOX_API_TOKEN="<your-mapbox-token>"
+export MAPBOX_API_TOKEN="MAPBOX_TOKEN"
