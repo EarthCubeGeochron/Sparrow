@@ -149,7 +149,7 @@ export function _MapArea({
       h.if(on_map)(MapNavbar, {
         chooseMapStyle,
         toggleShowMarkers,
-        MapStyle: state.style,
+        mapStyle: state.style,
         showMarkers: state.showMarkers,
       }),
     ]),
@@ -245,7 +245,7 @@ function MapNavbar({
       h(MapNav),
       h(LayerMenu, {
         hide: hide_filter,
-        mapStyle,
+        currentMapStyle: mapStyle,
         chooseMapStyle,
         showMarkers,
         toggleShowMarkers,
