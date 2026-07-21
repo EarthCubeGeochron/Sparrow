@@ -23,6 +23,7 @@ try {
 const config: UserConfig = {
   cacheDir: path.resolve(".vite"),
   root: "./src",
+  envPrefix: ["VITE_", "SPARROW_"],
   server: {
     host: "0.0.0.0",
     port: 3000,
