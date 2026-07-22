@@ -1,4 +1,4 @@
-import { UserConfig } from "vite";
+import { UserConfig, Plugin } from "vite";
 import path from "path";
 import { symlinkSync } from "fs";
 import mdx from "@mdx-js/rollup/index.js";
@@ -8,6 +8,31 @@ console.log(process.env);
 
 function relativePath(...tokens) {
   return path.resolve(__dirname, ...tokens);
+}
+
+function spaRouteFallbackPlugin(): Plugin {
+  return {
+    name: "sparrow-spa-route-fallback",
+    configureServer(server) {
+      server.middlewares.use((req, _res, next) => {
+        const pathname = req.url?.split("?", 1)[0] ?? "/";
+        const acceptHeader = req.headers.accept ?? "";
+        const acceptsHtml = Array.isArray(acceptHeader)
+          ? acceptHeader.some((value) => value.includes("text/html"))
+          : acceptHeader.includes("text/html");
+        const isInternalRequest =
+          pathname.startsWith("/@") ||
+          pathname.startsWith("/api/") ||
+          pathname.includes(".");
+
+        if (req.method === "GET" && acceptsHtml && !isInternalRequest) {
+          req.url = "/index.html";
+        }
+
+        next();
+      });
+    },
+  };
 }
 
 // Link site content into frontend cache directory
@@ -30,6 +55,7 @@ const config: UserConfig = {
     strictPort: true,
   },
   plugins: [
+    spaRouteFallbackPlugin(),
     mdx({
       mdxExtensions: [".mdx", ".md"],
       mdExtensions: [],
