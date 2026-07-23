@@ -32,6 +32,10 @@ import { Frame } from "~/frame";
 
 const h = hyperStyled(styles);
 
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
 export const EmbargoEditor = function (props) {
   const { model, actions, isEditing } = useContext(ModelEditorContext);
   const onChange = (date) => {
@@ -70,9 +74,11 @@ function EditSessions(props) {
   const { isEditing, model, actions } = useModelEditor();
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
   const { sampleHoverID } = useContext(SampleHoverIDContext);
+  const sessions = asArray(model.session);
+  const samples = asArray(model.sample);
 
   const addSession = (session_id, date, target, technique) => {
-    const currentSessions = [...model.session];
+    const currentSessions = [...sessions];
     const newSess = new Array({ id: session_id, date, target, technique });
     const newSessions = [...currentSessions, ...newSess];
     actions.updateState({
@@ -81,7 +87,7 @@ function EditSessions(props) {
   };
 
   const onClickDelete = ({ session_id: id, date }) => {
-    const ss = [...model.session];
+    const ss = [...sessions];
     const newSs = ss.filter((ele) => ele.id != id);
     actions.updateState({
       model: { session: { $set: newSs } },
@@ -102,8 +108,8 @@ function EditSessions(props) {
     // function that handles a sample drop into session container.
     // We want to add or replace the sample on the container session.
     // And then add the session to the sample
-    const sess = [...model.session];
-    const samp = [...model.sample];
+    const sess = [...sessions];
+    const samp = [...samples];
     const { id: sample_id, name } = sample;
     const dropSession = sess.filter((ss) => ss.id == session_id);
     const otherSessions = sess.filter((ss) => ss.id != session_id);
@@ -124,7 +130,7 @@ function EditSessions(props) {
   };
 
   return h(SessionAdd, {
-    data: model.session,
+    data: sessions,
     sampleHoverID,
     isEditing,
     onClickList,
@@ -137,7 +143,7 @@ function EditResearchers(props) {
   const { isEditing, model, actions } = useModelEditor();
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
-  const researchers = model.researcher == null ? [] : [...model.researcher];
+  const researchers = asArray(model.researcher);
 
   const onClickDelete = ({ id, name }) => {
     const updatedRes = researchers.filter((ele) => ele.name != name);
@@ -180,12 +186,11 @@ function EditResearchers(props) {
 function EditablePublications(props) {
   const { isEditing, model, actions } = useModelEditor();
 
-  if (model.publication == null && !isEditing) {
+  const data = asArray(model.publication);
+  if (data.length == 0 && !isEditing) {
     return h("h4", ["No Publications"]);
   }
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
-
-  const data = model.publication == null ? [] : [...model.publication];
 
   const onClickDelete = ({ id, title }) => {
     const newPubs = data.filter((ele) => ele.title != title);
@@ -196,7 +201,7 @@ function EditablePublications(props) {
 
   const onSubmit = (id, title, doi) => {
     const data = new Array({ id, title, doi });
-    const publication = model.publication == null ? [] : [...model.publication];
+    const publication = asArray(model.publication);
     let newPubs = [...publication, ...data];
     actions.updateState({
       model: { publication: { $set: newPubs } },
@@ -224,26 +229,25 @@ function SampleMapComponent() {
   const { model, actions, isEditing } = useModelEditor();
   const { sampleHoverID } = useContext(SampleHoverIDContext);
 
-  const samples =
-    model.sample == null || model.sample == [] ? [] : [...model.sample];
-  const sessions =
-    model.session == null || model.session == [] ? [] : [...model.session];
+  const samples = asArray(model.sample);
+  const sessions = asArray(model.session);
 
   const sampleData = getProjectSamples(samples, sessions);
   const locatedSamples = sampleData.filter((d) => d.location != null);
 
   return h("div", [
-    h("div", { style: { display: "flex", flexDirection: "row" } }, [
+    h("div.project-sample-row", [
       h.if(locatedSamples.length > 0)(
-        "div",
-        { style: { paddingRight: "10px" } },
+        "div.project-map-column",
         [
           h(PageViewBlock, { title: "Location" }, [
             h(ProjectMap, { samples: sampleData, hoverID: sampleHoverID }),
           ]),
         ]
       ),
-      h(EditableSamples, { samples: sampleData }),
+      h("div.project-samples-column", [
+        h(EditableSamples, { samples: sampleData }),
+      ]),
     ]),
   ]);
 }
@@ -275,10 +279,8 @@ export function EditableSamples() {
   const { model, actions, isEditing } = useModelEditor();
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
-  const samples =
-    model.sample == null || model.sample == [] ? [] : [...model.sample];
-  const sessions =
-    model.session == null || model.session == [] ? [] : [...model.session];
+  const samples = asArray(model.sample);
+  const sessions = asArray(model.session);
 
   const sampleData = getProjectSamples(samples, sessions);
 
@@ -335,9 +337,10 @@ const ProjEditNavBar = ({ header }) => {
 
 function ProjectTagContainer() {
   const { model, actions, isEditing } = useModelEditor();
+  const tags = asArray(model.tags_tag);
 
   const onAdd = (item) => {
-    const currentTags = [...model.tags_tag];
+    const currentTags = [...tags];
     currentTags.push(item);
     actions.updateState({
       model: { tags_tag: { $set: currentTags } },
@@ -345,7 +348,7 @@ function ProjectTagContainer() {
   };
 
   const onDelete = (id) => {
-    const currentTags = [...model.tags_tag];
+    const currentTags = [...tags];
     const newTags = currentTags.filter((tag) => tag.id != id);
     actions.updateState({
       model: { tags_tag: { $set: newTags } },
@@ -354,7 +357,7 @@ function ProjectTagContainer() {
 
   return h(TagContainer, {
     isEditing,
-    tags: model.tags_tag,
+    tags,
     onChange: onAdd,
     onClickDelete: onDelete,
     modelName: "project",
@@ -370,7 +373,7 @@ async function TagsChangeSet(changeset, updatedModel, url) {
   if (changeset.tags_tag) {
     let { id } = updatedModel;
     const model_id = id;
-    const tags = changeset.tags_tag;
+    const tags = asArray(changeset.tags_tag);
     const tag_ids = tags.map((tag) => tag.id);
     const body = { model_id: model_id, tag_ids: tag_ids };
     const res = await put(url, body);
@@ -383,8 +386,8 @@ async function TagsChangeSet(changeset, updatedModel, url) {
 const ProjectDataFiles = () => {
   const { model } = useModelEditor();
 
-  const sample_ids = model.sample.map((obj) => obj.id);
-  const session_ids = model.session.map((obj) => obj.id);
+  const sample_ids = asArray(model.sample).map((obj) => obj.id);
+  const session_ids = asArray(model.session).map((obj) => obj.id);
 
   return h(DataFilePage, { sample_ids, session_ids, model: "project" });
 };

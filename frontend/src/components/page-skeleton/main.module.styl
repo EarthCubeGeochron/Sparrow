@@ -6,12 +6,16 @@
   display flex
   flex-direction row
   align-items center
+  min-width 0
+  :global(.bp4-navbar-group)
+    min-width 0
   :global(.bp4-navbar-heading)
     display flex
     align-items center
     height auto
     min-height 0
     max-height 100%
+    min-width 0
     :global(.site-title)
       font-size clamp(0.6rem, 1.5vw, 1rem)
       max-height 100%
@@ -27,7 +31,6 @@
         font-weight 500
     :global(.has-subtitle)
       white-space nowrap
-    
 
 .navbar-spacer
   flex: 1 1 auto
@@ -45,7 +48,6 @@
       border-radius: 5px
       margin-top 2em
   &.wide
-    //padding-top: 50px
     height: 100vh
     overflow-y hidden
     .app-navbar
@@ -57,11 +59,13 @@
       left 0
       right 0
       bottom 0
-      padding 2em
-      overflow-y scroll
+      min-height 0
+      padding 1.5rem
+      overflow-y auto
 
 .expander
   flex-grow 1
+  min-height 0
 
 .minimal-navbar
   display: flex
@@ -81,14 +85,13 @@
   margin: 0 0.5em
   &:global(.active)
     background: var(--active-highlight) !important
-  text-overflow elipsis
+  text-overflow ellipsis
+  white-space nowrap
   font-size clamp(0.6rem, 1vw, 1rem)
   font-weight 500
 
 .navbar-divider
   padding: 0 0.5em
-
-  
 
 .shortTitle
   width 4em
@@ -96,3 +99,34 @@
   overflow hidden
   text-overflow ellipsis
 
+@media (max-width: 1200px)
+  .page-skeleton
+    &.wide
+      .app-navbar
+        padding-left 1rem
+        padding-right 1rem
+      .page-content
+        padding 1rem
+  .navbar-button
+    margin 0 0.25em
+
+@media (max-width: 960px)
+  .page-skeleton
+    &.wide
+      .app-navbar
+        padding-left 0.75rem
+        padding-right 0.75rem
+      .page-content
+        padding 0.75rem
+  .navbar-button
+    margin 0 0.15em
+    padding 0.1em 0.35em
+    font-size 0.82rem
+
+@media (max-width: 760px)
+  .app-navbar
+    overflow-x auto
+  .page-skeleton
+    &.wide
+      .page-content
+        padding 0.5rem

@@ -18,22 +18,24 @@ export function AdminPage(props) {
   };
 
   const SidebarButton = () => {
-    const iconname = hidden ? "arrow-up" : "arrow-down";
+    const iconname = hidden ? "arrow-right" : "arrow-left";
 
     const text = hidden ? "Expand" : "Hide";
 
-    return h("div", { style: { zIndex: 900 } }, [
+    return h("div.sidebar-toggle", [
       h(
         Button,
         {
-          style: { width: "15px", height: "100px" },
+          className: styles["sidebar-toggle-button"],
           onClick: handleClick,
           minimal: true,
+          title: `${text} admin list`,
+          "aria-controls": "admin-sidebar",
+          "aria-expanded": !hidden,
         },
         [
-          h("div.vertical", { style: { display: "flex" } }, [
-            text,
-            h("br"),
+          h("div.sidebar-toggle-label", [
+            h("span", text),
             h(Icon, { icon: iconname }),
           ]),
         ]
@@ -42,7 +44,7 @@ export function AdminPage(props) {
   };
   return h("div.admin-page-main", [
     h(SidebarButton),
-    h("div.left-panel", { className }, [listComponent]),
+    h("div.left-panel", { id: "admin-sidebar", className }, [listComponent]),
     h("div.right-panel", null, [mainPageComponent]),
   ]);
 }

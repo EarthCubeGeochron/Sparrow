@@ -2,13 +2,26 @@ import React, { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
-import { Button, Spinner } from "@blueprintjs/core";
+import { Spinner } from "@blueprintjs/core";
 import { NoSearchResults } from "./utils";
 import { ErrorCallout } from "~/util";
 //@ts-ignore
 import styles from "./main.styl?inline";
 
 const h = hyperStyled(styles);
+
+function errorMessage(error) {
+  if (error == null) return "The API request failed.";
+  if (typeof error == "string") return error;
+
+  const responseData = error.response?.data;
+  if (typeof responseData == "string") return responseData;
+  if (responseData?.error?.detail != null) return responseData.error.detail;
+  if (responseData?.detail != null) return responseData.detail;
+  if (responseData?.message != null) return responseData.message;
+
+  return error.message ?? error.toString();
+}
 
 /**@description function to implement the infinite scroll component with certain API views
  *
@@ -54,43 +67,46 @@ function InfiniteAPIView({
     const moreParams = { ...params, ...filterParams };
     const newParams = { ...moreParams, ...constParams };
     try {
-      const data = await get(url, newParams, {});
-      return data;
+      return await get(url, newParams, {});
     } catch (error) {
-      let msg;
-      if (error != null) {
-        msg = error.message;
-        setError(msg);
-      }
+      setError(errorMessage(error));
+      setMoreAfter(false);
+      return null;
     }
   }
 
-  useEffect(() => {
-    dataFetch(data);
-  }, []);
-
-  const dataFetch = (data, next = "") => {
+  const dataFetch = async (currentData, next = "") => {
     setNoResults(false);
-    const initData = getNextPageAPI(next, url, params);
-    initData.then((res) => {
-      if (res.data.length == 0) {
-        setNoResults(true);
-      }
+    const res = await getNextPageAPI(next, url, params);
+    if (res == null) return;
 
-      const newState = [...data, ...res.data];
-      const next_page = res.next_page;
-      if (next_page == null) {
-        setMoreAfter(false);
-      }
-      setNextPage(next_page);
-      setData(newState);
-    });
+    if (!Array.isArray(res.data)) {
+      setError("The API response did not include a data array.");
+      setMoreAfter(false);
+      return;
+    }
+
+    const pageData = res.data;
+    if (pageData.length == 0 && currentData.length == 0) {
+      setNoResults(true);
+    }
+
+    const newState = [...currentData, ...pageData];
+    const next_page = res.next_page;
+    if (next_page == null || pageData.length == 0) {
+      setMoreAfter(false);
+    }
+    setNextPage(next_page);
+    setData(newState);
   };
 
   useEffect(() => {
     setData([]);
+    setError(null);
+    setNextPage("");
+    setMoreAfter(true);
     dataFetch([]);
-  }, [JSON.stringify(filterParams)]);
+  }, [url, JSON.stringify(params ?? {}), JSON.stringify(filterParams ?? {})]);
 
   const fetchNewData = async () => {
     if (!nextPage) return;
@@ -98,7 +114,7 @@ function InfiniteAPIView({
   };
 
   if (error) {
-    return h(errorHandler, { error, title: "An API error has occured" });
+    return h(errorHandler, { error, title: "An API error has occurred" });
   }
 
   if (noResults) {

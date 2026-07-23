@@ -102,6 +102,18 @@ function unwrapDataFile(get_obj) {
   return data;
 }
 
+function normalizeIDList(value) {
+  if (Array.isArray(value)) {
+    return value.filter((id) => id != null);
+  }
+  if (value == null) return [];
+  return [value];
+}
+
+function hasFilterIDs(...idLists) {
+  return idLists.some((ids) => ids.length > 0);
+}
+
 function useDataFileModelLinks(props) {
   const { sample_id, session_id, analysis_id } = props;
 
@@ -111,7 +123,6 @@ function useDataFileModelLinks(props) {
   );
 
   const res = useAPIv2Result("/data_file/filter?" + q);
-  console.log(res);
   return res?.data ?? [];
 }
 
@@ -168,14 +179,9 @@ function DataFilePageCards(props) {
   ]);
 }
 
-export function DataFilePage(props) {
-  const { sample_ids = [], session_ids = [], analysis_ids = [], model } = props;
+function DataFilePageBlock(props) {
+  const { data = [], model } = props;
 
-  const data = useDataFileModelLinks({
-    sample_id: sample_ids,
-    session_id: session_ids,
-    analysis_id: analysis_ids,
-  });
   return h(
     PageViewBlock,
     {
@@ -186,4 +192,40 @@ export function DataFilePage(props) {
     },
     h(DataFilePageCards, { data, model })
   );
+}
+
+function LinkedDataFilePage(props) {
+  const { sample_ids, session_ids, analysis_ids, model } = props;
+
+  const data = useDataFileModelLinks({
+    sample_id: sample_ids,
+    session_id: session_ids,
+    analysis_id: analysis_ids,
+  });
+
+  return h(DataFilePageBlock, { data, model });
+}
+
+export function DataFilePage(props) {
+  const {
+    sample_ids: rawSampleIDs = [],
+    session_ids: rawSessionIDs = [],
+    analysis_ids: rawAnalysisIDs = [],
+    model,
+  } = props;
+
+  const sample_ids = normalizeIDList(rawSampleIDs);
+  const session_ids = normalizeIDList(rawSessionIDs);
+  const analysis_ids = normalizeIDList(rawAnalysisIDs);
+
+  if (!hasFilterIDs(sample_ids, session_ids, analysis_ids)) {
+    return h(DataFilePageBlock, { data: [], model });
+  }
+
+  return h(LinkedDataFilePage, {
+    sample_ids,
+    session_ids,
+    analysis_ids,
+    model,
+  });
 }

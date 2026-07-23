@@ -11,7 +11,7 @@ export const SessionAdd = (props) => {
   const {
     onClickDelete = () => {},
     onClickList = () => {},
-    data,
+    data = [],
     isEditing = false,
     sampleHoverID = null,
     onDrop = () => {},
@@ -65,7 +65,7 @@ export const SessionAdd = (props) => {
 export function PageViewSessions(props) {
   const {
     isEditing,
-    session,
+    session = [],
     onClick,
     sampleHoverID = null,
     onDrop = () => {},
@@ -81,7 +81,7 @@ export function PageViewSessions(props) {
           target,
           date,
           analysis,
-          data,
+          data = [],
           sample,
         } = obj;
         const onHover =

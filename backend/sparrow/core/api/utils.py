@@ -9,7 +9,7 @@ def nested_collection_path(start, end, allowed_collections=allowed_collections):
     start (string) : Starting model
     end (string) : Ending model
 
-    Dependencies: allowed_collections, and collections library from python.
+    Dependencies: allowed_collections, and collections library from Python.
     """
 
     dist = {start: [start]}
@@ -73,17 +73,19 @@ def nested_collection_joins(path, query, db, model):
 
 def text_fields(model):
     """
-    Function to return the column model attributes for a sqlalchemy model whose type is text
-    i.e sample.name
+    Return mapped text-like column attributes for a SQLAlchemy model.
+
+    Some reflected tables include audit columns that are not exposed on explicit
+    ORM classes. Skip those columns rather than failing while registering filters.
     """
-    fields = model.__table__.columns.keys()
-    text_fields = []
-    for c in fields:
-        if f"{getattr(model,c).type}" == "TEXT":
-            text_fields.append(c)
+    attrs = []
+    for column_name in model.__table__.columns.keys():
+        attr = getattr(model, column_name, None)
+        if attr is None:
+            continue
 
-    atr = []
-    for c in text_fields:
-        atr.append(getattr(model, c))
+        column_type = f"{getattr(attr, 'type', '')}".upper()
+        if column_type == "TEXT" or column_type.startswith("VARCHAR"):
+            attrs.append(attr)
 
-    return atr
+    return attrs
