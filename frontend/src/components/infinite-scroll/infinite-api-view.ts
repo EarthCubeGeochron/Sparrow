@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
-import { hyperStyled } from "@macrostrat/hyper";
+import h from "@macrostrat/hyper";
 import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
 import { Spinner } from "@blueprintjs/core";
 import { NoSearchResults } from "./utils";
 import { ErrorCallout } from "~/util";
-//@ts-ignore
-import styles from "./main.styl?inline";
-
-const h = hyperStyled(styles);
+import "./main.styl";
 
 function errorMessage(error) {
   if (error == null) return "The API request failed.";

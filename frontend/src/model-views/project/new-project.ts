@@ -1,4 +1,4 @@
-import { hyperStyled } from "@macrostrat/hyper";
+import h from "@macrostrat/hyper";
 import { useReducer, useState, createContext, useContext } from "react";
 import { AdminPage } from "~/admin/AdminPage";
 import { APIHelpers } from "@macrostrat/ui-components";
@@ -17,10 +17,7 @@ import { ProjectAdminContext } from "~/admin/project";
 import { MinimalNavbar } from "~/components";
 import { APIV2Context } from "../../api-v2";
 import axios from "axios";
-//@ts-ignore
-import styles from "./project-form.styl?inline";
-
-const h = hyperStyled(styles);
+import "./project-form.styl";
 
 export const ProjectFormContext = createContext({});
 
@@ -139,7 +136,7 @@ export function NewProjectFormMain() {
     const { data } = response;
     console.log(data);
     const { id } = data.data;
-    const goToRoute = process.env.BASE_URL + `admin/project/${id}`;
+    const goToRoute = `${import.meta.env.BASE_URL ?? "/"}admin/project/${id}`;
     window.location.assign(goToRoute);
   }
 
