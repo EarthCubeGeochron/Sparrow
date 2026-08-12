@@ -13,3 +13,6 @@ _docker
 
 # Ignore files present on other branches
 backend/shared-modules
+
+# IDE files
+.idea
