@@ -1,6 +1,6 @@
 # Note: see https://github.com/overhangio/tutor/releases for a well-developed release schedule
 # We could use a CHANGELOG generator to forward information about changes...
-name: Sparrow release generation 
+name: Sparrow release generation
 on:
   push:
     tags:
@@ -38,7 +38,7 @@ jobs:
         # For zipping, change directory to the dist directory.
         run: tar -czv -f sparrow-Linux-x86_64.tar.gz -C _cli/dist/sparrow .
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: sparrow-Linux-x86_64.tar.gz
           path: sparrow-Linux-x86_64.tar.gz
@@ -116,7 +116,7 @@ jobs:
       - name: Zip up command-line application
         run: tar -czv -f sparrow-Darwin-x86_64.tar.gz -C _cli/dist/sparrow .
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: sparrow-Darwin-x86_64.tar.gz
           path: sparrow-Darwin-x86_64.tar.gz
@@ -130,7 +130,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Get built Sparrow CLI (Linux) 
+      - name: Get built Sparrow CLI (Linux)
         uses: actions/download-artifact@v2
         with:
           name: sparrow-Linux-x86_64.tar.gz
@@ -151,7 +151,7 @@ jobs:
             echo ::set-output name=is_prerelease::false
             echo ::set-output name=prerelease_text::If you want to install this release specifically, you can add it to the above command
           fi
-          
+
       # We create the release only if things work both on Linux and Darwin
       # Note: see https://github.com/overhangio/tutor/releases for a well-developed release schedule
       - name: Create release
@@ -165,12 +165,12 @@ jobs:
           # Set prerelease status based on tag name
           prerelease: ${{ steps.get-version.outputs.is_prerelease }}
           fail_on_unmatched_files: true
-          body: |          
+          body: |
             The latest release of Sparrow can be installed using the following command:
             ```
             bash -c "$(curl -fsSL https://sparrow-data.org/get-sparrow.sh)"
             ```
-            
+
             If you are already running Sparrow version `2.1.0` or above, an in-place upgrade is possible:
             ```sparrow update```
 

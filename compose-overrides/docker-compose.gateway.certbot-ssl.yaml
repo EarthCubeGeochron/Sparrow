@@ -1,7 +1,7 @@
 version: "3.6"
 services:
   gateway:
-    image: jonasal/nginx-certbot:3.2
+    image: jonasal/nginx-certbot:6.2
     ports:
       - ${SPARROW_HTTP_PORT:-80}:80
       - ${SPARROW_HTTPS_PORT:-443}:443
