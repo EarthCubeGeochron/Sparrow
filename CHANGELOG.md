@@ -7,6 +7,11 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[3.2.0]` - 2024-08-12
+
+- Switch away from bundled `docker-compose` to using the system-installed version.
+- Upgrade dependencies so that modules continue to build
+
 ## `[3.0.0]` - Unreleased
 
 - Created API v3 based on Postgrest that can take on many of the functions that still rely on API v1
@@ -53,7 +58,7 @@ and this project is working towards adherence to
   the preferred minimum version of Node JS for frontend compilation has been increased to 16.
 - Many bugfixes to the Task-management API system, and preparation for future improvements there.
 - Added a `lab_id` field to the sample page
-- Added basic integration tests (does the frontend build properly and get served by the gateway container?) to the 
+- Added basic integration tests (does the frontend build properly and get served by the gateway container?) to the
   Sparrow CI process. These can be expanded and converted to Python in the future.
 
 ## `[2.3.1]` - 2022-06-07
