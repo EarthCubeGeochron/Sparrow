@@ -7,6 +7,10 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[3.2.1]` - 2024-08-12
+
+- Update Nginx certbot container
+
 ## `[3.2.0]` - 2024-08-12
 
 - Switch away from bundled `docker-compose` to using the system-installed version.
