@@ -9,7 +9,9 @@ jobs:
   build_test:
     # Note: for deployment, we move to an older version of Ubuntu
     # https://pyinstaller.readthedocs.io/en/stable/usage.html
-    runs-on: ubuntu-20.04
+    # If we get a "waiting for a runner to pick up this job" error,
+    # we need to switch to a newer version.
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out repository
         uses: actions/checkout@v2

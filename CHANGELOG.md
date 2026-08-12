@@ -10,8 +10,12 @@ and this project is working towards adherence to
 ## `[3.2.1]` - 2024-08-12
 
 - Update Nginx certbot container
+- Move GitHub Actions workflows to use `ubuntu-22.04` instead of `ubuntu-20.04`.
 
 ## `[3.2.0]` - 2024-08-12
+
+> [!note] Development release
+> This release was not actually built for production
 
 - Switch away from bundled `docker-compose` to using the system-installed version.
 - Upgrade dependencies so that modules continue to build
