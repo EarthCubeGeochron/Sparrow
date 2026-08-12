@@ -18,7 +18,7 @@ psycopg2 = "^2.9.6"
 shapely = "1.8.5.post1"
 lxml = "^4.9.2"
 numpy = "^1.22.3"
-pandas = "^2.0.0"
+pandas = "^2.0.0,<2.2.0"
 uvloop = "^0.17.0"
 
 "macrostrat.database" = {path = "./shared-modules/database", develop = true }
