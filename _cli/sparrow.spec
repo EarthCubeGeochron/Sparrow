@@ -17,13 +17,6 @@ with open(revfile, "w") as f:
 
 data_files = {revfile: "."}
 
-# Add data files needed by docker-compose
-_compose_files = ["config/config_schema_v1.json", "config/compose_spec.json"]
-compose_root = path.dirname(import_module("compose").__file__)
-for fn in _compose_files:
-    fullpath = path.join(compose_root, fn)
-    data_files[fullpath] = "compose/config"
-
 _schemainspect_root = path.dirname(import_module("schemainspect").__file__)
 fullpath = path.join(_schemainspect_root, "pg", "sql")
 data_files[fullpath] = "schemainspect/pg/sql"
