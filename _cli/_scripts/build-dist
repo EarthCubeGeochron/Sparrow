@@ -6,7 +6,7 @@ _cli/_scripts/build-local
 export VIRTUAL_ENV="$(cd _cli && poetry env info --path)"
 export PATH="$VIRTUAL_ENV/bin:$PATH"
 
-pip3 install pyinstaller==5.0.1
+pip3 install pyinstaller==6.22.0
 cd _cli
 pyinstaller --noconfirm --distpath dist sparrow.spec
 cd dist
