@@ -1,4 +1,3 @@
-version: "3.6"
 services:
   gateway:
     image: jonasal/nginx-certbot:6.2

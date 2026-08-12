@@ -1,4 +1,3 @@
-version: "3.6"
 services:
   # Add a production server for static files
   # Set restart policy to allow docker
@@ -10,5 +9,11 @@ services:
     restart: unless-stopped
   db:
     restart: unless-stopped
-  api:
+  pg_api:
+    restart: unless-stopped
+  frontend:
+    restart: unless-stopped
+  worker:
+    restart: unless-stopped
+  broker:
     restart: unless-stopped
