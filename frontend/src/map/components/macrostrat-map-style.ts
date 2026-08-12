@@ -11,6 +11,8 @@ export const MacrostratMapSettings = {
 
 export const mapStyle = {
   version: 8,
+  glyphs: "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+  sprite: "mapbox://sprites/mapbox/outdoors-v9",
   sources: {
     burwell: {
       type: "vector",

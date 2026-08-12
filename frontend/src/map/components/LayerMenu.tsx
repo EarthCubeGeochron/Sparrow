@@ -11,12 +11,12 @@ import {
 } from "@blueprintjs/core";
 import "../cluster.css";
 import { useDarkMode } from "@macrostrat/ui-components";
-import { mapStyle } from "./macrostrat-map-style";
+import { mapStyle as geologicMapStyle } from "./macrostrat-map-style";
 import { FrameContext } from "~/frame";
 
 export const LayerMenu = ({
   hide,
-  mapStyle,
+  currentMapStyle,
   chooseMapStyle,
   showMarkers,
   toggleShowMarkers,
@@ -39,7 +39,7 @@ export const LayerMenu = ({
       name: "Topographic Map",
       style: "mapbox://styles/jczaplewski/cjftzyqhh8o5l2rqu4k68soub",
     },
-    { name: "Geologic Map", style: mapStyle },
+    { name: "Geologic Map", style: geologicMapStyle },
     ...externalMapStyles,
   ];
   const dropMenu = (
@@ -49,8 +49,8 @@ export const LayerMenu = ({
         return (
           <MenuItem
             key={name}
-            intent={mapStyle == style ? "primary" : null}
-            labelElement={mapStyle == style ? <Icon icon="tick"></Icon> : null}
+            intent={currentMapStyle === style ? "primary" : null}
+            labelElement={currentMapStyle === style ? <Icon icon="tick" /> : null}
             text={name}
             onClick={() => {
               chooseMapStyle(style);

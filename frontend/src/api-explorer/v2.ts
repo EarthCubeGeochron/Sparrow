@@ -5,12 +5,11 @@ import { NavButton } from "~/components";
 import { Card } from "@blueprintjs/core";
 
 export function APIExplorerV2(props) {
-  return h(Card, { className: "api-explorer-v2 bp4-light" }, [
+  return h(Card, { className: "api-explorer-v2" }, [
     h("div.minimal-navbar", [
       h(
         NavButton,
         {
-          className: "bp4-light",
           to: "/api-explorer/v1",
           minimal: false,
           large: true,
@@ -20,7 +19,6 @@ export function APIExplorerV2(props) {
       h(
         NavButton,
         {
-          className: "bp4-light",
           to: "/import-schema-explorer",
           minimal: false,
           large: true,

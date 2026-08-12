@@ -61,6 +61,21 @@
     &:last-child
       margin-right 0em
 
+.project-sample-row
+  display flex
+  flex-direction row
+  align-items stretch
+  gap 0.75rem
+  width 100%
+
+.project-map-column
+  flex 0 0 auto
+  min-width 0
+
+.project-samples-column
+  flex 1 1 0
+  min-width 0
+
 .embargo-control-panel
   width 160px
   min-height: 2em
@@ -69,26 +84,127 @@
 .admin-page-main
   display flex
   flex-direction row
-  position fixed
-  top 50px
-  bottom 0
-  left 0
-  right 0
+  position relative
+  height 100%
+  min-height 0
+  gap 0.75rem
+
+  .sidebar-toggle
+    z-index 2
+    flex 0 0 auto
+    display flex
+    align-items flex-start
+    padding-top 0.25rem
+
+  .sidebar-toggle-button
+    min-width 2rem
+    min-height 5.5rem
+    padding 0 0.25rem
+    display flex
+    align-items center
+    justify-content center
+
+  .sidebar-toggle-label
+    display flex
+    align-items center
+    gap 0.35rem
+    writing-mode vertical-rl
+    transform rotate(180deg)
+    white-space nowrap
+
   .left-panel
     z-index 1
-    width 28vw
-    overflow-y: auto
+    flex 0 0 24rem
+    width 24rem
+    max-width 36vw
+    min-width 18rem
+    overflow-y auto
     overflow-x hidden
-    padding 0 1em 0 0.5em
-    transition .6s margin ease
+    padding 0 1rem 1rem 0
+    transition flex-basis .25s ease, width .25s ease, min-width .25s ease, max-width .25s ease, padding .25s ease, opacity .2s ease
     &.hidden
-      margin 0 0 0 -31em
-      transition .6s margin ease
+      flex-basis 0
+      width 0
+      max-width 0
+      min-width 0
+      padding 0
+      opacity 0
+      pointer-events none
 
   .right-panel
-    flex 1
-    padding 0 3em 0 2em
-    overflow-y: scroll
+    flex 1 1 auto
+    min-width 0
+    padding 0 2rem 1rem 1.25rem
+    overflow-y auto
+
+@media (max-width: 1200px)
+  .admin-page-main
+    gap 0.5rem
+    .left-panel
+      flex-basis 21rem
+      width 21rem
+      max-width 38vw
+      min-width 17rem
+    .right-panel
+      padding 0 1.25rem 1rem 1rem
+
+@media (max-width: 960px)
+  .content-area
+    flex-direction column
+    h5:first-child
+      min-width 0
+      margin-right 0
+
+  .flex-row
+    flex-direction column
+    &>*
+      margin-right 0
+      margin-bottom 1em
+      &:last-child
+        margin-bottom 0
+
+  .project-sample-row
+    flex-direction column
+
+  .project-map-column,
+  .project-samples-column
+    width 100%
+
+  .admin-page-main
+    .left-panel
+      flex-basis 18rem
+      width 18rem
+      max-width 42vw
+      min-width 15rem
+    .right-panel
+      padding 0 0.75rem 1rem
+
+@media (max-width: 760px)
+  .admin-page-main
+    flex-direction column
+    overflow-y auto
+    .sidebar-toggle
+      padding-top 0
+      width 100%
+    .sidebar-toggle-button
+      min-height auto
+      width 100%
+      justify-content flex-start
+    .sidebar-toggle-label
+      writing-mode horizontal-tb
+      transform none
+    .left-panel
+      flex 0 0 auto
+      width 100%
+      max-width none
+      min-width 0
+      max-height 42vh
+      padding 0 0 0.75rem
+      &.hidden
+        display none
+    .right-panel
+      overflow visible
+      padding 0 0.25rem 1rem
 
 @keyframes leftArrow
   0%  {left: 500px}
@@ -108,3 +224,18 @@
 .vertical
   transform rotate(90deg)
   float left
+
+.admin-navbar-links
+  display flex
+  flex-direction row
+  margin 0
+  padding 0
+  white-space nowrap
+
+  @media (max-width: 1100px)
+    gap 0.25rem
+
+  @media (max-width: 768px)
+    display grid
+    grid-template-columns repeat(2, 1fr)
+    column-gap 0.5rem

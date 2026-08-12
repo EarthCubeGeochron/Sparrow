@@ -70,13 +70,15 @@ def sample_joins(db, query, document_tables):
 def project_joins(db, query, document_tables):
     project_doc, sample_doc, session_doc = document_tables
 
-    sample = db.model.sample
     project = db.model.project
     session = db.model.session
+    project_sample = Table("project_sample", db.metadata, autoload_with=db.engine)
 
     query = query.outerjoin(project_doc, project.id == project_doc.c.project_id)
-    query = query.outerjoin(project.sample_collection).outerjoin(
-        sample_doc, sample.id == sample_doc.c.sample_id
+    query = query.outerjoin(
+        project_sample, project.id == project_sample.c.project_id
+    ).outerjoin(
+        sample_doc, project_sample.c.sample_id == sample_doc.c.sample_id
     )
     query = query.outerjoin(session, session.project_id == project.id).outerjoin(
         session_doc, session.id == session_doc.c.session_id

@@ -7,7 +7,9 @@ services:
     build:
       context: frontend
       target: base
-    command: yarn run dev:docker
+    # The full frontend directory is bind-mounted below, so any dependencies installed into the image are hidden at runtime.
+    # Ensure Yarn's PnP install state exists in the mounted /app before starting Vite.
+    command: sh -lc "yarn install --immutable && yarn run dev:docker"
     expose:
       - 3000
     volumes:

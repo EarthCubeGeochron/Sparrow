@@ -18,8 +18,13 @@ interface tagContainer {
 }
 
 export function TagContainer(props) {
-  const { tags, isEditing, onChange, onClickDelete, modelName }: tagContainer =
-    props;
+  const {
+    tags = [],
+    isEditing,
+    onChange,
+    onClickDelete,
+    modelName,
+  }: tagContainer = props;
 
   if (tags.length == 0 && !isEditing) {
     return h(ModelAttributeOneLiner, {
@@ -64,10 +69,10 @@ export function TagContainer(props) {
 }
 
 function TagPopover(props) {
-  const { tags, onChange, modelName }: tagContainer = props;
+  const { tags = [], onChange, modelName }: tagContainer = props;
 
   const onClick = () => {
-    const goToRoute = process.env.BASE_URL + `admin/tag-manager`;
+    const goToRoute = `${import.meta.env.BASE_URL ?? "/"}admin/tag-manager`;
     window.location.assign(goToRoute);
   };
 
@@ -81,7 +86,7 @@ function TagPopover(props) {
 }
 
 export function TagSelect(props) {
-  const { tags, onChange }: tagContainer = props;
+  const { tags = [], onChange }: tagContainer = props;
 
   // use the tags from tag container to show only tags that don't exist on model
   const allTags = useAPIv2Result("/tags/tag", { all: true });
@@ -89,7 +94,8 @@ export function TagSelect(props) {
 
   const currentIds = tags.map((tag) => tag.id);
 
-  const tagSet = allTags.data.filter((tag) => !currentIds.includes(tag.id));
+  const availableTags = Array.isArray(allTags.data) ? allTags.data : [];
+  const tagSet = availableTags.filter((tag) => !currentIds.includes(tag.id));
 
   const itemRenderer = (item, itemProps) => {
     const { name, description, color, id } = item;

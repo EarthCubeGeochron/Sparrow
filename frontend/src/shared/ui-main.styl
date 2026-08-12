@@ -61,12 +61,102 @@ div.api-result-placeholder
   align-items center
 
 .bp4-dark .api-explorer-v2
-  background-color: $light-gray3
+  background-color: $dark-gray2
+  color: $bp4-dark-text-color
+
+  .swagger-ui
+    color: $bp4-dark-text-color
+
+    .info
+      .title,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6
+        color: $bp4-dark-heading-color
+
+      p,
+      li,
+      table,
+      label,
+      span,
+      code,
+      pre,
+      .base-url,
+      .markdown p
+        color: $bp4-dark-text-color
+
+      a
+        color: $bp4-dark-link-color
+
+    .opblock-tag,
+    .opblock-summary-path,
+    .opblock-summary-path a,
+    .opblock-summary-path span,
+    .opblock-summary-description,
+    .parameter__name,
+    .parameter__type,
+    .response-col_status,
+    .response-col_description,
+    .tab li,
+    .model-title,
+    .model
+      color: $bp4-dark-text-color
+
+    .scheme-container,
+    .opblock,
+    .model-box,
+    section.models
+      background: $dark-gray3
 
 div.api-explorer-v2
   margin-top 1em
   .swagger-ui .info
     margin-top 1em
+
+  .swagger-ui .opblock .opblock-summary
+    align-items: center
+    gap: 0.5em
+
+  .swagger-ui .opblock .opblock-summary-method
+    flex: 0 0 86px
+
+  .swagger-ui .opblock .opblock-summary-path
+    flex: 0 1 34rem
+    max-width: 34rem
+    min-width: 16rem
+    overflow-wrap: anywhere
+    padding: 0.3em 0.5em
+    white-space: normal
+    word-break: normal
+
+  .swagger-ui .opblock .opblock-summary-path a,
+  .swagger-ui .opblock .opblock-summary-path span
+    overflow-wrap: anywhere
+    white-space: normal
+
+  .swagger-ui .opblock .opblock-summary-description
+    flex: 1 1 12rem
+    min-width: 10rem
+
+  .swagger-ui .opblock .opblock-summary svg
+    flex: 0 0 auto
+    margin-left: auto
+
+  @media (max-width: 700px)
+    .swagger-ui .opblock .opblock-summary
+      flex-wrap: wrap
+
+    .swagger-ui .opblock .opblock-summary-path
+      flex: 1 1 calc(100% - 120px)
+      max-width: none
+      min-width: 0
+
+    .swagger-ui .opblock .opblock-summary-description
+      flex-basis: 100%
+      min-width: 0
 
 .flex-container
   display flex

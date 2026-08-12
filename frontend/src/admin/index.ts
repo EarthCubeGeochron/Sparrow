@@ -70,7 +70,7 @@ const AdminNavbarLinks = function ({ base }) {
   if (base == null) {
     base = "/catalog";
   }
-  return h("div", [
+  return h("div", { className: "admin-navbar-links" }, [
     h(NavButton, { to: base + "/project" }, "Projects"),
     h(NavButton, { to: base + "/sample" }, "Samples"),
     h(NavButton, { to: base + "/session" }, "Sessions"),

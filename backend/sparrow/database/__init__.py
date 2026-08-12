@@ -2,6 +2,7 @@ from pathlib import Path
 from click import secho
 from time import perf_counter
 
+from sqlalchemy import text
 from sqlalchemy.schema import ForeignKey, Column
 from sqlalchemy.types import Integer
 from sqlalchemy.exc import IntegrityError
@@ -172,7 +173,8 @@ class Database(BaseDatabase):
         msg = "Reloading PostgREST schema cache"
         secho(msg, bold=True)
         log.info(msg)
-        self.engine.execute("NOTIFY pgrst, 'reload schema'")
+        with self.engine.begin() as conn:
+            conn.execute(text("NOTIFY pgrst, 'reload schema'"))
 
     def update_schema(self, **kwargs):
         # Might be worth creating an interactive upgrader

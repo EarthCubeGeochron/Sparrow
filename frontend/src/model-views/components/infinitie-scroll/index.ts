@@ -1,5 +1,5 @@
 import React from "react";
-import { hyperStyled } from "@macrostrat/hyper";
+import h from "@macrostrat/hyper";
 import {
   ProjectModelCard,
   SampleModelCard,
@@ -10,10 +10,7 @@ import {
 } from "~/model-views";
 import { InfiniteAPIView } from "~/components/infinite-scroll";
 import { APIV2Context, APIV3Context } from "~/api-v2";
-//@ts-ignore
-import styles from "./main.styl";
-
-const h = hyperStyled(styles);
+import "./main.styl";
 
 function ProjectListChildren({
   data,

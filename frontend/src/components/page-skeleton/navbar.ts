@@ -40,21 +40,31 @@ const ShortSiteTitle = () => {
 
 function AppNavbar({ children, fullTitle, subtitle, ...rest }) {
   const p = addClassNames(rest, "app-navbar");
+
   return h(Navbar, p, [
     h(Navbar.Group, [
       h(Navbar.Heading, [
-        h("h1.site-title", null, [
-          h(SiteTitle),
-          h.if(subtitle != null)([
-            h("span", " "),
-            h("span.subtitle", null, subtitle),
-          ]),
-        ]),
+        h(
+          "h1.site-title",
+          {
+            className: subtitle != null ? "has-subtitle" : null,
+          },
+          [
+            h(SiteTitle),
+
+            h.if(subtitle != null)([
+              h("span.subtitle", null, subtitle),
+            ]),
+          ]
+        ),
       ]),
+
       h.if(children != null)(Navbar.Divider),
       children,
     ]),
+
     h("div.navbar-spacer"),
+
     h(Navbar.Group, [
       h(DarkModeButton, { minimal: true, active: false }),
       h(AuthStatus, { className: "auth-right" }),

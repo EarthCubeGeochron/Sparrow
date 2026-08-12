@@ -1,14 +1,13 @@
 import { useState, useEffect, ReactNode } from "react";
 import { Frame } from "~/frame";
-import { hyperStyled } from "@macrostrat/hyper";
+import h from "@macrostrat/hyper";
 import { Link } from "react-router-dom";
 import { FormattedLngLat, pluralize } from "../new-model";
 import { useModelURL } from "~/util";
-import styles from "./card.styl";
+import "./card.styl";
 import classNames from "classnames";
 import { FormattedDate, ProjectCardContent, Publication } from "~/model-views";
 
-const h = hyperStyled(styles);
 
 function clickedClassname(props) {
   const { clicked, id } = props;

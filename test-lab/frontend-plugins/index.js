@@ -1,15 +1,14 @@
-import { Markdown } from "@macrostrat/ui-components";
-import aboutText from "./landing-text.md";
+import LandingText from "./landing-text.md";
 import h from "@macrostrat/hyper";
 import { SampleMap } from "plugins/globe";
 
 const MainComponent = () => {
   /** A simple React component that prints data about the site */
   return h([
-    h(Markdown, { src: aboutText }),
+    h(LandingText),
     h("h3.app-mode", [
       "Sparrow is running in ",
-      h("em", null, process.env.SPARROW_ENV),
+      h("em", null, import.meta.env.SPARROW_ENV ?? import.meta.env.MODE),
       " mode",
     ]),
   ]);
