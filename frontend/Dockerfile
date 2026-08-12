@@ -1,4 +1,4 @@
-FROM node:16 AS base
+FROM node:20 AS base
 
 WORKDIR /app/
 
@@ -6,7 +6,9 @@ FROM base AS frontend
 
 COPY package.json .
 
-RUN yarn set version 3.x && npm install -g 'nodemon@^2.0.0' 'webpack@^5.0.0' 'webpack-cli@^4.0.0'
+RUN corepack enable && \
+    yarn set version 3.2.3 && \
+    npm install -g 'nodemon@^2.0.0' 'webpack@^5.0.0' 'webpack-cli@^4.0.0'
 
 # This is annoying but I don't see a better alternative
 COPY packages/schema-linker/package.json /app/packages/schema-linker/
