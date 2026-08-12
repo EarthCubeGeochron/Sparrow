@@ -40,7 +40,7 @@ jobs:
         # For zipping, change directory to the dist directory.
         run: tar -czv -f sparrow-Linux-x86_64.tar.gz -C _cli/dist/sparrow .
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: sparrow-Linux-x86_64.tar.gz
           path: sparrow-Linux-x86_64.tar.gz
@@ -118,7 +118,7 @@ jobs:
       - name: Zip up command-line application
         run: tar -czv -f sparrow-Darwin-x86_64.tar.gz -C _cli/dist/sparrow .
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: sparrow-Darwin-x86_64.tar.gz
           path: sparrow-Darwin-x86_64.tar.gz
@@ -133,12 +133,12 @@ jobs:
     steps:
 
       - name: Get built Sparrow CLI (Linux)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v7
         with:
           name: sparrow-Linux-x86_64.tar.gz
 
       - name: Get built Sparrow CLI (Darwin)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v7
         with:
           name: sparrow-Darwin-x86_64.tar.gz
 
@@ -158,7 +158,7 @@ jobs:
       # Note: see https://github.com/overhangio/tutor/releases for a well-developed release schedule
       - name: Create release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         if: startsWith(github.ref, 'refs/tags/')
         with:
           tag_name: ${{ steps.get-version.outputs.tag_name }}
