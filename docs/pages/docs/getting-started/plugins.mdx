@@ -37,10 +37,10 @@ Some hooks will receive other parameters. For instance, the "database-available"
 - "api-initialized-v2": Runs code when APIv2 has been created. This hook is good to use for adding custom routes to the Sparrow API.
 - "database-ready" : Runs code after database has been mapped.
 - "database-mapped": Runs code after database is automapped, but only runs if database was not automapped already.
-- "core-tables-initialized": Run on database initialization
+- "define-schema": Receives the list of schema chunks; append a `SchemaDefinition` naming a file or directory of SQL to add tables and views. Chunks given this way are also covered by `sparrow schema sync`.
+- "define-migrations": Receives the list of migrations; append `SparrowMigration` subclasses for changes a schema diff cannot make safely.
+- "core-tables-initialized": Run on database initialization, after all schema chunks. Prefer "define-schema".
 - "finalize-database-schema": Run on database initialization
-- "prepare-database-migrations": Runs on schema upgrade
-- "prepare-database-upgrade": Runs on Schema upgrade, ****DEPRECATED****
 - "plugins-initialized" : Runs after Sparrow plugins have been initialized
 - "add-routes": Runs before the sparrow API is mounted
 - "finalize-routes": Runs after the api router is mounted

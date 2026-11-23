@@ -18,7 +18,6 @@ from sparrow.logs import get_logger
 from macrostrat.utils import relative_path
 from sparrow.loader import ModelSchema, model_interface
 from sparrow.defs import SparrowError
-from .migration import SparrowDatabaseMigrator
 from .mapper import SparrowDatabaseMapper
 from macrostrat.database.mapper.utils import classname_for_table
 
@@ -71,6 +70,11 @@ class Database(BaseDatabase):
             # Schema fixtures contain literal percent signs (e.g. in format() calls)
             kwargs.setdefault("has_server_binds", False)
         return super().run_sql(fn, params, **kwargs)
+
+    def run_fixtures(self, fixtures, params=None, **kwargs):
+        if not params:
+            kwargs.setdefault("has_server_binds", False)
+        return super().run_fixtures(fixtures, params, **kwargs)
 
     def model_schema(self, model_name) -> ModelSchema:
         """
@@ -146,21 +150,12 @@ class Database(BaseDatabase):
             fp = relative_path(__file__, "procedures", "drop-all-tables.sql")
             self.run_sql(fp)
 
-        p = Path(relative_path(__file__, "fixtures"))
-        filenames = list(p.glob("*.sql"))
-        filenames.sort()
+        from .schema import initialize_schema
 
-        for _fn in filenames:
-            self.run_sql(_fn)
-
+        if self.app is None:
+            secho("No application; plugin schemas are not built", fg="red", dim=True)
+        initialize_schema(self)
         self.reload_postgrest_cache()
-
-        try:
-            self.app.run_hook("core-tables-initialized", self)
-            self.app.run_hook("finalize-database-schema", self)
-        except AttributeError as err:
-            secho("Could not load plugins", fg="red", dim=True)
-            secho(str(err))
 
     def recreate_views(self):
         views = ["06-views.sql", "07-postgrest-api.sql"]
@@ -181,13 +176,26 @@ class Database(BaseDatabase):
         log.info(msg)
         self.run_sql("NOTIFY pgrst, 'reload schema'")
 
-    def update_schema(self, **kwargs):
-        # Might be worth creating an interactive upgrader
-        from sparrow import migrations
+    def schema_app(self, **kwargs):
+        """This database's schema, for the schema management tools"""
+        from .schema import create_schema_app
 
-        migrator = SparrowDatabaseMigrator(self)
-        migrator.add_module(migrations)
-        self.app.run_hook("prepare-database-migrations", migrator)
-        # TODO: deprecate this hook
-        self.app.run_hook("prepare-database-upgrade", migrator)
-        migrator.run_migration(**kwargs)
+        return create_schema_app(self, **kwargs)
+
+    def update_schema(self, dry_run=True, apply=True):
+        """Bring the schema up to date, rehearsing on a copy of it first."""
+        from .migration import create_schema_clone
+        from .schema import update_schema
+
+        if dry_run:
+            log.info("Rehearsing the schema update")
+            with create_schema_clone(self.engine) as engine:
+                clone = Database(engine.url, self.app)
+                try:
+                    update_schema(clone)
+                finally:
+                    clone.cleanup()
+        if not apply:
+            return
+        log.info("Updating the schema")
+        update_schema(self)

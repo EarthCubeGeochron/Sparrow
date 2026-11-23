@@ -5,6 +5,7 @@ from starlette.routing import Route, Router
 from starlette.endpoints import HTTPEndpoint
 from starlette.authentication import requires
 from pathlib import Path
+from macrostrat.schema_management import SchemaDefinition
 import json
 
 
@@ -82,13 +83,13 @@ class Tags(SparrowCorePlugin):
 
     name = "tags"
 
-    ## database-available hook is before the automapper
-    def on_core_tables_initialized(self, db):
-        """
-        Creates schema and tables for tags
-        """
-        f = fixtures / "tags.sql"
-        db.run_sql(f)
+    def on_define_schema(self, chunks):
+        """Schema and tables for tags"""
+        chunks.append(
+            SchemaDefinition(
+                name="tags", depends_on=["core"], provides=[fixtures / "tags.sql"]
+            )
+        )
 
     def default_tags(self):
         """Checks if there are any tags, if none, inserts some defualts"""

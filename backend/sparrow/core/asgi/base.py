@@ -4,6 +4,7 @@ modern application server that translates our primary Sparrow app
 (Flask/WSGI) to starlette (ASGI). This is for forward compatibility
 with new async server architecture available in Python 3.6+.
 """
+
 import logging
 from contextvars import ContextVar
 from starlette.applications import Starlette

@@ -118,8 +118,9 @@ class SparrowTaskManager(SparrowCorePlugin):
 
     def on_setup_cli(self, cli):
         self._cli_app._add_completion = False
-        typer_click_object = typer.main.get_command(self._cli_app)
-        cli.add_command(typer_click_object, "tasks")
+        from sparrow.core.cli.util import add_typer_command
+
+        add_typer_command(cli, self._cli_app, "tasks", help="Run Sparrow tasks")
 
     def on_api_initialized_v2(self, api):
         if TASK_BROKER is not None:

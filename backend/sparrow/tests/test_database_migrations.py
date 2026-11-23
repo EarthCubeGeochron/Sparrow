@@ -1,20 +1,10 @@
 from os import environ
-from sparrow.migrations import (
-    InstrumentSessionMigration,
-    SampleCheckMigration,
-    SampleLocationAddSRID,
-    SampleAttributeCascadeMigration,
-)
 from sparrow.core.app import Sparrow
+from sparrow.database import Database
+from sparrow.database.migration import create_schema_clone
 from macrostrat.utils import relative_path, cmd
-from sparrow.database.migration import (
-    create_migration,
-    create_schema_clone,
-    sync_view_comments,
-)
-from macrostrat.database.utils import connection_args, temp_database, run_sql
-from sparrow.core.open_search import DocumentTableMigration
-from core_plugins.versioning import PGMementoMigration, PGMemento074Migration
+from macrostrat.database.utils import connection_args, temporary_database
+from macrostrat.schema_management.plan import is_unsafe_statement, plan_changes
 
 from pytest import mark, fixture
 from macrostrat.utils import get_logger
@@ -25,95 +15,42 @@ testing_db = target_db + "_migration"
 log = get_logger(__name__)
 
 
-class BasicMigration:
-    def should_apply(self, db, target, migrator):
-        # If analysis has column but target db does not
-        # we should return true
-        return True
-
-    def apply(self, engine):
-        run_sql(engine, "ALTER TABLE analysis DROP COLUMN in_plateau")
-
-
 @fixture(scope="class")
 def migration_base():
     fn = relative_path(__file__, "fixtures", "e57d74b-detrital-zircon-F-90.pg-dump")
     args, dbname = connection_args(testing_db)
-    with temp_database(testing_db) as engine:
+    with temporary_database(testing_db, ensure_empty=True) as engine:
         cmd("pg_restore", args, "-d", dbname, str(fn), check=True)
         yield engine
 
 
-# @mark.order(-1)
 class TestDatabaseMigrations:
+    # Schema changes take locks that an open test transaction would hold
+    use_isolation = False
+
     def test_migration(self, db, migration_base):
         test_app = Sparrow(debug=True, database=migration_base.url)
         test_app.setup_database(automap=False)
-        # We can use the existing testing database as a target
+        test_db = test_app.db
 
-        migration = create_migration(test_app.db.engine, db.engine)
+        schema_app = test_db.schema_app()
 
-        # Check that we are not aligned
-        assert not migration.is_safe
+        # Check that we are not aligned: the old schema cannot be updated safely
+        statements = schema_app.plan()
+        assert any(is_unsafe_statement(s) for s in statements)
 
-        # Apply migrations
-        migrations = [
-            DocumentTableMigration,
-            PGMementoMigration,
-            PGMemento074Migration,
-            InstrumentSessionMigration,
-            SampleCheckMigration,
-            SampleLocationAddSRID,
-            BasicMigration,
-            SampleAttributeCascadeMigration,
-        ]
+        # Apply migrations, then the automatic update, which should now be "safe"
+        log.info("Updating schema")
+        test_db.update_schema(dry_run=False)
 
-        migrations = [m() for m in migrations]
-
-        while len(migrations) > 0:
-            errors = []
-            migrations = [
-                m
-                for m in migrations
-                if m.should_apply(test_app.db.engine, db.engine, None)
-            ]
-            for m in migrations:
-                log.info(f"Applying migration {type(m).__name__}")
-                try:
-                    m.apply(test_app.db.engine)
-                    # We have applied this migration and should not do it again.
-                    migrations.remove(m)
-                    log.info(f"Applied migration {type(m).__name__}")
-                except Exception as exc:
-                    log.error(f"Failed to apply migration {type(m).__name__}")
-                    log.error(exc)
-                    errors.append(exc)
-            if len(errors) > 0 and len(errors) == len(migrations):
-                log.error("Failed to apply all migrations")
-                raise errors[0]
-            migrations = [
-                m
-                for m in migrations
-                if m.should_apply(test_app.db.engine, db.engine, None)
-            ]
-
-        log.info("Initializing database")
-        test_app.database.initialize()
-
-        log.info("Applying automatic migration")
-
-        # Migrating to the new version should now be "safe"
-        migration = create_migration(test_app.database.engine, db.engine)
-        for change in migration.unsafe_changes():
+        # The schema is now the same as one built from scratch
+        remaining = schema_app.plan()
+        for change in remaining:
             print(change)
-        assert migration.is_safe
+        assert len(remaining) == 0
 
-        migration.apply(quiet=False)
-        # Recreated views lose their comments; the migrator restores them the same way
-        sync_view_comments(test_app.database.engine, db.engine)
-        # Compare the schemas again
-        migration = create_migration(test_app.database.engine, db.engine)
-        assert len(migration.statements) == 0
+        # ...and matches the testing database
+        assert len(plan_changes(test_db, db)) == 0
 
     @mark.slow
     def test_migration_built_in(self, db):
@@ -122,6 +59,7 @@ class TestDatabaseMigrations:
     @mark.slow
     def test_schema_clone(self, db):
         with create_schema_clone(db.engine) as engine:
-            m = create_migration(engine, db.engine)
+            clone = Database(engine.url)
             # Schemas should now be the same...
-            assert len(m.statements) == 0
+            assert len(plan_changes(clone, db)) == 0
+            clone.cleanup()

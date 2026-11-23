@@ -66,3 +66,20 @@ def with_full_app(cmd):
         return ctx.invoke(cmd, app, *args, **kwargs)
 
     return update_wrapper(new_cmd, cmd)
+
+
+def add_typer_command(cli, typer_app, name, help=None):
+    """Mount a Typer app on the click-based CLI. Typer bundles its own copy of
+    click, so its commands cannot be added to a click group directly."""
+
+    @cli.command(
+        name=name,
+        help=help,
+        add_help_option=False,
+        context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
+    )
+    @click.argument("args", nargs=-1, type=click.UNPROCESSED)
+    def _command(args):
+        typer_app(args=list(args), prog_name=f"sparrow {name}")
+
+    return _command

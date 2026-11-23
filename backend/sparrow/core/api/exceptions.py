@@ -25,5 +25,4 @@ class ApplicationError(HTTPException):
         super().__init__(status_code=status_code, detail=detail)
 
 
-class SerializationError(ApplicationError):
-    ...
+class SerializationError(ApplicationError): ...

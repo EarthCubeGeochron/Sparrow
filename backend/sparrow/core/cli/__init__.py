@@ -4,11 +4,10 @@ import sparrow
 from sys import exit
 from os import environ
 from json import dumps
-from .util import with_database, with_app, with_full_app
+from .util import with_database, with_app, with_full_app, add_typer_command
 from .user import create_user, list_users, reset_password
 from ..util import working_directory
 from ..context import get_sparrow_app
-from sparrow.database.migration import db_migration
 from macrostrat.utils.logs import setup_stderr_logs
 from typing import Optional
 from ..plugins import SparrowPlugin
@@ -176,12 +175,10 @@ def plugins(app):
 
 @cli.command(name="db-migration")
 @with_database
-@click.option("--safe", is_flag=True, default=True)
-@click.option("--apply", is_flag=True, default=False)
-@click.option("--hide-view-changes", is_flag=True, default=False)
-def _db_migration(db, safe=True, apply=False, hide_view_changes=False, quiet=False):
-    """Command to generate a basic migration."""
-    db_migration(db, safe=safe, apply=apply, hide_view_changes=hide_view_changes)
+def _db_migration(db):
+    """Print the changes that would bring the database schema up to date."""
+    for statement in db.schema_app().plan():
+        print(statement)
 
 
 @cli.command(name="db-drop-cache")
@@ -194,8 +191,26 @@ def _db_drop_cache(db):
 @with_database
 @click.option("--dry-run", is_flag=True, default=False)
 def db_update(db, dry_run=False):
-    setup_stderr_logs("sparrow", "macrostrat.dinosaur", level=INFO)
+    setup_stderr_logs("sparrow", "macrostrat.schema_management", level=INFO)
     db.update_schema(dry_run=True, apply=not dry_run)
+
+
+def _schema_app():
+    from sparrow.core import get_database
+
+    return get_database().schema_app()
+
+
+def _add_schema_commands():
+    """Schema management commands, shared with Macrostrat's other applications"""
+    from macrostrat.schema_management.cli import create_schema_cli
+
+    schema_cli = create_schema_cli(_schema_app)
+    schema_cli._add_completion = False
+    add_typer_command(cli, schema_cli, "schema", help="Manage the database schema")
+
+
+_add_schema_commands()
 
 
 def command_info(ctx, cli):

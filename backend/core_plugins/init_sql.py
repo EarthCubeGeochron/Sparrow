@@ -1,7 +1,7 @@
 from sparrow.core.plugins import SparrowCorePlugin
 from os import environ
 from pathlib import Path
-from click import secho
+from macrostrat.schema_management import SchemaDefinition
 
 
 class InitSQLPlugin(SparrowCorePlugin):
@@ -22,9 +22,14 @@ class InitSQLPlugin(SparrowCorePlugin):
                 files = [p]
             self.init_sql = [f for f in files if f.is_file()]
 
-    def on_core_tables_initialized(self, db):
+    def on_define_schema(self, chunks):
+        """A lab's own schema extensions, applied after everything built in"""
         if self.init_sql is None:
             return
-        secho("\nInitializing schema extensions", bold=True)
-        for s in self.init_sql:
-            db.run_sql(s)
+        chunks.append(
+            SchemaDefinition(
+                name="init-sql",
+                depends_on=[c.name for c in chunks],
+                provides=sorted(self.init_sql),
+            )
+        )

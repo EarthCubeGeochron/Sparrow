@@ -2,6 +2,7 @@
 JSON Web Token authentication.
 
 """
+
 import time
 from typing import Tuple, Any
 

@@ -1,82 +1,103 @@
-from sqlalchemy.exc import DataError
-from macrostrat.dinosaur import SchemaMigration
-from sparrow.database.migration import has_column, has_table
-from macrostrat.database.utils import run_sql, run_query
+"""
+Migrations for changes that a schema diff cannot make safely. Each states what
+holds before and after it runs, so its status is read from the database.
+"""
+
 from pathlib import Path
 
+from macrostrat.schema_management import any_of, exists, has_columns, negate
 
-class PlateauMigration(SchemaMigration):
+from sparrow.database.migration import SparrowMigration, has_constraint, query_is_true
+
+sql = Path(__file__).parent / "sql"
+
+
+class PlateauMigration(SparrowMigration):
     name = "remove-in-plateau"
+    destructive = True
+    preconditions = [has_columns("public", "analysis", "in_plateau")]
+    postconditions = [negate(has_columns("public", "analysis", "in_plateau"))]
 
-    def should_apply(self, source, target, migrator):
-        args = ('"public"."session"', "in_plateau")
-        return has_column(source, *args) and not has_column(target, *args)
-
-    def apply(self, engine):
-        run_sql(engine, "ALTER TABLE analysis DROP COLUMN in_plateau")
+    def apply(self, db):
+        db.run_sql("ALTER TABLE analysis DROP COLUMN in_plateau")
 
 
-class InstrumentSessionMigration(SchemaMigration):
+_data_file_link_key = "data_file_link_file_hash_session_id_analysis_id_sample_id_key"
+
+
+class InstrumentSessionMigration(SparrowMigration):
     name = "add-instrument-session"
+    preconditions = [has_constraint("public.data_file_link", _data_file_link_key)]
+    postconditions = [
+        negate(has_constraint("public.data_file_link", _data_file_link_key))
+    ]
 
-    def should_apply(self, source, target, migrator):
-        pub = '"public"."instrument_session"'
-        return has_table(target, pub)
-
-    def apply(self, engine):
-        ix = "data_file_link_file_hash_session_id_analysis_id_sample_id_key"
-        run_sql(
-            engine,
+    def apply(self, db):
+        db.run_sql(
             f"""
-        ALTER TABLE data_file_link DROP CONSTRAINT {ix};
+        ALTER TABLE data_file_link DROP CONSTRAINT {_data_file_link_key};
         ALTER TABLE data_file_link DROP CONSTRAINT data_file_link_check;
-        DROP INDEX IF EXISTS {ix};
-        """,
+        DROP INDEX IF EXISTS {_data_file_link_key};
+        """
         )
 
 
-class SampleCheckMigration(SchemaMigration):
+class SampleCheckMigration(SparrowMigration):
+    """The check constraint on samples changed when `lab_id` was added."""
+
     name = "add-sample-check"
+    preconditions = [
+        exists("public", "sample"),
+        has_constraint("public.sample", "sample_check"),
+    ]
+    postconditions = [
+        any_of(
+            [
+                has_columns("public", "sample", "lab_id"),
+                negate(has_constraint("public.sample", "sample_check")),
+            ]
+        )
+    ]
 
-    def should_apply(self, source, target, migrator):
-        pub = '"public"."sample"'
-        return not has_column(source, pub, "lab_id")
-
-    def apply(self, engine):
-        run_sql(engine, "ALTER TABLE sample DROP CONSTRAINT sample_check")
+    def apply(self, db):
+        db.run_sql("ALTER TABLE sample DROP CONSTRAINT sample_check")
 
 
-class SampleLocationAddSRID(SchemaMigration):
+class SampleLocationAddSRID(SparrowMigration):
     name = "add-srid-to-sample-location"
+    preconditions = [has_columns("public", "sample", "location")]
+    postconditions = [
+        query_is_true(
+            """SELECT srid = 4326 FROM geometry_columns
+            WHERE f_table_schema = 'public'
+              AND f_table_name = 'sample'
+              AND f_geometry_column = 'location'"""
+        )
+    ]
 
-    def should_apply(self, source, target, migrator):
-        sql = "SELECT srid FROM geometry_columns WHERE f_table_name = 'sample' AND f_geometry_column = 'location'"
-        res = run_query(source, sql).fetchone()
-        return res is None or res[0] != 4326
-
-    def apply(self, engine):
-        try:
-            sql_file = Path(__file__).parent / "sql" / "add-sample-srid.sql"
-            run_sql(engine, sql_file.read_text(), raise_errors=True)
-        except DataError:
-            pass
+    def apply(self, db):
+        db.run_sql(sql / "add-sample-srid.sql")
 
 
-class SampleAttributeCascadeMigration(SchemaMigration):
+class SampleAttributeCascadeMigration(SparrowMigration):
     name = "sample-attribute-cascade"
+    preconditions = [exists("public", "__analysis_attribute")]
+    postconditions = [
+        query_is_true(
+            """SELECT count(*) > 0 FROM pg_constraint
+            WHERE conrelid = '__analysis_attribute'::regclass
+              AND confdeltype = 'c'"""
+        )
+    ]
 
-    def should_apply(self, source, target, migrator):
-        """If there are no foreign key cascades on __sample_attribute"""
-        sql = """SELECT count(*) = 0 FROM pg_constraint
-        WHERE conrelid = '__analysis_attribute'::regclass
-        AND pg_get_constraintdef(oid) ILIKE '%ON DELETE CASCADE%'
-        """
-        res = run_query(source, sql).fetchone()
-        return res[0]
+    def apply(self, db):
+        db.run_sql(sql / "add-sample-delete-cascades.sql")
 
-    def apply(self, engine):
-        try:
-            sql_file = Path(__file__).parent / "sql" / "add-sample-delete-cascades.sql"
-            run_sql(engine, sql_file.read_text())
-        except DataError:
-            pass
+
+core_migrations = [
+    PlateauMigration,
+    InstrumentSessionMigration,
+    SampleCheckMigration,
+    SampleLocationAddSRID,
+    SampleAttributeCascadeMigration,
+]

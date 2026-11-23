@@ -1,6 +1,7 @@
 """
 An API for managing users
 """
+
 from starlette.routing import Route, Router
 from starlette.authentication import requires
 from starlette.responses import JSONResponse

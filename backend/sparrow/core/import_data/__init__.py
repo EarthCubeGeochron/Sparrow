@@ -24,7 +24,7 @@ def construct_error_response(err: Exception, code: int):
             "error": {
                 "type": get_qualified_name(err),
                 "code": code,
-                "messages": msg
+                "messages": msg,
                 # Note: the original data *could* be packaged in the response, but
                 # for now we have chosen not to do that. It seems useless to send back
                 # (possibly large) datasets the client already has.

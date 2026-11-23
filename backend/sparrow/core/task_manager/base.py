@@ -15,8 +15,7 @@ from .logging import RedisQueueLogger, local_logger
 log = get_logger(__name__)
 
 
-class SparrowTaskError(Exception):
-    ...
+class SparrowTaskError(Exception): ...
 
 
 _tasks_to_register = {}

@@ -1,5 +1,6 @@
-from macrostrat.dinosaur import SchemaMigration
-from sqlalchemy import inspect
+from macrostrat.schema_management import has_columns, negate
+from sparrow.database.migration import SparrowMigration
+from sqlalchemy import inspect, text
 from sparrow.core.plugins import SparrowCorePlugin
 from macrostrat.utils import relative_path, cmd
 from sparrow.core import get_database
@@ -118,24 +119,41 @@ def get_old_audit_id(engine):
     return run_query(engine, get_procedure("get-old-audit-id")).fetchall()
 
 
-class PGMementoMigration(SchemaMigration):
+def _pgmemento_version(db):
+    try:
+        return db.session.execute(
+            text(
+                "SELECT major_version, minor_version, revision FROM pgmemento.version()"
+            )
+        ).first()
+    except ProgrammingError:
+        db.session.rollback()
+        return None
+
+
+def _pgmemento_needs_bugfix(db):
+    version = _pgmemento_version(db)
+    if version is None:
+        return False
+    return (version.major_version, version.minor_version) == (
+        0,
+        7,
+    ) and version.revision < 4
+
+
+class PGMementoMigration(SparrowMigration):
     """Migrate audit logging to version 0.7.4 from the 0.6 series"""
 
     name = "pgmemento-upgrade-migration"
-    target = None
+    subsystem = "versioning"
+    preconditions = [
+        has_columns("public", "sample", "audit_id"),
+        lambda db: len(get_old_triggers(db.session)) > 0,
+        lambda db: len(get_old_audit_id(db.session)) > 0,
+    ]
+    postconditions = [negate(has_columns("public", "sample", "audit_id"))]
 
-    def should_apply(self, source, target, migrator):
-        db = Database(source.url)
-        old_triggers = get_old_triggers(db.session)
-        old_audit_id = get_old_audit_id(db.session)
-        return (
-            has_audit_id(source, "public", "sample", col_name="audit_id")
-            and len(old_triggers) > 0
-            and len(old_audit_id) > 0
-        )
-
-    def apply(self, engine):
-        db = Database(engine.url)
+    def apply(self, db):
 
         old_triggers = [
             "schema_drop_pre_trigger",
@@ -184,35 +202,21 @@ class PGMementoMigration(SchemaMigration):
         build_audit_tables(db)
 
 
-class PGMemento074Migration(SchemaMigration):
+class PGMemento074Migration(SparrowMigration):
     """
     Migrate PGMemento to a bugfix release to handle PostgreSQL 15.
     This migration only runs if we are on version 0.7.3.
     """
 
-    def should_apply(self, source, target, migrator):
-        # Get the version of PGMemento
-        try:
-            version = run_query(
-                source,
-                "SELECT major_version, minor_version, revision FROM pgmemento.version()",
-            ).first()
-        except ProgrammingError:
-            return False
-        if version is None:
-            return False
+    name = "pgmemento-074-migration"
+    subsystem = "versioning"
+    depends_on = ["pgmemento-upgrade-migration"]
+    preconditions = [_pgmemento_needs_bugfix]
+    postconditions = [negate(_pgmemento_needs_bugfix)]
 
-        return (
-            version.major_version == 0
-            and version.minor_version == 7
-            and version.revision < 4
-        )
-
-    def apply(self, engine):
+    def apply(self, db):
         fp = relative_path(__file__, "pg-memento-legacy/UPGRADE_v07_to_v074.sql")
-        run_psql(engine, fp)
-        db = Database(engine.url)
-        db.initialize()
+        run_psql(db.engine, fp)
 
 
 def build_audit_tables(db):
@@ -259,6 +263,5 @@ class VersioningPlugin(SparrowCorePlugin):
     def on_setup_cli(self, cli):
         cli.add_command(drop_audit_trail)
 
-    def on_prepare_database_migrations(self, migrator):
-        migrator.add_migration(PGMementoMigration)
-        migrator.add_migration(PGMemento074Migration)
+    def on_define_migrations(self, migrations):
+        migrations.extend([PGMementoMigration, PGMemento074Migration])

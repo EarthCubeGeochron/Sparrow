@@ -8,6 +8,7 @@ This server's technology stack is similar to that of FastAPI,
 but it uses the more mature Marshmallow schema-generation
 package instead of FastAPI's Pydantic.
 """
+
 from starlette.applications import Starlette
 from starlette.routing import Router
 from starlette.responses import JSONResponse

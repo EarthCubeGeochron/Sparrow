@@ -16,6 +16,15 @@ and this project is working towards adherence to
 - The backend image builds directly from `python:3.12`; the `backend-base` image is retired
 - Lab plugins (`SPARROW_PLUGIN_DIR`) are mounted under `python3.12/site-packages`
 - `sparrow-loader`'s bundled model cache is regenerated for SQLAlchemy 2
+- Schema management moves to `macrostrat.schema_management`, replacing
+  `macrostrat.dinosaur` in the backend:
+  - The schema is a set of chunks; plugins add theirs with the `define-schema` hook
+  - Migrations state preconditions and postconditions; plugins add theirs with the
+    `define-migrations` hook, which replaces `prepare-database-migrations`
+  - `sparrow schema` commands (`graph`, `plan`, `apply`, `sync`, `migrate`, `provision`)
+  - `sparrow db-update` runs migrations, then applies the schema diff, and still
+    rehearses on a copy of the schema first
+- `vocabulary.authority` is granted to `admin` and `view_public` on first initialization
 
 ## `[3.2.1]` - 2024-08-12
 

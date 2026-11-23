@@ -32,7 +32,6 @@ infrastructure provides a way to build something much cleaner and more sophistic
 
 """
 
-
 # Implement authentication using JSON Web Tokens
 # https://codeburst.io/jwt-authorization-in-flask-c63c1acf4eeb
 # Authentication is managed on the browser using cookies

@@ -1364,24 +1364,29 @@ sqlalchemy-utils = ">=0.41.1,<0.43"
 sqlparse = ">=0.5.1,<0.6"
 
 [[package]]
-name = "macrostrat-dinosaur"
-version = "4.3.0"
-description = "Diff-based database migrations"
+name = "macrostrat-schema-management"
+version = "2.0.1"
+description = "Declarative schemas, schema diffs and condition-checked migrations for PostgreSQL"
 optional = false
-python-versions = "<4,>=3.10"
+python-versions = "<4,>=3.11"
 files = [
-    {file = "macrostrat_dinosaur-4.3.0-py3-none-any.whl", hash = "sha256:591b17c45f37976e4a71ecce3aa4745fa9701dfe998d6006cadff8c99291dae2"},
-    {file = "macrostrat_dinosaur-4.3.0.tar.gz", hash = "sha256:9cf4db221f79be6bb521fc7e7ee2f43b28a80d77592e650ca4a727517fb2be44"},
+    {file = "macrostrat_schema_management-2.0.1-py3-none-any.whl", hash = "sha256:cb291f8e9203d3d151e5561335364cc769e871a2025bb6284784e5190aed9e8e"},
+    {file = "macrostrat_schema_management-2.0.1.tar.gz", hash = "sha256:ee6f019e24d774804b1d6763e17fddfaba24caf23db6dc02d27d97460790748b"},
 ]
 
 [package.dependencies]
+click = ">=8.1.0,<10"
 docker = ">=7.0.0,<8"
 macrostrat-database = ">=4.7.0,<5.0.0"
 macrostrat-utils = ">=1.3.3,<2"
-results = ">=1.4.0,<2.1.0"
-setuptools = ">=78.1.0,<83"
+psycopg = ">=3.1,<4"
+pydantic = ">=2,<3"
+results = ">=2.0.0,<2.1.0"
+rich = ">=13,<16"
 sqlalchemy = ">=2.0.0,<3"
+sqlparse = ">=0.5,<1"
 testcontainers = ">=4.14.2"
+typer = ">=0.22,<0.27"
 
 [[package]]
 name = "macrostrat-utils"
@@ -3258,19 +3263,18 @@ test = ["argcomplete (>=3.0.3)", "argcomplete (>=3.5.2)", "mypy (>=2.0)", "pre-c
 
 [[package]]
 name = "typer"
-version = "0.29.2"
+version = "0.26.8"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = false
-python-versions = ">=3.11"
+python-versions = ">=3.10"
 files = [
-    {file = "typer-0.29.2-py3-none-any.whl", hash = "sha256:f30731f8ca758368b836b3714872e58e395cef8fcaff918c853b1969ed5274e7"},
-    {file = "typer-0.29.2.tar.gz", hash = "sha256:b1998dc5f2c3dedafa1517a9521fa944cc4dc1fadcea085d81a3b10ebcaeb075"},
+    {file = "typer-0.26.8-py3-none-any.whl", hash = "sha256:3512ca79ac5c11113414b36e80281b872884477722440691c89d1112e321a49c"},
+    {file = "typer-0.26.8.tar.gz", hash = "sha256:c244a6bd558886fe3f8780efb6bdd28bb9aff005a94eedebaa5cb32926fe2f7e"},
 ]
 
 [package.dependencies]
 annotated-doc = ">=0.0.2"
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
-pydantic = ">=2.5.3"
 rich = ">=13.8.0"
 shellingham = ">=1.3.0"
 
@@ -3725,4 +3729,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.14"
-content-hash = "f43a0d95978cd9da841a1f2b1bad7c994144620c227d8ff56481bcfae580fd75"
+content-hash = "a9fe2fca72c7e3580c236c8170f3116e5d640262729450a3e4db322c92a57a65"
