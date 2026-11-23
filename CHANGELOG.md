@@ -24,6 +24,14 @@ and this project is working towards adherence to
   - `sparrow schema` commands (`graph`, `plan`, `apply`, `sync`, `migrate`, `provision`)
   - `sparrow db-update` runs migrations, then applies the schema diff, and still
     rehearses on a copy of the schema first
+- New `sparrow-pipelines` package (`backend/pipelines`): explicit Pydantic models
+  for the records Sparrow imports, and a `Pipeline` that turns files into them
+  with no database or server involved
+  - `sparrow-pipeline run` rehearses a pipeline locally (a dry run by default) or
+    sends its records to a lab's import API
+  - On the server, plugins add pipelines with the `define-pipelines` hook;
+    `sparrow run-pipeline` and the `run-pipeline` task load them and track data files
+  - The PyChron importer is a pipeline; `PyChronImporter` is removed
 - The `SPARROW_CACHE_DATABASE_MODELS` option and `sparrow db drop-cache` are removed
 - Code is formatted and imports sorted with `ruff`, replacing `black`
 - `vocabulary.authority` is granted to `admin` and `view_public` on first initialization

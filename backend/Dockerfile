@@ -17,6 +17,9 @@ RUN mkdir -p /app/loader/sparrow/loader && touch /app/loader/sparrow/loader/__in
 COPY loader/pyproject.toml /app/loader/
 COPY loader/README.md /app/loader/
 
+RUN mkdir -p /app/pipelines/sparrow/pipelines && touch /app/pipelines/sparrow/pipelines/__init__.py
+COPY pipelines/pyproject.toml pipelines/README.md /app/pipelines/
+
 # Project initialization:
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root
 

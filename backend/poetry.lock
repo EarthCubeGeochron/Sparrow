@@ -2908,6 +2908,25 @@ type = "directory"
 url = "loader"
 
 [[package]]
+name = "sparrow-pipelines"
+version = "0.1.0"
+description = "Data models and pipelines for bringing data into Sparrow"
+optional = false
+python-versions = ">=3.11,<4"
+files = []
+develop = true
+
+[package.dependencies]
+httpx = ">=0.25"
+pydantic = "^2.9.0"
+rich = ">=13.7.1"
+typer = ">=0.12.5"
+
+[package.source]
+type = "directory"
+url = "pipelines"
+
+[[package]]
 name = "sqlakeyset"
 version = "2.0.1787969905"
 description = "offset-free paging for sqlalchemy"
@@ -3685,4 +3704,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.14"
-content-hash = "cb6bbe7a2af659156d7c447e3356c2cc9a80cc0b79ddc2f6e1f915c4302b5a63"
+content-hash = "278816e562f75e8f57364a9b5c6ff1fb5324b09dccdeaf12e3cc196803087cbb"

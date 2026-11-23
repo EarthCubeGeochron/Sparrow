@@ -16,6 +16,7 @@ from ..web import WebPlugin
 from ..logs import get_logger
 from ..import_data import ImportDataPlugin
 from ..users import UserManagementPlugin
+from ..import_helpers.pipelines import PipelinesPlugin
 
 # isort: on
 
@@ -32,6 +33,7 @@ def prepare_plugin_manager(app):
         WebPlugin,
         HeartbeatPlugin,
         InterfacePlugin,
+        PipelinesPlugin,
         DatasheetPlugin,
         # ProjectEdits,
         DataValidationPlugin,

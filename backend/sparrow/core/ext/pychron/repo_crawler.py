@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 from itertools import groupby
+from pathlib import Path
 
 # Find IA files by regex
 iare = re.compile(r"(?P<cnt>_\d{5}\.ia\.json)")
@@ -16,6 +17,23 @@ def counterkey(x):
     # re returns cnt in form '_00000.ia.json'
     cnt = cnt.split(".")[0][1:]
     return int(cnt)
+
+
+def _latest_ia_files(root):
+    """The latest interpreted age file of each group beneath a directory."""
+    for d, ds, fs in os.walk(str(root)):
+        ias = [fi for fi in fs if iare.search(fi)]
+        b = os.path.basename(os.path.dirname(d))
+        for gi, gs in groupby(sorted(ias, key=key), key=key):
+            uid = "{}{}".format(b, gi)
+            # sort group by the counter suffix
+            gs = sorted(gs, key=counterkey, reverse=True)
+            yield uid, os.path.join(d, gs[0])
+
+
+def latest_ia_files(root):
+    for _uid, local_path in _latest_ia_files(root):
+        yield Path(local_path)
 
 
 class PyChronRepoCrawler:
@@ -57,19 +75,8 @@ class PyChronRepoCrawler:
             subprocess.run(["git", "remote", "set-url", "origin", giturl], cwd=root)
             subprocess.run(["git", "pull", "origin", "master"], cwd=root)
 
-        # scan repo looking for ia files
-        for d, ds, fs in os.walk(root):
-            ias = [fi for fi in fs if iare.search(fi)]
-            # only import the latest ia file for each group
+        for uid, local_path in _latest_ia_files(root):
+            tail = local_path.split(root)[1]
+            remote_url = f"{url}/blob/master{tail}"
 
-            b = os.path.basename(os.path.dirname(d))
-            for gi, gs in groupby(sorted(ias, key=key), key=key):
-                uid = "{}{}".format(b, gi)
-                # sort group by the counter suffix
-                gs = sorted(gs, key=counterkey, reverse=True)
-                local_path = os.path.join(d, gs[0])
-
-                tail = local_path.split(root)[1]
-                remote_url = f"{url}/blob/master{tail}"
-
-                yield uid, local_path, remote_url
+            yield uid, local_path, remote_url
