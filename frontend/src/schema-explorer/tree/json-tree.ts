@@ -25,7 +25,7 @@ export function JsonTree({
           return res.fields;
         }
       },
-    }
+    },
   );
   if (!data) return h("div");
 
@@ -48,7 +48,7 @@ export function JsonTree({
         name: fieldName,
         displayDataTypes: false,
         onEdit,
-      })
+      }),
     ),
     h("em.caption", ["Edit the fields and copy to your clipboard!"]),
   ]);

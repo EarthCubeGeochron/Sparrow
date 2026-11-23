@@ -38,7 +38,7 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
   const samples = useAPIv2Result(
     "/models/sample",
     { all: "true", not_has: "location" },
-    { unwrapResponse: unwrapSamples }
+    { unwrapResponse: unwrapSamples },
   );
 
   const onChange = (sampleName) => {

@@ -17,7 +17,7 @@ const LoginButton = function (props) {
       className: "login-button",
       ...props,
     },
-    "Login"
+    "Login",
   );
 };
 
@@ -48,7 +48,7 @@ const LoginSuggest = function () {
     [
       h("p", "Embargoed data and management tools are hidden."),
       h(LoginButton, { intent: "warning", minimal: true }),
-    ]
+    ],
   );
 };
 

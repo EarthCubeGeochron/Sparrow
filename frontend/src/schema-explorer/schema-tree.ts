@@ -50,7 +50,7 @@ function SchemaTree() {
               link: state.route,
               ...defaultSchema,
             }),
-          ])
+          ]),
         ),
       ]),
     ]),

@@ -21,7 +21,7 @@ const HomePage = () => {
       h(
         Frame,
         { id: "landingText" },
-        "This is where your lab's description text can go"
+        "This is where your lab's description text can go",
       ),
       h(Frame, { id: "landingGraphic" }, h(MapHome)),
     ]),

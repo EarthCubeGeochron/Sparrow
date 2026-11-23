@@ -43,7 +43,7 @@ class RouteName extends Component {
         [
           h(Icon, { icon: "arrow-left" }),
           h("span.bp4-button-text", api_route.replace(route, "")),
-        ]
+        ],
       );
     }
     return h("h2.route-name", [
@@ -77,7 +77,7 @@ const ChildRoutesList = function ({ base, routes }) {
         return h("li.route", [
           h(StyledLinkCard, { to }, [h("h4", d.route), h("p", d.description)]),
         ]);
-      })
+      }),
     ),
   ]);
 };

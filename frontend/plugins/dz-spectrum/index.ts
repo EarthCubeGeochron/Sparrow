@@ -103,7 +103,7 @@ function DZPlotInner(props) {
           ...labelProps,
         }),
         children,
-      ]
+      ],
     ),
   ]);
 }
@@ -143,9 +143,9 @@ function DetritalZirconComponent(props) {
       createElement(
         "foreignObject",
         { x: 0, y: -20, width: 500, height: 50 },
-        h("h4", null, [`${data.length} grains`])
+        h("h4", null, [`${data.length} grains`]),
       ),
-    ]
+    ],
   );
 }
 
@@ -169,7 +169,7 @@ function DZSessionData({ id, date, sample }) {
       {
         style: { height },
       },
-      h(DZPlotInner, { session_id: id, height, width, data })
+      h(DZPlotInner, { session_id: id, height, width, data }),
     ),
   ]);
 }

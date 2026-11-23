@@ -28,7 +28,7 @@ const ResponsiveHistogram = withParentSize(
       width: parentWidth,
       height: parentHeight,
       ...rest,
-    })
+    }),
 );
 
 class AgeChart extends Component {
@@ -69,7 +69,7 @@ class AgeChart extends Component {
         }),
         h(XAxis, { label: "Age" }),
         h(YAxis, { label: "Measurements" }),
-      ]
+      ],
     );
   }
 }
@@ -123,7 +123,7 @@ function ChartOuter(props) {
             },
           }),
         ]),
-      ]
+      ],
     ),
     h("div.chart-container", { style: { height: 460 } }, [
       h(AgeChart, { data, range }),

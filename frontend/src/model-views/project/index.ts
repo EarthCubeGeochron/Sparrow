@@ -76,7 +76,7 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
           h("h5", [pubData]),
         ]),
       ]),
-    ]
+    ],
   );
 }
 
@@ -86,7 +86,7 @@ export const ContentArea = ({ data, title, className, minimal = false }) =>
     h.if(!minimal)(
       "ul",
       { className },
-      data.map((d) => h("li", d))
+      data.map((d) => h("li", d)),
     ),
   ]);
 
@@ -102,7 +102,7 @@ const ProjectComponent = function (props: ProjectProps) {
     {
       nest: "publication,session,sample,researcher,tag",
     },
-    {}
+    {},
   );
 
   if (id == null || data == null) {

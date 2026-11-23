@@ -32,7 +32,7 @@ const CatalogMain = ({ base, ...rest }) => {
     h("div.catalog-index", [
       h(
         InsetText,
-        "The lab's data catalog can be browsed using several entrypoints:"
+        "The lab's data catalog can be browsed using several entrypoints:",
       ),
       h(DataModelLinks, { base: "/catalog" }),
     ]),
@@ -40,7 +40,7 @@ const CatalogMain = ({ base, ...rest }) => {
 };
 
 const CatalogBody = (
-  { base } // Render main body
+  { base }, // Render main body
 ) =>
   h(Switch, [
     h(Route, {

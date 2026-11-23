@@ -227,6 +227,6 @@ export function NewSamplePage() {
         dispatch,
       },
     },
-    [h(NewSamplePageMainComponent, { onSubmit })]
+    [h(NewSamplePageMainComponent, { onSubmit })],
   );
 }

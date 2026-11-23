@@ -71,7 +71,7 @@ export function NewSampleMap(props) {
         uncombineFeaturesControl: false,
         combineFeaturesControl: false,
       }),
-    ]
+    ],
   );
 }
 
@@ -181,7 +181,7 @@ export const SampleElevation = (props) => {
     },
     {
       unwrapResponse: unwrapElevation,
-    }
+    },
   );
   useEffect(() => {
     if (elev) {
@@ -236,12 +236,12 @@ export const SampleMaterial = (props) => {
     {
       like: query,
     },
-    { unwrapResponse: unwrapMaterialDataSp }
+    { unwrapResponse: unwrapMaterialDataSp },
   );
   const macrostratMat = useAPIv2Result(
     "https://macrostrat.org/api/v2/defs/lithologies",
     { all: true },
-    { unwrapResponse: unwrapMacroMaterials }
+    { unwrapResponse: unwrapMacroMaterials },
   );
 
   const [materials, setMaterials] = useState([]);

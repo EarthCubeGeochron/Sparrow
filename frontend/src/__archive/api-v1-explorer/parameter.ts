@@ -217,7 +217,7 @@ const BaseParameter = function (props) {
       description != null ? h("p.description", description) : undefined,
       details,
       deleteButton,
-    ]
+    ],
   );
 };
 

@@ -283,13 +283,13 @@ export function EditableSessionDetails(props) {
         TagsChangeSet(
           changeset,
           updatedModel,
-          buildURL("/tags/models/session", {})
+          buildURL("/tags/models/session", {}),
         );
         let rest;
         let { id } = updatedModel;
         const response = await put(
           buildURL(`/models/session/${id}`, {}),
-          changeset
+          changeset,
         );
         const { data } = response;
         ({ id, ...rest } = data);
@@ -302,6 +302,6 @@ export function EditableSessionDetails(props) {
         h.if(Edit)(EditableSessionInfoComponent),
         h.if(!Edit)(CatalogSessionInfoCard),
       ]),
-    ]
+    ],
   );
 }

@@ -21,7 +21,7 @@ const SessionListComponent = function () {
         icon: "info-sign",
         title: "Analytical sessions",
       },
-      "This page lists analytical sessions (individual instrument runs on a single sample)"
+      "This page lists analytical sessions (individual instrument runs on a single sample)",
     ),
     h(PostgRESTFilterList, {
       route,

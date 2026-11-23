@@ -95,9 +95,9 @@ const AdminNavbar = (props) => {
       h(
         NavButton,
         { to: base + "/terms/parameter", icon: "data-lineage" },
-        "Terms"
+        "Terms",
       ),
-    ]
+    ],
   );
 };
 
@@ -117,7 +117,7 @@ const QuickHeader = (props) => {
     [
       h("h2", { style: { marginTop: "0px", marginBottom: "0px" } }, text),
       h(Divider),
-    ]
+    ],
   );
 };
 
@@ -144,9 +144,9 @@ const AdminBody = ({ base, ...rest }) => {
               marginLeft: "15px",
             },
           },
-          [h(QuickHeader, { text: "Quick Search" }), h(OpenSearch)]
+          [h(QuickHeader, { text: "Quick Search" }), h(OpenSearch)],
         ),
-      ]
+      ],
     ),
   ]);
 };

@@ -15,7 +15,7 @@ function ErrorCallout(props) {
       icon: "error",
       intent: "danger",
     },
-    [h("p", [des])]
+    [h("p", [des])],
   );
 }
 

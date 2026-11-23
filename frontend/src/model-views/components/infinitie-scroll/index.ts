@@ -40,7 +40,7 @@ const ProjectListComponent = ({ params, componentProps = {} }) => {
         filterParams: { ...params },
         context: APIV2Context,
       },
-      [h(ProjectListChildren, { data: [], componentProps })]
+      [h(ProjectListChildren, { data: [], componentProps })],
     ),
   ]);
 };
@@ -65,7 +65,7 @@ function SampleListComponent({ params, componentProps = {} }) {
         filterParams: { ...params },
         context: APIV2Context,
       },
-      [h(SampleListChildren, { data: [], componentProps })]
+      [h(SampleListChildren, { data: [], componentProps })],
     ),
   ]);
 }
@@ -88,7 +88,7 @@ function SessionListComponent({ params, componentProps = {} }) {
         filterParams: { ...params },
         context: APIV2Context,
       },
-      [h(SessionListChildren, { data: [], componentProps })]
+      [h(SessionListChildren, { data: [], componentProps })],
     ),
   ]);
 }
@@ -121,7 +121,7 @@ function DataFilesListComponent({ params }) {
         filterParams: { ...params },
         context: APIV2Context,
       },
-      [h(DataFileListChildren)]
+      [h(DataFileListChildren)],
     ),
   ]);
 }
@@ -144,7 +144,7 @@ function PublicationAddList({ params, componentProps }) {
         filterParams: { ...params },
         context: APIV2Context,
       },
-      [h(PublicationAddListChildren, { data: [], componentProps })]
+      [h(PublicationAddListChildren, { data: [], componentProps })],
     ),
   ]);
 }
@@ -167,7 +167,7 @@ function ResearcherAddList({ params, componentProps }) {
         filterParams: { ...params },
         context: APIV2Context,
       },
-      [h(ResearcherAddListChildren, { data: [], componentProps })]
+      [h(ResearcherAddListChildren, { data: [], componentProps })],
     ),
   ]);
 }

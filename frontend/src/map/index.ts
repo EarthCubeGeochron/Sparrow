@@ -41,7 +41,7 @@ const MapHome = (props) => {
       h(
         Tooltip,
         { content: "Go to Map" },
-        h(Link, { to: "/map" }, h(Button, { icon: "maximize", minimal: true }))
+        h(Link, { to: "/map" }, h(Button, { icon: "maximize", minimal: true })),
       ),
     ]),
     h(
@@ -53,7 +53,7 @@ const MapHome = (props) => {
         h(MapArea, {
           style,
         }),
-      ]
+      ],
     ),
   ]);
 };
@@ -90,7 +90,7 @@ const MapLink = function (props) {
   return h(
     HashLink,
     { to: `/map#${zoom}/${latitude}/${longitude}`, ...rest },
-    children
+    children,
   );
 };
 

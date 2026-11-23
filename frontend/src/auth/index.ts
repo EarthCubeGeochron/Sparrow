@@ -25,7 +25,7 @@ function AuthStatus(props) {
         icon,
         onClick: () => runAction({ type: "request-form" }),
       },
-      text
+      text,
     ),
   ]);
 }

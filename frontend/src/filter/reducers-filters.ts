@@ -96,7 +96,7 @@ export function reducer(state: FilterState, action: FilterActions) {
       let param = action.field;
       const newParams = objectFilter(
         state.params,
-        ([key, value]) => key != param
+        ([key, value]) => key != param,
       );
       return {
         ...state,

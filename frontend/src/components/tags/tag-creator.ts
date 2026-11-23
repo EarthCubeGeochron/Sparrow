@@ -129,14 +129,14 @@ function TagEditor(props: tagEditor) {
               colors,
             }),
           },
-          [h(InputGroup, { value: tag.color, onChange: () => {} })]
+          [h(InputGroup, { value: tag.color, onChange: () => {} })],
         ),
       ]),
       h(ButtonGroup, [
         h(
           Button,
           { onClick: clickCancel, style: { marginRight: "10px" } },
-          "Cancel"
+          "Cancel",
         ),
         h(Button, { onClick: clickSubmit, intent: "success" }, "Submit"),
       ]),

@@ -145,7 +145,7 @@ function AuthProvider(props) {
   return h(
     AuthContext.Provider,
     { value: { ...state, runAction } },
-    props.children
+    props.children,
   );
 }
 

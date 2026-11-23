@@ -42,7 +42,7 @@ export function SampleFilterList({ onClick, link = false }: FilterListProps) {
         },
         params: {},
       }),
-    ]
+    ],
   );
 }
 
@@ -69,7 +69,7 @@ export function PublicationFilterList({
         },
         params: {},
       }),
-    ]
+    ],
   );
 }
 
@@ -96,7 +96,7 @@ export function ResearcherFilterList({
         },
         params: {},
       }),
-    ]
+    ],
   );
 }
 
@@ -117,7 +117,7 @@ export function ProjectFilterList({ onClick, link = false }: FilterListProps) {
         },
         params: {},
       }),
-    ]
+    ],
   );
 }
 
@@ -138,12 +138,12 @@ export function SessionFilterList({ onClick, link = false }: FilterListProps) {
         },
         params: {},
       }),
-    ]
+    ],
   );
 }
 
 export function ModelFilterLists(
-  props: FilterListProps & { listName: string }
+  props: FilterListProps & { listName: string },
 ) {
   const { listName, onClick } = props;
 

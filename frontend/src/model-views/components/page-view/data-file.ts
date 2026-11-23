@@ -75,7 +75,7 @@ function DownloadButtonContent(props) {
           marginLeft: "0.5em",
         },
       }),
-    ]
+    ],
   );
 }
 
@@ -107,7 +107,7 @@ function useDataFileModelLinks(props) {
 
   const q = buildQueryString(
     { sample_id, session_id, analysis_id },
-    { arrayFormat: "comma" }
+    { arrayFormat: "comma" },
   );
 
   const res = useAPIv2Result("/data_file/filter?" + q);
@@ -138,7 +138,7 @@ function DataFileCard(props) {
         h("div", [h(FormattedDate, { date })]),
         h("div", [h("div", [h("h4", basename)])]),
       ]),
-    ])
+    ]),
   );
 }
 
@@ -184,6 +184,6 @@ export function DataFilePage(props) {
       title: "Data files",
       hasData: data.length > 0,
     },
-    h(DataFilePageCards, { data, model })
+    h(DataFilePageCards, { data, model }),
   );
 }

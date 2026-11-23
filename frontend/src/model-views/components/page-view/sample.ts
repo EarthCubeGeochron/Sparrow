@@ -37,7 +37,7 @@ export const SampleAdd = (props) => {
       draggable,
       onClick: onClickDelete,
       setID,
-    })
+    }),
   );
 };
 
@@ -78,7 +78,7 @@ export function PageViewSamples({
           isEditing,
         }),
       ]);
-    })
+    }),
   );
 }
 
@@ -109,7 +109,7 @@ function Location(props) {
 
   return h(
     "h5.lon-lat",
-    `[${Number(longitude).toFixed(3)} , ${Number(latitude).toFixed(3)}]`
+    `[${Number(longitude).toFixed(3)} , ${Number(latitude).toFixed(3)}]`,
   );
 }
 
@@ -181,7 +181,7 @@ export function SampleCard(props: SampleCardProps) {
       h(FormattedLngLat, { location }),
       h.if(material != null)("div.material", material),
       h(SessionContent, { session }),
-    ])
+    ]),
   );
 }
 
@@ -191,7 +191,7 @@ export function SubSamplePageView(props) {
   let data = useAPIv2Result(
     `/models/sample/sub-sample/${sample_id}`,
     {},
-    { unwrapResponse: (data) => data.sample_collection }
+    { unwrapResponse: (data) => data.sample_collection },
   );
 
   if (data == null) data = [];
@@ -214,6 +214,6 @@ export function SubSamplePageView(props) {
       isEditing,
       onClick: () => {},
       draggable: false,
-    })
+    }),
   );
 }

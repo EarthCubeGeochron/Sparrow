@@ -65,7 +65,7 @@ const ProjectMap = function (props) {
         const { id } = d;
         [longitude, latitude] = d.location.coordinates;
         return h(StaticMarker, { latitude, longitude, id, hoverID });
-      })
+      }),
     ),
   ]);
 };

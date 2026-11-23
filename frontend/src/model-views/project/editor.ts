@@ -241,7 +241,7 @@ function SampleMapComponent() {
           h(PageViewBlock, { title: "Location" }, [
             h(ProjectMap, { samples: sampleData, hoverID: sampleHoverID }),
           ]),
-        ]
+        ],
       ),
       h(EditableSamples, { samples: sampleData }),
     ]),
@@ -413,13 +413,13 @@ const EditableProjectDetails = function (props) {
         TagsChangeSet(
           changeset,
           updatedModel,
-          buildURL("/tags/models/project", {})
+          buildURL("/tags/models/project", {}),
         );
         let rest;
         let { id } = updatedModel;
         const response = await put(
           buildURL(`/models/project/${id}`, {}),
-          updatedModel
+          updatedModel,
         );
         const { data } = response;
         console.log(data);
@@ -458,9 +458,9 @@ const EditableProjectDetails = function (props) {
               h(Frame, { id: "projectPage", data: project.data }, null),
             ]),
           ]),
-        ]
+        ],
       ),
-    ]
+    ],
   );
 };
 

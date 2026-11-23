@@ -43,7 +43,7 @@ function MarkerOverlay() {
           offsetLeft: -5,
           offsetTop: -5,
         });
-      })
+      }),
     );
   });
 }

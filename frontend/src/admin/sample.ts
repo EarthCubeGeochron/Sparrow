@@ -75,6 +75,6 @@ export function SampleAdminPage() {
         listComponent: h(SampleAdminList),
         mainPageComponent: h(SampleMainPanel),
       }),
-    ]
+    ],
   );
 }

@@ -57,7 +57,7 @@ class DataTable__ extends Component {
       var sz;
       const v = data[0][k];
       columns.push(
-        h(Column, { key: k, name: k, cellRenderer: cellRenderer(k) })
+        h(Column, { key: k, name: k, cellRenderer: cellRenderer(k) }),
       );
       if (typeof v === "boolean") {
         sz = 50;
@@ -75,7 +75,7 @@ class DataTable__ extends Component {
         columnWidths: sizes,
         className,
       },
-      columns
+      columns,
     );
   }
 }
@@ -115,7 +115,7 @@ class APIDataComponentInner extends JSONCollapsePanel {
         params,
         perPage: 20,
       },
-      this.renderDataInterior
+      this.renderDataInterior,
     );
   }
 }

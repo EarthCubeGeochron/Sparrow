@@ -53,7 +53,7 @@ function SampleFilter({ on_map = false }: Filter) {
             h(Icon, { icon: "filter" }),
           ]),
         ]),
-      ]
+      ],
     ),
   ]);
 }
@@ -93,12 +93,12 @@ const TagContainer = (props) => {
           key == "public"
             ? natLang[key][value]
             : key == "search" || key == "like"
-            ? value
-            : natLang[key];
+              ? value
+              : natLang[key];
         return h(
           Tag,
           { onRemove: () => handleRemove(key), className: "tag-individ" },
-          [name]
+          [name],
         );
       }),
     ]);
@@ -121,7 +121,7 @@ function AdminFilterPanel(props: AdminFilterPanelProps) {
         intent: "primary",
         onClick: onSubmit,
       },
-      ["Apply Filters"]
+      ["Apply Filters"],
     );
   };
   const CancelFilterButton = () => {
@@ -132,7 +132,7 @@ function AdminFilterPanel(props: AdminFilterPanelProps) {
         onClick: () => runAction({ type: "toggle-open" }),
         style: { marginLeft: "10px" },
       },
-      ["Cancel"]
+      ["Cancel"],
     );
   };
 
@@ -167,7 +167,7 @@ function AdminFilterPanel(props: AdminFilterPanelProps) {
           h(CancelFilterButton),
         ]),
       ]),
-    ]
+    ],
   );
 }
 
@@ -212,7 +212,7 @@ function AdminFilter(props: AdminFilterProps) {
     }),
     h.if(!filterState.isOpen)(React.Fragment, [
       React.Children.map(props.children, (child) =>
-        React.cloneElement(child, { params: filterState.params })
+        React.cloneElement(child, { params: filterState.params }),
       ),
     ]),
   ]);

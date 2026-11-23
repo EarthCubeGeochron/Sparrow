@@ -47,7 +47,7 @@ function Header({ fields }) {
             key: col.key,
             index,
           },
-          col.name
+          col.name,
         );
       }),
     ]),
@@ -127,6 +127,6 @@ export default function BasicDataSheet({
         const status = isValid(cell.value) ? "ok" : "invalid";
         return { "data-status": status };
       },
-    })
+    }),
   );
 }

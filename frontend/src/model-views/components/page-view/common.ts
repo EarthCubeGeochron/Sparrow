@@ -31,7 +31,7 @@ export const AddCard = (props) => {
   return h(
     Tooltip,
     { content: `Select from existing ${model}s` },
-    h(Button, { onClick, icon: "small-plus", minimal: true })
+    h(Button, { onClick, icon: "small-plus", minimal: true }),
   );
 };
 
@@ -52,7 +52,7 @@ export const NewModelButton = (props) => {
       intent: "success",
       to,
     },
-    `New ${model}`
+    `New ${model}`,
   );
 };
 
@@ -93,11 +93,11 @@ export const PageViewBlock = (props) => {
           [
             h.if(title)("h3", [title]),
             h.if(isEditing)(AddCard, { onClick, model }),
-          ]
+          ],
         ),
         h.if(!hasData)("h4", `No ${model}s`),
         children,
-      ]
+      ],
     );
   }
 

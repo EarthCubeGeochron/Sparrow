@@ -28,14 +28,14 @@ function SessionPageTabs(props) {
     },
     [
       extraTabs.map(({ title, component, id }) =>
-        h(Tab, { id, panel: h(component, props) }, title)
+        h(Tab, { id, panel: h(component, props) }, title),
       ),
       h(
         Tab,
         { id: "analysisDetails", panel: coreComponent },
-        "Analysis details"
+        "Analysis details",
       ),
-    ]
+    ],
   );
 }
 
@@ -53,7 +53,7 @@ function SessionComponent(props) {
         id: "sessionDetail",
         session_id: id,
       },
-      SessionPageTabs
+      SessionPageTabs,
     ),
   ]);
 }

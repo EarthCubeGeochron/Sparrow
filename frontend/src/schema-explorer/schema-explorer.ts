@@ -43,7 +43,7 @@ function SchemaModelButtons() {
                   intent: state.model == key ? "primary" : "none",
                   key: i,
                 },
-                h("span.monospace", key)
+                h("span.monospace", key),
               ),
             ]),
           ]);

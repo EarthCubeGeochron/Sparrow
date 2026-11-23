@@ -36,7 +36,7 @@ export const SessionAdd = (props) => {
           onDrop,
           isEditing,
         }),
-      ]
+      ],
     );
   }
 
@@ -58,7 +58,7 @@ export const SessionAdd = (props) => {
         onDrop,
         isEditing,
       }),
-    ]
+    ],
   );
 };
 
@@ -105,7 +105,7 @@ export function PageViewSessions(props) {
               onClick,
               onHover,
             }),
-          ]
+          ],
         );
       }),
     ]),
@@ -146,7 +146,7 @@ export const SessionCard = (props) => {
             h("div", target),
           ]),
         ]),
-      ]
+      ],
     ),
   ]);
 };

@@ -36,7 +36,7 @@ export function AdminPage(props) {
             h("br"),
             h(Icon, { icon: iconname }),
           ]),
-        ]
+        ],
       ),
     ]);
   };

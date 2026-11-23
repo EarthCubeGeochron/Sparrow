@@ -56,9 +56,9 @@ export function TagContainer(props) {
             intent: "success",
             minimal: true,
           },
-          ["Add a Tag"]
+          ["Add a Tag"],
         ),
-      ]
+      ],
     ),
   ]);
 }
@@ -103,7 +103,7 @@ export function TagSelect(props) {
       [
         h(TagBody, { name, description, color, id, disabled: true }),
         h(MenuDivider),
-      ]
+      ],
     );
   };
 

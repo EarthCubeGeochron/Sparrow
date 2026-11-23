@@ -49,7 +49,7 @@ export function EmabrgoSwitch(props) {
           intent: intentFinder("null"),
           active: clicked == "null",
         },
-        ["Any"]
+        ["Any"],
       ),
       h(
         Button,
@@ -58,7 +58,7 @@ export function EmabrgoSwitch(props) {
           intent: intentFinder("true"),
           active: clicked == "true",
         },
-        ["Public Only"]
+        ["Public Only"],
       ),
       h(
         Button,
@@ -67,9 +67,9 @@ export function EmabrgoSwitch(props) {
           intent: intentFinder("false"),
           active: clicked == "false",
         },
-        ["Private Only"]
+        ["Private Only"],
       ),
-    ]
+    ],
   );
 
   return h("div.filter-card", [

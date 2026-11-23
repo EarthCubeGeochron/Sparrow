@@ -89,7 +89,7 @@ function ForeverScroll({ initialData, children, fetch, moreAfter = null }) {
         ref: setBottom,
         style: { marginTop: "50px", height: "500px" },
       },
-      [h(Spinner)]
+      [h(Spinner)],
     ),
     h.if(!moreToLoad)("div.no-results", [
       `Completed, there are ${data.length} ${name}`,

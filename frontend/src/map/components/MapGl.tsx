@@ -112,7 +112,7 @@ export function Map({ width = "50vw", height = "500px", zoom = 0 }) {
             mode: ModeHandler,
             clickRadius: 12,
           }),
-        ]
+        ],
       ),
     ]),
   ]);
@@ -232,7 +232,7 @@ export function coordinatesFromGeoJSON(geoarray) {
         maxlng: element[2][0],
         maxlat: element[0][1],
       };
-    })
+    }),
   );
   return coordinates;
 }

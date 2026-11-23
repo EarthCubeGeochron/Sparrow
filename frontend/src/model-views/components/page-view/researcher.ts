@@ -11,7 +11,7 @@ const ResearcherCard = (props) => {
   return h(
     ModelLinkCard,
     { isEditing, link: false, onClick: () => onClick({ id, name }) },
-    [h("h4.name", name)]
+    [h("h4.name", name)],
   );
 };
 
@@ -47,6 +47,6 @@ export const ResearcherAdd = (props) => {
         data,
         isEditing,
       }),
-    ]
+    ],
   );
 };

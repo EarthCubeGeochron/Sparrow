@@ -37,7 +37,7 @@ function ServerStatus(props) {
       },
       ...rest,
     },
-    text
+    text,
   );
 }
 

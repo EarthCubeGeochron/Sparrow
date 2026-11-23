@@ -47,7 +47,7 @@ class APIUsageComponent extends Component {
               expand: expandParameter,
               ...d,
             });
-          })
+          }),
         ),
       ]),
       h("div.record", [
@@ -82,7 +82,7 @@ class APIUsageComponent extends Component {
         className: "usage",
         title: "Parameters",
       },
-      this.renderInterior()
+      this.renderInterior(),
     );
   }
 }

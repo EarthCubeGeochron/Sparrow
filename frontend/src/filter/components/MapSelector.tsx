@@ -59,7 +59,7 @@ export function MapPolygon(props) {
           uncombineFeaturesControl: false,
           combineFeaturesControl: false,
         }),
-      ]
+      ],
     ),
     h("div", { style: { position: "absolute", top: "0" } }, [h(MapHelpButton)]),
   ]);

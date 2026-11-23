@@ -41,7 +41,7 @@ class FilterListComponent extends Component<any, any> {
         update(this.state, {
           field: { $set: k },
           filter: { $set: "" },
-        })
+        }),
       );
 
     for (let k in filterFields) {
@@ -56,7 +56,7 @@ class FilterListComponent extends Component<any, any> {
       h(
         Button,
         { minimal: true, rightIcon: "caret-down" },
-        filterFields[field]
+        filterFields[field],
       ),
     ]);
 
@@ -84,8 +84,8 @@ class FilterListComponent extends Component<any, any> {
         h(
           "div",
           null,
-          data.map((d) => h(itemComponent, d))
-        )
+          data.map((d) => h(itemComponent, d)),
+        ),
     );
   }
 }

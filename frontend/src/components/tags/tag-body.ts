@@ -42,7 +42,7 @@ function TagBody(props: tagBody) {
         onRemove: isEditing && onRemove,
         style: { backgroundColor: color, color: textColor },
       },
-      [showName]
+      [showName],
     ),
   ]);
 }

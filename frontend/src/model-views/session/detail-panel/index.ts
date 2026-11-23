@@ -48,10 +48,10 @@ const AnalysisAttributes = function (props) {
         h("span.parameter", `${k}:`),
         h(
           "ul.values",
-          v.map((d) => h("li.value", d.value))
+          v.map((d) => h("li.value", d.value)),
         ),
-      ])
-    )
+      ]),
+    ),
   );
 };
 
@@ -95,7 +95,7 @@ const AnalysisDetails = function (props) {
   return h(Card, { className: "analysis-details" }, [
     h.if(a.analysis_type != null)(
       "h3.analysis-type",
-      toTitleCase(a.analysis_type ?? "")
+      toTitleCase(a.analysis_type ?? ""),
     ),
     h(Material, { data: a.material }),
     h("div.main", [

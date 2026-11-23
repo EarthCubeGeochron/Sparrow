@@ -90,7 +90,7 @@ export function MyNumericInput(props: MyInputNum) {
           clampValueOnBlur: true,
           ...rest,
         }),
-      ]
+      ],
     ),
   ]);
 }

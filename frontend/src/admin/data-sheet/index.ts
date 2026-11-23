@@ -61,7 +61,7 @@ function calculateWidths(data, columns) {
       const contentLength = `${row[col.key]}`.length;
       obj[col.key] = Math.min(
         Math.max(minWidth, contentLength, acc[col.key] ?? 0),
-        maxWidth
+        maxWidth,
       );
     }
     return obj;
@@ -97,7 +97,7 @@ function DataSheet() {
   const initialData = useAPIResult(
     "/datasheet/view",
     {},
-    { unwrapResponse, context: APIV2Context }
+    { unwrapResponse, context: APIV2Context },
   );
 
   useEffect(() => {
@@ -169,7 +169,7 @@ function DataSheet() {
     value: any,
     row: number,
     key: string,
-    col: number
+    col: number,
   ) => {
     /** Need to turn off submit on click away event for cell */
 
@@ -181,7 +181,7 @@ function DataSheet() {
       { edited: isChanged, "read-only": readOnly },
       "cell",
       "nowrap",
-      "clip"
+      "clip",
     );
     return {
       value,
@@ -201,7 +201,7 @@ function DataSheet() {
   const cellData = data.map(
     (obj, row) =>
       // Object is the row object for the sample, Row# is the row that it is
-      columns.map(({ key }, col) => buildCellProps(obj[key], row, key, col))
+      columns.map(({ key }, col) => buildCellProps(obj[key], row, key, col)),
     //key is name of column
   );
 
@@ -220,7 +220,7 @@ function DataSheet() {
           onUndo: handleUndo,
           hasChanges: initialData != data,
         },
-        h("div.right-actions", null, h(SettingsPopup))
+        h("div.right-actions", null, h(SettingsPopup)),
       ),
       h("div.sheet", { ref }, [
         h(VirtualizedSheet, {
@@ -232,7 +232,7 @@ function DataSheet() {
           dataEditor: DataEditor,
         }),
       ]),
-    ])
+    ]),
   );
 }
 
@@ -264,7 +264,7 @@ function DataSheetMain({ ...rest }) {
   return h(
     DataSheetSettingsProvider,
     { allColumns: columnSpec },
-    h(DataSheet, rest)
+    h(DataSheet, rest),
   );
 }
 

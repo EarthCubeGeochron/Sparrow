@@ -82,6 +82,6 @@ export function ProjectAdminPage() {
         listComponent: h(ProjectAdminList),
         mainPageComponent: h(ProjectMainPanel),
       }),
-    ]
+    ],
   );
 }

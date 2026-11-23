@@ -20,6 +20,6 @@ export function NoStateAdmin(props) {
   return h(
     NonIdealState,
     { title, description, icon: "inbox" },
-    children ?? content
+    children ?? content,
   );
 }

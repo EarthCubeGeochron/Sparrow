@@ -118,7 +118,7 @@ function getMarkers() {
         });
         return markers;
       },
-    }
+    },
   );
   if (!data) {
     return [];
@@ -132,7 +132,7 @@ function SampleMap() {
   return h("div", [
     h(
       "h4",
-      `${markers.length} measurements have been linked to their geologic metadata`
+      `${markers.length} measurements have been linked to their geologic metadata`,
     ),
     h(MapComponent, { markers }),
   ]);

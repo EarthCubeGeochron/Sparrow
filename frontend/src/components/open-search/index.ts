@@ -101,7 +101,7 @@ function OpenSearch() {
           initialData: scrollData,
           fetch: () => {},
         },
-        [h(OpenSearchCard)]
+        [h(OpenSearchCard)],
       ),
     ]),
   ]);

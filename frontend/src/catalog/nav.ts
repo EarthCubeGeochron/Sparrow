@@ -28,13 +28,13 @@ function DataModelLinks(props) {
 }
 
 const CatalogNavbar = (
-  { base, ...rest } // A standalone navbar for the admin panel, can be enabled by default
+  { base, ...rest }, // A standalone navbar for the admin panel, can be enabled by default
 ) =>
   h("div.minimal-navbar", { ...rest, subtitle: "Admin" }, [
     h(
       NavButton,
       { to: base, exact: true, active: false },
-      h("h4", "Data Catalog")
+      h("h4", "Data Catalog"),
     ),
     h(CatalogNavLinks, { base }),
   ]);
