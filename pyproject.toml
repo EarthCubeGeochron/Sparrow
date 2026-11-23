@@ -1,7 +1,7 @@
 [tool.black]
 line-length = 88
 skip-magic-trailing-comma = true
-target-version = ['py38']
+target-version = ['py312']
 
 [tool.pylint.messages_control]
 

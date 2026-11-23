@@ -9,7 +9,7 @@ from sqlalchemy import inspect
 from .util import md5hash, SparrowImportError, ensure_sequence
 from ..util import relative_path
 from .imperative_helpers import ImperativeImportHelperMixin
-from psycopg2.errors import ForeignKeyViolation
+from psycopg.errors import ForeignKeyViolation
 from rich import print
 import sparrow
 from macrostrat.utils import get_logger

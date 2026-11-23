@@ -95,8 +95,8 @@ def create_views(db):
     """
     # Don't need to build the app just for this
     with working_directory(__file__):
-        db.exec_sql("../database/fixtures/05-views.sql")
-        db.exec_sql("../database/fixtures/07-apiv2views.sql")
+        db.run_sql("../database/fixtures/05-views.sql")
+        db.run_sql("../database/fixtures/07-apiv2views.sql")
 
 
 @cli.command(name="shell")

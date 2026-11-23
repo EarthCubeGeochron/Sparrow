@@ -10,6 +10,7 @@ Tasks have
 - Optional stdout redirection
 
 """
+
 from celery import Celery
 from sparrow.logs import get_logger
 from os import environ
@@ -121,14 +122,15 @@ class SparrowTaskManager(SparrowCorePlugin):
         cli.add_command(typer_click_object, "tasks")
 
     def on_api_initialized_v2(self, api):
-        self.broadcast = Broadcast(TASK_BROKER)
+        if TASK_BROKER is not None:
+            self.broadcast = Broadcast(TASK_BROKER)
         api.mount("/tasks", build_tasks_api(self), name="tasks")
 
 
 def format_task_info(name, _task):
     params = _task.get("params", None)
     if params is not None:
-        params = params.schema()
+        params = params.model_json_schema()
 
     description = _task.get("description")
     doc = _task["func"].__doc__

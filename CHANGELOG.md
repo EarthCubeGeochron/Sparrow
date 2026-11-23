@@ -7,6 +7,16 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[Unreleased]`
+
+- Backend and command-line application run on Python 3.12 (was 3.9)
+- Backend uses SQLAlchemy 2 and the PostgreSQL `psycopg` (version 3) driver
+- `macrostrat.database`, `macrostrat.utils` and `macrostrat.dinosaur` are installed
+  from PyPI releases; the `backend/shared-modules` submodule is removed
+- The backend image builds directly from `python:3.12`; the `backend-base` image is retired
+- Lab plugins (`SPARROW_PLUGIN_DIR`) are mounted under `python3.12/site-packages`
+- `sparrow-loader`'s bundled model cache is regenerated for SQLAlchemy 2
+
 ## `[3.2.1]` - 2024-08-12
 
 - Update Nginx certbot container

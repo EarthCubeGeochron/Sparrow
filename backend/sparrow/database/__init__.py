@@ -31,7 +31,8 @@ class DatabaseMappingError(SparrowError):
 
 class Database(BaseDatabase):
     def __init__(self, db_conn, app=None):
-        super().__init__(db_conn)
+        # Batched inserts cannot be reconciled with ON CONFLICT DO NOTHING imports
+        super().__init__(db_conn, use_insertmanyvalues=False)
         self.app = app
 
     def automap(self, use_cache=True):
@@ -64,6 +65,12 @@ class Database(BaseDatabase):
             self.mapper._cache_database_map()
         t1 = perf_counter()
         log.info(f"Finished automapping database: {t1-t0:.2f}s")
+
+    def run_sql(self, fn, params=None, **kwargs):
+        if not params:
+            # Schema fixtures contain literal percent signs (e.g. in format() calls)
+            kwargs.setdefault("has_server_binds", False)
+        return super().run_sql(fn, params, **kwargs)
 
     def model_schema(self, model_name) -> ModelSchema:
         """
@@ -137,14 +144,14 @@ class Database(BaseDatabase):
 
         if drop:
             fp = relative_path(__file__, "procedures", "drop-all-tables.sql")
-            self.exec_sql(fp)
+            self.run_sql(fp)
 
         p = Path(relative_path(__file__, "fixtures"))
         filenames = list(p.glob("*.sql"))
         filenames.sort()
 
         for _fn in filenames:
-            self.exec_sql(_fn)
+            self.run_sql(_fn)
 
         self.reload_postgrest_cache()
 
@@ -159,7 +166,7 @@ class Database(BaseDatabase):
         views = ["06-views.sql", "07-postgrest-api.sql"]
         for view in views:
             fp = relative_path(__file__, "fixtures", view)
-            self.exec_sql(fp)
+            self.run_sql(fp)
         self.reload_postgrest_cache()
         try:
             self.app.run_hook("finalize-database-schema", self)
@@ -172,7 +179,7 @@ class Database(BaseDatabase):
         msg = "Reloading PostgREST schema cache"
         secho(msg, bold=True)
         log.info(msg)
-        self.engine.execute("NOTIFY pgrst, 'reload schema'")
+        self.run_sql("NOTIFY pgrst, 'reload schema'")
 
     def update_schema(self, **kwargs):
         # Might be worth creating an interactive upgrader

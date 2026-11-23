@@ -1,3 +1,4 @@
+from sqlalchemy import text
 import sparrow
 from sparrow.tests.helpers import json_fixture
 from sqlalchemy import Table, or_, MetaData
@@ -26,7 +27,7 @@ class TestOpenSearch:
     def test_project_edits(self, db):
         # We need to restart the ID sequence because this test makes
         # assumptions about the identity of auto-incrementing primary keys
-        db.session.execute("ALTER SEQUENCE session_id_seq RESTART 1")
+        db.session.execute(text("ALTER SEQUENCE session_id_seq RESTART 1"))
 
         # Load data (replaces load_data_loop)
         for model, spec_list in self.data.items():
@@ -58,7 +59,7 @@ class TestOpenSearch:
         for table in tables:
             sql = f"SELECT * FROM {table}"
 
-            res = db.session.execute(sql)
+            res = db.session.execute(text(sql))
             assert len(res.all()) > 0
 
     @mark.skip(reason="it fails and we're short on time")

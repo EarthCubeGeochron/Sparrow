@@ -38,8 +38,8 @@ def get_automap_base():
         generate_relationship=_gen_relationship,
     )
 
-    for schema in ["vocabulary", "core_view", "tags", "public"]:
-        base.prepare(None, schema=schema, **kwargs)
+    # The cached metadata already holds every schema
+    base.prepare(**kwargs)
 
     _model_cache.set(base)
     return base

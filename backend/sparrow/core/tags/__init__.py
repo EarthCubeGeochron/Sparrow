@@ -4,7 +4,6 @@ from starlette.responses import JSONResponse
 from starlette.routing import Route, Router
 from starlette.endpoints import HTTPEndpoint
 from starlette.authentication import requires
-from psycopg2 import sql
 from pathlib import Path
 import json
 
@@ -89,7 +88,7 @@ class Tags(SparrowCorePlugin):
         Creates schema and tables for tags
         """
         f = fixtures / "tags.sql"
-        db.exec_sql(f)
+        db.run_sql(f)
 
     def default_tags(self):
         """Checks if there are any tags, if none, inserts some defualts"""
@@ -99,7 +98,7 @@ class Tags(SparrowCorePlugin):
         tags = db.model.tags_tag
         q = db.session.query(tags).all()
         if len(q) == 0:
-            db.exec_sql(f)
+            db.run_sql(f)
 
     def on_api_initialized_v2(self, api):
         # Initialize tag data if none

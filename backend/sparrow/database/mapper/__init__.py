@@ -4,6 +4,7 @@ from os import path, environ
 from macrostrat.utils.logs import get_logger
 from macrostrat.database.mapper import DatabaseModelCache
 from macrostrat.database import DatabaseMapper
+from macrostrat.database.mapper.utils import ModelCollection, TableCollection
 
 from .shims import _is_many_to_many
 
@@ -65,3 +66,22 @@ class SparrowDatabaseMapper(DatabaseMapper):
                 schemas=["vocabulary", "core_view", "tags", "public"],
                 use_cache=use_cache,
             )
+
+    def reflect_database(self, schemas=["public"], use_cache=True):
+        base = self.automap_base
+        kwargs = dict(self.reflection_kwargs)
+        if not (use_cache and base.loaded_from_cache):
+            # Models are prepared once, after the supporting schemas are reflected,
+            # so that pre-declared models find their columns.
+            for schema in schemas:
+                if schema == "public":
+                    continue
+                log.info(f"Reflecting schema {schema}")
+                base.metadata.reflect(bind=self.db.engine, schema=schema)
+            kwargs["autoload_with"] = self.db.engine
+        base.prepare(**kwargs)
+        self._reflected_schemas.update(schemas)
+        self._cache_database_map()
+
+        self._models = ModelCollection(base.classes)
+        self._tables = TableCollection(self._models)

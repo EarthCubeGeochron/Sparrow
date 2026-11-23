@@ -24,8 +24,6 @@ testing_db = environ.get(
 )
 environ["SPARROW_DATABASE"] = testing_db
 
-collect_ignore = ["shared-modules"]
-
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -124,8 +122,7 @@ def statements(db):
 
 @fixture(scope="class")
 def db(app, pytestconfig, request):
-    # https://docs.sqlalchemy.org/en/13/orm/session_transaction.html
-    # https://gist.github.com/zzzeek/8443477
+    # https://docs.sqlalchemy.org/en/20/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
     use_isolation = pytestconfig.option.use_isolation
     if request.cls is not None:
         use_isolation = getattr(request.cls, "use_isolation", use_isolation)
@@ -133,21 +130,9 @@ def db(app, pytestconfig, request):
     if use_isolation:
         connection = app.database.engine.connect()
         transaction = connection.begin()
-        session = Session(bind=connection)
-
-        # start the session in a SAVEPOINT...
-        # start the session in a SAVEPOINT...
-        session.begin_nested()
-
-        # then each time that SAVEPOINT ends, reopen it
-        @event.listens_for(session, "after_transaction_end")
-        def restart_savepoint(session, transaction):
-            if transaction.nested and not transaction._parent.nested:
-                # ensure that state is expired the way
-                # session.commit() at the top level normally does
-                # (optional step)
-                session.expire_all()
-                session.begin_nested()
+        # Commits within the session release a SAVEPOINT rather than
+        # ending the enclosing transaction
+        session = Session(bind=connection, join_transaction_mode="create_savepoint")
 
         app.database.session = session
         _setup_context(app)

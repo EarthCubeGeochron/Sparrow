@@ -11,4 +11,4 @@ def remove_analytical_data():
     """Remove all analytical data from the Sparrow database"""
     db = get_database()
     qfile = relative_path(__file__, "remove-analytical-data.sql")
-    db.exec_sql(qfile)
+    db.run_sql(qfile)

@@ -2,7 +2,7 @@ from .helpers import json_fixture
 from sparrow.core.ext.pychron import PyChronJSONImporter
 from pytest import mark
 from sqlalchemy.exc import IntegrityError
-from psycopg2.errors import UniqueViolation
+from psycopg.errors import UniqueViolation
 
 
 class PyChronJSONImporterTest(PyChronJSONImporter):

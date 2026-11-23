@@ -80,7 +80,7 @@ class TaskEndpoint(WebSocketEndpoint):
         await session.send_json(
             {"info": f"Trying to connect to channel {channel_name}"}
         )
-        if not hasattr(plugin.broadcast._backend, "_subscriber"):
+        if not hasattr(plugin.broadcast, "_listener_task"):
             await plugin.broadcast.connect()
         async with plugin.broadcast.subscribe(channel=channel_name) as subscriber:
             await session.send_json({"info": f"Subscribed to channel {channel_name}"})
@@ -114,8 +114,10 @@ def build_tasks_api(manager):
         )
         routes.append(task_socket_route)
 
-    return Starlette(
-        routes=routes,
-        on_startup=[manager.broadcast.connect],
-        on_shutdown=[manager.broadcast.disconnect],
-    )
+    on_startup = []
+    on_shutdown = []
+    if manager.broadcast is not None:
+        on_startup.append(manager.broadcast.connect)
+        on_shutdown.append(manager.broadcast.disconnect)
+
+    return Starlette(routes=routes, on_startup=on_startup, on_shutdown=on_shutdown)

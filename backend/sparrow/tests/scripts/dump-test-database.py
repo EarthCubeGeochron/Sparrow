@@ -49,7 +49,7 @@ with redirect_stdout(stderr), testing_database(conn) as engine:
     app.database.session.commit()
 
     # Prepare for dump
-    app.database.engine.execute("TRUNCATE TABLE spatial_ref_sys")
+    app.database.run_sql("TRUNCATE TABLE spatial_ref_sys")
 
     dbargs = connection_args(engine)
     run("pg_dump", "-Fc", dbargs, engine.url.database, stdout=stdout)

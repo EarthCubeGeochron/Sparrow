@@ -59,13 +59,17 @@ class TestDatabaseInitialization:
     ]
 
     def test_correct_db(self, db):
-        assert str(db.engine.url) == environ.get("SPARROW_DATABASE")
+        # The driver is chosen by the database library, not the configuration
+        url = db.engine.url.set(drivername="postgresql")
+        assert url.render_as_string(hide_password=False) == environ.get(
+            "SPARROW_DATABASE"
+        )
 
     def test_postgis_installed(self, db):
         """
         Make sure that the postgis extension is installed.
         """
-        exts = db.engine.execute("SELECT extname FROM pg_extension").fetchall()
+        exts = db.run_query("SELECT extname FROM pg_extension").fetchall()
         extensions = [e[0] for e in exts]
         assert "postgis" in extensions
         assert "pgmemento" in extensions

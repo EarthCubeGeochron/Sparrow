@@ -7,7 +7,11 @@ from sparrow.migrations import (
 )
 from sparrow.core.app import Sparrow
 from macrostrat.utils import relative_path, cmd
-from macrostrat.dinosaur import _create_migration, create_schema_clone
+from sparrow.database.migration import (
+    create_migration,
+    create_schema_clone,
+    sync_view_comments,
+)
 from macrostrat.database.utils import connection_args, temp_database, run_sql
 from sparrow.core.open_search import DocumentTableMigration
 from core_plugins.versioning import PGMementoMigration, PGMemento074Migration
@@ -27,8 +31,8 @@ class BasicMigration:
         # we should return true
         return True
 
-    def apply(self, db):
-        db.engine.execute("ALTER TABLE analysis DROP COLUMN in_plateau")
+    def apply(self, engine):
+        run_sql(engine, "ALTER TABLE analysis DROP COLUMN in_plateau")
 
 
 @fixture(scope="class")
@@ -47,7 +51,7 @@ class TestDatabaseMigrations:
         test_app.setup_database(automap=False)
         # We can use the existing testing database as a target
 
-        migration = _create_migration(test_app.db.engine, db.engine)
+        migration = create_migration(test_app.db.engine, db.engine)
 
         # Check that we are not aligned
         assert not migration.is_safe
@@ -99,15 +103,16 @@ class TestDatabaseMigrations:
         log.info("Applying automatic migration")
 
         # Migrating to the new version should now be "safe"
-        migration = _create_migration(test_app.database.engine, db.engine)
+        migration = create_migration(test_app.database.engine, db.engine)
         for change in migration.unsafe_changes():
             print(change)
         assert migration.is_safe
 
         migration.apply(quiet=False)
-        migration.clear()
-        migration.add_all_changes()
-        # Re-add changes
+        # Recreated views lose their comments; the migrator restores them the same way
+        sync_view_comments(test_app.database.engine, db.engine)
+        # Compare the schemas again
+        migration = create_migration(test_app.database.engine, db.engine)
         assert len(migration.statements) == 0
 
     @mark.slow
@@ -117,6 +122,6 @@ class TestDatabaseMigrations:
     @mark.slow
     def test_schema_clone(self, db):
         with create_schema_clone(db.engine) as engine:
-            m = _create_migration(engine, db.engine)
+            m = create_migration(engine, db.engine)
             # Schemas should now be the same...
             assert len(m.statements) == 0

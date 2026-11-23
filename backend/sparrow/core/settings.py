@@ -3,7 +3,7 @@ from starlette.config import Config
 config = Config()
 
 LAB_NAME = config("SPARROW_LAB_NAME", default="Test lab")
-DATABASE = config("SPARROW_DATABASE", default="postgresql+psycopg2:///sparrow")
+DATABASE = config("SPARROW_DATABASE", default="postgresql:///sparrow")
 BASE_URL = config("SPARROW_BASE_URL", default="/")
 ECHO_SQL = config("SPARROW_ECHO_SQL", cast=bool, default=False)
 DATA_DIR = config("SPARROW_DATA_DIR", default="/data")

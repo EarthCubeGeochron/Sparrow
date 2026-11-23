@@ -27,4 +27,4 @@ class InitSQLPlugin(SparrowCorePlugin):
             return
         secho("\nInitializing schema extensions", bold=True)
         for s in self.init_sql:
-            db.exec_sql(s)
+            db.run_sql(s)

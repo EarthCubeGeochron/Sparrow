@@ -68,6 +68,6 @@ def import_earthchem(download=False):
     parameters = copy_table(conn, "MeasuredParameter", "parameter", download=download)
 
     _ = join(__here, "populate-vocabulary.sql")
-    db.exec_sql(_)
+    db.run_sql(_)
 
     run_sql(db.session, "DROP SCHEMA earthchem_vocabulary CASCADE")

@@ -1,6 +1,7 @@
+from sqlalchemy import text
 from datetime import datetime
 from sqlalchemy.exc import ProgrammingError
-from psycopg2.errors import InsufficientPrivilege
+from psycopg.errors import InsufficientPrivilege
 
 
 class TestSampleCRUD:
@@ -54,7 +55,7 @@ class TestSampleCRUD:
     def test_sample_deletion_unauthorized(self, db):
         """We should not be able to delete a sample without the right permissions."""
 
-        db.session.execute("SET ROLE 'view_public'")
+        db.session.execute(text("SET ROLE 'view_public'"))
         Sample = db.model.sample
         model = db.session.query(Sample).filter_by(name="Soil 003").one()
         try:

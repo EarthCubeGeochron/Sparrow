@@ -17,7 +17,7 @@ class TestTags:
             "project_tag",
         ]
         for table in tables:
-            assert db.engine.has_table(table, schema="tags")
+            assert db.inspector.has_table(table, schema="tags")
 
     def test_default_tags_exist(self, client, db):
         """Checks to make sure the default tags are in the db"""

@@ -1,3 +1,4 @@
+from sqlalchemy import text
 import json
 
 from sqlalchemy.exc import IntegrityError
@@ -12,7 +13,7 @@ from sparrow.core.encoders import JSONEncoder
 from json import dumps
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.exc import IntegrityError
-from psycopg2.errors import UniqueViolation
+from psycopg.errors import UniqueViolation
 
 from .fixtures import basic_data, incomplete_analysis, basic_project
 from .helpers import json_fixture, ensure_single
@@ -125,14 +126,16 @@ class TestImperativeImport(object):
         Test whether our PGMemento audit trail is working
         """
 
-        res = db.session.execute("SELECT count(*) " "FROM pgmemento.table_event_log")
+        res = db.session.execute(text("SELECT count(*) FROM pgmemento.table_event_log"))
         total_ops = res.scalar()
         assert total_ops > 0
 
         res = db.session.execute(
-            "SELECT table_operation, table_name "
-            "FROM pgmemento.table_event_log "
-            "ORDER BY id DESC LIMIT 1"
+            text(
+                "SELECT table_operation, table_name "
+                "FROM pgmemento.table_event_log "
+                "ORDER BY id DESC LIMIT 1"
+            )
         )
         (op, tbl) = res.first()
         assert op == "INSERT"

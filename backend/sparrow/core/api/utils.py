@@ -66,9 +66,10 @@ def nested_collection_joins(path, query, db, model):
             else:
                 list1.append(getattr(getattr(db.model, path[i]), model_col[i]))
 
-    db_query = getattr(query, "join")(*list1)
+    for target in list1:
+        query = query.join(target)
 
-    return db_query
+    return query
 
 
 def text_fields(model):
