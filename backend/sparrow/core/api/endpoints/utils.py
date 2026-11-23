@@ -1,7 +1,8 @@
-from shapely.geometry import mapping, Point
 from geoalchemy2.shape import from_shape
-from ..api_info import get_field_description, get_field_json_values
 from marshmallow_sqlalchemy.fields import get_primary_keys
+from shapely.geometry import Point, mapping
+
+from ..api_info import get_field_description, get_field_json_values
 
 
 def get_schema_field_items(schema):

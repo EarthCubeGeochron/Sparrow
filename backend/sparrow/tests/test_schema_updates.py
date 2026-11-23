@@ -1,8 +1,10 @@
-from pytest import fixture
-from geoalchemy2.shape import from_shape
-from shapely.geometry import shape
-from sparrow.loader import model_interface
 import logging
+
+from geoalchemy2.shape import from_shape
+from pytest import fixture
+from shapely.geometry import shape
+
+from sparrow.loader import model_interface
 
 test_sample = {
     "name": "4c1321a",

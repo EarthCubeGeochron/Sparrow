@@ -1,10 +1,8 @@
 #!/usr/bin/env python
-from typing import Any
+from contextvars import ContextVar
 from os import environ
 from pathlib import Path
 from typing import Any
-from contextvars import ContextVar
-
 
 from macrostrat.database.mapper import DatabaseModelCache
 from macrostrat.database.mapper.utils import (
@@ -12,14 +10,12 @@ from macrostrat.database.mapper.utils import (
     name_for_collection_relationship,
     name_for_scalar_relationship,
 )
+
 from .util import _gen_relationship
 
 _model_cache: ContextVar[Any] = ContextVar("model-cache", default=None)
 
 cache_file = Path(__file__).parent / "sparrow-db-models.pickle"
-
-environ["SPARROW_CACHE_DATABASE_MODELS"] = "1"
-environ["SPARROW_DATABASE_MODEL_CACHE_PATH"] = str(cache_file)
 
 cacher = DatabaseModelCache(cache_file=str(cache_file))
 

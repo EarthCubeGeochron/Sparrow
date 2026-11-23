@@ -1,14 +1,15 @@
-from starlette.endpoints import HTTPEndpoint
-from webargs_starlette import parser
-from webargs.fields import Str, Int, Boolean
 from sqlakeyset import get_page
+from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
+from webargs.fields import Boolean, Int, Str
+from webargs_starlette import parser
 
+from sparrow.database import classname_for_table
+
+from ...context import get_database
+from ...logs import get_logger
 from ..exceptions import ValidationError
 from ..response import APIResponse
-from sparrow.database import classname_for_table
-from ...logs import get_logger
-from ...context import get_database
 
 log = get_logger(__name__)
 

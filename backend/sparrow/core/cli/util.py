@@ -1,10 +1,11 @@
-import click
-from sqlalchemy.exc import OperationalError
-from os import devnull
-from click import style, echo
+import sys
 from contextlib import redirect_stderr
 from functools import update_wrapper
-import sys
+from os import devnull
+
+import click
+from click import echo, style
+from sqlalchemy.exc import OperationalError
 
 from ..app import Sparrow
 

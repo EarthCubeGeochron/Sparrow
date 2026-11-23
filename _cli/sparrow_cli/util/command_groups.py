@@ -1,11 +1,12 @@
+import sys
+from os import environ
+
 import click
 from click_default_group import DefaultGroup
-from os import environ
-import sys
 
 from ..config import SparrowConfig
 from .exceptions import SparrowCommandError
-from .formatting import format_description, console
+from .formatting import console, format_description
 from .shell import find_subcommand, run
 
 

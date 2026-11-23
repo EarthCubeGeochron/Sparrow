@@ -1,7 +1,7 @@
-from starlette.endpoints import HTTPEndpoint
-from starlette.routing import Route, Router
-from starlette.responses import JSONResponse
 from starlette.authentication import requires
+from starlette.endpoints import HTTPEndpoint
+from starlette.responses import JSONResponse
+from starlette.routing import Route, Router
 
 from ..context import app_context
 

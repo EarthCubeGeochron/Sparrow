@@ -1,5 +1,6 @@
-from sparrow.logs import get_logger
 from sqlalchemy import create_engine, text
+
+from sparrow.logs import get_logger
 
 log = get_logger(__name__)
 

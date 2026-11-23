@@ -1,22 +1,22 @@
-from sqlalchemy import text
 import json
+from datetime import datetime
+from json import dumps
 
-from sqlalchemy.exc import IntegrityError
-from sparrow.core.app import Sparrow
-from sparrow.database.mapper import BaseModel
 from marshmallow import Schema
 from marshmallow.exceptions import ValidationError
-from datetime import datetime
-from pytest import mark, raises, fixture
-from sparrow.logs import get_logger
-from sparrow.core.encoders import JSONEncoder
-from json import dumps
-from sqlalchemy.orm import RelationshipProperty
-from sqlalchemy.exc import IntegrityError
 from psycopg.errors import UniqueViolation
+from pytest import fixture, mark, raises
+from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import RelationshipProperty
 
-from .fixtures import basic_data, incomplete_analysis, basic_project
-from .helpers import json_fixture, ensure_single
+from sparrow.core.app import Sparrow
+from sparrow.core.encoders import JSONEncoder
+from sparrow.database.mapper import BaseModel
+from sparrow.logs import get_logger
+
+from .fixtures import basic_data, basic_project, incomplete_analysis
+from .helpers import ensure_single, json_fixture
 
 log = get_logger(__name__)
 
@@ -492,9 +492,9 @@ class TestSampleMessages:
 
     def test_fixed_sample_import(self, db):
         # Adjust sample to perform better by deduplicating length
-        self.sample["session"][0]["analysis"][0]["datum"][2]["type"][
-            "parameter"
-        ] = "Length 2"
+        self.sample["session"][0]["analysis"][0]["datum"][2]["type"]["parameter"] = (
+            "Length 2"
+        )
         db.load_data("sample", self.sample)
 
 

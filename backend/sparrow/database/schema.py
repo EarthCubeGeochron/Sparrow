@@ -20,7 +20,6 @@ from macrostrat.schema_management import (
     build_schema,
 )
 from macrostrat.schema_management.plan import StatementCounter, is_unsafe_statement
-
 from sqlparse import format as format_sql
 
 from sparrow.logs import get_logger

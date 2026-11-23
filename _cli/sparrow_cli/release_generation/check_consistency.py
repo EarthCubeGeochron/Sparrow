@@ -1,10 +1,11 @@
+import json
 from os import path
 from runpy import run_path
-import json
-from packaging.version import Version, InvalidVersion
+
+from packaging.version import InvalidVersion, Version
 
 from ..util import SparrowCommandError, console
-from .util import check_version_exists, all_equal, check_output, clean_tag
+from .util import all_equal, check_output, check_version_exists, clean_tag
 
 
 def _check_consistency(version=None, exact=False):

@@ -1,6 +1,7 @@
-from json import JSONEncoder as BaseJSONEncoder
 from datetime import datetime
 from decimal import Decimal
+from json import JSONEncoder as BaseJSONEncoder
+
 from geoalchemy2.elements import WKBElement
 from geoalchemy2.shape import to_shape
 from shapely.geometry import mapping

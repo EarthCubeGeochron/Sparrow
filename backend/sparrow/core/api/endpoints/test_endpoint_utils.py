@@ -1,6 +1,7 @@
-from .utils import construct_schema_fields_object, get_schema_field_items
-from ..api_info import get_field_json_values
 from pytest import mark
+
+from ..api_info import get_field_json_values
+from .utils import construct_schema_fields_object, get_schema_field_items
 
 
 class TestEndpointUtils:

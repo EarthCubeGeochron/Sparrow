@@ -1,17 +1,20 @@
-import click
-from click import echo, style, secho, pass_context
-import sparrow
-from sys import exit
-from os import environ
 from json import dumps
-from .util import with_database, with_app, with_full_app, add_typer_command
-from .user import create_user, list_users, reset_password
-from ..util import working_directory
-from ..context import get_sparrow_app
-from macrostrat.utils.logs import setup_stderr_logs
-from typing import Optional
-from ..plugins import SparrowPlugin
 from logging import INFO
+from os import environ
+from sys import exit
+from typing import Optional
+
+import click
+from click import echo, pass_context, secho, style
+from macrostrat.utils.logs import setup_stderr_logs
+
+import sparrow
+
+from ..context import get_sparrow_app
+from ..plugins import SparrowPlugin
+from ..util import working_directory
+from .user import create_user, list_users, reset_password
+from .util import add_typer_command, with_app, with_database, with_full_app
 
 
 def _build_app_context(config):
@@ -181,12 +184,6 @@ def _db_migration(db):
         print(statement)
 
 
-@cli.command(name="db-drop-cache")
-@with_database
-def _db_drop_cache(db):
-    db.mapper.drop_model_cache()
-
-
 @cli.command(name="db-update")
 @with_database
 @click.option("--dry-run", is_flag=True, default=False)
@@ -218,10 +215,13 @@ def command_info(ctx, cli):
         cmd = cli.get_command(ctx, name)
         if cmd.hidden:
             continue
-        yield name, {
-            "help": cmd.get_short_help_str(limit=120),
-            "plugin": getattr(cmd, "_plugin", None),
-        }
+        yield (
+            name,
+            {
+                "help": cmd.get_short_help_str(limit=120),
+                "plugin": getattr(cmd, "_plugin", None),
+            },
+        )
 
 
 @cli.command(name="get-cli-info", hidden=True)

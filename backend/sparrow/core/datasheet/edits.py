@@ -1,9 +1,10 @@
-from starlette.responses import JSONResponse
-from ..context import app_context
-from starlette.authentication import requires
 import json
 
-from .utils import material_check, make_changes
+from starlette.authentication import requires
+from starlette.responses import JSONResponse
+
+from ..context import app_context
+from .utils import make_changes, material_check
 
 
 @requires("admin")

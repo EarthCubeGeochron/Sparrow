@@ -1,8 +1,9 @@
 """
 Scripts for upgrading the database cluster if it is out of date.
 """
-from macrostrat.utils import get_logger
+
 from macrostrat.dinosaur import upgrade_cluster
+from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
 

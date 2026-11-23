@@ -1,7 +1,17 @@
-[tool.black]
+[tool.ruff]
 line-length = 88
+target-version = "py312"
+extend-exclude = ["__archive*", "_disabled_tests", "deps", "node_modules"]
+
+[tool.ruff.format]
 skip-magic-trailing-comma = true
-target-version = ['py312']
+
+[tool.ruff.lint]
+select = ["I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["sparrow", "sparrow_cli", "sparrow_worker", "core_plugins"]
+split-on-trailing-comma = false
 
 [tool.pylint.messages_control]
 

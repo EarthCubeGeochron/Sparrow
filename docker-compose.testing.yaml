@@ -11,7 +11,6 @@ x-backend: &x-backend
     - pg_api
   environment:
     - SPARROW_SECRET_KEY=test_secret_must_be_at_least_32_characters
-    - SPARROW_CACHE_DATABASE_MODELS
     # Whether we should enable a worker pool for running tasks.
     # If we don't, tasks must be run via the command line.
     - SPARROW_TASK_WORKER=0

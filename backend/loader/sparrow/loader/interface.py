@@ -1,10 +1,9 @@
-from marshmallow_sqlalchemy import exceptions
-
-from .schema import ModelSchema, BaseMeta
-from .util import to_schema_name
-
 from macrostrat.database.mapper.utils import ModelCollection, classname_for_table
 from macrostrat.utils import get_logger
+from marshmallow_sqlalchemy import exceptions
+
+from .schema import BaseMeta, ModelSchema
+from .util import to_schema_name
 
 log = get_logger(__name__)
 

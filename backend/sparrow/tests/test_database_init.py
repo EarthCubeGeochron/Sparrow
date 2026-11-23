@@ -1,9 +1,11 @@
 from datetime import datetime
-from pytest import mark
-from sparrow.logs import get_logger
-from sqlalchemy.engine.reflection import Inspector
 from os import environ
+
 import numpy as N
+from pytest import mark
+from sqlalchemy.engine.reflection import Inspector
+
+from sparrow.logs import get_logger
 
 log = get_logger(__name__)
 

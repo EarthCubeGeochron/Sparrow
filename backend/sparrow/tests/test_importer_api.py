@@ -1,9 +1,11 @@
-from sqlalchemy import and_
-from datetime import datetime
-from pytest import mark
-from .fixtures import basic_data, basic_d18O_data
-from .helpers import json_fixture
 import sys
+from datetime import datetime
+
+from pytest import mark
+from sqlalchemy import and_
+
+from .fixtures import basic_d18O_data, basic_data
+from .helpers import json_fixture
 
 
 class TestAPIImporter:

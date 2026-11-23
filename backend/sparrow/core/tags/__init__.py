@@ -1,13 +1,14 @@
-from sparrow.core.plugins import SparrowCorePlugin
-from sparrow.core.context import app_context
+import json
+from pathlib import Path
+
+from macrostrat.schema_management import SchemaDefinition
+from starlette.authentication import requires
+from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 from starlette.routing import Route, Router
-from starlette.endpoints import HTTPEndpoint
-from starlette.authentication import requires
-from pathlib import Path
-from macrostrat.schema_management import SchemaDefinition
-import json
 
+from sparrow.core.context import app_context
+from sparrow.core.plugins import SparrowCorePlugin
 
 here = Path(__file__).parent
 fixtures = here / "fixtures"

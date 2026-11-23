@@ -1,25 +1,26 @@
+import collections.abc
 from pathlib import Path
-from click import secho
 from time import perf_counter
 
-from sqlalchemy.schema import ForeignKey, Column
-from sqlalchemy.types import Integer
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import FlushError
-from marshmallow.exceptions import ValidationError
-from marshmallow import RAISE, EXCLUDE
+from click import secho
 from macrostrat.database import Database as BaseDatabase
 from macrostrat.database import on_conflict
-from macrostrat.database.utils import run_sql
-import collections.abc
-
-from .models import User, Project, Session, DatumType
-from sparrow.logs import get_logger
-from macrostrat.utils import relative_path
-from sparrow.loader import ModelSchema, model_interface
-from sparrow.defs import SparrowError
-from .mapper import SparrowDatabaseMapper
 from macrostrat.database.mapper.utils import classname_for_table
+from macrostrat.database.utils import run_sql
+from macrostrat.utils import relative_path
+from marshmallow import EXCLUDE, RAISE
+from marshmallow.exceptions import ValidationError
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import FlushError
+from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.types import Integer
+
+from sparrow.defs import SparrowError
+from sparrow.loader import ModelSchema, model_interface
+from sparrow.logs import get_logger
+
+from .mapper import SparrowDatabaseMapper
+from .models import DatumType, Project, Session, User
 
 log = get_logger(__name__)
 
@@ -34,11 +35,11 @@ class Database(BaseDatabase):
         super().__init__(db_conn, use_insertmanyvalues=False)
         self.app = app
 
-    def automap(self, use_cache=True):
+    def automap(self):
         log.info("Automapping the database")
         t0 = perf_counter()
 
-        self.mapper = SparrowDatabaseMapper(self, use_cache=use_cache)
+        self.mapper = SparrowDatabaseMapper(self)
 
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
@@ -60,10 +61,8 @@ class Database(BaseDatabase):
         self.mapper.register_models(cls)
         if self.app:
             self.app.run_hook("database-mapped")
-        if not use_cache:
-            self.mapper._cache_database_map()
         t1 = perf_counter()
-        log.info(f"Finished automapping database: {t1-t0:.2f}s")
+        log.info(f"Finished automapping database: {t1 - t0:.2f}s")
 
     def run_sql(self, fn, params=None, **kwargs):
         if not params:

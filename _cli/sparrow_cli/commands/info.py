@@ -1,4 +1,5 @@
 import click
+
 from ..config import SparrowConfig
 from ..meta import __version__
 

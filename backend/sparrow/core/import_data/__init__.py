@@ -1,12 +1,12 @@
+from starlette.authentication import requires
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse, Response
-from sparrow.core.context import app_context
-from sparrow.logs import get_logger
-from sparrow.core.plugins import SparrowCorePlugin
 from starlette.routing import Route, Router
-from starlette.authentication import requires
 
+from sparrow.core.context import app_context
+from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.core.util import get_qualified_name
+from sparrow.logs import get_logger
 
 log = get_logger(__name__)
 

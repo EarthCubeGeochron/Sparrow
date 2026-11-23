@@ -1,8 +1,9 @@
 import sys
-from os import environ, getcwd, chdir
-from envbash import load_envbash
+from os import chdir, environ, getcwd
 from pathlib import Path
 from typing import Optional
+
+from envbash import load_envbash
 from macrostrat.utils import get_logger
 
 log = get_logger(__name__)

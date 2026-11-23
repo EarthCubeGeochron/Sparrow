@@ -1,10 +1,12 @@
 from os import environ
+
 from pytest import fixture, mark
 from starlette.authentication import requires
 from starlette.testclient import TestClient
 from starlette.websockets import WebSocket, WebSocketDisconnect
-from .create_user import _create_user
+
 from .backend import JWTBackend
+from .create_user import _create_user
 
 
 @fixture(scope="class")

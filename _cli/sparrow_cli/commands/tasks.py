@@ -1,6 +1,7 @@
 ## This should probably be refactored out into a sparrow_tasks plugin eventually
 
 import click
+
 from ..util import CommandGroup, exec_backend_command
 
 shell_commands = {

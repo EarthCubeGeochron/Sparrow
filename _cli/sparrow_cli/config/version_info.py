@@ -1,8 +1,9 @@
 import typing
 from dataclasses import dataclass
 from os import environ
+
 from macrostrat.utils.shell import cmd
-from packaging.specifiers import SpecifierSet, InvalidSpecifier
+from packaging.specifiers import InvalidSpecifier, SpecifierSet
 from packaging.version import Version
 
 

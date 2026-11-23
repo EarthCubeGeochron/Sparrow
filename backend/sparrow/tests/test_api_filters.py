@@ -1,10 +1,13 @@
-from .helpers import json_fixture
-from sparrow.core.api.endpoints.utils import create_location_from_coordinates
-from sparrow.core.api.utils import nested_collection_joins, nested_collection_path
-from macrostrat.database.utils import get_db_model
-from pytest import mark
 import datetime
 import json
+
+from macrostrat.database.utils import get_db_model
+from pytest import mark
+
+from sparrow.core.api.endpoints.utils import create_location_from_coordinates
+from sparrow.core.api.utils import nested_collection_joins, nested_collection_path
+
+from .helpers import json_fixture
 
 
 class TestAPIV2_filters:

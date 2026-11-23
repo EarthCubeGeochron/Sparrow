@@ -24,6 +24,8 @@ and this project is working towards adherence to
   - `sparrow schema` commands (`graph`, `plan`, `apply`, `sync`, `migrate`, `provision`)
   - `sparrow db-update` runs migrations, then applies the schema diff, and still
     rehearses on a copy of the schema first
+- The `SPARROW_CACHE_DATABASE_MODELS` option and `sparrow db drop-cache` are removed
+- Code is formatted and imports sorted with `ruff`, replacing `black`
 - `vocabulary.authority` is granted to `admin` and `view_public` on first initialization
 
 ## `[3.2.1]` - 2024-08-12

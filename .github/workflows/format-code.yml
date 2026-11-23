@@ -8,18 +8,22 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-      - uses: rickstaa/action-black@v1
+      # Configured in the root pyproject.toml
+      - name: Format Python code and sort imports
+        run: |
+          pipx run ruff==0.16.9 format backend _cli
+          pipx run ruff==0.16.9 check --fix backend _cli
+      - uses: creyD/prettier_action@v4.6
         with:
-          black_args: "backend/**/*.py _cli/**/*.py"
-      - uses: actionsx/prettier@v2
-        with:
-          # prettier CLI arguments.
-          args: --ignore-path frontend/.prettierignore --write frontend
+          prettier_version: 2.8.8
+          prettier_options: --ignore-path frontend/.prettierignore --write frontend
+          # Changes are committed together below
+          no_commit: true
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4.1.2
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Formatting changes
           branch: ${{ github.head_ref }}

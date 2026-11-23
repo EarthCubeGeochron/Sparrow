@@ -2,17 +2,19 @@
 An API for managing users
 """
 
-from starlette.routing import Route, Router
+from collections.abc import Iterable
+
 from starlette.authentication import requires
 from starlette.responses import JSONResponse
-from sparrow.core.plugins import SparrowCorePlugin
-from sparrow.database.models import User
+from starlette.routing import Route, Router
+
 from sparrow.core.api import APIResponse, SparrowAPIError
-from sparrow.core.context import get_database
 from sparrow.core.auth import get_backend
 from sparrow.core.auth.create_user import _create_user
+from sparrow.core.context import get_database
+from sparrow.core.plugins import SparrowCorePlugin
+from sparrow.database.models import User
 from sparrow.logs import get_logger
-from collections.abc import Iterable
 
 log = get_logger(__name__)
 

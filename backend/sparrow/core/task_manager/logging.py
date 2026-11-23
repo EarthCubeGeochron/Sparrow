@@ -1,8 +1,8 @@
 import sys
+from asyncio import get_event_loop, sleep
+from contextlib import contextmanager
 from json import dumps
 from time import time
-from contextlib import contextmanager
-from asyncio import sleep, get_event_loop
 
 
 def create_message(**kwargs):

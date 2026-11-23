@@ -1,4 +1,5 @@
 import collections
+
 from sparrow.loader.converter import allowed_collections
 
 
@@ -80,7 +81,7 @@ def text_fields(model):
     fields = model.__table__.columns.keys()
     text_fields = []
     for c in fields:
-        if f"{getattr(model,c).type}" == "TEXT":
+        if f"{getattr(model, c).type}" == "TEXT":
             text_fields.append(c)
 
     atr = []

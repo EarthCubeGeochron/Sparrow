@@ -1,7 +1,8 @@
 from itertools import groupby
-from packaging.version import Version, InvalidVersion
 
-from ..util import cmd, SparrowCommandError
+from packaging.version import InvalidVersion, Version
+
+from ..util import SparrowCommandError, cmd
 
 
 def all_equal(*items):

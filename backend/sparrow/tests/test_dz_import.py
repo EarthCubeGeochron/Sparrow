@@ -1,8 +1,9 @@
+from pandas import read_csv
+from pytest import fixture, mark
+
+from sparrow.core.ext.detrital_zircon import DetritalZirconTableImporter
 from sparrow.core.util import relative_path
 from sparrow.loader import model_interface
-from sparrow.core.ext.detrital_zircon import DetritalZirconTableImporter
-from pandas import read_csv
-from pytest import mark, fixture
 
 
 def import_dz_test_data():

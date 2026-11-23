@@ -1,5 +1,6 @@
 import click
-from ..util import compose, container_id, cmd, log
+
+from ..util import cmd, compose, container_id, log
 
 
 @click.command(name="logs")

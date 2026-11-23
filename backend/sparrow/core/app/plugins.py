@@ -1,3 +1,5 @@
+# isort: off
+# Plugins import one another; this order avoids import cycles
 from ..task_manager import SparrowTaskManager
 from ..api import APIv2Plugin
 from ..plugins import SparrowPluginManager
@@ -14,6 +16,8 @@ from ..web import WebPlugin
 from ..logs import get_logger
 from ..import_data import ImportDataPlugin
 from ..users import UserManagementPlugin
+
+# isort: on
 
 log = get_logger(__name__)
 

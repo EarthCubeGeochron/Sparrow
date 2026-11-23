@@ -1,15 +1,17 @@
-from macrostrat.schema_management import has_columns, negate
-from sparrow.database.migration import SparrowMigration
-from sqlalchemy import inspect, text
-from sparrow.core.plugins import SparrowCorePlugin
-from macrostrat.utils import relative_path, cmd
-from sparrow.core import get_database
-import click
-from pathlib import Path
-from sqlalchemy.exc import ProgrammingError
-from sparrow.database import Database
-from macrostrat.database.utils import connection_args, run_sql, run_query
 import warnings
+from pathlib import Path
+
+import click
+from macrostrat.database.utils import connection_args, run_query, run_sql
+from macrostrat.schema_management import has_columns, negate
+from macrostrat.utils import cmd, relative_path
+from sqlalchemy import inspect, text
+from sqlalchemy.exc import ProgrammingError
+
+from sparrow.core import get_database
+from sparrow.core.plugins import SparrowCorePlugin
+from sparrow.database import Database
+from sparrow.database.migration import SparrowMigration
 
 exclude_tables = ["spatial_ref_sys"]
 audit_schemas = ["public", "vocabulary", "tags", "geo_context"]

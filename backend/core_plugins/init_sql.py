@@ -1,7 +1,9 @@
-from sparrow.core.plugins import SparrowCorePlugin
 from os import environ
 from pathlib import Path
+
 from macrostrat.schema_management import SchemaDefinition
+
+from sparrow.core.plugins import SparrowCorePlugin
 
 
 class InitSQLPlugin(SparrowCorePlugin):

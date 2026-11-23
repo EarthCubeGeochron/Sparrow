@@ -1,14 +1,16 @@
-import sys
 import re
-from click import style, Context
-from click.formatting import HelpFormatter
-from rich.text import Text
+import sys
+from itertools import chain
 from os import environ
 from pathlib import Path
-from itertools import chain
+
+from click import Context, style
+from click.formatting import HelpFormatter
 from rich.console import Console
-from ..util.formatting import format_config_path, format_description
+from rich.text import Text
+
 from ..config import Level, SparrowConfig
+from ..util.formatting import format_config_path, format_description
 
 console = Console()
 

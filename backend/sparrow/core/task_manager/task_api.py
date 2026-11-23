@@ -1,15 +1,16 @@
-from asyncio import sleep, create_task
+from asyncio import create_task, sleep
 from json import loads
-from starlette.authentication import requires, AuthenticationError
+
+from macrostrat.utils import get_logger
+from starlette import status
 from starlette.applications import Starlette
+from starlette.authentication import AuthenticationError, requires
 from starlette.endpoints import WebSocketEndpoint
 from starlette.routing import Route, WebSocketRoute
-from starlette import status
 
 from sparrow.core.api import APIResponse
-from sparrow.core.context import get_plugin
 from sparrow.core.auth import get_scopes
-from macrostrat.utils import get_logger
+from sparrow.core.context import get_plugin
 
 log = get_logger(__name__)
 

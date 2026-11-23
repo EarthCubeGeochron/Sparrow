@@ -1,10 +1,11 @@
 import sys
 from os import environ, getenv
-from rich import print
 from typing import List
 
-from macrostrat.utils import relative_path, get_logger
-from .models import Message, Level
+from macrostrat.utils import get_logger, relative_path
+from rich import print
+
+from .models import Level, Message
 
 log = get_logger(__name__)
 

@@ -1,11 +1,13 @@
 from pathlib import Path
+
+from macrostrat.database.utils import run_sql_file
+from macrostrat.schema_management import SchemaDefinition, has_columns, negate
 from sqlalchemy import text
+
 from sparrow import core
 from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.core.task_manager.base import task
-from macrostrat.schema_management import SchemaDefinition, has_columns, negate
 from sparrow.database.migration import SparrowMigration
-from macrostrat.database.utils import run_sql_file
 
 from .base import OpenSearchAPI
 

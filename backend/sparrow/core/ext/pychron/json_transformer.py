@@ -1,5 +1,6 @@
-from os import path
 from datetime import datetime
+from os import path
+
 from sparrow.core.util import run
 
 

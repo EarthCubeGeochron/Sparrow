@@ -105,7 +105,7 @@ setuptools = "^81.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.3.0"
-black = "^24.10.0"
+ruff = ">=0.16"
 docker = "^7.0.0"
 
 [build-system]

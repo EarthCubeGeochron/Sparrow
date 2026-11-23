@@ -1,5 +1,6 @@
 import os
 from contextlib import contextmanager
+
 from macrostrat.database.utils import temporary_database
 
 

@@ -1,10 +1,12 @@
-from boto3 import client
-from click import secho, command, option
 from os import environ
 from pathlib import Path
-from macrostrat.schema_management import SchemaDefinition
-from sparrow.core.plugins import SparrowPlugin
+
+from boto3 import client
+from click import command, option, secho
 from macrostrat.database.utils import run_sql
+from macrostrat.schema_management import SchemaDefinition
+
+from sparrow.core.plugins import SparrowPlugin
 
 
 class CloudDataPlugin(SparrowPlugin):

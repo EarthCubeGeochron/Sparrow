@@ -1,27 +1,29 @@
 from logging import error
-from starlette.endpoints import HTTPEndpoint
+
 from macrostrat.utils.logs import get_logger
-from webargs_starlette import parser
 from sqlakeyset import get_page
+from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
-from webargs.fields import Str, Int, Boolean, DelimitedList
+from webargs.fields import Boolean, DelimitedList, Int, Str
+from webargs_starlette import parser
+
 from sparrow.core.context import get_database
 from sparrow.core.open_search.filter import OpenSearchFilter
-from ...exceptions import SparrowAPIError, ValidationError, ApplicationError
-from ...response import APIResponse
+
+from ...exceptions import ApplicationError, SparrowAPIError, ValidationError
 from ...filters import (
-    BaseFilter,
+    AgeRangeFilter,
     AuthorityFilter,
+    BaseFilter,
+    DateFilter,
+    EmbargoFilter,
     FieldExistsFilter,
     FieldNotExistsFilter,
-    EmbargoFilter,
-    DateFilter,
-    TextSearchFilter,
-    AgeRangeFilter,
     IdListFilter,
     TagsFilter,
+    TextSearchFilter,
 )
-
+from ...response import APIResponse
 
 log = get_logger(__name__)
 

@@ -4,20 +4,21 @@ JSON Web Token authentication.
 """
 
 import time
-from typing import Tuple, Any
+import warnings
+from typing import Any, Tuple
 
 import jwt
-import warnings
 from starlette.authentication import (
+    AuthCredentials,
+    AuthenticationBackend,
+    AuthenticationError,
     BaseUser,
     SimpleUser,
-    AuthenticationBackend,
-    AuthCredentials,
-    AuthenticationError,
     UnauthenticatedUser,
 )
 from starlette.requests import Request
 from starlette.responses import Response
+
 from sparrow.logs import get_logger
 
 log = get_logger(__name__)

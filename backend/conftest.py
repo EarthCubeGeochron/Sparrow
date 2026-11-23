@@ -1,16 +1,17 @@
-from pytest import fixture
-from os import environ
-from starlette.testclient import TestClient
-from requests import Session as RequestsSession
-from sparrow.core.app import Sparrow
-from sparrow.core.context import _setup_context
-from macrostrat.database.utils import wait_for_database
-from sparrow.core.auth.create_user import _create_user
-from sparrow.tests.helpers.database import testing_database
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import Session
-from sqlalchemy import event
 import logging
+from os import environ
+
+from macrostrat.database.utils import wait_for_database
+from pytest import fixture
+from requests import Session as RequestsSession
+from sqlalchemy import event
+from sqlalchemy.orm import Session, scoped_session
+from starlette.testclient import TestClient
+
+from sparrow.core.app import Sparrow
+from sparrow.core.auth.create_user import _create_user
+from sparrow.core.context import _setup_context
+from sparrow.tests.helpers.database import testing_database
 
 disable_loggers = ["macrostrat.database.utils"]
 
@@ -73,8 +74,9 @@ def app(pytestconfig):
 
 def wait_for_pgrest_api(postgrest_url):
     """Wait for the PostgREST API to be available"""
-    from requests import get
     from time import sleep
+
+    from requests import get
 
     while True:
         try:

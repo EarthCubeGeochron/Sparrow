@@ -1,6 +1,8 @@
-from .helpers import json_fixture
-from pytest import mark
 import json
+
+from pytest import mark
+
+from .helpers import json_fixture
 
 
 class TestTags:

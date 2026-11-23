@@ -1,14 +1,14 @@
+from .attach import sparrow_attach
+from .build import sparrow_build
+from .database import sparrow_db
+from .dev import sparrow_dev
+from .docs import sparrow_docs
+from .info import sparrow_info
+from .logs import sparrow_logs
+from .tasks import tasks
 from .test import sparrow_test
 from .test_lab import sparrow_test_lab
-from .database import sparrow_db
-from .docs import sparrow_docs
-from .dev import sparrow_dev
-from .info import sparrow_info
-from .build import sparrow_build
-from .attach import sparrow_attach
-from .tasks import tasks
-from .logs import sparrow_logs
-from .up import sparrow_up, sparrow_restart
+from .up import sparrow_restart, sparrow_up
 from .update import sparrow_update, sparrow_upgrade
 
 _commands = {

@@ -1,14 +1,15 @@
 import json
-from json.decoder import JSONDecodeError
 import os
-from pathlib import Path
-from hashlib import md5
-from subprocess import PIPE
-from pydantic import BaseModel
 from enum import Enum
+from hashlib import md5
+from json.decoder import JSONDecodeError
+from pathlib import Path
+from subprocess import PIPE
 
-from ...util.shell import exec_or_run
+from pydantic import BaseModel
+
 from ...util.exceptions import SparrowCommandError
+from ...util.shell import exec_or_run
 from .default_backend_commands import default_commands
 
 

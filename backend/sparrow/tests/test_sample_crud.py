@@ -1,7 +1,8 @@
-from sqlalchemy import text
 from datetime import datetime
-from sqlalchemy.exc import ProgrammingError
+
 from psycopg.errors import InsufficientPrivilege
+from sqlalchemy import text
+from sqlalchemy.exc import ProgrammingError
 
 
 class TestSampleCRUD:

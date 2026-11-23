@@ -1,33 +1,34 @@
-import typing
-from typing import List, Optional
-import sys
-from dataclasses import dataclass, field
-from pathlib import Path
-from os import environ
-from macrostrat.utils.shell import git_revision_info
-from macrostrat.utils.logs import get_logger, setup_stderr_logs
 import hashlib
+import sys
+import typing
+from dataclasses import dataclass, field
+from enum import Enum
+from os import environ
+from pathlib import Path
+from typing import List, Optional
+
 import docker
 from docker.client import DockerClient
-from enum import Enum
+from macrostrat.dinosaur.upgrade_cluster.describe import check_database_cluster_version
+from macrostrat.utils.logs import get_logger, setup_stderr_logs
+from macrostrat.utils.shell import git_revision_info
 
-from .environment import (
-    is_truthy,
-    prepare_docker_environment,
-    prepare_compose_overrides,
-)
-from .version_info import SparrowVersionMatch, test_version
-from .command_cache import get_backend_command_help, CommandDataSource
-from .file_loader import load_config_file
+from ..upgrade_database import version_images
 from ..util.exceptions import SparrowCommandError
 from ..util.shell import (
     fail_without_docker_command,
-    has_command,
     fail_without_docker_running,
+    has_command,
 )
-from .models import Message, Level
-from macrostrat.dinosaur.upgrade_cluster.describe import check_database_cluster_version
-from ..upgrade_database import version_images
+from .command_cache import CommandDataSource, get_backend_command_help
+from .environment import (
+    is_truthy,
+    prepare_compose_overrides,
+    prepare_docker_environment,
+)
+from .file_loader import load_config_file
+from .models import Level, Message
+from .version_info import SparrowVersionMatch, test_version
 
 log = get_logger(__file__)
 

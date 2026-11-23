@@ -1,10 +1,12 @@
 from os import chdir
+
 import click
 from click.decorators import argument, option
 from rich import print
-from ..util.shell import cmd
+
 from ..config import SparrowConfig
 from ..meta import __version__
+from ..util.shell import cmd
 
 
 @click.command("update")

@@ -1,8 +1,8 @@
-from .util import md5hash, SparrowImportError, get_data_directory, get_file_object
-from .importer import BaseImporter
-from ..plugins import SparrowCorePlugin
-
 from sparrow.loader import InterfaceCollection
+
+from ..plugins import SparrowCorePlugin
+from .importer import BaseImporter
+from .util import SparrowImportError, get_data_directory, get_file_object, md5hash
 
 
 class InterfacePlugin(SparrowCorePlugin):

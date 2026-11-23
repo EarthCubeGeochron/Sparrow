@@ -1,9 +1,11 @@
-from sparrow.core.util import relative_path
 import gzip
 import json
-from pytest import mark
-from bs4 import BeautifulSoup as soup
 from pathlib import Path
+
+from bs4 import BeautifulSoup as soup
+from pytest import mark
+
+from sparrow.core.util import relative_path
 
 
 class TestSIMSImport:

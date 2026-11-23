@@ -1,5 +1,6 @@
-from .base import DatasheetAPI
 from sparrow.core.plugins import SparrowCorePlugin
+
+from .base import DatasheetAPI
 
 
 class DatasheetPlugin(SparrowCorePlugin):

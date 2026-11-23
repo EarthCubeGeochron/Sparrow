@@ -1,9 +1,10 @@
-from sqlalchemy import text
+from pytest import mark
+from sqlalchemy import MetaData, Table, or_, text
+
 import sparrow
 from sparrow.tests.helpers import json_fixture
-from sqlalchemy import Table, or_, MetaData
+
 from .filter import get_document_tables
-from pytest import mark
 
 
 class TestOpenSearch:

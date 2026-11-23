@@ -1,19 +1,21 @@
-import click
 import sys
+from subprocess import PIPE
+
+import click
+from macrostrat.utils.shell import cmd
+from rich import print
+from rich.console import Console
 
 from sparrow_cli.config import SparrowConfig
 from sparrow_cli.upgrade_database import upgrade_database_cluster
+
 from ..util import (
     CommandGroup,
+    compose,
     container_id,
     container_is_running,
-    compose,
     exec_sparrow,
 )
-from macrostrat.utils.shell import cmd
-from subprocess import PIPE
-from rich import print
-from rich.console import Console
 
 console = Console()
 
@@ -65,12 +67,6 @@ def sparrow_db(ctx):
 def migration(args):
     """Generate a changeset against the optimal database schema"""
     exec_sparrow("db-migration", *args)
-
-
-@sparrow_db.command(name="drop-cache")
-def drop_cache():
-    """Drop the cache of SQLAlchemy models maintained by the backend container."""
-    exec_sparrow("db-drop-cache")
 
 
 @sparrow_db.command(name="update", context_settings=dict(ignore_unknown_options=True))

@@ -1,7 +1,9 @@
-from ..context import app_context
 from geoalchemy2.shape import from_shape, to_shape
-from shapely.geometry import mapping, Polygon
+from shapely.geometry import Polygon, mapping
+
 from sparrow.core.api.endpoints.utils import create_location_from_coordinates
+
+from ..context import app_context
 
 
 def create_bound_shape(pnts: [float], srid=4326):

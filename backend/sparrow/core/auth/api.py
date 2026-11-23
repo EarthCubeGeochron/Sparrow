@@ -1,9 +1,10 @@
-from starlette.routing import Route, Router
+from starlette.authentication import AuthenticationError, requires
 from starlette.responses import JSONResponse
-from starlette.authentication import requires, AuthenticationError
+from starlette.routing import Route, Router
 from webargs_starlette import use_annotations
+
+from sparrow.core.context import get_database, get_sparrow_app
 from sparrow.database.models import User
-from sparrow.core.context import get_sparrow_app, get_database
 from sparrow.logs import get_logger
 
 log = get_logger(__name__)

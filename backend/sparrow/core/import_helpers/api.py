@@ -1,24 +1,27 @@
 import asyncio
-import typing
-from asyncio import sleep, get_event_loop, gather, create_task, wait
-from threading import Thread
-from asyncio.events import AbstractEventLoop
-from json import loads
-import time
 import sys
-from click import command, echo
-from sparrow.core.context import get_sparrow_app
-from starlette.responses import JSONResponse
-from sparrow.core.plugins import SparrowCorePlugin
-from starlette.endpoints import WebSocketEndpoint
+import time
+import typing
+from asyncio import create_task, gather, get_event_loop, sleep, wait
+from asyncio.events import AbstractEventLoop
 from contextlib import redirect_stdout
-from click._compat import _force_correct_text_writer
-from starlette.concurrency import run_until_first_complete
-from sparrow_worker import import_task
+from json import loads
+from threading import Thread
+
 from broadcaster import Broadcast
-from starlette.applications import Starlette
-from starlette.routing import Route, WebSocketRoute
+from click import command, echo
+from click._compat import _force_correct_text_writer
 from macrostrat.utils import get_logger
+from starlette.applications import Starlette
+from starlette.concurrency import run_until_first_complete
+from starlette.endpoints import WebSocketEndpoint
+from starlette.responses import JSONResponse
+from starlette.routing import Route, WebSocketRoute
+
+from sparrow.core.context import get_sparrow_app
+from sparrow.core.plugins import SparrowCorePlugin
+from sparrow_worker import import_task
+
 from .importer import WebSocketLogger
 
 started = False

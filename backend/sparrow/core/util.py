@@ -1,10 +1,12 @@
 import os
+from contextlib import contextmanager
 from os import path
 from pathlib import Path
-from contextlib import contextmanager
-from subprocess import run as _run
 from shlex import split
+from subprocess import run as _run
+
 from macrostrat.utils import relative_path
+
 from .settings import SECRET_KEY
 
 

@@ -1,13 +1,13 @@
 from os import environ
+
+from macrostrat.database.utils import connection_args, temporary_database
+from macrostrat.schema_management.plan import is_unsafe_statement, plan_changes
+from macrostrat.utils import cmd, get_logger, relative_path
+from pytest import fixture, mark
+
 from sparrow.core.app import Sparrow
 from sparrow.database import Database
 from sparrow.database.migration import create_schema_clone
-from macrostrat.utils import relative_path, cmd
-from macrostrat.database.utils import connection_args, temporary_database
-from macrostrat.schema_management.plan import is_unsafe_statement, plan_changes
-
-from pytest import mark, fixture
-from macrostrat.utils import get_logger
 
 target_db = environ.get("SPARROW_DATABASE")
 testing_db = target_db + "_migration"

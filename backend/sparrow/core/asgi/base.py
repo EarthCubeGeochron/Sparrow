@@ -7,16 +7,18 @@ with new async server architecture available in Python 3.6+.
 
 import logging
 from contextvars import ContextVar
+
+from asgiref.wsgi import WsgiToAsgi
 from starlette.applications import Starlette
-from webargs_starlette import parser
 from starlette.requests import Request
 from starlette.responses import JSONResponse, PlainTextResponse, Response
-from starlette.routing import Mount, Route, RedirectResponse
-from asgiref.wsgi import WsgiToAsgi
+from starlette.routing import Mount, RedirectResponse, Route
+from webargs_starlette import parser
+
 from ..api import APIv2
 from ..app import App
-from ..logs import console_handler
 from ..context import _setup_context
+from ..logs import console_handler
 
 # Customize Sparrow's root logger so we don't get overridden by uvicorn
 # We may want to customize this further eventually

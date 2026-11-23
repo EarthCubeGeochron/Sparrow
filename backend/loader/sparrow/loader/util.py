@@ -1,8 +1,7 @@
-from stringcase import pascalcase
-
 # from marshmallow_sqlalchemy.fields import get_primary_keys
 from macrostrat.database.mapper.utils import primary_key
 from sqlalchemy.ext.automap import generate_relationship
+from stringcase import pascalcase
 
 
 def column_is_required(col):

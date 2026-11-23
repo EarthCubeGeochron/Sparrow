@@ -1,15 +1,16 @@
-from celery import Task
-from typer.utils import get_params_from_function
-from pydantic import create_model
 import sys
 import traceback
-
-from stringcase import pascalcase
 from contextvars import ContextVar
-from redis import Redis
 
-from sparrow.logs import get_logger
+from celery import Task
+from pydantic import create_model
+from redis import Redis
+from stringcase import pascalcase
+from typer.utils import get_params_from_function
+
 from sparrow.core.context import get_plugin
+from sparrow.logs import get_logger
+
 from .logging import RedisQueueLogger, local_logger
 
 log = get_logger(__name__)

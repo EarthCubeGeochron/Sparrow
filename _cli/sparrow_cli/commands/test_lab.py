@@ -1,6 +1,8 @@
-import click
-from os import environ, path, chdir
+from os import chdir, environ, path
 from pathlib import Path
+
+import click
+
 from ..util import cmd
 
 
