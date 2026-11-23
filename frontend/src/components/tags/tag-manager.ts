@@ -88,7 +88,7 @@ function TagRow(props) {
         isEditing,
         onDelete,
       }),
-    ],
+    ]
   );
 }
 
@@ -137,7 +137,7 @@ function NewTag() {
         onClick: () => setOpen(!open),
         style: { marginBottom: "10px" },
       },
-      ["New Tag"],
+      ["New Tag"]
     ),
     h.if(open)(
       Callout,
@@ -150,7 +150,7 @@ function NewTag() {
           onSubmit,
           onCancel,
         }),
-      ],
+      ]
     ),
   ]);
 }

@@ -28,7 +28,7 @@ export const ProjectAdd = (props) => {
         isEditing,
         data,
       }),
-    ],
+    ]
   );
 };
 
@@ -63,7 +63,7 @@ const ProjectCard = (props) => {
           link: true,
           onClick: () => onClick({ id, name }),
         },
-        [h(ProjectCardContent, { ...obj, long: false })],
+        [h(ProjectCardContent, { ...obj, long: false })]
       );
     }),
   ]);
@@ -80,7 +80,7 @@ export function pubTitles({ publication }) {
       {},
       {
         unwrapResponse: unwrapPubTitles,
-      },
+      }
     );
     if (data == null) return null;
     if (publication.lenght > 1) {

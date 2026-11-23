@@ -135,7 +135,7 @@ const SessionInfoLink = function (props) {
       key: id,
       className: "session-info-card",
     },
-    h(SessionInfoComponent, props),
+    h(SessionInfoComponent, props)
   );
 };
 
@@ -147,7 +147,7 @@ const SessionInfoCard = function (props) {
       key: id,
       className: "session-info-card",
     },
-    h(SessionInfoComponent, props),
+    h(SessionInfoComponent, props)
   );
 };
 

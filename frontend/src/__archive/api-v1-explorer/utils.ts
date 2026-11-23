@@ -29,7 +29,7 @@ const JSONToggle = ({ showJSON, onChange }) => [
         return onChange({ showJSON: false });
       },
     },
-    "Summary",
+    "Summary"
   ),
   h(
     Button,
@@ -42,7 +42,7 @@ const JSONToggle = ({ showJSON, onChange }) => [
         return onChange({ showJSON: true });
       },
     },
-    "JSON",
+    "JSON"
   ),
 ];
 

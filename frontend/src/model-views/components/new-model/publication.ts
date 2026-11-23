@@ -101,7 +101,7 @@ export function PublicationXDDInput(props) {
         hide: { enabled: false },
       },
     },
-    [h(Button, { intent }, [totalNumber])],
+    [h(Button, { intent }, [totalNumber])]
   );
 
   const rightElement = h(Button, {
@@ -230,7 +230,7 @@ function DrawerContent(props) {
         h(
           "a",
           { href: "https://github.com/CrossRef/rest-api-doc" },
-          "Crossref API",
+          "Crossref API"
         ),
       ]),
     ]),

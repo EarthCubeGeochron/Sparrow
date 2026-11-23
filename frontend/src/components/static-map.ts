@@ -20,7 +20,7 @@ const StaticMarker = function (props) {
   return h(
     Marker,
     { offsetLeft, offsetTop, ...rest },
-    h(`span.${className}`, { style: { width: size, height: size } }),
+    h(`span.${className}`, { style: { width: size, height: size } })
   );
 };
 
@@ -61,7 +61,7 @@ class StaticMap extends Component {
         attributionControl: false,
         ...rest,
       },
-      [h.if(markCenter)(StaticMarker, { latitude, longitude }), children],
+      [h.if(markCenter)(StaticMarker, { latitude, longitude }), children]
     );
   }
 }

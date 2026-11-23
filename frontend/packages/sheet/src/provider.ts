@@ -87,7 +87,11 @@ type DataSheetProps = DataSheetParams & {
 };
 
 type DataSheetAction =
-  UpdateColumnWidth | SetSelection | SetRowOffset | SetColumns | MoveColumn;
+  | UpdateColumnWidth
+  | SetSelection
+  | SetRowOffset
+  | SetColumns
+  | MoveColumn;
 
 const DataSheetContext = createContext<DataSheetCtx>(defaultContext);
 
@@ -160,7 +164,7 @@ DataSheetProviderBase.defaultProps = defaultContext;
 
 const DataSheetProvider = compose(
   C(DndProvider, { backend: HTML5Backend }),
-  DataSheetProviderBase,
+  DataSheetProviderBase
 );
 
 const useDataSheet = () => {

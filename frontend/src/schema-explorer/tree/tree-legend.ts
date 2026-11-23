@@ -25,7 +25,7 @@ function TreeLegend() {
       h("b", "type_of"),
       h(
         "div.legend",
-        ": a hierarchical relationship, i.e this model is a subset of this other.",
+        ": a hierarchical relationship, i.e this model is a subset of this other."
       ),
     ]),
   ]);

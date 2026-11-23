@@ -41,7 +41,7 @@ const PubCard = (props) => {
       link: false,
       styles: { maxWidth: "700px" },
     },
-    [h(Publication, { doi, title })],
+    [h(Publication, { doi, title })]
   );
 };
 
@@ -94,6 +94,6 @@ export const PubAdd = (props) => {
         isEditing,
         onClick: onClickDelete,
       }),
-    ],
+    ]
   );
 };

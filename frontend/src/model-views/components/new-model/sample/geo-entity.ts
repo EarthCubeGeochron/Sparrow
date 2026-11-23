@@ -48,7 +48,7 @@ export const SampleGeoEntity = (props) => {
   const macroStratNames = useAPIv2Result(
     "https://macrostrat.org/api/v2/defs/strat_names",
     { strat_name_like: query },
-    { unwrapResponse: unwrapMacroStratNames },
+    { unwrapResponse: unwrapMacroStratNames }
   );
 
   const sparrowEntities = useAPIv2Result(
@@ -57,7 +57,7 @@ export const SampleGeoEntity = (props) => {
       like: query,
       per_page: 20,
     },
-    { unwrapResponse: unwrapSparrowGeoEntites },
+    { unwrapResponse: unwrapSparrowGeoEntites }
   );
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export const SampleGeoEntity = (props) => {
         onChange: changeGeoEntity,
         onFilter: changeQueryOnFilter,
       }),
-    ],
+    ]
   );
 };
 
@@ -99,7 +99,7 @@ export function EntityType(props) {
     {
       all: "true",
     },
-    { unwrapResponse: unwrapEntityTypes },
+    { unwrapResponse: unwrapEntityTypes }
   );
 
   console.log(entity_names);
@@ -140,7 +140,7 @@ export function GeoSpatialRef(props) {
   const refs = useAPIv2Result(
     "/vocabulary/entity_reference",
     { all: "true" },
-    { unwrapResponse: unwrapEntityTypes },
+    { unwrapResponse: unwrapEntityTypes }
   );
 
   let references = [];
@@ -265,7 +265,7 @@ function GeoEntityTextContainer(props) {
   return h(
     ModelLinkCard,
     { onClick: () => onClick(geoEntity), link: false, isEditing: true },
-    [h("h4", [geoEntityText])],
+    [h("h4", [geoEntityText])]
   );
 }
 

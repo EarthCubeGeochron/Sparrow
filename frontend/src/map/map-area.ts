@@ -124,7 +124,7 @@ export function _MapArea({
 
     console.log(
       "Samples:",
-      res.map((d) => d.properties),
+      res.map((d) => d.properties)
     );
 
     setState({
@@ -224,9 +224,9 @@ function OldMapPanel() {
             offsetLeft: -5,
             offsetTop: -10,
           },
-          h(Icon, { icon: "map-marker", color: "black" }),
+          h(Icon, { icon: "map-marker", color: "black" })
         ),
-      ],
+      ]
     ),
   ]);
 }

@@ -23,10 +23,10 @@ const MessageText = ({ text = "" }) => {
           "bg-dim": bgColor?.dim,
         },
         color?.name,
-        bg,
+        bg
       );
       return h("span", { className }, text);
-    }),
+    })
   );
 };
 
@@ -37,7 +37,7 @@ const Row = ({ data, index, style }) => {
   return h("div.message", { style }, [
     h.if(lineno >= 0 && lineno < data.length)(
       "span.lineno.dark-gray",
-      `${lineno + 1}`,
+      `${lineno + 1}`
     ),
     h(MessageText, { text }),
   ]);
@@ -52,7 +52,7 @@ function MessageHistory({ messages, width, height, gutterWidth = 70 }) {
 
   const [charSize, setCharSize] = useState(null);
   const charsPerLine = Math.floor(
-    (width - gutterWidth) / (charSize?.width ?? 8),
+    (width - gutterWidth) / (charSize?.width ?? 8)
   );
 
   const textMeasureRef = useRef<HTMLSpanElement>(null);
@@ -81,7 +81,7 @@ function MessageHistory({ messages, width, height, gutterWidth = 70 }) {
       const nLines = Math.max(Math.ceil(n / charsPerLine), 1);
       return lineHeight * nLines;
     },
-    [charSize, width],
+    [charSize, width]
   );
 
   if (charSize == null) {
@@ -99,7 +99,7 @@ function MessageHistory({ messages, width, height, gutterWidth = 70 }) {
       width,
       className: "message-history",
     },
-    Row,
+    Row
   );
 }
 
@@ -114,6 +114,6 @@ export function LogWindow({ messages }) {
   return h(
     "div.log-window",
     { ref: containerRef },
-    h(MessageHistory, { width, height, messages }),
+    h(MessageHistory, { width, height, messages })
   );
 }

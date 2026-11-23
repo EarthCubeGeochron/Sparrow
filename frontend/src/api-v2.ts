@@ -15,7 +15,7 @@ export const APIV2Context = createAPIContext({
 export function useAPIv2Result(
   route,
   params = {},
-  opts: Partial<APIOptions> = {},
+  opts: Partial<APIOptions> = {}
 ) {
   /** Temporary shim to convert V1 API to V2 */
   opts.context = APIV2Context;
@@ -29,7 +29,7 @@ export const APIV3Context = createAPIContext({
 export function useAPIv3Result(
   route,
   params = {},
-  opts: Partial<APIOptions> = {},
+  opts: Partial<APIOptions> = {}
 ) {
   /** Temporary shim to convert V1 API to V2 */
   opts.context = APIV3Context;

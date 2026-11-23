@@ -34,7 +34,7 @@ const ShortSiteTitle = () => {
     { to: "/" },
     h("div.shortTitle", [
       h(Frame, { id: "shortSiteTitle" }, [title ?? siteTitle]),
-    ]),
+    ])
   );
 };
 

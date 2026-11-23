@@ -25,7 +25,7 @@ const ResponsiveHistogram = withParentSize(
       width: parentWidth,
       height: parentHeight,
       ...rest,
-    }),
+    })
 );
 
 class AgeChart extends Component {
@@ -90,7 +90,7 @@ class AgeChart extends Component {
         }),
         h(XAxis, { label: "Age (Ma)" }),
         h(YAxis, { label: "Number of grains" }),
-      ],
+      ]
     );
   }
 }
@@ -151,13 +151,13 @@ class ChartOuter extends Component {
                   },
                 }),
               ]),
-            ],
+            ]
           ),
           h("div.chart-container", { style: { height: 500 } }, [
             h(AgeChart, { data, range }),
           ]),
         ]);
-      },
+      }
     );
   }
 }

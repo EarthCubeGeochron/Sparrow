@@ -58,7 +58,7 @@ export function ModelCard(props: ModelCardProps): ReactNode {
         {
           className,
         },
-        [h.if(showIdentity != null)("div.id-info", idInfo), children],
+        [h.if(showIdentity != null)("div.id-info", idInfo), children]
       ),
     ]);
   } else {
@@ -69,7 +69,7 @@ export function ModelCard(props: ModelCardProps): ReactNode {
           className,
           onClick,
         },
-        children,
+        children
       ),
     ]);
   }
@@ -149,8 +149,8 @@ const SampleModelCard = (props) => {
         id: "sampleCardContent",
         data: { material, id, name, location, session },
       },
-      h(SampleDefaultContent, { material, id, name, location, session }),
-    ),
+      h(SampleDefaultContent, { material, id, name, location, session })
+    )
   );
 };
 
@@ -195,7 +195,7 @@ export const ResearcherModelCard = (props) => {
   const children = h(
     Frame,
     { id: "researcherCardContent", data: { id, name } },
-    h("h4", { style: { margin: "10px" } }, name),
+    h("h4", { style: { margin: "10px" } }, name)
   );
 
   return h(ModelCard, {
@@ -236,7 +236,7 @@ const ProjectModelCard = (props) => {
       id: "projectCardContent",
       data: { id, name, description, sample, session, publication },
     },
-    children,
+    children
   );
 
   return h(ModelCard, {
@@ -331,7 +331,7 @@ const SessionListModelCard = (props) => {
         data,
       },
     },
-    children,
+    children
   );
 
   return h(ModelCard, {
@@ -389,7 +389,7 @@ const SessionModelLinkCard = (props) => {
         data,
       },
     },
-    children,
+    children
   );
 
   return h(ModelCard, {
@@ -417,7 +417,7 @@ const DataFileModelCard = (props) => {
       id: "dataFileCardContent",
       data: { dataFile },
     },
-    children,
+    children
   );
 
   return h(ModelCard, {
@@ -435,7 +435,7 @@ const ContentOverFlow = ({ data, title, className, minimal = false }) =>
       { className },
       data.length > 2
         ? h("div", [data.slice(0, 2).map((d) => h("li", d)), "More..."])
-        : data.map((d) => h("li", d)),
+        : data.map((d) => h("li", d))
     ),
   ]);
 

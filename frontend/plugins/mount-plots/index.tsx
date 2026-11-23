@@ -27,7 +27,7 @@ function MountMapChartInner(props) {
   });
   //Culled nulls to see if it fixes the plot...
   const culled_data = analysis_data.filter(
-    (d) => d.stage_X != null && d.stage_Y != null,
+    (d) => d.stage_X != null && d.stage_Y != null
   );
   console.log(data);
   console.log(analysis_data);

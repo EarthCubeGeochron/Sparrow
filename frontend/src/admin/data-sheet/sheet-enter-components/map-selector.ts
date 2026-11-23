@@ -119,7 +119,7 @@ export function MapSelector({
           min: -90,
           max: 90,
         }),
-      ],
+      ]
     );
   }
 
@@ -153,9 +153,9 @@ export function MapSelector({
                 offsetLeft: -10,
                 offsetTop: -15,
               },
-              [h(Icon, { icon: "map-marker", color: "black" })],
+              [h(Icon, { icon: "map-marker", color: "black" })]
             ),
-          ],
+          ]
         ),
         h(LongLatInputs),
         h("div", { style: { display: "flex", justifyContent: "flex-end" } }, [

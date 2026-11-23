@@ -18,7 +18,7 @@ export function GeologicFormationSelector() {
       setStratNames(
         geologicFormations.success.data
           .map((item) => item.strat_name)
-          .slice(0, 10),
+          .slice(0, 10)
       );
     }
   }, [geologicFormations]);

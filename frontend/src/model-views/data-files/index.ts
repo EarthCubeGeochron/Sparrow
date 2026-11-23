@@ -25,9 +25,9 @@ export function DataFilesList(props) {
         h("div", { className: "data-file-card" }, [
           h("h2", d.basename),
           h("div.type", d.type),
-        ]),
+        ])
       );
-    }),
+    })
   );
 }
 
@@ -47,7 +47,7 @@ export function DataFilesCard(data) {
           h("h2", basename),
           h("div.type", type),
         ]),
-      ]),
+      ])
     ),
   ]);
 }

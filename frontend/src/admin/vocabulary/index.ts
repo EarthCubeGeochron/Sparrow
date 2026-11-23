@@ -39,7 +39,7 @@ function VocabularyList(props) {
     h.if(authority != null)("h2", authority),
     h(
       "div.vocabulary-list",
-      data.map((d) => h(TermCard, { data: d })),
+      data.map((d) => h(TermCard, { data: d }))
     ),
   ]);
 }
@@ -63,14 +63,14 @@ function AuthorityMenu({ authority, setAuthority }) {
           setAuthority(d.id);
         },
         text: d.id,
-      }),
-    ),
+      })
+    )
   );
 
   return h(
     Popover,
     { content },
-    h(Button, { minimal: true }, h(["Authority: ", h("b", authority)])),
+    h(Button, { minimal: true }, h(["Authority: ", h("b", authority)]))
   );
 }
 
@@ -100,7 +100,7 @@ export function VocabularyPage() {
         {
           path: base + "/:term",
         },
-        h(VocabularyPanel, { authority }),
+        h(VocabularyPanel, { authority })
       ),
     ]),
   ]);

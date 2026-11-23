@@ -71,7 +71,7 @@ function CredentialsDialog({
       h("div", { className: Classes.DIALOG_FOOTER }, [
         h("div", { className: Classes.DIALOG_FOOTER_ACTIONS }, actionButtons),
       ]),
-    ],
+    ]
   );
 }
 
@@ -85,7 +85,7 @@ function LogoutForm() {
         large: true,
         onClick: () => runAction({ type: "logout" }),
       },
-      "Log out",
+      "Log out"
     ),
   ]);
   return h(CredentialsDialog, { actionButtons }, [
@@ -97,7 +97,7 @@ function LogoutForm() {
         intent: Intent.SUCCESS,
         icon: "person",
       },
-      h("p", ["Logged in as user ", h("em", username)]),
+      h("p", ["Logged in as user ", h("em", username)])
     ),
   ]);
 }
@@ -127,7 +127,7 @@ function _LoginForm() {
         onClick: submitForm,
         disabled: !isValid(state),
       },
-      "Login",
+      "Login"
     ),
   ]);
 

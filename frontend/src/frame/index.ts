@@ -50,7 +50,7 @@ function FrameProvider({ overrides = {}, children }) {
         registry: overrides,
       },
     },
-    children,
+    children
   );
 }
 

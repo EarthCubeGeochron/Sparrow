@@ -39,7 +39,7 @@ export function FilterMenu({ hide = true, on_map, changeParams }) {
         h(Tooltip, { content: "Choose Multiple Filters" }, [
           h(Button, { icon: "filter", minimal: true }),
         ]),
-      ],
+      ]
     );
   };
 

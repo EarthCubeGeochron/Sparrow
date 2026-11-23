@@ -11,7 +11,7 @@ export function CompositeTermCard(props) {
       h("div.sub-term", [
         h.if(d.list ?? false)("p.modifier", "List of"),
         h(TermCard, { data: d }),
-      ]),
+      ])
     ),
   ]);
 }
@@ -36,6 +36,6 @@ export function TermCard(props) {
   return h(
     Card,
     { className: "term-card", elevation: 0 },
-    h(CardContent, data),
+    h(CardContent, data)
   );
 }

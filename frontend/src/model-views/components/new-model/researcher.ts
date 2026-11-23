@@ -64,7 +64,7 @@ function ResearcherForm(props) {
         intent: "success",
         disabled,
       },
-      ["Create new researcher"],
+      ["Create new researcher"]
     ),
   ]);
 }

@@ -82,7 +82,7 @@ function Description(props: LabelProps) {
             setChecked(!checked);
           },
         },
-        ["Show in Schema"],
+        ["Show in Schema"]
       ),
     ]),
   ]);
@@ -136,9 +136,9 @@ function NodeLabel(props: LabelProps) {
           {
             className: classname,
           },
-          [type],
+          [type]
         ),
-      ],
+      ]
     );
   };
 
@@ -220,7 +220,7 @@ function Tree({
           return res.fields;
         }
       },
-    },
+    }
   );
 
   useEffect(() => {

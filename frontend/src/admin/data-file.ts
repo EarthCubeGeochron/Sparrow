@@ -35,7 +35,7 @@ export function DataFileAdminPage() {
         possibleFilters,
         initParams: initialState || {},
       },
-      [h(DataFilesListComponent)],
+      [h(DataFilesListComponent)]
     ),
     mainPageComponent: h(DataFilesMainPanel),
   });

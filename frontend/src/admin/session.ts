@@ -22,7 +22,7 @@ export function SessionMainPanel() {
       {
         path: base + "/:id",
       },
-      h(SessionMatch),
+      h(SessionMatch)
     ),
     h(Route, {
       path: base,
@@ -49,7 +49,7 @@ export function SessionAdminPage() {
   const [listName, setListName] = useState("main");
 
   const [updateFunction, setUpdateFunction] = useState(() =>
-    console.log("add"),
+    console.log("add")
   );
 
   const changeFunction = (func) => {
@@ -64,6 +64,6 @@ export function SessionAdminPage() {
         listComponent: h(SessionAdminList),
         mainPageComponent: h(SessionMainPanel),
       }),
-    ],
+    ]
   );
 }

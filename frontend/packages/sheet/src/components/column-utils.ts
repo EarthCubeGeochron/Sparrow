@@ -35,7 +35,7 @@ type DragItem = {
 function apportionWidths(
   columns: ColumnData[],
   desiredWidths: { [key: string]: number },
-  containerWidth: number,
+  containerWidth: number
 ): ColumnData[] {
   if (columns == null || desiredWidths == null || containerWidth == null)
     return columns;

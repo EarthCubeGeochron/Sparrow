@@ -73,7 +73,7 @@ export const ModelLinkCard = (props: ModelLinkCardProps) => {
         className: classNames(
           { "indirect-link": indirect },
           "model-card",
-          className,
+          className
         ),
         to,
         onMouseEnter,
@@ -86,7 +86,7 @@ export const ModelLinkCard = (props: ModelLinkCardProps) => {
           onClick,
         }),
         children,
-      ],
+      ]
     ),
     h.if(linkedThrough != null)(LinkedThrough, { data: linkedThrough }),
   ]);

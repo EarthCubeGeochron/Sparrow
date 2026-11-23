@@ -73,8 +73,8 @@ function NodeMembers({ node }) {
           group_by == null ? "" : " by " + group_by,
           ")",
         ]),
-      ]),
-    ),
+      ])
+    )
   );
 }
 
@@ -101,7 +101,7 @@ function Node({ width, height, node, top, left }) {
     h("div.node-content", { className }, [
       h("div.node-name", node.data.name),
       h(NodeMembers, { node }),
-    ]),
+    ])
   );
 }
 
@@ -192,9 +192,9 @@ export default function LinksArea({
               top: origin.y,
               left: origin.x,
             },
-            [tree.links().map(renderLink)],
-          ),
-        ),
+            [tree.links().map(renderLink)]
+          )
+        )
       ),
       h(
         "div.tree-nodes",
@@ -214,7 +214,7 @@ export default function LinksArea({
           const left = margin.left + widthIncludingHiddenRoot + node.y;
           if (node.depth === 0) return null;
           return h(Node, { width, height, node, top, left });
-        }),
+        })
       ),
     ]);
   };
@@ -237,7 +237,7 @@ export default function LinksArea({
           return 1;
         },
       },
-      renderTree,
-    ),
+      renderTree
+    )
   );
 }

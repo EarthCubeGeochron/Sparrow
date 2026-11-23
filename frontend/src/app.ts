@@ -70,7 +70,7 @@ function AppRouter(props) {
       }),
       h(Frame, { id: "extraPages", default: null }, null),
       h(PageRoute, { path: "*", component: NoMatchPage }),
-    ]),
+    ])
   );
 }
 
@@ -93,7 +93,7 @@ const CoreAppComponent = compose(
   C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
   AuthProvider,
   DarkModeManager,
-  C(AppRouter, { baseURL }),
+  C(AppRouter, { baseURL })
 );
 
 function App() {
@@ -104,7 +104,7 @@ function Canary() {
   return h(
     "div.__canary",
     { style: { display: "none" } },
-    "This element is used to test whether the application rendered properly.",
+    "This element is used to test whether the application rendered properly."
   );
 }
 

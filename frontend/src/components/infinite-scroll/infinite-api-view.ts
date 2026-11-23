@@ -113,7 +113,7 @@ function InfiniteAPIView({
         fetch: fetchNewData,
         moreAfter,
       },
-      [children],
+      [children]
     );
   }
   return h("div", { style: { marginTop: "100px" } }, [h(Spinner)]);

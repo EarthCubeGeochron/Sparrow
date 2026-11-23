@@ -87,7 +87,7 @@ const EditNavBarSample = () => {
         }),
         h(Navbar.Divider),
         h(NewModelButton, { model: "sample", minimal: true }),
-      ]),
+      ])
     ),
   ]);
 };
@@ -360,7 +360,7 @@ const SampleLocationEleDepthEditor = () => {
         sample: { longitude, latitude },
         stacked: false,
       }),
-    ],
+    ]
   );
 };
 
@@ -442,21 +442,21 @@ function useSamplePersist() {
       TagsChangeSet(
         changeset,
         updatedModel,
-        buildURL("/tags/models/sample", {}),
-      ),
+        buildURL("/tags/models/sample", {})
+      )
     );
     let { id } = updatedModel;
     console.log(
       handleMemberOfPersist(
         changeset,
-        buildURL(`/models/sample/sub-sample/${id}`),
-      ),
+        buildURL(`/models/sample/sub-sample/${id}`)
+      )
     );
     delete updatedModel.member_of;
     let rest;
     const response = await put(
       buildURL(`/models/sample/${id}`, {}),
-      updatedModel,
+      updatedModel
     );
     const { data } = response;
   };
@@ -521,7 +521,7 @@ function SamplePage(props: SampleProps) {
                 h(
                   Frame,
                   { id: "sampleHeaderExt", data: { sample: sample.data } },
-                  null,
+                  null
                 ),
               ]),
             ]),
@@ -533,8 +533,8 @@ function SamplePage(props: SampleProps) {
         h(SampleProjectAdd),
         h(GeoEntity),
         h(Frame, { id: "samplePage", data: sample.data }, null),
-      ],
-    ),
+      ]
+    )
   );
 }
 

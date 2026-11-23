@@ -23,7 +23,7 @@ const ProjectListComponent = () => {
         title: "Projects",
       },
       `This page lists projects of related samples, measurements, and publications. \
-Projects can be imported into Sparrow or defined using the managment interface.`,
+Projects can be imported into Sparrow or defined using the managment interface.`
     ),
     h(PostgRESTFilterList, {
       route: "/project",

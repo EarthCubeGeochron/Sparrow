@@ -33,7 +33,7 @@ const SampleListCard = function (props) {
     [
       h("h4", ["Sample ", h("span.name", name)]),
       h.if(material != null)("div.material", material),
-    ],
+    ]
   );
 };
 
@@ -53,7 +53,7 @@ const SampleList = function () {
         icon: "info-sign",
         title: "Samples",
       },
-      "This page lists all samples indexed in the laboratory data system.",
+      "This page lists all samples indexed in the laboratory data system."
     ),
 
     h(PostgRESTFilterList, {

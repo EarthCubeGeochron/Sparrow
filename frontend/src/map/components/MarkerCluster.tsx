@@ -82,7 +82,7 @@ export function MarkerCluster({ viewport, changeViewport, bounds, data }) {
                   e.stopPropagation();
                   const expansionZoom = Math.min(
                     supercluster.getClusterExpansionZoom(cluster.id),
-                    5,
+                    5
                   );
                   changeViewport({ expansionZoom, longitude, latitude });
                 }}

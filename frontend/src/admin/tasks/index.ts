@@ -94,7 +94,7 @@ function TaskMain({ tasks, task }) {
             minimal: true,
             disabled: schema == null,
           },
-          `Parameters`,
+          `Parameters`
         ),
         h(
           Button,
@@ -108,7 +108,7 @@ function TaskMain({ tasks, task }) {
               sendMessage(JSON.stringify(act));
             },
           },
-          isRunning ? "Stop" : "Start",
+          isRunning ? "Stop" : "Start"
         ),
         h("div.spacer", { style: { flexGrow: 1 } }),
         h(ServerStatus, { socket: ws, small: false }),
@@ -129,8 +129,8 @@ function TaskMain({ tasks, task }) {
               setParams(e.formData);
             },
           },
-          h("div"),
-        ),
+          h("div")
+        )
       ),
     ]),
     h(LogWindow, { messages: messageHistory.current }),
@@ -169,7 +169,7 @@ function TaskMenuItem({ taskName, base, isActive }) {
       {
         to: linkDest,
       },
-      taskName,
+      taskName
     ),
     onClick(e) {
       history.push(linkDest);
@@ -184,8 +184,8 @@ function TaskList({ tasks = [], base, task }) {
     h(
       Menu,
       tasks.map((d) =>
-        h(TaskMenuItem, { taskName: d.name, base, isActive: d.name === task }),
-      ),
+        h(TaskMenuItem, { taskName: d.name, base, isActive: d.name === task })
+      )
     ),
   ]);
 }
@@ -204,7 +204,7 @@ function TasksPage() {
         description:
           "A tasks worker is not available for this Sparrow instance. Use the Sparrow command-line application to run tasks.",
         icon: "console",
-      }),
+      })
     );
   }
 

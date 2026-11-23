@@ -15,7 +15,7 @@ export function APIExplorerV2(props) {
           minimal: false,
           large: true,
         },
-        "Version 1",
+        "Version 1"
       ),
       h(
         NavButton,
@@ -25,7 +25,7 @@ export function APIExplorerV2(props) {
           minimal: false,
           large: true,
         },
-        "Import schemas",
+        "Import schemas"
       ),
     ]),
     h(SwaggerUI, { url: "/api/v2/schema" }),

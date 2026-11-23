@@ -49,7 +49,7 @@ function StepHeatingChartInner(props) {
   const innerHeight = height - 2 * margin;
 
   const heatingSteps = data.filter(
-    (d) => d.session_index != null || d.analysis_type == "Heating step",
+    (d) => d.session_index != null || d.analysis_type == "Heating step"
   );
   heatingSteps.sort((a, b) => b.session_index - a.session_index);
 
@@ -110,7 +110,7 @@ function StepHeatingChartInner(props) {
                   height: yScale(mn) - y,
                   fill: in_plateau ? "#444" : "#aaa",
                 });
-              }),
+              })
             ),
             h("g.plateau-age", [
               h("rect", {
@@ -137,9 +137,9 @@ function StepHeatingChartInner(props) {
             label: "Age (Ma)",
             labelOffset: 30,
           }),
-        ],
+        ]
       ),
-    ],
+    ]
   );
 }
 

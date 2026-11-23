@@ -66,7 +66,7 @@ function useSchemaActions(dispatch) {
 /////////////// Schema Reducer ///////////////
 function schemaExplorerReducer(
   state = schemaExplorerDefaultState,
-  action: SchemaActions,
+  action: SchemaActions
 ) {
   switch (action.type) {
     case "switch-model": {
@@ -139,7 +139,7 @@ const SchemaExplorerContext = createContext<SchemaCtx>({
 function SchemaExplorerContextProvider(props) {
   const [state, dispatch] = useReducer(
     schemaExplorerReducer,
-    schemaExplorerDefaultState,
+    schemaExplorerDefaultState
   );
 
   const runAction = useSchemaActions(dispatch);
@@ -158,7 +158,7 @@ function SchemaExplorerContextProvider(props) {
   return h(
     SchemaExplorerContext.Provider,
     { value: { state, runAction } },
-    props.children,
+    props.children
   );
 }
 

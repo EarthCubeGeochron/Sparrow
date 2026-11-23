@@ -57,9 +57,9 @@ function ColumnResizeHandles() {
             e.preventDefault();
             e.stopPropagation();
           },
-        }),
+        })
       );
-    }),
+    })
   );
 }
 
@@ -82,7 +82,7 @@ function HeaderCell({ col, index }: { col: ColumnInfo; index: number }) {
   return h(
     "td.cell.header.read-only.header-cell",
     { style: { opacity }, key: col.name },
-    [h("div.cell-content", { ref }, col.name)],
+    [h("div.cell-content", { ref }, col.name)]
   );
 }
 

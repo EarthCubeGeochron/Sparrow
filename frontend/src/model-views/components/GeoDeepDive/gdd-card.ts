@@ -35,9 +35,9 @@ const SnippetResult = function (props) {
       h("h4.date", coverDate),
       h(
         "div.snippets",
-        highlight.map((d) => h(Snippet, { html: d })),
+        highlight.map((d) => h(Snippet, { html: d }))
       ),
-    ],
+    ]
   );
 };
 
@@ -52,7 +52,7 @@ const SnippetList = (props) => {
   return h(
     "div.snippet-list",
     null,
-    items.map((d) => h(SnippetResult, d)),
+    items.map((d) => h(SnippetResult, d))
   );
 };
 
@@ -91,9 +91,9 @@ function GeoDeepDiveCard(props) {
             "p",
             `The GeoDeepDive API can be used to aid \
 the linking of sample names to their containing \
-publications`,
+publications`
           ),
-        ],
+        ]
       ),
       h(APIResultView, { route, params }, (res) => {
         const {
@@ -101,7 +101,7 @@ publications`,
         } = res;
         return h(SnippetList, { items: data });
       }),
-    ]),
+    ])
   );
 }
 

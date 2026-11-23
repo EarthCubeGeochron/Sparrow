@@ -23,7 +23,7 @@ function TermList(props) {
     h(
       "div.term-list-data",
       data.terms.map((d) => h(TermCard, { data: d })),
-      children,
+      children
     ),
   ]);
 }
@@ -39,14 +39,14 @@ function SelectMenu({ items, activeItem, onSetItem, prefix = null }) {
           onSetItem(d);
         },
         text: d,
-      }),
-    ),
+      })
+    )
   );
 
   return h(
     Popover2,
     { content },
-    h(Button, { minimal: true }, h([prefix, h("b", activeItem)])),
+    h(Button, { minimal: true }, h([prefix, h("b", activeItem)]))
   );
 }
 
@@ -69,7 +69,7 @@ export default function () {
             value: activeVocabulary.name,
             onChange(event) {
               setActiveVocabulary(
-                externalVocabs.find((d) => d.name == event.currentTarget.value),
+                externalVocabs.find((d) => d.name == event.currentTarget.value)
               );
             },
           }),

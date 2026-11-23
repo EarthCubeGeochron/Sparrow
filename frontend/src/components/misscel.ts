@@ -19,7 +19,7 @@ export function HelpButton(props) {
         hide: { enabled: false },
       },
     },
-    [h(Button, { minimal: true, intent: "danger" }, ["Help"])],
+    [h(Button, { minimal: true, intent: "danger" }, ["Help"])]
   );
 }
 

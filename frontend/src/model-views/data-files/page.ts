@@ -88,7 +88,7 @@ const DataFileSessions = (props) => {
   const { actions, isEditing, model } = useModelEditor();
 
   const sessions_links = model.data_file_link.filter(
-    (obj) => obj.session != null,
+    (obj) => obj.session != null
   );
   const sessions = sessions_links.map((obj) => {
     const session = obj.session;
@@ -137,7 +137,7 @@ function DataFileDetails(props) {
           }),
         ]),
         h(Frame, { id: "dataFileHeaderExt", data: { dataFile: model } }, null),
-      ],
+      ]
     ),
   ]);
 }
@@ -174,7 +174,7 @@ export function DataFilePage(props) {
           h(Frame, { id: "dataFilePage", data }, null),
         ]),
       ]),
-    ],
+    ]
   );
 }
 

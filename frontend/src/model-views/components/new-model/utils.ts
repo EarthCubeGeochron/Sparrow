@@ -58,7 +58,7 @@ export function FormSlider(props) {
           icon: "plus",
           intent: "success",
         },
-        [`Create a New ${model}`],
+        [`Create a New ${model}`]
       ),
     ]),
     h(
@@ -71,7 +71,7 @@ export function FormSlider(props) {
         onClose: close,
         isCloseButtonShown: true,
       },
-      [content, h(Button, { onClick: close, intent: "danger" }, ["Cancel"])],
+      [content, h(Button, { onClick: close, intent: "danger" }, ["Cancel"])]
     ),
   ]);
 }
@@ -121,11 +121,11 @@ export const SubmitDialog = (props) => {
               onClick: goToModel,
               style: { marginRight: "5px" },
             },
-            [`Create New ${modelName}`],
+            [`Create New ${modelName}`]
           ),
           h(Button, { intent: "danger", onClick: changeOpen }, ["Cancel"]),
         ]),
-      ],
+      ]
     ),
   ]);
 };
@@ -150,7 +150,7 @@ export const SubmitButton = (props) => {
         onClick: changeOpen,
         intent: "primary",
       },
-      ["Done"],
+      ["Done"]
     ),
   ]);
 };
@@ -267,7 +267,7 @@ export const EmbargoDatePick = (props) => {
           onClick: () => onChange(null),
           minimal: true,
         },
-        ["Make Public"],
+        ["Make Public"]
       ),
     ]);
   };
@@ -299,7 +299,7 @@ export const EditStatusButtons = function (props) {
           disabled: !changed,
           onClick: onClickSubmit,
         },
-        "Save",
+        "Save"
       ),
       h(
         CancelButton,
@@ -307,7 +307,7 @@ export const EditStatusButtons = function (props) {
           intent: changed ? "warning" : "none",
           onClick: onClickCancel,
         },
-        "Done",
+        "Done"
       ),
     ]),
   ]);

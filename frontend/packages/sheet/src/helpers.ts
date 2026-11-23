@@ -14,7 +14,7 @@ type ElementSize = {
 // Should factor this into UI Components
 function useElementSize(
   ref: RefObject<HTMLElement>,
-  trackWindowResize: boolean = true,
+  trackWindowResize: boolean = true
 ): ElementSize | null {
   const [size, setSize] = useState<ElementSize>(null);
 

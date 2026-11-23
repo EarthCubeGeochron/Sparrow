@@ -59,7 +59,7 @@ function DataSheetSettingsProvider(props) {
   return h(
     DataSheetSettingsContext.Provider,
     { value: { allColumns, ...state } },
-    h(DataSheetDispatchContext.Provider, { value: dispatch }, children),
+    h(DataSheetDispatchContext.Provider, { value: dispatch }, children)
   );
 }
 
@@ -93,7 +93,7 @@ function ColumnToggleList(props) {
         isShown: showColumns[col.key] ?? true,
         column: col,
       });
-    }),
+    })
   );
 }
 
@@ -108,7 +108,7 @@ function SettingsPopup() {
       content: h("div", null, h(ColumnTogglePanel)),
       rootBoundary: document.querySelector(".data-sheet-page"),
     },
-    h(Button, { icon: "cog" }, "Settings"),
+    h(Button, { icon: "cog" }, "Settings")
   );
 }
 
