@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "sparrow-admin"
+version = "0.1.0"
+description = "Commands for administering a Sparrow lab's database"
+authors = ["Daven Quinn <dev@davenquinn.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "sparrow"}]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.14"
+# The application whose database these commands manage
+sparrow = {path = "..", develop = true}
+click = "^8.1.0"
+typer = ">=0.12.5"
+
+[tool.poetry.scripts]
+sparrow-admin = "sparrow.admin:cli"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

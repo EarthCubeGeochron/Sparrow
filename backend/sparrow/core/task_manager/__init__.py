@@ -120,7 +120,7 @@ class SparrowTaskManager(SparrowCorePlugin):
 
     def on_setup_cli(self, cli):
         self._cli_app._add_completion = False
-        from sparrow.core.cli.util import add_typer_command
+        from sparrow.admin.util import add_typer_command
 
         add_typer_command(cli, self._cli_app, "tasks", help="Run Sparrow tasks")
 

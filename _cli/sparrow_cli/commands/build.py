@@ -65,9 +65,12 @@ def sparrow_build(ctx, images, push=False):
         print(f"{image_name}: building image {name}")
         # Allow build to be used for layer cache
         # https://github.com/moby/moby/issues/39003
+        # The backend's last stage adds what its tests need
+        target_args = ["--target main"] if image_name == "backend" else []
         cmd(
             "docker build",
             *tag_args,
+            *target_args,
             "--build-arg DOCKER_BUILDKIT=1",
             "--build-arg BUILDKIT_INLINE_CACHE=1",
             im["context"],

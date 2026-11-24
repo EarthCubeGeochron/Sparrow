@@ -1,8 +1,7 @@
 from datetime import datetime
 from os import environ
 
-import numpy as N
-from pytest import mark
+from pytest import approx, mark
 from sqlalchemy.engine.reflection import Inspector
 
 from sparrow.logs import get_logger
@@ -145,4 +144,4 @@ class TestGeoInstance(object):
         assert out["location"] is not None
         c0 = self.obj["location"]["coordinates"]
         c1 = out["location"]["coordinates"]
-        assert N.allclose(c0, c1)
+        assert list(c1) == approx(list(c0))

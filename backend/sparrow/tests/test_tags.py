@@ -1,12 +1,11 @@
-import json
-
-from pytest import mark
-
 from .helpers import json_fixture
 
 
 class TestTags:
-    def test_tag_tables_exist(self, client, db):
+    # PostgREST has its own connection, so it sees only committed data
+    use_isolation = False
+
+    def test_tag_tables_exist(self, db):
         """
         Check if the tags tables were successfully created
         """
@@ -21,67 +20,53 @@ class TestTags:
         for table in tables:
             assert db.inspector.has_table(table, schema="tags")
 
-    def test_default_tags_exist(self, client, db):
+    def test_default_tags_exist(self, db, pg_api):
         """Checks to make sure the default tags are in the db"""
-        res = client.get("/api/v2/tags/tag?all=true")
-        d = res.json()
-        assert len(d["data"]) >= 3
-
-    def test_post_tag(self, client, db, token):
-        """Create a new tag add to db and make sure it was entered"""
-        data = json_fixture("tags.json")
-        tags = db.model.tags_tag
-
-        new_tag = data["new_tag"]
-
-        res = client.post(
-            "/api/v2/tags/tag", headers={"Authorization": token}, json=new_tag
-        )
-
+        res = pg_api.get("/tag")
         assert res.status_code == 200
+        assert len(res.json()) >= 3
 
+    def test_post_tag_unauthorized(self, pg_api):
+        new_tag = json_fixture("tags.json")["new_tag"]
+        res = pg_api.post("/tag", json=new_tag)
+        assert res.status_code == 401
+
+    def test_post_tag(self, db, pg_api, token):
+        """Create a new tag add to db and make sure it was entered"""
+        new_tag = json_fixture("tags.json")["new_tag"]
+        res = pg_api.post(
+            "/tag", headers={"Authorization": "Bearer " + token}, json=new_tag
+        )
+        assert res.status_code == 201
+
+        tags = db.model.tags_tag
         q = db.session.query(tags).filter(tags.name == new_tag["name"]).first()
         assert q.name == new_tag["name"]
 
-    @mark.skip(reason="Only works with the --no-isolation flag")
-    def test_edit_tag(self, client, db, token):
-        """Edit a tag's name and color"""
-        data = json_fixture("tags.json")
+    def test_tag_a_sample(self, db, pg_api, token):
+        """Records are tagged by adding a link"""
+        auth = {"Authorization": "Bearer " + token}
+        sample = db.load_data("sample", json_fixture("tags.json")["new_sample"])
+        tag = pg_api.get("/tag", params={"limit": 1}).json()[0]
 
-        new_tag = data["new_tag"]
-        tags = db.model.tags_tag
-
-        t = db.session.query(tags).filter(tags.name == new_tag["name"]).first()
-        edits = data["edit_tag"]
-
-        res = client.put(
-            f"/api/v2/tags/tag/{t.id}",
-            headers={"Authorization": token},
-            json=data["edit_tag"],
+        res = pg_api.post(
+            "/sample_tag",
+            headers=auth,
+            json={"tag_id": tag["id"], "sample_id": sample.id},
         )
+        assert res.status_code == 201
 
-        t = db.session.query(tags).filter(tags.name == edits["name"]).first()
+        res = pg_api.get("/sample_tag", params={"sample_id": f"eq.{sample.id}"})
+        assert [t["tag_id"] for t in res.json()] == [tag["id"]]
 
-        assert t.description == edits["description"]
-
-    def test_tag_plugin_endpoints(self, client, db, token):
+    def test_cleanup(self, db, pg_api, token):
+        auth = {"Authorization": "Bearer " + token}
         data = json_fixture("tags.json")
-
-        sample = data["new_sample"]
-
-        sample_ = db.load_data("sample", sample)
-
-        sample_id = sample_.id
-
-        tag = db.session.query(db.model.tags_tag).first()
-        tag_id = tag.id
-
-        body = {}
-        body["tag_ids"] = [tag_id]
-        body["model_id"] = sample_id
-
-        res = client.put(
-            "/api/v2/tags/models/sample", headers={"Authorization": token}, json=body
+        res = pg_api.delete(
+            "/sample", headers=auth, params={"name": f"eq.{data['new_sample']['name']}"}
         )
-
-        assert res.status_code == 200
+        assert res.status_code == 204
+        res = pg_api.delete(
+            "/tag", headers=auth, params={"name": f"eq.{data['new_tag']['name']}"}
+        )
+        assert res.status_code == 204

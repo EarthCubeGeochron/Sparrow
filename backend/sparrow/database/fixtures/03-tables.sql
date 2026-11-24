@@ -586,7 +586,9 @@ CREATE TABLE IF NOT EXISTS data_file (
   basename text,
   file_path text UNIQUE,
   source_url text,
-  type_id text REFERENCES data_file_type(id)
+  type_id text REFERENCES data_file_type(id),
+  -- The object store's ETag, where it is not the MD5 of the contents
+  file_etag text UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS data_file_link (

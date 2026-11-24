@@ -186,6 +186,28 @@ variable of the same name (`data_dir` is `SPARROW_DATA_DIR`), paths beginning wi
 are relative to the file, and a value such as `op://…`, `env://…` or `file://…` names a
 secret that is fetched when the lab is run rather than kept in the file.
 
+### Administering a lab from your own machine
+
+With `pip install 'sparrow-cli[admin]'`, commands that manage a lab's database run on the
+machine you type them on, against the `database` of the active environment:
+
+```toml
+[production]
+env_class = "production"
+database = "op://Lab/Sparrow/database-url"
+secret_key = "op://Lab/Sparrow/secret-key"
+```
+
+```
+sparrow --env production schema plan
+sparrow --env production db update
+sparrow --env production create-user
+```
+
+A command that changes a production environment asks for confirmation first. For a lab
+run with Docker Compose on the same machine no `database` is needed: the one it publishes
+locally is used.
+
 A `sparrow-config.sh` shell script, the earlier form of this file, is still sourced where
 one is found, and what it exports takes precedence.
 

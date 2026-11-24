@@ -68,3 +68,20 @@ def test_dry_run(tmp_path):
     assert not report.ok
     # A file is loaded whole or not at all
     assert len(sink.records) == 2
+
+
+class NamedByFolder(Pipeline):
+    name = "by-folder"
+
+    def read_source(self, source, path):
+        yield Session(
+            date=datetime(2020, 1, 1), sample=Sample(name=source.path.parent.name)
+        )
+
+
+def test_source_name_is_available(tmp_path):
+    (tmp_path / "Project A").mkdir()
+    (tmp_path / "Project A" / "run.txt").write_text("1")
+    sink = DryRunSink()
+    run_pipeline(NamedByFolder(), [tmp_path], sink)
+    assert sink.records[0].sample.name == "Project A"

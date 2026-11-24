@@ -14,7 +14,6 @@ from sqlalchemy.exc import NoSuchTableError
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 from starlette.routing import Router
-from webargs_starlette import WebargsHTTPException
 
 from sparrow.core import settings
 
@@ -110,7 +109,6 @@ class Sparrow(Starlette):
     def setup_server(self):
         # This could maybe be added to the API...
         log.info("Setting up server")
-        self.add_exception_handler(WebargsHTTPException, http_exception)
 
         if self.api_loaded:
             return

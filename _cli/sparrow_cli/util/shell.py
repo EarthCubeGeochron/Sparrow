@@ -95,8 +95,22 @@ def exec_backend_command(ctx, *args, **kwargs):
     return exec_sparrow(*args, **kwargs)
 
 
+# The configuration of this invocation, for commands that have no context
+_config = None
+
+
+def set_config(cfg):
+    global _config
+    _config = cfg
+
+
 def exec_sparrow(*args, **kwargs):
-    return exec_or_run("backend", "python -m sparrow.core", *args, **kwargs)
+    """Run one of the application's administrative commands, on this machine."""
+    from ..config.admin import run_admin_command
+
+    for key in ("log_level", "run_args", "tty"):
+        kwargs.pop(key, None)
+    return run_admin_command(_config, split_args(*args), **kwargs)
 
 
 def has_command(command):
@@ -124,7 +138,7 @@ def fail_without_docker_running():
     except ImportError as exc:
         raise SparrowCommandError(
             "Managing a Sparrow server needs Docker support",
-            details="Install it with: pip install 'sparrow-cli[server]'",
+            details="Install it with: pip install 'sparrow-cli\\[server]'",
         ) from exc
     try:
         from_env()

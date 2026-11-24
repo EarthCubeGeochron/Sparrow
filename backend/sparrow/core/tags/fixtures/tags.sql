@@ -49,3 +49,21 @@ GRANT SELECT ON ALL TABLES IN SCHEMA tags TO view_public;
 
 GRANT USAGE ON SCHEMA tags TO admin;
 GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA tags TO admin;
+
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA tags TO admin;
+
+/* Tags for PostgREST: the tags themselves, and which records carry them */
+CREATE OR REPLACE VIEW sparrow_api.tag AS SELECT * FROM tags.tag;
+CREATE OR REPLACE VIEW sparrow_api.sample_tag AS SELECT * FROM tags.sample_tag;
+CREATE OR REPLACE VIEW sparrow_api.session_tag AS SELECT * FROM tags.session_tag;
+CREATE OR REPLACE VIEW sparrow_api.project_tag AS SELECT * FROM tags.project_tag;
+CREATE OR REPLACE VIEW sparrow_api.analysis_tag AS SELECT * FROM tags.analysis_tag;
+CREATE OR REPLACE VIEW sparrow_api.datum_tag AS SELECT * FROM tags.datum_tag;
+
+GRANT SELECT ON sparrow_api.tag, sparrow_api.sample_tag, sparrow_api.session_tag,
+  sparrow_api.project_tag, sparrow_api.analysis_tag, sparrow_api.datum_tag
+  TO view_public;
+GRANT SELECT, UPDATE, INSERT, DELETE ON sparrow_api.tag, sparrow_api.sample_tag,
+  sparrow_api.session_tag, sparrow_api.project_tag, sparrow_api.analysis_tag,
+  sparrow_api.datum_tag
+  TO admin;

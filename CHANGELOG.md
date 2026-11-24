@@ -24,6 +24,33 @@ and this project is working towards adherence to
   - `sparrow schema` commands (`graph`, `plan`, `apply`, `sync`, `migrate`, `provision`)
   - `sparrow db-update` runs migrations, then applies the schema diff, and still
     rehearses on a copy of the schema first
+- The backend holds only what has to keep running: signing in, loading records,
+  data file downloads and tasks. Removed from it:
+  - The generic API v2 routes (`/models/*`, `/vocabulary/*`, `/core_view/*`,
+    `/data_file/list`, `/map-samples`, the datasheet, tags and search routes, the
+    OpenAPI schema). PostgREST serves these instead, at `/api/v3`: new views for
+    researchers, publications, instruments, datum types, vocabularies, tags, data
+    files (administrators only) and `metrics`, and a `search` function
+    (`/rpc/search?term=…`)
+  - The importer framework (`BaseImporter`, `CloudDataPlugin`, the detrital zircon
+    and EarthChem vocabulary importers), replaced by pipelines. The PyChron
+    pipeline moves to `sparrow.pipelines.pychron`
+  - The Flask application and its two legacy routes
+  - `sadisplay` and the schema graph commands, the IPython shell, and the
+    `validate-data` and `show-interface` commands
+  - 46 packages from the lock file, among them pandas, numpy, lxml and Flask
+- Administrative commands are a package of their own, `sparrow-admin`
+  (`backend/admin`), and are no longer in the backend image. `sparrow db update`,
+  `sparrow schema …`, `sparrow create-user`, `sparrow run <task>` and the rest run
+  on your machine, against the `database` of the active environment and after its
+  confirmation gate. `pip install 'sparrow-cli[admin]'` provides them, and the
+  bundled application includes them. They no longer run in the backend container
+- A lab's plugin directory (`SPARROW_PLUGIN_DIR`) is loaded from where it is, so
+  those commands see the lab's plugins without a container mount
+- The backend image has a `main` stage, which services run, and a `testing` stage
+  that adds what the tests need
+- Administrators can add records through PostgREST: the `admin` role is granted the
+  sequences it draws on, including the audit trail's
 - The backend can keep a lab's files in an object store instead of a directory
   (`SPARROW_S3_BUCKET`, with `SPARROW_S3_ENDPOINT`, `_KEY`, `_SECRET`, `_PREFIX`):
   - Pipelines run on the server read objects, skipping unchanged ones without

@@ -2,14 +2,12 @@ from pathlib import Path
 
 from macrostrat.database.utils import run_sql_file
 from macrostrat.schema_management import SchemaDefinition, has_columns, negate
-from sqlalchemy import text
+from sqlalchemy import MetaData, Table, text
 
 from sparrow import core
 from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.core.task_manager.base import task
 from sparrow.database.migration import SparrowMigration
-
-from .base import OpenSearchAPI
 
 here = Path(__file__).parent
 fixtures = here / "fixtures"
@@ -30,6 +28,16 @@ def _initialize_tables(engine, refresh=True):
 
     # checks if tables are empty, if so try to fill with info from other tables
     run_sql_file(engine, fill_empty_docs)
+
+
+def get_document_tables(db):
+    """The search index tables: for projects, samples and sessions."""
+    return [
+        Table(
+            f"{name}_document", MetaData(), autoload_with=db.engine, schema="documents"
+        )
+        for name in ("project", "sample", "session")
+    ]
 
 
 class DocumentTableMigration(SparrowMigration):
@@ -63,9 +71,6 @@ class OpenSearch(SparrowCorePlugin):
                 ],
             )
         )
-
-    def on_api_initialized_v2(self, api):
-        api.mount("/search", OpenSearchAPI, name=self.name)
 
     def on_define_migrations(self, migrations):
         migrations.append(DocumentTableMigration)
