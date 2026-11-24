@@ -186,7 +186,8 @@ def sparrow_test_main(
     )
     if use_docker:
         print("Preparing [cyan]Sparrow[/cyan] application images")
-        res = compose("build")
+        # Named, since a bare build skips services behind a profile
+        res = compose("build backend")
         if res.returncode != 0:
             raise SparrowCommandError("Could not build Sparrow images", res)
 
