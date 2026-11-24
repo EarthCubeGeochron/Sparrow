@@ -111,7 +111,7 @@ class SparrowHelpFormatter(HelpFormatter):
         self.write_usage("sparrow", "[options] <command> [args]...")
         self.write_line()
         self.flush()
-        cfg = environ.get("SPARROW_CONFIG", None)
+        cfg = self.config.config_file
 
         lines = []
 
