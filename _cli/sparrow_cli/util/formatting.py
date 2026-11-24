@@ -29,6 +29,6 @@ def format_config_path(cfg: Path):
 
 
 def format_description(desc):
-    desc = re.sub("\[\[(.*?)\]\]", style("\\1", fg="red", bold=True), desc)
-    desc = re.sub("\[(.*?)\]", style("\\1", fg="green", bold=True), desc)
+    desc = re.sub(r"\[\[(.*?)\]\]", style("\\1", fg="red", bold=True), desc)
+    desc = re.sub(r"\[(.*?)\]", style("\\1", fg="green", bold=True), desc)
     return re.sub("`(.*?)`", style("\\1", fg="cyan"), desc)

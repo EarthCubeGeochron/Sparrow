@@ -7,15 +7,12 @@ from os import environ
 from pathlib import Path
 from typing import List, Optional
 
-import docker
-from docker.client import DockerClient
-from macrostrat.dinosaur.upgrade_cluster.describe import check_database_cluster_version
 from macrostrat.utils.logs import get_logger, setup_stderr_logs
 from macrostrat.utils.shell import git_revision_info
 
-from ..upgrade_database import version_images
 from ..util.exceptions import SparrowCommandError
 from ..util.shell import (
+    NO_SERVER,
     fail_without_docker_command,
     fail_without_docker_running,
     has_command,
@@ -26,6 +23,7 @@ from .environment import (
     prepare_compose_overrides,
     prepare_docker_environment,
 )
+from .environments import export_settings, load_environments
 from .file_loader import load_config_file
 from .models import Level, Message
 from .version_info import SparrowVersionMatch, test_version
@@ -41,7 +39,10 @@ class SparrowConfig:
     path_provided: bool
     is_frozen: bool
     docker_available: bool = False
-    docker_client: typing.Optional[DockerClient] = None
+    docker_client: typing.Optional[typing.Any] = None
+    # Whether there is a Sparrow server to manage from here
+    server_available: bool = False
+    environments: typing.Optional[typing.Any] = None
     bundle_dir: Path = None
     config_file: typing.Optional[Path] = None
     config_dir: typing.Optional[Path] = None
@@ -52,17 +53,18 @@ class SparrowConfig:
     backend_commands: List[dict] = list
     lab_name: Optional[str] = None
 
-    # The PostgreSQL major version required for this Sparrow instance
-    postgres_supported_version: int = 14
-    postgres_current_version: int = None
-
     # Whether we will try to run the frontend locally
     local_frontend: bool = False
 
-    def __init__(self, verbose=False, offline=False):
+    def __init__(self, verbose=False, offline=False, env=None):
         self.verbose = verbose
         self.offline = offline
         self.messages = []
+        self.bin_directories = []
+        self.project_name = None
+
+        self.environments = load_environments(env)
+        export_settings(self.environments)
 
         # Important: define if we're running under pyinstaller.
         self.is_frozen = getattr(sys, "frozen", False)
@@ -75,8 +77,7 @@ class SparrowConfig:
             for mod in [
                 "sparrow_cli",
                 "docker",
-                "macrostrat.database",
-                "macrostrat.dinosaur",
+                "macrostrat.app_frame",
                 "macrostrat.utils",
             ]:
                 setup_stderr_logs(mod)
@@ -129,18 +130,27 @@ class SparrowConfig:
             source_root.is_dir() and (source_root / "sparrow-version.json").is_file()
         )
         if not _is_correct_source:
-            raise SparrowCommandError(
-                "The SPARROW_PATH environment variable does not appear to point to a Sparrow source directory.",
-                details=f"SPARROW_PATH={environ['SPARROW_PATH']}",
+            if self.path_provided:
+                raise SparrowCommandError(
+                    "The SPARROW_PATH environment variable does not appear to point to a Sparrow source directory.",
+                    details=f"SPARROW_PATH={environ['SPARROW_PATH']}",
+                )
+            # Installed as a package, away from the server's source: pipelines
+            # and environments work, and managing a server does not.
+            self.server_available = False
+            environ[NO_SERVER] = "1"
+            self.add_message(
+                id="no-server",
+                text="No Sparrow server to manage here",
+                details="Commands that run a lab need the Sparrow application; pipelines can be run locally.",
             )
+            return
+        self.server_available = True
 
         self.enhance_secret_key()
 
         self.project_name = self.infer_project_name()
         self.local_frontend = self.configure_local_frontend()
-
-        # Check database version
-        self.check_database_version()
 
         self.version_info = test_version(self)
         self.add_revision_message()
@@ -192,6 +202,11 @@ class SparrowConfig:
 
     def validate_environment(self):
         """Validate environment for services"""
+        if not self.server_available:
+            raise SparrowCommandError(
+                "This command manages a Sparrow server, and there is none here",
+                details="Run it from a lab's directory, with the Sparrow application installed.",
+            )
         # Ensure that the SPARROW_SECRET_KEY is set and >= 32 characters long
         secret_key = environ.get("SPARROW_SECRET_KEY")
         if secret_key is None:
@@ -286,8 +301,10 @@ class SparrowConfig:
             )
         try:
             fail_without_docker_running()
+            import docker
+
             self.docker_client = docker.from_env()
-        except (SparrowCommandError, docker.errors.DockerException) as err:
+        except Exception as err:
             self.add_message(
                 id="docker-not-running",
                 text="Docker is not running",
@@ -321,57 +338,3 @@ class SparrowConfig:
             )
             _local_frontend = False
         return _local_frontend
-
-    def check_database_version(self):
-        if self.docker_client is None:
-            self.add_message(
-                id="unknown-database-cluster",
-                text="Unknown database cluster version",
-                details=[
-                    "Could not determine the database cluster version because Docker is not available."
-                ],
-                level=Level.WARNING,
-            )
-            return
-
-        cluster_volume_name = self.project_name + "_db_cluster"
-        version = check_database_cluster_version(
-            self.docker_client, cluster_volume_name
-        )
-        self.postgres_current_version = version
-        if version is None:
-            self.add_message(
-                id="no-database-cluster",
-                text="No database cluster",
-                details=[
-                    "The database cluster has not yet been initialized.",
-                    "Run [bold]sparrow up[/bold] or [bold]sparrow init[/bold] to create one.",
-                ],
-                level=Level.WARNING,
-            )
-            return
-
-        upgrade_text = " No upgrade path is available — perhaps you have downgraded your Sparrow installation?"
-        if (
-            version < self.postgres_supported_version
-            and version_images[version] is not None
-        ):
-            upgrade_text = (
-                " Run [cyan]sparrow db update[/cyan] to upgrade the database."
-            )
-        if version < self.postgres_supported_version:
-            self.add_message(
-                id="postgresql-version",
-                text=f"PostgreSQL version {self.postgres_supported_version} is required",
-                details=f"Sparrow's database cluster is running PostgreSQL version {version}."
-                + upgrade_text,
-                level=Level.ERROR,
-            )
-            # Fall back to old database version
-            environ["SPARROW_DATABASE_IMAGE"] = version_images[version]
-        else:
-            self.add_message(
-                id="postgresql-version",
-                text=f"Using PostgreSQL version {version}",
-                level=Level.SUCCESS,
-            )

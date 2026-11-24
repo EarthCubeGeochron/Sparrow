@@ -7,7 +7,6 @@ from rich import print
 from rich.console import Console
 
 from sparrow_cli.config import SparrowConfig
-from sparrow_cli.upgrade_database import upgrade_database_cluster
 
 from ..util import (
     CommandGroup,
@@ -71,27 +70,11 @@ def migration(args):
 
 @sparrow_db.command(name="update", context_settings=dict(ignore_unknown_options=True))
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
-@click.option("--skip-cluster-upgrade", is_flag=True, default=False)
-@click.pass_context
-def update(ctx, args, skip_cluster_upgrade=False):
+def update(args):
     """Update the database schema"""
-    cfg = ctx.find_object(SparrowConfig)
-    # If needed, we upgrade the database cluster.
-    if cfg.postgres_current_version == cfg.postgres_supported_version:
-        skip_cluster_upgrade = True
-    if not skip_cluster_upgrade:
-        upgrade_database_cluster(cfg)
     # Ensure that the database is running for this step.
     compose("up -d db")
     exec_sparrow("db-update", *args)
-
-
-@sparrow_db.command(name="upgrade")
-@click.pass_context
-def upgrade(ctx):
-    """Upgrade the database cluster to the latest version"""
-    cfg = ctx.find_object(SparrowConfig)
-    upgrade_database_cluster(cfg)
 
 
 @sparrow_db.command(name="check-schema")

@@ -32,7 +32,18 @@ and this project is working towards adherence to
   - On the server, plugins add pipelines with the `define-pipelines` hook. Each is
     a task under its own name (`sparrow run <name>`), loading into the database
     and tracking data files
-- `sparrow run` is a command of its own, for backend tasks and local pipelines
+- `sparrow run` also runs a pipeline locally; `--load` sends its records to the
+  lab of the active environment
+- The command-line application can be installed as a package (`sparrow-cli`) in a
+  pipeline's own Python environment. Without Docker or the Sparrow application it
+  still runs pipelines and manages environments; `sparrow-cli[server]` adds what
+  manages a lab
+- Environments in a `sparrow.toml` (`sparrow env`, `--env`), from
+  `macrostrat.app_frame`: named labs or deployments, with secret references and
+  confirmation before writes to production. `sparrow-config.sh` is still read
+- The command line no longer upgrades PostgreSQL clusters (`sparrow db upgrade` and
+  the upgrade step of `sparrow db update` are removed), and with that no part of
+  Sparrow depends on `macrostrat.dinosaur`
   - The PyChron importer is a pipeline; `PyChronImporter` is removed
 - The `SPARROW_CACHE_DATABASE_MODELS` option and `sparrow db drop-cache` are removed
 - Code is formatted and imports sorted with `ruff`, replacing `black`

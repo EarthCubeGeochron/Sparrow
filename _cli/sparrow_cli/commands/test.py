@@ -17,7 +17,7 @@ log = get_logger(__name__)
 
 
 class TestGroup(SparrowDefaultCommand):
-    """
+    r"""
     Usage: sparrow test \[subcommand?] OPTIONS... PYTEST_OPTIONS...
 
     [bold]Backend tests[/bold] (default)
