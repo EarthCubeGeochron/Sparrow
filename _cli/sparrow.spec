@@ -3,6 +3,8 @@ from os import path
 from macrostrat.utils.shell import git_revision_info
 from importlib import import_module
 
+from PyInstaller.utils.hooks import collect_all
+
 block_cipher = None
 
 spec_path = path.abspath(SPECPATH)
@@ -17,13 +19,34 @@ with open(revfile, "w") as f:
 
 data_files = {revfile: "."}
 
+# Administrative commands run inside the bundle. The application's own code is
+# read from the source tree bundled below (it carries SQL and other data
+# files); what it depends on is collected here.
+admin_dependencies = [
+    "sqlalchemy", "geoalchemy2", "sqlalchemy_utils", "psycopg", "psycopg2",
+    "macrostrat", "results", "pglast", "sqlparse", "shapely",
+    "marshmallow", "marshmallow_sqlalchemy", "marshmallow_jsonschema", "stringcase",
+    "starlette", "werkzeug", "jwt", "boto3", "botocore", "toposort",
+    "celery", "kombu", "redis", "broadcaster", "requests", "aiofiles",
+    "typer", "pydantic", "httpx", "multipart",
+]
+admin_datas, admin_binaries, admin_hiddenimports = [], [], []
+for name in admin_dependencies:
+    try:
+        datas, binaries, hiddenimports = collect_all(name)
+    except Exception:
+        continue
+    admin_datas += datas
+    admin_binaries += binaries
+    admin_hiddenimports += hiddenimports
+
 
 a = Analysis(
     ["sparrow_cli/__main__.py"],
     pathex=[spec_path],
-    binaries=[],
-    datas=data_files.items(),
-    hiddenimports=[],
+    binaries=admin_binaries,
+    datas=[*data_files.items(), *admin_datas],
+    hiddenimports=admin_hiddenimports,
     hookspath=[],
     runtime_hooks=[],
     excludes=[],

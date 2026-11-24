@@ -1873,6 +1873,24 @@ type = "directory"
 url = "../backend"
 
 [[package]]
+name = "sparrow-admin"
+version = "0.1.0"
+description = "Commands for administering a Sparrow lab's database"
+optional = true
+python-versions = ">=3.12,<3.14"
+files = []
+develop = true
+
+[package.dependencies]
+click = "^8.1.0"
+sparrow = {path = "..", develop = true}
+typer = ">=0.12.5"
+
+[package.source]
+type = "directory"
+url = "../backend/admin"
+
+[[package]]
 name = "sparrow-loader"
 version = "1.1.0"
 description = "Utilities for loading data into Sparrow"
@@ -2477,10 +2495,10 @@ files = [
 h11 = ">=0.16.0,<1"
 
 [extras]
-admin = ["sparrow"]
+admin = ["sparrow-admin"]
 server = ["docker"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.14"
-content-hash = "7ee4c5f6bfd0031b61dcb3de44f64be27d6648e2302e394fad94e8a123ab2f5e"
+content-hash = "cb6e27404e4126d748bf94008e5303dddf494875ae373d2f79f5c46e54bca69d"

@@ -9,6 +9,7 @@ from rich import print
 from sparrow_cli.help import echo_messages
 
 from ..config import SparrowConfig
+from ..config.admin import admin_available
 from ..config.command_cache import get_backend_help_info
 from ..util import cmd, compose, log
 
@@ -122,13 +123,15 @@ def sparrow_up(ctx, container="", force_recreate=False):
     if "gateway" in running_containers:
         compose("exec gateway nginx -s reload")
 
-    # While we're spinning up, repopulate command help in case it's changed
-    log.info("Caching backend help info")
-    get_backend_help_info(write_cache=True)
+    # The lab's services bring their own schema up on a first start; checking
+    # it, and listing a lab's commands, is for where those commands are installed
+    if admin_available():
+        log.info("Caching help for administrative commands")
+        get_backend_help_info(write_cache=True)
 
-    if "backend" not in running_containers:
-        sleep(5)
-        cmd("sparrow", "db", "check-schema")
+        if "backend" not in running_containers:
+            sleep(5)
+            cmd("sparrow", "db", "check-schema")
 
     p.wait()
     if frontend_proc is not None:

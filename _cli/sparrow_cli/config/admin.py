@@ -1,14 +1,18 @@
 """
 Administering a lab from outside it. Commands that manage a lab's database
-(its schema, users, pipelines and tasks) run on this machine, against the
-database the active environment names, when Sparrow's application package is
-installed here (`pip install 'sparrow-cli[admin]'`). A lab's services then
-need to hold only what serves requests.
+(its schema, users, pipelines and tasks) are a package of their own,
+`sparrow-admin`, and run on this machine against the database the active
+environment names (`pip install 'sparrow-cli[admin]'`). A lab's services hold
+only what serves requests.
 """
 
 import sys
+from contextlib import redirect_stdout
 from importlib.util import find_spec
+from io import StringIO
 from os import environ
+from pathlib import Path
+from subprocess import PIPE, CompletedProcess, run
 from typing import Optional
 
 from macrostrat.app_frame.environments import AccessScope
@@ -29,12 +33,26 @@ _read_commands = (
 )
 
 
+def _use_bundled_application():
+    """In the bundled application, Sparrow's own code is the source tree it
+    carries, which holds the schema's SQL beside the modules that apply it."""
+    backend = Path(sys._MEIPASS) / "srcroot" / "backend"
+    for package in (
+        backend,
+        backend / "admin",
+        backend / "loader",
+        backend / "pipelines",
+    ):
+        if str(package) not in sys.path:
+            sys.path.insert(0, str(package))
+
+
 def admin_available() -> bool:
-    """Whether Sparrow's application is installed beside this command line."""
+    """Whether Sparrow's administrative commands are installed beside this one."""
     if getattr(sys, "frozen", False):
-        return False
+        _use_bundled_application()
     try:
-        return find_spec("sparrow.core") is not None
+        return find_spec("sparrow.admin") is not None
     except ModuleNotFoundError:
         return False
 
@@ -66,12 +84,13 @@ def access_scope(args) -> AccessScope:
     return AccessScope.Data
 
 
-def can_run_locally(cfg) -> bool:
-    return admin_available() and database_url(cfg) is not None
-
-
-def admin_command(cfg, args) -> tuple[list[str], dict]:
-    """The command line and environment that run an admin command here."""
+def admin_environment(cfg, args) -> dict:
+    """The environment an admin command runs in, once it is allowed to."""
+    if not admin_available():
+        raise SparrowCommandError(
+            "Administering a lab needs Sparrow's administrative commands",
+            details="Install them with: pip install 'sparrow-cli\\[admin]'",
+        )
     # Credentials are needed now, and a secret manager may ask for approval
     export_settings(cfg.environments, secrets=True)
     url = database_url(cfg)
@@ -86,4 +105,26 @@ def admin_command(cfg, args) -> tuple[list[str], dict]:
     env["SPARROW_DATABASE"] = url
     # Set for the lab's containers, where it has another meaning
     env.pop("SPARROW_BACKEND_CONFIG", None)
-    return [sys.executable, "-m", "sparrow.core", *args], env
+    return env
+
+
+def run_admin_command(cfg, args, **kwargs) -> CompletedProcess:
+    """Run one of the application's administrative commands on this machine."""
+    args = list(args)
+    env = admin_environment(cfg, args)
+    if not getattr(sys, "frozen", False):
+        return run([sys.executable, "-m", "sparrow.admin", *args], env=env, **kwargs)
+
+    # The bundled application has no interpreter to start: run in this process
+    environ.update(env)
+    from sparrow.admin import cli
+
+    captured = StringIO()
+    capture = kwargs.get("stdout") == PIPE or kwargs.get("capture_output", False)
+    code = 0
+    with redirect_stdout(captured if capture else sys.stdout):
+        try:
+            cli.main(args=args, prog_name="sparrow", standalone_mode=False)
+        except SystemExit as err:
+            code = err.code if isinstance(err.code, int) else 1
+    return CompletedProcess(args, code, stdout=captured.getvalue().encode())

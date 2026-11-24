@@ -9,7 +9,6 @@ from subprocess import PIPE
 from pydantic import BaseModel
 
 from ...util.exceptions import SparrowCommandError
-from ...util.shell import exec_or_run
 from .default_backend_commands import default_commands
 
 
@@ -36,27 +35,12 @@ def cli_cache_file():
 
 
 def get_backend_help_info(write_cache=True):
-    env = dict(**os.environ)
-    env["SPARROW_SECRET_KEY"] = env.get("SPARROW_SECRET_KEY", "Test")
-    out = None
-    # In sparrow.core > 3, we no can longer import from the global namespace
-    for location in ["/app/sparrow/core/__main__.py", "/app/sparrow/__main__.py"]:
-        out = exec_or_run(
-            "backend",
-            location,
-            "get-cli-info",
-            stdout=PIPE,
-            env=env,
-            tty=False,
-            run_args=("--no-deps --rm",),
-        )
-        if out.returncode == 0:
-            break
+    """The administrative commands a lab has, including its plugins'."""
+    from ...util.shell import exec_sparrow
+
+    out = exec_sparrow("get-cli-info", stdout=PIPE)
     if out.returncode != 0:
-        details = str(b"\n".join(out.stdout.splitlines()[1:]), "utf-8") + "\n"
-        raise SparrowCommandError(
-            "Could not access help text for sparrow backend", details=details
-        )
+        raise SparrowCommandError("Could not list Sparrow's administrative commands")
 
     data = out.stdout.decode("utf-8").strip()
     try:

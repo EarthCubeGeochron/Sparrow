@@ -39,11 +39,12 @@ and this project is working towards adherence to
   - `sadisplay` and the schema graph commands, the IPython shell, and the
     `validate-data` and `show-interface` commands
   - 46 packages from the lock file, among them pandas, numpy, lxml and Flask
-- Administrative commands run outside the lab's services. With the application
-  installed beside the command line (`sparrow-cli[admin]`), `sparrow db update`,
+- Administrative commands are a package of their own, `sparrow-admin`
+  (`backend/admin`), and are no longer in the backend image. `sparrow db update`,
   `sparrow schema …`, `sparrow create-user`, `sparrow run <task>` and the rest run
-  on your machine against the `database` of the active environment, after its
-  confirmation gate. Without it they run in the backend container as before
+  on your machine, against the `database` of the active environment and after its
+  confirmation gate. `pip install 'sparrow-cli[admin]'` provides them, and the
+  bundled application includes them. They no longer run in the backend container
 - A lab's plugin directory (`SPARROW_PLUGIN_DIR`) is loaded from where it is, so
   those commands see the lab's plugins without a container mount
 - The backend image has a `main` stage, which services run, and a `testing` stage

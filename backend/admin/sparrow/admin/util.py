@@ -7,7 +7,7 @@ import click
 from click import echo, style
 from sqlalchemy.exc import OperationalError
 
-from ..app import Sparrow
+from sparrow.core.app import Sparrow
 
 
 def abort(err):

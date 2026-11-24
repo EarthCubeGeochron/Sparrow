@@ -131,8 +131,8 @@ class SparrowConfig:
         if res.source == CommandDataSource.default:
             self.add_message(
                 id="backend-commands",
-                text="Plugin commands have not yet been loaded from Sparrow core",
-                details="Run [cyan]sparrow up[/cyan] to populate the configuration cache.",
+                text="A lab's own commands are not listed",
+                details="They are listed once [cyan]sparrow up[/cyan] has run where sparrow-cli[admin] is installed.",
             )
 
         self.lab_name = environ.get("SPARROW_LAB_NAME")

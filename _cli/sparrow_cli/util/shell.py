@@ -105,16 +105,12 @@ def set_config(cfg):
 
 
 def exec_sparrow(*args, **kwargs):
-    """Run one of the application's own commands: on this machine where the
-    application is installed, and otherwise in the lab's backend container."""
-    from ..config.admin import admin_command, can_run_locally
+    """Run one of the application's administrative commands, on this machine."""
+    from ..config.admin import run_admin_command
 
-    if _config is not None and can_run_locally(_config):
-        command, env = admin_command(_config, split_args(*args))
-        for key in ("log_level", "run_args", "tty"):
-            kwargs.pop(key, None)
-        return run(*command, env=env, **kwargs)
-    return exec_or_run("backend", "python -m sparrow.core", *args, **kwargs)
+    for key in ("log_level", "run_args", "tty"):
+        kwargs.pop(key, None)
+    return run_admin_command(_config, split_args(*args), **kwargs)
 
 
 def has_command(command):
@@ -142,7 +138,7 @@ def fail_without_docker_running():
     except ImportError as exc:
         raise SparrowCommandError(
             "Managing a Sparrow server needs Docker support",
-            details="Install it with: pip install 'sparrow-cli[server]'",
+            details="Install it with: pip install 'sparrow-cli\\[server]'",
         ) from exc
     try:
         from_env()

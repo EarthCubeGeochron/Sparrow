@@ -42,9 +42,8 @@ COPY ./ /app/
 
 RUN poetry install --no-interaction --no-ansi --without dev
 
-# Copy command-line options to a place where they can be easily accessed
-# by the wrapper CLI.
-RUN SPARROW_SECRET_KEY=test /app/sparrow/core/__main__.py get-cli-info > /run/cli-info.json
+# Administrative commands are a separate package, installed where they are run
+RUN rm -rf /app/admin
 
 CMD ["/bin/run"]
 
@@ -52,3 +51,7 @@ FROM main AS testing
 
 # The service image holds what runs; tests need more
 RUN poetry install --no-interaction --no-ansi --with dev
+
+# Administrative commands live outside the service; their tests run here
+COPY ./admin /app/admin
+RUN pip install --no-deps -e /app/admin

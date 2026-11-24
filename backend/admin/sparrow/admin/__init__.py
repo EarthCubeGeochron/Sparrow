@@ -11,10 +11,10 @@ from click import echo, pass_context, secho, style
 from macrostrat.utils.logs import setup_stderr_logs
 
 import sparrow
+from sparrow.core.context import get_sparrow_app
+from sparrow.core.plugins import SparrowPlugin
+from sparrow.core.util import working_directory
 
-from ..context import get_sparrow_app
-from ..plugins import SparrowPlugin
-from ..util import working_directory
 from .user import create_user, list_users, reset_password
 from .util import add_typer_command, with_app, with_database, with_full_app
 
