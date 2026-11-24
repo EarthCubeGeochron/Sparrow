@@ -85,7 +85,7 @@ class SparrowHelpFormatter(HelpFormatter):
         "down": "Safely stop `sparrow`",
         "info": "Show information about the installation",
         "create-test-lab": "Create an example installation of Sparrow",
-        "run": "Run Sparrow tasks (alias to `sparrow tasks run`)",
+        "run": "Run a task in the backend, or a pipeline (`module:Pipeline`) locally",
     }
 
     config: SparrowConfig

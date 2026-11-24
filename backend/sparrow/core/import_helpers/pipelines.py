@@ -7,7 +7,7 @@ import click
 
 from sparrow.core.context import get_database, get_plugin
 from sparrow.core.plugins import SparrowCorePlugin
-from sparrow.core.task_manager.base import task
+from sparrow.core.task_manager.base import SparrowTask
 from sparrow.logs import get_logger
 from sparrow.pipelines import DryRunSink, Pipeline, RunReport, run_pipeline
 
@@ -55,8 +55,27 @@ class PipelinesPlugin(SparrowCorePlugin):
         sink = DryRunSink() if dry_run else DatabaseSink(get_database())
         return run_pipeline(pipeline, [Path(p) for p in paths], sink, redo=redo)
 
+    def on_plugins_initialized(self):
+        """Each pipeline is a task under its own name, so `sparrow run <name>`
+        loads it in the backend or on the task worker."""
+        manager = self.app.plugins.get("task-manager")
+        for name in self.pipelines:
+            manager.register_task(
+                _pipeline_task(self, name), name=name, base=SparrowTask
+            )
+
     def on_setup_cli(self, cli):
         cli.add_command(_run_pipeline)
+
+
+def _pipeline_task(plugin, name):
+    def run(path: str = "", redo: bool = False):
+        report = plugin.run(name, [path] if path else None, redo=redo)
+        print(_summarize(report))
+
+    run.__name__ = name.replace("-", "_")
+    run.__doc__ = f"Load data files with the {name} pipeline."
+    return run
 
 
 def _summarize(report: RunReport) -> str:
@@ -80,11 +99,3 @@ def _run_pipeline(name, paths, redo=False, dry_run=False):
     click.echo(_summarize(report))
     if not report.ok:
         raise click.exceptions.Exit(1)
-
-
-@task(name="run-pipeline")
-def run_pipeline_task(name: str, path: str = "", redo: bool = False):
-    """Load data files with a pipeline."""
-    paths = [path] if path else None
-    report = get_plugin("pipelines").run(name, paths, redo=redo)
-    print(_summarize(report))

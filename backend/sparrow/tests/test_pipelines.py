@@ -132,3 +132,17 @@ class TestPipelines:
         assert report.count("failed") == 1
         Link = db.model.data_file_link
         assert db.session.query(Link).filter(Link.error.isnot(None)).count() == 1
+
+
+class TestPipelineTasks:
+    def test_pipeline_is_registered_as_task(self, app, db, data_dir):
+        plugin = app.plugins.get("pipelines")
+        plugin._pipelines = {"stable-isotopes": IsotopePipeline()}
+        plugin.on_plugins_initialized()
+
+        manager = app.plugins.get("task-manager")
+        task = manager.get_task("stable-isotopes")
+        task(path=str(data_dir), redo=True)
+
+        names = [t["name"] for t in manager.task_info()]
+        assert "stable-isotopes" in names

@@ -36,14 +36,21 @@ class StableIsotopes(Pipeline):
 
 ```sh
 # Build and validate records; nothing is sent anywhere
-sparrow-pipeline run my_lab.pipelines:StableIsotopes ./data
+sparrow run my_lab.pipelines:StableIsotopes ./data
 
 # Send them to a lab (the token is read from SPARROW_API_TOKEN)
-sparrow-pipeline run my_lab.pipelines:StableIsotopes ./data --api https://sparrow.my-lab.org
+sparrow run my_lab.pipelines:StableIsotopes ./data --api https://sparrow.my-lab.org
+
+# Once a lab's plugin has added the pipeline, load it in the lab's backend
+sparrow run stable-isotopes
 
 # The shape of a record
 sparrow-pipeline schema session
 ```
+
+`sparrow run` takes a task name or a pipeline. A name containing a colon is a
+pipeline to run on this machine; it is handed to `sparrow-pipeline run`, which
+this package installs and which works without the `sparrow` command too.
 
 Records are plain [Pydantic](https://docs.pydantic.dev) models (`sparrow.pipelines.models`).
 Vocabulary terms such as materials, techniques and units are strings; Sparrow

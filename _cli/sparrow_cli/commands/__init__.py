@@ -5,7 +5,7 @@ from .dev import sparrow_dev
 from .docs import sparrow_docs
 from .info import sparrow_info
 from .logs import sparrow_logs
-from .tasks import tasks
+from .tasks import sparrow_run, tasks
 from .test import sparrow_test
 from .test_lab import sparrow_test_lab
 from .up import sparrow_restart, sparrow_up
@@ -26,6 +26,7 @@ _commands = {
     "info": sparrow_info,
     "create-test-lab": sparrow_test_lab,
     "tasks": tasks,
+    "run": sparrow_run,
 }
 
 

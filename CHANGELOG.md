@@ -27,10 +27,12 @@ and this project is working towards adherence to
 - New `sparrow-pipelines` package (`backend/pipelines`): explicit Pydantic models
   for the records Sparrow imports, and a `Pipeline` that turns files into them
   with no database or server involved
-  - `sparrow-pipeline run` rehearses a pipeline locally (a dry run by default) or
-    sends its records to a lab's import API
-  - On the server, plugins add pipelines with the `define-pipelines` hook;
-    `sparrow run-pipeline` and the `run-pipeline` task load them and track data files
+  - `sparrow run module:Pipeline PATHS` rehearses a pipeline locally (a dry run
+    by default) or sends its records to a lab's import API
+  - On the server, plugins add pipelines with the `define-pipelines` hook. Each is
+    a task under its own name (`sparrow run <name>`), loading into the database
+    and tracking data files
+- `sparrow run` is a command of its own, for backend tasks and local pipelines
   - The PyChron importer is a pipeline; `PyChronImporter` is removed
 - The `SPARROW_CACHE_DATABASE_MODELS` option and `sparrow db drop-cache` are removed
 - Code is formatted and imports sorted with `ruff`, replacing `black`
