@@ -10,6 +10,10 @@ working directory. Each table describes one lab, or one deployment of it:
     api = "https://sparrow.example.org"
     api_token = "op://Lab/Sparrow/token"
 
+`SPARROW_ENV` names the environment in use. It was always `development` or
+`production`; those still work with no file at all, and any other environment
+says which of the two it is with `env_class`.
+
 `sparrow-config.sh` is still read where it exists; it describes the server a
 lab runs on, and its variables take precedence there.
 """
@@ -22,19 +26,38 @@ from macrostrat.app_frame.secrets import Secret
 
 
 class SparrowEnvironments(Environments):
-    # SPARROW_ENV and SPARROW_CONFIG already mean the backend's mode and the
-    # path of sparrow-config.sh, so the selection variables take other names.
-    env_var = property(lambda self: "SPARROW_ENVIRONMENT", lambda self, v: None)
-    expires_var = property(
-        lambda self: "SPARROW_ENVIRONMENT_EXPIRES", lambda self, v: None
-    )
+    # SPARROW_CONFIG is already the path of sparrow-config.sh
     config_var = property(lambda self: "SPARROW_TOML", lambda self, v: None)
+
+
+# Environment names that say their own class, as SPARROW_ENV always has
+_class_names = ("local", "development", "staging", "production")
+
+
+def environment_class(environments: Environments) -> str:
+    """Where the active environment sits, from laptop to production."""
+    env = environments.env
+    if environments.settings.get("env_class") is not None:
+        return environments.env_class.value
+    if env is None:
+        # Nothing chosen: a lab being worked on, as before
+        return "development"
+    if env in _class_names:
+        return env
+    return "production"
+
+
+def service_mode(environments: Environments) -> str:
+    """What the lab's services are told: they know only two ways to run."""
+    if environment_class(environments) in ("local", "development"):
+        return "development"
+    return "production"
 
 
 def load_environments(env: Optional[str] = None) -> Environments:
     if env is not None:
-        environ["SPARROW_ENVIRONMENT"] = env
-        environ.pop("SPARROW_ENVIRONMENT_EXPIRES", None)
+        environ["SPARROW_ENV"] = env
+        environ.pop("SPARROW_ENV_EXPIRES", None)
     # --env is an option of `sparrow` itself; `-e` belongs to wrapped commands
     return SparrowEnvironments.for_command_line(
         "sparrow", config_name="sparrow.toml", read_argv=False

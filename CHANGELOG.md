@@ -41,6 +41,9 @@ and this project is working towards adherence to
 - Environments in a `sparrow.toml` (`sparrow env`, `--env`), from
   `macrostrat.app_frame`: named labs or deployments, with secret references and
   confirmation before writes to production. `sparrow-config.sh` is still read
+- `SPARROW_ENV` names the environment in use. `development` and `production` work
+  as before with no `sparrow.toml`; any other environment declares its `env_class`,
+  and services are started in development or production mode accordingly
 - The command line no longer upgrades PostgreSQL clusters (`sparrow db upgrade` and
   the upgrade step of `sparrow db update` are removed), and with that no part of
   Sparrow depends on `macrostrat.dinosaur`

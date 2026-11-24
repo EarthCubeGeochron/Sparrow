@@ -10,7 +10,7 @@ x-backend: &x-backend
   depends_on:
     - db
   environment:
-    - SPARROW_ENV
+    - SPARROW_ENV=${SPARROW_SERVICE_MODE:-development}
     - SPARROW_SECRET_KEY
     - SPARROW_BASE_URL
     - SPARROW_LAB_NAME
@@ -168,7 +168,7 @@ services:
       # inside and outside of the container
       - SPARROW_SITE_CONTENT=/site-content
       - SPARROW_FRONTEND_BUILD_DIR=/build
-      - SPARROW_ENV
+      - SPARROW_ENV=${SPARROW_SERVICE_MODE:-development}
     volumes:
       - frontend_build:/build
       # Right now, we configure default site content

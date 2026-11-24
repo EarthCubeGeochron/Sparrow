@@ -5,6 +5,7 @@ from typing import List
 from macrostrat.utils import get_logger, relative_path
 from rich import print
 
+from .environments import service_mode
 from .models import Level, Message
 
 log = get_logger(__name__)
@@ -58,9 +59,10 @@ def prepare_compose_overrides(cfg) -> List[Message]:
         fn = relative_path(base, "compose-overrides", f"docker-compose.{name}.yaml")
         compose_files.append(fn)
 
-    env = environ.get("SPARROW_ENV", "development")
-    environ.setdefault("SPARROW_ENV", "development")
-    is_production = env == "production"
+    # Services are told how to run, not which environment this is
+    mode = service_mode(cfg.environments)
+    environ["SPARROW_SERVICE_MODE"] = mode
+    is_production = mode == "production"
 
     # Use the docker-compose profile tool to enable some services
     # NOTE: this is a nicer way to do some things that needed to be handled by
@@ -138,7 +140,7 @@ def prepare_compose_overrides(cfg) -> List[Message]:
     if is_production:
         add_override("production")
 
-    if env == "development":
+    if mode == "development":
         add_override("development")
 
     # Overrides should now be formatted as a COMPOSE_FILE colon-separated list

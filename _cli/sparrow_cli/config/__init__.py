@@ -63,9 +63,6 @@ class SparrowConfig:
         self.bin_directories = []
         self.project_name = None
 
-        self.environments = load_environments(env)
-        export_settings(self.environments)
-
         # Important: define if we're running under pyinstaller.
         self.is_frozen = getattr(sys, "frozen", False)
         if self.is_frozen:
@@ -87,6 +84,9 @@ class SparrowConfig:
 
         # Load configuration from file!
         self.config_file = load_config_file()
+        # After sparrow-config.sh, which may itself name the environment
+        self.environments = load_environments(env)
+        export_settings(self.environments)
         if self.config_file is None:
             self.add_message(
                 id="no-config-file",
