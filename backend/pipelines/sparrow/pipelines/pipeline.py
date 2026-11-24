@@ -60,6 +60,13 @@ class Pipeline:
         """Yield the records a file holds. Raise to reject the file."""
         raise NotImplementedError
 
+    def read_source(self, source: SourceFile, path: Path) -> Iterable[TopLevelRecord]:
+        """Yield the records of a source. `path` is where its contents are on
+        this machine, which for an object in a bucket is a temporary copy;
+        `source.path` is the name the lab knows it by. Override this instead
+        of `read` when that name carries information, such as a project."""
+        return self.read(path)
+
 
 class Sink(Protocol):
     """Where records go: nowhere (a dry run), a lab's API, or its database."""
@@ -124,7 +131,7 @@ def run_sources(
             continue
         try:
             with source.open() as path:
-                records = list(pipeline.read(path))
+                records = list(pipeline.read_source(file, path))
             sink.load(file, records)
         except Exception as error:
             if stop_on_error:

@@ -1,4 +1,5 @@
 import collections.abc
+from datetime import datetime
 from pathlib import Path
 from time import perf_counter
 
@@ -10,6 +11,8 @@ from macrostrat.database.utils import run_sql
 from macrostrat.utils import relative_path
 from marshmallow import EXCLUDE, RAISE
 from marshmallow.exceptions import ValidationError
+from psycopg.types.datetime import TimestampLoader
+from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from sqlalchemy.schema import Column, ForeignKey
@@ -25,6 +28,23 @@ from .models import DatumType, Project, Session, User
 log = get_logger(__name__)
 
 
+class _InfiniteTimestampLoader(TimestampLoader):
+    def load(self, data):
+        if bytes(data) == b"infinity":
+            return datetime.max
+        if bytes(data) == b"-infinity":
+            return datetime.min
+        return super().load(data)
+
+
+def _read_infinite_timestamps(dbapi_connection, connection_record):
+    # A lab embargoes data indefinitely with an `infinity` date, which the
+    # driver has no Python value for unless it is given one
+    adapters = getattr(dbapi_connection, "adapters", None)
+    if adapters is not None:
+        adapters.register_loader("timestamp", _InfiniteTimestampLoader)
+
+
 class DatabaseMappingError(SparrowError):
     """Raised when a problem occurs with finding a database model"""
 
@@ -34,6 +54,7 @@ class Database(BaseDatabase):
         # Batched inserts cannot be reconciled with ON CONFLICT DO NOTHING imports
         super().__init__(db_conn, use_insertmanyvalues=False)
         self.app = app
+        event.listen(self.engine, "connect", _read_infinite_timestamps)
 
     def automap(self):
         log.info("Automapping the database")
