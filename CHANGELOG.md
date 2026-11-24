@@ -24,6 +24,16 @@ and this project is working towards adherence to
   - `sparrow schema` commands (`graph`, `plan`, `apply`, `sync`, `migrate`, `provision`)
   - `sparrow db-update` runs migrations, then applies the schema diff, and still
     rehearses on a copy of the schema first
+- The backend can keep a lab's files in an object store instead of a directory
+  (`SPARROW_S3_BUCKET`, with `SPARROW_S3_ENDPOINT`, `_KEY`, `_SECRET`, `_PREFIX`):
+  - Pipelines run on the server read objects, skipping unchanged ones without
+    downloading them, and record each file's `s3://` address
+  - Data file downloads redirect to a short-lived address, or pass through the
+    backend where the store is not reachable from a browser (`SPARROW_S3_PRIVATE`)
+  - `SPARROW_STORAGE_GATEWAY=rclone` serves an existing data directory as a
+    bucket with `rclone serve s3`, so such a lab runs the same way
+- A lab's plugins can be an installed package that names them in the
+  `sparrow.plugins` entry-point group, instead of a mounted directory
 - New `sparrow-pipelines` package (`backend/pipelines`): explicit Pydantic models
   for the records Sparrow imports, and a `Pipeline` that turns files into them
   with no database or server involved

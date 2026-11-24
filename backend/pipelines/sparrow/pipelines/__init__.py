@@ -15,5 +15,13 @@ from .models import (
     Session,
     TopLevelRecord,
 )
-from .pipeline import Pipeline, RunReport, Sink, SourceFile, run_pipeline
+from .pipeline import (
+    Pipeline,
+    RunReport,
+    Sink,
+    Source,
+    SourceFile,
+    run_pipeline,
+    run_sources,
+)
 from .sinks import APISink, DryRunSink

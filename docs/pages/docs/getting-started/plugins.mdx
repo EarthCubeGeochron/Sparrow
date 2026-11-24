@@ -204,3 +204,25 @@ export default {
 You can find more information on frontend visualization on [this page](/docs/frontend/visualizations)
 
 export default DocsPage;
+
+## Packaging a lab's plugins
+
+Plugins can be installed into the backend as an ordinary Python package rather than
+mounted from a directory (`SPARROW_PLUGIN_DIR`). The package names the module that holds
+its plugins, or a single plugin class, in the `sparrow.plugins` entry-point group:
+
+```toml
+[project.entry-points."sparrow.plugins"]
+my-lab = "my_lab.plugins"
+```
+
+A lab's backend image is then the Sparrow backend with that package installed, which is
+what running without host directories (for example on Kubernetes) needs:
+
+```dockerfile
+FROM ghcr.io/earthcubegeochron/sparrow/backend
+RUN pip install my-lab-sparrow
+```
+
+Schema extensions that were given as `SPARROW_INIT_SQL` can ship in the same package, as
+a schema chunk added through the "define-schema" hook.
