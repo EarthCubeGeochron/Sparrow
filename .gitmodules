@@ -1,6 +1,3 @@
-[submodule "deps/sadisplay"]
-	path = deps/sadisplay
-	url = https://github.com/davenquinn/sadisplay.git
 [submodule "deps/postgis-tile-utils"]
 	path = backend/deps/postgis-tile-utils
 	url = https://github.com/UW-Macrostrat/postgis-tile-utils.git

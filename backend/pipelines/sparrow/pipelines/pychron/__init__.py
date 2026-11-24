@@ -2,8 +2,7 @@ from json import JSONDecodeError, loads
 from os import environ, path
 from pathlib import Path
 
-from sparrow.pipelines import Pipeline
-
+from ..pipeline import Pipeline
 from .json_transformer import PyChronJSONImporter
 from .repo_crawler import PyChronRepoCrawler, iare, latest_ia_files
 
@@ -12,6 +11,8 @@ class PyChronPipeline(Pipeline):
     """Reads PyChron interpreted age files from clones of PyChron's data
     repositories. `sync_repositories` fetches them; reading needs no network."""
 
+    # An example of a pipeline for one kind of instrument software. It reads
+    # each file's date from the history of the repository it is kept in.
     name = "pychron"
     file_type = "PyChron Interpreted Age"
     transformer = PyChronJSONImporter()

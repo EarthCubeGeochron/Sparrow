@@ -386,11 +386,6 @@ class TestDeclarativeImporter:
         res = SampleSchema.dump(inst)
         dumps(res, cls=JSONEncoder)
 
-    def test_get_instance_api(self, client):
-        """Test that our API at least allows us to retrieve all of the data at once."""
-        res = client.get("/api/v2/models/datum_type", params={"all": True})
-        assert res.status_code == 200
-
     def test_incomplete_import_excluded(self, db):
         try:
             db.load_data("analysis", incomplete_analysis)

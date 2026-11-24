@@ -1,7 +1,6 @@
 from starlette.authentication import AuthenticationError, requires
 from starlette.responses import JSONResponse
 from starlette.routing import Route, Router
-from webargs_starlette import use_annotations
 
 from sparrow.core.context import get_database, get_sparrow_app
 from sparrow.database.models import User
@@ -21,8 +20,19 @@ def UnauthorizedResponse(**kwargs):
     )
 
 
-@use_annotations(location="json")
-async def login(request, username: str, password: str):
+async def login(request):
+    try:
+        data = await request.json()
+    except ValueError:
+        data = None
+    if not isinstance(data, dict):
+        data = {}
+    username = data.get("username")
+    password = data.get("password")
+    if not isinstance(username, str) or not isinstance(password, str):
+        return JSONResponse(
+            {"error": "Provide a username and a password"}, status_code=422
+        )
     db = get_database()
     backend = get_backend()
 

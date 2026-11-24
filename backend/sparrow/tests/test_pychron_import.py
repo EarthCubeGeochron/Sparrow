@@ -2,8 +2,8 @@ from psycopg.errors import UniqueViolation
 from pytest import mark
 from sqlalchemy.exc import IntegrityError
 
-from sparrow.core.ext.pychron import PyChronJSONImporter
 from sparrow.pipelines import DatumType
+from sparrow.pipelines.pychron import PyChronJSONImporter
 
 from .helpers import json_fixture
 

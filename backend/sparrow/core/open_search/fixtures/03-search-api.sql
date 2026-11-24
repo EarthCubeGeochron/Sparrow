@@ -1,9 +1,21 @@
 /*
-Open search for getting all the models back at a time
+Search across projects, samples and sessions, for PostgREST:
+
+  GET /rpc/search?term=lava
+
+It runs as the role that calls it, so embargoed records stay hidden from
+the public.
 */
+GRANT USAGE ON SCHEMA documents TO view_public, admin;
+GRANT SELECT ON ALL TABLES IN SCHEMA documents TO view_public, admin;
+
+CREATE OR REPLACE FUNCTION sparrow_api.search(term text)
+RETURNS TABLE (model text, data jsonb)
+LANGUAGE sql STABLE
+AS $$
 WITH search AS (
     SELECT to_tsquery(string_agg(lexeme || ':*', ' & ' order by positions)) AS query
-    FROM unnest(to_tsvector(:query))
+    FROM unnest(to_tsvector(term))
 )
 SELECT DISTINCT 'project' model, to_jsonb(p.*) json
 FROM search, project p
@@ -56,3 +68,6 @@ sd.sample_token @@ search.query OR
 pd.project_token @@ search.query OR
 ssd.session_token @@ search.query) se
 ;
+$$;
+
+GRANT EXECUTE ON FUNCTION sparrow_api.search(text) TO view_public, admin;

@@ -1,8 +1,6 @@
 from sparrow.loader import InterfaceCollection
 
 from ..plugins import SparrowCorePlugin
-from .importer import BaseImporter
-from .util import SparrowImportError, get_data_directory, get_file_object, md5hash
 
 
 class InterfacePlugin(SparrowCorePlugin):
@@ -11,8 +9,3 @@ class InterfacePlugin(SparrowCorePlugin):
     def on_database_ready(self, db):
         iface = InterfaceCollection(db.model)
         db.interface = iface
-
-    def on_setup_cli(self, cli):
-        from .cli import show_interface
-
-        cli.add_command(show_interface)

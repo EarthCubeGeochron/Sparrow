@@ -101,20 +101,6 @@ def create_views(db):
         db.run_sql("../database/fixtures/07-apiv2views.sql")
 
 
-@cli.command(name="shell")
-@with_full_app
-def shell(app):
-    """
-    Get a Python shell within the application
-    """
-    from IPython import embed
-
-    db = app.database
-    # `using` is related to this issue:
-    # https://github.com/ipython/ipython/issues/11523
-    embed(using=False)
-
-
 @cli.command(name="config")
 @click.argument("key", required=False)
 @click.option("--json", is_flag=True, default=False)

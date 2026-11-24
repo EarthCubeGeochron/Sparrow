@@ -1,8 +1,8 @@
 from datetime import datetime
 from os import path
+from subprocess import run
 
-from sparrow.core.util import run
-from sparrow.pipelines import Analysis, Datum, DatumType, Point, Sample, Session
+from ..models import Analysis, Datum, DatumType, Point, Sample, Session
 
 
 class PyChronJSONImporter:
@@ -61,11 +61,7 @@ class PyChronJSONImporter:
         # as a proxy.
         DT_FMT = "%Y-%m-%d %H:%M:%S"
         ret = run(
-            "git log -1",
-            '--format="%ad"',
-            f'--date=format:"{DT_FMT}"',
-            "--",
-            fn,
+            ["git", "log", "-1", "--format=%ad", f"--date=format:{DT_FMT}", "--", fn],
             capture_output=True,
             check=True,
             cwd=path.dirname(fn),

@@ -1,8 +1,6 @@
-import pandas as pd
-from macrostrat.database.utils import get_dataframe
-from pytest import mark
+from sqlalchemy import text
 
 
 def test_method_exec_query(db):
-    data = get_dataframe(db.engine, "SELECT * FROM sample")
-    assert data.columns[0] == "id"
+    res = db.session.execute(text("SELECT * FROM sample"))
+    assert list(res.keys())[0] == "id"

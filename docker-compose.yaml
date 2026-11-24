@@ -2,6 +2,7 @@ x-backend: &x-backend
   image: ${SPARROW_BACKEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/backend}
   build:
     context: backend
+    target: main
     cache_from:
       - ${SPARROW_BACKEND_IMAGE:-ghcr.io/earthcubegeochron/sparrow/backend}
   command: /bin/run
@@ -70,7 +71,6 @@ x-backend: &x-backend
     - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.12/site-packages/sparrow_plugins:ro
     # Save ipython configuration to anonymous volume so
     # we keep command history between app runs
-    - ipython_config:/root/.ipython/profile_default
     # Save CLI help info for rapid access
     - runtime_data:/run:ro
     # A working location for caching files that need to persist over time
@@ -245,7 +245,6 @@ services:
 volumes:
   frontend_build:
   # Anonymous volume to preserve `sparrow shell` history
-  ipython_config:
   db_cluster:
   runtime_data:
   backend_cache:

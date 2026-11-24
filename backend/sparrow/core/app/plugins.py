@@ -7,14 +7,9 @@ from ..api import APIv2Plugin
 from ..plugins import SparrowPluginManager
 from ..import_helpers import InterfacePlugin
 from ..auth import AuthPlugin
-from ..datasheet import DatasheetPlugin
-from ..project_edits import ProjectEdits
 from ..ext import HeartbeatPlugin
-from ..ext.data_validation import DataValidationPlugin
-from ..metrics_endpoint import MetricsEndpoint
 from ..tags import Tags
 from ..open_search import OpenSearch
-from ..web import WebPlugin
 from ..logs import get_logger
 from ..import_data import ImportDataPlugin
 from ..users import UserManagementPlugin
@@ -32,14 +27,9 @@ def prepare_plugin_manager(app):
     mgr.add_all(
         APIv2Plugin,
         AuthPlugin,
-        WebPlugin,
         HeartbeatPlugin,
         InterfacePlugin,
         PipelinesPlugin,
-        DatasheetPlugin,
-        # ProjectEdits,
-        DataValidationPlugin,
-        MetricsEndpoint,
         Tags,
         ImportDataPlugin,
         OpenSearch,

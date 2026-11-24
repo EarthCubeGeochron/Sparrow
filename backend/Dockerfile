@@ -21,7 +21,7 @@ RUN mkdir -p /app/pipelines/sparrow/pipelines && touch /app/pipelines/sparrow/pi
 COPY pipelines/pyproject.toml pipelines/README.md /app/pipelines/
 
 # Project initialization:
-RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root --without dev
 
 COPY ./docker.cfg /config/docker.cfg
 # These values should not change between installations
@@ -40,7 +40,7 @@ COPY ./docker-scripts/* /bin/
 ## Copy app core
 COPY ./ /app/
 
-RUN poetry install --no-interaction --no-ansi 
+RUN poetry install --no-interaction --no-ansi --without dev
 
 # Copy command-line options to a place where they can be easily accessed
 # by the wrapper CLI.
@@ -50,5 +50,5 @@ CMD ["/bin/run"]
 
 FROM main AS testing
 
-# For right now, the testing target is the same as the "main" target, but
-# we could grab or create additional artifacts or fixtures here.
+# The service image holds what runs; tests need more
+RUN poetry install --no-interaction --no-ansi --with dev

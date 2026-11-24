@@ -47,3 +47,8 @@ SELECT pgmemento.init(
   'tags'
 );
 
+
+-- Administrators add records through PostgREST as the `admin` role, and each
+-- audited row draws its identifier from here
+GRANT USAGE ON SCHEMA pgmemento TO admin;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA pgmemento TO admin;

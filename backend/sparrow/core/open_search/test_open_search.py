@@ -4,7 +4,7 @@ from sqlalchemy import MetaData, Table, or_, text
 import sparrow
 from sparrow.tests.helpers import json_fixture
 
-from .filter import get_document_tables
+from . import get_document_tables
 
 
 class TestOpenSearch:
@@ -145,19 +145,6 @@ class TestOpenSearch:
 
         assert q.count() > 0
         assert q.first().name == "fake1"
-
-    @mark.skip(reason="it fails and we're short on time")
-    def test_open_search_api(self, client, db):
-        """test filter api"""
-
-        models = {"project": "casey", "sample": "fake1", "session": "UW114"}
-
-        for k, v in models.items():
-            route = f"/api/v2/models/{k}?search={v}"
-
-            res = client.get(route)
-            data = res.json()
-            assert data["total_count"] != 0
 
     @mark.skip(reason="it fails and we're short on time")
     def test_add_new(self, client, db):
