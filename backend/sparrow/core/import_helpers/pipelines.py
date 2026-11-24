@@ -7,10 +7,12 @@ import click
 
 from sparrow.core.context import get_database, get_plugin
 from sparrow.core.plugins import SparrowCorePlugin
+from sparrow.core.storage import get_object_store
 from sparrow.core.task_manager.base import SparrowTask
 from sparrow.logs import get_logger
-from sparrow.pipelines import DryRunSink, Pipeline, RunReport, run_pipeline
+from sparrow.pipelines import DryRunSink, Pipeline, RunReport, run_pipeline, run_sources
 
+from .object_sources import stored_sources
 from .sink import DatabaseSink
 from .util import get_data_directory
 
@@ -46,13 +48,22 @@ class PipelinesPlugin(SparrowCorePlugin):
             raise click.BadParameter(f"No pipeline named '{name}' ({known})")
 
     def run(self, name, paths=None, *, redo=False, dry_run=False) -> RunReport:
+        """Run a pipeline over the lab's files: objects in its store where it
+        has one (paths are then key prefixes), and otherwise its data directory."""
         pipeline = self.get(name)
+        sink = DryRunSink() if dry_run else DatabaseSink(get_database())
+        store = get_object_store()
+        if store is not None:
+            prefixes = [str(p) for p in paths] if paths else [""]
+            sources = stored_sources(pipeline, store, prefixes)
+            return run_sources(pipeline, sources, sink, redo=redo)
         if not paths:
             data_dir = get_data_directory()
             if data_dir is None:
-                raise click.UsageError("Give paths to read, or set SPARROW_DATA_DIR")
+                raise click.UsageError(
+                    "Give paths to read, or set SPARROW_S3_BUCKET or SPARROW_DATA_DIR"
+                )
             paths = [data_dir]
-        sink = DryRunSink() if dry_run else DatabaseSink(get_database())
         return run_pipeline(pipeline, [Path(p) for p in paths], sink, redo=redo)
 
     def on_plugins_initialized(self):
@@ -87,11 +98,13 @@ def _summarize(report: RunReport) -> str:
 
 @click.command(name="run-pipeline")
 @click.argument("name")
-@click.argument("paths", nargs=-1, type=click.Path(exists=True, path_type=Path))
+@click.argument("paths", nargs=-1)
 @click.option("--redo", is_flag=True, help="Read files that are already loaded")
 @click.option("--dry-run", is_flag=True, help="Build records without loading them")
 def _run_pipeline(name, paths, redo=False, dry_run=False):
-    """Load data files with a pipeline (by default, from the data directory)"""
+    """Load data files with a pipeline. Paths are key prefixes in the lab's
+    object store, or files and directories where it has none; by default,
+    everything is read."""
     report = get_plugin("pipelines").run(name, paths, redo=redo, dry_run=dry_run)
     for result in report.files:
         if result.status == "failed":

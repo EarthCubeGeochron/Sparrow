@@ -1,3 +1,5 @@
+from importlib.metadata import entry_points
+
 # isort: off
 # Plugins import one another; this order avoids import cycles
 from ..task_manager import SparrowTaskManager
@@ -47,7 +49,17 @@ def prepare_plugin_manager(app):
     # GraphQL is disabled for now
     mgr.add_module(core_plugins)
 
-    # Try to import external plugins, but they might not be defined.
+    # A lab's own code, installed as a package that names its plugins:
+    #   [project.entry-points."sparrow.plugins"]
+    #   my-lab = "my_lab.plugins"
+    for entry_point in entry_points(group="sparrow.plugins"):
+        loaded = entry_point.load()
+        if isinstance(loaded, type):
+            mgr.add(loaded)
+        else:
+            mgr.add_module(loaded)
+
+    # ...or mounted as a `sparrow_plugins` directory, which may not be there.
     try:
         import sparrow_plugins
 

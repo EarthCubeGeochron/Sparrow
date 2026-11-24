@@ -70,6 +70,15 @@ def prepare_compose_overrides(cfg) -> List[Message]:
         profiles.append("production")
     if is_truthy("SPARROW_TASK_WORKER"):
         profiles.append("task-worker")
+    if environ.get("SPARROW_STORAGE_GATEWAY") == "rclone":
+        # Serve the data directory as a bucket, and point the backend at it
+        profiles.append("storage-gateway")
+        environ.setdefault("SPARROW_S3_ENDPOINT", "http://storage:9000")
+        environ.setdefault("SPARROW_S3_BUCKET", "data")
+        environ.setdefault("SPARROW_S3_KEY", "sparrow")
+        environ.setdefault("SPARROW_S3_SECRET", "sparrow-storage")
+        # Browsers cannot reach the gateway, so the backend passes files on
+        environ.setdefault("SPARROW_S3_PRIVATE", "1")
 
     if cfg.local_frontend:
         profiles.remove("frontend")

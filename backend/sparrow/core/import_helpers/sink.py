@@ -22,6 +22,9 @@ class DatabaseSink:
 
     def _reference_path(self, source: SourceFile) -> str:
         path = Path(source.path)
+        if source.source_url is not None and source.source_url.startswith("s3://"):
+            # An object's key is already relative to the lab's store
+            return str(path)
         if self.basedir is not None and path.is_relative_to(self.basedir):
             path = path.relative_to(self.basedir)
         return str(path)

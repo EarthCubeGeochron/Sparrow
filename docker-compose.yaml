@@ -31,6 +31,8 @@ x-backend: &x-backend
     - SPARROW_S3_BUCKET
     - SPARROW_S3_KEY
     - SPARROW_S3_SECRET
+    - SPARROW_S3_PREFIX
+    - SPARROW_S3_PRIVATE
     # Whether we should enable a worker pool for running tasks. If we don't,
     # tasks must be run via the command line.
     - SPARROW_TASK_WORKER
@@ -214,6 +216,20 @@ services:
   # The broker and worker containers create an architecture
   # for running import and processing tasks on a separate thread
   # from the web server. These only run in "worker" profile.
+  storage:
+    # Presents the lab's data directory as an S3 bucket named `data`, so the
+    # backend reaches files the same way wherever they are kept. Any rclone
+    # remote (Google Drive, SFTP, ...) can stand in for the directory.
+    image: rclone/rclone:1.68
+    profiles:
+      - storage-gateway
+    command: >
+      serve s3 /srv --addr :9000 --read-only
+      --auth-key ${SPARROW_S3_KEY:-sparrow},${SPARROW_S3_SECRET:-sparrow-storage}
+    expose:
+      - 9000
+    volumes:
+      - ${SPARROW_DATA_DIR:-placeholder}:/srv/data:ro
   broker:
     profiles:
       - task-worker
