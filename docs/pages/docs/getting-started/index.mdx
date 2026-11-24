@@ -162,10 +162,32 @@ is shown in [`sparrow-config.sh.example`](https://github.com/EarthCubeGeochron/S
 While not _required_ (environment
 variables can be set externally), this approach is strongly preferred.
 
-At runtime, the `sparrow` application fsearches
+At runtime, the `sparrow` application searches
 upwards from the current directory until the first file named
-`sparrow-config.sh` is found. This behavior is similar to that of the
+`sparrow.toml` is found. This behavior is similar to that of the
 `git` command.
+
+```toml
+[default]
+lab_name = "Example lab"
+data_dir = "./data"
+
+[development]
+secret_key = "not a real secret, for a laptop"
+
+[production]
+domain = "sparrow.example.org"
+secret_key = "op://Lab/Sparrow/secret-key"
+```
+
+Each table is an environment, chosen with `sparrow env <name>`, `sparrow --env <name>` or
+the `SPARROW_ENV` variable. A setting reaches the lab's services as the `SPARROW_*`
+variable of the same name (`data_dir` is `SPARROW_DATA_DIR`), paths beginning with `./`
+are relative to the file, and a value such as `op://…`, `env://…` or `file://…` names a
+secret that is fetched when the lab is run rather than kept in the file.
+
+A `sparrow-config.sh` shell script, the earlier form of this file, is still sourced where
+one is found, and what it exports takes precedence.
 
 :::tip
 Alternatively, the location of the configuration

@@ -31,6 +31,17 @@ from .version_info import SparrowVersionMatch, test_version
 log = get_logger(__file__)
 
 
+def _runs_services() -> bool:
+    """Whether this invocation does more than describe the installation, so
+    that asking for help does not send anyone to their password manager."""
+    args = sys.argv[1:]
+    if "--env" in args:
+        i = args.index("--env")
+        del args[i : i + 2]
+    words = [a for a in args if not a.startswith("-")]
+    return len(words) > 0 and words[0] not in ("help", "env", "info")
+
+
 @dataclass
 class SparrowConfig:
     bin_directories: typing.List[Path]
@@ -83,15 +94,16 @@ class SparrowConfig:
             environ["SPARROW_VERBOSE"] = "1"
 
         # Load configuration from file!
-        self.config_file = load_config_file()
+        config_script = load_config_file()
         # After sparrow-config.sh, which may itself name the environment
         self.environments = load_environments(env)
         export_settings(self.environments)
+        self.config_file = self.environments.config_file or config_script
         if self.config_file is None:
             self.add_message(
                 id="no-config-file",
                 text="No lab configuration file found",
-                details="Create a [cyan]sparrow-config.sh[/cyan] file in a project directory to set up a lab.",
+                details="Create a [cyan]sparrow.toml[/cyan] file in a project directory to set up a lab.",
             )
         else:
             self.config_dir = self.config_file.parent
@@ -147,8 +159,6 @@ class SparrowConfig:
             return
         self.server_available = True
 
-        self.enhance_secret_key()
-
         self.project_name = self.infer_project_name()
         self.local_frontend = self.configure_local_frontend()
 
@@ -173,6 +183,10 @@ class SparrowConfig:
 
         environ.setdefault("SPARROW_BACKEND_IMAGE", f"{image_prefix}/backend" + tag)
         environ.setdefault("SPARROW_FRONTEND_IMAGE", f"{image_prefix}/frontend" + tag)
+
+        # The lab's services are about to be used, so they need its secrets
+        export_settings(self.environments, secrets=_runs_services())
+        self.enhance_secret_key()
 
         prepare_docker_environment()
         if "COMPOSE_FILE" in environ:

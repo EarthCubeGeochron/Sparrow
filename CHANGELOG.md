@@ -51,6 +51,11 @@ and this project is working towards adherence to
 - Environments in a `sparrow.toml` (`sparrow env`, `--env`), from
   `macrostrat.app_frame`: named labs or deployments, with secret references and
   confirmation before writes to production. `sparrow-config.sh` is still read
+- A lab's settings can be written in `sparrow.toml` instead of `sparrow-config.sh`:
+  each reaches the services as the `SPARROW_*` variable of the same name, relative
+  paths are resolved against the file, and secrets are fetched when the lab is run.
+  `SPARROW_CONFIG` now names this file; a value ending in `.sh` is still taken as
+  the shell script
 - `SPARROW_ENV` names the environment in use. `development` and `production` work
   as before with no `sparrow.toml`; any other environment declares its `env_class`,
   and services are started in development or production mode accordingly
