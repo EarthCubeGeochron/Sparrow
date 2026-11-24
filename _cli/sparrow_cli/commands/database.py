@@ -1,4 +1,5 @@
 import sys
+from os import environ
 from subprocess import PIPE
 
 import click
@@ -72,9 +73,11 @@ def migration(args):
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def update(args):
     """Update the database schema"""
-    # Ensure that the database is running for this step.
-    compose("up -d db")
-    exec_sparrow("db-update", *args)
+    if "SPARROW_DATABASE" not in environ:
+        # A lab run with Docker Compose here: its database must be up
+        compose("up -d db")
+    res = exec_sparrow("db-update", *args)
+    sys.exit(res.returncode)
 
 
 @sparrow_db.command(name="check-schema")
@@ -84,9 +87,7 @@ def check_database(quiet: bool = False):
 
     if not quiet:
         console.status("[bold green]Checking database schema...")
-    res = exec_sparrow(
-        "db-migration --hide-view-changes", tty=False, capture_output=True
-    )
+    res = exec_sparrow("db-migration", tty=False, stdout=PIPE)
     migration_sql = res.stdout.decode("utf-8").strip("\n ")
 
     if migration_sql == "" or migration_sql is None:

@@ -11,4 +11,4 @@ fi
 # Meant to be run from the repository root folder
 cd _cli
 # The development and bundled builds manage a server
-poetry install --extras server
+poetry install --extras "server admin"

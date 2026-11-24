@@ -16,6 +16,7 @@ from ..util.shell import (
     fail_without_docker_command,
     fail_without_docker_running,
     has_command,
+    set_config,
 )
 from .command_cache import CommandDataSource, get_backend_command_help
 from .environment import (
@@ -97,6 +98,7 @@ class SparrowConfig:
         config_script = load_config_file()
         # After sparrow-config.sh, which may itself name the environment
         self.environments = load_environments(env)
+        set_config(self)
         export_settings(self.environments)
         self.config_file = self.environments.config_file or config_script
         if self.config_file is None:

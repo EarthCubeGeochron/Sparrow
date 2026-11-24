@@ -1,3 +1,5 @@
+import sys
+from contextlib import redirect_stdout
 from json import dumps
 from logging import INFO
 from os import environ
@@ -166,7 +168,10 @@ def plugins(app):
 @with_database
 def _db_migration(db):
     """Print the changes that would bring the database schema up to date."""
-    for statement in db.schema_app().plan():
+    # Building the schema to compare against is chatty; only the plan is output
+    with redirect_stdout(sys.stderr):
+        statements = db.schema_app().plan()
+    for statement in statements:
         print(statement)
 
 

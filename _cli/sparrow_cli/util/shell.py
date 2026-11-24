@@ -95,7 +95,25 @@ def exec_backend_command(ctx, *args, **kwargs):
     return exec_sparrow(*args, **kwargs)
 
 
+# The configuration of this invocation, for commands that have no context
+_config = None
+
+
+def set_config(cfg):
+    global _config
+    _config = cfg
+
+
 def exec_sparrow(*args, **kwargs):
+    """Run one of the application's own commands: on this machine where the
+    application is installed, and otherwise in the lab's backend container."""
+    from ..config.admin import admin_command, can_run_locally
+
+    if _config is not None and can_run_locally(_config):
+        command, env = admin_command(_config, split_args(*args))
+        for key in ("log_level", "run_args", "tty"):
+            kwargs.pop(key, None)
+        return run(*command, env=env, **kwargs)
     return exec_or_run("backend", "python -m sparrow.core", *args, **kwargs)
 
 
