@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "sparrow-pipelines"
+version = "0.1.0"
+description = "Data models and pipelines for bringing data into Sparrow"
+authors = ["Daven Quinn <dev@davenquinn.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "sparrow"}]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<4"
+pydantic = "^2.9.0"
+typer = ">=0.12.5"
+rich = ">=13.7.1"
+httpx = ">=0.25"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.0"
+
+[tool.poetry.scripts]
+sparrow-pipeline = "sparrow.pipelines.cli:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

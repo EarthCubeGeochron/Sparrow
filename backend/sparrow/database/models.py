@@ -10,22 +10,22 @@ TODO: this module bundles convenience methods with core functionality
 in the API should be separately handled than things only used in import
 scripts.
 """
-from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, String, ForeignKey, Table
-from geoalchemy2 import Geometry
+
 from os import environ
-from sqlalchemy.orm import relationship
 from uuid import uuid4
+
+from geoalchemy2 import Geometry
+from sqlalchemy import Column, ForeignKey, String, Table
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from .mapper import BaseModel
 
 
 class User(BaseModel):
-    if BaseModel.loaded_from_cache:
-        __table__ = BaseModel.metadata.tables["user"]
-    else:
-        __tablename__ = "user"
-        __table_args__ = {"extend_existing": True}
+    __tablename__ = "user"
+    __table_args__ = {"extend_existing": True}
 
     # Columns are automagically mapped from database
     # *NEVER* directly set the password column.
@@ -41,11 +41,8 @@ class User(BaseModel):
 
 
 class Project(BaseModel):
-    if BaseModel.loaded_from_cache:
-        __table__ = BaseModel.metadata.tables["project"]
-    else:
-        __tablename__ = "project"
-        __table_args__ = {"extend_existing": True}
+    __tablename__ = "project"
+    __table_args__ = {"extend_existing": True}
 
     def add_researcher(self, researcher):
         self.researcher_collection.append(researcher)
@@ -55,19 +52,16 @@ class Project(BaseModel):
 
 
 class Session(BaseModel):
-    if BaseModel.loaded_from_cache:
-        __table__ = BaseModel.metadata.tables["session"]
-    else:
-        __tablename__ = "session"
-        __table_args__ = {"extend_existing": True}
-        # Define UUID column so it is caught as unique
-        uuid = Column(
-            "uuid",
-            UUID(as_uuid=True),
-            unique=True,
-            nullable=False,
-            server_default="uuid_generate_v4()",
-        )
+    __tablename__ = "session"
+    __table_args__ = {"extend_existing": True}
+    # Define UUID column so it is caught as unique
+    uuid = Column(
+        "uuid",
+        UUID(as_uuid=True),
+        unique=True,
+        nullable=False,
+        server_default="uuid_generate_v4()",
+    )
 
     def get_attribute(self, type):
         # There has got to be a better way to get self!
@@ -82,16 +76,13 @@ class Session(BaseModel):
 
 
 class DatumType(BaseModel):
-    if BaseModel.loaded_from_cache:
-        __table__ = BaseModel.metadata.tables["datum_type"]
-    else:
-        __tablename__ = "datum_type"
-        __table_args__ = {"extend_existing": True}
+    __tablename__ = "datum_type"
+    __table_args__ = {"extend_existing": True}
 
-        # We need to override foreign keys
-        unit = Column("unit", String, ForeignKey("vocabulary.unit.id"))
-        error_unit = Column("error_unit", String, ForeignKey("vocabulary.unit.id"))
-        _unit = relationship("vocabulary_unit", foreign_keys=[unit])
-        _error_unit = relationship(
-            "vocabulary_unit", foreign_keys=[error_unit], back_populates=None
-        )
+    # We need to override foreign keys
+    unit = Column("unit", String, ForeignKey("vocabulary.unit.id"))
+    error_unit = Column("error_unit", String, ForeignKey("vocabulary.unit.id"))
+    _unit = relationship("vocabulary_unit", foreign_keys=[unit])
+    _error_unit = relationship(
+        "vocabulary_unit", foreign_keys=[error_unit], back_populates=None
+    )

@@ -1,6 +1,8 @@
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
+
 from sparrow.core.context import get_database
+
 from ...exceptions import ApplicationError
 
 

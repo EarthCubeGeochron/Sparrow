@@ -1,30 +1,30 @@
-import yaml
 import json
-from starlette.applications import Starlette
-from starlette.middleware import Middleware
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.endpoints import HTTPEndpoint
-from starlette.responses import JSONResponse, Response
-from starlette.exceptions import HTTPException
-from sparrow.logs import get_logger
+import time
+from collections import defaultdict
+
+import yaml
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
-from collections import defaultdict
+from starlette.applications import Starlette
+from starlette.endpoints import HTTPEndpoint
+from starlette.exceptions import HTTPException
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse, Response
 from starlette_apispec import APISpecSchemaGenerator
+
 from sparrow.database import classname_for_table
+from sparrow.logs import get_logger
+
+from .api_info import meta_info, model_description, root_example, root_info
+from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint
 from .endpoints.selectables.data_file import (
-    DataFileListEndpoint,
     DataFileFilterByModelID,
+    DataFileListEndpoint,
 )
-from .endpoints.selectables.sample import SubSamples, MapSamples
-
-from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint
-
-from .endpoints import ModelAPIEndpoint, ViewAPIEndpoint
-from .api_info import model_description, root_example, root_info, meta_info
-from .response import APIResponse
+from .endpoints.selectables.sample import MapSamples, SubSamples
 from .exceptions import SparrowAPIError
-import time
+from .response import APIResponse
 
 log = get_logger(__name__)
 

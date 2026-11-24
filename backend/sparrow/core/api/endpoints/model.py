@@ -1,46 +1,47 @@
-from sparrow.core.auth.api import UnauthorizedResponse
-from starlette.endpoints import HTTPEndpoint
-from webargs_starlette import parser
-from webargs.fields import DelimitedList, Str, Int, Boolean
-from sqlakeyset import get_page
 from marshmallow_sqlalchemy.fields import get_primary_keys
+from sqlakeyset import get_page
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
-from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.authentication import requires
+from starlette.endpoints import HTTPEndpoint
+from starlette.responses import JSONResponse, PlainTextResponse
+from webargs.fields import Boolean, DelimitedList, Int, Str
+from webargs_starlette import parser
 from yaml import safe_load
 
-from ...context import get_database
-from ..exceptions import ValidationError, HTTPException, ApplicationError
-from ..fields import NestedModelField
-from ..response import APIResponse
-from ..filters import (
-    BaseFilter,
-    AuthorityFilter,
-    FieldExistsFilter,
-    FieldNotExistsFilter,
-    _schema_fields,
-    EmbargoFilter,
-    DateFilter,
-    DOIFilter,
-    CoordinateFilter,
-    GeometryFilter,
-    TextSearchFilter,
-    AgeRangeFilter,
-    IdListFilter,
-    TagsFilter,
-)
+from sparrow.core.auth.api import UnauthorizedResponse
 from sparrow.core.open_search.filter import OpenSearchFilter
 from sparrow.database import classname_for_table
+
+from ...context import get_database
 from ...logs import get_logger
 from ...util import relative_path
 from ..api_info import (
+    meta_info,
     model_description,
     model_examples,
     root_example,
     root_info,
-    meta_info,
 )
+from ..exceptions import ApplicationError, HTTPException, ValidationError
+from ..fields import NestedModelField
+from ..filters import (
+    AgeRangeFilter,
+    AuthorityFilter,
+    BaseFilter,
+    CoordinateFilter,
+    DateFilter,
+    DOIFilter,
+    EmbargoFilter,
+    FieldExistsFilter,
+    FieldNotExistsFilter,
+    GeometryFilter,
+    IdListFilter,
+    TagsFilter,
+    TextSearchFilter,
+    _schema_fields,
+)
+from ..response import APIResponse
 from .utils import construct_schema_fields_object
 
 log = get_logger(__name__)

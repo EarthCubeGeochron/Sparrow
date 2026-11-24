@@ -1,14 +1,17 @@
-from macrostrat.dinosaur import SchemaMigration
-from sqlalchemy import inspect
-from sparrow.core.plugins import SparrowCorePlugin
-from macrostrat.utils import relative_path, cmd
-from sparrow.core import get_database
-import click
-from pathlib import Path
-from sqlalchemy.exc import ProgrammingError
-from sparrow.database import Database
-from macrostrat.database.utils import connection_args, run_sql
 import warnings
+from pathlib import Path
+
+import click
+from macrostrat.database.utils import connection_args, run_query, run_sql
+from macrostrat.schema_management import has_columns, negate
+from macrostrat.utils import cmd, relative_path
+from sqlalchemy import inspect, text
+from sqlalchemy.exc import ProgrammingError
+
+from sparrow.core import get_database
+from sparrow.core.plugins import SparrowCorePlugin
+from sparrow.database import Database
+from sparrow.database.migration import SparrowMigration
 
 exclude_tables = ["spatial_ref_sys"]
 audit_schemas = ["public", "vocabulary", "tags", "geo_context"]
@@ -74,7 +77,7 @@ def drop_audit_trail():
     Remove PGMemento audit trail
     """
     db = get_database()
-    db.exec_sql(relative_path(__file__, "drop-audit.sql"))
+    db.run_sql(relative_path(__file__, "drop-audit.sql"))
     drop_audit_columns(db)
 
 
@@ -111,31 +114,48 @@ def get_old_triggers(engine):
     """
     Get the old triggers that need to be dropped
     """
-    return engine.execute(get_procedure("get-old-triggers")).fetchall()
+    return run_query(engine, get_procedure("get-old-triggers")).fetchall()
 
 
 def get_old_audit_id(engine):
-    return engine.execute(get_procedure("get-old-audit-id")).fetchall()
+    return run_query(engine, get_procedure("get-old-audit-id")).fetchall()
 
 
-class PGMementoMigration(SchemaMigration):
+def _pgmemento_version(db):
+    try:
+        return db.session.execute(
+            text(
+                "SELECT major_version, minor_version, revision FROM pgmemento.version()"
+            )
+        ).first()
+    except ProgrammingError:
+        db.session.rollback()
+        return None
+
+
+def _pgmemento_needs_bugfix(db):
+    version = _pgmemento_version(db)
+    if version is None:
+        return False
+    return (version.major_version, version.minor_version) == (
+        0,
+        7,
+    ) and version.revision < 4
+
+
+class PGMementoMigration(SparrowMigration):
     """Migrate audit logging to version 0.7.4 from the 0.6 series"""
 
     name = "pgmemento-upgrade-migration"
-    target = None
+    subsystem = "versioning"
+    preconditions = [
+        has_columns("public", "sample", "audit_id"),
+        lambda db: len(get_old_triggers(db.session)) > 0,
+        lambda db: len(get_old_audit_id(db.session)) > 0,
+    ]
+    postconditions = [negate(has_columns("public", "sample", "audit_id"))]
 
-    def should_apply(self, source, target, migrator):
-        db = Database(source.url)
-        old_triggers = get_old_triggers(db.session)
-        old_audit_id = get_old_audit_id(db.session)
-        return (
-            has_audit_id(source, "public", "sample", col_name="audit_id")
-            and len(old_triggers) > 0
-            and len(old_audit_id) > 0
-        )
-
-    def apply(self, engine):
-        db = Database(engine.url)
+    def apply(self, db):
 
         old_triggers = [
             "schema_drop_pre_trigger",
@@ -147,11 +167,11 @@ class PGMementoMigration(SchemaMigration):
         ]
 
         # Drop views
-        db.engine.execute("DROP SCHEMA IF EXISTS core_view CASCADE;")
+        db.run_sql("DROP SCHEMA IF EXISTS core_view CASCADE")
 
         # Drop old triggers
         for trigger in old_triggers:
-            db.engine.execute(f"DROP EVENT TRIGGER IF EXISTS {trigger};")
+            db.run_sql(f"DROP EVENT TRIGGER IF EXISTS {trigger}")
 
         # db.engine.execute("SELECT pgmemento.drop_schema_event_trigger()")
         # for schema in ["public", "vocabulary", "tags", "geo_context", "core_view"]:
@@ -184,42 +204,27 @@ class PGMementoMigration(SchemaMigration):
         build_audit_tables(db)
 
 
-class PGMemento074Migration(SchemaMigration):
+class PGMemento074Migration(SparrowMigration):
     """
     Migrate PGMemento to a bugfix release to handle PostgreSQL 15.
     This migration only runs if we are on version 0.7.3.
     """
 
-    def should_apply(self, source, target, migrator):
-        # Get the version of PGMemento
-        try:
-            version = source.execute(
-                "SELECT major_version, minor_version, revision FROM pgmemento.version()"
-            ).scalar()
-        except ProgrammingError:
-            return False
-        # Parse version string
-        print(version)
-        if version == 0:
-            return False
+    name = "pgmemento-074-migration"
+    subsystem = "versioning"
+    depends_on = ["pgmemento-upgrade-migration"]
+    preconditions = [_pgmemento_needs_bugfix]
+    postconditions = [negate(_pgmemento_needs_bugfix)]
 
-        return (
-            version.major_version == 0
-            and version.minor_version == 7
-            and version.revision < 4
-        )
-
-    def apply(self, engine):
+    def apply(self, db):
         fp = relative_path(__file__, "pg-memento-legacy/UPGRADE_v07_to_v074.sql")
-        run_psql(engine, fp)
-        db = Database(engine.url)
-        db.initialize()
+        run_psql(db.engine, fp)
 
 
 def build_audit_tables(db):
     # Check if extension is available
     try:
-        db.engine.execute("CREATE EXTENSION IF NOT EXISTS pgmemento")
+        db.run_sql("CREATE EXTENSION IF NOT EXISTS pgmemento", raise_errors=True)
     except ProgrammingError:
         # Extension is not available
         pass
@@ -247,7 +252,7 @@ def build_audit_tables(db):
 
     for id in procedures:
         fp = relative_path(__file__, "pg-memento-legacy", "src", id + ".sql")
-        db.exec_sql(fp)
+        db.run_sql(fp)
 
 
 class VersioningPlugin(SparrowCorePlugin):
@@ -255,11 +260,10 @@ class VersioningPlugin(SparrowCorePlugin):
 
     def on_finalize_database_schema(self, db):
         build_audit_tables(db)
-        db.exec_sql(relative_path(__file__, "start-logging.sql"))
+        db.run_sql(relative_path(__file__, "start-logging.sql"))
 
     def on_setup_cli(self, cli):
         cli.add_command(drop_audit_trail)
 
-    def on_prepare_database_migrations(self, migrator):
-        migrator.add_migration(PGMementoMigration)
-        migrator.add_migration(PGMemento074Migration)
+    def on_define_migrations(self, migrations):
+        migrations.extend([PGMementoMigration, PGMemento074Migration])

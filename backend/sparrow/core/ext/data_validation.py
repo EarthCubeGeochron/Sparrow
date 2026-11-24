@@ -1,10 +1,12 @@
-from click import command, argument, File
 from json import load
 from sys import stdin
 from time import time
-from sparrow.core.plugins import SparrowPlugin
-from sparrow.core.context import get_database
+
+from click import File, argument, command
 from macrostrat.database import on_conflict
+
+from sparrow.core.context import get_database
+from sparrow.core.plugins import SparrowPlugin
 from sparrow.logs import setup_stderr_logs
 
 

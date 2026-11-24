@@ -68,7 +68,8 @@ install-hooks:
 	-[ ! -d .git/modules ] && git submodule update --init
 
 format-code:
-	black backend/**/*.py _cli/**/*.py
+	ruff format backend _cli
+	ruff check --fix backend _cli
 	prettier --ignore-path frontend/.prettierignore --write frontend
 
 get-poetry-installer: 

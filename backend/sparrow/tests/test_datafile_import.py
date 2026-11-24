@@ -1,6 +1,7 @@
-from sparrow.core.import_helpers import BaseImporter
 from macrostrat.utils import relative_path
 from pandas import read_csv
+
+from sparrow.core.import_helpers import BaseImporter
 
 
 class IsotopeImporter(BaseImporter):

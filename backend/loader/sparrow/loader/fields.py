@@ -4,17 +4,19 @@ data from the Sparrow database.
 
 Taken from https://gist.github.com/om-henners/97bc3a4c0b589b5184ba621fd22ca42e
 """
-from marshmallow_sqlalchemy.fields import Related, Nested
-from marshmallow.fields import Field, Raw, DateTime
-from marshmallow.exceptions import ValidationError
-from marshmallow.fields import UUID as _UUID
-from marshmallow.utils import is_collection
-from geoalchemy2.shape import from_shape, to_shape
-from shapely.geometry import mapping, shape
+
 from datetime import datetime
 
-from .util import primary_key
+from geoalchemy2.shape import from_shape, to_shape
 from macrostrat.utils import get_logger
+from marshmallow.exceptions import ValidationError
+from marshmallow.fields import UUID as _UUID
+from marshmallow.fields import DateTime, Field, Raw
+from marshmallow.utils import is_collection
+from marshmallow_sqlalchemy.fields import Nested, Related
+from shapely.geometry import mapping, shape
+
+from .util import primary_key
 
 log = get_logger(__name__)
 

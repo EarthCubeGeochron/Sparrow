@@ -1,7 +1,7 @@
-from yaml import safe_load
 from macrostrat.utils import relative_path
-from sparrow.database import classname_for_table
+from yaml import safe_load
 
+from sparrow.database import classname_for_table
 
 with open(relative_path(__file__, ".", "api-help.yaml"), "r") as f:
     api_help = safe_load(f)

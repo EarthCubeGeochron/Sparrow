@@ -17,9 +17,6 @@ with open(revfile, "w") as f:
 
 data_files = {revfile: "."}
 
-_schemainspect_root = path.dirname(import_module("schemainspect").__file__)
-fullpath = path.join(_schemainspect_root, "pg", "sql")
-data_files[fullpath] = "schemainspect/pg/sql"
 
 a = Analysis(
     ["sparrow_cli/__main__.py"],

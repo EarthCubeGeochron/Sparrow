@@ -1,15 +1,16 @@
-import sys
 import os
-import click
+import sys
 from subprocess import Popen
-from rich import print
 from time import sleep
+
+import click
+from rich import print
 
 from sparrow_cli.help import echo_messages
 
 from ..config import SparrowConfig
-from ..util import compose, cmd, log
 from ..config.command_cache import get_backend_help_info
+from ..util import cmd, compose, log
 
 
 def _report_image_versions():

@@ -1,15 +1,16 @@
-from asyncio import sleep, create_task
+from asyncio import create_task, sleep
 from json import loads
-from starlette.authentication import requires, AuthenticationError
+
+from macrostrat.utils import get_logger
+from starlette import status
 from starlette.applications import Starlette
+from starlette.authentication import AuthenticationError, requires
 from starlette.endpoints import WebSocketEndpoint
 from starlette.routing import Route, WebSocketRoute
-from starlette import status
 
 from sparrow.core.api import APIResponse
-from sparrow.core.context import get_plugin
 from sparrow.core.auth import get_scopes
-from macrostrat.utils import get_logger
+from sparrow.core.context import get_plugin
 
 log = get_logger(__name__)
 
@@ -80,7 +81,7 @@ class TaskEndpoint(WebSocketEndpoint):
         await session.send_json(
             {"info": f"Trying to connect to channel {channel_name}"}
         )
-        if not hasattr(plugin.broadcast._backend, "_subscriber"):
+        if not hasattr(plugin.broadcast, "_listener_task"):
             await plugin.broadcast.connect()
         async with plugin.broadcast.subscribe(channel=channel_name) as subscriber:
             await session.send_json({"info": f"Subscribed to channel {channel_name}"})
@@ -114,8 +115,10 @@ def build_tasks_api(manager):
         )
         routes.append(task_socket_route)
 
-    return Starlette(
-        routes=routes,
-        on_startup=[manager.broadcast.connect],
-        on_shutdown=[manager.broadcast.disconnect],
-    )
+    on_startup = []
+    on_shutdown = []
+    if manager.broadcast is not None:
+        on_startup.append(manager.broadcast.connect)
+        on_shutdown.append(manager.broadcast.disconnect)
+
+    return Starlette(routes=routes, on_startup=on_startup, on_shutdown=on_shutdown)

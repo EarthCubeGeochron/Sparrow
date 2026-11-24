@@ -1,15 +1,16 @@
-import click
 import json
-from click import argument, option
 from os import chdir, path
 from shlex import quote
+
+import click
+from click import argument, option
 
 # import keepachangelog
 from ..config import SparrowConfig
 from ..util import SparrowCommandError, cmd, console
-from .util import check_output
-from .check_validity import check_release_validity
 from .check_consistency import check_consistency
+from .check_validity import check_release_validity
+from .util import check_output
 
 
 def write_version_info(version):

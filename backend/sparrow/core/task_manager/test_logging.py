@@ -1,5 +1,6 @@
-from .logging import ChunkedMessageLogger
 from click import echo
+
+from .logging import ChunkedMessageLogger
 
 
 class MockLogger(ChunkedMessageLogger):

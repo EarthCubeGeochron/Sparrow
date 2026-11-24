@@ -4,12 +4,14 @@ via the Sparrow API using x-accel-redirect
 """
 
 import os
-from starlette.endpoints import HTTPEndpoint
-from starlette.responses import RedirectResponse, JSONResponse, Response
-from sparrow.core.plugins import SparrowCorePlugin
-from sparrow.core import get_sparrow_app
-from starlette.exceptions import HTTPException
+
 from macrostrat.utils import get_logger
+from starlette.endpoints import HTTPEndpoint
+from starlette.exceptions import HTTPException
+from starlette.responses import JSONResponse, RedirectResponse, Response
+
+from sparrow.core import get_sparrow_app
+from sparrow.core.plugins import SparrowCorePlugin
 
 log = get_logger(__name__)
 

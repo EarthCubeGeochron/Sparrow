@@ -8,17 +8,20 @@ This server's technology stack is similar to that of FastAPI,
 but it uses the more mature Marshmallow schema-generation
 package instead of FastAPI's Pydantic.
 """
-from starlette.applications import Starlette
-from starlette.routing import Router
-from starlette.responses import JSONResponse
-from webargs_starlette import WebargsHTTPException
-from sparrow.core import settings
-from ..util import check_secret_key
-from ..logs import get_logger
-from .plugins import prepare_plugin_manager, SparrowPluginManager
+
 from macrostrat.database.utils import wait_for_database
 from sqlalchemy.exc import NoSuchTableError
+from starlette.applications import Starlette
+from starlette.responses import JSONResponse
+from starlette.routing import Router
+from webargs_starlette import WebargsHTTPException
+
+from sparrow.core import settings
+
+from ..logs import get_logger
 from ..startup import tables_exist
+from ..util import check_secret_key
+from .plugins import SparrowPluginManager, prepare_plugin_manager
 
 log = get_logger(__name__)
 
@@ -45,11 +48,11 @@ class Sparrow(Starlette):
 
         super().__init__(*args, **kwargs)
 
-    def bootstrap(self, init=False, force_db_setup=False, use_schema_cache=True):
+    def bootstrap(self, init=False, force_db_setup=False):
         check_secret_key()
         if init:
             self.init_database(force=force_db_setup)
-        self.setup_database(use_cache=use_schema_cache)
+        self.setup_database()
         log.info("Booting up application server")
         self.setup_server()
 
@@ -71,7 +74,7 @@ class Sparrow(Starlette):
         elif _exists:
             log.info("Application tables exist")
 
-    def setup_database(self, automap=True, use_cache=False):
+    def setup_database(self, automap=True):
         # If we set up the database twice, bad things will happen
         # with overriding of models, etc. We must make sure we only
         # set up the database once.
@@ -81,7 +84,7 @@ class Sparrow(Starlette):
         self.run_hook("database-available", self.db)
         # Database is only "ready" when it is mapped
         if self.db.mapper is None and automap:
-            self.database.automap(use_cache=use_cache)
+            self.database.automap()
         if self.db.mapper is not None:
             self.run_hook("database-ready", self.db)
             self.database_ready = True

@@ -1,3 +1,6 @@
+import geoalchemy2 as geo
+from macrostrat.database.mapper.utils import trim_postfix
+from macrostrat.utils import get_logger
 from marshmallow_sqlalchemy import ModelConverter
 
 # We need to use marshmallow_sqlalchemy's own implementation
@@ -5,25 +8,20 @@ from marshmallow_sqlalchemy import ModelConverter
 # to nested schemas.
 # See https://github.com/marshmallow-code/marshmallow-sqlalchemy/issues/67
 from marshmallow_sqlalchemy.fields import Related, RelatedList
-
-import geoalchemy2 as geo
-from sqlalchemy.orm import RelationshipProperty
-from sqlalchemy.types import Integer, Numeric, DateTime
 from sqlalchemy.dialects import postgresql
-from macrostrat.utils import get_logger
+from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy.types import DateTime, Integer, Numeric
 
-from macrostrat.database.mapper.utils import trim_postfix
 from .fields import (
-    Geometry,
-    Enum,
     JSON,
-    SmartNested,
     UUID,
     DateTimeExt,
+    Enum,
+    Geometry,
     PassThroughRelated,
+    SmartNested,
 )
 from .util import to_schema_name
-
 
 log = get_logger(__name__)
 

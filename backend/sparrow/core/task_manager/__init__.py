@@ -10,24 +10,27 @@ Tasks have
 - Optional stdout redirection
 
 """
-from celery import Celery
-from sparrow.logs import get_logger
-from os import environ
+
 from json import loads
+from os import environ
+
+import typer
+from broadcaster import Broadcast
+from celery import Celery
+from redis import Redis
+
 from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.core.settings import TASK_BROKER, TASK_WORKER_ENABLED
-import typer
-from .task_api import build_tasks_api
+from sparrow.logs import get_logger
+
 from .base import (
+    SparrowTaskError,
+    _name_for_task,
+    _tasks_to_register,
     create_args_schema,
     task,  # noqa
-    _tasks_to_register,
-    _name_for_task,
-    SparrowTaskError,
 )
-from redis import Redis
-from broadcaster import Broadcast
-
+from .task_api import build_tasks_api
 
 log = get_logger(__name__)
 
@@ -117,18 +120,20 @@ class SparrowTaskManager(SparrowCorePlugin):
 
     def on_setup_cli(self, cli):
         self._cli_app._add_completion = False
-        typer_click_object = typer.main.get_command(self._cli_app)
-        cli.add_command(typer_click_object, "tasks")
+        from sparrow.core.cli.util import add_typer_command
+
+        add_typer_command(cli, self._cli_app, "tasks", help="Run Sparrow tasks")
 
     def on_api_initialized_v2(self, api):
-        self.broadcast = Broadcast(TASK_BROKER)
+        if TASK_BROKER is not None:
+            self.broadcast = Broadcast(TASK_BROKER)
         api.mount("/tasks", build_tasks_api(self), name="tasks")
 
 
 def format_task_info(name, _task):
     params = _task.get("params", None)
     if params is not None:
-        params = params.schema()
+        params = params.model_json_schema()
 
     description = _task.get("description")
     doc = _task["func"].__doc__

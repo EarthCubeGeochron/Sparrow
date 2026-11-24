@@ -1,8 +1,11 @@
-from .helpers import json_fixture
-from sparrow.core.ext.pychron import PyChronJSONImporter
+from psycopg.errors import UniqueViolation
 from pytest import mark
 from sqlalchemy.exc import IntegrityError
-from psycopg2.errors import UniqueViolation
+
+from sparrow.core.ext.pychron import PyChronJSONImporter
+from sparrow.pipelines import DatumType
+
+from .helpers import json_fixture
 
 
 class PyChronJSONImporterTest(PyChronJSONImporter):
@@ -12,7 +15,7 @@ class PyChronJSONImporterTest(PyChronJSONImporter):
 
     def datum_type_for(self, key):
         # Right now we phone this in with "dimensionless" for everything
-        return {"unit": "dimensionless", "parameter": key}
+        return DatumType(unit="dimensionless", parameter=key)
 
 
 def check_age_units(session, unit):

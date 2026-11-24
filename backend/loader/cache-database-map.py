@@ -2,13 +2,15 @@
 """This file caches Sparrow's database models to a JSON file. We could probably
 integrate this within the module itself."""
 
+from os import environ
+
 from macrostrat.database import Database
 from macrostrat.database.mapper import DatabaseMapper, DatabaseModelCache
 
 # environ["SPARROW_SECRET_KEY"] = "test-sparrow"
 
 # cmd("sparrow compose up -d db")
-uri = "postgresql://postgres@localhost:54321/sparrow"
+uri = environ.get("SPARROW_DATABASE", "postgresql://postgres@localhost:54321/sparrow")
 # wait_for_database(uri)
 
 # cmd("sparrow init")

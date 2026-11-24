@@ -8,11 +8,13 @@ This should be reworked as a plugin,
 once a stable plugin system is created.
 """
 
+from os.path import dirname, join, realpath
+
 import pandas as P
-from sparrow.database import Database, run_sql
-from macrostrat.database.utils import run_sql
-from os.path import join, realpath, dirname
 from click import command, option
+from macrostrat.database.utils import run_sql
+
+from sparrow.database import Database, run_sql
 
 __here = dirname(realpath(__file__))
 __fixtures = join(__here, "fixtures")
@@ -68,6 +70,6 @@ def import_earthchem(download=False):
     parameters = copy_table(conn, "MeasuredParameter", "parameter", download=download)
 
     _ = join(__here, "populate-vocabulary.sql")
-    db.exec_sql(_)
+    db.run_sql(_)
 
     run_sql(db.session, "DROP SCHEMA earthchem_vocabulary CASCADE")

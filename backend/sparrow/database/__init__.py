@@ -1,26 +1,26 @@
+import collections.abc
 from pathlib import Path
-from click import secho
 from time import perf_counter
 
-from sqlalchemy.schema import ForeignKey, Column
-from sqlalchemy.types import Integer
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import FlushError
-from marshmallow.exceptions import ValidationError
-from marshmallow import RAISE, EXCLUDE
+from click import secho
 from macrostrat.database import Database as BaseDatabase
 from macrostrat.database import on_conflict
-from macrostrat.database.utils import run_sql
-import collections.abc
-
-from .models import User, Project, Session, DatumType
-from sparrow.logs import get_logger
-from macrostrat.utils import relative_path
-from sparrow.loader import ModelSchema, model_interface
-from sparrow.defs import SparrowError
-from .migration import SparrowDatabaseMigrator
-from .mapper import SparrowDatabaseMapper
 from macrostrat.database.mapper.utils import classname_for_table
+from macrostrat.database.utils import run_sql
+from macrostrat.utils import relative_path
+from marshmallow import EXCLUDE, RAISE
+from marshmallow.exceptions import ValidationError
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import FlushError
+from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.types import Integer
+
+from sparrow.defs import SparrowError
+from sparrow.loader import ModelSchema, model_interface
+from sparrow.logs import get_logger
+
+from .mapper import SparrowDatabaseMapper
+from .models import DatumType, Project, Session, User
 
 log = get_logger(__name__)
 
@@ -31,14 +31,15 @@ class DatabaseMappingError(SparrowError):
 
 class Database(BaseDatabase):
     def __init__(self, db_conn, app=None):
-        super().__init__(db_conn)
+        # Batched inserts cannot be reconciled with ON CONFLICT DO NOTHING imports
+        super().__init__(db_conn, use_insertmanyvalues=False)
         self.app = app
 
-    def automap(self, use_cache=True):
+    def automap(self):
         log.info("Automapping the database")
         t0 = perf_counter()
 
-        self.mapper = SparrowDatabaseMapper(self, use_cache=use_cache)
+        self.mapper = SparrowDatabaseMapper(self)
 
         # Database models we have extended with our own functions
         # (we need to add these to the automapped classes since
@@ -60,10 +61,19 @@ class Database(BaseDatabase):
         self.mapper.register_models(cls)
         if self.app:
             self.app.run_hook("database-mapped")
-        if not use_cache:
-            self.mapper._cache_database_map()
         t1 = perf_counter()
-        log.info(f"Finished automapping database: {t1-t0:.2f}s")
+        log.info(f"Finished automapping database: {t1 - t0:.2f}s")
+
+    def run_sql(self, fn, params=None, **kwargs):
+        if not params:
+            # Schema fixtures contain literal percent signs (e.g. in format() calls)
+            kwargs.setdefault("has_server_binds", False)
+        return super().run_sql(fn, params, **kwargs)
+
+    def run_fixtures(self, fixtures, params=None, **kwargs):
+        if not params:
+            kwargs.setdefault("has_server_binds", False)
+        return super().run_fixtures(fixtures, params, **kwargs)
 
     def model_schema(self, model_name) -> ModelSchema:
         """
@@ -137,29 +147,20 @@ class Database(BaseDatabase):
 
         if drop:
             fp = relative_path(__file__, "procedures", "drop-all-tables.sql")
-            self.exec_sql(fp)
+            self.run_sql(fp)
 
-        p = Path(relative_path(__file__, "fixtures"))
-        filenames = list(p.glob("*.sql"))
-        filenames.sort()
+        from .schema import initialize_schema
 
-        for _fn in filenames:
-            self.exec_sql(_fn)
-
+        if self.app is None:
+            secho("No application; plugin schemas are not built", fg="red", dim=True)
+        initialize_schema(self)
         self.reload_postgrest_cache()
-
-        try:
-            self.app.run_hook("core-tables-initialized", self)
-            self.app.run_hook("finalize-database-schema", self)
-        except AttributeError as err:
-            secho("Could not load plugins", fg="red", dim=True)
-            secho(str(err))
 
     def recreate_views(self):
         views = ["06-views.sql", "07-postgrest-api.sql"]
         for view in views:
             fp = relative_path(__file__, "fixtures", view)
-            self.exec_sql(fp)
+            self.run_sql(fp)
         self.reload_postgrest_cache()
         try:
             self.app.run_hook("finalize-database-schema", self)
@@ -172,15 +173,28 @@ class Database(BaseDatabase):
         msg = "Reloading PostgREST schema cache"
         secho(msg, bold=True)
         log.info(msg)
-        self.engine.execute("NOTIFY pgrst, 'reload schema'")
+        self.run_sql("NOTIFY pgrst, 'reload schema'")
 
-    def update_schema(self, **kwargs):
-        # Might be worth creating an interactive upgrader
-        from sparrow import migrations
+    def schema_app(self, **kwargs):
+        """This database's schema, for the schema management tools"""
+        from .schema import create_schema_app
 
-        migrator = SparrowDatabaseMigrator(self)
-        migrator.add_module(migrations)
-        self.app.run_hook("prepare-database-migrations", migrator)
-        # TODO: deprecate this hook
-        self.app.run_hook("prepare-database-upgrade", migrator)
-        migrator.run_migration(**kwargs)
+        return create_schema_app(self, **kwargs)
+
+    def update_schema(self, dry_run=True, apply=True):
+        """Bring the schema up to date, rehearsing on a copy of it first."""
+        from .migration import create_schema_clone
+        from .schema import update_schema
+
+        if dry_run:
+            log.info("Rehearsing the schema update")
+            with create_schema_clone(self.engine) as engine:
+                clone = Database(engine.url, self.app)
+                try:
+                    update_schema(clone)
+                finally:
+                    clone.cleanup()
+        if not apply:
+            return
+        log.info("Updating the schema")
+        update_schema(self)

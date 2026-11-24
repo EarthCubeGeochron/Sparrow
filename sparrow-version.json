@@ -4,10 +4,6 @@
   "schema": "1.1.0",
   "cli": "2.0-beta",
   "docker_images": {
-    "backend-base": {
-      "context": "./base-images/backend",
-      "version": "2.0"
-    },
     "postgis-mysql-fdw": {
       "context": "./base-images/postgis-mysql-fdw",
       "version": "1.0"

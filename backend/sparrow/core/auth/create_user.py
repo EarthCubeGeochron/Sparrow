@@ -1,6 +1,7 @@
 import click
-from click import echo, secho, style, prompt
+from click import echo, prompt, secho, style
 from sqlalchemy.exc import IntegrityError
+
 from sparrow.database.models import User
 
 

@@ -1,8 +1,10 @@
-import click
-from sqlalchemy import func
 from json import loads
+
+import click
 from requests import get
-from sparrow.core import SparrowPlugin, task, get_plugin
+from sqlalchemy import func
+
+from sparrow.core import SparrowPlugin, get_plugin, task
 
 # TODO: add geoalchemy to base docker image
 # ..tricky because we are using Alpine

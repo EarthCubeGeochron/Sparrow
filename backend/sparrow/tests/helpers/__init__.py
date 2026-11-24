@@ -1,5 +1,6 @@
-from sparrow.core.util import relative_path
 from json import load
+
+from sparrow.core.util import relative_path
 
 
 def ensure_single(db, model_name, **filter_params):

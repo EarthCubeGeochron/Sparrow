@@ -1,11 +1,13 @@
-from sparrow.core.plugins import SparrowCorePlugin
-from sparrow.core.context import app_context
+import json
+from pathlib import Path
+
 from macrostrat.database.utils import get_dataframe
 from macrostrat.utils import relative_path
-from starlette.routing import Route, Router
 from starlette.responses import JSONResponse
-from pathlib import Path
-import json
+from starlette.routing import Route, Router
+
+from sparrow.core.context import app_context
+from sparrow.core.plugins import SparrowCorePlugin
 
 
 class MetricsEndpoint(SparrowCorePlugin):

@@ -45,11 +45,12 @@ def _docker_compose(*args, **kwargs):
 )
 @click.option("--verbose", is_flag=True, default=is_truthy("SPARROW_VERBOSE"))
 @click.option("--offline", is_flag=True, default=is_truthy("SPARROW_OFFLINE"))
+@click.option("--env", default=None, help="Environment in sparrow.toml to use")
 @click.pass_context
-def cli(ctx, verbose=False, offline=False):
+def cli(ctx, verbose=False, offline=False, env=None):
     """Startup function that sets configuration environment variables."""
     # Here is where the configuration gets set up for the entire command-line application
-    ctx.obj = SparrowConfig(verbose=verbose, offline=offline)
+    ctx.obj = SparrowConfig(verbose=verbose, offline=offline, env=env)
 
 
 @cli.command(
@@ -115,6 +116,20 @@ def shell(ctx, container):
         return
     print("Running [bold]iPython[/bold] shell in application context.")
     exec_backend_command(ctx, "shell")
+
+
+@cli.command(
+    name="env",
+    add_help_option=False,
+    context_settings=dict(ignore_unknown_options=True, allow_extra_args=True),
+)
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+@click.pass_context
+def _env(ctx, args):
+    """Show or set the active environment (from sparrow.toml)"""
+    cfg = ctx.find_object(SparrowConfig)
+    # A Typer app, which bundles its own click and so runs on its own
+    cfg.environments.cli()(args=list(args), prog_name="sparrow env")
 
 
 add_commands(cli)

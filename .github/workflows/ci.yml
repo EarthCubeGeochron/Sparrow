@@ -17,11 +17,12 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.12'
 
       # Bundling
       - name: Install software for local development 
-        run: make && sudo make install-dev
+        # The CLI is built as the runner; root's Python is not the one set up above
+        run: make && sudo make -o build-dev install-dev
 
       - name: Run Sparrow cli tests
         run: sparrow test cli

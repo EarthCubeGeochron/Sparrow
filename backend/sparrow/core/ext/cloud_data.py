@@ -1,8 +1,12 @@
-from boto3 import client
-from click import secho, command, option
 from os import environ
-from sparrow.core.plugins import SparrowPlugin
+from pathlib import Path
+
+from boto3 import client
+from click import command, option, secho
 from macrostrat.database.utils import run_sql
+from macrostrat.schema_management import SchemaDefinition
+
+from sparrow.core.plugins import SparrowPlugin
 
 
 class CloudDataPlugin(SparrowPlugin):
@@ -48,10 +52,17 @@ class CloudDataPlugin(SparrowPlugin):
         res = self.session.get_object(Bucket=self.auth["bucket"], Key=key)
         return res["Body"]
 
-    def on_core_tables_initialized(self, db):
-        # We need a separate column to store S3 ETags, which are almost like our
-        # MD5 hashes, but not quite...
-        run_sql(db.session, "ALTER TABLE data_file ADD COLUMN file_etag text UNIQUE")
+    def on_define_schema(self, chunks):
+        # Importers subclass this plugin, and may be loaded together
+        if any(c.name == "cloud-data" for c in chunks):
+            return
+        chunks.append(
+            SchemaDefinition(
+                name="cloud-data",
+                depends_on=["core"],
+                provides=[Path(__file__).parent / "cloud-data.sql"],
+            )
+        )
 
     def _instance_for_meta(self, meta):
         db = self.app.database

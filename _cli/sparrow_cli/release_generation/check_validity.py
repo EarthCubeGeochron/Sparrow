@@ -1,9 +1,10 @@
 import json
-from os import path
 from itertools import groupby
+from os import path
 
 # import keepachangelog
-from packaging.version import Version, InvalidVersion
+from packaging.version import InvalidVersion, Version
+
 from ..util import SparrowCommandError, console
 from .util import check_version_exists, remove_postrelease
 

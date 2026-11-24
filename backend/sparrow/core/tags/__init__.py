@@ -1,13 +1,14 @@
-from sparrow.core.plugins import SparrowCorePlugin
-from sparrow.core.context import app_context
+import json
+from pathlib import Path
+
+from macrostrat.schema_management import SchemaDefinition
+from starlette.authentication import requires
+from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 from starlette.routing import Route, Router
-from starlette.endpoints import HTTPEndpoint
-from starlette.authentication import requires
-from psycopg2 import sql
-from pathlib import Path
-import json
 
+from sparrow.core.context import app_context
+from sparrow.core.plugins import SparrowCorePlugin
 
 here = Path(__file__).parent
 fixtures = here / "fixtures"
@@ -83,13 +84,13 @@ class Tags(SparrowCorePlugin):
 
     name = "tags"
 
-    ## database-available hook is before the automapper
-    def on_core_tables_initialized(self, db):
-        """
-        Creates schema and tables for tags
-        """
-        f = fixtures / "tags.sql"
-        db.exec_sql(f)
+    def on_define_schema(self, chunks):
+        """Schema and tables for tags"""
+        chunks.append(
+            SchemaDefinition(
+                name="tags", depends_on=["core"], provides=[fixtures / "tags.sql"]
+            )
+        )
 
     def default_tags(self):
         """Checks if there are any tags, if none, inserts some defualts"""
@@ -99,7 +100,7 @@ class Tags(SparrowCorePlugin):
         tags = db.model.tags_tag
         q = db.session.query(tags).all()
         if len(q) == 0:
-            db.exec_sql(f)
+            db.run_sql(f)
 
     def on_api_initialized_v2(self, api):
         # Initialize tag data if none

@@ -1,5 +1,6 @@
-from .base import Project_edits_api
 from sparrow.core.plugins import SparrowCorePlugin
+
+from .base import Project_edits_api
 
 
 class ProjectEdits(SparrowCorePlugin):

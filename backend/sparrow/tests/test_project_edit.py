@@ -1,6 +1,9 @@
-from .helpers import json_fixture
-from pytest import mark, fixture
 import json
+
+from pytest import fixture, mark
+from sqlalchemy import text
+
+from .helpers import json_fixture
 
 
 class TestProjectEdits:
@@ -28,7 +31,7 @@ class TestProjectEdits:
     def test_project_edits(self, db):
         # We need to restart the ID sequence because this test makes
         # assumptions about the identity of auto-incrementing primary keys
-        db.session.execute("ALTER SEQUENCE session_id_seq RESTART 1")
+        db.session.execute(text("ALTER SEQUENCE session_id_seq RESTART 1"))
 
         # Load data (replaces load_data_loop)
         for model, spec_list in self.data.items():

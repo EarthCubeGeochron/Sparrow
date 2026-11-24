@@ -7,6 +7,56 @@ The format is based on
 and this project is working towards adherence to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## `[Unreleased]`
+
+- Backend and command-line application run on Python 3.12 (was 3.9)
+- Backend uses SQLAlchemy 2 and the PostgreSQL `psycopg` (version 3) driver
+- `macrostrat.database`, `macrostrat.utils` and `macrostrat.dinosaur` are installed
+  from PyPI releases; the `backend/shared-modules` submodule is removed
+- The backend image builds directly from `python:3.12`; the `backend-base` image is retired
+- Lab plugins (`SPARROW_PLUGIN_DIR`) are mounted under `python3.12/site-packages`
+- `sparrow-loader`'s bundled model cache is regenerated for SQLAlchemy 2
+- Schema management moves to `macrostrat.schema_management`, replacing
+  `macrostrat.dinosaur` in the backend:
+  - The schema is a set of chunks; plugins add theirs with the `define-schema` hook
+  - Migrations state preconditions and postconditions; plugins add theirs with the
+    `define-migrations` hook, which replaces `prepare-database-migrations`
+  - `sparrow schema` commands (`graph`, `plan`, `apply`, `sync`, `migrate`, `provision`)
+  - `sparrow db-update` runs migrations, then applies the schema diff, and still
+    rehearses on a copy of the schema first
+- New `sparrow-pipelines` package (`backend/pipelines`): explicit Pydantic models
+  for the records Sparrow imports, and a `Pipeline` that turns files into them
+  with no database or server involved
+  - `sparrow run module:Pipeline PATHS` rehearses a pipeline locally (a dry run
+    by default) or sends its records to a lab's import API
+  - On the server, plugins add pipelines with the `define-pipelines` hook. Each is
+    a task under its own name (`sparrow run <name>`), loading into the database
+    and tracking data files
+- `sparrow run` also runs a pipeline locally; `--load` sends its records to the
+  lab of the active environment
+- The command-line application can be installed as a package (`sparrow-cli`) in a
+  pipeline's own Python environment. Without Docker or the Sparrow application it
+  still runs pipelines and manages environments; `sparrow-cli[server]` adds what
+  manages a lab
+- Environments in a `sparrow.toml` (`sparrow env`, `--env`), from
+  `macrostrat.app_frame`: named labs or deployments, with secret references and
+  confirmation before writes to production. `sparrow-config.sh` is still read
+- A lab's settings can be written in `sparrow.toml` instead of `sparrow-config.sh`:
+  each reaches the services as the `SPARROW_*` variable of the same name, relative
+  paths are resolved against the file, and secrets are fetched when the lab is run.
+  `SPARROW_CONFIG` now names this file; a value ending in `.sh` is still taken as
+  the shell script
+- `SPARROW_ENV` names the environment in use. `development` and `production` work
+  as before with no `sparrow.toml`; any other environment declares its `env_class`,
+  and services are started in development or production mode accordingly
+- The command line no longer upgrades PostgreSQL clusters (`sparrow db upgrade` and
+  the upgrade step of `sparrow db update` are removed), and with that no part of
+  Sparrow depends on `macrostrat.dinosaur`
+  - The PyChron importer is a pipeline; `PyChronImporter` is removed
+- The `SPARROW_CACHE_DATABASE_MODELS` option and `sparrow db drop-cache` are removed
+- Code is formatted and imports sorted with `ruff`, replacing `black`
+- `vocabulary.authority` is granted to `admin` and `view_public` on first initialization
+
 ## `[3.2.1]` - 2024-08-12
 
 - Update Nginx certbot container

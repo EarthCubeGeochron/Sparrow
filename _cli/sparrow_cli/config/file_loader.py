@@ -1,8 +1,9 @@
 import sys
-from os import environ, getcwd, chdir
-from envbash import load_envbash
+from os import chdir, environ, getcwd
 from pathlib import Path
 from typing import Optional
+
+from envbash import load_envbash
 from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
@@ -52,9 +53,16 @@ def find_config_file(_dir: Path, filename="sparrow-config.sh") -> Optional[Path]
     return None
 
 
+# Where sparrow-config.sh is. SPARROW_CONFIG now names sparrow.toml.
+CONFIG_SCRIPT = "SPARROW_CONFIG_SCRIPT"
+
+
 def get_config() -> Optional[Path]:
     # Get configuration from existing environment variable
-    __config = environ.get("SPARROW_CONFIG")
+    if environ.get("SPARROW_CONFIG", "").endswith(".sh"):
+        # As set before sparrow.toml existed
+        environ[CONFIG_SCRIPT] = environ.pop("SPARROW_CONFIG")
+    __config = environ.get(CONFIG_SCRIPT)
     __config_unset = environ.get("_SPARROW_CONFIG_UNSET", "0") == "1"
     if __config is None or __config_unset:
         return None
@@ -75,7 +83,7 @@ def load_config_file():
         # echo("No configuration file found. Running using default values.", err=True)
         environ["_SPARROW_CONFIG_UNSET"] = "1"
     else:
-        environ["SPARROW_CONFIG"] = str(sparrow_config)
+        environ[CONFIG_SCRIPT] = str(sparrow_config)
         environ["SPARROW_CONFIG_DIR"] = str(sparrow_config.parent)
 
     _config_sourced = environ.get("_SPARROW_CONFIG_SOURCED", "0") == "1"

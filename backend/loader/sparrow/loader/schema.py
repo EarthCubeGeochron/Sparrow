@@ -1,25 +1,23 @@
+from collections.abc import Mapping
+
 import marshmallow
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow_sqlalchemy.fields import Related
+from macrostrat.utils import get_logger
+from marshmallow.decorators import post_dump, post_load, pre_load
 from marshmallow.fields import Nested
 from marshmallow_jsonschema import JSONSchema
-from marshmallow_sqlalchemy.fields import get_primary_keys, ensure_list
-from marshmallow.decorators import pre_load, post_load, post_dump
-from sqlalchemy.orm import RelationshipProperty, joinedload, defer
-from collections.abc import Mapping
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow_sqlalchemy.fields import Related, ensure_list, get_primary_keys
 from sqlalchemy import inspect
+from sqlalchemy.orm import RelationshipProperty, defer, joinedload
 
+from .converter import SparrowConverter, allow_nest, exclude_fields
 from .fields import SmartNested
 from .util import is_pk_defined, pk_values, prop_is_required
-from .converter import SparrowConverter, allow_nest, exclude_fields
-
-from macrostrat.utils import get_logger
 
 log = get_logger(__name__)
 
 
-class SparrowSchemaError(Exception):
-    ...
+class SparrowSchemaError(Exception): ...
 
 
 def _jsonschema_type_mapping(self):

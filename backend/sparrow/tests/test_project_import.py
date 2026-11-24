@@ -1,14 +1,17 @@
+import logging
 from contextlib import redirect_stdout
-from .helpers import json_fixture
-from deepdiff import DeepDiff
+from datetime import datetime
 from json import dumps, loads
-from sparrow.core.encoders import JSONEncoder
+
+from deepdiff import DeepDiff
+from marshmallow import EXCLUDE
+from pytest import mark
 from sqlalchemy import event
 from sqlalchemy.orm import joinedload
-from marshmallow import EXCLUDE
-from datetime import datetime
-from pytest import mark
-import logging
+
+from sparrow.core.encoders import JSONEncoder
+
+from .helpers import json_fixture
 
 
 def omit_key(changeset, key):

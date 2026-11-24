@@ -1,13 +1,15 @@
-from starlette.endpoints import HTTPEndpoint
-from starlette.routing import Route, Router
-from starlette.responses import JSONResponse, PlainTextResponse
-from sqlakeyset import select_page
-from webargs.fields import Str, Int, Boolean, DelimitedList
-from pathlib import Path
 import json
+from pathlib import Path
+
+from sqlakeyset import select_page
+from starlette.endpoints import HTTPEndpoint
+from starlette.responses import JSONResponse, PlainTextResponse
+from starlette.routing import Route, Router
+from webargs.fields import Boolean, DelimitedList, Int, Str
+
+from sparrow.core.api.response import APIResponse
 
 from ..context import app_context
-from sparrow.core.api.response import APIResponse
 
 here = Path(__file__).parent
 queries = here / "queries"
@@ -49,7 +51,7 @@ class OpenSearchEndpoint(HTTPEndpoint):
         }
         if model == "all":
             sql_fn = search_total
-            query_res = db.exec_sql(sql_fn, params=params)
+            query_res = db.run_sql(sql_fn, params=params)
 
             json_res = [dict(model=x, data=y) for x, y in query_res]
             json_res.reverse()
@@ -61,7 +63,7 @@ class OpenSearchEndpoint(HTTPEndpoint):
                     sql_fn = value
                     schema = getattr(db.interface, key)(many=True)
 
-        query_res = db.exec_sql(sql_fn, params=params)
+        query_res = db.run_sql(sql_fn, params=params)
 
         json_res = [dict(r) for r in query_res]
 

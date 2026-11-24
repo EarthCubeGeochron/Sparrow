@@ -1,21 +1,23 @@
-import click
 import sys
-from os import environ, chdir
-from typing import List
+from os import chdir, environ
 from pathlib import Path
-from rich import print
 from textwrap import dedent
+from typing import List
+
+import click
+from macrostrat.utils import get_logger
+from rich import print
 
 from sparrow_cli.util.command_groups import SparrowDefaultCommand
 from sparrow_cli.util.exceptions import SparrowCommandError
-from ..util import cmd, exec_or_run, container_is_running
-from macrostrat.utils import get_logger
+
+from ..util import cmd, container_is_running, exec_or_run
 
 log = get_logger(__name__)
 
 
 class TestGroup(SparrowDefaultCommand):
-    """
+    r"""
     Usage: sparrow test \[subcommand?] OPTIONS... PYTEST_OPTIONS...
 
     [bold]Backend tests[/bold] (default)

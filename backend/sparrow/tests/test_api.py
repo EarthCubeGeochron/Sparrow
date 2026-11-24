@@ -1,11 +1,13 @@
+import datetime
 import json
+import pdb
+
+from geoalchemy2.shape import from_shape, to_shape
 from pytest import mark
+from shapely.geometry import Point, mapping
+
 from .fixtures import basic_data
 from .helpers import json_fixture
-from geoalchemy2.shape import from_shape, to_shape
-from shapely.geometry import mapping, Point
-import datetime
-import pdb
 
 
 def create_location_from_coordinates(longitude, latitude):

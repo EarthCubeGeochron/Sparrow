@@ -1,9 +1,9 @@
+from macrostrat.database import DatabaseMapper
+from macrostrat.database.mapper import DatabaseModelCache
+from macrostrat.database.mapper.utils import ModelCollection, TableCollection
+from macrostrat.utils.logs import get_logger
 from sqlalchemy.ext import automap
 from sqlalchemy.ext.automap import generate_relationship
-from os import path, environ
-from macrostrat.utils.logs import get_logger
-from macrostrat.database.mapper import DatabaseModelCache
-from macrostrat.database import DatabaseMapper
 
 from .shims import _is_many_to_many
 
@@ -25,32 +25,17 @@ def _gen_relationship(
     )
 
 
-should_enable_cache = environ.get("SPARROW_CACHE_DATABASE_MODELS", "0").lower() in [
-    "true",
-    "1",
-]
-
-
 class AutomapError(Exception):
     pass
 
 
-default_cache_path = path.join(
-    path.expanduser("~"), ".sqlalchemy-cache", "sparrow-db-cache.pickle"
-)
-cache_path = environ.get("SPARROW_DATABASE_MODEL_CACHE_PATH", default_cache_path)
-
-if not should_enable_cache:
-    cache_path = None
-
-model_builder = DatabaseModelCache(cache_file=cache_path)
-BaseModel = model_builder.automap_base()
+BaseModel = DatabaseModelCache().automap_base()
 
 
 class SparrowDatabaseMapper(DatabaseMapper):
     automap_base = BaseModel
 
-    def __init__(self, db, use_cache=True, reflect=True):
+    def __init__(self, db, reflect=True):
         # Apply the hotfix to the SQLAlchemy model.
         automap._is_many_to_many = _is_many_to_many
         super().__init__(db, generate_relationship=_gen_relationship)
@@ -61,7 +46,19 @@ class SparrowDatabaseMapper(DatabaseMapper):
         self.db = db
         self.automap_base = BaseModel
         if reflect:
-            self.reflect_database(
-                schemas=["vocabulary", "core_view", "tags", "public"],
-                use_cache=use_cache,
-            )
+            self.reflect_database(schemas=["vocabulary", "core_view", "tags", "public"])
+
+    def reflect_database(self, schemas=["public"]):
+        base = self.automap_base
+        # Models are prepared once, after the supporting schemas are reflected,
+        # so that pre-declared models find their columns.
+        for schema in schemas:
+            if schema == "public":
+                continue
+            log.info(f"Reflecting schema {schema}")
+            base.metadata.reflect(bind=self.db.engine, schema=schema)
+        base.prepare(autoload_with=self.db.engine, **self.reflection_kwargs)
+        self._reflected_schemas.update(schemas)
+
+        self._models = ModelCollection(base.classes)
+        self._tables = TableCollection(self._models)

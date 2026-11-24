@@ -1,16 +1,17 @@
-from pytest import fixture
-from os import environ
-from starlette.testclient import TestClient
-from requests import Session as RequestsSession
-from sparrow.core.app import Sparrow
-from sparrow.core.context import _setup_context
-from macrostrat.database.utils import wait_for_database
-from sparrow.core.auth.create_user import _create_user
-from sparrow.tests.helpers.database import testing_database
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import Session
-from sqlalchemy import event
 import logging
+from os import environ
+
+from macrostrat.database.utils import wait_for_database
+from pytest import fixture
+from requests import Session as RequestsSession
+from sqlalchemy import event
+from sqlalchemy.orm import Session, scoped_session
+from starlette.testclient import TestClient
+
+from sparrow.core.app import Sparrow
+from sparrow.core.auth.create_user import _create_user
+from sparrow.core.context import _setup_context
+from sparrow.tests.helpers.database import testing_database
 
 disable_loggers = ["macrostrat.database.utils"]
 
@@ -23,8 +24,6 @@ testing_db = environ.get(
     "SPARROW_TESTING_DATABASE", "postgresql://postgres@db:5432/sparrow_test"
 )
 environ["SPARROW_DATABASE"] = testing_db
-
-collect_ignore = ["shared-modules"]
 
 
 def pytest_addoption(parser):
@@ -75,8 +74,9 @@ def app(pytestconfig):
 
 def wait_for_pgrest_api(postgrest_url):
     """Wait for the PostgREST API to be available"""
-    from requests import get
     from time import sleep
+
+    from requests import get
 
     while True:
         try:
@@ -124,8 +124,7 @@ def statements(db):
 
 @fixture(scope="class")
 def db(app, pytestconfig, request):
-    # https://docs.sqlalchemy.org/en/13/orm/session_transaction.html
-    # https://gist.github.com/zzzeek/8443477
+    # https://docs.sqlalchemy.org/en/20/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
     use_isolation = pytestconfig.option.use_isolation
     if request.cls is not None:
         use_isolation = getattr(request.cls, "use_isolation", use_isolation)
@@ -133,21 +132,9 @@ def db(app, pytestconfig, request):
     if use_isolation:
         connection = app.database.engine.connect()
         transaction = connection.begin()
-        session = Session(bind=connection)
-
-        # start the session in a SAVEPOINT...
-        # start the session in a SAVEPOINT...
-        session.begin_nested()
-
-        # then each time that SAVEPOINT ends, reopen it
-        @event.listens_for(session, "after_transaction_end")
-        def restart_savepoint(session, transaction):
-            if transaction.nested and not transaction._parent.nested:
-                # ensure that state is expired the way
-                # session.commit() at the top level normally does
-                # (optional step)
-                session.expire_all()
-                session.begin_nested()
+        # Commits within the session release a SAVEPOINT rather than
+        # ending the enclosing transaction
+        session = Session(bind=connection, join_transaction_mode="create_savepoint")
 
         app.database.session = session
         _setup_context(app)

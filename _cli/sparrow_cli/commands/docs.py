@@ -1,5 +1,7 @@
-from click import group
 from os import environ, path
+
+from click import group
+
 from ..util import CommandGroup, compose
 
 # Commands inherited from earlier shell version of CLI.

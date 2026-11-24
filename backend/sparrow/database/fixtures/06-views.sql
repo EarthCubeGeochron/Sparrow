@@ -417,3 +417,7 @@ SELECT DISTINCT authority FROM geo_entity
 SELECT DISTINCT authority id FROM a
 WHERE authority IS NOT null
 ORDER BY authority;
+
+-- Views are created after the schema-wide grants, so this one is granted here
+GRANT SELECT, UPDATE, INSERT, DELETE ON vocabulary.authority TO admin;
+GRANT SELECT ON vocabulary.authority TO view_public;

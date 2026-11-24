@@ -1,12 +1,13 @@
-from starlette.endpoints import HTTPEndpoint
-from webargs_starlette import parser
 from sqlakeyset import select_page
+from sqlalchemy.sql import select, text
+from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
-from webargs.fields import Str, Int, Boolean
-from sqlalchemy.sql import text, select
-from sparrow.core.context import get_database
+from webargs.fields import Boolean, Int, Str
+from webargs_starlette import parser
+
 from sparrow.api.exceptions import ValidationError
 from sparrow.api.response import APIResponse
+from sparrow.core.context import get_database
 
 
 class BaseSelectableAPI(HTTPEndpoint):

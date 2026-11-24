@@ -1,14 +1,16 @@
-import sys
 import re
-from click import style, Context
-from click.formatting import HelpFormatter
-from rich.text import Text
+import sys
+from itertools import chain
 from os import environ
 from pathlib import Path
-from itertools import chain
+
+from click import Context, style
+from click.formatting import HelpFormatter
 from rich.console import Console
-from ..util.formatting import format_config_path, format_description
+from rich.text import Text
+
 from ..config import Level, SparrowConfig
+from ..util.formatting import format_config_path, format_description
 
 console = Console()
 
@@ -83,7 +85,7 @@ class SparrowHelpFormatter(HelpFormatter):
         "down": "Safely stop `sparrow`",
         "info": "Show information about the installation",
         "create-test-lab": "Create an example installation of Sparrow",
-        "run": "Run Sparrow tasks (alias to `sparrow tasks run`)",
+        "run": "Run a task in the backend, or a pipeline (`module:Pipeline`) locally",
     }
 
     config: SparrowConfig
@@ -109,7 +111,7 @@ class SparrowHelpFormatter(HelpFormatter):
         self.write_usage("sparrow", "[options] <command> [args]...")
         self.write_line()
         self.flush()
-        cfg = environ.get("SPARROW_CONFIG", None)
+        cfg = self.config.config_file
 
         lines = []
 

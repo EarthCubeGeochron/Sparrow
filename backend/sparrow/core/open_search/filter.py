@@ -1,8 +1,10 @@
+from contextvars import ContextVar
+
+from sqlalchemy import Table, or_, text
+from webargs.fields import Str
+
 from sparrow.core.api.filters import BaseFilter, create_params
 from sparrow.core.context import app_context
-from webargs.fields import Str
-from sqlalchemy import text, Table, or_
-from contextvars import ContextVar
 from sparrow.logs import get_logger
 
 doc_table_cache = ContextVar("doc_table_cache")

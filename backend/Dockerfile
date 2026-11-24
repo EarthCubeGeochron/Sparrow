@@ -1,26 +1,24 @@
-FROM ghcr.io/earthcubegeochron/sparrow/backend-base:2.0 AS main
+FROM python:3.12-bookworm AS main
 # Multi-stage build of Sparrow backend.
 
-## Git is required for the PyChron importer
-RUN apt update && \
-  apt install -y git && \
-  pip install "poetry==1.4.2" && \
+## Git is required for the PyChron importer;
+## the PostgreSQL client for migrations and backups
+RUN apt-get update && \
+  apt-get install -y git postgresql-client && \
+  pip install "poetry==1.8.5" && \
   rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# For shared modules, first copy only requirements to install their dependencies.
-# Poetry must see them as a set of modules.
+# First copy only requirements, so that dependencies are cached between builds.
 COPY poetry.lock pyproject.toml /app/
-COPY __docker/dummy-shared-module-tree /app/shared-modules
-COPY shared-modules/database/pyproject.toml  /app/shared-modules/database/
-COPY shared-modules/dinosaur/pyproject.toml /app/shared-modules/dinosaur/
-COPY shared-modules/utils/pyproject.toml /app/shared-modules/utils/
-COPY shared-modules/pyproject.toml /app/shared-modules/pyproject.toml
 
 RUN mkdir -p /app/loader/sparrow/loader && touch /app/loader/sparrow/loader/__init__.py
 COPY loader/pyproject.toml /app/loader/
 COPY loader/README.md /app/loader/
+
+RUN mkdir -p /app/pipelines/sparrow/pipelines && touch /app/pipelines/sparrow/pipelines/__init__.py
+COPY pipelines/pyproject.toml pipelines/README.md /app/pipelines/
 
 # Project initialization:
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root

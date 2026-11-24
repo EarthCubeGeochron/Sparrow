@@ -1,9 +1,11 @@
 from datetime import datetime
-from pytest import mark
-from sparrow.logs import get_logger
-from sqlalchemy.engine.reflection import Inspector
 from os import environ
+
 import numpy as N
+from pytest import mark
+from sqlalchemy.engine.reflection import Inspector
+
+from sparrow.logs import get_logger
 
 log = get_logger(__name__)
 
@@ -59,13 +61,17 @@ class TestDatabaseInitialization:
     ]
 
     def test_correct_db(self, db):
-        assert str(db.engine.url) == environ.get("SPARROW_DATABASE")
+        # The driver is chosen by the database library, not the configuration
+        url = db.engine.url.set(drivername="postgresql")
+        assert url.render_as_string(hide_password=False) == environ.get(
+            "SPARROW_DATABASE"
+        )
 
     def test_postgis_installed(self, db):
         """
         Make sure that the postgis extension is installed.
         """
-        exts = db.engine.execute("SELECT extname FROM pg_extension").fetchall()
+        exts = db.run_query("SELECT extname FROM pg_extension").fetchall()
         extensions = [e[0] for e in exts]
         assert "postgis" in extensions
         assert "pgmemento" in extensions

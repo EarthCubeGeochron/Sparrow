@@ -1,16 +1,17 @@
-from sparrow_cli.util.exceptions import SparrowCommandError
-import click
-from os import environ, chdir
+from json import load
+from os import chdir, environ
+from pathlib import Path
 
+import click
 from click import pass_context
 from rich import print
-from pathlib import Path
-from json import load
+
+from sparrow_cli.util.exceptions import SparrowCommandError
 
 from ..config import SparrowConfig
-from ..util import cmd, SparrowCommandError
+from ..util import SparrowCommandError, cmd
 
-images_ = ["backend-base", "postgis-mysql-fdw", "backend", "frontend", "database"]
+images_ = ["postgis-mysql-fdw", "backend", "frontend", "database"]
 
 prefix = "ghcr.io/earthcubegeochron/sparrow"
 

@@ -1,4 +1,5 @@
-from click import echo, style, prompt, secho
+from click import echo, prompt, secho, style
+
 from sparrow.database.models import User
 
 

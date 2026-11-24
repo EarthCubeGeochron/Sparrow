@@ -26,4 +26,4 @@ and validate import schemas.
 
 `pip install sparrow-loader`
 
-Requires Python `>=3.9`
+Requires Python `>=3.12`

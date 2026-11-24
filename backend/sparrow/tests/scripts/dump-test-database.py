@@ -2,15 +2,17 @@
 """
 Initialize database and dump data into it.
 """
-from sparrow.app import App
-from sparrow.tests.helpers.database import testing_database, connection_args
-from sparrow.tests.test_dz_import import import_dz_test_data
-from sparrow.core.util import run
-from sys import stderr, stdout
+
+import logging
 from contextlib import redirect_stdout
+from sys import stderr, stdout
+
+from sparrow.app import App
+from sparrow.core.util import run
 from sparrow.logs import console_handler, get_logger
 from sparrow.tests.fixtures import basic_project
-import logging
+from sparrow.tests.helpers.database import connection_args, testing_database
+from sparrow.tests.test_dz_import import import_dz_test_data
 
 log = get_logger(level=logging.WARNING, handler=console_handler)
 
@@ -49,7 +51,7 @@ with redirect_stdout(stderr), testing_database(conn) as engine:
     app.database.session.commit()
 
     # Prepare for dump
-    app.database.engine.execute("TRUNCATE TABLE spatial_ref_sys")
+    app.database.run_sql("TRUNCATE TABLE spatial_ref_sys")
 
     dbargs = connection_args(engine)
     run("pg_dump", "-Fc", dbargs, engine.url.database, stdout=stdout)

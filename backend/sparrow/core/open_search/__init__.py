@@ -1,10 +1,13 @@
 from pathlib import Path
+
+from macrostrat.database.utils import run_sql_file
+from macrostrat.schema_management import SchemaDefinition, has_columns, negate
 from sqlalchemy import text
+
 from sparrow import core
 from sparrow.core.plugins import SparrowCorePlugin
 from sparrow.core.task_manager.base import task
-from macrostrat.dinosaur import SchemaMigration, has_column
-from macrostrat.database.utils import run_sql_file
+from sparrow.database.migration import SparrowMigration
 
 from .base import OpenSearchAPI
 
@@ -29,18 +32,17 @@ def _initialize_tables(engine, refresh=True):
     run_sql_file(engine, fill_empty_docs)
 
 
-class DocumentTableMigration(SchemaMigration):
+class DocumentTableMigration(SparrowMigration):
     """Remove unintentional application of schema versioning."""
 
     name = "document-table-migration"
+    subsystem = "open-search"
+    preconditions = [has_columns("documents", "project_document", "audit_id")]
+    postconditions = [negate(has_columns("documents", "project_document", "audit_id"))]
 
-    def should_apply(self, source, target, migrator):
-        args = ('"documents"."project_document"', "audit_id")
-        return has_column(source, *args) and not has_column(target, *args)
-
-    def apply(self, engine):
-        _initialize_tables(engine, refresh=True)
-        run_sql_file(engine, procedures / "drop-extra-triggers.sql")
+    def apply(self, db):
+        _initialize_tables(db.engine, refresh=True)
+        run_sql_file(db.engine, procedures / "drop-extra-triggers.sql")
 
 
 class OpenSearch(SparrowCorePlugin):
@@ -49,15 +51,24 @@ class OpenSearch(SparrowCorePlugin):
     def initialize_tables(self, db, refresh=True):
         _initialize_tables(db.engine, refresh)
 
-    def on_core_tables_initialized(self, db):
-        """Initialize tables on sparrow init"""
-        self.initialize_tables(db)
+    def on_define_schema(self, chunks):
+        chunks.append(
+            SchemaDefinition(
+                name="open-search",
+                depends_on=["core"],
+                provides=[
+                    fixtures,
+                    # Fill empty document tables from the tables they index
+                    lambda db: db.run_sql(procedures / "fill_empty_tables.sql"),
+                ],
+            )
+        )
 
     def on_api_initialized_v2(self, api):
         api.mount("/search", OpenSearchAPI, name=self.name)
 
-    def on_prepare_database_migrations(self, migrator):
-        migrator.add_migration(DocumentTableMigration)
+    def on_define_migrations(self, migrations):
+        migrations.append(DocumentTableMigration)
 
 
 @task(name="refresh-search-index")

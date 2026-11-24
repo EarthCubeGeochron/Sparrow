@@ -1,11 +1,12 @@
 from typing import List
+
 from macrostrat.database.mapper.utils import ModelCollection
 from marshmallow.utils import RAISE
-from .interface import model_interface, InterfaceCollection
-from .schema import ModelSchema, BaseMeta
 
-from .schema_checking import get_automap_base, get_model
 from .display import print_key
+from .interface import InterfaceCollection, model_interface
+from .schema import BaseMeta, ModelSchema
+from .schema_checking import get_automap_base, get_model
 
 
 def get_cached_models():

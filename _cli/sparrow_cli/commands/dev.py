@@ -1,9 +1,10 @@
+from os import environ
+
 from click import group, pass_obj
 from rich import print
-from os import environ
-from ..release_generation import create_release, check_version
-from ..util import CommandGroup, compose
 
+from ..release_generation import check_version, create_release
+from ..util import CommandGroup, compose
 
 # Commands inherited from earlier shell version of CLI.
 shell_commands = {

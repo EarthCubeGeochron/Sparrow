@@ -1,7 +1,8 @@
-from flask import Blueprint, Response, current_app, abort, Flask
 from asgiref.wsgi import WsgiToAsgi
-from .plugins import SparrowCorePlugin
+from flask import Blueprint, Flask, Response, abort, current_app
+
 from .context import get_sparrow_app
+from .plugins import SparrowCorePlugin
 from .settings import LAB_NAME
 
 web = Blueprint("frontend", __name__)

@@ -1,5 +1,6 @@
-from .helpers import json_fixture
 from pytest import fixture, mark
+
+from .helpers import json_fixture
 
 
 @fixture(scope="class")

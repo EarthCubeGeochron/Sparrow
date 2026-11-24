@@ -1,18 +1,20 @@
-import click
-from click import echo, style, secho, pass_context
-import sparrow
-from sys import exit
-from os import environ
 from json import dumps
-from .util import with_database, with_app, with_full_app
-from .user import create_user, list_users, reset_password
-from ..util import working_directory
-from ..context import get_sparrow_app
-from sparrow.database.migration import db_migration
-from macrostrat.utils.logs import setup_stderr_logs
-from typing import Optional
-from ..plugins import SparrowPlugin
 from logging import INFO
+from os import environ
+from sys import exit
+from typing import Optional
+
+import click
+from click import echo, pass_context, secho, style
+from macrostrat.utils.logs import setup_stderr_logs
+
+import sparrow
+
+from ..context import get_sparrow_app
+from ..plugins import SparrowPlugin
+from ..util import working_directory
+from .user import create_user, list_users, reset_password
+from .util import add_typer_command, with_app, with_database, with_full_app
 
 
 def _build_app_context(config):
@@ -95,8 +97,8 @@ def create_views(db):
     """
     # Don't need to build the app just for this
     with working_directory(__file__):
-        db.exec_sql("../database/fixtures/05-views.sql")
-        db.exec_sql("../database/fixtures/07-apiv2views.sql")
+        db.run_sql("../database/fixtures/05-views.sql")
+        db.run_sql("../database/fixtures/07-apiv2views.sql")
 
 
 @cli.command(name="shell")
@@ -176,26 +178,36 @@ def plugins(app):
 
 @cli.command(name="db-migration")
 @with_database
-@click.option("--safe", is_flag=True, default=True)
-@click.option("--apply", is_flag=True, default=False)
-@click.option("--hide-view-changes", is_flag=True, default=False)
-def _db_migration(db, safe=True, apply=False, hide_view_changes=False, quiet=False):
-    """Command to generate a basic migration."""
-    db_migration(db, safe=safe, apply=apply, hide_view_changes=hide_view_changes)
-
-
-@cli.command(name="db-drop-cache")
-@with_database
-def _db_drop_cache(db):
-    db.mapper.drop_model_cache()
+def _db_migration(db):
+    """Print the changes that would bring the database schema up to date."""
+    for statement in db.schema_app().plan():
+        print(statement)
 
 
 @cli.command(name="db-update")
 @with_database
 @click.option("--dry-run", is_flag=True, default=False)
 def db_update(db, dry_run=False):
-    setup_stderr_logs("sparrow", "macrostrat.dinosaur", level=INFO)
+    setup_stderr_logs("sparrow", "macrostrat.schema_management", level=INFO)
     db.update_schema(dry_run=True, apply=not dry_run)
+
+
+def _schema_app():
+    from sparrow.core import get_database
+
+    return get_database().schema_app()
+
+
+def _add_schema_commands():
+    """Schema management commands, shared with Macrostrat's other applications"""
+    from macrostrat.schema_management.cli import create_schema_cli
+
+    schema_cli = create_schema_cli(_schema_app)
+    schema_cli._add_completion = False
+    add_typer_command(cli, schema_cli, "schema", help="Manage the database schema")
+
+
+_add_schema_commands()
 
 
 def command_info(ctx, cli):
@@ -203,10 +215,13 @@ def command_info(ctx, cli):
         cmd = cli.get_command(ctx, name)
         if cmd.hidden:
             continue
-        yield name, {
-            "help": cmd.get_short_help_str(limit=120),
-            "plugin": getattr(cmd, "_plugin", None),
-        }
+        yield (
+            name,
+            {
+                "help": cmd.get_short_help_str(limit=120),
+                "plugin": getattr(cmd, "_plugin", None),
+            },
+        )
 
 
 @cli.command(name="get-cli-info", hidden=True)

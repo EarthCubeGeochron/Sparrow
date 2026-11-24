@@ -21,7 +21,7 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.12'
 
       # Bundling (note: we build the CLI in Docker to support older Linux platforms)
       # 2023-04-07: We had to fall back to a standard build (for modern platforms)
@@ -108,7 +108,7 @@ jobs:
 
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
+          python-version: '3.12'
 
         # Bundling
       - name: Bundle command-line application with PyInstaller

@@ -1,19 +1,22 @@
+from json import loads
+from json.decoder import JSONDecodeError
+from os import environ
+from pathlib import Path
 from subprocess import PIPE, STDOUT, CalledProcessError
 from typing import List
-from pathlib import Path
-from json import loads
-from os import environ
-from json.decoder import JSONDecodeError
-from macrostrat.utils.logs import get_logger
-from macrostrat.utils.shell import split_args, cmd as cmd_, run as run_
-from docker import from_env
-from docker.errors import DockerException
 
+from macrostrat.utils.logs import get_logger
+from macrostrat.utils.shell import cmd as cmd_
+from macrostrat.utils.shell import run as run_
+from macrostrat.utils.shell import split_args
 from rich import print
+
 from .exceptions import SparrowCommandError
 
-
 log = get_logger(__name__)
+
+# Set when this installation has no Sparrow server to manage
+NO_SERVER = "_SPARROW_NO_SERVER"
 
 
 def find_subcommand(directories: List[Path], name: str, prefix="sparrow-"):
@@ -117,8 +120,15 @@ def fail_without_docker_command():
 
 def fail_without_docker_running():
     try:
+        from docker import from_env
+    except ImportError as exc:
+        raise SparrowCommandError(
+            "Managing a Sparrow server needs Docker support",
+            details="Install it with: pip install 'sparrow-cli[server]'",
+        ) from exc
+    try:
         from_env()
-    except DockerException as exc:
+    except Exception as exc:
         raise SparrowCommandError(
             "Cannot connect to the Docker daemon. Is Docker running?", details=str(exc)
         ) from exc
@@ -128,6 +138,11 @@ def raise_docker_engine_errors():
     k = "_SPARROW_CHECKED_DOCKER_ENGINE"
     if environ.get(k) == "1":
         return
+    if environ.get(NO_SERVER) == "1":
+        raise SparrowCommandError(
+            "This command manages a Sparrow server, and there is none here",
+            details="Run it from a lab's directory, with the Sparrow application installed.",
+        )
     fail_without_docker_command()
     fail_without_docker_running()
     res = cmd("docker info --format '{{json .ServerErrors}}'", stdout=PIPE)

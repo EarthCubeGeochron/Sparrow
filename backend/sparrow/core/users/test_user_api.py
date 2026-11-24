@@ -1,5 +1,6 @@
 from pytest import fixture
-from sparrow.core.auth.test_auth import is_forbidden, verify_credentials, admin_client
+
+from sparrow.core.auth.test_auth import admin_client, is_forbidden, verify_credentials
 from sparrow.database.models import User
 
 

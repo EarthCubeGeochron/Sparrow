@@ -1,9 +1,10 @@
 from hashlib import md5
-from numpy import isnan
+from io import IOBase
 from os import environ
 from pathlib import Path
+
 from click import echo, secho, style
-from io import IOBase
+from numpy import isnan
 
 
 class SparrowImportError(Exception):

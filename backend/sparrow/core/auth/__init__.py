@@ -32,7 +32,6 @@ infrastructure provides a way to build something much cleaner and more sophistic
 
 """
 
-
 # Implement authentication using JSON Web Tokens
 # https://codeburst.io/jwt-authorization-in-flask-c63c1acf4eeb
 # Authentication is managed on the browser using cookies
@@ -43,10 +42,12 @@ infrastructure provides a way to build something much cleaner and more sophistic
 # https://members.orcid.org/api/integrate/orcid-sign-in
 
 from os import environ
+
 from starlette.authentication import AuthenticationError  # noqa
 from starlette.middleware.authentication import AuthenticationMiddleware
 
 from sparrow.core.plugins import SparrowCorePlugin
+
 from .api import AuthAPI, get_backend  # noqa
 from .backend import JWTBackend
 

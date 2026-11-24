@@ -10,7 +10,7 @@ x-backend: &x-backend
   depends_on:
     - db
   environment:
-    - SPARROW_ENV
+    - SPARROW_ENV=${SPARROW_SERVICE_MODE:-development}
     - SPARROW_SECRET_KEY
     - SPARROW_BASE_URL
     - SPARROW_LAB_NAME
@@ -22,7 +22,6 @@ x-backend: &x-backend
     - SPARROW_CACHE_DIR=/cache
     # We have an experimental caching mechanism for SQLAlchemy models, but this
     # may cause bugs for importers and is not enabled by default. (added in v2.2.0)
-    - SPARROW_CACHE_DATABASE_MODELS
     - SPARROW_INIT_SQL=/init-sql
     # For cloud data support
     # NOTE: it may be useful to split this into a
@@ -66,7 +65,7 @@ x-backend: &x-backend
     - ${SPARROW_COMMANDS_VOLUME:-placeholder}:/sparrow-commands/:ro
     # Link `SPARROW_PLUGIN_DIR` directly into site-packages as a folder
     # ...we could probably do this in a more elegant way
-    - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.9/site-packages/sparrow_plugins:ro
+    - ${SPARROW_PLUGIN_DIR:-placeholder}:/usr/local/lib/python3.12/site-packages/sparrow_plugins:ro
     # Save ipython configuration to anonymous volume so
     # we keep command history between app runs
     - ipython_config:/root/.ipython/profile_default
@@ -76,7 +75,6 @@ x-backend: &x-backend
     # (for example, git repositorites for the PyChron importer). This could conceivably
     # be delegated to a separate importer container, but that seems overcomplex for now.
     - backend_cache:/cache
-    - model_cache:/root/.sqlalchemy-cache
 services:
   gateway:
     ports:
@@ -170,7 +168,7 @@ services:
       # inside and outside of the container
       - SPARROW_SITE_CONTENT=/site-content
       - SPARROW_FRONTEND_BUILD_DIR=/build
-      - SPARROW_ENV
+      - SPARROW_ENV=${SPARROW_SERVICE_MODE:-development}
     volumes:
       - frontend_build:/build
       # Right now, we configure default site content
@@ -237,5 +235,4 @@ volumes:
   backend_cache:
   # Placeholder volumes in case we don't have these volumes to mount
   placeholder:
-  model_cache:
 
