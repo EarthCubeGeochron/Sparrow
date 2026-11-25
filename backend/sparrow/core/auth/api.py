@@ -60,7 +60,7 @@ def logout(request):
 
 def status(request):
     backend = get_backend()
-    orcid = orcid_status(request)
+    orcid = orcid_status()
     try:
         identity = backend.get_identity(request)
         return JSONResponse(dict(login=True, username=identity, orcid=orcid))

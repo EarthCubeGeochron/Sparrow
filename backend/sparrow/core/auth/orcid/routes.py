@@ -8,7 +8,7 @@ from starlette.responses import RedirectResponse
 from sparrow.core.context import get_database, get_sparrow_app
 
 from .accounts import find_users_for_orcid, normalize_orcid
-from .config import OrcidSignIn
+from .config import LOGIN_PATH, OrcidSignIn
 
 
 async def orcid_login(request):
@@ -66,13 +66,12 @@ async def orcid_callback(request):
     return response
 
 
-def orcid_status(request) -> dict:
+def orcid_status() -> dict:
     """How the frontend can offer ORCID sign-in, if at all."""
     orcid = get_orcid()
     if orcid is None:
         return {"enabled": False, "mode": None, "login_url": None}
-    root = request.scope.get("root_path", "")
-    return {"enabled": True, "mode": orcid.mode, "login_url": f"{root}/orcid/login"}
+    return {"enabled": True, "mode": orcid.mode, "login_url": LOGIN_PATH}
 
 
 def get_orcid() -> OrcidSignIn | None:

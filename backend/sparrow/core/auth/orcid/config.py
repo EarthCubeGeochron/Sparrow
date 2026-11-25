@@ -11,6 +11,7 @@ from .sources import BrokerIdentitySource, DirectIdentitySource, IdentitySource
 log = get_logger(__name__)
 
 # Fixed by the gateway, which serves the API at the root of the lab's domain
+LOGIN_PATH = "/api/v2/auth/orcid/login"
 CALLBACK_PATH = "/api/v2/auth/orcid/callback"
 # Keeps state tokens from being accepted as anything else signed with the lab's key
 STATE_AUDIENCE = "sparrow-orcid-state"
