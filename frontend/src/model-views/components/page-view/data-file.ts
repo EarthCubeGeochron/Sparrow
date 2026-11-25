@@ -1,10 +1,11 @@
 import { AnchorButton, Intent, Tooltip } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { APIV2Context, useAPIv2Result } from "~/api-v2";
+import { APIV2Context } from "~/api-v2";
+import { useDataFileLinks } from "~/api/models";
 import { SiMicrosoftexcel } from "react-icons/si";
 import { AiFillFile } from "react-icons/ai";
 import { GrDocumentCsv, GrDocumentTxt } from "react-icons/gr";
-import { useAPIHelpers, buildQueryString } from "@macrostrat/ui-components";
+import { useAPIHelpers } from "@macrostrat/ui-components";
 import {
   VscFileBinary,
   VscFilePdf,
@@ -87,32 +88,12 @@ export function DownloadButton(props) {
   const { file_hash, file_type, basename } = props;
   const { buildURL } = useAPIHelpers(APIV2Context);
 
-  const href = buildURL(`/data_file/${file_hash}/download/`);
+  const href = buildURL(`/data_file/${file_hash}/download`);
   return h(Tooltip, { content: `Download ${file_type ?? "data"} file` }, [
     h(AnchorButton, { href, intent: Intent.PRIMARY }, [
       h(DownloadButtonContent, { basename, file_hash, file_type }),
     ]),
   ]);
-}
-
-function unwrapDataFile(get_obj) {
-  const { data, total_count } = get_obj;
-  if (total_count == 0) return [];
-
-  return data;
-}
-
-function useDataFileModelLinks(props) {
-  const { sample_id, session_id, analysis_id } = props;
-
-  const q = buildQueryString(
-    { sample_id, session_id, analysis_id },
-    { arrayFormat: "comma" }
-  );
-
-  const res = useAPIv2Result("/data_file/filter?" + q);
-  console.log(res);
-  return res?.data ?? [];
 }
 
 function DataFileCard(props) {
@@ -171,11 +152,12 @@ function DataFilePageCards(props) {
 export function DataFilePage(props) {
   const { sample_ids = [], session_ids = [], analysis_ids = [], model } = props;
 
-  const data = useDataFileModelLinks({
-    sample_id: sample_ids,
-    session_id: session_ids,
-    analysis_id: analysis_ids,
-  });
+  const data =
+    useDataFileLinks({
+      sample_id: sample_ids,
+      session_id: session_ids,
+      analysis_id: analysis_ids,
+    }) ?? [];
   return h(
     PageViewBlock,
     {

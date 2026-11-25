@@ -5,7 +5,7 @@ import { useModelURL } from "~/util";
 //@ts-ignore
 import styles from "./module.styl";
 import { Frame } from "~/frame";
-import { useAPIv2Result } from "~/api-v2";
+import { useSubSamples } from "~/api/models";
 import { FormattedLngLat } from "./common";
 
 const h = hyperStyled(styles);
@@ -188,13 +188,7 @@ export function SampleCard(props: SampleCardProps) {
 export function SubSamplePageView(props) {
   const { sample_id, isEditing, fallback = null } = props;
 
-  let data = useAPIv2Result(
-    `/models/sample/sub-sample/${sample_id}`,
-    {},
-    { unwrapResponse: (data) => data.sample_collection }
-  );
-
-  if (data == null) data = [];
+  const data = useSubSamples(sample_id) ?? [];
 
   if (data.length == 0 && !isEditing) {
     return fallback;

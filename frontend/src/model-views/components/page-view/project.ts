@@ -1,7 +1,7 @@
 import { Button } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
 import { useModelURL } from "~/util";
-import { useAPIv2Result } from "~/api-v2";
+import { usePublication } from "~/api/models";
 import { pluralize } from "../new-model";
 import { ModelLinkCard, PageViewBlock } from "~/model-views";
 //@ts-ignore
@@ -69,27 +69,14 @@ const ProjectCard = (props) => {
   ]);
 };
 
-const unwrapPubTitles = (obj) => {
-  return obj.data.title;
-};
-
 export function pubTitles({ publication }) {
-  if (publication.length > 0) {
-    const data = useAPIv2Result(
-      `/models/publication/${publication[0]}`,
-      {},
-      {
-        unwrapResponse: unwrapPubTitles,
-      }
-    );
-    if (data == null) return null;
-    if (publication.lenght > 1) {
-      return data + "....";
-    }
-
-    return data;
-  }
-  return null;
+  // Publications arrive either as records or as bare ids
+  const pub = publication[0];
+  const fetched = usePublication(typeof pub == "object" ? null : pub);
+  const title = typeof pub == "object" ? pub?.title : fetched?.title;
+  if (title == null) return null;
+  if (publication.length > 1) return title + "....";
+  return title;
 }
 
 export function ProjectCardContent(props) {

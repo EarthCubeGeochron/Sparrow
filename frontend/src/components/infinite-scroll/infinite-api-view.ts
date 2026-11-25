@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import ForeverScroll from "./forever-scroll";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useAPIActions, setQueryString } from "@macrostrat/ui-components";
-import { Button, Spinner } from "@blueprintjs/core";
+import { setQueryString } from "@macrostrat/ui-components";
+import { QueryParams, usePostgRESTGet } from "~/api/postgrest";
+import { filterParams as toPostgRESTFilters } from "~/api/models";
+import { useAuth } from "~/auth/context";
+import { Spinner } from "@blueprintjs/core";
 import { NoSearchResults } from "./utils";
 import { ErrorCallout } from "~/util";
 //@ts-ignore
@@ -10,91 +13,69 @@ import styles from "./main.styl";
 
 const h = hyperStyled(styles);
 
-/**@description function to implement the infinite scroll component with certain API views
- *
- * @param {string} url: base url for API call.
- * @param {function} unwrapData: function that destructures json from API call. Must return an object that is compatible with the component also passed
- * @param {object} params: object of params to be added to base URL. Optional
- * @param {component} component: react component designed to take in data object created by the unwrapData function
- *
- *
- * @example function unwrapProjectCardData(data) {
-  const dataObj = data.data.map((obj) => {
-    const { id, name, description, publication, session } = obj;
-    const samples = session.map((ob) => ob.sample);
-    return { id, name, description, publication, samples };
-  });
-  return dataObj;
+const perPage = 15;
+
+interface InfiniteAPIViewProps {
+  url: string;
+  /** Model name, for translating the admin filters */
+  model: string;
+  params?: QueryParams;
+  filterParams?: object;
+  normalize?: (row: object) => object;
+  children: React.ReactNode;
+  errorHandler?: React.ComponentType<any>;
 }
- return h(InfiniteAPIView, {
-    url: projectURL,
-    unwrapData: unwrapProjectCardData,
-    params: {nest: "session,sample"},
-    component: ProjectInfoLink,
-  });
- */
+
+/** An endless list of PostgREST records, fetched a page at a time with limit/offset */
 function InfiniteAPIView({
   url,
-  params,
+  model,
+  params = {},
   children,
-  context,
-  filterParams,
+  filterParams = {},
+  normalize,
   errorHandler = ErrorCallout,
-}) {
+}: InfiniteAPIViewProps) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
-  const [nextPage, setNextPage] = useState("");
+  const [nextOffset, setNextOffset] = useState(0);
   const [moreAfter, setMoreAfter] = useState(true);
-  const { get } = useAPIActions(context);
+  const get = usePostgRESTGet();
+  const { token } = useAuth();
 
-  async function getNextPageAPI(nextPage, url, params) {
-    const constParams =
-      nextPage == "" ? { per_page: 15 } : { per_page: 15, page: nextPage };
-    const moreParams = { ...params, ...filterParams };
-    const newParams = { ...moreParams, ...constParams };
-    try {
-      const data = await get(url, newParams, {});
-      return data;
-    } catch (error) {
-      let msg;
-      if (error != null) {
-        msg = error.message;
-        setError(msg);
-      }
-    }
-  }
-
-  useEffect(() => {
-    dataFetch(data);
-  }, []);
-
-  const dataFetch = (data, next = "") => {
+  const dataFetch = (data, offset = 0) => {
     setNoResults(false);
-    const initData = getNextPageAPI(next, url, params);
-    initData.then((res) => {
-      if (res.data.length == 0) {
+    const query = {
+      ...params,
+      ...toPostgRESTFilters(model, filterParams),
+      limit: perPage,
+      offset,
+    };
+    get(url, query).then((res) => {
+      if (res == null) {
+        setError("Could not load records");
+        return;
+      }
+      if (res.length == 0 && offset == 0) {
         setNoResults(true);
       }
-
-      const newState = [...data, ...res.data];
-      const next_page = res.next_page;
-      if (next_page == null) {
-        setMoreAfter(false);
-      }
-      setNextPage(next_page);
-      setData(newState);
+      const rows = normalize == null ? res : res.map(normalize);
+      setMoreAfter(res.length == perPage);
+      setNextOffset(offset + res.length);
+      setData([...data, ...rows]);
     });
   };
 
   useEffect(() => {
     setData([]);
+    setMoreAfter(true);
     dataFetch([]);
-  }, [JSON.stringify(filterParams)]);
+  }, [JSON.stringify(filterParams), token]);
 
   const fetchNewData = async () => {
-    if (!nextPage) return;
-    dataFetch(data, nextPage);
+    if (!moreAfter) return;
+    dataFetch(data, nextOffset);
   };
 
   if (error) {

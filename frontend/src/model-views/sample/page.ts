@@ -2,15 +2,11 @@ import { useContext, useEffect, useState } from "react";
 import { Frame } from "~/frame";
 import { useAuth } from "~/auth";
 import hyper from "@macrostrat/hyper";
-import {
-  APIHelpers,
-  ModelEditor,
-  useAPIHelpers,
-  useModelEditor,
-} from "@macrostrat/ui-components";
-import { Navbar } from "@blueprintjs/core";
-import { APIV2Context, useAPIv2Result } from "~/api-v2";
-import { put } from "axios";
+import { ModelEditor, useModelEditor } from "@macrostrat/ui-components";
+import { Navbar, Spinner } from "@blueprintjs/core";
+import { usePostgRESTResult } from "~/api/postgrest";
+import { normalizeSample, useSampleModel } from "~/api/models";
+import { useModelPersist } from "~/api/editing";
 import { SampleContextMap, MinimalNavbar } from "~/components";
 import { ModelTitleBar } from "~/model-views/components/page-view";
 import { MapLink } from "~/map";
@@ -27,7 +23,6 @@ import {
   SessionAdd,
   EmbargoDatePick,
   EditStatusButtons,
-  DataSheetButton,
   NewModelButton,
   ModelAttributeOneLiner,
   TagContainer,
@@ -75,7 +70,6 @@ const EditNavBarSample = () => {
       MinimalNavbar,
       null,
       h("div.editor-buttons", { style: { display: "flex" } }, [
-        h.if(isEditing)(DataSheetButton),
         h(EditStatusButtons, {
           onClickCancel,
           onClickSubmit,
@@ -141,7 +135,11 @@ const Material = function (props) {
 
 function MemberOfCard(props) {
   const { id, ...rest } = props;
-  const sample = useAPIv2Result(`/models/sample/${id}`)?.data;
+  const sample = usePostgRESTResult(
+    "/sample",
+    { id: `eq.${id}` },
+    { unwrap: (rows) => (rows.length > 0 ? normalizeSample(rows[0]) : null) }
+  );
   if (sample == null) return `Sample ${id}`;
   return h(SampleCard, { ...sample, ...rest });
 }
@@ -224,8 +222,12 @@ const DepthElevation = (props) => {
   ]);
 };
 
+// TODO: re-enable once the API exposes geo_entity, sample_geo_entity and project_sample
+const canEditLinks = false;
+
 const GeoEntity = (props) => {
-  const { isEditing, model, actions } = useModelEditor();
+  const { isEditing: editing, model, actions } = useModelEditor();
+  const isEditing = editing && canEditLinks;
 
   const { sample_geo_entity } = model;
 
@@ -261,7 +263,8 @@ const GeoEntity = (props) => {
 };
 
 const SampleProjectAdd = () => {
-  const { model, actions, isEditing } = useModelEditor();
+  const { model, actions, isEditing: editing } = useModelEditor();
+  const isEditing = editing && canEditLinks;
   const { setListName, changeFunction } = useContext(SampleAdminContext);
 
   const onClickDelete = ({ id, name }) => {
@@ -296,7 +299,8 @@ const SampleProjectAdd = () => {
 };
 
 const SampleSessionAdd = () => {
-  const { model, actions, isEditing } = useModelEditor();
+  const { model, actions, isEditing: editing } = useModelEditor();
+  const isEditing = editing && canEditLinks;
   const { setListName, changeFunction } = useContext(SampleAdminContext);
 
   const addSession = (id, date, target, technique) => {
@@ -392,36 +396,6 @@ function SampleTagContainer() {
   });
 }
 
-const handleMemberOfPersist = async (changeset, url) => {
-  if (!changeset["member_of"]) return [];
-  let body = { member_of: changeset["member_of"] };
-  const res = await put(url, body);
-  const { data } = res;
-
-  delete changeset.member_of;
-  return data;
-};
-
-async function TagsChangeSet(changeset, updatedModel, url) {
-  /**
-   * tag_ids = data['tag_ids']
-        for tag_id in tag_ids:
-            params = {"jointable":f"tags.{model}_tag", "model_id_column":f"{model}_id",\
-            "model_id": data['model_d'], "tag_id":tag_id}
-   */
-  if (changeset.tags_tag) {
-    let { id } = updatedModel;
-    const model_id = id;
-    const tags = changeset.tags_tag;
-    const tag_ids = tags.map((tag) => tag.id);
-    const body = { model_id: model_id, tag_ids: tag_ids };
-    const res = await put(url, body);
-    const { data } = res;
-    return data;
-  }
-  return "no tags";
-}
-
 const SamplePageDataFiles = () => {
   const { model } = useModelEditor();
 
@@ -431,36 +405,6 @@ const SamplePageDataFiles = () => {
     sample_ids: [model.id],
   });
 };
-
-function useSamplePersist() {
-  const { buildURL } = useAPIHelpers(APIV2Context);
-  return async function persistSampleChanges(updatedModel, changeset) {
-    console.log("changeset", changeset);
-    console.log("updatedModel", updatedModel);
-    console.log(
-      "Tags",
-      TagsChangeSet(
-        changeset,
-        updatedModel,
-        buildURL("/tags/models/sample", {})
-      )
-    );
-    let { id } = updatedModel;
-    console.log(
-      handleMemberOfPersist(
-        changeset,
-        buildURL(`/models/sample/sub-sample/${id}`)
-      )
-    );
-    delete updatedModel.member_of;
-    let rest;
-    const response = await put(
-      buildURL(`/models/sample/${id}`, {}),
-      updatedModel
-    );
-    const { data } = response;
-  };
-}
 
 function TitleBar() {
   const { model } = useModelEditor();
@@ -482,13 +426,11 @@ function SamplePage(props: SampleProps) {
   if (id == null) return null;
 
   const { login } = useAuth();
-  const persistChanges = useSamplePersist();
+  const persistChanges = useModelPersist("sample");
 
-  const sample = useAPIv2Result(`/models/sample/${id}`, {
-    nest: "session,project,sample_geo_entity,geo_entity,tag",
-  });
+  const sample = useSampleModel(id);
   if (sample == null) {
-    return null;
+    return h(Spinner);
   }
 
   /*
@@ -501,7 +443,7 @@ function SamplePage(props: SampleProps) {
     h(
       ModelEditor,
       {
-        model: sample.data,
+        model: sample,
         canEdit: login || Edit,
         persistChanges,
       },
@@ -518,11 +460,7 @@ function SamplePage(props: SampleProps) {
                 h.if(Edit)(SampleTagContainer),
               ]),
               h("div", null, [
-                h(
-                  Frame,
-                  { id: "sampleHeaderExt", data: { sample: sample.data } },
-                  null
-                ),
+                h(Frame, { id: "sampleHeaderExt", data: { sample } }, null),
               ]),
             ]),
           ]),
@@ -532,7 +470,7 @@ function SamplePage(props: SampleProps) {
         h(SamplePageDataFiles),
         h(SampleProjectAdd),
         h(GeoEntity),
-        h(Frame, { id: "samplePage", data: sample.data }, null),
+        h(Frame, { id: "samplePage", data: sample }, null),
       ]
     )
   );
