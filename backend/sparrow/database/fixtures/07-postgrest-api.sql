@@ -129,6 +129,11 @@ CREATE OR REPLACE FUNCTION sparrow_api.sample_tile(
   FROM grouped_features;
 $$ LANGUAGE sql IMMUTABLE;
 
+-- The tile function runs as its caller, so callers need its helpers and source view
+GRANT USAGE ON SCHEMA tile_utils, core_view TO view_public, admin;
+GRANT SELECT ON ALL TABLES IN SCHEMA tile_utils TO view_public, admin;
+GRANT SELECT ON core_view.sample_v3 TO view_public, admin;
+
 
 /* Supporting records and vocabularies */
 CREATE OR REPLACE VIEW sparrow_api.researcher AS
