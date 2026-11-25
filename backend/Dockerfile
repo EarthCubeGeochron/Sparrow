@@ -42,8 +42,8 @@ COPY ./ /app/
 
 RUN poetry install --no-interaction --no-ansi --without dev
 
-# Administrative commands are a separate package, installed where they are run
-RUN rm -rf /app/admin
+# Administrative commands and the identity broker are separate packages, run elsewhere
+RUN rm -rf /app/admin /app/broker
 
 CMD ["/bin/run"]
 
@@ -52,6 +52,7 @@ FROM main AS testing
 # The service image holds what runs; tests need more
 RUN poetry install --no-interaction --no-ansi --with dev
 
-# Administrative commands live outside the service; their tests run here
+# Administrative commands and the identity broker live outside the service; their tests run here
 COPY ./admin /app/admin
-RUN pip install --no-deps -e /app/admin
+COPY ./broker /app/broker
+RUN pip install --no-deps -e /app/admin -e /app/broker

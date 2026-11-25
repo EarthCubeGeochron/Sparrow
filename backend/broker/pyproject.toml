@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "sparrow-identity-broker"
+version = "0.1.0"
+description = "Signs in with ORCID on behalf of Sparrow labs"
+authors = ["Daven Quinn <dev@davenquinn.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "sparrow"}]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.14"
+# The ORCID exchange, shared with Sparrow labs and Macrostrat
+"macrostrat.auth_system" = "^1.2.0"
+PyJWT = {version = "^2.8.0", extras = ["crypto"]}
+cryptography = ">=42"
+fastapi = ">=0.104.0"
+httpx2 = ">=2.4.0"
+Hypercorn = "^0.17.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.0"
+
+[tool.poetry.scripts]
+sparrow-identity-broker = "sparrow.broker.__main__:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
