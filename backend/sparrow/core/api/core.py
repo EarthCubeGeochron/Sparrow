@@ -4,6 +4,7 @@ from starlette.applications import Starlette
 from starlette.exceptions import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
+from starlette.routing import WebSocketRoute
 
 from sparrow.logs import get_logger
 
@@ -65,6 +66,9 @@ class APIv2(Starlette):
             self.route_descriptions[path] = desc
 
         super().add_route(path, *args, **kwargs)
+
+    def add_websocket_route(self, path, endpoint, name=None):
+        self.router.routes.append(WebSocketRoute(path, endpoint, name=name))
 
     def mount(self, path, app, **kwargs):
         desc = kwargs.pop("help", None)
