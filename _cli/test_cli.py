@@ -51,6 +51,9 @@ def test_access_scopes():
     assert access_scope(["schema", "migrate", "--apply"]) == AccessScope.Schema
     assert access_scope(["db-update"]) == AccessScope.Schema
     assert access_scope(["create-user"]) == AccessScope.Data
+    assert access_scope(["link-orcid", "user", "0000-0002-1825-0097"]) == (
+        AccessScope.Data
+    )
     assert access_scope(["tasks", "anything"]) == AccessScope.Data
 
 

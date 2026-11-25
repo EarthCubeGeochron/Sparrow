@@ -1,4 +1,5 @@
 from asyncio import create_task, sleep
+from contextlib import asynccontextmanager
 from json import loads
 
 from macrostrat.utils import get_logger
@@ -115,10 +116,12 @@ def build_tasks_api(manager):
         )
         routes.append(task_socket_route)
 
-    on_startup = []
-    on_shutdown = []
-    if manager.broadcast is not None:
-        on_startup.append(manager.broadcast.connect)
-        on_shutdown.append(manager.broadcast.disconnect)
+    @asynccontextmanager
+    async def lifespan(app):
+        if manager.broadcast is not None:
+            await manager.broadcast.connect()
+        yield
+        if manager.broadcast is not None:
+            await manager.broadcast.disconnect()
 
-    return Starlette(routes=routes, on_startup=on_startup, on_shutdown=on_shutdown)
+    return Starlette(routes=routes, lifespan=lifespan)

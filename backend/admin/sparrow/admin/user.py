@@ -1,4 +1,4 @@
-from click import echo, prompt, secho, style
+from click import ClickException, echo, prompt, secho, style
 
 from sparrow.database.models import User
 
@@ -49,3 +49,16 @@ def create_user(db):
     _create_user(db, username, password)
     db.session.commit()
     echo("Successfully created user and hashed password!")
+
+
+def link_orcid(db, username, orcid, name=None):
+    from sparrow.core.auth.orcid import AccountLinkError
+    from sparrow.core.auth.orcid import link_orcid as _link_orcid
+
+    try:
+        researcher, created = _link_orcid(db, username, orcid, name)
+    except (AccountLinkError, ValueError) as err:
+        raise ClickException(str(err))
+    action = "Created" if created else "Using"
+    echo(f"{action} researcher {researcher.name} (ORCID iD {researcher.orcid})")
+    echo(_format_username(username) + " can now sign in with ORCID")

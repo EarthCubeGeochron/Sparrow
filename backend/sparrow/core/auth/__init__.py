@@ -38,8 +38,8 @@ infrastructure provides a way to build something much cleaner and more sophistic
 # to protect against XSS attacks.
 # https://flask-jwt-extended.readthedocs.io/en/latest/tokens_in_cookies.html
 
-# ORCID login
-# https://members.orcid.org/api/integrate/orcid-sign-in
+# ORCID sign-in: see the `orcid` module
+# https://info.orcid.org/documentation/integration-guide/sign-in-using-orcid/
 
 from os import environ
 
@@ -50,12 +50,17 @@ from sparrow.core.plugins import SparrowCorePlugin
 
 from .api import AuthAPI, get_backend  # noqa
 from .backend import JWTBackend
+from .orcid import orcid_sign_in_from_env
 
 
 class AuthPlugin(SparrowCorePlugin):
     name = "auth"
 
     backend = JWTBackend(environ.get("SPARROW_SECRET_KEY", ""))
+
+    def __init__(self, app):
+        super().__init__(app)
+        self.orcid = orcid_sign_in_from_env()
 
     def on_asgi_setup(self, api):
         api.add_middleware(AuthenticationMiddleware, backend=self.backend)

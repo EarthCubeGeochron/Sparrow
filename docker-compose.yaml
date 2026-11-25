@@ -15,6 +15,15 @@ x-backend: &x-backend
     - SPARROW_SECRET_KEY
     - SPARROW_BASE_URL
     - SPARROW_LAB_NAME
+    # ORCID sign-in: the lab's own ORCID client, or an identity broker
+    - SPARROW_ORCID_CLIENT_ID
+    - SPARROW_ORCID_CLIENT_SECRET
+    - SPARROW_ORCID_BROKER_URL
+    - SPARROW_ORCID_REDIRECT_URI
+    - SPARROW_ORCID_BASE_URL
+    # The lab's public address, from which the ORCID callback URL is built
+    - SPARROW_DOMAIN
+    - SPARROW_HTTPS_PORT
     - SPARROW_ECHO_SQL
     - SPARROW_DATABASE=postgresql+psycopg2://postgres@db/sparrow
     # Inside the container, the data directory is mapped to a standardized folder

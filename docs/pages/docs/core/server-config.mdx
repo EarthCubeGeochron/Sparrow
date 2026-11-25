@@ -44,6 +44,43 @@ following config values must be set:
 If configured, Sparrow will serve SSL on port 443. This can be adjusted with the `SPARROW_HTTPS_PORT`
 variable.
 
+## Signing in with ORCID
+
+Besides usernames and passwords, a lab can let its users sign in with their
+[ORCID iD](https://orcid.org). There are two ways to set this up; if neither is
+configured, ORCID sign-in is off.
+
+- **With the lab's own ORCID client.** Register an
+  [ORCID public API client](https://info.orcid.org/documentation/integration-guide/registering-a-public-api-client/)
+  with the redirect URI `https://<SPARROW_DOMAIN>/api/v2/auth/orcid/callback`, then set
+  - `SPARROW_ORCID_CLIENT_ID=<client id>`
+  - `SPARROW_ORCID_CLIENT_SECRET=<client secret>`: keep this in `sparrow-secrets.sh`.
+- **Through an identity broker**, which holds one ORCID client for many labs:
+  - `SPARROW_ORCID_BROKER_URL=<broker URL>`
+
+  The lab then trusts the broker to say who signed in. See the broker's README
+  (`backend/broker/README.md`) for how it works.
+
+If both are set, the lab's own client is used. The callback URL is built from
+`SPARROW_DOMAIN` (and `SPARROW_HTTPS_PORT`, if it is not 443). To serve the lab
+at another address, or without HTTPS during development, set it outright:
+
+- `SPARROW_ORCID_REDIRECT_URI=http://localhost:5002/api/v2/auth/orcid/callback`
+
+`SPARROW_ORCID_BASE_URL=https://sandbox.orcid.org/oauth` signs in against ORCID's
+sandbox instead.
+
+Signing in with ORCID never creates an account. An ORCID iD signs in as the
+user linked to the researcher with that iD, with the same access as a password
+sign-in. Link a user with
+
+```sh
+sparrow link-orcid <username> <ORCID iD> [--name "Researcher name"]
+```
+
+It uses the researcher that already has the iD; failing that, the user's own
+researcher record if it has no iD yet; failing that, a new researcher.
+
 :::note
 More detailed configurations can be set by directly
 using [docker-compose environment variables](https://docs.docker.com/compose/reference/envvars/).

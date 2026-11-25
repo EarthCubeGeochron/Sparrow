@@ -51,7 +51,7 @@ class JWTBackend(AuthenticationBackend):
         payload = dict(iat=now, nbf=now, exp=now + max_age, type=type)
         payload.update(data)
 
-        token = self._encode(payload).decode("utf-8")
+        token = self._encode(payload)
 
         if response is None:
             return token
@@ -71,12 +71,8 @@ class JWTBackend(AuthenticationBackend):
         return jwt.encode(payload, **kwargs)
 
     def _decode(self, cookie, **kwargs):
-        kwargs.update(key=self.encode_key, verify=True, algorithms={"HS256"})
-        return jwt.decode(
-            cookie,
-            # do symmetrical encryption for now
-            **kwargs,
-        )
+        kwargs.update(key=self.encode_key, algorithms=["HS256"])
+        return jwt.decode(cookie, **kwargs)
 
     def get_identity(self, request: Request, type="access"):
         name = f"{type}_token_cookie"
