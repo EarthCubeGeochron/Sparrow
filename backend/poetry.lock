@@ -2081,6 +2081,9 @@ files = [
     {file = "pyjwt-2.15.1.tar.gz", hash = "sha256:4f259e80cdfb6b3fc18a7de51fd1ef9ec79652f25019bae68975ca2468a34df8"},
 ]
 
+[package.dependencies]
+cryptography = {version = ">=3.4.0", optional = true, markers = "extra == \"crypto\""}
+
 [package.extras]
 crypto = ["cryptography (>=3.4.0)"]
 
@@ -3239,4 +3242,4 @@ test = ["pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.14"
-content-hash = "4bc894b451df29e3f8d807e90328c127d2adfb3b687270b3c035d9e5b4f920fa"
+content-hash = "3f300c5b40dc34c19d934cc5e0cf144dd18a19bb16e93ed782f1e43139262a45"

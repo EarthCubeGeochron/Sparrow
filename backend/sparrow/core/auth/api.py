@@ -6,6 +6,8 @@ from sparrow.core.context import get_database, get_sparrow_app
 from sparrow.database.models import User
 from sparrow.logs import get_logger
 
+from .orcid import orcid_callback, orcid_login, orcid_status
+
 log = get_logger(__name__)
 
 
@@ -14,10 +16,11 @@ def get_backend():
     return app.plugins.get("auth").backend
 
 
-def UnauthorizedResponse(**kwargs):
-    return JSONResponse(
-        dict(login=False, username=None, message="user is not authenticated"), **kwargs
-    )
+def UnauthorizedResponse(orcid=None, **kwargs):
+    data = dict(login=False, username=None, message="user is not authenticated")
+    if orcid is not None:
+        data["orcid"] = orcid
+    return JSONResponse(data, **kwargs)
 
 
 async def login(request):
@@ -57,13 +60,14 @@ def logout(request):
 
 def status(request):
     backend = get_backend()
+    orcid = orcid_status(request)
     try:
         identity = backend.get_identity(request)
-        return JSONResponse(dict(login=True, username=identity))
+        return JSONResponse(dict(login=True, username=identity, orcid=orcid))
     except AuthenticationError:
         # We have to handle authentication errors to return a 200 response
         # even though the user is logged out
-        return UnauthorizedResponse(status_code=200)
+        return UnauthorizedResponse(status_code=200, orcid=orcid)
 
 
 def refresh(request):
@@ -88,5 +92,7 @@ AuthAPI = Router(
         Route("/refresh", endpoint=refresh, methods=["POST"]),
         Route("/status", endpoint=status),
         Route("/secret", endpoint=secret),
+        Route("/orcid/login", endpoint=orcid_login),
+        Route("/orcid/callback", endpoint=orcid_callback),
     ]
 )
