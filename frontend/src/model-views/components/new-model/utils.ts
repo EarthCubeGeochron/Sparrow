@@ -12,28 +12,16 @@ import {
 } from "@blueprintjs/core";
 import { DatePicker } from "@blueprintjs/datetime";
 import {
-  useAPIActions,
   ModelEditorContext,
   ModelEditButton,
   CancelButton,
   SaveButton,
 } from "@macrostrat/ui-components";
-import { APIV2Context } from "~/api-v2";
 import { MySwitch, MinimalNavbar } from "~/components";
 //@ts-ignore
 import styles from "./module.styl";
 
 const h = hyperStyled(styles);
-
-export async function getfunc(props) {
-  const { url, params } = props;
-  const { get } = useAPIActions(APIV2Context);
-  try {
-    const data = await get(url, params, {});
-  } catch (error) {
-    console.error(error);
-  }
-}
 
 export function FormSlider(props) {
   const { content, onClose = () => {}, model } = props;
@@ -321,18 +309,6 @@ export const EditNavBar = function (props) {
     embargoEditor,
   ]);
 };
-
-export function DataSheetButton() {
-  const url = "/admin/data-sheet";
-  const handleClick = (e) => {
-    e.preventDefault();
-    window.location.href = url;
-  };
-
-  return h("div", { style: { padding: "0px 5px 5px 0px" } }, [
-    h(Button, { onClick: handleClick, minimal: true }, ["Data Sheet View"]),
-  ]);
-}
 
 export const pluralize = function (term, arrayOrNumber) {
   let count = arrayOrNumber;
