@@ -15,7 +15,7 @@ from sparrow.core.context import get_sparrow_app
 from sparrow.core.plugins import SparrowPlugin
 from sparrow.core.util import working_directory
 
-from .user import create_user, list_users, reset_password
+from .user import create_user, link_orcid, list_users, reset_password
 from .util import add_typer_command, with_app, with_database, with_full_app
 
 
@@ -152,6 +152,18 @@ def _reset_password(db, username):
     Reset the password for an existing user
     """
     reset_password(db, username)
+
+
+@cli.command(name="link-orcid")
+@click.argument("username")
+@click.argument("orcid")
+@click.option("--name", help="Name of the researcher, if one must be created")
+@with_database
+def _link_orcid(db, username, orcid, name=None):
+    """
+    Let a user sign in with an ORCID iD
+    """
+    link_orcid(db, username, orcid, name)
 
 
 @cli.command(name="plugins")

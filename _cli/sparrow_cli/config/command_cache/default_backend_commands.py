@@ -15,6 +15,7 @@ default_commands = {
         "plugin": "earthchem-vocabulary",
     },
     "init": {"help": "Initialize database schema (non-destructive)", "plugin": None},
+    "link-orcid": {"help": "Let a user sign in with an ORCID iD", "plugin": None},
     "list-users": {"help": "", "plugin": None},
     "plugins": {"help": "Print a list of enabled plugins", "plugin": None},
     "remove-audit-trail": {
