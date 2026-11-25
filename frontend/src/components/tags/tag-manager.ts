@@ -1,15 +1,13 @@
-import { useState, useContext } from "react";
-import { APIHelpers } from "@macrostrat/ui-components";
+import { useState } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import { Button, ButtonGroup, Card, Callout } from "@blueprintjs/core";
-import { useAPIv2Result, APIV2Context } from "~/api-v2";
+import { Button, ButtonGroup, Card, Callout, Spinner } from "@blueprintjs/core";
+import { usePostgRESTActions, usePostgRESTResult } from "~/api/postgrest";
 import { randomHexColor } from "../misscel";
 import { TagBody } from "./tag-body";
 import { tagBody } from "./types";
 import { TagEditor } from "./tag-creator";
 //@ts-ignore
 import styles from "./module.styl";
-import Axios from "axios";
 
 const h = hyperStyled(styles);
 
@@ -41,20 +39,19 @@ function TagEditButtons(props) {
 
 function TagRow(props) {
   const { tag, onCommit } = props;
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
+  const { update, remove } = usePostgRESTActions();
   const [isEditing, setIsEditing] = useState(false);
 
   const onSubmit = async (editedTag) => {
-    console.log(editedTag);
-    const route = buildURL(`/tags/tag/${tag.id}`);
-    const res = await Axios.put(route, editedTag).then((response) => {
-      return response;
-    });
+    const { name, description, color } = editedTag;
+    await update("/tag", { id: `eq.${tag.id}` }, { name, description, color });
+    setIsEditing(false);
+    onCommit();
   };
 
   const onDelete = async () => {
-    const route = buildURL(`/tags/tag/${tag.id}`);
-    await Axios.delete(route);
+    await remove("/tag", { id: `eq.${tag.id}` });
+    onCommit();
   };
 
   if (!tag) return null;
@@ -93,25 +90,30 @@ function TagRow(props) {
 }
 
 function TagManager() {
-  const data = useAPIv2Result("/tags/tag?all=true");
-  if (!data) return null;
-
-  const total_count = data["total_count"];
-  const tags = data["data"];
+  // Bumped after each write; remounting the list reads it again
+  const [version, setVersion] = useState(0);
+  const onCommit = () => setVersion((v) => v + 1);
 
   return h("div", [
-    h("div.new-tag-btn", [h(NewTag)]),
-    h(Callout, [
-      h("div.manager-header", [total_count + " Tags"]),
-      tags.map((tag) => {
-        return h(TagRow, { key: tag["id"], tag });
-      }),
-    ]),
+    h("div.new-tag-btn", [h(NewTag, { onCommit })]),
+    h(TagList, { key: version, onCommit }),
   ]);
 }
 
-function NewTag() {
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
+function TagList({ onCommit }) {
+  const tags = usePostgRESTResult("/tag", { order: "name" }, { all: true });
+  if (tags == null) return h(Spinner);
+
+  return h(Callout, [
+    h("div.manager-header", [tags.length + " Tags"]),
+    tags.map((tag) => {
+      return h(TagRow, { key: tag["id"], tag, onCommit });
+    }),
+  ]);
+}
+
+function NewTag({ onCommit }) {
+  const { insert } = usePostgRESTActions();
   const [open, setOpen] = useState(false);
   const initTag = {
     name: "",
@@ -120,10 +122,10 @@ function NewTag() {
   };
 
   const onSubmit = async (tag) => {
-    const url = buildURL("/tags/tag");
-    const res = await Axios.post(url, tag).then((response) => {
-      return response;
-    });
+    const { name, description, color } = tag;
+    await insert("/tag", { name, description, color });
+    setOpen(false);
+    onCommit();
   };
   const onCancel = () => {
     setOpen(!open);
