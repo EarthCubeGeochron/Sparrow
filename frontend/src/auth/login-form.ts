@@ -1,8 +1,16 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import React, { useState } from "react";
 import { useAuth } from "./context";
-import { Button, Dialog, Callout, Intent, Classes } from "@blueprintjs/core";
+import {
+  AnchorButton,
+  Button,
+  Dialog,
+  Callout,
+  Intent,
+  Classes,
+} from "@blueprintjs/core";
 import { ServerStatus } from "~/components";
+import { apiV2BaseURL } from "~/api-v2";
 import classNames from "classnames";
 import styles from "./module.styl";
 
@@ -160,6 +168,19 @@ function _LoginForm() {
         placeholder: "Password",
       }),
     ]),
+    h(OrcidSignInButton),
+  ]);
+}
+
+function OrcidSignInButton() {
+  const { orcid } = useAuth();
+  if (!orcid?.enabled) return null;
+  // A full navigation: the sign-in leaves for ORCID and returns to this page
+  const { pathname, search } = window.location;
+  const returnURL = encodeURIComponent(pathname + search);
+  const href = `${apiV2BaseURL}/auth/orcid/login?return_url=${returnURL}`;
+  return h("div.orcid-sign-in", [
+    h(AnchorButton, { href, large: true, fill: true }, "Sign in with ORCID"),
   ]);
 }
 
