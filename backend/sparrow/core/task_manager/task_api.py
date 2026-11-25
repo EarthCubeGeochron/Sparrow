@@ -1,5 +1,5 @@
-from contextlib import asynccontextmanager
 from asyncio import create_task, sleep
+from contextlib import asynccontextmanager
 from json import loads
 
 from macrostrat.utils import get_logger
