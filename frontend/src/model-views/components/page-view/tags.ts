@@ -1,7 +1,7 @@
 import { TagBody, tagBody } from "~/components";
 import { Suggest } from "@blueprintjs/select";
 import { Button, Popover, MenuDivider, Card } from "@blueprintjs/core";
-import { useAPIv2Result } from "~/api-v2";
+import { useAllTags } from "~/api/models";
 import { hyperStyled } from "@macrostrat/hyper";
 //@ts-ignore
 import styles from "./module.styl";
@@ -84,12 +84,12 @@ export function TagSelect(props) {
   const { tags, onChange }: tagContainer = props;
 
   // use the tags from tag container to show only tags that don't exist on model
-  const allTags = useAPIv2Result("/tags/tag", { all: true });
+  const allTags = useAllTags();
   if (allTags == null) return null;
 
   const currentIds = tags.map((tag) => tag.id);
 
-  const tagSet = allTags.data.filter((tag) => !currentIds.includes(tag.id));
+  const tagSet = allTags.filter((tag) => !currentIds.includes(tag.id));
 
   const itemRenderer = (item, itemProps) => {
     const { name, description, color, id } = item;

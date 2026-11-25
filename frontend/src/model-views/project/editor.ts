@@ -5,9 +5,8 @@ import {
   ModelEditor,
   ModelEditorContext,
   useModelEditor,
-  APIHelpers,
 } from "@macrostrat/ui-components";
-import { put } from "axios";
+import { useModelPersist } from "~/api/editing";
 import "../main.styl";
 //@ts-ignore
 import styles from "~/admin/module.styl";
@@ -25,7 +24,6 @@ import {
   PageViewBlock,
   DataFilePage,
 } from "../components";
-import { APIV2Context } from "../../api-v2";
 import { ProjectMap } from "./map";
 import { ProjectAdminContext } from "~/admin/project";
 import { Frame } from "~/frame";
@@ -66,8 +64,12 @@ function EditStatusButtonsProj() {
   });
 }
 
+// TODO: re-enable link editing once the API exposes writable link views
+const canEditLinks = false;
+
 function EditSessions(props) {
-  const { isEditing, model, actions } = useModelEditor();
+  const { model, actions, isEditing: editing } = useModelEditor();
+  const isEditing = editing && canEditLinks;
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
   const { sampleHoverID } = useContext(SampleHoverIDContext);
 
@@ -134,7 +136,8 @@ function EditSessions(props) {
 }
 
 function EditResearchers(props) {
-  const { isEditing, model, actions } = useModelEditor();
+  const { model, actions, isEditing: editing } = useModelEditor();
+  const isEditing = editing && canEditLinks;
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
   const researchers = model.researcher == null ? [] : [...model.researcher];
@@ -178,7 +181,8 @@ function EditResearchers(props) {
  * TODO: Have paper title appear, maybe in an alert or a tooltip, check to make sure it's the correct pub
  */
 function EditablePublications(props) {
-  const { isEditing, model, actions } = useModelEditor();
+  const { model, actions, isEditing: editing } = useModelEditor();
+  const isEditing = editing && canEditLinks;
 
   if (model.publication == null && !isEditing) {
     return h("h4", ["No Publications"]);
@@ -272,7 +276,8 @@ function getProjectSamples(samples, sessions) {
 
 export function EditableSamples() {
   const { setHoverID } = useContext(SampleHoverIDContext);
-  const { model, actions, isEditing } = useModelEditor();
+  const { model, actions, isEditing: editing } = useModelEditor();
+  const isEditing = editing && canEditLinks;
   const { setListName, changeFunction } = useContext(ProjectAdminContext);
 
   const samples =
@@ -360,26 +365,6 @@ function ProjectTagContainer() {
     modelName: "project",
   });
 }
-async function TagsChangeSet(changeset, updatedModel, url) {
-  /**
-   * tag_ids = data['tag_ids']
-        for tag_id in tag_ids:
-            params = {"jointable":f"tags.{model}_tag", "model_id_column":f"{model}_id",\
-            "model_id": data['model_d'], "tag_id":tag_id}
-   */
-  if (changeset.tags_tag) {
-    let { id } = updatedModel;
-    const model_id = id;
-    const tags = changeset.tags_tag;
-    const tag_ids = tags.map((tag) => tag.id);
-    const body = { model_id: model_id, tag_ids: tag_ids };
-    const res = await put(url, body);
-    const { data } = res;
-    return data;
-  }
-  return "no tags";
-}
-
 const ProjectDataFiles = () => {
   const { model } = useModelEditor();
 
@@ -394,7 +379,7 @@ const SampleHoverIDContext = createContext({});
 const EditableProjectDetails = function (props) {
   const { project, Edit } = props;
   const { login } = useAuth();
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
+  const persistChanges = useModelPersist("project");
 
   const [sampleHoverID, setSampleHoverID] = useState();
 
@@ -405,27 +390,9 @@ const EditableProjectDetails = function (props) {
   return h(
     ModelEditor,
     {
-      model: project.data,
+      model: project,
       canEdit: login || Edit,
-      persistChanges: async (updatedModel, changeset) => {
-        console.log(changeset);
-        console.log(updatedModel);
-        TagsChangeSet(
-          changeset,
-          updatedModel,
-          buildURL("/tags/models/project", {})
-        );
-        let rest;
-        let { id } = updatedModel;
-        const response = await put(
-          buildURL(`/models/project/${id}`, {}),
-          updatedModel
-        );
-        const { data } = response;
-        console.log(data);
-        ({ data } = data);
-        return data;
-      },
+      persistChanges,
     },
     [
       h(
@@ -455,7 +422,7 @@ const EditableProjectDetails = function (props) {
               h(EditSessions),
               h(SampleMapComponent),
               h(ProjectDataFiles),
-              h(Frame, { id: "projectPage", data: project.data }, null),
+              h(Frame, { id: "projectPage", data: project }, null),
             ]),
           ]),
         ]

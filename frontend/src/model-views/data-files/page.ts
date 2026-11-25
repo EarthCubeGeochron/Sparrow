@@ -8,7 +8,7 @@ import { useModelEditor, ModelEditor } from "@macrostrat/ui-components";
 import { useAuth } from "~/auth";
 import { SampleCard } from "~/model-views";
 import { Frame } from "~/frame";
-import { useAPIv2Result } from "~/api-v2";
+import { useDataFile } from "~/api/models";
 import {
   EditNavBar,
   ModelEditableText,
@@ -146,15 +146,8 @@ export function DataFilePage(props) {
   const { file_hash } = props;
   if (file_hash == null) return null;
 
-  const dataFileURL = `/models/data_file/${file_hash}`;
-
-  const res = useAPIv2Result(dataFileURL, {
-    nest: "data_file_link,session,sample",
-  });
-
+  const data = useDataFile(file_hash);
   const { login } = useAuth();
-
-  const data = res?.data;
 
   if (data == null) return h(Spinner);
 

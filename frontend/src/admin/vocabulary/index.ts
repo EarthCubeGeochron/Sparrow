@@ -1,5 +1,5 @@
 import { hyperStyled } from "@macrostrat/hyper";
-import { useAPIv2Result } from "~/api-v2";
+import { usePostgRESTResult } from "~/api/postgrest";
 import { useState } from "react";
 import {
   Spinner,
@@ -22,15 +22,26 @@ enum Term {
   MATERIAL = "material",
 }
 
+// Vocabularies the API serves, by route and label
+const vocabularies = {
+  parameter: "Parameter",
+  material: "Material",
+  method: "Method",
+  unit: "Unit",
+  error_metric: "Error metric",
+  analysis_type: "Analysis type",
+};
+
 function VocabularyList(props) {
   const { authority, exclude, local = false, term = Term.PARAMETER } = props;
 
-  const params = useAPIv2Result(`/vocabulary/${term}`, {
-    all: true,
-    authority,
-  });
-  if (params == null) return h(Spinner);
-  let { data } = params;
+  const filter = authority == null ? {} : { authority: `eq.${authority}` };
+  let data = usePostgRESTResult(
+    `/${term}`,
+    { ...filter, order: "id" },
+    { all: true }
+  );
+  if (data == null) return h(Spinner);
   if (exclude != null) data = data.filter((d) => d.authority != exclude);
   if (local)
     data = data.filter((d) => d.authority == null || d.authority != "Sparrow");
@@ -45,19 +56,22 @@ function VocabularyList(props) {
 }
 
 function NavMenu() {
-  return h(ButtonGroup, { minimal: true }, [
-    h(NavButton, { to: "/admin/terms/parameter" }, "Parameter"),
-    h(NavButton, { to: "/admin/terms/material" }, "Material"),
-  ]);
+  return h(
+    ButtonGroup,
+    { minimal: true },
+    Object.entries(vocabularies).map(([term, label]) =>
+      h(NavButton, { to: `/admin/terms/${term}` }, label)
+    )
+  );
 }
 
 function AuthorityMenu({ authority, setAuthority }) {
-  const auth = useAPIv2Result("/vocabulary/authority", { all: true }, {});
+  const auth = usePostgRESTResult("/authority", { order: "id" });
   if (auth == null) return null;
   const content = h(
     Menu,
     {},
-    auth.data.map((d) =>
+    auth.map((d) =>
       h(MenuItem, {
         onClick() {
           setAuthority(d.id);
@@ -75,7 +89,8 @@ function AuthorityMenu({ authority, setAuthority }) {
 }
 
 function VocabularyPanel({ authority }) {
-  const term = useRouteMatch()?.params?.term ?? "parameter";
+  let term = useRouteMatch()?.params?.term;
+  if (!(term in vocabularies)) term = Term.PARAMETER;
 
   return h("div.vocabulary-panel", [
     h(VocabularyList, { local: true, term }),

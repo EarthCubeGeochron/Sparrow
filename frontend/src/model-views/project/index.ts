@@ -1,8 +1,8 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useRouteMatch } from "react-router-dom";
-import { useAPIResult } from "@macrostrat/ui-components";
 import { LinkCard } from "@macrostrat/ui-components";
-import { useAPIv2Result } from "~/api-v2";
+import { Spinner } from "@blueprintjs/core";
+import { useProjectModel } from "~/api/models";
 import { ProjectPage } from "./page";
 import { useModelURL } from "~/util/router";
 import { pluralize } from "../components";
@@ -16,6 +16,7 @@ interface Project {
   description: string;
   samples: any[];
   publication: any[];
+  publications?: any[];
 }
 
 interface ProjectInfoLinkProps extends Project {
@@ -39,7 +40,7 @@ function ProjectInfoLink(props: ProjectInfoLinkProps) {
     name,
     description,
     samples = [],
-    publication = [],
+    publication = props.publications,
     minimal = false,
   } = props;
 
@@ -97,19 +98,11 @@ interface ProjectProps {
 
 const ProjectComponent = function (props: ProjectProps) {
   const { id, Edit } = props;
-  const data = useAPIv2Result(
-    `/models/project/${id}`,
-    {
-      nest: "publication,session,sample,researcher,tag",
-    },
-    {}
-  );
+  const project = useProjectModel(id);
 
-  if (id == null || data == null) {
-    return null;
-  }
+  if (id == null) return null;
+  if (project == null) return h(Spinner);
 
-  const project = data;
   return h("div.data-view.project", null, h(ProjectPage, { project, Edit }));
 };
 

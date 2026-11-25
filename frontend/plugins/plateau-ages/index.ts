@@ -9,6 +9,7 @@ import h from "@macrostrat/hyper";
 import { useState, Component } from "react";
 import { Callout, Icon, RangeSlider } from "@blueprintjs/core";
 import { APIResultView } from "@macrostrat/ui-components";
+import { usePostgRESTResult } from "~/api/postgrest";
 import { scaleLinear } from "@vx/scale";
 import {
   Histogram,
@@ -20,7 +21,6 @@ import {
 } from "@data-ui/histogram";
 import md from "./plateau-ages.md";
 import "./main.styl";
-import { useAPIv3Result } from "~/api-v2";
 
 const ResponsiveHistogram = withParentSize(
   ({ parentWidth, parentHeight, ...rest }) =>
@@ -92,7 +92,7 @@ function ChartOuter(props) {
     return `${v} Ga`;
   };
 
-  const data = useAPIv3Result("/datum", params);
+  const data = usePostgRESTResult("/datum", params, { all: true });
 
   if (data == null) {
     return null;

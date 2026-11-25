@@ -33,7 +33,11 @@ function findPlateauAge(data) {
 
 function StepHeatingChartInner(props) {
   const { session_id } = props;
-  const data = useAPIResult("/analysis", { session_id }, null);
+  const data = useAPIResult(
+    "/analysis",
+    { session_id: `eq.${session_id}` },
+    null
+  );
 
   if (data == null) return h(Spinner);
 

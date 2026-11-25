@@ -8,6 +8,9 @@ the public.
 */
 GRANT USAGE ON SCHEMA documents TO view_public, admin;
 GRANT SELECT ON ALL TABLES IN SCHEMA documents TO view_public, admin;
+-- Triggers rewrite search documents when an admin edits records through the API
+GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA documents TO admin;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA documents TO admin;
 
 CREATE OR REPLACE FUNCTION sparrow_api.search(term text)
 RETURNS TABLE (model text, data jsonb)

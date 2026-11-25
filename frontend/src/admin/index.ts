@@ -26,10 +26,6 @@ import styles from "./module.styl";
 
 const h = hyperStyled(styles);
 
-const DataSheetPage = loadable(() => import("./data-sheet"), {
-  fallback: h(Spinner),
-});
-
 const TasksPage = loadable(() => import("./tasks"), {
   fallback: h(Spinner),
 });
@@ -53,7 +49,6 @@ function SecondaryPageLinks(props) {
   const { base = "/admin" } = props;
   return h(Menu, [
     h(SecondaryMenuItem, { to: base + "/tasks" }, "Tasks"),
-    h(SecondaryMenuItem, { to: base + "/data-sheet" }, "Metadata"),
     h(SecondaryMenuItem, { to: base + "/terms/parameter" }, "Terms"),
     h(SecondaryMenuItem, { to: "/map" }, "Map"),
   ]);
@@ -90,7 +85,6 @@ const AdminNavbar = (props) => {
     [
       h(AdminNavbarLinks, { base }),
       h(AppNavbar.Divider),
-      h(NavButton, { to: base + "/data-sheet" }, "Metadata"),
       h(NavButton, { to: "/map" }, "Map"),
       h(
         NavButton,
@@ -153,10 +147,6 @@ const AdminBody = ({ base, ...rest }) => {
 
 const AdminRouter = ({ base }) =>
   h(Switch, [
-    h(Route, {
-      path: base + "/data-sheet",
-      render: () => h(DataSheetPage),
-    }),
     h(Route, {
       path: base + "/tasks",
       render: () => h(TasksPage),

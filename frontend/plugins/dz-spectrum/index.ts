@@ -19,7 +19,7 @@ import {
 } from "./kernel-density";
 
 import "./main.styl";
-import { useAPIv3Result } from "~/api-v2";
+import { usePostgRESTResult } from "~/api/postgrest";
 
 function DZPlotInner(props) {
   const {
@@ -111,11 +111,11 @@ function DZPlotInner(props) {
 function DetritalZirconComponent(props) {
   const { session_id } = props;
 
-  const data = useAPIv3Result("/datum", {
-    unit: "eq.Ma",
-    is_accepted: "eq.true",
-    session_id: `eq.${session_id}`,
-  });
+  const data = usePostgRESTResult(
+    "/datum",
+    { unit: "eq.Ma", is_accepted: "eq.true", session_id: `eq.${session_id}` },
+    { all: true }
+  );
 
   if (data == null) {
     return null;
@@ -153,11 +153,11 @@ function DZSessionData({ id, date, sample }) {
   const name = sample?.name ?? "";
   const height = 50;
   const width = 340;
-  const data = useAPIv3Result("/datum", {
-    unit: "eq.Ma",
-    is_accepted: "eq.true",
-    session_id: `eq.${id}`,
-  });
+  const data = usePostgRESTResult(
+    "/datum",
+    { unit: "eq.Ma", is_accepted: "eq.true", session_id: `eq.${id}` },
+    { all: true }
+  );
 
   let text = name;
   if (data != null) text += " " + `(${data.length} ages)`;

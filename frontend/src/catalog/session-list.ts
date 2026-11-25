@@ -1,7 +1,12 @@
 import h from "@macrostrat/hyper";
 import { Callout } from "@blueprintjs/core";
 import { SessionInfoLink } from "~/model-views/session/info-card";
+import { normalizeSession } from "~/api/models";
 import { PostgRESTFilterList } from "../components/filter-list";
+
+function SessionListItem(props) {
+  return h(SessionInfoLink, normalizeSession(props));
+}
 
 const SessionListComponent = function () {
   const route = "/session";
@@ -11,7 +16,7 @@ const SessionListComponent = function () {
     target: "Material",
     instrument_name: "Instrument",
     technique: "Technique",
-    measurement_group_id: "Group",
+    name: "Session name",
   };
 
   return h("div.data-view#session-list", [
@@ -26,7 +31,8 @@ const SessionListComponent = function () {
     h(PostgRESTFilterList, {
       route,
       filterFields,
-      itemComponent: SessionInfoLink,
+      itemComponent: SessionListItem,
+      params: { order: "date.desc" },
     }),
   ]);
 };

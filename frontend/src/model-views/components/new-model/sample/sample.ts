@@ -7,6 +7,7 @@ import { FormSlider } from "../utils";
 import { ModelEditableText } from "../utils";
 import { ProjectFormContext } from "../../../project/new-project";
 import { useAPIv2Result } from "~/api-v2";
+import { usePostgRESTResult } from "~/api/postgrest";
 import { MySuggest } from "../../../../components/blueprint.select";
 import { FormGroup, Button, Icon, Tooltip } from "@blueprintjs/core";
 import { HelpButton, MySwitch } from "~/components";
@@ -213,11 +214,7 @@ export const SampleElevation = (props) => {
   ]);
 };
 
-const unwrapMaterialDataSp = (obj) => {
-  const { data } = obj;
-  const materials = data.map((ele) => ele.id);
-  return materials;
-};
+const unwrapMaterialDataSp = (data) => data.map((ele) => ele.id);
 const unwrapMacroMaterials = (obj) => {
   const { success } = obj;
   const materials = success.data.map((ele) => ele.name);
@@ -231,12 +228,10 @@ export const SampleMaterial = (props) => {
   const { sample, changeMaterial } = props;
   const { material } = sample;
   const [query, setQuery] = useState("");
-  const initMaterials = useAPIv2Result(
-    "/vocabulary/material",
-    {
-      like: query,
-    },
-    { unwrapResponse: unwrapMaterialDataSp }
+  const initMaterials = usePostgRESTResult(
+    "/material",
+    { id: query == "" ? null : `ilike.*${query}*`, select: "id", order: "id" },
+    { unwrap: unwrapMaterialDataSp, all: true }
   );
   const macrostratMat = useAPIv2Result(
     "https://macrostrat.org/api/v2/defs/lithologies",

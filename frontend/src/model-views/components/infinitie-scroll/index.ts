@@ -9,7 +9,11 @@ import {
   ResearcherModelCard,
 } from "~/model-views";
 import { InfiniteAPIView } from "~/components/infinite-scroll";
-import { APIV2Context, APIV3Context } from "~/api-v2";
+import {
+  normalizeProject,
+  normalizeSample,
+  normalizeSession,
+} from "~/api/models";
 //@ts-ignore
 import styles from "./main.styl";
 
@@ -35,10 +39,11 @@ const ProjectListComponent = ({ params, componentProps = {} }) => {
     h(
       InfiniteAPIView,
       {
-        url: "/models/project",
-        params: {},
+        url: "/project",
+        model: "project",
+        params: { order: "id.desc" },
         filterParams: { ...params },
-        context: APIV2Context,
+        normalize: normalizeProject,
       },
       [h(ProjectListChildren, { data: [], componentProps })]
     ),
@@ -60,10 +65,11 @@ function SampleListComponent({ params, componentProps = {} }) {
     h(
       InfiniteAPIView,
       {
-        url: "/models/sample",
-        params: { nest: "session" },
+        url: "/sample",
+        model: "sample",
+        params: { order: "id.desc" },
         filterParams: { ...params },
-        context: APIV2Context,
+        normalize: normalizeSample,
       },
       [h(SampleListChildren, { data: [], componentProps })]
     ),
@@ -83,10 +89,11 @@ function SessionListComponent({ params, componentProps = {} }) {
     h(
       InfiniteAPIView,
       {
-        url: "/models/session",
-        params: { nest: "instrument,sample" },
+        url: "/session",
+        model: "session",
+        params: { order: "date.desc,id" },
         filterParams: { ...params },
-        context: APIV2Context,
+        normalize: normalizeSession,
       },
       [h(SessionListChildren, { data: [], componentProps })]
     ),
@@ -94,7 +101,7 @@ function SessionListComponent({ params, componentProps = {} }) {
 }
 
 function unwrapDataFileCardData(data) {
-  const { basename, file_hash, type, file_mtime: date } = data;
+  const { basename, file_hash, type_id: type, file_mtime: date } = data;
   return { basename, file_hash, type, date };
 }
 
@@ -108,18 +115,14 @@ function DataFileListChildren({ data }) {
 }
 
 function DataFilesListComponent({ params }) {
-  if ("search" in params) {
-    params["like"] = params["search"];
-    delete params["search"];
-  }
   return h("div", { style: { padding: "1px" } }, [
     h(
       InfiniteAPIView,
       {
-        url: "/data_file/list",
-        params: {},
+        url: "/data_file",
+        model: "data_file",
+        params: { order: "file_mtime.desc.nullslast" },
         filterParams: { ...params },
-        context: APIV2Context,
       },
       [h(DataFileListChildren)]
     ),
@@ -139,10 +142,10 @@ function PublicationAddList({ params, componentProps }) {
     h(
       InfiniteAPIView,
       {
-        url: "/models/publication",
-        params: {},
+        url: "/publication",
+        model: "publication",
+        params: { order: "id.desc" },
         filterParams: { ...params },
-        context: APIV2Context,
       },
       [h(PublicationAddListChildren, { data: [], componentProps })]
     ),
@@ -162,10 +165,10 @@ function ResearcherAddList({ params, componentProps }) {
     h(
       InfiniteAPIView,
       {
-        url: "/models/researcher",
-        params: {},
+        url: "/researcher",
+        model: "researcher",
+        params: { order: "name" },
         filterParams: { ...params },
-        context: APIV2Context,
       },
       [h(ResearcherAddListChildren, { data: [], componentProps })]
     ),

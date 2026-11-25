@@ -1,27 +1,20 @@
 import h, { C, compose } from "@macrostrat/hyper";
 import { useEffect } from "react";
-import join from "url-join";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import loadable from "@loadable/component";
 import siteContent from "site-content";
 import { FrameProvider } from "./frame";
 import { Intent } from "@blueprintjs/core";
 import { DarkModeManager, PageRoute, NoMatchPage } from "~/util";
-import { APIProvider } from "@macrostrat/ui-components";
 import { APIExplorer } from "./api-explorer";
 import { AuthProvider } from "./auth";
+import { PostgRESTProvider } from "./api/postgrest";
 import { AppToaster } from "./toaster";
 import { AdminRoute } from "./admin";
-import SchemaExplorerMainPanel from "./schema-explorer";
 import { PageStyle } from "~/components/page-skeleton";
 import HomePage from "./homepage";
 import Catalog from "./catalog";
 import { Frame } from "./frame";
-
-const APIExplorerV2 = loadable(async function () {
-  const module = await import("./api-v2");
-  return module.APIExplorerV2;
-});
 
 const MapPage = loadable(async function () {
   const module = await import("./map");
@@ -59,15 +52,6 @@ function AppRouter(props) {
       }),
       h(AdminRoute, { path: "/admin" }),
       h(PageRoute, { path: "/api-explorer", component: APIExplorer }),
-      h(PageRoute, {
-        path: "/api-explorer/v2",
-        component: APIExplorerV2,
-        exact: true,
-      }),
-      h(PageRoute, {
-        path: "/import-schema-explorer",
-        component: SchemaExplorerMainPanel,
-      }),
       h(Frame, { id: "extraPages", default: null }, null),
       h(PageRoute, { path: "*", component: NoMatchPage }),
     ])
@@ -85,13 +69,12 @@ const errorHandler = function (route, response) {
 };
 
 const baseURL = process.env.BASE_URL ?? "/";
-const apiBaseURL = join(process.env.API_BASE_URL ?? "/", "/api/v1");
 
 // Nest application in React context providers
 const CoreAppComponent = compose(
   C(FrameProvider, { overrides: siteContent }),
-  C(APIProvider, { baseURL: apiBaseURL, onError: errorHandler }),
   AuthProvider,
+  C(PostgRESTProvider, { onError: errorHandler }),
   DarkModeManager,
   C(AppRouter, { baseURL })
 );

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Icon, InputGroup, Button } from "@blueprintjs/core";
 import { hyperStyled } from "@macrostrat/hyper";
-import { useAPIv2Result } from "~/api-v2";
+import { usePostgRESTResult } from "~/api/postgrest";
+import { normalizeSample, normalizeSession } from "~/api/models";
 import {
   ProjectModelCard,
   SessionListModelCard,
@@ -25,9 +26,9 @@ const OpenSearchCard = (props: OpenSearchCardProps) => {
     data.map((dat, i) => {
       const { model, data } = dat;
       return h(React.Fragment, [
-        h.if(model == "sample")(SampleModelCard, { ...data }),
+        h.if(model == "sample")(SampleModelCard, normalizeSample(data)),
         h.if(model == "project")(ProjectModelCard, { ...data }),
-        h.if(model == "session")(SessionListModelCard, { ...data }),
+        h.if(model == "session")(SessionListModelCard, normalizeSession(data)),
       ]);
     }),
   ]);
@@ -60,28 +61,13 @@ function OpenSearchInput(props: OpenSearchInputProps) {
  */
 function OpenSearch() {
   const [query, setQuery] = useState("");
-  const [scrollData, setScrollData] = useState<any>([]);
-  const url = "search/query";
+  const term = query.trim();
 
-  const data = useAPIv2Result(url, { query: query, model: "all" });
-
-  useEffect(() => {
-    if (data) {
-      setScrollData([]);
-      setScrollData(data);
-    } else if (query.length == 0) {
-      setScrollData([]);
-    }
-    return () => {
-      setScrollData([]);
-    };
-  }, [query, data]);
-
-  useEffect(() => {
-    setScrollData([]);
-  }, [query]);
-
-  if (!data) return null;
+  // Very short terms match nearly everything as prefixes
+  const data = usePostgRESTResult(term.length >= 2 ? "/rpc/search" : null, {
+    term,
+  });
+  const scrollData = term.length >= 2 ? data ?? [] : [];
 
   const onChange = (value) => {
     setQuery(value);
@@ -98,6 +84,8 @@ function OpenSearch() {
       h.if(scrollData.length > 0)(
         ForeverScroll,
         {
+          // Remount per term so the scroller drops the previous results
+          key: term,
           initialData: scrollData,
           fetch: () => {},
         },

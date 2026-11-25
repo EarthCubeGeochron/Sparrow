@@ -32,6 +32,7 @@ Projects can be imported into Sparrow or defined using the managment interface.`
         description: "Description",
       },
       itemComponent: ProjectInfoLink,
+      params: { order: "name" },
     }),
   ]);
 };

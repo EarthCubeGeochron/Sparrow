@@ -18,7 +18,11 @@ import ReactJSON from "react-json-view";
 
 function MountMapChartInner(props) {
   const { session_id } = props;
-  const data = useAPIResult("/analysis", { session_id }, null);
+  const data = useAPIResult(
+    "/analysis",
+    { session_id: `eq.${session_id}` },
+    null
+  );
   if (data == null) return h(Spinner);
   const analysis_data = data.map((d) => {
     const stage_X = d.data.find((d) => d.parameter == "X");

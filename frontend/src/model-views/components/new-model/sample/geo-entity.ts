@@ -22,12 +22,6 @@ const unwrapMacroStratNames = (obj) => {
   return StratNames.slice(0, 20);
 };
 
-const unwrapSparrowGeoEntites = (obj) => {
-  const { data } = obj;
-  const entities = data.map((ele) => ele.name);
-  return entities;
-};
-
 export const SampleGeoEntity = (props) => {
   const { geoEntity, changeGeoEntity, initialQuery } = props;
   const [query, setQuery] = useState("");
@@ -51,23 +45,15 @@ export const SampleGeoEntity = (props) => {
     { unwrapResponse: unwrapMacroStratNames }
   );
 
-  const sparrowEntities = useAPIv2Result(
-    "/models/geo_entity",
-    {
-      like: query,
-      per_page: 20,
-    },
-    { unwrapResponse: unwrapSparrowGeoEntites }
-  );
+  // TODO: suggest the lab's own geologic entities once the API exposes geo_entity
+  const sparrowEntities = [];
 
   useEffect(() => {
     if (macroStratNames) {
-      if (sparrowEntities) {
-        const entityNames = new Set([...macroStratNames, ...sparrowEntities]);
-        setEntities([...entityNames]);
-      }
+      const entityNames = new Set([...macroStratNames, ...sparrowEntities]);
+      setEntities([...entityNames]);
     }
-  }, [macroStratNames, sparrowEntities]);
+  }, [macroStratNames]);
 
   return h(
     FormGroup,
@@ -85,22 +71,11 @@ export const SampleGeoEntity = (props) => {
   );
 };
 
-const unwrapEntityTypes = (obj) => {
-  const { data } = obj;
-  const types = data.map((entity) => entity.id);
-  return types;
-};
-
 export function EntityType(props) {
   const { onEntityTypeChange } = props;
 
-  const entity_names = useAPIv2Result(
-    "/vocabulary/entity_type",
-    {
-      all: "true",
-    },
-    { unwrapResponse: unwrapEntityTypes }
-  );
+  // TODO: the API has no entity_type vocabulary view yet
+  const entity_names = null;
 
   console.log(entity_names);
   const onChange = (entity) => {
@@ -137,11 +112,8 @@ export function GeoSpatialRef(props) {
     changeUnit("meters");
   };
 
-  const refs = useAPIv2Result(
-    "/vocabulary/entity_reference",
-    { all: "true" },
-    { unwrapResponse: unwrapEntityTypes }
-  );
+  // TODO: the API has no entity_reference vocabulary view yet
+  const refs = null;
 
   let references = [];
   if (refs) {

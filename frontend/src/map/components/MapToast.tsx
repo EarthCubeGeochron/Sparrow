@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useContext } from "react";
+import { useState } from "react";
 import {
   Button,
   Card,
@@ -10,20 +10,17 @@ import {
   FormGroup,
   InputGroup,
 } from "@blueprintjs/core";
-import { useAPIResult, APIHelpers } from "@macrostrat/ui-components";
-import { useAPIv2Result, APIV2Context } from "~/api-v2";
+import { useAPIResult } from "@macrostrat/ui-components";
+import { usePostgRESTActions, usePostgRESTResult } from "~/api/postgrest";
 import { useToggle, MySuggest } from "~/components";
 import { GeoContext } from "~/model-views/components";
 import { mapStyle } from "./macrostrat-map-style";
-import axios from "axios";
 
-const unwrapSamples = (obj) => {
-  const { data } = obj;
-  const names = data.map((sample) => {
-    const { name, id, sample_geo_entity } = sample;
-    return { name, id, sample_geo_entity };
+const unwrapSamples = (data) => {
+  return data.map((sample) => {
+    const { name, id } = sample;
+    return { name, id, sample_geo_entity: [] };
   });
-  return names;
 };
 //needs more complex state management
 function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
@@ -33,12 +30,12 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
     id: null,
     sample_geo_entity: [],
   });
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
+  const { update } = usePostgRESTActions();
 
-  const samples = useAPIv2Result(
-    "/models/sample",
-    { all: "true", not_has: "location" },
-    { unwrapResponse: unwrapSamples }
+  const samples = usePostgRESTResult(
+    "/sample",
+    { location: "is.null", select: "id,name", order: "name" },
+    { unwrap: unwrapSamples, all: true }
   );
 
   const onChange = (sampleName) => {
@@ -73,10 +70,7 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
   };
 
   const onSubmit = async () => {
-    let url = buildURL(`/models/sample/${sampleState.id}`);
-    console.log(url);
     const updatedSample = {
-      ...sampleState,
       location: {
         type: "Point",
         coordinates: [
@@ -85,8 +79,7 @@ function AddSampleAtLocal({ lng, lat, data, open, toggleOpen }) {
         ],
       },
     };
-    console.log(updatedSample);
-    const response = await axios.put(url, updatedSample);
+    await update("/sample", { id: `eq.${sampleState.id}` }, updatedSample);
     toggleOpen();
   };
 

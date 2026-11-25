@@ -1,13 +1,7 @@
 import { useContext } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import {
-  ModelEditor,
-  useModelEditor,
-  APIHelpers,
-} from "@macrostrat/ui-components";
-import { useAPIv2Result, APIV2Context } from "~/api-v2";
-import { useAuth } from "~/auth";
-import { put } from "axios";
+import { ModelEditor, useModelEditor } from "@macrostrat/ui-components";
+import { useSessionModel } from "~/api/models";
 import { useModelURL, useEditingAllowed } from "~/util/router";
 import { Spinner } from "@blueprintjs/core";
 import {
@@ -168,26 +162,6 @@ function SessionPublication(props) {
   });
 }
 
-async function TagsChangeSet(changeset, updatedModel, url) {
-  /**
-   * tag_ids = data['tag_ids']
-        for tag_id in tag_ids:
-            params = {"jointable":f"tags.{model}_tag", "model_id_column":f"{model}_id",\
-            "model_id": data['model_d'], "tag_id":tag_id}
-   */
-  if (changeset.tags_tag) {
-    let { id } = updatedModel;
-    const model_id = id;
-    const tags = changeset.tags_tag;
-    const tag_ids = tags.map((tag) => tag.id);
-    const body = { model_id: model_id, tag_ids: tag_ids };
-    const res = await put(url, body);
-    const { data } = res;
-    return data;
-  }
-  return "no tags";
-}
-
 function EditableSessionInfoComponent(props) {
   const { model, isEditing, actions } = useModelEditor();
   const { setListName, changeFunction } = useContext(SessionAdminContext);
@@ -264,37 +238,17 @@ export function EditableSessionDetails(props) {
   const { id } = props;
 
   const Edit = useEditingAllowed();
-  const res = useAPIv2Result(`/models/session/${id}`, {
-    nest: "sample,instrument,project,tag,publication",
-  });
-  const { login } = useAuth();
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
+  const session = useSessionModel(id);
 
-  if (res == null) return h(Spinner);
+  if (session == null) return h(Spinner);
 
+  // TODO: enable editing once the API's session view is updatable (it joins
+  // several tables, so PostgreSQL refuses writes through it)
   return h(
     ModelEditor,
     {
-      model: res.data,
-      canEdit: login || Edit,
-      persistChanges: async (updatedModel, changeset) => {
-        console.log(updatedModel);
-        console.log(changeset);
-        TagsChangeSet(
-          changeset,
-          updatedModel,
-          buildURL("/tags/models/session", {})
-        );
-        let rest;
-        let { id } = updatedModel;
-        const response = await put(
-          buildURL(`/models/session/${id}`, {}),
-          changeset
-        );
-        const { data } = response;
-        ({ id, ...rest } = data);
-        return rest;
-      },
+      model: session,
+      canEdit: false,
     },
     [
       h("div", [

@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useReducer } from "react";
 import { hyperStyled } from "@macrostrat/hyper";
-import { APIHelpers } from "@macrostrat/ui-components";
-import Ax from "axios";
-import { APIV2Context } from "~/api-v2";
+import { usePostgRESTActions } from "~/api/postgrest";
+import { editableFields } from "~/api/editing";
 import {
   NewSampleMap,
   SampleLocation,
@@ -202,19 +201,18 @@ const initialState: sampleFormState = {
 
 export function NewSamplePage() {
   const [sample, dispatch] = useReducer(sampleReducer, initialState);
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
+  const { insert } = usePostgRESTActions();
 
   const onSubmit = async () => {
-    const route = buildURL("/models/sample");
-    const samplePost = { ...sample };
-    delete samplePost.changeFunction;
-    if (!samplePost.location.coordinates[0]) {
-      samplePost.location = null;
+    // TODO: link projects, sessions and geologic context once the API can write those links
+    const samplePost = {};
+    for (const k of editableFields.sample) {
+      if (sample[k] != null) samplePost[k] = sample[k];
     }
-    const response = await Ax.post(route, samplePost).then((response) => {
-      return response;
-    });
-    const { id } = response.data.data;
+    if (!sample.location?.coordinates[0]) {
+      delete samplePost["location"];
+    }
+    const [{ id }] = await insert("/sample", samplePost);
     const goToRoute = process.env.BASE_URL + `admin/sample/${id}`;
     window.location.assign(goToRoute);
   };

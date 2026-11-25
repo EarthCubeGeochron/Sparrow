@@ -43,7 +43,8 @@ const SampleList = function () {
   const filterFields = {
     name: "Sample name",
     material: "Material",
-    project_name: "Project",
+    igsn: "IGSN",
+    location_name: "Location",
   };
 
   return h("div.data-view.sample-list", [
@@ -60,6 +61,7 @@ const SampleList = function () {
       route,
       filterFields,
       itemComponent: SampleListCard,
+      params: { order: "name" },
     }),
   ]);
 };

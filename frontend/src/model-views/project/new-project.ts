@@ -1,7 +1,6 @@
 import { hyperStyled } from "@macrostrat/hyper";
 import { useReducer, useState, createContext, useContext } from "react";
 import { AdminPage } from "~/admin/AdminPage";
-import { APIHelpers } from "@macrostrat/ui-components";
 import {
   ModelEditableText,
   SampleAdd,
@@ -15,8 +14,7 @@ import {
 } from "../components";
 import { ProjectAdminContext } from "~/admin/project";
 import { MinimalNavbar } from "~/components";
-import { APIV2Context } from "../../api-v2";
-import axios from "axios";
+import { usePostgRESTActions } from "~/api/postgrest";
 //@ts-ignore
 import styles from "./project-form.styl";
 
@@ -120,25 +118,17 @@ const projectReducer = (state, action) => {
 export function NewProjectFormMain() {
   const { project, dispatch } = useContext(ProjectFormContext);
   console.log(project);
-  const { buildURL } = APIHelpers(useContext(APIV2Context));
+  const { insert } = usePostgRESTActions();
 
   async function postData() {
-    const route = buildURL("/models/project", {});
-
+    // TODO: save samples, publications and researchers once the API exposes the project link tables
     const projectPost = {
       name: project.name,
       description: project.description,
-      sample: project.sample_collection,
-      publication: project.publication_collection,
-      researcher: project.researcher_collection,
+      embargo_date: project.embargo_date,
     };
 
-    const response = await axios.post(route, projectPost).then((response) => {
-      return response;
-    });
-    const { data } = response;
-    console.log(data);
-    const { id } = data.data;
+    const [{ id }] = await insert("/project", projectPost);
     const goToRoute = process.env.BASE_URL + `admin/project/${id}`;
     window.location.assign(goToRoute);
   }

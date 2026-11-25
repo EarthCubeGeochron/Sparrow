@@ -17,7 +17,8 @@ pointer-events: all;\
 function MarkerOverlay() {
   const route = "/sample";
   const params = {
-    geometry: "%",
+    location: "not.is.null",
+    select: "id,name,material,location",
   };
   return h(APIResultView, { route, params }, (data) => {
     if (data == null) {
@@ -27,8 +28,8 @@ function MarkerOverlay() {
       return null;
     }
     const markers = data.map(function (d) {
-      const { geometry, ...rest } = d;
-      const { coordinates } = JSON.parse(d.geometry);
+      const { location, ...rest } = d;
+      const { coordinates } = location;
       return { coordinates, ...rest };
     });
 

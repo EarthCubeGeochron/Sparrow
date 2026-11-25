@@ -8,6 +8,8 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useCallback, useContext, useState } from "react";
 import { apiBaseURL } from "./env";
 
+/** Application services: auth, users, record import, tasks and sockets.
+ * Data is read from PostgREST instead (see `~/api/postgrest`). */
 export const APIV2Context = createAPIContext({
   baseURL: join(apiBaseURL, "/api/v2"),
 });
@@ -17,22 +19,7 @@ export function useAPIv2Result(
   params = {},
   opts: Partial<APIOptions> = {}
 ) {
-  /** Temporary shim to convert V1 API to V2 */
   opts.context = APIV2Context;
-  return useAPIResult(route, params, opts);
-}
-
-export const APIV3Context = createAPIContext({
-  baseURL: join(apiBaseURL, "/api/v3"),
-});
-
-export function useAPIv3Result(
-  route,
-  params = {},
-  opts: Partial<APIOptions> = {}
-) {
-  /** Temporary shim to convert V1 API to V2 */
-  opts.context = APIV3Context;
   return useAPIResult(route, params, opts);
 }
 

@@ -23,7 +23,8 @@ interface FilterListProps {
 }
 
 export function SampleFilterList({ onClick, link = false }: FilterListProps) {
-  const possibleFilters = ["public", "geometry", "date_range"]; //needs to work with "doi_like"
+  // Spatial filters need an API function; PostgREST has no geometry operators
+  const possibleFilters = ["public"];
 
   return h(
     AdminFilter,
@@ -50,7 +51,7 @@ export function PublicationFilterList({
   onClick,
   link = false,
 }: FilterListProps) {
-  const possibleFilters = ["date_range", "doi_like"];
+  const possibleFilters = ["doi_like"];
 
   return h(
     AdminFilter,
@@ -101,7 +102,7 @@ export function ResearcherFilterList({
 }
 
 export function ProjectFilterList({ onClick, link = false }: FilterListProps) {
-  const possibleFilters = ["public", "geometry", "doi_like", "date_range"];
+  const possibleFilters = ["public"];
 
   return h(
     AdminFilter,
@@ -122,7 +123,7 @@ export function ProjectFilterList({ onClick, link = false }: FilterListProps) {
 }
 
 export function SessionFilterList({ onClick, link = false }: FilterListProps) {
-  const possibleFilters = ["public", "date_range", "geometry"];
+  const possibleFilters = ["public", "date_range"];
 
   return h(
     AdminFilter,
