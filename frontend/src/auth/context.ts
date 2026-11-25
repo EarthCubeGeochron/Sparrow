@@ -11,6 +11,13 @@ type LoginStatus = {
   login: boolean;
   error: Error | null;
   token: string | null;
+  orcid?: OrcidSignIn | null;
+};
+
+/** Whether the lab offers ORCID sign-in, from /auth/status */
+type OrcidSignIn = {
+  enabled: boolean;
+  mode: "direct" | "broker" | null;
 };
 
 type UpdateStatus = {
@@ -58,12 +65,12 @@ function useAuthActions(dispatch) {
         // only refresh tokens when access is proactively
         // granted by the application.
         try {
-          const { login, username } = await get("/auth/status");
+          const { login, username, orcid = null } = await get("/auth/status");
           const token = login ? await findToken(post) : null;
           storeToken(token);
           return dispatch({
             type: "update-status",
-            payload: { login, username, token, error: null },
+            payload: { login, username, token, orcid, error: null },
           });
         } catch (error) {
           return dispatch({ type: "update-status", payload: { error } });
@@ -107,6 +114,7 @@ interface AuthState {
   username: string | null;
   /** JWT sent to PostgREST; null reads data as the public */
   token: string | null;
+  orcid: OrcidSignIn | null;
   isLoggingIn: boolean;
   invalidAttempt: boolean;
   error: Error | null;
@@ -120,6 +128,7 @@ const authDefaultState: AuthState = {
   login: false,
   username: null,
   token: readStoredToken(),
+  orcid: null,
   isLoggingIn: false,
   invalidAttempt: false,
   error: null,
@@ -140,6 +149,7 @@ function authReducer(state = authDefaultState, action: AuthAction) {
     }
     case "auth-form-success": {
       return {
+        orcid: state.orcid,
         ...action.payload,
         isLoggingIn: false,
         invalidAttempt: false,

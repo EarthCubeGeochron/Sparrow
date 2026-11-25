@@ -10,9 +10,9 @@ import { apiBaseURL } from "./env";
 
 /** Application services: auth, users, record import, tasks and sockets.
  * Data is read from PostgREST instead (see `~/api/postgrest`). */
-export const APIV2Context = createAPIContext({
-  baseURL: join(apiBaseURL, "/api/v2"),
-});
+export const apiV2BaseURL = join(apiBaseURL, "/api/v2");
+
+export const APIV2Context = createAPIContext({ baseURL: apiV2BaseURL });
 
 export function useAPIv2Result(
   route,
