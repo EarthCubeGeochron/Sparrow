@@ -435,8 +435,17 @@ class TestBrokerSignIn:
     def test_assertion_is_single_use(self, broker):
         token = assertion("some-state")
         source = broker.source
-        claims = asyncio.run(source.verify(token, "some-state"))
+        claims = run(source.verify(token, "some-state"))
         assert claims["sub"] == LINKED
         with raises(Exception) as err:
-            asyncio.run(source.verify(token, "some-state"))
+            run(source.verify(token, "some-state"))
         assert err.value.status_code == 400
+
+
+def run(coroutine):
+    # Unlike asyncio.run, leaves the thread's event loop alone for later tests
+    loop = asyncio.new_event_loop()
+    try:
+        return loop.run_until_complete(coroutine)
+    finally:
+        loop.close()

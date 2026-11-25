@@ -254,6 +254,15 @@ def test_lab_accepts_the_brokers_assertion(settings):
         BROKER, lab, transport=httpx2.ASGITransport(app=broker_app)
     )
     params = {"assertion": query["assertion"][0]}
-    identity = asyncio.run(source.identify(params, "lab-state"))
+    identity = run(source.identify(params, "lab-state"))
     assert identity.sub == ORCID_ID
     assert identity.name == "Josiah Carberry"
+
+
+def run(coroutine):
+    # Unlike asyncio.run, leaves the thread's event loop alone for later tests
+    loop = asyncio.new_event_loop()
+    try:
+        return loop.run_until_complete(coroutine)
+    finally:
+        loop.close()
