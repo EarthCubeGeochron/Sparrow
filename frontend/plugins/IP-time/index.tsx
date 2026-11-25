@@ -54,7 +54,11 @@ const parseTime = timeParse("%Y%B%dT%H:%M:%S");
 
 function IPtimeChartInner(props) {
   const { session_id } = props;
-  const data = useAPIResult("/analysis", { session_id }, null);
+  const data = useAPIResult(
+    "/analysis",
+    { session_id: `eq.${session_id}` },
+    null
+  );
   //console.log(data);
   if (data == null) return h(Spinner);
   const analysisData = data.map((d) => {

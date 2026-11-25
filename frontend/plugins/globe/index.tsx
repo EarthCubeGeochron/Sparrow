@@ -9,7 +9,7 @@ import {
   Markers,
 } from "react-simple-maps";
 import worldMap from "./assets/land-110m.json";
-import { useAPIv2Result } from "~/api-v2";
+import { usePostgRESTResult } from "~/api/postgrest";
 import { Colors } from "@blueprintjs/core";
 import { useHistory } from "react-router-dom";
 
@@ -106,18 +106,15 @@ function MapComponent(props) {
 }
 
 function getMarkers() {
-  const data = useAPIv2Result(
-    "/map-samples",
-    {},
+  const data = usePostgRESTResult(
+    "/sample",
+    { location: "not.is.null", select: "id,name,location" },
     {
-      unwrapResponse: (data) => {
-        const markers = data.data.map((d) => {
-          const { id, name, location } = d;
-          const { coordinates } = location;
-          return { id, name, coordinates };
-        });
-        return markers;
-      },
+      all: true,
+      unwrap: (data) =>
+        data.map(({ id, name, location }) => {
+          return { id, name, coordinates: location.coordinates };
+        }),
     }
   );
   if (!data) {

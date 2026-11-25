@@ -2,10 +2,16 @@ import h from "@macrostrat/hyper";
 import { useAPIActions } from "@macrostrat/ui-components";
 import { APIV2Context } from "~/api-v2";
 import { createContext, useContext, useEffect, useReducer } from "react";
+import { readStoredToken, storeToken, tokenFromCookie } from "./token";
 
 type RequestForm = { type: "request-form"; enabled?: boolean };
 type Credentials = { username: string; password: string };
-type LoginStatus = { username: string; login: boolean; error: Error | null };
+type LoginStatus = {
+  username: string;
+  login: boolean;
+  error: Error | null;
+  token: string | null;
+};
 
 type UpdateStatus = {
   type: "update-status";
@@ -26,6 +32,19 @@ type Logout = { type: "logout" };
 
 type AsyncAuthAction = GetStatus | Login | Logout;
 
+async function findToken(post): Promise<string | null> {
+  /** A token for PostgREST, for a user who signed in before this page loaded */
+  const token = readStoredToken() ?? tokenFromCookie();
+  if (token != null) return token;
+  try {
+    // Refreshing re-issues the access cookie with the role claim PostgREST needs
+    await post("/auth/refresh", {}, { handleError: false });
+  } catch {
+    return null;
+  }
+  return tokenFromCookie();
+}
+
 function useAuthActions(dispatch) {
   const { get, post } = useAPIActions(APIV2Context);
   return async (action: AuthAction | AsyncAuthAction) => {
@@ -40,9 +59,11 @@ function useAuthActions(dispatch) {
         // granted by the application.
         try {
           const { login, username } = await get("/auth/status");
+          const token = login ? await findToken(post) : null;
+          storeToken(token);
           return dispatch({
             type: "update-status",
-            payload: { login, username, error: null },
+            payload: { login, username, token, error: null },
           });
         } catch (error) {
           return dispatch({ type: "update-status", payload: { error } });
@@ -50,24 +71,27 @@ function useAuthActions(dispatch) {
       case "login":
         try {
           const res = await post("/auth/login", action.payload);
-          const { login, username } = res;
+          const { login, username, token = null } = res;
+          storeToken(token);
           return dispatch({
             type: "auth-form-success",
-            payload: { username, login, error: null },
+            payload: { username, login, token, error: null },
           });
         } catch (error) {
           return dispatch({
             type: "auth-form-failure",
-            payload: { login: false, username: null, error },
+            payload: { login: false, username: null, token: null, error },
           });
         }
       case "logout": {
         const { login } = await post("/auth/logout", {});
+        storeToken(null);
         return dispatch({
           type: "auth-form-success",
           payload: {
             login,
             username: null,
+            token: null,
             error: null,
           },
         });
@@ -81,6 +105,8 @@ function useAuthActions(dispatch) {
 interface AuthState {
   login: boolean;
   username: string | null;
+  /** JWT sent to PostgREST; null reads data as the public */
+  token: string | null;
   isLoggingIn: boolean;
   invalidAttempt: boolean;
   error: Error | null;
@@ -93,6 +119,7 @@ interface AuthCtx extends AuthState {
 const authDefaultState: AuthState = {
   login: false,
   username: null,
+  token: readStoredToken(),
   isLoggingIn: false,
   invalidAttempt: false,
   error: null,

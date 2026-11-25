@@ -7,8 +7,7 @@
 import hyper from "@macrostrat/hyper";
 import styles from "./module.styl";
 import { Card, Breadcrumbs } from "@blueprintjs/core";
-import { useAPIResult } from "@macrostrat/ui-components";
-import { useAPIv3Result } from "~/api-v2";
+import { usePostgRESTResult } from "~/api/postgrest";
 import ReactJson from "react-json-view";
 import { format } from "d3-format";
 import { group } from "d3-array";
@@ -120,9 +119,11 @@ const SessionDetails = function (props) {
 
 function SessionDetailPanel(props) {
   const { session_id, ...rest } = props;
-  const data = useAPIv3Result("/analysis", {
-    session_id: `eq.${session_id}`,
-  });
+  const data = usePostgRESTResult(
+    "/analysis",
+    { session_id: `eq.${session_id}`, order: "session_index,analysis_id" },
+    { all: true }
+  );
 
   if (!data) return h("div");
 

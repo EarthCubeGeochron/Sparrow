@@ -4,6 +4,7 @@ import { InputGroup, Menu, Popover, Button, Position } from "@blueprintjs/core";
 import { PagedAPIView } from "@macrostrat/ui-components";
 import update from "immutability-helper";
 import T from "prop-types";
+import { useAuth } from "~/auth/context";
 
 class FilterListComponent extends Component<any, any> {
   static propTypes = {
@@ -27,12 +28,18 @@ class FilterListComponent extends Component<any, any> {
   }
 
   render() {
-    const { route, filterFields, itemComponent, ...rest } = this.props;
+    const {
+      route,
+      filterFields,
+      itemComponent,
+      params: baseParams = {},
+      ...rest
+    } = this.props;
     const { filter, field } = this.state;
-    let params = {};
+    let params = baseParams;
     if (filter != null && filter !== "") {
       const val = `ilike.*${filter}*`;
-      params = { [field]: val };
+      params = { ...baseParams, [field]: val };
     }
 
     const menuItems = [];
@@ -91,10 +98,13 @@ class FilterListComponent extends Component<any, any> {
 }
 
 function PostgRESTFilterList(props) {
+  const { token } = useAuth();
   return h(FilterListComponent, {
+    // Reload when the user signs in or out, which changes what is visible
+    key: token ?? "public",
     getTotalCount: (response) => {
-      console.log(response.headers);
-      return parseInt(response.headers["content-range"].split("/")[1]);
+      const range = response.headers["content-range"] ?? "";
+      return parseInt(range.split("/")[1]);
     },
     opts: {
       headers: {
